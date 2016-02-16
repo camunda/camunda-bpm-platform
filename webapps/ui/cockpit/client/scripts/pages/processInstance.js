@@ -362,6 +362,23 @@ var angular = require('angular'),
       $scope.processDefinition = processDefinition;
     });
 
+    $scope.getDeploymentUrl = function() {
+      var path = '#/repository';
+
+      var deploymentId = $scope.processDefinition.deploymentId;
+      var searches = {
+        deployment: deploymentId,
+        resourceName: $scope.processDefinition.resource,
+        deploymentsQuery: JSON.stringify([{
+          type     : 'id',
+          operator : 'eq',
+          value    : deploymentId
+        }])
+      };
+
+      return routeUtil.redirectTo(path, searches, [ 'deployment', 'resourceName', 'deploymentsQuery' ]);
+    };
+
     processData.provide('superProcessInstanceCount', ['processInstance', function (processInstance) {
       return ProcessInstanceResource.count({ subProcessInstance : processInstance.id }).$promise;
     }]);
@@ -694,6 +711,8 @@ var angular = require('angular'),
 
         processData.set('filter', filterData.filter);
       };
+
+      $scope.sidebarTab = 'info';
   }]);
 
   var RouteConfig = [

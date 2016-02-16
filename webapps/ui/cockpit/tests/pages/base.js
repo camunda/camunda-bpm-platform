@@ -31,5 +31,4 @@ module.exports = Page.extend({
   navbarItemClick: function () {
     return this.navbarItem().element(by.css('a')).click();
   }
-
 });

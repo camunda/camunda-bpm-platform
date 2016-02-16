@@ -610,6 +610,7 @@ var angular = require('angular'),
       $scope.filterChanged();
     };
 
+    $scope.sidebarTab = 'info';
   }];
 
   var RouteConfig = [

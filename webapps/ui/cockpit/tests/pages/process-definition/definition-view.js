@@ -30,6 +30,9 @@ module.exports = Base.extend({
 
   getReportLink: function() {
     return element(by.css('a.report-link'));
-  }
+  },
 
+  sidebarTabClick: function (name) {
+    return element(by.cssContainingText('.ctn-sidebar .nav-tabs a', name)).click();
+  }
 });

@@ -42,6 +42,9 @@ module.exports = Base.extend({
       .then(function(classes) {
         return classes.indexOf('ng-hide') === -1;
       });
-  }
+  },
 
+  sidebarTabClick: function (name) {
+    return element(by.cssContainingText('.ctn-sidebar .nav-tabs a', name)).click();
+  }
 });
