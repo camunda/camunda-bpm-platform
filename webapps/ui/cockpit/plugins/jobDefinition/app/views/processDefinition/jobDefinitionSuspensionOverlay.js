@@ -28,7 +28,8 @@ var template = fs.readFileSync(__dirname + '/job-definition-suspension-overlay.h
     });
 
     $scope.isSuspended = function() {
-      return $scope.jobDefinitionsForElement.filter(function(jobDefinition) {
+      return $scope.jobDefinitionsForElement.filter &&
+             $scope.jobDefinitionsForElement.filter(function(jobDefinition) {
         return jobDefinition.suspended;
       }).length > 0;
     };
