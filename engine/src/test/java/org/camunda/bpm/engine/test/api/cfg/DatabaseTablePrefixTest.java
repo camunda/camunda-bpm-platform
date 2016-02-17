@@ -13,9 +13,9 @@
 
 package org.camunda.bpm.engine.test.api.cfg;
 
-import java.sql.Connection;
+import static org.junit.Assert.*;
 
-import junit.framework.TestCase;
+import java.sql.Connection;
 
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -24,13 +24,15 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.junit.Test;
 
 /**
  * @author Daniel Meyer
  */
-public class DatabaseTablePrefixTest extends TestCase {
+public class DatabaseTablePrefixTest {
 
-  public void testPerformDatabaseSchemaOperationCreate() throws Exception{
+  @Test
+  public void shouldPerformDatabaseSchemaOperationCreate() throws Exception{
 
     // both process engines will be using this datasource.
     PooledDataSource pooledDataSource = new PooledDataSource(ReflectUtil.getClassLoader(),
@@ -53,6 +55,7 @@ public class DatabaseTablePrefixTest extends TestCase {
             .setDataSource(pooledDataSource)
             .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema
     config1.setDatabaseTablePrefix("SCHEMA1.");
+    config1.setUseSharedSqlSessionFactory(true);
     ProcessEngine engine1 = config1.buildProcessEngine();
 
     ProcessEngineConfigurationImpl config2 = createCustomProcessEngineConfiguration()
@@ -60,6 +63,7 @@ public class DatabaseTablePrefixTest extends TestCase {
             .setDataSource(pooledDataSource)
             .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema
     config2.setDatabaseTablePrefix("SCHEMA2.");
+    config2.setUseSharedSqlSessionFactory(true);
     ProcessEngine engine2 = config2.buildProcessEngine();
 
     // create the tables in SCHEMA1
@@ -88,6 +92,7 @@ public class DatabaseTablePrefixTest extends TestCase {
     } finally {
       engine1.close();
       engine2.close();
+      ProcessEngineConfigurationImpl.cachedSqlSessionFactory = null;
     }
   }
 
@@ -97,6 +102,7 @@ public class DatabaseTablePrefixTest extends TestCase {
   // allows to return a process engine configuration which doesn't create a schema when it's build.
   private static class CustomStandaloneInMemProcessEngineConfiguration extends StandaloneInMemProcessEngineConfiguration {
 
+    @Override
     public ProcessEngine buildProcessEngine() {
       init();
       return new NoSchemaProcessEngineImpl(this);
@@ -107,6 +113,7 @@ public class DatabaseTablePrefixTest extends TestCase {
         super(processEngineConfiguration);
       }
 
+      @Override
       protected void executeSchemaOperations() {
         // nop - do not execute create schema operations
       }
