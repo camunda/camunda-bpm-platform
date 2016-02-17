@@ -48,7 +48,7 @@
           return deferred.reject(err);
         }
 
-        deferred.resolve(res.count);
+        deferred.resolve(res);
 
       });
 
