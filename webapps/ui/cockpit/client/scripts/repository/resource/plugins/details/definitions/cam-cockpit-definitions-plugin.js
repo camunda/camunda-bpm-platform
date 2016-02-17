@@ -60,7 +60,8 @@ var template = fs.readFileSync(__dirname + '/cam-cockpit-definitions-plugin.html
           }
 
           definition.instances.$loaded = true;
-          definition.instances.count = result.count;
+          definition.instances.count = result;
+          $scope.$apply();
         });
       }
 
