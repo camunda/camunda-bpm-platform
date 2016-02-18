@@ -12,13 +12,22 @@
  */
 package org.camunda.bpm.application.impl.context;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.concurrent.Callable;
 
+import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.application.impl.embedded.TestApplicationWithoutEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -183,6 +192,24 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
 
   }
 
+  @SuppressWarnings("unchecked")
+  public void testExecuteWithInvocationContext() throws Exception {
+    // given a process application which extends the default one
+    // - using a spy for verify the invocations
+    TestApplicationWithoutEngine processApplication = spy(pa);
+    ProcessApplicationReference processApplicationReference = mock(ProcessApplicationReference.class);
+    when(processApplicationReference.getProcessApplication()).thenReturn(processApplication);
+
+    // when execute with context
+    InvocationContext invocationContext = new InvocationContext(mock(BaseDelegateExecution.class));
+    Context.executeWithinProcessApplication(mock(Callable.class), processApplicationReference, invocationContext);
+
+    // then the execute method should be invoked with context
+    verify(processApplication).execute(any(Callable.class), eq(invocationContext));
+    // and forward to call to the default execute method
+    verify(processApplication).execute(any(Callable.class));
+  }
+
   protected ProcessApplicationReference getCurrentContextApplication() {
     ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
     return engineConfiguration.getCommandExecutorTxRequired().execute(new Command<ProcessApplicationReference>() {
@@ -193,4 +220,5 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
       }
     });
   }
+
 }

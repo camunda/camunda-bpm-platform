@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.impl.context;
 
 import java.util.Stack;
 import java.util.concurrent.Callable;
+
+import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
@@ -170,10 +172,14 @@ public class Context {
   }
 
   /**
-   * @param callback
-   * @param processApplicationReference
+   * Use {@link #executeWithinProcessApplication(Callable, ProcessApplicationReference, InvocationContext)}
+   * instead if an {@link InvocationContext} is available.
    */
   public static <T> T executeWithinProcessApplication(Callable<T> callback, ProcessApplicationReference processApplicationReference) {
+    return executeWithinProcessApplication(callback, processApplicationReference, null);
+  }
+
+  public static <T> T executeWithinProcessApplication(Callable<T> callback, ProcessApplicationReference processApplicationReference, InvocationContext invocationContext) {
     String paName = processApplicationReference.getName();
     try {
       ProcessApplicationInterface processApplication = processApplicationReference.getProcessApplication();
@@ -183,7 +189,7 @@ public class Context {
         // wrap callback
         ProcessApplicationClassloaderInterceptor<T> wrappedCallback = new ProcessApplicationClassloaderInterceptor<T>(callback);
         // execute wrapped callback
-        return processApplication.execute(wrappedCallback);
+        return processApplication.execute(wrappedCallback, invocationContext);
 
       } catch (Exception e) {
 

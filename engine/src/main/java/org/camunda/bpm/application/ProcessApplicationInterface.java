@@ -122,11 +122,22 @@ public interface ProcessApplicationInterface {
   /**
    * The default implementation simply modifies the Context {@link ClassLoader}
    *
-   * @param callable the callable to be executed "within" the context of this process application.
+   * @param callable to be executed "within" the context of this process application.
    * @return the result of the callback
-   * @throws Exception
    */
   public <T> T execute(Callable<T> callable) throws ProcessApplicationExecutionException;
+
+  /**
+   * Is invoked instead of {@link #execute(Callable)} if a context is available.
+   * The default implementation simply forward the call to
+   * {@link #execute(Callable)}. A custom implementation can override the method
+   * to hook into the invocation.
+   *
+   * @param callable to be executed "within" the context of this process application.
+   * @param context of the current invocation, can be <code>null</code>
+   * @return the result of the callback
+   */
+  public <T> T execute(Callable<T> callable, InvocationContext context) throws ProcessApplicationExecutionException;
 
   /**
    * <p>Override this method to provide an environment-specific {@link ClassLoader} to be used by the process
