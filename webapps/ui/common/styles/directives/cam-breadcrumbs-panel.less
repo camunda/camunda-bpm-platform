@@ -7,12 +7,21 @@
   background: @custom-gray-lighter;
 
   > .breadcrumb {
+    margin-bottom: 0;
+    height: @breadcrumb-height;
     font-size: 0.85em;
 
     line-height: @grid-gutter-width;
     background-color: inherit;
     margin: 0 0 20px;
     padding: 0 10px;
+
+    white-space: nowrap;
+    * {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
 
     > li + li:before {
       display: none;
