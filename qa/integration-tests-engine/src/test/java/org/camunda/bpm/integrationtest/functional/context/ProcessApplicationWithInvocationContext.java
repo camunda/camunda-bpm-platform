@@ -19,7 +19,7 @@ import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationExecutionException;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
 
-@ProcessApplication("pa")
+@ProcessApplication("app")
 public class ProcessApplicationWithInvocationContext extends ServletProcessApplication {
 
   private static InvocationContext invocationContext = null;

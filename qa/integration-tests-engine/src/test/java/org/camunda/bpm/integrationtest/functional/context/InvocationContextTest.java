@@ -41,9 +41,9 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class InvocationContextTest extends AbstractFoxPlatformIntegrationTest {
 
-  @Deployment(name = "pa")
+  @Deployment(name = "app")
   public static WebArchive createDeployment() {
-    return ShrinkWrap.create(WebArchive.class, "pa.war")
+    return ShrinkWrap.create(WebArchive.class, "app.war")
         .addAsResource("META-INF/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
         .addClass(TestContainer.class)
@@ -61,7 +61,7 @@ public class InvocationContextTest extends AbstractFoxPlatformIntegrationTest {
   }
 
   @Test
-  @OperateOnDeployment("pa")
+  @OperateOnDeployment("app")
   public void testInvokeProcessApplicationWithContextOnStart() {
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("messageProcess");
@@ -73,7 +73,7 @@ public class InvocationContextTest extends AbstractFoxPlatformIntegrationTest {
   }
 
   @Test
-  @OperateOnDeployment("pa")
+  @OperateOnDeployment("app")
   public void testInvokeProcessApplicationWithContextOnAsyncExecution() {
 
     runtimeService.startProcessInstanceByKey("timerProcess");
@@ -92,7 +92,7 @@ public class InvocationContextTest extends AbstractFoxPlatformIntegrationTest {
   }
 
   @Test
-  @OperateOnDeployment("pa")
+  @OperateOnDeployment("app")
   public void testInvokeProcessApplicationWithContextOnMessageReceived() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("messageProcess");
@@ -110,7 +110,7 @@ public class InvocationContextTest extends AbstractFoxPlatformIntegrationTest {
   }
 
   @Test
-  @OperateOnDeployment("pa")
+  @OperateOnDeployment("app")
   public void testInvokeProcessApplicationWithContextOnSignalTask() {
 
     runtimeService.startProcessInstanceByKey("signalableProcess");
