@@ -117,6 +117,15 @@ module.exports = function(config, copyConf) {
           src: ['*.{eot,svg,ttf,woff,woff2}'],
           dest: '<%= pkg.gruntConfig.adminBuildTarget %>/fonts/'
         },
+        // bpmn fonts
+        {
+          expand: true,
+          cwd: '<%= pkg.gruntConfig.commonsUiDir %>/node_modules/bpmn-font/dist/font',
+          src: [
+            '*.{eot,ttf,svg,woff}'
+          ],
+          dest: '<%= pkg.gruntConfig.adminBuildTarget %>/fonts/'
+        },
 
         // placeholder shims
         {
