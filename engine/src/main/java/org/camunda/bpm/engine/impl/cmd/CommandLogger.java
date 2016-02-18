@@ -145,14 +145,24 @@ public class CommandLogger extends ProcessEngineLogger {
         + "This can lead to problems when multiple process engines use the same data source (i.e. in cluster mode).");
   }
 
-  public ProcessEngineException exceptionStartProcessInstanceByIdAndTenantId() {
+  public BadUserRequestException exceptionStartProcessInstanceByIdAndTenantId() {
     return new BadUserRequestException(exceptionMessage(
         "023", "Cannot specify a tenant-id when start a process instance by process definition id."));
   }
 
-  public ProcessEngineException exceptionStartProcessInstanceAtStartActivityAndSkipListenersOrMapping() {
+  public BadUserRequestException exceptionStartProcessInstanceAtStartActivityAndSkipListenersOrMapping() {
     return new BadUserRequestException(exceptionMessage(
         "024", "Cannot skip custom listeners or input/output mappings when start a process instance at default start activity."));
+  }
+
+  public BadUserRequestException exceptionCorrelateMessageWithProcessDefinitionId() {
+    return new BadUserRequestException(exceptionMessage(
+        "025", "Cannot specify a process definition id when correlate a message, except for explicit correlation of a start message."));
+  }
+
+  public BadUserRequestException exceptionCorrelateStartMessageWithCorrelationVariables() {
+    return new BadUserRequestException(exceptionMessage(
+        "026", "Cannot specify correlation variables of a process instance when correlate a start message."));
   }
 
 }

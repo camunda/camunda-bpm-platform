@@ -14,10 +14,9 @@ package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.cmd.CorrelateAllMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.CorrelateMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.CorrelateStartMessageCmd;
@@ -26,6 +25,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
 /**
@@ -33,6 +33,8 @@ import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
  *
  */
 public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder {
+
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected CommandExecutor commandExecutor;
   protected CommandContext commandContext;
@@ -44,8 +46,8 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   protected String processInstanceId;
   protected String processDefinitionId;
 
-  protected Map<String, Object> correlationProcessInstanceVariables;
-  protected Map<String, Object> payloadProcessInstanceVariables;
+  protected VariableMap correlationProcessInstanceVariables;
+  protected VariableMap payloadProcessInstanceVariables;
 
   public MessageCorrelationBuilderImpl(CommandExecutor commandExecutor, String messageName) {
     this(messageName);
@@ -71,20 +73,24 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   public MessageCorrelationBuilder processInstanceVariableEquals(String variableName, Object variableValue) {
     ensureNotNull("variableName", variableName);
-    if(correlationProcessInstanceVariables == null) {
-      correlationProcessInstanceVariables = new HashMap<String, Object>();
-    }
+    ensureCorrelationProcessInstanceVariablesInitialized();
+
     correlationProcessInstanceVariables.put(variableName, variableValue);
     return this;
   }
 
   public MessageCorrelationBuilder processInstanceVariablesEqual(Map<String, Object> variables) {
     ensureNotNull("variables", variables);
-    if(correlationProcessInstanceVariables == null) {
-      correlationProcessInstanceVariables = new HashMap<String, Object>();
-    }
+    ensureCorrelationProcessInstanceVariablesInitialized();
+
     correlationProcessInstanceVariables.putAll(variables);
     return this;
+  }
+
+  protected void ensureCorrelationProcessInstanceVariablesInitialized() {
+    if(correlationProcessInstanceVariables == null) {
+      correlationProcessInstanceVariables = new VariableMapImpl();
+    }
   }
 
   public MessageCorrelationBuilder processInstanceId(String id) {
@@ -139,12 +145,16 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   }
 
   public ProcessInstance correlateStartMessage() {
+    if (correlationProcessInstanceVariables != null) {
+      throw LOG.exceptionCorrelateStartMessageWithCorrelationVariables();
+    }
+
     return execute(new CorrelateStartMessageCmd(this));
   }
 
   protected void ensureProcessDefinitionIdNotSet() {
     if(processDefinitionId != null) {
-      throw new ProcessEngineException("It is not supported to specify a process definition id except for correlate a message start event.");
+      throw LOG.exceptionCorrelateMessageWithProcessDefinitionId();
     }
   }
 
