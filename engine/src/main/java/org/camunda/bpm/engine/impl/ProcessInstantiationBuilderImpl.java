@@ -16,7 +16,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceAtActivitiesCmd;
 import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -30,6 +30,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
  * @author Thorben Lindhauer
  */
 public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuilder {
+
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected CommandExecutor commandExecutor;
 
@@ -113,7 +115,7 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
     ensureOnlyOneNotNull("either process definition id or key must be set", processDefinitionId, processDefinitionKey);
 
     if (isTenantIdSet && processDefinitionId != null) {
-      throw new ProcessEngineException("It is not supported to specify a tenant-id when the process definition is referenced by id.");
+      throw LOG.exceptionStartProcessInstanceByIdAndTenantId();
     }
 
     Command<ProcessInstance> command;
@@ -121,7 +123,7 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
     if (modificationBuilder.getModificationOperations().isEmpty()) {
 
       if(skipCustomListeners || skipIoMappings) {
-        throw new ProcessEngineException("It is not supported no start a process instance at the default start activity and skip custom listeners or input/output mappings.");
+        throw LOG.exceptionStartProcessInstanceAtStartActivityAndSkipListenersOrMapping();
       }
       // start at the default start activity
       command = new StartProcessInstanceCmd(this);

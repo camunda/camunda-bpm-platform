@@ -17,6 +17,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -93,8 +94,8 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
         .execute();
 
       fail("expected exception");
-    } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("not supported"));
+    } catch (BadUserRequestException e) {
+      assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
     }
   }
 
@@ -162,8 +163,8 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
         .execute();
 
       fail("expected exception");
-    } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("not supported"));
+    } catch (BadUserRequestException e) {
+      assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
     }
   }
 

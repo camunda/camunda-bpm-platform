@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.application.impl.ProcessApplicationIdentifier;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -142,6 +143,16 @@ public class CommandLogger extends ProcessEngineLogger {
     logWarn(
         "022", "No exclusive lock is aquired while deploying because it is disabled. "
         + "This can lead to problems when multiple process engines use the same data source (i.e. in cluster mode).");
+  }
+
+  public ProcessEngineException exceptionStartProcessInstanceByIdAndTenantId() {
+    return new BadUserRequestException(exceptionMessage(
+        "023", "Cannot specify a tenant-id when start a process instance by process definition id."));
+  }
+
+  public ProcessEngineException exceptionStartProcessInstanceAtStartActivityAndSkipListenersOrMapping() {
+    return new BadUserRequestException(exceptionMessage(
+        "024", "Cannot skip custom listeners or input/output mappings when start a process instance at default start activity."));
   }
 
 }

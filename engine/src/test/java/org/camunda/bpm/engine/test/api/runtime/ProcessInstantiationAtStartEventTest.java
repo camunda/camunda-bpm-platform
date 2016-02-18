@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -102,8 +102,8 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
       runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).execute(true, false);
 
       fail("expected exception");
-    } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("not supported"));
+    } catch (BadUserRequestException e) {
+      assertThat(e.getMessage(), containsString("Cannot skip"));
     }
   }
 
@@ -112,8 +112,8 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
       runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).execute(false, true);
 
       fail("expected exception");
-    } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("not supported"));
+    } catch (BadUserRequestException e) {
+      assertThat(e.getMessage(), containsString("Cannot skip"));
     }
   }
 
