@@ -1212,8 +1212,10 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
       .processInstanceBusinessKey("second")
       .correlateStartMessage();
 
-    assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("first").count());
-    assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("second").count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery()
+        .processInstanceBusinessKey("first").processDefinitionId(firstProcessDefinition.getId()).count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery()
+        .processInstanceBusinessKey("second").processDefinitionId(secondProcessDefinition.getId()).count());
   }
 
   public void testFailCorrelateMessageStartEventWithWrongProcessDefinitionId() {
@@ -1272,7 +1274,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
     try {
       runtimeService.createMessageCorrelation("a")
         .processDefinitionId("id")
-        .correlate();
+        .correlateAll();
 
       fail("expected exception");
     } catch (ProcessEngineException e){
