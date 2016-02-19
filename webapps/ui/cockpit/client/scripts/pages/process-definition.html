@@ -113,10 +113,22 @@
                     <li>
                       current version:
                       <strong class="current-version">{{ instanceStatistics.current.count }}</strong>
+                      <a ng-href="{{ getMigrationUrl() }}"
+                         class="instance-upgrade-link"
+                         ng-if="hasMigrationPlugin && !isLatestVersion() && instanceStatistics.current.count > 0">
+                        <span class="glyphicon glyphicon-arrow-up"
+                              tooltip="Migrate Process Instances to latest version"></span>
+                      </a>
                     </li>
                     <li>
                       all versions:
                       <strong class="all-versions">{{ instanceStatistics.all.count }}</strong>
+                      <a ng-href="{{ getMigrationUrl() }}"
+                         class="instance-upgrade-link"
+                         ng-if="hasMigrationPlugin && isLatestVersion() && instanceStatistics.all.count !== instanceStatistics.current.count">
+                        <span class="glyphicon glyphicon-arrow-up"
+                              tooltip="Migrate Process Instances to latest version"></span>
+                      </a>
                     </li>
                   </ul>
                 </dd>
