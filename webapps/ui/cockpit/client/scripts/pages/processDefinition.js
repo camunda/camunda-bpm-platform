@@ -319,6 +319,9 @@ var angular = require('angular'),
     Data.instantiateProviders('cockpit.processDefinition.data', { $scope: $scope, processData : processData });
 
     $scope.hasReportPlugin = Views.getProviders({ component: 'cockpit.report' }).length > 0;
+    $scope.hasMigrationPlugin = Views.getProviders({ component: 'cockpit.navbar.action' }).filter(function(plugin) {
+      return plugin.id === 'migration';
+    }).length > 0;
 
     // INITIALIZE PLUGINS
     var processPlugins = (
@@ -521,6 +524,36 @@ var angular = require('angular'),
 
       processData.set('filter', newFilter);
     }, 2000);
+
+    var getLatestVersion = function() {
+      if($scope.filterData && $scope.filterData.allDefinitions) {
+        return Math.max.apply(null, $scope.filterData.allDefinitions.map(function(def) {
+          return def.version;
+        }));
+      }
+    };
+
+    $scope.isLatestVersion = function() {
+      if($scope.processDefinition) {
+        return $scope.processDefinition.version === getLatestVersion();
+      }
+      return false;
+    };
+
+    $scope.getMigrationUrl = function() {
+      var path = '#/migration';
+
+      var latestVersion = getLatestVersion();
+
+      var searches = {
+        sourceKey: $scope.processDefinition.key,
+        targetKey: $scope.processDefinition.key,
+        sourceVersion: $scope.isLatestVersion() ? $scope.processDefinition.version - 1 : $scope.processDefinition.version,
+        targetVersion: $scope.isLatestVersion() ? $scope.processDefinition.version : latestVersion
+      };
+
+      return routeUtil.redirectTo(path, searches, [ 'sourceKey', 'targetKey', 'sourceVersion', 'targetVersion' ]);
+    };
 
     $scope.toggleVariableFilterHelp = function() {
       $scope.showVariableFilterHelp = !$scope.showVariableFilterHelp;
