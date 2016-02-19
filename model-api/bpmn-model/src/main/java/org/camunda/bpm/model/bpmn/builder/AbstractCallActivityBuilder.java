@@ -87,4 +87,37 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
     return myself;
   }
 
+  /**
+   * Sets the camunda caseRef attribute
+   *
+   * @param caseRef the case to call
+   * @return the builder object
+   */
+  public B camundaCaseRef(String caseRef) {
+    element.setCamundaCaseRef(caseRef);
+    return myself;
+  }
+
+  /**
+   * Sets the camunda caseBinding attribute
+   *
+   * @param camundaCaseBinding  the case binding to use
+   * @return the builder object
+   */
+  public B camundaCaseBinding(String camundaCaseBinding) {
+    element.setCamundaCaseBinding(camundaCaseBinding);
+    return myself;
+  }
+
+  /**
+   * Sets the camunda caseVersion attribute
+   *
+   * @param camundaCaseVersion  the case version to use
+   * @return the builder object
+   */
+  public B camundaCaseVersion(String camundaCaseVersion) {
+    element.setCamundaCaseVersion(camundaCaseVersion);
+    return myself;
+  }
+
 }

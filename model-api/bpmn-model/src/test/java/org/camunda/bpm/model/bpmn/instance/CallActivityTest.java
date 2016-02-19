@@ -13,31 +13,37 @@
 
 package org.camunda.bpm.model.bpmn.instance;
 
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+
 import java.util.Arrays;
 import java.util.Collection;
-
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
 /**
  * @author Sebastian Menski
  */
 public class CallActivityTest extends BpmnModelElementInstanceTest {
 
+  @Override
   public TypeAssumption getTypeAssumption() {
     return new TypeAssumption(Activity.class, false);
   }
 
+  @Override
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return null;
   }
 
+  @Override
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
       new AttributeAssumption("calledElement"),
       /** camunda extensions */
       new AttributeAssumption(CAMUNDA_NS, "async", false, false, false),
       new AttributeAssumption(CAMUNDA_NS, "calledElementBinding"),
-      new AttributeAssumption(CAMUNDA_NS, "calledElementVersion")
+      new AttributeAssumption(CAMUNDA_NS, "calledElementVersion"),
+      new AttributeAssumption(CAMUNDA_NS, "caseRef"),
+      new AttributeAssumption(CAMUNDA_NS, "caseBinding"),
+      new AttributeAssumption(CAMUNDA_NS, "caseVersion")
     );
   }
 }

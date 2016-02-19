@@ -158,6 +158,9 @@
     <callActivity id="callActivity"
                   camunda:calledElementBinding="test"
                   camunda:calledElementVersion="test"
+                  camunda:caseRef="test"
+                  camunda:caseBinding="test"
+                  camunda:caseVersion="test"
                   camunda:exclusive="false">
       <extensionElements>
         <camunda:in source="test" sourceExpression="${test}" variables="test" businessKey="${test}" target="test" local="true"/>

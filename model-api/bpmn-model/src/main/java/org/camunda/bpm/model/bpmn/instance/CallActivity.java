@@ -50,4 +50,16 @@ public interface CallActivity extends Activity {
 
   void setCamundaCalledElementVersion(String camundaCalledElementVersion);
 
+  String getCamundaCaseRef();
+
+  void setCamundaCaseRef(String caseRef);
+
+  String getCamundaCaseBinding();
+
+  void setCamundaCaseBinding(String camundaCaseBinding);
+
+  String getCamundaCaseVersion();
+
+  void setCamundaCaseVersion(String camundaCaseVersion);
+
 }

@@ -33,12 +33,14 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_EXECUTION_EVENT_
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_EXECUTION_EVENT_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_EXPRESSION_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_EXPRESSION_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_FLOW_NODE_JOB_PRIORITY;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_LIST_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_LIST_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PRIORITY_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PRIORITY_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PROCESS_JOB_PRIORITY;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_STRING_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_STRING_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_TASK_EVENT_API;
@@ -49,12 +51,10 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_XML;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_FLOW_NODE_JOB_PRIORITY;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PROCESS_JOB_PRIORITY;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.USER_TASK_ID;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.ACTIVITI_NS;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_ERROR_CODE_VARIABLE;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.ACTIVITI_NS;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +63,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.camunda.bpm.model.bpmn.impl.BpmnModelInstanceImpl;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
@@ -246,6 +245,27 @@ public class CamundaExtensionsTest {
     assertThat(callActivity.getCamundaCalledElementVersion()).isEqualTo(TEST_STRING_XML);
     callActivity.setCamundaCalledElementVersion(TEST_STRING_API);
     assertThat(callActivity.getCamundaCalledElementVersion()).isEqualTo(TEST_STRING_API);
+  }
+
+  @Test
+  public void testCaseRef() {
+    assertThat(callActivity.getCamundaCaseRef()).isEqualTo(TEST_STRING_XML);
+    callActivity.setCamundaCaseRef(TEST_STRING_API);
+    assertThat(callActivity.getCamundaCaseRef()).isEqualTo(TEST_STRING_API);
+  }
+
+  @Test
+  public void testCaseBinding() {
+    assertThat(callActivity.getCamundaCaseBinding()).isEqualTo(TEST_STRING_XML);
+    callActivity.setCamundaCaseBinding(TEST_STRING_API);
+    assertThat(callActivity.getCamundaCaseBinding()).isEqualTo(TEST_STRING_API);
+  }
+
+  @Test
+  public void testCaseVersion() {
+    assertThat(callActivity.getCamundaCaseVersion()).isEqualTo(TEST_STRING_XML);
+    callActivity.setCamundaCaseVersion(TEST_STRING_API);
+    assertThat(callActivity.getCamundaCaseVersion()).isEqualTo(TEST_STRING_API);
   }
 
   @Test

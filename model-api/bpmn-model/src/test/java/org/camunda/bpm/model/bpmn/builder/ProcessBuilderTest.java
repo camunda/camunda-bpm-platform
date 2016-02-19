@@ -599,6 +599,9 @@ public class ProcessBuilderTest {
         .camundaAsyncBefore()
         .camundaCalledElementBinding("version")
         .camundaCalledElementVersion("1.0")
+        .camundaCaseRef("case")
+        .camundaCaseBinding("deployment")
+        .camundaCaseVersion("2")
         .notCamundaExclusive()
       .endEvent()
       .done();
@@ -608,6 +611,9 @@ public class ProcessBuilderTest {
     assertThat(callActivity.isCamundaAsyncBefore()).isTrue();
     assertThat(callActivity.getCamundaCalledElementBinding()).isEqualTo("version");
     assertThat(callActivity.getCamundaCalledElementVersion()).isEqualTo("1.0");
+    assertThat(callActivity.getCamundaCaseRef()).isEqualTo("case");
+    assertThat(callActivity.getCamundaCaseBinding()).isEqualTo("deployment");
+    assertThat(callActivity.getCamundaCaseVersion()).isEqualTo("2");
     assertThat(callActivity.isCamundaExclusive()).isFalse();
   }
 
