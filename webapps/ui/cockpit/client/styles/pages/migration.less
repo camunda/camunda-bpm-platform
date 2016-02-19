@@ -1,0 +1,42 @@
+.migration-page {
+  height: ~"calc(100vh - (@{header-height} + @{breadcrumb-height} + @{footer-height}))";
+  margin-top: @breadcrumb-height;
+  background-color: @body-bg;
+  form > h4 {
+    margin-top: 0;
+  }
+
+  h4.center-block {
+    max-width: 75%;
+    margin-top: 70px;
+    color: @gray;
+  }
+
+  option.empty-value {
+    color: @gray-light;
+  }
+
+  > .row > div {
+    padding-top: (@grid-gutter-width * 0.5);
+    &.col-sm-6 {
+      min-height: 250px;
+      padding-bottom: (@grid-gutter-width * 0.5);
+      position: relative;
+
+      &:first-of-type {
+        border-right: 1px solid @gray-lighter;
+      }
+    }
+
+    &.col-xs-12 {
+      border-top: 1px solid @gray-lighter;
+    }
+  }
+
+  [cam-widget-bpmn-viewer] {
+    margin-top: (@grid-gutter-width * 0.5);
+    height: 50vh;
+    max-height: 650px;
+    min-height: 350px;
+  }
+}
