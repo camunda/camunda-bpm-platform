@@ -149,6 +149,7 @@
   right: auto;
   background: @filters-bg;
   overflow: hidden;
+  overflow-y: auto;
 
   table {
     height: 100%;
@@ -240,19 +241,27 @@ a.expand-collapse {
   display: none;
   position: absolute;
   top: 0;
-  left: 0;
-  z-index: 4;
+  left: 5px;
   text-decoration: none;
   cursor: pointer;
-  opacity: 0.2;
-  filter: alpha(opacity=20);
-  padding: 5px;
+  opacity: 0.6;
+  padding: 0;
   z-index: 99;
+  background-color: fade(@body-bg, 90%);
+  border: 1px solid @gray-lighter;
+  border-width: 0 1px 1px 0;
+  border-radius: 0 0 4px 0;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
 
   &.pull-right {
     top: 0;
     left: auto;
     right: 0;
+    border-width: 0 0 1px 1px;
+    border-radius: 0 0 0 4px;
   }
 }
 
