@@ -52,7 +52,7 @@ public interface CallActivity extends Activity {
 
   String getCamundaCaseRef();
 
-  void setCamundaCaseRef(String caseRef);
+  void setCamundaCaseRef(String camundaCaseRef);
 
   String getCamundaCaseBinding();
 
