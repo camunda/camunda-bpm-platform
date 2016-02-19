@@ -62,16 +62,16 @@
                  ng-show="sidebarTab === 'info'">
               <dl class="process-information">
                 <dt>Definition ID:</dt>
-                <dd class="definition-id">
-                  <a ng-href="#/process-definition/{{ processDefinition.id }}">{{ processDefinition.id }}</a>
-                </dd>
+                <dd class="definition-id">{{ processDefinition.id }}</dd>
 
                 <dt>Definition Key:</dt>
                 <dd class="definition-key">{{ processDefinition.key }}</dd>
 
                 <dt>Definition Name:</dt>
-                <dd ng-if="processDefinition.name && processDefinition.name !== processDefinition.key">{{ processDefinition.name }}</dd>
-                <dd ng-if="!processDefinition.name || processDefinition.name === processDefinition.key"><span class="null-value">null</span></dd>
+                <dd class="definition-name"
+                    ng-if="processDefinition.name && processDefinition.name !== processDefinition.key">{{ processDefinition.name }}</dd>
+                <dd class="definition-name"
+                    ng-if="!processDefinition.name || processDefinition.name === processDefinition.key"><span class="null-value">null</span></dd>
 
                 <dt>Definition Version:</dt>
                 <dd class="definition-version">
@@ -101,7 +101,9 @@
                 </dd>
 
                 <dt>Deployment ID:</dt>
-                <dd class="deployment-id"><a ng-href="{{ getDeploymentUrl() }}">{{ processDefinition.deploymentId }}</a></dd>
+                <dd class="deployment-id">
+                  <a ng-href="{{ getDeploymentUrl() }}">{{ processDefinition.deploymentId }}</a>
+                </dd>
 
                 <dt>Instances Running:</dt>
                 <dd class="running-instances">

@@ -1,18 +1,20 @@
 <!-- # CE - camunda-cockpit-ui/client/scripts/pages/decision-definition.html -->
 <div class="ctn-fixed-view">
-
   <div class="ctn-header">
     <h1>
-      <span class="process-name-prefix">
-        <span>Decision</span>
-        <span>definition</span>
+      <span class="inner">
+        <span class="process-name-prefix">
+          <span>Decision</span>
+          <span>definition</span>
+        </span>
+        <span class="process-name">{{ decisionDefinition.name || decisionDefinition.key }}</span>
       </span>
-
-      {{ decisionDefinition.name || decisionDefinition.key }}
-
     </h1>
 
-    <div class="view-pills" id="cockpit.decisionDefinition.view"></div>
+    <div class="view-pills-wrapper">
+      <div class="view-pills"
+           id="cockpit.decisionDefinition.view"></div>
+    </div>
   </div>
 
 
@@ -33,32 +35,31 @@
     <!-- sidebar -->
     <div class="ctn-column ctn-sidebar ctn-scroll"
          ctn-collapsable="left">
+      <dl class="process-information">
+        <dt>Definition ID:</dt>
+        <dd>{{ decisionDefinition.id }}</dd>
 
+        <dt>Definition Key:</dt>
+        <dd class="definition-key">{{ decisionDefinition.key }}</dd>
 
-      <div class="definition-details">
-        <div class="key">
-          <span class="name">
-            Key
-          </span>
-          {{ decisionDefinition.key }}
-        </div>
-      </div>
+        <dt>Definition Name:</dt>
+        <dd class="definition-name"
+            ng-if="decisionDefinition.name && decisionDefinition.name !== decisionDefinition.key">{{ decisionDefinition.name }}</dd>
+        <dd class="definition-name"
+            ng-if="!decisionDefinition.name || decisionDefinition.name === decisionDefinition.key"><span class="null-value">null</span></dd>
 
-      <div class="filters">
-        <div class="version-filter filter">
-          <span class="name">
-            Version
-          </span>
-
+        <dt>Definition Version:</dt>
+        <dd class="definition-version">
           <span ng-if="!allDefinitions || !decisionDefinition"
                 class="glyphicon glyphicon-refresh animate-spin"></span>
 
-          <div class="btn-group dropdown"
+          <div class="dropdown"
                ng-if="allDefinitions && allDefinitions.length > 1">
-            <button class="btn btn-default dropdown-toggle"
-                    data-toggle="dropdown">
-              {{ decisionDefinition.version }} <span class="caret"></span>
-            </button>
+            <a href
+               class="dropdown-toggle">
+              {{ decisionDefinition.version }}
+              <span class="caret"></span>
+            </a>
 
             <ul class="dropdown-menu">
               <li ng-repeat="definition in allDefinitions">
@@ -72,11 +73,13 @@
           <span ng-if="allDefinitions && allDefinitions.length < 2 && decisionDefinition">
             {{ decisionDefinition.version }}
           </span>
-        </div>
+        </dd>
 
-      </div>
-
-      <a class="navigate-deployment" ng-href="{{ getDeploymentUrl() }}">Navigate to deployment</a>
+        <dt>Deployment ID:</dt>
+        <dd class="deployment-id">
+          <a ng-href="{{ getDeploymentUrl() }}">{{ decisionDefinition.deploymentId }}</a>
+        </dd>
+      </dl>
 
       <a class="hide-collapsable pull-right"></a>
     </div>
@@ -87,7 +90,8 @@
 
       <!-- content top pane -->
       <div class="ctn-row ctn-content-top">
-        <div decision-table="tableXml" style="height: 100%;"></div>
+        <div decision-table="tableXml"
+             style="height: 100%;padding:20px 10px;margin:0;"></div>
       </div>
 
       <!-- content bottom pane -->
