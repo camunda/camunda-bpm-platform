@@ -190,6 +190,7 @@ public class ConditionalMigrationTest {
 		else
 		{
 			executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+			assertNotNull(executionTree);
 			assertThat(executionTree)
 			.matches(
 					describeExecutionTree(null).scope().id(processInstance.getId())
