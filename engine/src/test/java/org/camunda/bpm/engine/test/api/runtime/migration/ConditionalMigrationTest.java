@@ -284,6 +284,7 @@ public class ConditionalMigrationTest {
 		if(hungry == true && cashInHand == true)		
 		{			
 			executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+			assertNotNull(executionTree);
 			assertThat(executionTree)
 			.matches(
 					describeExecutionTree(null).scope().id(processInstance.getId())
@@ -319,6 +320,7 @@ public class ConditionalMigrationTest {
 		else if(hungry == true && cashInHand == false)
 		{
 			executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+			assertNotNull(executionTree);
 			assertThat(executionTree)
 			.matches(
 					describeExecutionTree(null).scope().id(processInstance.getId())
@@ -354,6 +356,7 @@ public class ConditionalMigrationTest {
 		else if(hungry == false && cashInHand == true)
 		{
 			executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+			assertNotNull(executionTree);
 			assertThat(executionTree)
 			.matches(
 					describeExecutionTree(null).scope().id(processInstance.getId())
@@ -389,6 +392,7 @@ public class ConditionalMigrationTest {
 		else if(hungry == false && cashInHand == false)
 		{
 			executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+			assertNotNull(executionTree);
 			assertThat(executionTree)
 			.matches(
 					describeExecutionTree(null).scope().id(processInstance.getId())
