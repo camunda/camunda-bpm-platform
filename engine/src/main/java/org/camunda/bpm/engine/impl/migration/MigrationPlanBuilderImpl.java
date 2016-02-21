@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.camunda.bpm.engine.Condition;
 import org.camunda.bpm.engine.MigrationPlanBuilder;
 import org.camunda.bpm.engine.impl.cmd.CreateMigrationPlanCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -27,56 +28,65 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
  */
 public class MigrationPlanBuilderImpl implements MigrationPlanBuilder {
 
-  protected CommandExecutor commandExecutor;
+	protected CommandExecutor commandExecutor;
 
-  protected String sourceProcessDefinitionId;
-  protected String targetProcessDefinitionId;
-  protected boolean mapEqualActivities = false;
-  protected List<MigrationInstructionImpl> explicitMigrationInstructions;
+	protected String sourceProcessDefinitionId;
+	protected String targetProcessDefinitionId;
+	protected boolean mapEqualActivities = false;
+	protected List<MigrationInstructionImpl> explicitMigrationInstructions;
 
-  public MigrationPlanBuilderImpl(CommandExecutor commandExecutor, String sourceProcessDefinitionId,
-      String targetProcessDefinitionId) {
-    this.commandExecutor = commandExecutor;
-    this.sourceProcessDefinitionId = sourceProcessDefinitionId;
-    this.targetProcessDefinitionId = targetProcessDefinitionId;
-    this.explicitMigrationInstructions = new ArrayList<MigrationInstructionImpl>();
-  }
+	public MigrationPlanBuilderImpl(CommandExecutor commandExecutor, String sourceProcessDefinitionId,
+			String targetProcessDefinitionId) {
+		this.commandExecutor = commandExecutor;
+		this.sourceProcessDefinitionId = sourceProcessDefinitionId;
+		this.targetProcessDefinitionId = targetProcessDefinitionId;
+		this.explicitMigrationInstructions = new ArrayList<MigrationInstructionImpl>();
+	}
 
-  public MigrationPlanBuilder mapEqualActivities() {
-    this.mapEqualActivities = true;
-    return this;
-  }
+	public MigrationPlanBuilder mapEqualActivities() {
+		this.mapEqualActivities = true;
+		return this;
+	}
 
-  public MigrationPlanBuilder mapActivities(String sourceActivityId, String targetActivityId) {
-    return mapActivities(Collections.singletonList(sourceActivityId), Collections.singletonList(targetActivityId));
-  }
+	public MigrationPlanBuilder mapActivities(String sourceActivityId, String targetActivityId) {
+		return mapActivities(Collections.singletonList(sourceActivityId), Collections.singletonList(targetActivityId));
+	}
+	@Override
+	public MigrationPlanBuilder mapActivities(List<String> sourceActivityIds,List<String> targetActivityIds) {
+		this.explicitMigrationInstructions.add(
+				new MigrationInstructionImpl(sourceActivityIds, targetActivityIds)
+				);
+		return this;
+	}
 
-  public MigrationPlanBuilder mapActivities(List<String> sourceActivityIds, List<String> targetActivityIds) {
-    this.explicitMigrationInstructions.add(
-      new MigrationInstructionImpl(sourceActivityIds, targetActivityIds)
-    );
-    return this;
-  }
+	public MigrationPlanBuilder mapActivitiesConditionally(String sourceActivityId, String targetActivityId, Condition condition) {
+		return mapActivities(Collections.singletonList(sourceActivityId), Collections.singletonList(targetActivityId),condition);
+	}
+	public MigrationPlanBuilder mapActivities(List<String> sourceActivityIds, List<String> targetActivityIds, Condition condition) {
+		this.explicitMigrationInstructions.add(
+				new MigrationInstructionImpl(sourceActivityIds, targetActivityIds,condition)
+				);
+		return this;
+	}
 
-  public String getSourceProcessDefinitionId() {
-    return sourceProcessDefinitionId;
-  }
+	public String getSourceProcessDefinitionId() {
+		return sourceProcessDefinitionId;
+	}
 
-  public String getTargetProcessDefinitionId() {
-    return targetProcessDefinitionId;
-  }
+	public String getTargetProcessDefinitionId() {
+		return targetProcessDefinitionId;
+	}
 
-  public boolean isMapEqualActivities() {
-    return mapEqualActivities;
-  }
+	public boolean isMapEqualActivities() {
+		return mapEqualActivities;
+	}
 
-  public List<MigrationInstructionImpl> getExplicitMigrationInstructions() {
-    return explicitMigrationInstructions;
-  }
+	public List<MigrationInstructionImpl> getExplicitMigrationInstructions() {
+		return explicitMigrationInstructions;
+	}
 
-  public MigrationPlan build() {
+	public MigrationPlan build() {
 
-    return commandExecutor.execute(new CreateMigrationPlanCmd(this));
-  }
-
+		return commandExecutor.execute(new CreateMigrationPlanCmd(this));
+	}
 }

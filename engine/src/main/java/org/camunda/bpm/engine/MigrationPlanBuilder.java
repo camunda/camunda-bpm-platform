@@ -35,7 +35,15 @@ public interface MigrationPlanBuilder {
    * to activity instances of the target activity (of the target process definition)
    */
   MigrationPlanBuilder mapActivities(String sourceActivityId, String targetActivityId);
-
+  /**
+   * Adds a migration instruction that maps activity instances of the source activity (of the source process definition)
+   * to activity instances of the target activity (of the target process definition) based on a condition
+   * @param sourceActivityId
+   * @param targetActivityId
+   * @param condition
+   * @return
+   */
+  MigrationPlanBuilder mapActivitiesConditionally(String sourceActivityId, String targetActivityId, Condition condition);
   /**
    * Adds a migration instruction that maps a set of activity instances to a set of activity instances.
    */

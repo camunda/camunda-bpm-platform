@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.migration;
 import java.util.Collections;
 import java.util.List;
 
+import org.camunda.bpm.engine.Condition;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 
 /**
@@ -25,14 +26,22 @@ public class MigrationInstructionImpl implements MigrationInstruction {
 
   protected List<String> sourceActivityIds;
   protected List<String> targetActivityIds;
-
+  protected Condition condition;
+  
   public MigrationInstructionImpl(String sourceActivityId, String targetActivityId) {
-    this(Collections.singletonList(sourceActivityId), Collections.singletonList(targetActivityId));
+    this(Collections.singletonList(sourceActivityId), Collections.singletonList(targetActivityId),null);
   }
 
   public MigrationInstructionImpl(List<String> sourceActivityIds, List<String> targetActivityIds) {
+	    this.sourceActivityIds = sourceActivityIds;
+	    this.targetActivityIds = targetActivityIds;
+	    this.condition = null;
+  }
+  
+  public MigrationInstructionImpl(List<String> sourceActivityIds, List<String> targetActivityIds, Condition condition) {
     this.sourceActivityIds = sourceActivityIds;
     this.targetActivityIds = targetActivityIds;
+    this.condition = condition;
   }
 
   public List<String> getSourceActivityIds() {
@@ -43,6 +52,11 @@ public class MigrationInstructionImpl implements MigrationInstruction {
     return targetActivityIds;
   }
 
+  @Override
+  public Condition getCondition() {
+  	return condition;
+  }
+  
   public String toString() {
     StringBuilder sb = new StringBuilder();
 
