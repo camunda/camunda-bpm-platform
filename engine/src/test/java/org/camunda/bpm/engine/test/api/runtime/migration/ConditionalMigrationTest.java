@@ -51,6 +51,8 @@ public class ConditionalMigrationTest {
 				.mapActivitiesConditionally("freeShipment", "freeShipment", largerOrderCondition)
 				.mapActivitiesConditionally("freeShipment", "costShipment", smallerOrderCondition)
 				.build();
+		assertNotNull(migrationPlan);
+		
 		ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
 		assertNotNull(processInstance);
 		ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
