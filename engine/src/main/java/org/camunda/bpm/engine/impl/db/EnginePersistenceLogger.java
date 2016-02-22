@@ -393,10 +393,10 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
     return new ProcessEngineException(exceptionMessage("044", "Cannot update entity from an unrelated process definition"));
   }
 
-  public ProcessEngineException toManyProcessDefinitionsException(int count, String key, Integer version) {
+  public ProcessEngineException toManyProcessDefinitionsException(int count, String key, Integer version, String tenantId) {
     return new ProcessEngineException(exceptionMessage(
       "045",
-      "There are '{}' results for a process definition with key '{}' and version '{}'.",
+      "There are '{}' results for a process definition with key '{}', version '{}' and tenant-id '{}'.",
       count,
       key,
       version

@@ -106,15 +106,18 @@ public class ProcessDefinitionManager extends AbstractManager {
     return (ProcessDefinitionEntity) getDbEntityManager().selectOne("selectProcessDefinitionByDeploymentAndKey", parameters);
   }
 
-  public ProcessDefinition findProcessDefinitionByKeyAndVersion(String processDefinitionKey, Integer processDefinitionVersion) {
-    ProcessDefinitionQueryImpl processDefinitionQuery = new ProcessDefinitionQueryImpl()
-      .processDefinitionKey(processDefinitionKey)
-      .processDefinitionVersion(processDefinitionVersion);
-    List<ProcessDefinition> results = findProcessDefinitionsByQueryCriteria(processDefinitionQuery, null);
+  public ProcessDefinition findProcessDefinitionByKeyVersionAndTenantId(String processDefinitionKey, Integer processDefinitionVersion, String tenantId) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processDefinitionVersion", processDefinitionVersion);
+    parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("tenantId", tenantId);
+
+    @SuppressWarnings("unchecked")
+    List<ProcessDefinition> results = getDbEntityManager().selectList("selectProcessDefinitionByKeyVersionAndTenantId", parameters);
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
-      throw LOG.toManyProcessDefinitionsException(results.size(), processDefinitionKey, processDefinitionVersion);
+      throw LOG.toManyProcessDefinitionsException(results.size(), processDefinitionKey, processDefinitionVersion, tenantId);
     }
     return null;
   }

@@ -265,6 +265,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
     ExecutionEntity subProcessInstance = (ExecutionEntity) super.createSubProcessInstance(processDefinition, businessKey, caseInstanceId);
 
+    // inherit the tenant-id from the process definition
+    String tenantId = ((ProcessDefinitionEntity) processDefinition).getTenantId();
+    if (tenantId != null) {
+      subProcessInstance.setTenantId(tenantId);
+    }
+
     fireHistoricActivityInstanceUpdate();
 
     return subProcessInstance;

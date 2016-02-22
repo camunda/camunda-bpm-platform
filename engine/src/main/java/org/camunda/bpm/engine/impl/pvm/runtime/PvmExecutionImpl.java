@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
@@ -818,10 +817,10 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     PvmExecutionImpl currentExecution = this;
     for (PvmActivity instantiatedActivity : activityStack) {
       // there must exactly one child execution
-      currentExecution = (ExecutionEntity) currentExecution.getNonEventScopeExecutions().get(0);
+      currentExecution = currentExecution.getNonEventScopeExecutions().get(0);
       if (currentExecution.isConcurrent()) {
         // there may be a non-scope execution that we have to skip (e.g. multi-instance)
-        currentExecution = (ExecutionEntity) currentExecution.getNonEventScopeExecutions().get(0);
+        currentExecution = currentExecution.getNonEventScopeExecutions().get(0);
       }
 
       createdExecutions.put(instantiatedActivity, currentExecution);

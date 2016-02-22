@@ -213,7 +213,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return super.hasExcludingConditions() || CompareUtil.elementIsNotContainedInArray(id, ids);
   }
 
-  public ProcessDefinitionQuery tenantIdIn(String... tenantIds) {
+  public ProcessDefinitionQueryImpl tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
     return this;

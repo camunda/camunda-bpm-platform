@@ -113,11 +113,17 @@
               where KEY_ = #{caseDefinitionKey} and TENANT_ID_ = #{tenantId})
   </select>
 
-  <select id="selectCaseDefinitionByKeyAndVersion" parameterType="map" resultMap="caseDefinitionResultMap">
+  <select id="selectCaseDefinitionByKeyVersionAndTenantId" parameterType="map" resultMap="caseDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_CASE_DEF 
     where KEY_ = #{caseDefinitionKey}
       and VERSION_ = #{caseDefinitionVersion}
+      <if test="tenantId != null">
+        and TENANT_ID_ = #{tenantId}
+      </if>
+      <if test="tenantId == null">
+        and TENANT_ID_ is null
+      </if>
   </select>
 
   <select id="selectPreviousCaseDefinitionId" parameterType="map" resultType="string">

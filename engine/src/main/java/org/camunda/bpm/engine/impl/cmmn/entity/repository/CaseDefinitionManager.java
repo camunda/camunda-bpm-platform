@@ -82,11 +82,12 @@ public class CaseDefinitionManager extends AbstractManager {
     }
   }
 
-  public CaseDefinitionEntity findCaseDefinitionByKeyAndVersion(String caseDefinitionKey, Integer caseDefinitionVersion) {
+  public CaseDefinitionEntity findCaseDefinitionByKeyVersionAndTenantId(String caseDefinitionKey, Integer caseDefinitionVersion, String tenantId) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("caseDefinitionVersion", caseDefinitionVersion);
     parameters.put("caseDefinitionKey", caseDefinitionKey);
-    return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectCaseDefinitionByKeyAndVersion", parameters);
+    parameters.put("tenantId", tenantId);
+    return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectCaseDefinitionByKeyVersionAndTenantId", parameters);
   }
 
   public CaseDefinitionEntity findCaseDefinitionByDeploymentAndKey(String deploymentId, String caseDefinitionKey) {
