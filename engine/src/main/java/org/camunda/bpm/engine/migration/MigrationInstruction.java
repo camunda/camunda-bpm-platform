@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.migration;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.Condition;
+
 /**
  * @author Thorben Lindhauer
  *
@@ -24,4 +26,5 @@ public interface MigrationInstruction {
 
   List<String> getTargetActivityIds();
 
+  Condition getCondition();
 }

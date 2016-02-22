@@ -252,5 +252,54 @@ public class ProcessModels {
       .message("Message")
     .endEvent()
     .done();
+  
+   public static final BpmnModelInstance BASIC_CONDITONAL_SOURCE_PROCESS = Bpmn.createExecutableProcess("BSCP")
+			.startEvent()
+			.userTask("freeShipment")
+			.endEvent()
+			.done();
 
+	public static final BpmnModelInstance BASIC_CONDITIONAL_TARGET_PROCESS = Bpmn.createExecutableProcess("BCTP")
+			.startEvent()
+			.exclusiveGateway().condition("largeorder", "${amount>100}")
+			.userTask("freeShipment").endEvent()
+			.moveToLastGateway().condition("largeorder", "${amount<=100}")
+			.userTask("costShipment").endEvent().done();			
+
+	public static final BpmnModelInstance SINGLE_CONDITIONAL_SOURCE_PROCESS=Bpmn.createExecutableProcess("SCSP")
+			.startEvent().userTask("receiveLoanForm").endEvent()
+			.userTask("acceptLoan").endEvent()
+			.userTask("givecheque").endEvent()
+			.done();
+
+	public static final BpmnModelInstance SINGLE_CONDITONAL_TARGET_PROCESS =Bpmn.createExecutableProcess("SCTP").startEvent()
+			.userTask("receiveLoanForm").endEvent()	
+			.exclusiveGateway().condition("validation", "${documentvalid==true}")
+			.userTask("acceptLoan").endEvent()
+			.userTask("givecheque").endEvent()
+			.moveToLastGateway().condition("validation", "${documentvalid==false}")
+			.userTask("rejectLoan").endEvent().done();
+	
+	public static final BpmnModelInstance MULTIPLE_CONDITION_SOURCE_PROCESS=Bpmn.createExecutableProcess("MSCP")
+			.startEvent()
+			.userTask("gotoRestaurant").endEvent()
+			.userTask("orderPizza").endEvent()
+			.userTask("eat").endEvent()
+			.userTask("paybyCash").endEvent()
+			.done();
+	public static final BpmnModelInstance MULTIPLE_CONDITION_TARGET_PROCESS=Bpmn.createExecutableProcess("MCTP")
+			.startEvent()
+			.userTask("gotoRestaurant").endEvent()
+			.exclusiveGateway().condition("HungryState", "${hungry==true}")
+			.userTask("orderPizza").endEvent()
+			.userTask("eat").endEvent()
+			.moveToLastGateway().condition("HungryState", "${hungry==false}")
+			.userTask("orderSnack").endEvent()
+			.moveToNode("eat")
+			.exclusiveGateway().condition("PaymentState", "${cashInHand==true}")
+			.userTask("payByCash").endEvent()
+			.moveToLastGateway().condition("PaymentState", "${cashInHand==false}")
+			.userTask("payByCard").endEvent()
+			.done();
+	
 }
