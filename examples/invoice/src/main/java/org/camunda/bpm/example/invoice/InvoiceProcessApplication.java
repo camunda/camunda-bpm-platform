@@ -42,15 +42,16 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
   public void startFirstProcess(ProcessEngine processEngine) {
 
     createUsers(processEngine);
-    startProcessInstance(processEngine);
+    startProcessInstances(processEngine, "invoice.v1");
+    startProcessInstances(processEngine, "invoice.v2");
   }
 
-  private void startProcessInstance(ProcessEngine processEngine) {
+  private void startProcessInstances(ProcessEngine processEngine, String processDefinitionKey) {
 
     InputStream invoiceInputStream = InvoiceProcessApplication.class.getClassLoader().getResourceAsStream("invoice.pdf");
 
     // process instance 1
-    processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
+    processEngine.getRuntimeService().startProcessInstanceByKey(processDefinitionKey, createVariables()
         .putValue("creditor", "Great Pizza for Everyone Inc.")
         .putValue("amount", 30.00d)
         .putValue("invoiceCategory", "Travel Expenses")
@@ -69,7 +70,7 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
       calendar.add(Calendar.DAY_OF_MONTH, -14);
       ClockUtil.setCurrentTime(calendar.getTime());
 
-      ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
+      ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey(processDefinitionKey, createVariables()
           .putValue("creditor", "Bobby's Office Supplies")
           .putValue("amount", 900.00d)
           .putValue("invoiceCategory", "Misc")
@@ -101,7 +102,7 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
       calendar.add(Calendar.DAY_OF_MONTH, -5);
       ClockUtil.setCurrentTime(calendar.getTime());
 
-      ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
+      ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey(processDefinitionKey, createVariables()
           .putValue("creditor", "Papa Steve's all you can eat")
           .putValue("amount", 10.99d)
           .putValue("invoiceCategory", "Travel Expenses")
