@@ -15,6 +15,11 @@ package org.camunda.bpm.engine.rest.sub.repository.impl;
 import java.net.URI;
 import java.util.List;
 
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotFoundException;
@@ -28,11 +33,6 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResource;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResourcesResource;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -62,43 +62,9 @@ public class DeploymentResourceImpl extends AbstractRestProcessEngineAware imple
   }
 
   public DeploymentDto redeploy(UriInfo uriInfo, RedeploymentDto redeployment) {
-    RepositoryService repositoryService = getProcessEngine().getRepositoryService();
-
     Deployment deployment = null;
     try {
-
-      DeploymentBuilder builder = repositoryService.createDeployment();
-      builder.nameFromDeployment(deploymentId);
-
-      if (redeployment != null) {
-        builder.source(redeployment.getSource());
-
-        List<String> resourceIds = redeployment.getResourceIds();
-        List<String> resourceNames = redeployment.getResourceNames();
-
-        boolean isResourceIdListEmpty = resourceIds == null || resourceIds.isEmpty();
-        boolean isResourceNameListEmpty = resourceNames == null || resourceNames.isEmpty();
-
-        if (isResourceIdListEmpty && isResourceNameListEmpty) {
-          builder.addDeploymentResources(deploymentId);
-        }
-        else {
-
-          if (!isResourceIdListEmpty) {
-            builder.addDeploymentResourcesById(deploymentId, resourceIds);
-          }
-
-          if (!isResourceNameListEmpty) {
-            builder.addDeploymentResourcesByName(deploymentId, resourceNames);
-          }
-
-        }
-      }
-      else {
-        builder.addDeploymentResources(deploymentId);
-      }
-
-      deployment = builder.deploy();
+      deployment = tryToRedeploy(redeployment);
 
     } catch (NotFoundException e) {
       throw createInvalidRequestException("redeploy", Status.NOT_FOUND, e);
@@ -119,6 +85,49 @@ public class DeploymentResourceImpl extends AbstractRestProcessEngineAware imple
     deploymentDto.addReflexiveLink(uri, HttpMethod.GET, "self");
 
     return deploymentDto;
+  }
+
+  protected Deployment tryToRedeploy(RedeploymentDto redeployment) {
+    RepositoryService repositoryService = getProcessEngine().getRepositoryService();
+
+    DeploymentBuilder builder = repositoryService.createDeployment();
+    builder.nameFromDeployment(deploymentId);
+
+    String tenantId = getDeployment().getTenantId();
+    if (tenantId != null) {
+      builder.tenantId(tenantId);
+    }
+
+    if (redeployment != null) {
+      builder = addRedeploymentResources(builder, redeployment);
+    } else {
+      builder.addDeploymentResources(deploymentId);
+    }
+
+    return builder.deploy();
+  }
+
+  protected DeploymentBuilder addRedeploymentResources(DeploymentBuilder builder, RedeploymentDto redeployment) {
+    builder.source(redeployment.getSource());
+
+    List<String> resourceIds = redeployment.getResourceIds();
+    List<String> resourceNames = redeployment.getResourceNames();
+
+    boolean isResourceIdListEmpty = resourceIds == null || resourceIds.isEmpty();
+    boolean isResourceNameListEmpty = resourceNames == null || resourceNames.isEmpty();
+
+    if (isResourceIdListEmpty && isResourceNameListEmpty) {
+      builder.addDeploymentResources(deploymentId);
+
+    } else {
+      if (!isResourceIdListEmpty) {
+        builder.addDeploymentResourcesById(deploymentId, resourceIds);
+      }
+      if (!isResourceNameListEmpty) {
+        builder.addDeploymentResourcesByName(deploymentId, resourceNames);
+      }
+    }
+    return builder;
   }
 
   @Override
