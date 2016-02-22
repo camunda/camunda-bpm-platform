@@ -3,6 +3,14 @@
 var Base = require('./base');
 
 module.exports = Base.extend({
+  sidebarTabs: function () {
+    return element(by.css('.ctn-sidebar .nav-tabs'));
+  },
+
+  sidebarTabClick: function (name) {
+    return this.sidebarTabs().element(by.cssContainingText('a', name)).click();
+  },
+
   listElement: function () {
     return element(by.css('.ctn-sidebar dl'));
   },
@@ -25,6 +33,18 @@ module.exports = Base.extend({
 
   definitionVersion: function () {
     return this.listElement().element(by.css('.definition-version')).getText();
+  },
+
+  definitionVersionDropdownButton: function () {
+    return this.listElement().element(by.css('.definition-version .dropdown-toggle'));
+  },
+
+  definitionVersionDropdownButtonText: function () {
+    return this.definitionVersionDropdownButton().getText();
+  },
+
+  definitionVersionDropdownOptions: function () {
+    return this.listElement().all(by.css('.definition-version .dropdown-menu li'));
   },
 
   definitionInstancesCurrent: function () {

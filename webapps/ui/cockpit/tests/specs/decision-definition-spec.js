@@ -30,7 +30,7 @@ describe('Cockpit Decision Definition Spec', function() {
         dashboardPage.deployedDecisionsList.selectDecision(0);
 
         // then
-        expect(definitionPage.pageHeaderDecisionDefinitionName()).to.eventually.eql(decisionName);
+        expect(definitionPage.information.definitionName()).to.eventually.eql(decisionName);
 
       });
     });
@@ -96,23 +96,23 @@ describe('Cockpit Decision Definition Spec', function() {
     });
 
     it('should display the most recent version initially', function() {
-      expect(definitionPage.version.getVersion()).to.eventually.eql('2');
+      expect(definitionPage.information.definitionVersionDropdownButtonText()).to.eventually.eql('2');
     });
 
     it('should list all available versions', function() {
       // when
-      definitionPage.version.getDropdownButton().click();
+      definitionPage.information.definitionVersionDropdownButton().click();
 
       // then
-      expect(definitionPage.version.getDropdownOptions().count()).to.eventually.eql(2);
+      expect(definitionPage.information.definitionVersionDropdownOptions().count()).to.eventually.eql(2);
     });
 
     it('should load the requested version on selection', function() {
       // when
-      definitionPage.version.getDropdownOption(1).click();
+      definitionPage.information.definitionVersionDropdownOptions().get(0).click();
 
       // then
-      expect(definitionPage.version.getVersion()).to.eventually.eql('1');
+      expect(definitionPage.information.definitionVersionDropdownButtonText()).to.eventually.eql('2');
     });
 
   });

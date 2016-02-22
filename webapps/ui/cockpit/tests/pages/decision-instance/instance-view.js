@@ -9,12 +9,5 @@ module.exports = Base.extend({
   pageHeader: function() {
     this.waitForElementToBeVisible(element(by.css('.ctn-header h1')));
     return element(by.css('.ctn-header h1'));
-  },
-
-  pageHeaderDecisionInstanceId: function() {
-    return this.pageHeader().getText().then(function(fullString) {
-      return fullString.replace('<', '').replace('>', '');
-    });
   }
-
 });

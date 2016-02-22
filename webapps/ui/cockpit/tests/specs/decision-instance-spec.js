@@ -46,7 +46,7 @@ describe('Cockpit Decision Instance Spec', function() {
         definitionPage.decisionInstancesTab.selectInstanceId(0).then(function() {
 
           // then
-          expect(instancePage.pageHeaderDecisionInstanceId()).to.eventually.match(new RegExp(instanceId));
+          expect(instancePage.information.instanceId()).to.eventually.match(new RegExp(instanceId));
         });
       });
     });
