@@ -45,11 +45,6 @@ public abstract class JobRetryCmd implements Command<Object> {
         .findJobById(jobId);
   }
 
-  protected void unlockJob(JobEntity job) {
-    job.setLockOwner(null);
-    job.setLockExpirationTime(null);
-  }
-
   protected void logException(JobEntity job) {
     if(exception != null) {
       job.setExceptionMessage(exception.getMessage());

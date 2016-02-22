@@ -602,7 +602,18 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
       }
     }
   }
+  
+  /**
+   * 
+   * Unlock from current lock owner
+   * 
+   */
 
+  public void unlock() {
+    this.lockOwner = null;
+    this.lockExpirationTime = null;
+  }
+  
   public abstract String getType();
 
   @Override

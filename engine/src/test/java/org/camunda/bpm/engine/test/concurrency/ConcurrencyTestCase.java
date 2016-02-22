@@ -191,6 +191,10 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
       this.reportFailure = true;
     }
 
+    public void ignoreFutureSyncs() {
+      this.ignoreSync = true;
+    }
+
     public synchronized void setException(Exception e) {
       this.exception = e;
     }

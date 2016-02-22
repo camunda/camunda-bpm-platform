@@ -97,9 +97,11 @@ public class JobManager extends AbstractManager {
     // and timers are usually set further in the future
 
     JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
-    int waitTimeInMillis = jobExecutor.getWaitTimeInMillis();
-    if (duedate.getTime() < (ClockUtil.getCurrentTime().getTime() + waitTimeInMillis)) {
-      hintJobExecutor(timer);
+    if(jobExecutor.isActive()) {
+      int waitTimeInMillis = jobExecutor.getWaitTimeInMillis();
+      if (duedate.getTime() < (ClockUtil.getCurrentTime().getTime() + waitTimeInMillis)) {
+        hintJobExecutor(timer);
+      }
     }
   }
 
