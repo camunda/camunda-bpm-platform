@@ -27,27 +27,14 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 /**
  * @author Roman Smirnov
  */
-public abstract class JobRetryCmd implements Command<Object> {
+public abstract class JobRetryCmd extends AbstractUnlockJobCmd {
 
   protected static final long serialVersionUID = 1L;
-  protected String jobId;
   protected Throwable exception;
 
   public JobRetryCmd(String jobId, Throwable exception) {
-    this.jobId = jobId;
+	super(jobId);
     this.exception = exception;
-  }
-
-  protected JobEntity getJob() {
-    return Context
-        .getCommandContext()
-        .getJobManager()
-        .findJobById(jobId);
-  }
-
-  protected void unlockJob(JobEntity job) {
-    job.setLockOwner(null);
-    job.setLockExpirationTime(null);
   }
 
   protected void logException(JobEntity job) {

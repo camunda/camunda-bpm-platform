@@ -17,6 +17,7 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
+import org.camunda.bpm.engine.impl.cmd.UnlockJobCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
@@ -62,21 +63,35 @@ public class ExecuteJobsRunnable implements Runnable {
       while (!currentProcessorJobQueue.isEmpty()) {
 
         String nextJobId = currentProcessorJobQueue.remove(0);
-        try {
-          executeJob(nextJobId, commandExecutor);
-        }
-        catch(Throwable t) {
-          LOG.exceptionWhileExecutingJob(nextJobId, t);
-        }
+        if((jobExecutor == null || jobExecutor.isActive())) {
+	        try {
+	       	  executeJob(nextJobId, commandExecutor);
+	        }
+	        catch(Throwable t) {
+	          LOG.exceptionWhileExecutingJob(nextJobId, t);
+	        }
+        } else {
+            try {
+          	  unlockJob(nextJobId, commandExecutor);
+            }
+            catch(Throwable t) {
+              LOG.exceptionWhileUnlockingJob(nextJobId, t);
+            }
 
+        }
       }
-    }finally {
+      
+    } finally {
       Context.removeJobExecutorContext();
     }
   }
 
   protected void executeJob(String nextJobId, CommandExecutor commandExecutor) {
     commandExecutor.execute(new ExecuteJobsCmd(nextJobId));
+  }
+  
+  protected void unlockJob(String nextJobId, CommandExecutor commandExecutor) {
+	commandExecutor.execute(new UnlockJobCmd(nextJobId));
   }
 
 }
