@@ -90,6 +90,7 @@ function(
     reportData.set('plugin', _plugin);
   });
 
+  $scope.reportTitle = (($scope.getPluginProviders() || [])[0] || {}).label || null;
 }];
 
 var RouteConfig = [ '$routeProvider', function($routeProvider) {

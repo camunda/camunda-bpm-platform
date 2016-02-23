@@ -1,13 +1,18 @@
 <!-- # CE - camunda-cockpit-ui/client/scripts/reports/controllers/reports-view.html -->
-<div class="reports-wrapper container-fluid">
-  <div class="row">
-    <div class="col-xs-12 reports-type-wrapper"
+<div class="reports-wrapper">
+  <div class="ctn-header"
+       ng-if="reportTitle">
+    <h1>{{ reportTitle }} Report</h1>
+  </div>
+
+  <div class="container-fluid">
+    <div class="reports-type-wrapper"
          cam-reports-type
          report-data="reportData"
          get-plugin-providers="getPluginProviders">
     </div>
 
-    <div class="col-xs-12 reports-plugin-wrapper"
+    <div class="reports-plugin-wrapper"
          cam-reports-plugin
          report-data="reportData">
     </div>
