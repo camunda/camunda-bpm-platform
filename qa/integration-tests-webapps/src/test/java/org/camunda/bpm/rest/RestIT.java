@@ -73,15 +73,24 @@ public class RestIT extends AbstractWebappIntegrationTest {
 
     JSONArray definitionsJson = response.getEntity(JSONArray.class);
     // invoice example
-    assertEquals(1, definitionsJson.length());
+    assertEquals(2, definitionsJson.length());
 
     JSONObject definitionJson = definitionsJson.getJSONObject(0);
 
-    assertEquals("invoice", definitionJson.getString("key"));
+    assertEquals("invoice.v1", definitionJson.getString("key"));
+    assertEquals("http://www.omg.org/spec/BPMN/20100524/MODEL", definitionJson.getString("category"));
+    assertEquals("Invoice Receipt (old)", definitionJson.getString("name"));
+    Assert.assertTrue(definitionJson.isNull("description"));
+    Assert.assertTrue(definitionJson.getString("resource").contains("invoice.v1.bpmn"));
+    Assert.assertFalse(definitionJson.getBoolean("suspended"));
+
+    definitionJson = definitionsJson.getJSONObject(1);
+
+    assertEquals("invoice.v2", definitionJson.getString("key"));
     assertEquals("http://www.omg.org/spec/BPMN/20100524/MODEL", definitionJson.getString("category"));
     assertEquals("Invoice Receipt", definitionJson.getString("name"));
     Assert.assertTrue(definitionJson.isNull("description"));
-    Assert.assertTrue(definitionJson.getString("resource").contains("invoice.bpmn"));
+    Assert.assertTrue(definitionJson.getString("resource").contains("invoice.v2.bpmn"));
     Assert.assertFalse(definitionJson.getBoolean("suspended"));
 
     response.close();
@@ -99,7 +108,7 @@ public class RestIT extends AbstractWebappIntegrationTest {
     assertEquals(200, response.getStatus());
 
     JSONArray definitionsJson = response.getEntity(JSONArray.class);
-    assertEquals(3, definitionsJson.length());
+    assertEquals(6, definitionsJson.length());
 
     response.close();
   }
@@ -197,7 +206,7 @@ public class RestIT extends AbstractWebappIntegrationTest {
 
     assertEquals(200, response.getStatus());
     // invoice example instance
-    assertEquals(1, instancesJson.length());
+    assertEquals(2, instancesJson.length());
 
   }
 
