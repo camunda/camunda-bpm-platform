@@ -1,8 +1,17 @@
 .reports-wrapper {
   position: relative;
-  top: @breadcrumb-height + (@grid-gutter-width * 0.5);
+  top: @breadcrumb-height;
+  .ctn-header {
+    display: block;
+    margin-bottom: (@grid-gutter-width * 0.5);
+    border-bottom: 1px solid #e5e5e5;
+    > h1 {
+      padding: 0 10px;
+    }
+  }
 }
 
+.no-reports-available,
 .reporting-chart-holder,
 .chart-info {
   margin-top: @grid-gutter-width * 0.5;
