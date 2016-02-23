@@ -59,35 +59,13 @@
         <dd class="definition-name"
             ng-if="!decisionInstance.decisionDefinitionName || decisionInstance.decisionDefinitionName === decisionInstance.key"><span class="null-value">null</span></dd>
 
-        <!-- <dt>Definition Version:</dt>
-        <dd class="definition-version">
-          <span ng-if="!allDefinitions || !decisionDefinition"
-                class="glyphicon glyphicon-refresh animate-spin"></span>
+        <dt>Definition Version:</dt>
+        <dd class="definition-version">{{decisionDefinition.version}}</dd>
 
-          <div class="dropdown"
-               ng-if="allDefinitions && allDefinitions.length > 1">
-            <a href
-               class="dropdown-toggle">
-              {{ decisionDefinition.version }}
-              <span class="caret"></span>
-            </a>
+        <dt>Deployment ID:</dt>
+        <dd class="deployment-id"
+            ng-if="decisionDefinition"><a ng-href="{{ getDeploymentUrl() }}">{{ decisionDefinition.deploymentId }}</a></dd>
 
-            <ul class="dropdown-menu">
-              <li ng-repeat="definition in allDefinitions">
-                <a ng-href="#/decision-definition/{{ definition.id }}">
-                  {{ definition.version }}
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <span ng-if="allDefinitions && allDefinitions.length < 2 && decisionDefinition">
-            {{ decisionDefinition.version }}
-          </span>
-        </dd> -->
-
-        <!-- <dt>Deployment ID:</dt>
-        <dd class="deployment-id"><a ng-href="{{ getDeploymentUrl() }}">{{ decisionInstance.deploymentId }}</a></dd> -->
       </dl>
 
       <a class="hide-collapsable pull-right"></a>
