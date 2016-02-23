@@ -45,6 +45,20 @@ var angular = require('angular'),
       return deferred.promise;
     });
 
+    decisionData.provide('decisionDefinition', function() {
+      var deferred = $q.defer();
+
+      decisionDefinitionService.get(decisionInstance.decisionDefinitionId, function(err, data) {
+        if(!err) {
+          deferred.resolve(data);
+        } else {
+          deferred.reject(err);
+        }
+      });
+
+      return deferred.promise;
+    });
+
     // end data definition /////////////////////////
 
 
@@ -76,6 +90,26 @@ var angular = require('angular'),
     decisionData.observe(['tableXml'], function(tableXml) {
       $scope.tableXml = tableXml;
     });
+    decisionData.observe(['decisionDefinition'], function(decisionDefinition) {
+      $scope.decisionDefinition = decisionDefinition;
+    });
+
+    $scope.getDeploymentUrl = function() {
+      var path = '#/repository';
+
+      var deploymentId = $scope.decisionDefinition.deploymentId;
+      var searches = {
+        deployment: deploymentId,
+        resourceName: $scope.decisionDefinition.resource,
+        deploymentsQuery: JSON.stringify([{
+          type     : 'id',
+          operator : 'eq',
+          value    : deploymentId
+        }])
+      };
+
+      return routeUtil.redirectTo(path, searches, [ 'deployment', 'resourceName', 'deploymentsQuery' ]);
+    };
 
     $scope.initializeTablePlugins = function() {
       var tablePlugins = Views.getProviders({ component: 'cockpit.decisionInstance.table' });
