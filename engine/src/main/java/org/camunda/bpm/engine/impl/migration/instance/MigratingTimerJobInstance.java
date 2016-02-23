@@ -70,8 +70,8 @@ public class MigratingTimerJobInstance implements MigratingInstance, RemovingIns
     // do nothing
   }
 
-  public void create(ExecutionEntity representativeExecution) {
-    timerDeclaration.createTimer(representativeExecution);
+  public void create(ExecutionEntity scopeExecution) {
+    timerDeclaration.createTimer(scopeExecution);
   }
 
   public void remove() {

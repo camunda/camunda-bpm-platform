@@ -55,8 +55,8 @@ public class MigratingEventSubscriptionInstance implements MigratingInstance, Re
     // do nothing
   }
 
-  public void create(ExecutionEntity representativeExecution) {
-    eventSubscriptionDeclaration.createSubscription(representativeExecution);
+  public void create(ExecutionEntity scopeExecution) {
+    eventSubscriptionDeclaration.createSubscription(scopeExecution);
   }
 
   public void remove() {

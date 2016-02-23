@@ -12,8 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.migration.instance;
 
+/**
+ * Represents a instance which will be removed by a migration, i.e.
+ * removed event subscriptions or jobs.
+ */
 public interface RemovingInstance {
 
+  /**
+   * Remove this instance from the process instance.
+   */
   void remove();
 
 }
