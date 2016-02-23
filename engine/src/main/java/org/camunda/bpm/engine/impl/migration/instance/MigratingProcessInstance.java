@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -42,6 +43,7 @@ import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.Incident;
 
 /**
  * @author Thorben Lindhauer
@@ -230,7 +232,9 @@ public class MigratingProcessInstance {
         ActivityImpl timerJobTargetActivity = findTargetActivityForInstruction(timerJobMigrationInstruction, targetProcessDefinition);
         migratedTimerJobTargetActivityIds.add(timerJobTargetActivity.getId());
         JobDefinitionEntity jobDefinitionEntity = jobDefinitionsByActivityId.get(timerJobTargetActivity.getActivityId());
-        migratingInstance.addMigratingDependentInstance(new MigratingTimerJobInstance(job, jobDefinitionEntity, timerJobTargetActivity));
+        MigratingTimerJobInstance migratingTimerJobInstance = new MigratingTimerJobInstance(job, jobDefinitionEntity, timerJobTargetActivity);
+        addFailingJobIncidentsAsDependentInstances(job, migratingInstance.getTargetScope(), migratingTimerJobInstance);
+        migratingInstance.addMigratingDependentInstance(migratingTimerJobInstance);
 
       }
       else {
@@ -256,6 +260,14 @@ public class MigratingProcessInstance {
     }
 
     return emergingTimerDeclarations;
+  }
+
+  protected static void addFailingJobIncidentsAsDependentInstances(JobEntity job, ScopeImpl targetScope, MigratingTimerJobInstance migratingTimerJobInstance) {
+    List<Incident> incidents = Context.getCommandContext().getIncidentManager().findIncidentByConfigurationAndIncidentType(job.getId(), Incident.FAILED_JOB_HANDLER_TYPE);
+    for (Incident incident : incidents) {
+      MigratingFailedJobIncident migratingIncident = new MigratingFailedJobIncident((IncidentEntity) incident, targetScope);
+      migratingTimerJobInstance.addMigratingDependentInstance(migratingIncident);
+    }
   }
 
   protected static Set<ActivityInstance> flatten(ActivityInstance activityInstance) {

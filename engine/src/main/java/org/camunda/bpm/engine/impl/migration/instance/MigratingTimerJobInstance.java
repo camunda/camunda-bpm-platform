@@ -13,6 +13,9 @@
 
 package org.camunda.bpm.engine.impl.migration.instance;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -29,6 +32,8 @@ public class MigratingTimerJobInstance implements MigratingInstance, RemovingIns
 
   protected TimerDeclarationImpl timerDeclaration;
 
+  protected List<MigratingInstance> migratingDependentInstances = new ArrayList<MigratingInstance>();
+
   public MigratingTimerJobInstance(JobEntity jobEntity, JobDefinitionEntity jobDefinitionEntity, ScopeImpl targetScope) {
     this.jobEntity = jobEntity;
     this.targetJobDefinitionEntity = jobDefinitionEntity;
@@ -41,6 +46,10 @@ public class MigratingTimerJobInstance implements MigratingInstance, RemovingIns
 
   public MigratingTimerJobInstance(TimerDeclarationImpl timerDeclaration) {
     this.timerDeclaration = timerDeclaration;
+  }
+
+  public void addMigratingDependentInstance(MigratingInstance migratingInstance) {
+    migratingDependentInstances.add(migratingInstance);
   }
 
   public void detachState() {
@@ -67,7 +76,9 @@ public class MigratingTimerJobInstance implements MigratingInstance, RemovingIns
   }
 
   public void migrateDependentEntities() {
-    // do nothing
+    for (MigratingInstance migratingDependentInstance : migratingDependentInstances) {
+      migratingDependentInstance.migrateState();
+    }
   }
 
   public void create(ExecutionEntity scopeExecution) {

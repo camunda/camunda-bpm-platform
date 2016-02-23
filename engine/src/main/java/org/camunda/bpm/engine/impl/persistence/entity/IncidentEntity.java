@@ -371,13 +371,23 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
   }
 
   public void setExecution(ExecutionEntity execution) {
-    executionId = execution.getId();
-    activityId = execution.getActivityId();
-    processInstanceId = execution.getProcessInstanceId();
-    processDefinitionId = execution.getProcessDefinitionId();
-    tenantId = execution.getTenantId();
+    if (execution != null) {
+      executionId = execution.getId();
+      activityId = execution.getActivityId();
+      processInstanceId = execution.getProcessInstanceId();
+      processDefinitionId = execution.getProcessDefinitionId();
+      tenantId = execution.getTenantId();
 
-    execution.addIncident(this);
+      execution.addIncident(this);
+    }
+    else {
+      getExecution().removeIncident(this);
+      executionId = null;
+      activityId = null;
+      processInstanceId = null;
+      processDefinitionId = null;
+      tenantId = null;
+    }
   }
 
   public ExecutionEntity getExecution() {
@@ -393,8 +403,9 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
   @Override
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("executionId", this.executionId);
+    persistentState.put("executionId", executionId);
     persistentState.put("processDefinitionId", processDefinitionId);
+    persistentState.put("activityId", activityId);
     return persistentState;
   }
 

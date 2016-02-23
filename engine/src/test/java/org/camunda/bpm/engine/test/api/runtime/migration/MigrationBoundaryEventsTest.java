@@ -15,11 +15,17 @@ package org.camunda.bpm.engine.test.api.runtime.migration;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
+import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Test;
 
@@ -1681,5 +1687,71 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     completeTasks("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
+
+  @Test
+  public void testMigrateIncidentForJob() {
+    // given
+    BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .builderForUserTask("userTask")
+      .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+      .serviceTask("failingTask").camundaClass("org.camunda.bpm.engine.test.api.runtime.FailingDelegate")
+      .endEvent()
+      .done();
+    BpmnModelInstance targetProcess = modify(sourceProcess)
+      .changeElementId("userTask", "newUserTask")
+      .changeElementId("boundary", "newBoundary");
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+
+    // a timer job exists
+    Job jobBeforeMigration = rule.getManagementService().createJobQuery().singleResult();
+    assertNotNull(jobBeforeMigration);
+
+    // if the timer job is triggered the failing delegate fails and an incident is created
+    executeJob(jobBeforeMigration);
+    Incident incidentBeforeMigration = runtimeService.createIncidentQuery().singleResult();
+    assertEquals("userTask", incidentBeforeMigration.getActivityId());
+
+    MigrationPlan migrationPlan = runtimeService
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "newUserTask")
+      .mapActivities("boundary", "newBoundary")
+      .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then the job and incident still exists
+    Job jobAfterMigration = rule.getManagementService().createJobQuery().jobId(jobBeforeMigration.getId()).singleResult();
+    assertNotNull(jobAfterMigration);
+    Incident incidentAfterMigration = runtimeService.createIncidentQuery().singleResult();
+    assertNotNull(incidentAfterMigration);
+
+    // and it is still the same incident
+    assertEquals(incidentBeforeMigration.getId(), incidentAfterMigration.getId());
+
+    // and the activity and process definition references where updated
+    assertEquals("newUserTask", incidentAfterMigration.getActivityId());
+    assertEquals(targetProcessDefinition.getId(), incidentAfterMigration.getProcessDefinitionId());
+  }
+
+  protected void executeJob(Job job) {
+    ManagementService managementService = rule.getManagementService();
+
+    while (job != null && job.getRetries() > 0) {
+      try {
+        managementService.executeJob(job.getId());
+      }
+      catch (Exception e) {
+        // ignore
+      }
+
+      job = managementService.createJobQuery().jobId(job.getId()).singleResult();
+    }
+  }
+
 
 }

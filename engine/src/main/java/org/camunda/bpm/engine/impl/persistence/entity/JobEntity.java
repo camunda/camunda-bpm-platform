@@ -206,9 +206,16 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   }
 
   public void setExecution(ExecutionEntity execution) {
-    executionId = execution.getId();
-    processInstanceId = execution.getProcessInstanceId();
-    execution.addJob(this);
+    if (execution != null) {
+      executionId = execution.getId();
+      processInstanceId = execution.getProcessInstanceId();
+      execution.addJob(this);
+    }
+    else {
+      this.execution.removeJob(this);
+      processInstanceId = null;
+      executionId = null;
+    }
   }
 
   // sequence counter /////////////////////////////////////////////////////////

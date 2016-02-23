@@ -20,6 +20,7 @@ import org.camunda.bpm.model.bpmn.builder.AbstractActivityBuilder;
 import org.camunda.bpm.model.bpmn.builder.AbstractBaseElementBuilder;
 import org.camunda.bpm.model.bpmn.builder.AbstractFlowNodeBuilder;
 import org.camunda.bpm.model.bpmn.builder.SubProcessBuilder;
+import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
@@ -94,6 +95,10 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
   public <T extends AbstractBaseElementBuilder> T getBuilderForElementById(String id, Class<T> builderClass) {
     BaseElement modelElementById = modelInstance.getModelElementById(id);
     return (T) modelElementById.builder();
+  }
+
+  public UserTaskBuilder builderForUserTask(String id) {
+    return getBuilderForElementById(id, UserTaskBuilder.class);
   }
 
   public ModifiableBpmnModelInstance changeElementId(String oldId, String newId) {
