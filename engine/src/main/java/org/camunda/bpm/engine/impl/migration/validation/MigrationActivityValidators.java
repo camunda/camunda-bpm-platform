@@ -80,7 +80,7 @@ public class MigrationActivityValidators {
 
   public static final MigrationActivityValidator HAS_NO_EVENT_SUB_PROCESS_CHILD = new AbstractMigrationActivityValidator() {
     public boolean canBeMigrated(ActivityImpl activity, ProcessDefinitionImpl processDefinition) {
-      return !hasEventSubProcessChildOrAncestor(activity);
+      return !hasEventSubProcessChildOrSibling(activity);
     }
   };
 
@@ -116,12 +116,12 @@ public class MigrationActivityValidators {
     return !isProcessDefinition(scope) && scope.getActivityBehavior() instanceof EventSubProcessActivityBehavior;
   }
 
-  protected static boolean hasEventSubProcessChildOrAncestor(ActivityImpl activity) {
+  protected static boolean hasEventSubProcessChildOrSibling(ActivityImpl activity) {
     if (isScope(activity) || isProcessDefinition(activity.getFlowScope())) {
       List<ActivityImpl> activitiesToCheck;
       if (!isScope(activity) && isProcessDefinition(activity.getFlowScope())) {
         // if the activity is not a scope its parent is the process definition
-        // so we have to check for ancestors not childs as the process definition
+        // so we have to check for siblings not children as the process definition
         // has no explicit instruction
         activitiesToCheck = activity.getFlowScope().getActivities();
       }

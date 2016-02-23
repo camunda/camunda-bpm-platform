@@ -103,7 +103,7 @@ public abstract class AbstractMigrationTest {
 
     for (EventSubscription eventSubscription : testHelper.snapshotBeforeMigration.getEventSubscriptions()) {
       if (eventSubscriptionAfter.getId().equals(eventSubscription.getId())) {
-        fail("Expected event subscription '" + eventSubscriptionAfter.getId() + "' to be first created after migration");
+        fail("Expected event subscription '" + eventSubscriptionAfter.getId() + "' to be created after migration");
       }
     }
   }

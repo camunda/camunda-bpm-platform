@@ -27,7 +27,7 @@ public class MigrationEventSubProcessTest extends AbstractMigrationTest {
   public static final String IN_EVENT_SUB_PROCESS_TASK = "inEventSubProcessTask";
 
   @Test
-  public void testMapUserTaskAncestorOfMessageEventSubProcess() {
+  public void testMapUserTaskSiblingOfMessageEventSubProcess() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
       .addSubProcessToParent("subProcess")
       .triggerByEvent()
@@ -72,7 +72,7 @@ public class MigrationEventSubProcessTest extends AbstractMigrationTest {
   }
 
   @Test
-  public void testMapUserTaskAncestorOfMessageEventSubProcessAndTriggerMessage() {
+  public void testMapUserTaskSiblingOfMessageEventSubProcessAndTriggerMessage() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
       .addSubProcessToParent("subProcess")
       .triggerByEvent()
@@ -100,7 +100,7 @@ public class MigrationEventSubProcessTest extends AbstractMigrationTest {
   }
 
   @Test
-  public void testMapUserTaskAncestorOfSignalEventSubProcess() {
+  public void testMapUserTaskSiblingOfSignalEventSubProcess() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
       .addSubProcessToParent("subProcess")
       .triggerByEvent()
@@ -145,7 +145,7 @@ public class MigrationEventSubProcessTest extends AbstractMigrationTest {
   }
 
   @Test
-  public void testMapUserTaskAncestorOfSignalEventSubProcessAndSendSignal() {
+  public void testMapUserTaskSiblingOfSignalEventSubProcessAndSendSignal() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
       .addSubProcessToParent("subProcess")
       .triggerByEvent()
@@ -173,7 +173,7 @@ public class MigrationEventSubProcessTest extends AbstractMigrationTest {
   }
 
   @Test
-  public void testMapUserTaskAncestorOfTimerEventSubProcess() {
+  public void testMapUserTaskSiblingOfTimerEventSubProcess() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
       .addSubProcessToParent("subProcess")
       .triggerByEvent()
@@ -218,7 +218,7 @@ public class MigrationEventSubProcessTest extends AbstractMigrationTest {
   }
 
   @Test
-  public void testMapUserTaskAncestorOfTimerEventSubProcessAndTriggerTimer() {
+  public void testMapUserTaskSiblingOfTimerEventSubProcessAndTriggerTimer() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
       .addSubProcessToParent("subProcess")
       .triggerByEvent()

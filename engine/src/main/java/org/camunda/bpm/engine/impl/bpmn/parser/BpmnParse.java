@@ -3239,11 +3239,10 @@ public class BpmnParse extends Parse {
   }
 
   protected void addTimerDeclaration(ScopeImpl scope, TimerDeclarationImpl timerDeclaration) {
-    List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) scope.getProperty(PROPERTYNAME_TIMER_DECLARATION);
-    if (timerDeclarations == null) {
-      timerDeclarations = new ArrayList<TimerDeclarationImpl>();
-      scope.setProperty(PROPERTYNAME_TIMER_DECLARATION, timerDeclarations);
+    if (!scope.getProperties().contains(BpmnProperties.TIMER_DECLARATIONS)) {
+      scope.getProperties().set(BpmnProperties.TIMER_DECLARATIONS, new ArrayList<TimerDeclarationImpl>());
     }
+    List<TimerDeclarationImpl> timerDeclarations = scope.getProperties().get(BpmnProperties.TIMER_DECLARATIONS);
     timerDeclarations.add(timerDeclaration);
   }
 

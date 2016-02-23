@@ -131,7 +131,7 @@ public class MigratingProcessInstance {
         targetActivity = findTargetActivityForInstruction(applyingInstruction, targetProcessDefinition);
       }
       else if (isLeafActivity(instance)) {
-          unmappedLeafInstances.add(instance);
+        unmappedLeafInstances.add(instance);
       }
 
       MigratingActivityInstance migratingInstance = migratingProcessInstance.addActivityInstance(

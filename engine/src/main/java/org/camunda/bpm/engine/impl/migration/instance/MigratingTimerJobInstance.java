@@ -23,14 +23,14 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 public class MigratingTimerJobInstance implements MigratingInstance, RemovingInstance, EmergingInstance {
 
   protected JobEntity jobEntity;
-  protected JobDefinitionEntity jobDefinitionEntity;
+  protected JobDefinitionEntity targetJobDefinitionEntity;
   protected ScopeImpl targetScope;
 
   protected TimerDeclarationImpl timerDeclaration;
 
   public MigratingTimerJobInstance(JobEntity jobEntity, JobDefinitionEntity jobDefinitionEntity, ScopeImpl targetScope) {
     this.jobEntity = jobEntity;
-    this.jobDefinitionEntity = jobDefinitionEntity;
+    this.targetJobDefinitionEntity = jobDefinitionEntity;
     this.targetScope = targetScope;
   }
 
@@ -54,8 +54,8 @@ public class MigratingTimerJobInstance implements MigratingInstance, RemovingIns
     String activityId = targetScope.getId();
     jobEntity.setActivityId(activityId);
     updateJobConfiguration(activityId);
-    if (jobDefinitionEntity != null) {
-      jobEntity.setJobDefinition(jobDefinitionEntity);
+    if (targetJobDefinitionEntity != null) {
+      jobEntity.setJobDefinition(targetJobDefinitionEntity);
     }
   }
 

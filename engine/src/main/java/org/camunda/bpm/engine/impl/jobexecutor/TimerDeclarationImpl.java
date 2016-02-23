@@ -20,6 +20,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.calendar.BusinessCalendar;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -169,11 +170,10 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
     return context;
   }
 
-  @SuppressWarnings("unchecked")
   public static List<TimerDeclarationImpl> getDeclarationsForScope(PvmScope scope) {
-    Object result = scope.getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
+    List<TimerDeclarationImpl> result = scope.getProperties().get(BpmnProperties.TIMER_DECLARATIONS);
     if (result != null) {
-      return (List<TimerDeclarationImpl>) result;
+      return result;
     }
     else {
       return Collections.emptyList();
