@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 public class MigratingTimerJobInstance implements MigratingInstance, RemovingInstance, EmergingInstance {
@@ -51,12 +52,18 @@ public class MigratingTimerJobInstance implements MigratingInstance, RemovingIns
   }
 
   public void migrateState() {
+    // update activity reference
     String activityId = targetScope.getId();
     jobEntity.setActivityId(activityId);
     updateJobConfiguration(activityId);
     if (targetJobDefinitionEntity != null) {
       jobEntity.setJobDefinition(targetJobDefinitionEntity);
     }
+
+    // update process definition reference
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) targetScope.getProcessDefinition();
+    jobEntity.setProcessDefinitionId(processDefinition.getId());
+    jobEntity.setProcessDefinitionKey(processDefinition.getKey());
   }
 
   public void migrateDependentEntities() {

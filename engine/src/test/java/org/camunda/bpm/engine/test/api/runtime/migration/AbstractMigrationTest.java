@@ -125,7 +125,8 @@ public abstract class AbstractMigrationTest {
 
     assertEquals(jobBefore.getId(), jobAfter.getId());
     assertEquals(jobBefore.getDuedate(), jobAfter.getDuedate());
-
+    assertEquals(jobDefinitionAfter.getProcessDefinitionId(), jobAfter.getProcessDefinitionId());
+    assertEquals(jobDefinitionAfter.getProcessDefinitionKey(), jobAfter.getProcessDefinitionKey());
   }
 
   protected void assertTimerJobsRemoved(String... activityIds) {
