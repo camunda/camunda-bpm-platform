@@ -77,16 +77,16 @@ public class RestIT extends AbstractWebappIntegrationTest {
 
     JSONObject definitionJson = definitionsJson.getJSONObject(0);
 
-    assertEquals("invoice.v1", definitionJson.getString("key"));
+    assertEquals("invoice", definitionJson.getString("key"));
     assertEquals("http://www.omg.org/spec/BPMN/20100524/MODEL", definitionJson.getString("category"));
-    assertEquals("Invoice Receipt (old)", definitionJson.getString("name"));
+    assertEquals("Invoice Receipt", definitionJson.getString("name"));
     Assert.assertTrue(definitionJson.isNull("description"));
     Assert.assertTrue(definitionJson.getString("resource").contains("invoice.v1.bpmn"));
     Assert.assertFalse(definitionJson.getBoolean("suspended"));
 
     definitionJson = definitionsJson.getJSONObject(1);
 
-    assertEquals("invoice.v2", definitionJson.getString("key"));
+    assertEquals("invoice", definitionJson.getString("key"));
     assertEquals("http://www.omg.org/spec/BPMN/20100524/MODEL", definitionJson.getString("category"));
     assertEquals("Invoice Receipt", definitionJson.getString("name"));
     Assert.assertTrue(definitionJson.isNull("description"));

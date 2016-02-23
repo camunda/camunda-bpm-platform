@@ -5,9 +5,9 @@
   </dataStore>
   <message id="foxMessage_en" name="foxMessage_en" />
   <collaboration id="collaboration_3">
-    <participant id="Process_Engine_1" name="Invoice Receipt" processRef="invoice.v2" />
+    <participant id="Process_Engine_1" name="Invoice Receipt" processRef="invoice" />
   </collaboration>
-  <process id="invoice.v2" name="Invoice Receipt" isExecutable="true">
+  <process id="invoice" name="Invoice Receipt" isExecutable="true">
     <laneSet id="laneSet_5">
       <lane id="Approver" name="Approver">
         <flowNodeRef>approveInvoice</flowNodeRef>

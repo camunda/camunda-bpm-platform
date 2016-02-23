@@ -12,19 +12,25 @@
  */
 package org.camunda.bpm.example.invoice;
 
-import static org.camunda.bpm.engine.variable.Variables.*;
+import static org.camunda.bpm.engine.variable.Variables.createVariables;
+import static org.camunda.bpm.engine.variable.Variables.fileValue;
 
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 
@@ -42,16 +48,55 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
   public void startFirstProcess(ProcessEngine processEngine) {
 
     createUsers(processEngine);
-    startProcessInstances(processEngine, "invoice.v1");
-    startProcessInstances(processEngine, "invoice.v2");
+    startProcessInstances(processEngine, "invoice", 1);
+    startProcessInstances(processEngine, "invoice", null);
   }
 
-  private void startProcessInstances(ProcessEngine processEngine, String processDefinitionKey) {
+  @Override
+  public void createDeployment(String processArchiveName, DeploymentBuilder deploymentBuilder) {
+    ProcessEngine processEngine = BpmPlatform.getProcessEngineService().getProcessEngine("default");
+
+    // Hack: deploy the first version of the invoice process once before the process application
+    //   is deployed the first time
+    if (processEngine != null) {
+
+      RepositoryService repositoryService = processEngine.getRepositoryService();
+
+      if (!isProcessDeployed(repositoryService, "invoice")) {
+        ClassLoader classLoader = getProcessApplicationClassloader();
+
+        repositoryService.createDeployment(this.getReference())
+          .addInputStream("invoice.bpmn", classLoader.getResourceAsStream("invoice.v1.bpmn"))
+          .addInputStream("assign-approver-groups.dmn", classLoader.getResourceAsStream("assign-approver-groups.dmn"))
+          .deploy();
+      }
+    }
+  }
+
+  protected boolean isProcessDeployed(RepositoryService repositoryService, String key) {
+    return repositoryService.createProcessDefinitionQuery().processDefinitionKey("invoice").count() > 0;
+  }
+
+  private void startProcessInstances(ProcessEngine processEngine, String processDefinitionKey, Integer version) {
+
+    ProcessDefinitionQuery processDefinitionQuery = processEngine
+      .getRepositoryService()
+      .createProcessDefinitionQuery()
+      .processDefinitionKey(processDefinitionKey);
+
+    if (version != null) {
+      processDefinitionQuery.processDefinitionVersion(version);
+    }
+    else {
+      processDefinitionQuery.latestVersion();
+    }
+
+    ProcessDefinition processDefinition = processDefinitionQuery.singleResult();
 
     InputStream invoiceInputStream = InvoiceProcessApplication.class.getClassLoader().getResourceAsStream("invoice.pdf");
 
     // process instance 1
-    processEngine.getRuntimeService().startProcessInstanceByKey(processDefinitionKey, createVariables()
+    processEngine.getRuntimeService().startProcessInstanceById(processDefinition.getId(), createVariables()
         .putValue("creditor", "Great Pizza for Everyone Inc.")
         .putValue("amount", 30.00d)
         .putValue("invoiceCategory", "Travel Expenses")
@@ -70,7 +115,7 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
       calendar.add(Calendar.DAY_OF_MONTH, -14);
       ClockUtil.setCurrentTime(calendar.getTime());
 
-      ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey(processDefinitionKey, createVariables()
+      ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceById(processDefinition.getId(), createVariables()
           .putValue("creditor", "Bobby's Office Supplies")
           .putValue("amount", 900.00d)
           .putValue("invoiceCategory", "Misc")
@@ -102,7 +147,7 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
       calendar.add(Calendar.DAY_OF_MONTH, -5);
       ClockUtil.setCurrentTime(calendar.getTime());
 
-      ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey(processDefinitionKey, createVariables()
+      ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceById(processDefinition.getId(), createVariables()
           .putValue("creditor", "Papa Steve's all you can eat")
           .putValue("amount", 10.99d)
           .putValue("invoiceCategory", "Travel Expenses")
