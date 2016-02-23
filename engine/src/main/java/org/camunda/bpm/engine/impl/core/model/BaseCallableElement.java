@@ -118,7 +118,7 @@ public class BaseCallableElement {
     this.deploymentId = deploymentId;
   }
 
-  public String getProcessDefinitionTenantId(CoreExecution execution) {
+  public String getDefinitionTenantId(CoreExecution execution) {
     // CAM-5413 - use an expression to resolve the tenant-id 
 
     if(execution instanceof ExecutionEntity) {

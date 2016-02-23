@@ -35,7 +35,7 @@ public class CallableElementUtil {
 
   public static ProcessDefinitionImpl getProcessDefinitionToCall(VariableScope execution, BaseCallableElement callableElement) {
     String processDefinitionKey = callableElement.getDefinitionKey(execution);
-    String tenantId = callableElement.getProcessDefinitionTenantId((CoreExecution) execution);
+    String tenantId = callableElement.getDefinitionTenantId((CoreExecution) execution);
 
     DeploymentCache deploymentCache = getDeploymentCache();
 
@@ -58,7 +58,7 @@ public class CallableElementUtil {
 
   public static CmmnCaseDefinition getCaseDefinitionToCall(VariableScope execution, BaseCallableElement callableElement) {
     String caseDefinitionKey = callableElement.getDefinitionKey(execution);
-    String tenantId = callableElement.getProcessDefinitionTenantId((CoreExecution) execution);
+    String tenantId = callableElement.getDefinitionTenantId((CoreExecution) execution);
 
     DeploymentCache deploymentCache = getDeploymentCache();
 
