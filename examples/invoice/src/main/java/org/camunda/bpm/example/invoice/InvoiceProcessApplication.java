@@ -66,7 +66,7 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
         ClassLoader classLoader = getProcessApplicationClassloader();
 
         repositoryService.createDeployment(this.getReference())
-          .addInputStream("invoice.bpmn", classLoader.getResourceAsStream("invoice.v1.bpmn"))
+          .addInputStream("invoice.v1.bpmn", classLoader.getResourceAsStream("invoice.v1.bpmn"))
           .addInputStream("assign-approver-groups.dmn", classLoader.getResourceAsStream("assign-approver-groups.dmn"))
           .deploy();
       }
