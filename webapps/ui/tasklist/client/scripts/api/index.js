@@ -1,5 +1,5 @@
 'use strict';
-var angular = require('angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
   CamSDK = require('camunda-bpm-sdk-js/lib/angularjs/index');
 
   var apiModule = angular.module('cam.tasklist.client', []);

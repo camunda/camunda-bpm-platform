@@ -1,6 +1,6 @@
 'use strict';
 
-var angular = require('angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
     angularRoute = require('angular-route'),
     camundaCommonsUi = require('camunda-commons-ui'),
     authorizations = require('./authorizations'),

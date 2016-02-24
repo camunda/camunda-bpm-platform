@@ -17,7 +17,6 @@
     "commonsUiDir": "node_modules/camunda-commons-ui"
   },
   "dependencies": {
-    "angular": "1.2.29",
     "angular-data-depend": "git://github.com/camunda-third-party/angular-data-depend#8e3b66914c611069e3698fd5d4275e6cf8055d01",
     "angular-moment": "0.9.0",
     "angular-route": "1.2.29",

@@ -3,7 +3,7 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-tasklist-filter-modal-form-general.html', 'utf8');
 
-var angular = require('angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 
   module.exports = [function() {
 

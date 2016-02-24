@@ -3,7 +3,7 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-tasklist-task.html', 'utf8');
 
-var angular = require('angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 var jquery = require('jquery');
 
   var TaskErrorManager = (function() {

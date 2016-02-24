@@ -3,7 +3,7 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-tasklist-form.html', 'utf8');
 
-var angular = require('angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 
   var EMBEDDED_KEY = 'embedded:',
       APP_KEY = 'app:',

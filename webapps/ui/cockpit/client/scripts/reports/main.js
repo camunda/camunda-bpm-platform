@@ -1,6 +1,6 @@
 'use strict';
 
-var angular = require('angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
     reportsView = require('./controllers/reports-view-ctrl'),
     reportsPlugin = require('./directives/reports-plugin'),
     reportsType = require('./directives/reports-type');

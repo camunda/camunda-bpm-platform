@@ -9,7 +9,7 @@ var dataDepend = require('angular-data-depend');
 
 var APP_NAME = 'cam.cockpit';
 
-var angular = require('angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 
   module.exports = function(pluginDependencies) {
 

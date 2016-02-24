@@ -1,6 +1,6 @@
 'use strict';
 var moment = require('camunda-commons-ui/vendor/moment'),
-    angular = require('angular');
+    angular = require('camunda-bpm-sdk-js/vendor/angular');
 
   module.exports = function(ngModule, appRoot) {
 

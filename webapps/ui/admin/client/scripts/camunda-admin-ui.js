@@ -7,7 +7,7 @@ var pagesModule = require('./pages/main'),
     resourcesModule = require('./resources/main'),
     camCommonsUi = require('camunda-commons-ui/lib'),
     sdk = require('camunda-bpm-sdk-js/lib/angularjs/index'),
-    angular = require('angular'),
+    angular = require('camunda-bpm-sdk-js/vendor/angular'),
     $ = require('jquery');
 
 

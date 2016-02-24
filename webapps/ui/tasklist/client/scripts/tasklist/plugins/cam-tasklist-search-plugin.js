@@ -4,7 +4,7 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/cam-tasklist-search-plugin.html', 'utf8');
 var searchConfigJSON = fs.readFileSync(__dirname + '/cam-tasklist-search-plugin-config.json', 'utf8');
 
-var angular = require('angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 
   var expressionsRegex = /^[\s]*(\#|\$)\{/;
 

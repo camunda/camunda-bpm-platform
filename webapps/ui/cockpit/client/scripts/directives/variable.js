@@ -9,7 +9,7 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/variable.html', 'utf8');
 
-var angular = require('angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 
   var Directive = ['$compile', function ($compile) {
     return {

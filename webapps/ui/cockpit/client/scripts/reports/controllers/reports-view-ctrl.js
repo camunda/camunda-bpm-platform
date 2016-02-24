@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/reports-view.html', 'utf8');
-var angular = require('angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 var extend = angular.extend;
 
 var Controller = [

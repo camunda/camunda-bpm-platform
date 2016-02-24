@@ -4,7 +4,7 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/processDiagramPreview.html', 'utf8');
 
-var angular = require('angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 
   module.exports = ['ProcessDefinitionResource', 'debounce', function (ProcessDefinitionResource, debounce) {
     return {

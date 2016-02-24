@@ -7,7 +7,7 @@
 
 'use strict';
 
-var angular = require('angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
 
   /* directives */
   camTasklistFilters = require('./directives/cam-tasklist-filters'),

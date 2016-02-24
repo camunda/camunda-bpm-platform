@@ -7,7 +7,7 @@ var commons = require('camunda-commons-ui/lib');
 var sdk = require('camunda-bpm-sdk-js/lib/angularjs/index');
 require('angular-data-depend');
 
-var angular = require('angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 var dataDepend = require('angular-data-depend');
 
   /**
