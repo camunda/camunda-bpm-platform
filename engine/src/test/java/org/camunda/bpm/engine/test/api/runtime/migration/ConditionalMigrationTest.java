@@ -59,7 +59,6 @@ public class ConditionalMigrationTest {
 		assertNotNull(activityInstance);
 
 		rule.getRuntimeService().executeMigrationPlan(migrationPlan, Collections.singletonList(processInstance.getId()));
-
 		String variableName = "amount";
 		int value = (Integer)rule.getRuntimeService().getVariable(processInstance.getId(), variableName);
 		assertNotNull(value);

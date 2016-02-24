@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.Condition;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
@@ -35,8 +36,6 @@ import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
-import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateEvent;
-
 /**
  * @author Thorben Lindhauer
  *
@@ -88,7 +87,7 @@ public class MigratingProcessInstance {
 
     return migratingInstance;
   }
-
+  
 
   /**
    * Returns a {@link MigratingProcessInstance}, a data structure that contains meta-data for the activity
@@ -110,7 +109,7 @@ public class MigratingProcessInstance {
     Set<ActivityInstance> unmappedLeafInstances = new HashSet<ActivityInstance>();
 
     // always create an entry for the root activity instance because it is implicitly always migrated
-    migratingProcessInstance.addActivityInstance(
+    MigratingActivityInstance migratingInstance = migratingProcessInstance.addActivityInstance(
         null,
         activityInstanceTree,
         sourceProcessDefinition,
@@ -140,7 +139,7 @@ public class MigratingProcessInstance {
 						continue;
 					Condition condition = applyingInstruction.getCondition();
 					//TODO: Retrieving the delegate event has to be checked for mapping condition
-					if(condition != null && condition.shouldMap(DelegateEvent.getEvents().get(0)))
+					if(condition != null && condition.shouldMap((DelegateExecution)migratingInstance.representativeExecution))
 					{
 						conditionSatisfied = true;
 						break;
@@ -161,7 +160,7 @@ public class MigratingProcessInstance {
 				continue;
 			}
 			targetActivity = targetProcessDefinition.findActivity(applyingInstruction.getTargetActivityIds().get(0));
-			MigratingActivityInstance migratingInstance = migratingProcessInstance.addActivityInstance(
+			migratingInstance = migratingProcessInstance.addActivityInstance(
 					applyingInstruction,
 					instance,
 					sourceActivity,
