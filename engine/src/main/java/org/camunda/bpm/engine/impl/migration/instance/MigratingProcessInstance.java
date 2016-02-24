@@ -138,7 +138,6 @@ public class MigratingProcessInstance {
 					if(applyingInstruction == null)//java.util.List allows null object as well
 						continue;
 					Condition condition = applyingInstruction.getCondition();
-					//TODO: Retrieving the delegate event has to be checked for mapping condition
 					if(condition != null && condition.shouldMap((DelegateExecution)migratingInstance.representativeExecution))
 					{
 						conditionSatisfied = true;
