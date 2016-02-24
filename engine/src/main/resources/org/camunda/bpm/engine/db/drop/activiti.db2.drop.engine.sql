@@ -9,6 +9,7 @@ drop index ACT_IDX_JOB_PROCINST;
 drop index ACT_UNIQ_AUTH_USER;
 drop index ACT_UNIQ_AUTH_GROUP;
 drop index ACT_UNIQ_VARIABLE;
+drop index ACT_IDX_AUTH_GROUP_ID;
 
 alter table ACT_GE_BYTEARRAY
     drop foreign key ACT_FK_BYTEARR_DEPL;

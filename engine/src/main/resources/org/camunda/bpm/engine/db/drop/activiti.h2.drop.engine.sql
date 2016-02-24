@@ -6,6 +6,7 @@ drop index ACT_IDX_IDENT_LNK_GROUP;
 drop index ACT_IDX_VARIABLE_TASK_ID;
 drop index ACT_IDX_INC_CONFIGURATION;
 drop index ACT_IDX_JOB_PROCINST;
+drop index ACT_IDX_AUTH_GROUP_ID;
 
 alter table ACT_GE_BYTEARRAY 
     drop constraint ACT_FK_BYTEARR_DEPL;

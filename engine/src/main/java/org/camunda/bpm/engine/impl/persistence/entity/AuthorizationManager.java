@@ -34,9 +34,12 @@ import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.IdentityService;
@@ -96,6 +99,15 @@ public class AuthorizationManager extends AbstractManager {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
   public static final String DEFAULT_AUTHORIZATION_CHECK = "defaultAuthorizationCheck";
+
+  /**
+   * Group ids for which authorizations exist in the database.
+   * This is initialized once per command by the {@link #filterAuthenticatedGroupIds(List)} method. (Manager
+   * instances are command scoped).
+   * It is used to only check authorizations for groups for which authorizations exist. In other words,
+   * if for a given group no authorization exists in the DB, then auth checks are not performed for this group.
+   */
+  protected Set<String> availableAuthorizedGroupIds = null;
 
   public Authorization createNewAuthorization(int type) {
     checkAuthorization(CREATE, AUTHORIZATION, null);
@@ -171,7 +183,7 @@ public class AuthorizationManager extends AbstractManager {
     if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
       String userId = currentAuthentication.getUserId();
-      boolean isAuthorized = isAuthorized(userId, currentAuthentication.getGroupIds(), permissionChecks);
+      boolean isAuthorized = isAuthorized(userId, filterAuthenticatedGroupIds(currentAuthentication.getGroupIds()), permissionChecks);
       if (!isAuthorized) {
 
         List<MissingAuthorization> info = new ArrayList<MissingAuthorization>();
@@ -201,7 +213,7 @@ public class AuthorizationManager extends AbstractManager {
 
     if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
-      boolean isAuthorized = isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
+      boolean isAuthorized = isAuthorized(currentAuthentication.getUserId(), filterAuthenticatedGroupIds(currentAuthentication.getGroupIds()), permission, resource, resourceId);
       if (!isAuthorized) {
         throw new AuthorizationException(
             currentAuthentication.getUserId(),
@@ -220,7 +232,7 @@ public class AuthorizationManager extends AbstractManager {
     final Authentication currentAuthentication = getCurrentAuthentication();
 
     if(isAuthorizationEnabled() && currentAuthentication != null) {
-      return isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
+      return isAuthorized(currentAuthentication.getUserId(), filterAuthenticatedGroupIds(currentAuthentication.getGroupIds()), permission, resource, resourceId);
 
     } else {
       return true;
@@ -261,7 +273,7 @@ public class AuthorizationManager extends AbstractManager {
       query.setAuthorizationCheckEnabled(true);
 
       String currentUserId = currentAuthentication.getUserId();
-      List<String> currentGroupIds = currentAuthentication.getGroupIds();
+      List<String> currentGroupIds = filterAuthenticatedGroupIds(currentAuthentication.getGroupIds());
 
       query.setAuthUserId(currentUserId);
       query.setAuthGroupIds(currentGroupIds);
@@ -1071,6 +1083,20 @@ public class AuthorizationManager extends AbstractManager {
 
   public void checkReadDecisionDefinition(String decisionDefinitionKey) {
     checkAuthorization(READ, DECISION_DEFINITION, decisionDefinitionKey);
+  }
+
+  public List<String> filterAuthenticatedGroupIds(List<String> authenticatedGroupIds) {
+    if(authenticatedGroupIds == null || authenticatedGroupIds.isEmpty()) {
+      return Collections.emptyList();
+    }
+    else {
+      if(availableAuthorizedGroupIds == null) {
+        availableAuthorizedGroupIds = new HashSet<String>(getDbEntityManager().selectList("selectAuthorizedGroupIds"));
+      }
+      Set<String> copy = new HashSet<String>(availableAuthorizedGroupIds);
+      copy.retainAll(authenticatedGroupIds);
+      return new ArrayList<String>(copy);
+    }
   }
 
 }
