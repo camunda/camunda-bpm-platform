@@ -1,7 +1,8 @@
 <span class="sorting-label hidden-xs hidden-sm hidden-md"
       translate="SORT_BY"></span>
 
-<ol class="sorting-choice list-inline">
+<ol class="sorting-choice list-inline"
+    data-total="{{ sortings.length }}">
   <li ng-repeat="(index, sorting) in sortings"
       class="sorting-choice dropdown"
       is-open="openDropdowns[index]"

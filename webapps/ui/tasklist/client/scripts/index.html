@@ -2,7 +2,7 @@
      ng-controller="camLayoutCtrl">
 
   <!-- # filters column -->
-  <section class="column task-filters"
+  <section class="column column-left task-filters"
            ng-controller="camFiltersCtrl">
     <header class="cell top">
       <button class="btn btn-link"
@@ -34,7 +34,7 @@
 
 
   <!-- # list column -->
-  <section class="column tasks-list"
+  <section class="column column-center tasks-list"
            ng-controller="camListCtrl">
     <header class="cell top">
       <div cam-sorting-choices
@@ -65,7 +65,7 @@
 
 
   <!-- # task column -->
-  <section class="column task-details"
+  <section class="column column-right task-details"
            ng-controller="camTaskActionCtrl">
     <header class="cell top">
       <button ng-click="toggleRegion($event)"

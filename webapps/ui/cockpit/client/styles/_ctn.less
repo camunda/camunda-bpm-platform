@@ -9,7 +9,12 @@
   bottom: @footer-height;
   left: 0;
   right: 0;
+  overflow: hidden;
+}
+
+.ctn-view {
   overflow: auto;
+  max-height: ~"calc(100vh - (@{header-height} + @{footer-height}))";
 }
 
 .ctn-wrapper {

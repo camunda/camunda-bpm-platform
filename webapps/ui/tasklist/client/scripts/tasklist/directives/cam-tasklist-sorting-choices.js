@@ -88,7 +88,7 @@ var $ = require('jquery');
             var columnTopHeight = height;
 
             headers.height(columnTopHeight);
-            bodies.css('top', columnTopHeight + 30);
+            bodies.css('top', columnTopHeight + 12);
             plannedRefresh = null;
           }, 100);
         }

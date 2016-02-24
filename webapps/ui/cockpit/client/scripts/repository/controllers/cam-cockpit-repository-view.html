@@ -1,10 +1,10 @@
 <!-- # cockpit client/scripts/repository/controllers/cam-cockpit-repository-view.html -->
 <div cam-repository
-     class="ctn-fixed-view">
-  <div class="ctn-content-container">
+     class="three-cols-layout">
+  <div class="columns">
 
       <!-- # deployment-list column -->
-    <section class="ctn-column deployments"
+    <section class="column column-left deployments"
              ng-controller="camDeploymentsCtrl">
 
       <header class="cell top">
@@ -30,7 +30,7 @@
 
 
     <!-- # resource-list column -->
-    <section class="ctn-column resources">
+    <section class="column column-center resources">
 
       <header class="cell top">
       </header>
@@ -46,7 +46,7 @@
 
 
     <!-- # resource-details column -->
-    <section class="ctn-column resource-details"
+    <section class="column column-right resource-details"
              ng-controller="camResourceDetailsCtrl">
 
       <header class="cell top">
