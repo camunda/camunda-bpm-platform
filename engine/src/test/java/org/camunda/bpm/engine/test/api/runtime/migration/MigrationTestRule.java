@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.util.ActivityInstanceAssert;
+import org.camunda.bpm.engine.test.util.ActivityInstanceAssert.ActivityInstanceAssertThatClause;
 import org.camunda.bpm.engine.test.util.ExecutionAssert;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
@@ -158,7 +158,7 @@ public class MigrationTestRule extends TestWatcher {
     return assertThat(snapshotAfterMigration.getExecutionTree());
   }
 
-  public ActivityInstanceAssert.ActivityInstanceAssertThatClause assertActivityTreeAfterMigration() {
+  public ActivityInstanceAssertThatClause assertActivityTreeAfterMigration() {
     return assertThat(snapshotAfterMigration.getActivityTree());
   }
 }
