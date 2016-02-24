@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa.upgrade</groupId>
     <artifactId>camunda-qa-db-instance-migration</artifactId>
-    <version>7.5.0-SNAPSHOT</version>
+    <version>7.5.0-alpha2</version>
   </parent>
 
   <artifactId>camunda-qa-upgrade-test-fixture-75</artifactId>
@@ -121,11 +121,7 @@
                 <configuration>
                   <target>
                     <!-- copy patches from 7.4 for mariadb -->
-                    <copy
-                      file="${project.build.directory}/scripts-current/sql/upgrade/mysql_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.2_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.3.sql"
-                      tofile="${project.build.directory}/scripts-current/sql/upgrade/mariadb_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.2_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.3.sql"
-                      overwrite="true"
-                     />
+                    <copy file="${project.build.directory}/scripts-current/sql/upgrade/mysql_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.2_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.3.sql" tofile="${project.build.directory}/scripts-current/sql/upgrade/mariadb_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.2_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.3.sql" overwrite="true" />
 
                   </target>
                 </configuration>
