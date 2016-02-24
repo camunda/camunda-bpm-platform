@@ -24,11 +24,26 @@ import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
-public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
+public class MigrationBoundaryEventsTest {
+
+  public static final String AFTER_BOUNDARY_TASK = "afterBoundary";
+  public static final String MESSAGE_NAME = "Message";
+  public static final String SIGNAL_NAME = "Signal";
+  public static final String TIMER_DATE = "2016-02-11T12:13:14Z";
+  public static final String NEW_TIMER_DATE = "2018-02-11T12:13:14Z";
+
+  protected ProcessEngineRule rule = new ProcessEngineRule();
+  protected MigrationTestRule testHelper = new MigrationTestRule(rule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
 
   @Test
   public void testMigrateMessageBoundaryEventOnUserTask() {
@@ -41,7 +56,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .mapActivities("boundary", "newBoundary")
@@ -51,10 +66,10 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -69,7 +84,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .mapActivities("boundary", "newBoundary")
@@ -79,8 +94,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    correlateMessage(MESSAGE_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.correlateMessage(MESSAGE_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -95,7 +110,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .mapActivities("boundary", "boundary")
@@ -105,15 +120,15 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "boundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "boundary", MESSAGE_NAME);
 
     // and no event subscription for the new message name exists
-    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().eventName("new" + MESSAGE_NAME).singleResult();
+    EventSubscription eventSubscription = rule.getRuntimeService().createEventSubscriptionQuery().eventName("new" + MESSAGE_NAME).singleResult();
     assertNull(eventSubscription);
 
     // and it is possible to correlate the message with the old message name and successfully complete the migrated instance
-    correlateMessage(MESSAGE_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.correlateMessage(MESSAGE_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -128,7 +143,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .mapActivities("boundary", "newBoundary")
@@ -138,10 +153,10 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -156,7 +171,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .mapActivities("boundary", "newBoundary")
@@ -166,8 +181,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    correlateMessage(MESSAGE_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.correlateMessage(MESSAGE_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -182,7 +197,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("boundary", "newBoundary")
@@ -193,11 +208,11 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -212,7 +227,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("boundary", "newBoundary")
@@ -223,9 +238,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    correlateMessage(MESSAGE_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
-    completeTask("userTask2");
+    testHelper.correlateMessage(MESSAGE_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -240,7 +255,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("boundary", "newBoundary")
@@ -251,11 +266,11 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -270,7 +285,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("boundary", "newBoundary")
@@ -281,9 +296,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    correlateMessage(MESSAGE_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
-    completeTask("userTask2");
+    testHelper.correlateMessage(MESSAGE_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -298,7 +313,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("boundary", "newBoundary")
@@ -309,10 +324,10 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -327,7 +342,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("boundary", "newBoundary")
@@ -338,8 +353,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    correlateMessage(MESSAGE_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.correlateMessage(MESSAGE_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -354,7 +369,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("boundary", "newBoundary")
@@ -365,10 +380,10 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -383,7 +398,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("boundary", "newBoundary")
@@ -394,8 +409,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    correlateMessage(MESSAGE_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.correlateMessage(MESSAGE_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -409,7 +424,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess1", "subProcess1")
       .mapActivities("boundary", "newBoundary")
@@ -422,11 +437,11 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -440,7 +455,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess1", "subProcess1")
       .mapActivities("boundary", "newBoundary")
@@ -453,9 +468,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    correlateMessage(MESSAGE_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
-    completeTask("userTask2");
+    testHelper.correlateMessage(MESSAGE_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -470,7 +485,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .mapActivities("boundary", "newBoundary")
@@ -480,10 +495,10 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -498,7 +513,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .mapActivities("boundary", "newBoundary")
@@ -508,8 +523,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the signal and successfully complete the migrated instance
-    sendSignal(SIGNAL_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.sendSignal(SIGNAL_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -524,7 +539,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .mapActivities("boundary", "boundary")
@@ -534,15 +549,15 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "boundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "boundary", SIGNAL_NAME);
 
     // and no event subscription for the new signal exists
-    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().eventName("new" + SIGNAL_NAME).singleResult();
+    EventSubscription eventSubscription = rule.getRuntimeService().createEventSubscriptionQuery().eventName("new" + SIGNAL_NAME).singleResult();
     assertNull(eventSubscription);
 
     // and it is possible to correlate the signal by the old signal name and successfully complete the migrated instance
-    sendSignal(SIGNAL_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.sendSignal(SIGNAL_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -557,7 +572,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .mapActivities("boundary", "newBoundary")
@@ -567,10 +582,10 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -585,7 +600,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .mapActivities("boundary", "newBoundary")
@@ -595,8 +610,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the signal and successfully complete the migrated instance
-    sendSignal(SIGNAL_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.sendSignal(SIGNAL_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -611,7 +626,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("boundary", "newBoundary")
@@ -622,11 +637,11 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -641,7 +656,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("boundary", "newBoundary")
@@ -652,9 +667,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the signal and successfully complete the migrated instance
-    sendSignal(SIGNAL_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
-    completeTask("userTask2");
+    testHelper.sendSignal(SIGNAL_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -669,7 +684,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("boundary", "newBoundary")
@@ -680,11 +695,11 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -699,7 +714,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("boundary", "newBoundary")
@@ -710,9 +725,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the signal and successfully complete the migrated instance
-    sendSignal(SIGNAL_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
-    completeTask("userTask2");
+    testHelper.sendSignal(SIGNAL_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -727,7 +742,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("boundary", "newBoundary")
@@ -738,10 +753,10 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -756,7 +771,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("boundary", "newBoundary")
@@ -767,8 +782,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the signal and successfully complete the migrated instance
-    sendSignal(SIGNAL_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.sendSignal(SIGNAL_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -783,7 +798,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("boundary", "newBoundary")
@@ -794,10 +809,10 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -812,7 +827,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("boundary", "newBoundary")
@@ -823,8 +838,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the signal and successfully complete the migrated instance
-    sendSignal(SIGNAL_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.sendSignal(SIGNAL_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -838,7 +853,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess1", "subProcess1")
       .mapActivities("boundary", "newBoundary")
@@ -851,11 +866,11 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -869,7 +884,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess1", "subProcess1")
       .mapActivities("boundary", "newBoundary")
@@ -882,9 +897,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the signal and successfully complete the migrated instance
-    sendSignal(SIGNAL_NAME);
-    completeTask(AFTER_BOUNDARY_TASK);
-    completeTask("userTask2");
+    testHelper.sendSignal(SIGNAL_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -899,7 +914,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .mapActivities("boundary", "newBoundary")
@@ -909,10 +924,10 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobMigrated("boundary", "newBoundary");
+    testHelper.assertTimerJobMigrated("boundary", "newBoundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -927,7 +942,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .mapActivities("boundary", "newBoundary")
@@ -937,8 +952,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimer();
-    completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.triggerTimer();
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -953,7 +968,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .mapActivities("boundary", "boundary")
@@ -963,11 +978,11 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobMigrated("boundary", "boundary");
+    testHelper.assertTimerJobMigrated("boundary", "boundary");
 
     // and it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimer();
-    completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.triggerTimer();
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -982,7 +997,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .mapActivities("boundary", "newBoundary")
@@ -992,10 +1007,10 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobMigrated("boundary", "newBoundary");
+    testHelper.assertTimerJobMigrated("boundary", "newBoundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1010,7 +1025,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .mapActivities("boundary", "newBoundary")
@@ -1020,8 +1035,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimer();
-    completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.triggerTimer();
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1036,7 +1051,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("boundary", "newBoundary")
@@ -1047,11 +1062,11 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobMigrated("boundary", "newBoundary");
+    testHelper.assertTimerJobMigrated("boundary", "newBoundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1066,7 +1081,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("boundary", "newBoundary")
@@ -1077,9 +1092,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimer();
-    completeTask(AFTER_BOUNDARY_TASK);
-    completeTask("userTask2");
+    testHelper.triggerTimer();
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1094,7 +1109,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("boundary", "newBoundary")
@@ -1105,11 +1120,11 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobMigrated("boundary", "newBoundary");
+    testHelper.assertTimerJobMigrated("boundary", "newBoundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1124,7 +1139,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("boundary", "newBoundary")
@@ -1135,9 +1150,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimer();
-    completeTask(AFTER_BOUNDARY_TASK);
-    completeTask("userTask2");
+    testHelper.triggerTimer();
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1152,7 +1167,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("boundary", "newBoundary")
@@ -1163,10 +1178,10 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobMigrated("boundary", "newBoundary");
+    testHelper.assertTimerJobMigrated("boundary", "newBoundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1181,7 +1196,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("boundary", "newBoundary")
@@ -1192,8 +1207,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimer();
-    completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.triggerTimer();
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1208,7 +1223,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("boundary", "newBoundary")
@@ -1219,10 +1234,10 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobMigrated("boundary", "newBoundary");
+    testHelper.assertTimerJobMigrated("boundary", "newBoundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1237,7 +1252,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("boundary", "newBoundary")
@@ -1248,8 +1263,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimer();
-    completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.triggerTimer();
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1263,7 +1278,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess1", "subProcess1")
       .mapActivities("boundary", "newBoundary")
@@ -1276,11 +1291,11 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobMigrated("boundary", "newBoundary");
+    testHelper.assertTimerJobMigrated("boundary", "newBoundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1294,7 +1309,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess1", "subProcess1")
       .mapActivities("boundary", "newBoundary")
@@ -1307,9 +1322,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimer();
-    completeTask(AFTER_BOUNDARY_TASK);
-    completeTask("userTask2");
+    testHelper.triggerTimer();
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1327,7 +1342,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("timerBoundary1", "timerBoundary1")
@@ -1340,18 +1355,18 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("messageBoundary1", MESSAGE_NAME);
-    assertEventSubscriptionRemoved("signalBoundary2", SIGNAL_NAME);
-    assertEventSubscriptionMigrated("signalBoundary1", "signalBoundary1", SIGNAL_NAME);
-    assertEventSubscriptionMigrated("messageBoundary2", "messageBoundary2", MESSAGE_NAME);
-    assertEventSubscriptionCreated("messageBoundary1", MESSAGE_NAME);
-    assertEventSubscriptionCreated("signalBoundary2", SIGNAL_NAME);
-    assertTimerJobsRemoved("timerBoundary2");
-    assertTimerJobMigrated("timerBoundary1", "timerBoundary1");
-    assertTimerJobsCreated("timerBoundary2");
+    testHelper.assertEventSubscriptionRemoved("messageBoundary1", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionRemoved("signalBoundary2", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionMigrated("signalBoundary1", "signalBoundary1", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionMigrated("messageBoundary2", "messageBoundary2", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionCreated("messageBoundary1", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionCreated("signalBoundary2", SIGNAL_NAME);
+    testHelper.assertTimerJobRemoved("timerBoundary2");
+    testHelper.assertTimerJobMigrated("timerBoundary1", "timerBoundary1");
+    testHelper.assertTimerJobCreated("timerBoundary2");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1370,7 +1385,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("boundary", "boundary")
       .mapActivities("userTask", "userTask")
@@ -1380,12 +1395,12 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("eventStart", MESSAGE_NAME);
-    assertEventSubscriptionMigrated("boundary", "boundary", SIGNAL_NAME);
-    assertEventSubscriptionCreated("eventStart", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionRemoved("eventStart", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionMigrated("boundary", "boundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionCreated("eventStart", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1405,7 +1420,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
 
     // a timer job exists
     Job jobBeforeMigration = rule.getManagementService().createJobQuery().singleResult();
@@ -1413,10 +1428,10 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
 
     // if the timer job is triggered the failing delegate fails and an incident is created
     executeJob(jobBeforeMigration);
-    Incident incidentBeforeMigration = runtimeService.createIncidentQuery().singleResult();
+    Incident incidentBeforeMigration = rule.getRuntimeService().createIncidentQuery().singleResult();
     assertEquals("userTask", incidentBeforeMigration.getActivityId());
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "newUserTask")
       .mapActivities("boundary", "newBoundary")
@@ -1428,7 +1443,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     // then the job and incident still exists
     Job jobAfterMigration = rule.getManagementService().createJobQuery().jobId(jobBeforeMigration.getId()).singleResult();
     assertNotNull(jobAfterMigration);
-    Incident incidentAfterMigration = runtimeService.createIncidentQuery().singleResult();
+    Incident incidentAfterMigration = rule.getRuntimeService().createIncidentQuery().singleResult();
     assertNotNull(incidentAfterMigration);
 
     // and it is still the same incident
@@ -1454,6 +1469,5 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
       job = managementService.createJobQuery().jobId(job.getId()).singleResult();
     }
   }
-
 
 }

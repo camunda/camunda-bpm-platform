@@ -23,10 +23,26 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
-public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
+public class MigrationRemoveBoundaryEventsTest {
+
+  public static final String AFTER_BOUNDARY_TASK = "afterBoundary";
+  public static final String MESSAGE_NAME = "Message";
+  public static final String SIGNAL_NAME = "Signal";
+  public static final String TIMER_DATE = "2016-02-11T12:13:14Z";
+  public static final String ERROR_CODE = "Error";
+  public static final String ESCALATION_CODE = "Escalation";
+
+  protected ProcessEngineRule rule = new ProcessEngineRule();
+  protected MigrationTestRule testHelper = new MigrationTestRule(rule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
 
   @Test
   public void testRemoveMessageBoundaryEventFromUserTask() {
@@ -36,7 +52,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .build();
@@ -45,10 +61,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -60,7 +76,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .build();
@@ -69,10 +85,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -84,7 +100,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("userTask2", "userTask2")
@@ -94,11 +110,11 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -110,7 +126,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SCOPE_TASKS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("userTask2", "userTask2")
@@ -120,11 +136,11 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -136,7 +152,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("userTask", "userTask")
@@ -146,10 +162,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -161,7 +177,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("userTask", "userTask")
@@ -171,10 +187,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -186,7 +202,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess1", "subProcess1")
       .mapActivities("subProcess2", "subProcess2")
@@ -198,11 +214,11 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -214,7 +230,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("userTask", "userTask")
@@ -224,10 +240,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -239,7 +255,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .build();
@@ -248,10 +264,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -263,7 +279,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .build();
@@ -272,10 +288,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -287,7 +303,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("userTask2", "userTask2")
@@ -297,11 +313,11 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -313,7 +329,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SCOPE_TASKS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("userTask2", "userTask2")
@@ -323,11 +339,11 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -339,7 +355,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("userTask", "userTask")
@@ -349,10 +365,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -364,7 +380,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("userTask", "userTask")
@@ -374,10 +390,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -389,7 +405,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess1", "subProcess1")
       .mapActivities("subProcess2", "subProcess2")
@@ -401,11 +417,11 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -417,7 +433,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("userTask", "userTask")
@@ -427,10 +443,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
+    testHelper.assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -442,7 +458,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .build();
@@ -451,10 +467,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobRemoved("boundary");
+    testHelper.assertTimerJobRemoved("boundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -466,7 +482,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .build();
@@ -475,10 +491,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobRemoved("boundary");
+    testHelper.assertTimerJobRemoved("boundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -490,7 +506,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("userTask2", "userTask2")
@@ -500,11 +516,11 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobRemoved("boundary");
+    testHelper.assertTimerJobRemoved("boundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -516,7 +532,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SCOPE_TASKS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")
       .mapActivities("userTask2", "userTask2")
@@ -526,11 +542,11 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobRemoved("boundary");
+    testHelper.assertTimerJobRemoved("boundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -542,7 +558,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("userTask", "userTask")
@@ -552,10 +568,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobRemoved("boundary");
+    testHelper.assertTimerJobRemoved("boundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -567,7 +583,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("userTask", "userTask")
@@ -577,10 +593,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobRemoved("boundary");
+    testHelper.assertTimerJobRemoved("boundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -592,7 +608,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess1", "subProcess1")
       .mapActivities("subProcess2", "subProcess2")
@@ -604,11 +620,11 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobRemoved("boundary");
+    testHelper.assertTimerJobRemoved("boundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask1");
-    completeTask("userTask2");
+    testHelper.completeTask("userTask1");
+    testHelper.completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -620,7 +636,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("userTask", "userTask")
@@ -630,10 +646,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertTimerJobRemoved("boundary");
+    testHelper.assertTimerJobRemoved("boundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -647,7 +663,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("userTask", "userTask")
@@ -657,12 +673,12 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertEventSubscriptionRemoved("messageBoundary", MESSAGE_NAME);
-    assertEventSubscriptionRemoved("signalBoundary", SIGNAL_NAME);
-    assertTimerJobRemoved("timerBoundary");
+    testHelper.assertEventSubscriptionRemoved("messageBoundary", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionRemoved("signalBoundary", SIGNAL_NAME);
+    testHelper.assertTimerJobRemoved("timerBoundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -674,7 +690,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("userTask", "userTask")
@@ -684,7 +700,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -696,7 +712,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("subProcess", "subProcess")
       .mapActivities("userTask", "userTask")
@@ -706,7 +722,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to successfully complete the migrated instance
-    completeTask("userTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -726,7 +742,7 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
 
     // a timer job exists
     Job jobBeforeMigration = rule.getManagementService().createJobQuery().singleResult();
@@ -734,10 +750,10 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
 
     // if the timer job is triggered the failing delegate fails and an incident is created
     executeJob(jobBeforeMigration);
-    Incident incidentBeforeMigration = runtimeService.createIncidentQuery().singleResult();
+    Incident incidentBeforeMigration = rule.getRuntimeService().createIncidentQuery().singleResult();
     assertEquals("userTask", incidentBeforeMigration.getActivityId());
 
-    MigrationPlan migrationPlan = runtimeService
+    MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "newUserTask")
       .build();

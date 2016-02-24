@@ -14,15 +14,26 @@ package org.camunda.bpm.engine.test.api.runtime.migration;
 
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.EventSubscription;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ActivityInstanceAssert.ActivityInstanceAssertThatClause;
 import org.camunda.bpm.engine.test.util.ExecutionAssert;
@@ -154,6 +165,26 @@ public class MigrationTestRule extends TestWatcher {
     snapshotAfterMigration = takeFullProcessInstanceSnapshot(processInstance);
   }
 
+  public void completeTask(String taskKey) {
+    TaskService taskService = processEngine.getTaskService();
+    Task task = taskService.createTaskQuery().taskDefinitionKey(taskKey).singleResult();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+  }
+
+  public void correlateMessage(String messageName) {
+    processEngine.getRuntimeService().createMessageCorrelation(messageName).correlate();
+  }
+
+  public void sendSignal(String signalName) {
+    processEngine.getRuntimeService().signalEventReceived(signalName);
+  }
+
+  public void triggerTimer() {
+    Job job = assertTimerJobExists(snapshotAfterMigration);
+    processEngine.getManagementService().executeJob(job.getId());
+  }
+
   public ExecutionAssert assertExecutionTreeAfterMigration() {
     return assertThat(snapshotAfterMigration.getExecutionTree());
   }
@@ -161,4 +192,100 @@ public class MigrationTestRule extends TestWatcher {
   public ActivityInstanceAssertThatClause assertActivityTreeAfterMigration() {
     return assertThat(snapshotAfterMigration.getActivityTree());
   }
+
+  public void assertEventSubscriptionMigrated(String activityIdBefore, String activityIdAfter, String eventName) {
+    EventSubscription eventSubscriptionBefore = snapshotBeforeMigration.getEventSubscriptionForActivityIdAndEventName(activityIdBefore, eventName);
+    assertNotNull("Expected that an event subscription for activity '" + activityIdBefore + "' exists before migration", eventSubscriptionBefore);
+    EventSubscription eventSubscriptionAfter = snapshotAfterMigration.getEventSubscriptionForActivityIdAndEventName(activityIdAfter, eventName);
+    assertNotNull("Expected that an event subscription for activity '" + activityIdAfter + "' exists after migration", eventSubscriptionAfter);
+
+    assertEquals(eventSubscriptionBefore.getId(), eventSubscriptionAfter.getId());
+    assertEquals(eventSubscriptionBefore.getEventType(), eventSubscriptionAfter.getEventType());
+  }
+
+  public void assertEventSubscriptionRemoved(String activityId, String eventName) {
+    EventSubscription eventSubscriptionBefore = snapshotBeforeMigration.getEventSubscriptionForActivityIdAndEventName(activityId, eventName);
+    assertNotNull("Expected an event subscription for activity '" + activityId + "' before the migration", eventSubscriptionBefore);
+
+    for (EventSubscription eventSubscription : snapshotAfterMigration.getEventSubscriptions()) {
+      if (eventSubscriptionBefore.getId().equals(eventSubscription.getId())) {
+        fail("Expected event subscription '" + eventSubscriptionBefore.getId() + "' to be removed after migration");
+      }
+    }
+  }
+
+  public void assertEventSubscriptionCreated(String activityId, String eventName) {
+    EventSubscription eventSubscriptionAfter = snapshotAfterMigration.getEventSubscriptionForActivityIdAndEventName(activityId, eventName);
+    assertNotNull("Expected an event subscription for activity '" + activityId + "' after the migration", eventSubscriptionAfter);
+
+    for (EventSubscription eventSubscription : snapshotBeforeMigration.getEventSubscriptions()) {
+      if (eventSubscriptionAfter.getId().equals(eventSubscription.getId())) {
+        fail("Expected event subscription '" + eventSubscriptionAfter.getId() + "' to be created after migration");
+      }
+    }
+  }
+
+  public void assertTimerJob(Job job) {
+    assertEquals("Expected job to be a timer job", TimerEntity.TYPE, ((JobEntity) job).getType());
+  }
+
+  public Job assertTimerJobExists(ProcessInstanceSnapshot snapshot) {
+    List<Job> jobs = snapshot.getJobs();
+    assertEquals(1, jobs.size());
+    Job job = jobs.get(0);
+    assertTimerJob(job);
+    return job;
+  }
+
+  public void assertTimerJobCreated(String activityId) {
+    JobDefinition jobDefinitionAfter = snapshotAfterMigration.getJobDefinitionForActivityId(activityId);
+    assertNotNull("Expected that a job definition for activity '" + activityId + "' exists after migration", jobDefinitionAfter);
+
+    Job jobAfter = snapshotAfterMigration.getJobForDefinitionId(jobDefinitionAfter.getId());
+    assertNotNull("Expected that a timer job for activity '" + activityId + "' exists after migration", jobAfter);
+    assertTimerJob(jobAfter);
+
+    for (Job job : snapshotBeforeMigration.getJobs()) {
+      if (jobAfter.getId().equals(job.getId())) {
+        fail("Expected job '" + jobAfter.getId() + "' to be created first after migration");
+      }
+    }
+  }
+
+  public void assertTimerJobRemoved(String activityId) {
+    JobDefinition jobDefinitionBefore = snapshotBeforeMigration.getJobDefinitionForActivityId(activityId);
+    assertNotNull("Expected that a job definition for activity '" + activityId + "' exists before migration", jobDefinitionBefore);
+
+    Job jobBefore = snapshotBeforeMigration.getJobForDefinitionId(jobDefinitionBefore.getId());
+    assertNotNull("Expected that a timer job for activity '" + activityId + "' exists before migration", jobBefore);
+    assertTimerJob(jobBefore);
+
+    for (Job job : snapshotAfterMigration.getJobs()) {
+      if (jobBefore.getId().equals(job.getId())) {
+        fail("Expected job '" + jobBefore.getId() + "' to be removed after migration");
+      }
+    }
+  }
+
+  public void assertTimerJobMigrated(String activityIdBefore, String activityIdAfter) {
+    JobDefinition jobDefinitionBefore = snapshotBeforeMigration.getJobDefinitionForActivityId(activityIdBefore);
+    assertNotNull("Expected that a job definition for activity '" + activityIdBefore + "' exists before migration", jobDefinitionBefore);
+
+    Job jobBefore = snapshotBeforeMigration.getJobForDefinitionId(jobDefinitionBefore.getId());
+    assertNotNull("Expected that a timer job for activity '" + activityIdBefore + "' exists before migration", jobBefore);
+    assertTimerJob(jobBefore);
+
+    JobDefinition jobDefinitionAfter = snapshotAfterMigration.getJobDefinitionForActivityId(activityIdAfter);
+    assertNotNull("Expected that a job definition for activity '" + activityIdAfter + "' exists after migration", jobDefinitionAfter);
+
+    Job jobAfter = snapshotAfterMigration.getJobForDefinitionId(jobDefinitionAfter.getId());
+    assertNotNull("Expected that a timer job for activity '" + activityIdAfter + "' exists after migration", jobAfter);
+    assertTimerJob(jobAfter);
+
+    assertEquals(jobBefore.getId(), jobAfter.getId());
+    assertEquals(jobBefore.getDuedate(), jobAfter.getDuedate());
+    assertEquals(jobDefinitionAfter.getProcessDefinitionId(), jobAfter.getProcessDefinitionId());
+    assertEquals(jobDefinitionAfter.getProcessDefinitionKey(), jobAfter.getProcessDefinitionKey());
+  }
+
 }
