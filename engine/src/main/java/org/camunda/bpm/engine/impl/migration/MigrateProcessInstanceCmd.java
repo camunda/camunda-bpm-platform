@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.migration;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -20,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -38,6 +39,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 
@@ -80,8 +82,12 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
   }
 
   public Void migrateProcessInstance(CommandContext commandContext, String processInstanceId, ProcessDefinitionEntity targetProcessDefinition) {
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Process instance id cannot be null", "process instance id", processInstanceId);
 
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+
+    ensureProcessInstanceExist(processInstanceId, processInstance);
+    ensureSameProcessDefinition(processInstance, migrationPlan.getSourceProcessDefinitionId());
 
     // Initialize migration: match migration instructions to activity instances and collect required entities
     MigratingProcessInstance migratingProcessInstance = MigratingProcessInstance.initializeFrom(
@@ -313,6 +319,18 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
       createdExecution.setActivity(null);
       executionBranch.registerExecution(scope, createdExecution);
 
+    }
+  }
+
+  protected void ensureProcessInstanceExist(String processInstanceId, ExecutionEntity processInstance) {
+    if (processInstance == null) {
+      throw LOGGER.processInstanceDoesNotExist(processInstanceId);
+    }
+  }
+
+  protected void ensureSameProcessDefinition(ExecutionEntity processInstance, String processDefinitionId) {
+    if (!processDefinitionId.equals(processInstance.getProcessDefinitionId())) {
+      throw LOGGER.processDefinitionOfInstanceDoesNotMatchMigrationPlan(processInstance, processDefinitionId);
     }
   }
 

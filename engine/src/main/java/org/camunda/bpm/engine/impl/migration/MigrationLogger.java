@@ -14,16 +14,15 @@ package org.camunda.bpm.engine.impl.migration;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidationReportImpl;
 import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationReportImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationException;
-import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 
@@ -40,18 +39,18 @@ public class MigrationLogger extends ProcessEngineLogger {
         processInstanceId, formatActivityInstances(unmappedInstances)));
   }
 
-  public BadUserRequestException invalidMigrationPlan(MigrationPlan migrationPlan, List<String> errorMessages) {
-    return new BadUserRequestException(exceptionMessage(
-        "002",
-        "The provided migration plan is invalid: {}\n{}",
-        migrationPlan, formatMigrationPlanErrors(errorMessages)
+  public ProcessEngineException processDefinitionOfInstanceDoesNotMatchMigrationPlan(ExecutionEntity processInstance, String processDefinitionId) {
+    return new ProcessEngineException(exceptionMessage(
+      "002",
+      "Process instance '{}' cannot be migrated. Its process definition '{}' does not match the source process definition of the migration plan '{}'",
+      processInstance.getId(), processInstance.getProcessDefinitionId(), processDefinitionId
     ));
   }
 
   public MigrationInstructionInstanceValidationException failingInstructionInstanceValidation(MigrationInstructionInstanceValidationReportImpl validationReport) {
     StringBuilder sb = new StringBuilder();
     validationReport.writeTo(sb);
-    return new MigrationInstructionInstanceValidationException(exceptionMessage("003", "Cannot migrate process instance {}: {}",
+    return new MigrationInstructionInstanceValidationException(exceptionMessage("003", "Cannot migrate process instance '{}': {}",
       validationReport.getMigratingProcessInstance().getProcessInstanceId(),
       sb.toString()), validationReport);
   }
@@ -59,10 +58,18 @@ public class MigrationLogger extends ProcessEngineLogger {
   public MigrationPlanValidationException failingMigrationPlanValidation(MigrationPlanValidationReportImpl validationReport) {
     StringBuilder sb = new StringBuilder();
     validationReport.writeTo(sb);
-    return new MigrationPlanValidationException(exceptionMessage("004", "Cannot migrate process definition {} to {}: {}",
+    return new MigrationPlanValidationException(exceptionMessage("004", "Cannot migrate process definition '{}' to '{}': {}",
       validationReport.getMigrationPlan().getSourceProcessDefinitionId(),
       validationReport.getMigrationPlan().getTargetProcessDefinitionId(),
       sb.toString()), validationReport);
+  }
+
+  public ProcessEngineException processInstanceDoesNotExist(String processInstanceId) {
+    return new ProcessEngineException(exceptionMessage(
+      "005",
+      "Process instance '{}' cannot be migrated. The process instance does not exist",
+      processInstanceId
+    ));
   }
 
   protected String formatActivityInstances(Collection<ActivityInstance> activityInstances) {
@@ -73,20 +80,6 @@ public class MigrationLogger extends ProcessEngineLogger {
       sb.append(iterator.next().getId());
       if (iterator.hasNext()) {
         sb.append(", ");
-      }
-    }
-
-    return sb.toString();
-  }
-
-  protected String formatMigrationPlanErrors(List<String> errorMessages) {
-    StringBuilder sb = new StringBuilder();
-
-    Iterator<String> iterator = errorMessages.iterator();
-    while(iterator.hasNext()) {
-      sb.append(iterator.next());
-      if (iterator.hasNext()) {
-        sb.append("\n");
       }
     }
 
