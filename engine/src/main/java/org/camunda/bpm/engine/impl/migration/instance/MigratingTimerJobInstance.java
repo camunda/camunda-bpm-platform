@@ -54,10 +54,18 @@ public class MigratingTimerJobInstance implements MigratingInstance, RemovingIns
 
   public void detachState() {
     jobEntity.setExecution(null);
+
+    for (MigratingInstance dependentInstance : migratingDependentInstances) {
+      dependentInstance.detachState();
+    }
   }
 
   public void attachState(ExecutionEntity newScopeExecution) {
     jobEntity.setExecution(newScopeExecution);
+
+    for (MigratingInstance dependentInstance : migratingDependentInstances) {
+      dependentInstance.attachState(newScopeExecution);
+    }
   }
 
   public void migrateState() {

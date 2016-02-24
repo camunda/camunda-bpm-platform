@@ -1128,6 +1128,8 @@ public class MigrationRemoveBoundaryEventsTest extends AbstractMigrationTest {
     // then the incident was removed
     Job jobAfterMigration = rule.getManagementService().createJobQuery().jobId(jobBeforeMigration.getId()).singleResult();
     assertNull(jobAfterMigration);
+
+    assertEquals(0, rule.getRuntimeService().createIncidentQuery().count());
   }
 
   protected void executeJob(Job job) {

@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Test;
 
@@ -1694,7 +1695,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
       .builderForUserTask("userTask")
       .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
-      .serviceTask("failingTask").camundaClass("org.camunda.bpm.engine.test.api.runtime.FailingDelegate")
+      .serviceTask("failingTask").camundaClass(FailingDelegate.class.getName())
       .endEvent()
       .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
@@ -1732,8 +1733,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
 
     // and it is still the same incident
     assertEquals(incidentBeforeMigration.getId(), incidentAfterMigration.getId());
+    assertEquals(jobAfterMigration.getId(), incidentAfterMigration.getConfiguration());
 
-    // and the activity and process definition references where updated
+    // and the activity and process definition references were updated
     assertEquals("newUserTask", incidentAfterMigration.getActivityId());
     assertEquals(targetProcessDefinition.getId(), incidentAfterMigration.getProcessDefinitionId());
   }
