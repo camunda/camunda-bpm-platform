@@ -54,7 +54,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -79,7 +79,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    correlateMessageAndCompleteTasks(MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+    correlateMessage(MESSAGE_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -111,7 +112,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertNull(eventSubscription);
 
     // and it is possible to correlate the message with the old message name and successfully complete the migrated instance
-    correlateMessageAndCompleteTasks(MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+    correlateMessage(MESSAGE_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -139,7 +141,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -164,7 +166,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    correlateMessageAndCompleteTasks(MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+    correlateMessage(MESSAGE_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -193,7 +196,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask1", "userTask2");
+    completeTask("userTask1");
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -219,7 +223,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    correlateMessageAndCompleteTasks(MESSAGE_NAME, AFTER_BOUNDARY_TASK, "userTask2");
+    correlateMessage(MESSAGE_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -248,7 +254,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask1", "userTask2");
+    completeTask("userTask1");
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -274,7 +281,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    correlateMessageAndCompleteTasks(MESSAGE_NAME, AFTER_BOUNDARY_TASK, "userTask2");
+    correlateMessage(MESSAGE_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -303,7 +312,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -329,7 +338,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    correlateMessageAndCompleteTasks(MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+    correlateMessage(MESSAGE_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -358,7 +368,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -384,7 +394,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    correlateMessageAndCompleteTasks(MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+    correlateMessage(MESSAGE_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -414,7 +425,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertEventSubscriptionMigrated("boundary", "newBoundary", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask1", "userTask2");
+    completeTask("userTask1");
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -441,7 +453,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    correlateMessageAndCompleteTasks(MESSAGE_NAME, AFTER_BOUNDARY_TASK, "userTask2");
+    correlateMessage(MESSAGE_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -469,7 +483,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -494,7 +508,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the signal and successfully complete the migrated instance
-    sendSignalAndCompleteTasks(SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+    sendSignal(SIGNAL_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -526,7 +541,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertNull(eventSubscription);
 
     // and it is possible to correlate the signal by the old signal name and successfully complete the migrated instance
-    sendSignalAndCompleteTasks(SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+    sendSignal(SIGNAL_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -554,7 +570,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -579,7 +595,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the signal and successfully complete the migrated instance
-    sendSignalAndCompleteTasks(SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+    sendSignal(SIGNAL_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -608,7 +625,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask1", "userTask2");
+    completeTask("userTask1");
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -634,7 +652,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the signal and successfully complete the migrated instance
-    sendSignalAndCompleteTasks(SIGNAL_NAME, AFTER_BOUNDARY_TASK, "userTask2");
+    sendSignal(SIGNAL_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -663,7 +683,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask1", "userTask2");
+    completeTask("userTask1");
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -689,7 +710,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the signal and successfully complete the migrated instance
-    sendSignalAndCompleteTasks(SIGNAL_NAME, AFTER_BOUNDARY_TASK, "userTask2");
+    sendSignal(SIGNAL_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -718,7 +741,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -744,7 +767,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the signal and successfully complete the migrated instance
-    sendSignalAndCompleteTasks(SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+    sendSignal(SIGNAL_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -773,7 +797,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -799,7 +823,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the signal and successfully complete the migrated instance
-    sendSignalAndCompleteTasks(SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+    sendSignal(SIGNAL_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -829,7 +854,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertEventSubscriptionMigrated("boundary", "newBoundary", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask1", "userTask2");
+    completeTask("userTask1");
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -856,7 +882,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the signal and successfully complete the migrated instance
-    sendSignalAndCompleteTasks(SIGNAL_NAME, AFTER_BOUNDARY_TASK, "userTask2");
+    sendSignal(SIGNAL_NAME);
+    completeTask(AFTER_BOUNDARY_TASK);
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -884,7 +912,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertTimerJobMigrated("boundary", "newBoundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -909,7 +937,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimerAndCompleteTasks(AFTER_BOUNDARY_TASK);
+    triggerTimer();
+    completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -937,7 +966,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertTimerJobMigrated("boundary", "boundary");
 
     // and it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimerAndCompleteTasks(AFTER_BOUNDARY_TASK);
+    triggerTimer();
+    completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -965,7 +995,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertTimerJobMigrated("boundary", "newBoundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -990,7 +1020,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimerAndCompleteTasks(AFTER_BOUNDARY_TASK);
+    triggerTimer();
+    completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1019,7 +1050,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertTimerJobMigrated("boundary", "newBoundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask1", "userTask2");
+    completeTask("userTask1");
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1045,7 +1077,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimerAndCompleteTasks(AFTER_BOUNDARY_TASK, "userTask2");
+    triggerTimer();
+    completeTask(AFTER_BOUNDARY_TASK);
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1074,7 +1108,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertTimerJobMigrated("boundary", "newBoundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask1", "userTask2");
+    completeTask("userTask1");
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1100,7 +1135,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimerAndCompleteTasks(AFTER_BOUNDARY_TASK, "userTask2");
+    triggerTimer();
+    completeTask(AFTER_BOUNDARY_TASK);
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1129,7 +1166,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertTimerJobMigrated("boundary", "newBoundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1155,7 +1192,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimerAndCompleteTasks(AFTER_BOUNDARY_TASK);
+    triggerTimer();
+    completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1184,7 +1222,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertTimerJobMigrated("boundary", "newBoundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1210,7 +1248,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimerAndCompleteTasks(AFTER_BOUNDARY_TASK);
+    triggerTimer();
+    completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1240,7 +1279,8 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertTimerJobMigrated("boundary", "newBoundary");
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask1", "userTask2");
+    completeTask("userTask1");
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1267,7 +1307,9 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the timer and successfully complete the migrated instance
-    triggerTimerAndCompleteTasks(AFTER_BOUNDARY_TASK, "userTask2");
+    triggerTimer();
+    completeTask(AFTER_BOUNDARY_TASK);
+    completeTask("userTask2");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1309,7 +1351,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertTimerJobsCreated("timerBoundary2");
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -1343,7 +1385,7 @@ public class MigrationBoundaryEventsTest extends AbstractMigrationTest {
     assertEventSubscriptionCreated("eventStart", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 

@@ -57,23 +57,23 @@ public abstract class AbstractMigrationTest {
     taskService = rule.getTaskService();
   }
 
-  protected void completeTasks(String... taskKeys) {
-    List<Task> tasks = taskService.createTaskQuery().taskDefinitionKeyIn(taskKeys).list();
-    assertEquals(taskKeys.length, tasks.size());
-    for (Task task : tasks) {
-      assertNotNull(task);
-      taskService.complete(task.getId());
-    }
+  protected void completeTask(String taskKey) {
+    Task task = taskService.createTaskQuery().taskDefinitionKey(taskKey).singleResult();
+    assertNotNull(task);
+    taskService.complete(task.getId());
   }
 
-  protected void correlateMessageAndCompleteTasks(String messageName, String... taskKeys) {
+  protected void correlateMessage(String messageName) {
     runtimeService.createMessageCorrelation(messageName).correlate();
-    completeTasks(taskKeys);
   }
 
-  protected void sendSignalAndCompleteTasks(String signalName, String... taskKeys) {
+  protected void sendSignal(String signalName) {
     runtimeService.signalEventReceived(signalName);
-    completeTasks(taskKeys);
+  }
+
+  protected void triggerTimer() {
+    Job job = assertTimerJobExists(testHelper.snapshotAfterMigration);
+    rule.getManagementService().executeJob(job.getId());
   }
 
   protected void assertEventSubscriptionMigrated(String activityIdBefore, String activityIdAfter, String eventName) {
@@ -181,12 +181,6 @@ public abstract class AbstractMigrationTest {
 
   protected void assertTimerJob(Job job) {
     assertEquals("Expected job to be a timer job", TimerEntity.TYPE, ((JobEntity) job).getType());
-  }
-
-  protected void triggerTimerAndCompleteTasks(String... taskKeys) {
-    Job job = assertTimerJobExists(testHelper.snapshotAfterMigration);
-    rule.getManagementService().executeJob(job.getId());
-    completeTasks(taskKeys);
   }
 
 }

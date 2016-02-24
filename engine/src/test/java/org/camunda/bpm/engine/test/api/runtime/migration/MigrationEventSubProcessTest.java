@@ -67,7 +67,7 @@ public class MigrationEventSubProcessTest extends AbstractMigrationTest {
     assertEventSubscriptionCreated("eventStart", MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -95,7 +95,8 @@ public class MigrationEventSubProcessTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    correlateMessageAndCompleteTasks(MESSAGE_NAME, IN_EVENT_SUB_PROCESS_TASK);
+    correlateMessage(MESSAGE_NAME);
+    completeTask(IN_EVENT_SUB_PROCESS_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -140,7 +141,7 @@ public class MigrationEventSubProcessTest extends AbstractMigrationTest {
     assertEventSubscriptionCreated("eventStart", SIGNAL_NAME);
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -168,7 +169,8 @@ public class MigrationEventSubProcessTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to send the signal and successfully complete the migrated instance
-    sendSignalAndCompleteTasks(SIGNAL_NAME, IN_EVENT_SUB_PROCESS_TASK);
+    sendSignal(SIGNAL_NAME);
+    completeTask(IN_EVENT_SUB_PROCESS_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -213,7 +215,7 @@ public class MigrationEventSubProcessTest extends AbstractMigrationTest {
     assertTimerJobCreated("eventStart");
 
     // and it is possible to successfully complete the migrated instance
-    completeTasks("userTask");
+    completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -241,7 +243,8 @@ public class MigrationEventSubProcessTest extends AbstractMigrationTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to trigger the timer and successfully complete the migrated instance
-    triggerTimerAndCompleteTasks(IN_EVENT_SUB_PROCESS_TASK);
+    triggerTimer();
+    completeTask(IN_EVENT_SUB_PROCESS_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
