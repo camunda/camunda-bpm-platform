@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
-    <version>7.5.0-SNAPSHOT</version>
+    <version>7.5.0-alpha2</version>
     <relativePath>../camunda-bpm-platform/database</relativePath>
   </parent>
 
@@ -383,7 +383,7 @@
                 <phase>generate-resources</phase>
                 <configuration>
                   <target>
-                    <mkdir dir="${project.basedir}/target/webapp"/>
+                    <mkdir dir="${project.basedir}/target/webapp" />
                   </target>
                 </configuration>
                 <goals>
