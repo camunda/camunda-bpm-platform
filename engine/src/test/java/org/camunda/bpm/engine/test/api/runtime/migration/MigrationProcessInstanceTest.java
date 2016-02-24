@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -98,6 +99,50 @@ public class MigrationProcessInstanceTest {
     }
     catch (ProcessEngineException e) {
       assertThat(e.getMessage(), CoreMatchers.containsString("process instance id is null"));
+    }
+  }
+
+  @Test
+  public void testNotMigrateProcessInstanceWithAsyncTransition() {
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
+      .userTaskBuilder("userTask")
+        .camundaAsyncBefore()
+      .done()
+    );
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    try {
+      testHelper.createProcessInstanceAndMigrate(migrationPlan);
+      fail("Should not be able to migrate");
+    }
+    catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), CoreMatchers.startsWith("ENGINE-23006"));
+    }
+  }
+
+  @Test
+  public void testNotMigrateProcessInstanceWithNestedAsyncTransition() {
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.TRIPLE_SUBPROCESS_PROCESS)
+      .userTaskBuilder("userTask")
+      .camundaAsyncBefore()
+      .done()
+    );
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    try {
+      testHelper.createProcessInstanceAndMigrate(migrationPlan);
+      fail("Should not be able to migrate");
+    }
+    catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), CoreMatchers.startsWith("ENGINE-23006"));
     }
   }
 

@@ -21,10 +21,11 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidationReportImpl;
 import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationReportImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.ProcessElementInstance;
+import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 /**
  * @author Thorben Lindhauer
@@ -36,7 +37,7 @@ public class MigrationLogger extends ProcessEngineLogger {
     return new ProcessEngineException(exceptionMessage(
         "001",
         "Process instance '{}' cannot be migrated. There are no migration instructions that apply to the following activity instances: {}",
-        processInstanceId, formatActivityInstances(unmappedInstances)));
+        processInstanceId, formatProcessElementInstances(unmappedInstances)));
   }
 
   public ProcessEngineException processDefinitionOfInstanceDoesNotMatchMigrationPlan(ExecutionEntity processInstance, String processDefinitionId) {
@@ -72,10 +73,18 @@ public class MigrationLogger extends ProcessEngineLogger {
     ));
   }
 
-  protected String formatActivityInstances(Collection<ActivityInstance> activityInstances) {
+  public ProcessEngineException processInstanceContainsAsyncTransitions(String processInstanceId, Set<TransitionInstance> transitionInstances) {
+    return new ProcessEngineException(exceptionMessage(
+      "006",
+      "Process instance '{}' cannot be migrated. There are asynchronous transitions active in the process instance: {}",
+        processInstanceId, formatProcessElementInstances(transitionInstances)
+    ));
+  }
+
+  protected String formatProcessElementInstances(Collection<? extends  ProcessElementInstance> processElementInstance) {
     StringBuilder sb = new StringBuilder();
 
-    Iterator<ActivityInstance> iterator = activityInstances.iterator();
+    Iterator<? extends ProcessElementInstance> iterator = processElementInstance.iterator();
     while (iterator.hasNext()) {
       sb.append(iterator.next().getId());
       if (iterator.hasNext()) {

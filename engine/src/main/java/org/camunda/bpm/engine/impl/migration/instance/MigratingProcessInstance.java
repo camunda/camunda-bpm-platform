@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.migration.instance;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +37,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -44,6 +46,7 @@ import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 /**
  * @author Thorben Lindhauer
@@ -111,6 +114,11 @@ public class MigratingProcessInstance {
       .execute(commandContext);
     Set<ActivityInstance> activityInstances = flatten(activityInstanceTree);
     Set<ActivityInstance> unmappedLeafInstances = new HashSet<ActivityInstance>();
+    Set<TransitionInstance> transitionInstances = collectTransitions(activityInstances);
+
+    if (!transitionInstances.isEmpty()) {
+      throw LOGGER.processInstanceContainsAsyncTransitions(processInstance.getId(), transitionInstances);
+    }
 
     // always create an entry for the root activity instance because it is implicitly always migrated
     migratingProcessInstance.addActivityInstance(
@@ -334,5 +342,15 @@ public class MigratingProcessInstance {
             migratingProcessInstance.getMigratingInstance(childActivityInstance.getId()));
       }
     }
+  }
+
+  protected static Set<TransitionInstance> collectTransitions(Set<ActivityInstance> activityInstances) {
+    HashSet<TransitionInstance> transitions = new HashSet<TransitionInstance>();
+
+    for (ActivityInstance activityInstance : activityInstances) {
+      Collections.addAll(transitions, activityInstance.getChildTransitionInstances());
+    }
+
+    return transitions;
   }
 }
