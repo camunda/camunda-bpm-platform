@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnMo
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.model.bpmn.builder.EndEventBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -42,7 +41,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -66,7 +69,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -88,7 +95,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -112,7 +123,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -134,7 +149,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask1", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -160,7 +179,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask1", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -184,7 +207,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SCOPE_TASKS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .addMessageBoundaryEventWithUserTask("userTask1", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -210,7 +237,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SCOPE_TASKS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .addMessageBoundaryEventWithUserTask("userTask1", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -234,7 +265,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("subProcess", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -259,7 +294,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("subProcess", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -282,7 +321,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("subProcess", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -307,7 +350,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("subProcess", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -330,7 +377,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("subProcess1", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -358,7 +409,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("subProcess1", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -384,7 +439,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -408,7 +467,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -430,7 +493,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -454,7 +521,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -476,7 +547,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask1", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -502,7 +577,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask1", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -526,7 +605,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SCOPE_TASKS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .addSignalBoundaryEventWithUserTask("userTask1", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -552,7 +635,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SCOPE_TASKS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .addSignalBoundaryEventWithUserTask("userTask1", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -576,7 +663,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("subProcess", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -601,7 +692,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("subProcess", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -624,7 +719,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("subProcess", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -649,7 +748,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("subProcess", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -672,7 +775,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("subProcess1", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess1")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -700,7 +807,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("subProcess1", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess1")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -726,7 +837,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -750,7 +865,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -772,7 +891,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -796,7 +919,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -818,7 +945,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask1", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -844,7 +975,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask1", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -868,7 +1003,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SCOPE_TASKS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .addTimerDateBoundaryEventWithUserTask("userTask1", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -894,7 +1033,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SCOPE_TASKS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .addTimerDateBoundaryEventWithUserTask("userTask1", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -918,7 +1061,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("subProcess", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -943,7 +1090,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("subProcess", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -966,7 +1117,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("subProcess", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -991,7 +1146,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("subProcess", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -1014,7 +1173,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("subProcess1", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess1")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -1042,7 +1205,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("subProcess1", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess1")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -1068,9 +1235,13 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEvent("subProcess", "timerBoundary", TIMER_DATE)
-      .addMessageBoundaryEvent("userTask", "messageBoundary", MESSAGE_NAME)
-      .addSignalBoundaryEvent("userTask", "signalBoundary", SIGNAL_NAME)
+      .activityBuilder("subProcess")
+        .boundaryEvent("timerBoundary").timerWithDate(TIMER_DATE)
+      .moveToActivity("userTask")
+        .boundaryEvent("messageBoundary").message(MESSAGE_NAME)
+      .moveToActivity("userTask")
+        .boundaryEvent("signalBoundary").signal(SIGNAL_NAME)
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -1097,9 +1268,12 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addErrorBoundaryEventWithUserTask("subProcess", ERROR_CODE, AFTER_BOUNDARY_TASK) // catch error with boundary event
-      .getBuilderForElementById("subProcessEnd", EndEventBuilder.class)
-      .error(ERROR_CODE) // let the end event of the subprocess throw an error
+      .endEventBuilder("subProcessEnd")
+        .error(ERROR_CODE) // let the end event of the subprocess throw an error
+      .moveToActivity("subProcess")
+        .boundaryEvent().error(ERROR_CODE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
       .done()
     );
 
@@ -1123,9 +1297,11 @@ public class MigrationAddBoundaryEventsTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addEscalationBoundaryEventWithUserTask("subProcess", ESCALATION_CODE, AFTER_BOUNDARY_TASK) // catch escalation with boundary event
-      .getBuilderForElementById("subProcessEnd", EndEventBuilder.class)
-      .escalation(ESCALATION_CODE) // let the end event of the subprocess escalate
+      .endEventBuilder("subProcessEnd").escalation(ESCALATION_CODE) // let the end event of the subprocess escalate
+      .moveToActivity("subProcess")
+        .boundaryEvent().escalation(ESCALATION_CODE) // catch escalation with boundary event
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
       .done()
     );
 

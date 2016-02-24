@@ -218,19 +218,28 @@ public class ProcessModels {
       .done();
 
   public static final BpmnModelInstance SCOPE_TASK_PROCESS = modify(ONE_TASK_PROCESS)
-    .addCamundaInputParameter("userTask", "foo", "bar");
+    .activityBuilder("userTask")
+    .camundaInputParameter("foo", "bar")
+    .done();
 
   public static final BpmnModelInstance SCOPE_TASK_SUBPROCESS_PROCESS = modify(SUBPROCESS_PROCESS)
-    .addCamundaInputParameter("userTask", "foo", "bar");
+    .activityBuilder("userTask")
+    .camundaInputParameter("foo", "bar")
+    .done();
 
   public static final BpmnModelInstance PARALLEL_SCOPE_TASKS = modify(PARALLEL_GATEWAY_PROCESS)
-    .addCamundaInputParameter("userTask1", "foo", "bar")
-    .addCamundaInputParameter("userTask2", "foo", "bar");
+    .activityBuilder("userTask1")
+    .camundaInputParameter("foo", "bar")
+    .moveToActivity("userTask2")
+    .camundaInputParameter("foo", "bar")
+    .done();
 
   public static final BpmnModelInstance PARALLEL_SCOPE_TASKS_SUB_PROCESS = modify(PARALLEL_GATEWAY_SUBPROCESS_PROCESS)
-    .addCamundaInputParameter("userTask1", "foo", "bar")
-    .addCamundaInputParameter("userTask2", "foo", "bar");
-
+    .activityBuilder("userTask1")
+    .camundaInputParameter("foo", "bar")
+    .moveToActivity("userTask2")
+    .camundaInputParameter("foo", "bar")
+    .done();
 
   public static final BpmnModelInstance UNSUPPORTED_ACTIVITIES = Bpmn.createExecutableProcess(PROCESS_KEY)
     .startEvent()

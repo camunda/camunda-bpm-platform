@@ -288,7 +288,9 @@ public class MigrationPlanCreationTest {
   @Test
   public void testMapEqualBoundaryEvents() {
     BpmnModelInstance testProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addMessageBoundaryEvent("userTask", "boundary", MESSAGE_NAME);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
@@ -311,7 +313,9 @@ public class MigrationPlanCreationTest {
   @Test
   public void testMapBoundaryEventsWithDifferentId() {
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addMessageBoundaryEvent("userTask", "boundary", MESSAGE_NAME);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -336,7 +340,9 @@ public class MigrationPlanCreationTest {
   @Test
   public void testMapBoundaryToMigratedActivity() {
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addMessageBoundaryEvent("userTask", "boundary", MESSAGE_NAME);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("userTask", "newUserTask");
 
@@ -361,9 +367,13 @@ public class MigrationPlanCreationTest {
   @Test
   public void testNotMapBoundaryToParallelActivity() {
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addMessageBoundaryEvent("userTask1", "boundary", MESSAGE_NAME);
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
     BpmnModelInstance targetProcess = modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addMessageBoundaryEvent("userTask2", "boundary", MESSAGE_NAME);
+      .activityBuilder("userTask2")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
@@ -387,9 +397,13 @@ public class MigrationPlanCreationTest {
   @Test
   public void testMapBoundaryToHigherScope() {
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addMessageBoundaryEvent("userTask", "boundary", MESSAGE_NAME);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
     BpmnModelInstance targetProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addMessageBoundaryEvent("userTask", "boundary", MESSAGE_NAME);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
@@ -412,9 +426,13 @@ public class MigrationPlanCreationTest {
   @Test
   public void testMapBoundaryToLowerScope() {
     BpmnModelInstance sourceProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addMessageBoundaryEvent("userTask", "boundary", MESSAGE_NAME);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
     BpmnModelInstance targetProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addMessageBoundaryEvent("userTask", "boundary", MESSAGE_NAME);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
@@ -437,9 +455,13 @@ public class MigrationPlanCreationTest {
   @Test
   public void testNotMapBoundaryToChildActivity() {
     BpmnModelInstance sourceProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addMessageBoundaryEvent("subProcess", "boundary", MESSAGE_NAME);
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
     BpmnModelInstance targetProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addMessageBoundaryEvent("userTask", "boundary", MESSAGE_NAME);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
@@ -463,9 +485,13 @@ public class MigrationPlanCreationTest {
   @Test
   public void testNotMapBoundaryToParentActivity() {
     BpmnModelInstance sourceProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addMessageBoundaryEvent("userTask", "boundary", MESSAGE_NAME);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
     BpmnModelInstance targetProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addMessageBoundaryEvent("subProcess", "boundary", MESSAGE_NAME);
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
@@ -489,8 +515,11 @@ public class MigrationPlanCreationTest {
   @Test
   public void testNotMapUnsupportedBoundaryEvents() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addErrorBoundaryEvent("subProcess", "error", ERROR_CODE)
-      .addEscalationBoundaryEvent("subProcess", "escalation", ESCALATION_CODE);
+      .activityBuilder("subProcess")
+        .boundaryEvent("error").error(ERROR_CODE)
+      .moveToActivity("subProcess")
+        .boundaryEvent("escalation").escalation(ESCALATION_CODE)
+      .done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
@@ -517,7 +546,7 @@ public class MigrationPlanCreationTest {
   @Test
   public void testNotMapProcessDefinitionWithEventSubProcess() {
     BpmnModelInstance testProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addSubProcessToParent(ProcessModels.PROCESS_KEY)
+      .addSubProcessTo(ProcessModels.PROCESS_KEY)
       .triggerByEvent()
       .embeddedSubProcess()
       .startEvent().message(MESSAGE_NAME)
@@ -545,7 +574,7 @@ public class MigrationPlanCreationTest {
   @Test
   public void testNotMapSubProcessWithEventSubProcess() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSubProcessToParent("subProcess")
+      .addSubProcessTo("subProcess")
       .triggerByEvent()
       .embeddedSubProcess()
       .startEvent().message(MESSAGE_NAME)
@@ -574,7 +603,7 @@ public class MigrationPlanCreationTest {
   @Test
   public void testMapActivityWithUnmappedParentWhichHasAEventSubProcessChild() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSubProcessToParent("subProcess")
+      .addSubProcessTo("subProcess")
       .triggerByEvent()
       .embeddedSubProcess()
       .startEvent().message(MESSAGE_NAME)
@@ -601,7 +630,7 @@ public class MigrationPlanCreationTest {
   @Test
   public void testNotMapUserTaskInEventSubProcess() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSubProcessToParent("subProcess")
+      .addSubProcessTo("subProcess")
       .triggerByEvent()
       .embeddedSubProcess()
       .startEvent().message(MESSAGE_NAME)

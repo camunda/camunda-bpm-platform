@@ -505,8 +505,11 @@ public class MigrationAddScopesTest {
     DelegateEvent.clearEvents();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+
     ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-        .addCamundaExecutionListenerClass("subProcess", ExecutionListener.EVENTNAME_START, DelegateExecutionListener.class.getName())
+      .activityBuilder("subProcess")
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, DelegateExecutionListener.class.getName())
+      .done()
     );
 
     MigrationPlan migrationPlan = rule.getRuntimeService()

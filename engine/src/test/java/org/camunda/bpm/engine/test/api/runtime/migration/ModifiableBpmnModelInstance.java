@@ -18,7 +18,7 @@ import java.util.Collection;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.AbstractActivityBuilder;
 import org.camunda.bpm.model.bpmn.builder.AbstractBaseElementBuilder;
-import org.camunda.bpm.model.bpmn.builder.AbstractFlowNodeBuilder;
+import org.camunda.bpm.model.bpmn.builder.EndEventBuilder;
 import org.camunda.bpm.model.bpmn.builder.SubProcessBuilder;
 import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
@@ -97,8 +97,16 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
     return (T) modelElementById.builder();
   }
 
-  public UserTaskBuilder builderForUserTask(String id) {
-    return getBuilderForElementById(id, UserTaskBuilder.class);
+  public AbstractActivityBuilder activityBuilder(String activityId) {
+    return getBuilderForElementById(activityId, AbstractActivityBuilder.class);
+  }
+
+  public UserTaskBuilder userTaskBuilder(String userTaskId) {
+    return getBuilderForElementById(userTaskId, UserTaskBuilder.class);
+  }
+
+  public EndEventBuilder endEventBuilder(String eventId) {
+    return getBuilderForElementById(eventId, EndEventBuilder.class);
   }
 
   public ModifiableBpmnModelInstance changeElementId(String oldId, String newId) {
@@ -118,203 +126,7 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
     return this;
   }
 
-  public ModifiableBpmnModelInstance addMessageBoundaryEvent(String activityId, String messageName) {
-    return addMessageBoundaryEvent(activityId, null, messageName);
-  }
-
-  public ModifiableBpmnModelInstance addMessageBoundaryEvent(String activityId, String boundaryId, String messageName) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .boundaryEvent(boundaryId).message(messageName)
-      .endEvent();
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addMessageBoundaryEventWithUserTask(String activityId, String messageName, String userTaskId) {
-    return addMessageBoundaryEventWithUserTask(activityId, null, messageName, userTaskId);
-  }
-
-  public ModifiableBpmnModelInstance addMessageBoundaryEventWithUserTask(String activityId, String boundaryId, String messageName, String userTaskId) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .boundaryEvent(boundaryId).message(messageName)
-      .userTask(userTaskId)
-      .endEvent();
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addSignalBoundaryEvent(String activityId, String signalName) {
-    return addSignalBoundaryEvent(activityId, null, signalName);
-  }
-
-  public ModifiableBpmnModelInstance addSignalBoundaryEvent(String activityId, String boundaryId, String signalName) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .boundaryEvent(boundaryId).signal(signalName)
-      .endEvent();
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addSignalBoundaryEventWithUserTask(String activityId, String signalName, String userTaskId) {
-    return addSignalBoundaryEventWithUserTask(activityId, null, signalName, userTaskId);
-  }
-
-  public ModifiableBpmnModelInstance addSignalBoundaryEventWithUserTask(String activityId, String boundaryId, String signalName, String userTaskId) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .boundaryEvent(boundaryId).signal(signalName)
-      .userTask(userTaskId)
-      .endEvent();
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addTimerDateBoundaryEvent(String activityId, String timerDate) {
-    return addTimerDateBoundaryEvent(activityId, null, timerDate);
-  }
-
-  public ModifiableBpmnModelInstance addTimerDateBoundaryEvent(String activityId, String boundaryId, String timerDate) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .boundaryEvent(boundaryId).timerWithDate(timerDate)
-      .endEvent();
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addTimerDateBoundaryEventWithUserTask(String activityId, String timerDate, String userTaskId) {
-    return addTimerDateBoundaryEventWithUserTask(activityId, null, timerDate, userTaskId);
-  }
-
-  public ModifiableBpmnModelInstance addTimerDateBoundaryEventWithUserTask(String activityId, String boundaryId, String timerDate, String userTaskId) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .boundaryEvent(boundaryId).timerWithDate(timerDate)
-      .userTask(userTaskId)
-      .endEvent();
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addTimerCycleBoundaryEvent(String activityId, String timerCycle) {
-    return addTimerCycleBoundaryEvent(activityId, null, timerCycle);
-  }
-
-  public ModifiableBpmnModelInstance addTimerCycleBoundaryEvent(String activityId, String boundaryId, String timerCycle) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .boundaryEvent(boundaryId).timerWithCycle(timerCycle)
-      .endEvent();
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addTimerCycleBoundaryEventWithUserTask(String activityId, String timerCycle, String userTaskId) {
-    return addTimerCycleBoundaryEventWithUserTask(activityId, null, timerCycle, userTaskId);
-  }
-
-  public ModifiableBpmnModelInstance addTimerCycleBoundaryEventWithUserTask(String activityId, String boundaryId, String timerCycle, String userTaskId) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .boundaryEvent(boundaryId).timerWithCycle(timerCycle)
-      .userTask(userTaskId)
-      .endEvent();
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addTimerDurationBoundaryEvent(String activityId, String timerDuration) {
-    return addTimerDurationBoundaryEventWithUserTask(activityId, null, timerDuration);
-  }
-
-  public ModifiableBpmnModelInstance addTimerDurationBoundaryEvent(String activityId, String boundaryId, String timerDuration) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .boundaryEvent(boundaryId).timerWithDuration(timerDuration)
-      .endEvent();
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addTimerDurationBoundaryEventWithUserTask(String activityId, String timerDuration, String userTaskId) {
-    return addTimerDurationBoundaryEventWithUserTask(activityId, null, timerDuration, userTaskId);
-  }
-
-  public ModifiableBpmnModelInstance addTimerDurationBoundaryEventWithUserTask(String activityId, String boundaryId, String timerDuration, String userTaskId) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .boundaryEvent(boundaryId).timerWithDuration(timerDuration)
-      .userTask(userTaskId)
-      .endEvent();
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addErrorBoundaryEvent(String activityId, String errorCode) {
-    return addErrorBoundaryEvent(activityId, null, errorCode);
-  }
-
-  public ModifiableBpmnModelInstance addErrorBoundaryEvent(String activityId, String boundaryId, String errorCode) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .boundaryEvent(boundaryId).error(errorCode)
-      .endEvent();
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addErrorBoundaryEventWithUserTask(String activityId, String errorCode, String userTaskId) {
-    return addErrorBoundaryEventWithUserTask(activityId, null, errorCode, userTaskId);
-  }
-
-  public ModifiableBpmnModelInstance addErrorBoundaryEventWithUserTask(String activityId, String boundaryId, String errorCode, String userTaskId) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .boundaryEvent(boundaryId).error(errorCode)
-      .userTask(userTaskId)
-      .endEvent();
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addEscalationBoundaryEvent(String activityId, String escalationCode) {
-    return addEscalationBoundaryEvent(activityId, null, escalationCode);
-  }
-
-  public ModifiableBpmnModelInstance addEscalationBoundaryEvent(String activityId, String boundaryId, String escalationCode) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .boundaryEvent(boundaryId).escalation(escalationCode)
-      .endEvent();
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addEscalationBoundaryEventWithUserTask(String activityId, String escalationCode, String userTaskId) {
-    return addEscalationBoundaryEventWithUserTask(activityId, null, escalationCode, userTaskId);
-  }
-
-  public ModifiableBpmnModelInstance addEscalationBoundaryEventWithUserTask(String activityId, String boundaryId, String escalationCode, String userTaskId) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .boundaryEvent(boundaryId).escalation(escalationCode)
-      .userTask(userTaskId)
-      .endEvent();
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addCamundaInputParameter(String activityId, String name, String value) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .camundaInputParameter(name, value);
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addCamundaOutputParameter(String activityId, String name, String value) {
-    getBuilderForElementById(activityId, AbstractActivityBuilder.class)
-      .camundaOutputParameter(name, value);
-
-    return this;
-  }
-
-  public ModifiableBpmnModelInstance addCamundaExecutionListenerClass(String activityId, String eventName, String className) {
-    getBuilderForElementById(activityId, AbstractFlowNodeBuilder.class)
-      .camundaExecutionListenerClass(eventName, className);
-
-    return this;
-  }
-
-  public SubProcessBuilder addSubProcessToParent(String parentId) {
+  public SubProcessBuilder addSubProcessTo(String parentId) {
     SubProcess eventSubProcess = modelInstance.newInstance(SubProcess.class);
 
     BpmnModelElementInstance parent = getModelElementById(parentId);

@@ -422,7 +422,9 @@ public class MigrationRemoveScopesTest {
     DelegateEvent.clearEvents();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addCamundaExecutionListenerClass("subProcess", ExecutionListener.EVENTNAME_END, DelegateExecutionListener.class.getName())
+      .activityBuilder("subProcess")
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, DelegateExecutionListener.class.getName())
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 

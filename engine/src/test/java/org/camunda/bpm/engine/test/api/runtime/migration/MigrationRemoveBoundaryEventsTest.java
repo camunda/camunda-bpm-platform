@@ -48,7 +48,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveMessageBoundaryEventFromUserTask() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 
@@ -72,7 +76,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveMessageBoundaryEventFromScopeUserTask() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_PROCESS);
 
@@ -96,7 +104,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveMessageBoundaryEventFromConcurrentUserTask() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask1", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
 
@@ -122,7 +134,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveMessageBoundaryEventFromConcurrentScopeUserTask() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .addMessageBoundaryEventWithUserTask("userTask1", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SCOPE_TASKS);
 
@@ -148,7 +164,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveMessageBoundaryEventFromSubProcess() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("subProcess", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
@@ -173,7 +193,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveMessageBoundaryEventFromSubProcessWithScopeUserTask() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("subProcess", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
 
@@ -198,7 +222,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveMessageBoundaryEventFromParallelSubProcess() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("subProcess1", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
 
@@ -226,7 +254,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveMessageBoundaryEventFromUserTaskInSubProcess() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
@@ -251,7 +283,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveSignalBoundaryEventFromUserTask() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 
@@ -275,7 +311,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveSignalBoundaryEventFromScopeUserTask() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_PROCESS);
 
@@ -299,7 +339,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveSignalBoundaryEventFromConcurrentUserTask() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask1", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
 
@@ -325,7 +369,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveSignalBoundaryEventFromConcurrentScopeUserTask() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .addSignalBoundaryEventWithUserTask("userTask1", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SCOPE_TASKS);
 
@@ -351,7 +399,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveSignalBoundaryEventFromSubProcess() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("subProcess", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
@@ -376,7 +428,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveSignalBoundaryEventFromSubProcessWithScopeUserTask() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("subProcess", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
 
@@ -401,7 +457,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveSignalBoundaryEventFromParallelSubProcess() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("subProcess1", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess1")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
 
@@ -429,7 +489,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveSignalBoundaryEventFromUserTaskInSubProcess() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
@@ -454,7 +518,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveTimerBoundaryEventFromUserTask() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 
@@ -478,7 +546,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveTimerBoundaryEventFromScopeUserTask() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_PROCESS);
 
@@ -502,7 +574,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveTimerBoundaryEventFromConcurrentUserTask() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask1", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
 
@@ -528,7 +604,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveTimerBoundaryEventFromConcurrentScopeUserTask() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .addTimerDateBoundaryEventWithUserTask("userTask1", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SCOPE_TASKS);
 
@@ -554,7 +634,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveTimerBoundaryEventFromSubProcess() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("subProcess", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
@@ -579,7 +663,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveTimerBoundaryEventFromSubProcessWithScopeUserTask() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("subProcess", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
 
@@ -604,7 +692,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveTimerBoundaryEventFromParallelSubProcess() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("subProcess1", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("subProcess1")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
 
@@ -632,7 +724,11 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveTimerBoundaryEventFromUserTaskInSubProcess() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
@@ -657,9 +753,13 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveMultipleBoundaryEvents() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEvent("subProcess", "timerBoundary", TIMER_DATE)
-      .addMessageBoundaryEvent("userTask", "messageBoundary", MESSAGE_NAME)
-      .addSignalBoundaryEvent("userTask", "signalBoundary", SIGNAL_NAME)
+      .activityBuilder("subProcess")
+        .boundaryEvent("timerBoundary").timerWithDate(TIMER_DATE)
+      .moveToActivity("userTask")
+        .boundaryEvent("messageBoundary").message(MESSAGE_NAME)
+      .moveToActivity("userTask")
+        .boundaryEvent("signalBoundary").signal(SIGNAL_NAME)
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
@@ -686,7 +786,9 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveErrorBoundaryEventFromSubProcess() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addErrorBoundaryEvent("subProcess", ERROR_CODE)
+      .activityBuilder("subProcess")
+      .boundaryEvent().error(ERROR_CODE)
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
@@ -708,7 +810,9 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveEscalationBoundaryEventFromSubProcess() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addEscalationBoundaryEvent("subProcess", ESCALATION_CODE)
+      .activityBuilder("subProcess")
+      .boundaryEvent().escalation(ESCALATION_CODE)
+      .done()
     );
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
@@ -730,7 +834,7 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testMigrateIncidentForJob() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .builderForUserTask("userTask")
+      .userTaskBuilder("userTask")
       .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
       .serviceTask("failingTask").camundaClass("org.camunda.bpm.engine.test.api.runtime.FailingDelegate")
       .endEvent()

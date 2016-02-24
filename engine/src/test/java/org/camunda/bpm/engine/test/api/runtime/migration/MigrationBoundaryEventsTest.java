@@ -49,7 +49,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMessageBoundaryEventOnUserTask() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -77,7 +81,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMessageBoundaryEventOnUserTaskAndCorrelateMessage() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -103,9 +111,17 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMessageBoundaryEventAndTriggerByOldMessageName() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask", "boundary", "new" + MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message("new" + MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
@@ -136,7 +152,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMessageBoundaryEventOnScopeUserTask() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -164,7 +184,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMessageBoundaryEventOnScopeUserTaskAndCorrelateMessage() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -190,7 +214,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMessageBoundaryEventOnConcurrentUserTask() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask1", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -220,7 +248,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMessageBoundaryEventOnConcurrentUserTaskAndCorrelateMessage() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addMessageBoundaryEventWithUserTask("userTask1", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -248,7 +280,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMessageBoundaryEventOnConcurrentScopeUserTask() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .addMessageBoundaryEventWithUserTask("userTask1", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -278,7 +314,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMessageBoundaryEventOnConcurrentScopeUserTaskAndCorrelateMessage() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .addMessageBoundaryEventWithUserTask("userTask1", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -306,7 +346,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMessageBoundaryEventToSubProcess() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("subProcess", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -335,7 +379,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMessageBoundaryEventToSubProcessAndCorrelateMessage() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("subProcess", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -362,7 +410,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMessageBoundaryEventToSubProcessWithScopeUserTask() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("subProcess", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -391,7 +443,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMessageBoundaryEventToSubProcessWithScopeUserTaskAndCorrelateMessage() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("subProcess", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -418,7 +474,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMessageBoundaryEventToParallelSubProcess() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("subProcess1", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
@@ -449,7 +509,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMessageBoundaryEventToParallelSubProcessAndCorrelateMessage() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .addMessageBoundaryEventWithUserTask("subProcess1", "boundary", MESSAGE_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
@@ -478,7 +542,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateSignalBoundaryEventOnUserTask() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -506,7 +574,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateSignalBoundaryEventOnUserTaskAndCorrelateSignal() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -532,9 +604,17 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateSignalBoundaryEventOnUserTaskAndSendOldSignalName() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask", "boundary", "new" + SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal("new" + SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
@@ -565,7 +645,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateSignalBoundaryEventOnScopeUserTask() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -593,7 +677,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateSignalBoundaryEventOnScopeUserTaskAndCorrelateSignal() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -619,7 +707,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateSignalBoundaryEventOnConcurrentUserTask() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask1", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -649,7 +741,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateSignalBoundaryEventOnConcurrentUserTaskAndCorrelateSignal() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addSignalBoundaryEventWithUserTask("userTask1", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -677,7 +773,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateSignalBoundaryEventOnConcurrentScopeUserTask() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .addSignalBoundaryEventWithUserTask("userTask1", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -707,7 +807,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateSignalBoundaryEventOnConcurrentScopeUserTaskAndCorrelateSignal() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .addSignalBoundaryEventWithUserTask("userTask1", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -735,7 +839,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateSignalBoundaryEventToSubProcess() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("subProcess", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -764,7 +872,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateSignalBoundaryEventToSubProcessAndCorrelateSignal() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("subProcess", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -791,7 +903,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateSignalBoundaryEventToSubProcessWithScopeUserTask() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("subProcess", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -820,7 +936,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateSignalBoundaryEventToSubProcessWithScopeUserTaskAndCorrelateSignal() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("subProcess", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -847,7 +967,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateSignalBoundaryEventToParallelSubProcess() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("subProcess1", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess1")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
@@ -878,7 +1002,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateSignalBoundaryEventToParallelSubProcessAndCorrelateSignal() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .addSignalBoundaryEventWithUserTask("subProcess1", "boundary", SIGNAL_NAME, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess1")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
@@ -907,7 +1035,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateTimerBoundaryEventOnUserTask() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -935,7 +1067,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateTimerBoundaryEventOnUserTaskAndTriggerTimer() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -961,9 +1097,17 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateTimerBoundaryEventOnUserTaskAndTriggerTimerWithOldDueDate() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask", "boundary", NEW_TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDate(NEW_TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
@@ -990,7 +1134,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateTimerBoundaryEventOnScopeUserTask() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -1018,7 +1166,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateTimerBoundaryEventOnScopeUserTaskAndTriggerTimer() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -1044,7 +1196,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateTimerBoundaryEventOnConcurrentUserTask() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask1", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -1074,7 +1230,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateTimerBoundaryEventOnConcurrentUserTaskAndTriggerTimer() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("userTask1", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -1102,7 +1262,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateTimerBoundaryEventOnConcurrentScopeUserTask() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .addTimerDateBoundaryEventWithUserTask("userTask1", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -1132,7 +1296,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateTimerBoundaryEventOnConcurrentScopeUserTaskAndTriggerTimer() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .addTimerDateBoundaryEventWithUserTask("userTask1", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -1160,7 +1328,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateTimerBoundaryEventToSubProcess() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("subProcess", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -1189,7 +1361,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateTimerBoundaryEventToSubProcessAndTriggerTimer() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("subProcess", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -1216,7 +1392,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateTimerBoundaryEventToSubProcessWithScopeUserTask() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("subProcess", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -1245,7 +1425,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateTimerBoundaryEventToSubProcessWithScopeUserTaskAndTriggerTimer() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("subProcess", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
@@ -1272,7 +1456,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateTimerBoundaryEventToParallelSubProcess() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("subProcess1", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess1")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
@@ -1303,7 +1491,11 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateTimerBoundaryEventToParallelSubProcessAndTriggerTimer() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEventWithUserTask("subProcess1", "boundary", TIMER_DATE, AFTER_BOUNDARY_TASK);
+      .activityBuilder("subProcess1")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
@@ -1332,12 +1524,19 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateMultipleBoundaryEvents() {
     // given
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addTimerDateBoundaryEvent("subProcess", "timerBoundary1", TIMER_DATE)
-      .addMessageBoundaryEvent("subProcess", "messageBoundary1", MESSAGE_NAME)
-      .addSignalBoundaryEvent("subProcess", "signalBoundary1", SIGNAL_NAME)
-      .addTimerDateBoundaryEvent("userTask", "timerBoundary2", TIMER_DATE)
-      .addMessageBoundaryEvent("userTask", "messageBoundary2", MESSAGE_NAME)
-      .addSignalBoundaryEvent("userTask", "signalBoundary2", SIGNAL_NAME);
+      .activityBuilder("subProcess")
+        .boundaryEvent("timerBoundary1").timerWithDate(TIMER_DATE)
+      .moveToActivity("subProcess")
+        .boundaryEvent("messageBoundary1").message(MESSAGE_NAME)
+      .moveToActivity("subProcess")
+        .boundaryEvent("signalBoundary1").signal(SIGNAL_NAME)
+      .moveToActivity("userTask")
+        .boundaryEvent("timerBoundary2").timerWithDate(TIMER_DATE)
+      .moveToActivity("userTask")
+        .boundaryEvent("messageBoundary2").message(MESSAGE_NAME)
+      .moveToActivity("userTask")
+        .boundaryEvent("signalBoundary2").signal(SIGNAL_NAME)
+      .done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
@@ -1373,13 +1572,14 @@ public class MigrationBoundaryEventsTest {
   @Test
   public void testMigrateBoundaryEventAndEventSubProcess() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSignalBoundaryEvent("userTask", "boundary", SIGNAL_NAME)
-      .addSubProcessToParent("subProcess")
+      .addSubProcessTo("subProcess")
         .triggerByEvent()
         .embeddedSubProcess()
           .startEvent("eventStart").message(MESSAGE_NAME)
           .endEvent()
         .subProcessDone()
+      .moveToActivity("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
       .done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
@@ -1408,7 +1608,7 @@ public class MigrationBoundaryEventsTest {
   public void testMigrateIncidentForJob() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .builderForUserTask("userTask")
+      .userTaskBuilder("userTask")
       .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
       .serviceTask("failingTask").camundaClass(FailingDelegate.class.getName())
       .endEvent()

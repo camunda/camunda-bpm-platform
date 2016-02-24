@@ -41,7 +41,7 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMapUserTaskSiblingOfMessageEventSubProcess() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSubProcessToParent("subProcess")
+      .addSubProcessTo("subProcess")
       .triggerByEvent()
       .embeddedSubProcess()
       .startEvent("eventStart").message(MESSAGE_NAME)
@@ -86,7 +86,7 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMapUserTaskSiblingOfMessageEventSubProcessAndTriggerMessage() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSubProcessToParent("subProcess")
+      .addSubProcessTo("subProcess")
       .triggerByEvent()
       .embeddedSubProcess()
       .startEvent("eventStart").message(MESSAGE_NAME)
@@ -115,7 +115,7 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMapUserTaskSiblingOfSignalEventSubProcess() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSubProcessToParent("subProcess")
+      .addSubProcessTo("subProcess")
       .triggerByEvent()
       .embeddedSubProcess()
       .startEvent("eventStart").signal(SIGNAL_NAME)
@@ -160,7 +160,7 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMapUserTaskSiblingOfSignalEventSubProcessAndSendSignal() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSubProcessToParent("subProcess")
+      .addSubProcessTo("subProcess")
       .triggerByEvent()
       .embeddedSubProcess()
       .startEvent("eventStart").signal(SIGNAL_NAME)
@@ -189,7 +189,7 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMapUserTaskSiblingOfTimerEventSubProcess() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSubProcessToParent("subProcess")
+      .addSubProcessTo("subProcess")
       .triggerByEvent()
       .embeddedSubProcess()
       .startEvent("eventStart").timerWithDate(TIMER_DATE)
@@ -234,7 +234,7 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMapUserTaskSiblingOfTimerEventSubProcessAndTriggerTimer() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSubProcessToParent("subProcess")
+      .addSubProcessTo("subProcess")
       .triggerByEvent()
       .embeddedSubProcess()
       .startEvent("eventStart").timerWithDate(TIMER_DATE)
