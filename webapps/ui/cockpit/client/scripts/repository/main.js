@@ -1,6 +1,6 @@
 'use strict';
 
-var angular = require('angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
     dataDepend = require('angular-data-depend'),
     camCommons = require('camunda-commons-ui/lib/index'),
 

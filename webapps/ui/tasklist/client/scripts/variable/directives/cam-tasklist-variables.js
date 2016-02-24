@@ -4,7 +4,7 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/cam-tasklist-variables.html', 'utf8');
 var modalTemplate = fs.readFileSync(__dirname + '/../modals/cam-tasklist-variables-detail-modal.html', 'utf8');
 
-var angular = require('angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 
   // AngularJS DI
   module.exports = [

@@ -1,6 +1,6 @@
 'use strict';
 
-var angular = require('angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
 
   taskDirective = require('./directives/cam-tasklist-task'),
   taskMetaDirective = require('./directives/cam-tasklist-task-meta'),

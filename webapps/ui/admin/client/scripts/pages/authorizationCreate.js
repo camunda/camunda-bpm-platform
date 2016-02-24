@@ -1,7 +1,7 @@
 'use strict';
 
 var CamSDK = require('camunda-bpm-sdk-js');
-var angular = require('angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 
   module.exports = [ '$scope', '$q', '$location', 'Uri', 'Notifications', 'AuthorizationResource', function AuthorizationCreateController ($scope, $q, $location, Uri, Notifications, AuthorizationResource) {
 

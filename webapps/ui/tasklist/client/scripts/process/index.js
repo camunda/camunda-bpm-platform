@@ -1,6 +1,6 @@
 'use strict';
 
-var angular = require('angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
     camNavbarActionStartProcessPlugin = require('./plugins/action/cam-tasklist-navbar-action-start-process-plugin'),
     camProcessStartModalCtrl = require('./plugins/action/modals/cam-tasklist-process-start-modal');
 

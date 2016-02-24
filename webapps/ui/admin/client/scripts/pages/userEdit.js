@@ -6,7 +6,7 @@ var template = fs.readFileSync(__dirname + '/userEdit.html', 'utf8');
 var groupTemplate = fs.readFileSync(__dirname + '/create-group-membership.html', 'utf8');
 var confirmationTemplate = fs.readFileSync(__dirname + '/generic-confirmation.html', 'utf8');
 
-var angular = require('angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 
   module.exports = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/users/:userId', {

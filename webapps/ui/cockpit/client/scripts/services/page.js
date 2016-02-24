@@ -1,6 +1,6 @@
 'use strict';
 
-var angular = require('angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 
   /**
    * A service to manage a page page.

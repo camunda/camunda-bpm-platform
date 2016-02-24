@@ -4,7 +4,7 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-cockpit-source.html', 'utf8');
 
-var angular = require('angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 require('camunda-commons-ui/vendor/prism');
 
   module.exports = [
