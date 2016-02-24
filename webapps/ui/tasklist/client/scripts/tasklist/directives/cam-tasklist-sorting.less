@@ -26,7 +26,12 @@ section.tasks-list {
     width: 100%;
     margin: 0;
     float: left;
+
+    &[data-total="1"] li.sorting-choice:first-of-type {
+      padding-left: 0;
+    }
   }
+
   li.sorting-choice {
     max-width: 200px;
     white-space: nowrap;
@@ -60,6 +65,7 @@ section.tasks-list {
       text-overflow: ellipsis;
     }
   }
+
   li.new-sort {
     float: left;
   }
@@ -72,7 +78,7 @@ section.tasks-list {
 
   .dropdown-menu > li > .variable-inputs {
     margin: (@grid-gutter-width / 2) 0;
-    padding: 0 20px;
+    padding: 0 9px;
     .actions {
       text-align: right;
       margin-bottom: 0;

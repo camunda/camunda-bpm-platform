@@ -116,6 +116,7 @@ describe('Tasklist Filter Variables Spec', function() {
 
       // when
       dashboardPage.taskFilters.selectFilter(1);
+      dashboardPage.taskList.taskList().get(0).click();
 
       // then
       expect(dashboardPage.taskList.taskVariableLabel(0,0).getText()).to.eventually.eql('my test variable:');

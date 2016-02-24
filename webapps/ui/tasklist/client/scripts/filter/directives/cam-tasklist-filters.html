@@ -10,7 +10,8 @@
   <span class="message">{{ 'FILTERS_LOADING_FAILURE' | translate }}</span>
 </div>
 
-<div ng-show="state.$loaded && !state.$error">
+<div ng-show="state.$loaded && !state.$error"
+     class="list-unstyled">
 
   <div ng-hide="totalItems"
        class="well">
@@ -20,27 +21,29 @@
 
   <div ng-show="totalItems"
        ng-repeat="(delta, filter) in filters | orderBy:'properties.priority'"
-       class="task-filter-wrapper"
+       class="item task-filter-wrapper"
        ng-class="{active: isFocused(filter)}"
-       ng-style="{'z-index': ((filters.length + 10) - delta) }">
+       ng-style="filter.style"
+       ng-click="focus(filter)">
 
-    <div class="task-filter"
-         ng-style="filter.style"
-         ng-click="focus(filter)">
-
+    <div class="task-filter">
       <div ng-if="isFocused(filter)"
            class="counter">{{ filterCount }}</div>
 
-      <a ng-click="openModal($event, filter)"
-         class="edit-filter">
-        <span class="glyphicon glyphicon-pencil"></span>
-        <span class="hidden-sm hidden-xs hidden-md"
-              translate="FILTER_DETAILS">Filter details</span>
-      </a>
+      <div class="actions">
+        <a ng-click="openModal($event, filter)"
+           tooltip="{{ 'FILTER_DETAILS' | translate }}"
+           tooltip-placement="top">
+          <span class="glyphicon glyphicon-pencil"></span>
+        </a>
+      </div>
 
       <h4 class="name"
           tooltip="{{ filter.properties.description }}"
-          tooltip-placement="top">{{ filter.name }}</h4>
+          tooltip-placement="top">
+        <span ng-style="{'background-color': filter.properties.color}"></span>
+        <a href>{{ filter.name }}</a>
+      </h4>
     </div>
   </div>
 </div>

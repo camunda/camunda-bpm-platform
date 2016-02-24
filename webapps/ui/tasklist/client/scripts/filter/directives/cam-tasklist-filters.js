@@ -46,12 +46,9 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-filters.html', 'utf8')
           $scope.totalItems = filters.length;
 
           for (var i = 0, filter; !!(filter = filters[i]); i++) {
-            // read background color from properties
             filter.style = {
-              'border-color': filter.properties.color,
-              'background-color': filter.properties.color
+              'z-index': filters.length + 10 - i
             };
-
           }
 
           $scope.filters = filters;

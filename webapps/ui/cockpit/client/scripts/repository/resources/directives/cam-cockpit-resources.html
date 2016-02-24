@@ -28,9 +28,9 @@
           ng-class="{active: currentResourceId === resource.id, clickable: true}"
           ng-click="focus($event, resource)">
         <div class="filepath">{{ truncateFilepath(resource._filepath) }}</div>
-        <a href>
-          {{ resource._filename }}
-        </a>
+        <h4>
+          <a href>{{ resource._filename }}</a>
+        </h4>
       </li>
     </ol>
   </div>

@@ -65,6 +65,7 @@ exports.config = {
   */
 
   mochaOpts: {
+    bail: true,
     timeout: 15000,
     colors: true,
     reporter: 'spec',
