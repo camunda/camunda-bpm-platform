@@ -76,19 +76,52 @@ public class EventSubscriptionManager extends AbstractManager {
     return getDbEntityManager().selectList("selectEventSubscriptionByQueryCriteria", eventSubscriptionQueryImpl, page);
   }
 
+  /**
+   * Find all signal event subscriptions with the given event name for any tenant.
+   *
+   * @see #findSignalEventSubscriptionsByEventNameAndTenantId(String, String)
+   */
   @SuppressWarnings("unchecked")
   public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByEventName(String eventName) {
     final String query = "selectSignalEventSubscriptionsByEventName";
-    Set<SignalEventSubscriptionEntity> selectList = new HashSet<SignalEventSubscriptionEntity>( getDbEntityManager().selectList(query, eventName));
+    Set<SignalEventSubscriptionEntity> eventSubscriptions = new HashSet<SignalEventSubscriptionEntity>( getDbEntityManager().selectList(query, eventName));
 
     // add events created in this command (not visible yet in query)
     for (SignalEventSubscriptionEntity entity : createdSignalSubscriptions) {
       if(eventName.equals(entity.getEventName())) {
-        selectList.add(entity);
+        eventSubscriptions.add(entity);
       }
     }
+    return new ArrayList<SignalEventSubscriptionEntity>(eventSubscriptions);
+  }
 
-    return new ArrayList<SignalEventSubscriptionEntity>(selectList);
+  /**
+   * Find all signal event subscriptions with the given event name and tenant.
+   */
+  @SuppressWarnings("unchecked")
+  public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByEventNameAndTenantId(String eventName, String tenantId) {
+    final String query = "selectSignalEventSubscriptionsByEventNameAndTenantId";
+
+    Map<String, Object> parameter = new HashMap<String, Object>();
+    parameter.put("eventName", eventName);
+    parameter.put("tenantId", tenantId);
+    Set<SignalEventSubscriptionEntity> eventSubscriptions = new HashSet<SignalEventSubscriptionEntity>( getDbEntityManager().selectList(query, parameter));
+
+    // add events created in this command (not visible yet in query)
+    for (SignalEventSubscriptionEntity entity : createdSignalSubscriptions) {
+      if(eventName.equals(entity.getEventName()) && hasTenantId(entity, tenantId)) {
+        eventSubscriptions.add(entity);
+      }
+    }
+    return new ArrayList<SignalEventSubscriptionEntity>(eventSubscriptions);
+  }
+
+  protected boolean hasTenantId(SignalEventSubscriptionEntity entity, String tenantId) {
+    if (tenantId == null) {
+      return entity.getTenantId() == null;
+    } else {
+      return tenantId.equals(entity.getTenantId());
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -102,7 +135,6 @@ public class EventSubscriptionManager extends AbstractManager {
         selectList.add(entity);
       }
     }
-
     return new ArrayList<SignalEventSubscriptionEntity>(selectList);
   }
 
@@ -121,10 +153,10 @@ public class EventSubscriptionManager extends AbstractManager {
         selectList.add(entity);
       }
     }
-
     return new ArrayList<SignalEventSubscriptionEntity>(selectList);
   }
 
+  @SuppressWarnings("unchecked")
   public List<EventSubscriptionEntity> findEventSubscriptionsByExecutionAndType(String executionId, String type, boolean lockResult) {
     final String query = "selectEventSubscriptionsByExecutionAndType";
     Map<String, Object> params = new HashMap<String, Object>();
@@ -134,11 +166,13 @@ public class EventSubscriptionManager extends AbstractManager {
     return getDbEntityManager().selectList(query, params);
   }
 
+  @SuppressWarnings("unchecked")
   public List<EventSubscriptionEntity> findEventSubscriptionsByExecution(String executionId) {
     final String query = "selectEventSubscriptionsByExecution";
     return getDbEntityManager().selectList(query, executionId);
   }
 
+  @SuppressWarnings("unchecked")
   public List<EventSubscriptionEntity> findEventSubscriptions(String executionId, String type, String activityId) {
     final String query = "selectEventSubscriptionsByExecutionTypeAndActivity";
     Map<String,String> params = new HashMap<String, String>();
@@ -148,6 +182,7 @@ public class EventSubscriptionManager extends AbstractManager {
     return getDbEntityManager().selectList(query, params);
   }
 
+  @SuppressWarnings("unchecked")
   public List<EventSubscriptionEntity> findEventSubscriptionsByConfiguration(String type, String configuration) {
     final String query = "selectEventSubscriptionsByConfiguration";
     Map<String,String> params = new HashMap<String, String>();
@@ -156,6 +191,7 @@ public class EventSubscriptionManager extends AbstractManager {
     return getDbEntityManager().selectList(query, params);
   }
 
+  @SuppressWarnings("unchecked")
   public List<EventSubscriptionEntity> findEventSubscriptionsByNameAndTenantId(String type, String eventName, String tenantId) {
     final String query = "selectEventSubscriptionsByNameAndTenantId";
     Map<String,String> params = new HashMap<String, String>();
@@ -165,6 +201,7 @@ public class EventSubscriptionManager extends AbstractManager {
     return getDbEntityManager().selectList(query, params);
   }
 
+  @SuppressWarnings("unchecked")
   public List<EventSubscriptionEntity> findEventSubscriptionsByNameAndExecution(String type, String eventName, String executionId, boolean lockResult) {
     // first check cache in case entity is already loaded
     ExecutionEntity cachedExecution = getDbEntityManager().getCachedEntity(ExecutionEntity.class, executionId);

@@ -165,4 +165,14 @@ public class CommandLogger extends ProcessEngineLogger {
         "026", "Cannot specify correlation variables of a process instance when correlate a start message."));
   }
 
+  public ProcessEngineException exceptionDeliverSignalToMultipleTenants(String signalName) {
+    return new ProcessEngineException(exceptionMessage(
+        "027", "Cannot deliver a signal with name '{}' to multiple tenants.", signalName));
+  }
+
+  public BadUserRequestException exceptionDeliverSignalToSingleExecutionWithTenantId() {
+    return new BadUserRequestException(exceptionMessage(
+        "028", "Cannot specify a tenant-id when deliver a signal to a single execution."));
+  }
+
 }

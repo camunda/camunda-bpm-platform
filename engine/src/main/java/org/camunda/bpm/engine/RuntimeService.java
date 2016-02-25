@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
+import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
@@ -1399,6 +1400,16 @@ public interface RuntimeService {
    *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void signalEventReceived(String signalName, String executionId, Map<String, Object> processVariables);
+
+  /**
+   * Notifies the process engine that a signal event has been received using a
+   * fluent builder.
+   *
+   * @param signalName
+   *          the name of the signal event
+   * @return the fluent builder to send the signal
+   */
+  SignalEventReceivedBuilder createSignalEvent(String signalName);
 
   /**
    * Notifies the process engine that a message event with name 'messageName' has
