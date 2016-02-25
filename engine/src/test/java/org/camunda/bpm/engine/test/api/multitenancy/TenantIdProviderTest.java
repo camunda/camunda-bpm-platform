@@ -20,6 +20,8 @@ import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInstanceContext;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.CaseExecution;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -279,6 +281,25 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
     // then the tenant id is inherited to the sub process instance even tough it is not set by the provider
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess").singleResult();
     assertThat(processInstance.getTenantId(), is(tenantId));
+  }
+
+  // process task in case //////////////////////////////
+
+  public void testSuperCaseExecutionPassedIn() {
+
+    ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
+    TestTenantIdProvider.delegate = tenantIdProvider;
+
+    deployment(repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/CaseWithProcessTask.cmmn"),
+        Bpmn.createExecutableProcess("testProcess").startEvent().userTask().done());
+
+    // if the case is started
+    caseService.createCaseInstanceByKey("testCase");
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId("PI_ProcessTask_1").singleResult();
+    caseService.manuallyStartCaseExecution(caseExecution.getId());
+
+    // then the tenant id provider is handed in the super case execution
+    assertThat(tenantIdProvider.parameters.get(0).getSuperCaseExecution(), is(notNullValue()));
   }
 
   // helpers //////////////////////////////////////////

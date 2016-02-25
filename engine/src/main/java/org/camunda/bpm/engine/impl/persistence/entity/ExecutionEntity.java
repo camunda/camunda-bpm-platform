@@ -406,13 +406,20 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
     if(tenantIdProvider != null) {
       VariableMap variableMap = Variables.fromMap(variables);
+      ProcessDefinition processDefinition = (ProcessDefinition) getProcessDefinition();
+
       TenantIdProviderProcessInstanceContext ctx = null;
-      if(superExecutionId == null) {
-        ctx = new TenantIdProviderProcessInstanceContext((ProcessDefinition) getProcessDefinition(), variableMap);
+
+      if(superExecutionId != null) {
+        ctx = new TenantIdProviderProcessInstanceContext(processDefinition, variableMap, getSuperExecution());
+      }
+      else if(superCaseExecutionId != null) {
+        ctx = new TenantIdProviderProcessInstanceContext(processDefinition, variableMap, getSuperCaseExecution());
       }
       else {
-        ctx = new TenantIdProviderProcessInstanceContext((ProcessDefinition) getProcessDefinition(), variableMap, getSuperExecution());
+        ctx = new TenantIdProviderProcessInstanceContext(processDefinition, variableMap);
       }
+
       tenantId = tenantIdProvider.provideTenantIdForProcessInstance(ctx);
     }
   }

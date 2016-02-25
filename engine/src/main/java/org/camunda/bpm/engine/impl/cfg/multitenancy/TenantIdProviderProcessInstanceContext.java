@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cfg.multitenancy;
 
+import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -30,14 +31,21 @@ public class TenantIdProviderProcessInstanceContext {
 
   protected DelegateExecution superExecution;
 
+  protected DelegateCaseExecution superCaseExecution;
+
   public TenantIdProviderProcessInstanceContext(ProcessDefinition processDefinition, VariableMap variables) {
-    this(processDefinition, variables, null);
+    this.processDefinition = processDefinition;
+    this.variables = variables;
   }
 
   public TenantIdProviderProcessInstanceContext(ProcessDefinition processDefinition, VariableMap variables, DelegateExecution superExecution) {
-    this.processDefinition = processDefinition;
-    this.variables = variables;
+    this(processDefinition, variables);
     this.superExecution = superExecution;
+  }
+
+  public TenantIdProviderProcessInstanceContext(ProcessDefinition processDefinition, VariableMap variables, DelegateCaseExecution superCaseExecution) {
+    this(processDefinition, variables);
+    this.superCaseExecution = superCaseExecution;
   }
 
   /**
@@ -61,6 +69,13 @@ public class TenantIdProviderProcessInstanceContext {
    */
   public DelegateExecution getSuperExecution() {
     return superExecution;
+  }
+
+  /**
+   * @return the super case execution. Null if the starting process instance is not a sub process instance started using a CMMN case task.
+   */
+  public DelegateCaseExecution getSuperCaseExecution() {
+    return superCaseExecution;
   }
 
 }
