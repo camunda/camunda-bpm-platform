@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.repository;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +69,8 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
   protected Integer version;
   protected Boolean latestVersion;
   protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
+  protected Boolean includeDefinitionsWithoutTenantId;
 
   public DecisionDefinitionQueryDto() {}
 
@@ -144,6 +148,16 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
+  @CamundaQueryParam(value = "includeDecisionDefinitionsWithoutTenantId", converter = BooleanConverter.class)
+  public void setIncludeDecisionDefinitionsWithoutTenantId(Boolean includeDefinitionsWithoutTenantId) {
+    this.includeDefinitionsWithoutTenantId = includeDefinitionsWithoutTenantId;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -192,11 +206,17 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
     if (version != null) {
       query.decisionDefinitionVersion(version);
     }
-    if (latestVersion != null && latestVersion) {
+    if (TRUE.equals(latestVersion)) {
       query.latestVersion();
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
+    }
+    if (TRUE.equals(includeDefinitionsWithoutTenantId)) {
+      query.includeDecisionDefinitionsWithoutTenantId();
     }
   }
 

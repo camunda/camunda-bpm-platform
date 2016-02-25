@@ -125,6 +125,15 @@ public interface CaseDefinitionQuery extends Query<CaseDefinitionQuery, CaseDefi
   /** Only select case definitions with one of the given tenant ids. */
   CaseDefinitionQuery tenantIdIn(String... tenantIds);
 
+  /** Only select case definitions which have no tenant id. */
+  CaseDefinitionQuery withoutTenantId();
+
+  /**
+   * Select case definitions which have no tenant id. Can be used in
+   * combination with {@link #tenantIdIn(String...)}.
+   */
+  CaseDefinitionQuery includeCaseDefinitionsWithoutTenantId();
+
   // ordering ////////////////////////////////////////////////////////////
 
   /** Order by the category of the case definitions (needs to be followed by

@@ -121,6 +121,15 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
   /** Only select decision definitions with one of the given tenant ids. */
   DecisionDefinitionQuery tenantIdIn(String... tenantIds);
 
+  /** Only select decision definitions which have no tenant id. */
+  DecisionDefinitionQuery withoutTenantId();
+
+  /**
+   * Select decision definitions which have no tenant id. Can be used in
+   * combination with {@link #tenantIdIn(String...)}.
+   */
+  DecisionDefinitionQuery includeDecisionDefinitionsWithoutTenantId();
+
   // ordering ////////////////////////////////////////////////////////////
 
   /** Order by the category of the decision definitions (needs to be followed by

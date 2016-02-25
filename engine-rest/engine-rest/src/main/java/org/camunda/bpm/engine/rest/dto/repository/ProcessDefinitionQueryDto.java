@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.repository;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +73,8 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
   private String incidentMessage;
   private String incidentMessageLike;
   private List<String> tenantIds;
+  private Boolean withoutTenantId;
+  private Boolean includeDefinitionsWithoutTenantId;
 
   public ProcessDefinitionQueryDto() {
 
@@ -203,6 +207,16 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
+  @CamundaQueryParam(value = "includeProcessDefinitionsWithoutTenantId", converter = BooleanConverter.class)
+  public void setIncludeProcessDefinitionsWithoutTenantId(Boolean includeDefinitionsWithoutTenantId) {
+    this.includeDefinitionsWithoutTenantId = includeDefinitionsWithoutTenantId;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -245,7 +259,7 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     if (version != null) {
       query.processDefinitionVersion(version);
     }
-    if (latestVersion != null && latestVersion == true) {
+    if (TRUE.equals(latestVersion)) {
       query.latestVersion();
     }
     if (resourceName != null) {
@@ -257,10 +271,10 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     if (startableBy != null) {
       query.startableByUser(startableBy);
     }
-    if (active != null && active == true) {
+    if (TRUE.equals(active)) {
       query.active();
     }
-    if (suspended != null && suspended == true) {
+    if (TRUE.equals(suspended)) {
       query.suspended();
     }
     if (incidentId != null) {
@@ -277,6 +291,12 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
+    }
+    if (TRUE.equals(includeDefinitionsWithoutTenantId)) {
+      query.includeProcessDefinitionsWithoutTenantId();
     }
   }
 

@@ -42,7 +42,10 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   protected String resourceNameLike;
   protected Integer version;
   protected boolean latest = false;
+
+  protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
+  protected boolean includeDefinitionsWithoutTenantId = false;
 
   public DecisionDefinitionQueryImpl() {
   }
@@ -133,6 +136,18 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   public DecisionDefinitionQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public DecisionDefinitionQuery withoutTenantId() {
+    isTenantIdSet = true;
+    this.tenantIds = null;
+    return this;
+  }
+
+  public DecisionDefinitionQuery includeDecisionDefinitionsWithoutTenantId() {
+    this.includeDefinitionsWithoutTenantId  = true;
     return this;
   }
 

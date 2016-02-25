@@ -31,6 +31,12 @@ public interface ProcessInstantiationBuilder
   ProcessInstantiationBuilder processDefinitionTenantId(String tenantId);
 
   /**
+   * Specify that the process definition belongs to no tenant. Can only be
+   * used when the definition is referenced by <code>key</code> and not by <code>id</code>.
+   */
+  ProcessInstantiationBuilder processDefinitionWithoutTenantId();
+
+  /**
    * Set the business key for the process instance
    */
   ProcessInstantiationBuilder businessKey(String businessKey);

@@ -34,15 +34,16 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
   public void setUp() throws Exception {
     BpmnModelInstance emptyProcess = Bpmn.createExecutableProcess().done();
 
+    deployment(emptyProcess);
     deploymentForTenant(TENANT_ONE, emptyProcess);
     deploymentForTenant(TENANT_TWO, emptyProcess);
   }
 
-  public void testQueryWithoutTenantId() {
+  public void testQueryNoTenantIdSet() {
     DeploymentQuery query = repositoryService
         .createDeploymentQuery();
 
-   assertThat(query.count(), is(2L));
+   assertThat(query.count(), is(3L));
   }
 
   public void testQueryByTenantId() {
@@ -67,6 +68,37 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
     assertThat(query.count(), is(2L));
   }
 
+  public void testQueryWithoutTenantId() {
+    DeploymentQuery query = repositoryService
+        .createDeploymentQuery()
+        .withoutTenantId();
+
+    assertThat(query.count(), is(1L));
+  }
+
+  public void testQueryByTenantIdsIncludeDeploymentsWithoutTenantId() {
+    DeploymentQuery query = repositoryService
+        .createDeploymentQuery()
+        .tenantIdIn(TENANT_ONE)
+        .includeDeploymentsWithoutTenantId();
+
+    assertThat(query.count(), is(2L));
+
+    query = repositoryService
+        .createDeploymentQuery()
+        .tenantIdIn(TENANT_TWO)
+        .includeDeploymentsWithoutTenantId();
+
+    assertThat(query.count(), is(2L));
+
+    query = repositoryService
+        .createDeploymentQuery()
+        .tenantIdIn(TENANT_ONE, TENANT_TWO)
+        .includeDeploymentsWithoutTenantId();
+
+    assertThat(query.count(), is(3L));
+  }
+
   public void testQueryByNonExistingTenantId() {
     DeploymentQuery query = repositoryService
         .createDeploymentQuery()
@@ -86,7 +118,9 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
   }
 
   public void testQuerySortingAsc() {
+    // exclude deployments without tenant id because of database-specific ordering
     List<Deployment> deployments = repositoryService.createDeploymentQuery()
+        .tenantIdIn(TENANT_ONE, TENANT_TWO)
         .orderByTenantId()
         .asc()
         .list();
@@ -97,7 +131,9 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
   }
 
   public void testQuerySortingDesc() {
+    // exclude deployments without tenant id because of database-specific ordering
     List<Deployment> deployments = repositoryService.createDeploymentQuery()
+        .tenantIdIn(TENANT_ONE, TENANT_TWO)
         .orderByTenantId()
         .desc()
         .list();

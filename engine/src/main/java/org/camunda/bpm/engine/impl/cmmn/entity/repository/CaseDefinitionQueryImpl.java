@@ -47,7 +47,10 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
   protected String resourceNameLike;
   protected Integer version;
   protected boolean latest = false;
+
+  protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
+  protected boolean includeDefinitionsWithoutTenantId = false;
 
   public CaseDefinitionQueryImpl() {
   }
@@ -138,6 +141,18 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
   public CaseDefinitionQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public CaseDefinitionQuery withoutTenantId() {
+    isTenantIdSet = true;
+    this.tenantIds = null;
+    return this;
+  }
+
+  public CaseDefinitionQuery includeCaseDefinitionsWithoutTenantId() {
+    this.includeDefinitionsWithoutTenantId  = true;
     return this;
   }
 

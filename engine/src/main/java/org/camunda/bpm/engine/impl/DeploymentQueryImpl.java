@@ -41,7 +41,10 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
   protected String source;
   protected Date deploymentBefore;
   protected Date deploymentAfter;
+
+  protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
+  protected boolean includeDeploymentsWithoutTenantId = false;
 
   public DeploymentQueryImpl() {
   }
@@ -89,6 +92,18 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
   public DeploymentQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public DeploymentQuery withoutTenantId() {
+    isTenantIdSet = true;
+    this.tenantIds = null;
+    return this;
+  }
+
+  public DeploymentQuery includeDeploymentsWithoutTenantId() {
+    this.includeDeploymentsWithoutTenantId  = true;
     return this;
   }
 

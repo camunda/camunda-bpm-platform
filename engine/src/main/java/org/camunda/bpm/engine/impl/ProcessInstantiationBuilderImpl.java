@@ -107,6 +107,12 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
     return this;
   }
 
+  public ProcessInstantiationBuilder processDefinitionWithoutTenantId() {
+    this.processDefinitionTenantId = null;
+    isTenantIdSet = true;
+    return this;
+  }
+
   public ProcessInstance execute() {
     return execute(false, false);
   }

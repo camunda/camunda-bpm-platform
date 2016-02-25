@@ -68,7 +68,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
   protected String eventSubscriptionName;
   protected String eventSubscriptionType;
+
+  protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
+  protected boolean includeDefinitionsWithoutTenantId = false;
 
   public ProcessDefinitionQueryImpl() {
   }
@@ -216,6 +219,18 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public ProcessDefinitionQueryImpl tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public ProcessDefinitionQuery withoutTenantId() {
+    isTenantIdSet = true;
+    this.tenantIds = null;
+    return this;
+  }
+
+  public ProcessDefinitionQuery includeProcessDefinitionsWithoutTenantId() {
+    this.includeDefinitionsWithoutTenantId  = true;
     return this;
   }
 
