@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior
 import org.camunda.bpm.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
@@ -63,7 +64,7 @@ public class MigrationActivityValidators {
 
     public boolean canBeMigrated(ActivityImpl activity, ProcessDefinitionImpl processDefinition) {
       if (activity.getActivityBehavior().getClass().isAssignableFrom(BoundaryEventActivityBehavior.class)) {
-        String boundaryType = (String) activity.getProperty("type");
+        String boundaryType = (String) activity.getProperties().get(BpmnProperties.TYPE);
         return supportedTypes.contains(boundaryType);
       }
       else {

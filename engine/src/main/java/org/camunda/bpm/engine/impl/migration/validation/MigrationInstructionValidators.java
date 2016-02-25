@@ -16,8 +16,7 @@ package org.camunda.bpm.engine.impl.migration.validation;
 import java.util.Arrays;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
@@ -177,10 +176,10 @@ public class MigrationInstructionValidators {
   }
 
   protected static boolean haveSameType(String sourceActivityId, String targetActivityId, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
-    ActivityBehavior sourceActivityBehavior = sourceProcessDefinition.findActivity(sourceActivityId).getActivityBehavior();
-    ActivityBehavior targetActivityBehavior = targetProcessDefinition.findActivity(targetActivityId).getActivityBehavior();
+    String sourceType = sourceProcessDefinition.findActivity(sourceActivityId).getProperties().get(BpmnProperties.TYPE);
+    String targetType = targetProcessDefinition.findActivity(targetActivityId).getProperties().get(BpmnProperties.TYPE);
 
-    return sourceActivityBehavior.getClass().equals(targetActivityBehavior.getClass());
+    return sourceType != null && sourceType.equals(targetType);
   }
 
 }

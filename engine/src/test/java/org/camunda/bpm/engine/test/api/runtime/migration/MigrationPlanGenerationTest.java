@@ -456,6 +456,22 @@ public class MigrationPlanGenerationTest {
       .hasEmptyInstructions();
   }
 
+  @Test
+  public void testNotMigrateBoundaryEventsOfDifferentType() {
+    BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
+    BpmnModelInstance targetProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+      .done();
+
+    assertGeneratedMigrationPlan(sourceProcess, targetProcess)
+      .hasInstructions(
+        migrate("userTask").to("userTask")
+      );
+  }
 
   // helper
 

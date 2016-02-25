@@ -910,14 +910,14 @@ public class BpmnParse extends Parse {
     if (timerEventDefinition != null) {
       parseTimerStartEventDefinition(timerEventDefinition, startEventActivity, processDefinition);
     } else if (messageEventDefinition != null) {
-      startEventActivity.setProperty("type", "messageStartEvent");
+      startEventActivity.getProperties().set(BpmnProperties.TYPE, "messageStartEvent");
 
       EventSubscriptionDeclaration messageDefinition = parseMessageEventDefinition(messageEventDefinition);
       messageDefinition.setActivityId(startEventActivity.getId());
       messageDefinition.setStartEvent(true);
       addEventSubscriptionDeclaration(messageDefinition, processDefinition, startEventElement);
     } else if (signalEventDefinition != null){
-      startEventActivity.setProperty("type", "signalStartEvent");
+      startEventActivity.getProperties().set(BpmnProperties.TYPE, "signalStartEvent");
       startEventActivity.setEventScope(scope);
 
       parseSignalCatchEventDefinition(signalEventDefinition, startEventActivity, true);
@@ -989,13 +989,13 @@ public class BpmnParse extends Parse {
         parseErrorStartEventDefinition(errorEventDefinition, startEventActivity);
 
       } else if (messageEventDefinition != null) {
-        startEventActivity.setProperty("type", "messageStartEvent");
+        startEventActivity.getProperties().set(BpmnProperties.TYPE, "messageStartEvent");
 
         EventSubscriptionDeclaration eventSubscriptionDeclaration = parseMessageEventDefinition(messageEventDefinition);
         parseEventDefinitionForSubprocess(eventSubscriptionDeclaration, startEventActivity, messageEventDefinition);
 
       } else if (signalEventDefinition != null) {
-        startEventActivity.setProperty("type", "signalStartEvent");
+        startEventActivity.getProperties().set(BpmnProperties.TYPE, "signalStartEvent");
 
         EventSubscriptionDeclaration eventSubscriptionDeclaration = parseSignalEventDefinition(signalEventDefinition);
         parseEventDefinitionForSubprocess(eventSubscriptionDeclaration, startEventActivity, signalEventDefinition);
@@ -1047,7 +1047,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseCompensationEventSubprocess(ActivityImpl startEventActivity, Element startEventElement, ActivityImpl scopeActivity, Element compensateEventDefinition) {
-    startEventActivity.setProperty("type", "compensationStartEvent");
+    startEventActivity.getProperties().set(BpmnProperties.TYPE, "compensationStartEvent");
     scopeActivity.setProperty(PROPERTYNAME_IS_FOR_COMPENSATION, Boolean.TRUE);
 
     if (scopeActivity.getFlowScope() instanceof ProcessDefinitionEntity) {
@@ -1073,7 +1073,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseErrorStartEventDefinition(Element errorEventDefinition, ActivityImpl startEventActivity) {
-    startEventActivity.setProperty("type", "errorStartEvent");
+    startEventActivity.getProperties().set(BpmnProperties.TYPE, "errorStartEvent");
     String errorRef = errorEventDefinition.attribute("errorRef");
     Error error = null;
     // the error event definition executes the event subprocess activity which
@@ -1386,7 +1386,7 @@ public class BpmnParse extends Parse {
 
   protected void parseIntermediateLinkEventCatchBehavior(Element intermediateEventElement, ActivityImpl activity, Element linkEventDefinitionElement) {
 
-    activity.setProperty("type", "intermediateLinkCatch");
+    activity.getProperties().set(BpmnProperties.TYPE, "intermediateLinkCatch");
 
     String linkName = linkEventDefinitionElement.attribute("name");
     String elementName = intermediateEventElement.attribute("name");
@@ -1409,7 +1409,7 @@ public class BpmnParse extends Parse {
 
   protected void parseIntermediateMessageEventDefinition(Element messageEventDefinition, ActivityImpl nestedActivity) {
 
-    nestedActivity.setProperty("type", "intermediateMessageCatch");
+    nestedActivity.getProperties().set(BpmnProperties.TYPE, "intermediateMessageCatch");
 
     EventSubscriptionDeclaration messageDefinition = parseMessageEventDefinition(messageEventDefinition);
     messageDefinition.setActivityId(nestedActivity.getId());
@@ -1448,12 +1448,12 @@ public class BpmnParse extends Parse {
     parseAsynchronousContinuationForActivity(intermediateEventElement, nestedActivityImpl);
 
     if (signalEventDefinitionElement != null) {
-      nestedActivityImpl.setProperty("type", "intermediateSignalThrow");
+      nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, "intermediateSignalThrow");
 
       EventSubscriptionDeclaration signalDefinition = parseSignalEventDefinition(signalEventDefinitionElement);
       activityBehavior = new IntermediateThrowSignalEventActivityBehavior(signalDefinition);
     } else if (compensateEventDefinitionElement != null) {
-      nestedActivityImpl.setProperty("type", "intermediateCompensationThrowEvent");
+      nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, "intermediateCompensationThrowEvent");
       CompensateEventDefinition compensateEventDefinition = parseThrowCompensateEventDefinition(compensateEventDefinitionElement, scopeElement);
       activityBehavior = new CompensationEventActivityBehavior(compensateEventDefinition);
       nestedActivityImpl.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
@@ -1462,12 +1462,12 @@ public class BpmnParse extends Parse {
       if (isServiceTaskLike(messageEventDefinitionElement)) {
 
         // CAM-436 same behavior as service task
-        nestedActivityImpl.setProperty("type", "intermediateMessageThrowEvent");
+        nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, "intermediateMessageThrowEvent");
         activityBehavior = parseServiceTaskLike("intermediateMessageThrowEvent", messageEventDefinitionElement, scopeElement).getActivityBehavior();
       } else {
         // default to non behavior if no service task
         // properties have been specified
-        nestedActivityImpl.setProperty("type", "intermediateNoneThrowEvent");
+        nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, "intermediateNoneThrowEvent");
         activityBehavior = new IntermediateThrowNoneEventActivityBehavior();
       }
     } else if (escalationEventDefinition != null) {
@@ -1481,7 +1481,7 @@ public class BpmnParse extends Parse {
       activityBehavior = new ThrowEscalationEventActivityBehavior(escalation);
 
     } else { // None intermediate event
-      nestedActivityImpl.setProperty("type", "intermediateNoneThrowEvent");
+      nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, "intermediateNoneThrowEvent");
       activityBehavior = new IntermediateThrowNoneEventActivityBehavior();
     }
 
@@ -1540,7 +1540,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseBoundaryCompensateEventDefinition(Element compensateEventDefinition, ActivityImpl activity) {
-    activity.setProperty("type", "compensationBoundaryCatch");
+    activity.getProperties().set(BpmnProperties.TYPE, "compensationBoundaryCatch");
 
     ScopeImpl hostActivity = activity.getEventScope();
     for (ActivityImpl sibling : activity.getFlowScope().getActivities()) {
@@ -1553,7 +1553,7 @@ public class BpmnParse extends Parse {
   }
 
   protected ActivityBehavior parseBoundaryCancelEventDefinition(Element cancelEventDefinition, ActivityImpl activity) {
-    activity.setProperty("type", "cancelBoundaryCatch");
+    activity.getProperties().set(BpmnProperties.TYPE, "cancelBoundaryCatch");
 
     LegacyBehavior.parseCancelBoundaryEvent(activity);
 
@@ -1702,7 +1702,7 @@ public class BpmnParse extends Parse {
     activity.setProperty("name", activityElement.attribute("name"));
     activity.setProperty("documentation", parseDocumentation(activityElement));
     activity.setProperty("default", activityElement.attribute("default"));
-    activity.setProperty("type", activityElement.getTagName());
+    activity.getProperties().set(BpmnProperties.TYPE, activityElement.getTagName());
     activity.setProperty("line", activityElement.getLine());
 
     activity.setProperty(PROPERTYNAME_JOB_PRIORITY, parseJobPriority(activityElement));
@@ -2716,28 +2716,28 @@ public class BpmnParse extends Parse {
                 "'errorCode' is mandatory on errors referenced by throwing error event definitions, but the error '" + error.getId() + "' does not define one.",
                 errorEventDefinition);
           }
-          activity.setProperty("type", "errorEndEvent");
+          activity.getProperties().set(BpmnProperties.TYPE, "errorEndEvent");
           activity.setActivityBehavior(new ErrorEndEventActivityBehavior(error != null ? error.getErrorCode() : errorRef));
         }
       } else if (cancelEventDefinition != null) {
         if (scope.getProperty("type") == null || !scope.getProperty("type").equals("transaction")) {
           addError("end event with cancelEventDefinition only supported inside transaction subprocess", cancelEventDefinition);
         } else {
-          activity.setProperty("type", "cancelEndEvent");
+          activity.getProperties().set(BpmnProperties.TYPE, "cancelEndEvent");
           activity.setActivityBehavior(new CancelEndEventActivityBehavior());
           activity.setActivityStartBehavior(ActivityStartBehavior.INTERRUPT_FLOW_SCOPE);
           activity.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
           activity.setScope(true);
         }
       } else if (terminateEventDefinition != null) {
-        activity.setProperty("type", "terminateEndEvent");
+        activity.getProperties().set(BpmnProperties.TYPE, "terminateEndEvent");
         activity.setActivityBehavior(new TerminateEndEventActivityBehavior());
         activity.setActivityStartBehavior(ActivityStartBehavior.INTERRUPT_FLOW_SCOPE);
       } else if (messageEventDefinitionElement != null) {
         if (isServiceTaskLike(messageEventDefinitionElement)) {
 
           // CAM-436 same behaviour as service task
-          activity.setProperty("type", "messageEndEvent");
+          activity.getProperties().set(BpmnProperties.TYPE, "messageEndEvent");
           activity.setActivityBehavior(parseServiceTaskLike("messageEndEvent", messageEventDefinitionElement, scope).getActivityBehavior());
         } else {
           // default to non behavior if no service task
@@ -2745,12 +2745,12 @@ public class BpmnParse extends Parse {
           activity.setActivityBehavior(new IntermediateThrowNoneEventActivityBehavior());
         }
       } else if (signalEventDefinition != null) {
-        activity.setProperty("type", "signalEndEvent");
+        activity.getProperties().set(BpmnProperties.TYPE, "signalEndEvent");
         EventSubscriptionDeclaration signalDefinition = parseSignalEventDefinition(signalEventDefinition);
         activity.setActivityBehavior(new SignalEndEventActivityBehavior(signalDefinition));
 
       } else if (compensateEventDefinitionElement != null) {
-        activity.setProperty("type", "compensationEndEvent");
+        activity.getProperties().set(BpmnProperties.TYPE, "compensationEndEvent");
         CompensateEventDefinition compensateEventDefinition = parseThrowCompensateEventDefinition(compensateEventDefinitionElement, scope);
         activity.setActivityBehavior(new CompensationEventActivityBehavior(compensateEventDefinition));
         activity.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
@@ -2766,7 +2766,7 @@ public class BpmnParse extends Parse {
         activity.setActivityBehavior(new ThrowEscalationEventActivityBehavior(escalation));
 
       } else { // default: none end event
-        activity.setProperty("type", "noneEndEvent");
+        activity.getProperties().set(BpmnProperties.TYPE, "noneEndEvent");
         activity.setActivityBehavior(new NoneEndEventActivityBehavior());
       }
 
@@ -2928,7 +2928,7 @@ public class BpmnParse extends Parse {
    *          inside this activity, specifically created for this event.
    */
   public void parseBoundaryTimerEventDefinition(Element timerEventDefinition, boolean interrupting, ActivityImpl boundaryActivity) {
-    boundaryActivity.setProperty("type", "boundaryTimer");
+    boundaryActivity.getProperties().set(BpmnProperties.TYPE, "boundaryTimer");
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, boundaryActivity, TimerExecuteNestedActivityJobHandler.TYPE);
 
     // ACT-1427
@@ -2949,7 +2949,7 @@ public class BpmnParse extends Parse {
   }
 
   public void parseBoundarySignalEventDefinition(Element element, boolean interrupting, ActivityImpl signalActivity) {
-    signalActivity.setProperty("type", "boundarySignal");
+    signalActivity.getProperties().set(BpmnProperties.TYPE, "boundarySignal");
 
     EventSubscriptionDeclaration signalDefinition = parseSignalEventDefinition(element);
     if (signalActivity.getId() == null) {
@@ -2965,7 +2965,7 @@ public class BpmnParse extends Parse {
   }
 
   public void parseBoundaryMessageEventDefinition(Element element, boolean interrupting, ActivityImpl messageActivity) {
-    messageActivity.setProperty("type", "boundaryMessage");
+    messageActivity.getProperties().set(BpmnProperties.TYPE, "boundaryMessage");
 
     EventSubscriptionDeclaration messageEventDefinition = parseMessageEventDefinition(element);
     if (messageActivity.getId() == null) {
@@ -2982,7 +2982,7 @@ public class BpmnParse extends Parse {
 
   @SuppressWarnings("unchecked")
   protected void parseTimerStartEventDefinition(Element timerEventDefinition, ActivityImpl timerActivity, ProcessDefinitionEntity processDefinition) {
-    timerActivity.setProperty("type", "startTimerEvent");
+    timerActivity.getProperties().set(BpmnProperties.TYPE, "startTimerEvent");
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerStartEventJobHandler.TYPE);
     timerDeclaration.setJobHandlerConfiguration(processDefinition.getKey());
 
@@ -2996,7 +2996,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseTimerStartEventDefinitionForEventSubprocess(Element timerEventDefinition, ActivityImpl timerActivity, boolean interrupting) {
-    timerActivity.setProperty("type", "startTimerEvent");
+    timerActivity.getProperties().set(BpmnProperties.TYPE, "startTimerEvent");
 
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerStartEventSubprocessJobHandler.TYPE);
 
@@ -3024,7 +3024,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseIntermediateSignalEventDefinition(Element element, ActivityImpl signalActivity) {
-    signalActivity.setProperty("type", "intermediateSignalCatch");
+    signalActivity.getProperties().set(BpmnProperties.TYPE, "intermediateSignalCatch");
 
     parseSignalCatchEventDefinition(element, signalActivity, false);
 
@@ -3066,7 +3066,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseIntermediateTimerEventDefinition(Element timerEventDefinition, ActivityImpl timerActivity) {
-    timerActivity.setProperty("type", "intermediateTimer");
+    timerActivity.getProperties().set(BpmnProperties.TYPE, "intermediateTimer");
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerCatchIntermediateEventJobHandler.TYPE);
 
     Element timeCycleElement = timerEventDefinition.element("timeCycle");
@@ -3128,7 +3128,7 @@ public class BpmnParse extends Parse {
 
   public void parseBoundaryErrorEventDefinition(Element errorEventDefinition, ActivityImpl boundaryEventActivity) {
 
-    boundaryEventActivity.setProperty("type", "boundaryError");
+    boundaryEventActivity.getProperties().set(BpmnProperties.TYPE, "boundaryError");
 
     String errorRef = errorEventDefinition.attribute("errorRef");
     Error error = null;

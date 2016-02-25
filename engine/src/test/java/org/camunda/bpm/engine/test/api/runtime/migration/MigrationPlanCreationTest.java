@@ -41,6 +41,7 @@ import org.junit.rules.RuleChain;
 public class MigrationPlanCreationTest {
 
   public static final String MESSAGE_NAME = "Message";
+  public static final String SIGNAL_NAME = "Signal";
   public static final String ERROR_CODE = "Error";
   public static final String ESCALATION_CODE = "Escalation";
 
@@ -261,6 +262,33 @@ public class MigrationPlanCreationTest {
       assertThat(e.getValidationReport())
         .hasFailures(1)
         .hasFailure("userTask", "the mapped activities must have the same type");
+    }
+  }
+
+  @Test
+  public void testNotMigrateBoundaryEventsOfDifferentType() {
+    ProcessDefinition sourceDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+      .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done()
+    );
+    ProcessDefinition targetDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+      .boundaryEvent("boundary").signal(SIGNAL_NAME)
+      .done()
+    );
+
+    try {
+      runtimeService
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .mapActivities("boundary", "boundary")
+        .build();
+      fail("Should not succeed");
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasFailures(1)
+        .hasFailure("boundary", "the mapped activities must have the same type");
     }
   }
 
