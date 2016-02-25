@@ -90,6 +90,16 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
   }
 
   /**
+   * Sets the camunda calledElementTenantId attribute
+   * @param camundaCalledElementTenantId
+   * @return the builder object
+   */
+  public B camundaCalledElementTenantId(String camundaCalledElementTenantId) {
+    element.setCamundaCalledElementTenantId(camundaCalledElementTenantId);
+    return myself;
+  }
+
+  /**
    * Sets the camunda caseRef attribute
    *
    * @param caseRef the case to call
@@ -119,6 +129,16 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
    */
   public B camundaCaseVersion(String camundaCaseVersion) {
     element.setCamundaCaseVersion(camundaCaseVersion);
+    return myself;
+  }
+
+  /**
+   * Sets the caseTenantId
+   * @param tenantd the tenant id to set
+   * @return the builder object
+   */
+  public B camundaCaseTenantId(String tenantd) {
+    element.setCamundaCaseTenantId(tenantd);
     return myself;
   }
 

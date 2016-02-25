@@ -406,6 +406,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_BUSINESS_KEY = "businessKey";
   public static final String CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_BINDING = "calledElementBinding";
   public static final String CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_VERSION = "calledElementVersion";
+  public static final String CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_TENANT_ID = "calledElementTenantId";
   public static final String CAMUNDA_ATTRIBUTE_CANDIDATE_GROUPS = "candidateGroups";
   public static final String CAMUNDA_ATTRIBUTE_CANDIDATE_STARTER_GROUPS = "candidateStarterGroups";
   public static final String CAMUNDA_ATTRIBUTE_CANDIDATE_STARTER_USERS = "candidateStarterUsers";
@@ -417,6 +418,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_DECISION_REF = "decisionRef";
   public static final String CAMUNDA_ATTRIBUTE_DECISION_REF_BINDING = "decisionRefBinding";
   public static final String CAMUNDA_ATTRIBUTE_DECISION_REF_VERSION = "decisionRefVersion";
+  public static final String CAMUNDA_ATTRIBUTE_DECISION_REF_TENANT_ID = "decisionRefTenantId";
   public static final String CAMUNDA_ATTRIBUTE_DEFAULT = "default";
   public static final String CAMUNDA_ATTRIBUTE_DEFAULT_VALUE = "defaultValue";
   public static final String CAMUNDA_ATTRIBUTE_DELEGATE_EXPRESSION = "delegateExpression";
@@ -456,5 +458,6 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_CASE_REF = "caseRef";
   public static final String CAMUNDA_ATTRIBUTE_CASE_BINDING = "caseBinding";
   public static final String CAMUNDA_ATTRIBUTE_CASE_VERSION = "caseVersion";
+  public static final String CAMUNDA_ATTRIBUTE_CASE_TENANT_ID = "caseTenantId";
 
 }

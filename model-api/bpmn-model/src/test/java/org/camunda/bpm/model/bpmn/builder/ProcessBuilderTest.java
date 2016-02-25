@@ -541,6 +541,7 @@ public class ProcessBuilderTest {
         .camundaDecisionRef(TEST_STRING_API)
         .camundaDecisionRefBinding(TEST_STRING_API)
         .camundaDecisionRefVersion(TEST_STRING_API)
+        .camundaDecisionRefTenantId(TEST_STRING_API)
         .camundaMapDecisionResult(TEST_STRING_API)
       .endEvent()
       .done();
@@ -555,6 +556,7 @@ public class ProcessBuilderTest {
     assertThat(businessRuleTask.getCamundaDecisionRef()).isEqualTo(TEST_STRING_API);
     assertThat(businessRuleTask.getCamundaDecisionRefBinding()).isEqualTo(TEST_STRING_API);
     assertThat(businessRuleTask.getCamundaDecisionRefVersion()).isEqualTo(TEST_STRING_API);
+    assertThat(businessRuleTask.getCamundaDecisionRefTenantId()).isEqualTo(TEST_STRING_API);
     assertThat(businessRuleTask.getCamundaMapDecisionResult()).isEqualTo(TEST_STRING_API);
   }
 
@@ -601,9 +603,11 @@ public class ProcessBuilderTest {
         .camundaAsyncBefore()
         .camundaCalledElementBinding("version")
         .camundaCalledElementVersion("1.0")
+        .camundaCalledElementTenantId("t1")
         .camundaCaseRef("case")
         .camundaCaseBinding("deployment")
         .camundaCaseVersion("2")
+        .camundaCaseTenantId("t2")
         .camundaIn("in-source", "in-target")
         .camundaOut("out-source", "out-target")
         .notCamundaExclusive()
@@ -615,9 +619,11 @@ public class ProcessBuilderTest {
     assertThat(callActivity.isCamundaAsyncBefore()).isTrue();
     assertThat(callActivity.getCamundaCalledElementBinding()).isEqualTo("version");
     assertThat(callActivity.getCamundaCalledElementVersion()).isEqualTo("1.0");
+    assertThat(callActivity.getCamundaCalledElementTenantId()).isEqualTo("t1");
     assertThat(callActivity.getCamundaCaseRef()).isEqualTo("case");
     assertThat(callActivity.getCamundaCaseBinding()).isEqualTo("deployment");
     assertThat(callActivity.getCamundaCaseVersion()).isEqualTo("2");
+    assertThat(callActivity.getCamundaCaseTenantId()).isEqualTo("t2");
     assertThat(callActivity.isCamundaExclusive()).isFalse();
 
     CamundaIn camundaIn = (CamundaIn) callActivity.getExtensionElements().getUniqueChildElementByType(CamundaIn.class);

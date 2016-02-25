@@ -18,9 +18,11 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ATTRIBUTE_
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_CALL_ACTIVITY;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_ASYNC;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_BINDING;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_TENANT_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_VERSION;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_BINDING;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_REF;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_TENANT_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_VERSION;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
@@ -48,10 +50,12 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
   protected static Attribute<Boolean> camundaAsyncAttribute;
   protected static Attribute<String> camundaCalledElementBindingAttribute;
   protected static Attribute<String> camundaCalledElementVersionAttribute;
+  protected static Attribute<String> camundaCalledElementTenantIdAttribute;
 
   protected static Attribute<String> camundaCaseRefAttribute;
   protected static Attribute<String> camundaCaseBindingAttribute;
   protected static Attribute<String> camundaCaseVersionAttribute;
+  protected static Attribute<String> camundaCaseTenantIdAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CallActivity.class, BPMN_ELEMENT_CALL_ACTIVITY)
@@ -90,6 +94,14 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
         .build();
 
     camundaCaseVersionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_CASE_VERSION)
+        .namespace(CAMUNDA_NS)
+        .build();
+
+    camundaCalledElementTenantIdAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_TENANT_ID)
+        .namespace(CAMUNDA_NS)
+        .build();
+
+    camundaCaseTenantIdAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_CASE_TENANT_ID)
         .namespace(CAMUNDA_NS)
         .build();
 
@@ -167,6 +179,22 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
 
   public void setCamundaCaseVersion(String camundaCaseVersion) {
     camundaCaseVersionAttribute.setValue(this, camundaCaseVersion);
+  }
+
+  public String getCamundaCalledElementTenantId() {
+    return camundaCalledElementTenantIdAttribute.getValue(this);
+  }
+
+  public void setCamundaCalledElementTenantId(String tenantId) {
+    camundaCalledElementTenantIdAttribute.setValue(this, tenantId);
+  }
+
+  public String getCamundaCaseTenantId() {
+    return camundaCaseTenantIdAttribute.getValue(this);
+  }
+
+  public void setCamundaCaseTenantId(String tenantId) {
+    camundaCaseTenantIdAttribute.setValue(this, tenantId);
   }
 
 }

@@ -158,9 +158,11 @@
     <callActivity id="callActivity"
                   camunda:calledElementBinding="test"
                   camunda:calledElementVersion="test"
+                  camunda:calledElementTenantId="test"
                   camunda:caseRef="test"
                   camunda:caseBinding="test"
                   camunda:caseVersion="test"
+                  camunda:caseTenantId="test"
                   camunda:exclusive="false">
       <extensionElements>
         <camunda:in source="test" sourceExpression="${test}" variables="test" businessKey="${test}" target="test" local="true"/>
@@ -172,6 +174,7 @@
                       camunda:decisionRef="test"
                       camunda:decisionRefBinding="test"
                       camunda:decisionRefVersion="test"
+                      camunda:decisionRefTenantId="test"
                       camunda:mapDecisionResult="test" />
 
     <endEvent id="endEvent"

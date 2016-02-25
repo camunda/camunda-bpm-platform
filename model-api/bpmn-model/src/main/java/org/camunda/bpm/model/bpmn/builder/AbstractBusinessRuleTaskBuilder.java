@@ -139,6 +139,17 @@ public abstract class AbstractBusinessRuleTaskBuilder<B extends AbstractBusiness
   }
 
   /**
+   * Sets the camunda decisionRefTenantId attribute.
+   *
+   * @param decisionRefTenantId the decisionRefTenantId to set
+   * @return the builder object
+   */
+  public B camundaDecisionRefTenantId(String decisionRefTenantId) {
+    element.setCamundaDecisionRefTenantId(decisionRefTenantId);
+    return myself;
+  }
+
+  /**
    * Set the camunda mapDecisionResult attribute.
    *
    * @param camundaMapDecisionResult the mapper for the decision result to set

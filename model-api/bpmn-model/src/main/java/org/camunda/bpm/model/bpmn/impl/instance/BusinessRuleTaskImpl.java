@@ -21,7 +21,7 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBU
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_DECISION_REF_BINDING;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_DECISION_REF_VERSION;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_DELEGATE_EXPRESSION;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_EXPRESSION;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.*;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_MAP_DECISION_RESULT;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_RESULT_VARIABLE;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_TOPIC;
@@ -61,6 +61,7 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
   protected static Attribute<String> camundaDecisionRefAttribute;
   protected static Attribute<String> camundaDecisionRefBindingAttribute;
   protected static Attribute<String> camundaDecisionRefVersionAttribute;
+  protected static Attribute<String> camundaDecisionRefTenantIdAttribute;
   protected static Attribute<String> camundaMapDecisionResultAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
@@ -115,9 +116,13 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
       .namespace(CAMUNDA_NS)
       .build();
 
-    camundaMapDecisionResultAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_MAP_DECISION_RESULT)
+    camundaDecisionRefTenantIdAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_DECISION_REF_TENANT_ID)
       .namespace(CAMUNDA_NS)
       .build();
+
+    camundaMapDecisionResultAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_MAP_DECISION_RESULT)
+        .namespace(CAMUNDA_NS)
+        .build();
 
     typeBuilder.build();
   }
@@ -222,5 +227,15 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
   public void setCamundaMapDecisionResult(String camundaMapDecisionResult) {
     camundaMapDecisionResultAttribute.setValue(this, camundaMapDecisionResult);
   }
+
+  public String getCamundaDecisionRefTenantId() {
+    return camundaDecisionRefAttribute.getValue(this);
+  }
+
+  public void setCamundaDecisionRefTenantId(String tenantId) {
+    camundaDecisionRefAttribute.setValue(this, tenantId);
+  }
+
+
 
 }

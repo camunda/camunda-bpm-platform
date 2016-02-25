@@ -248,6 +248,13 @@ public class CamundaExtensionsTest {
   }
 
   @Test
+  public void testCalledElementTenantId() {
+    assertThat(callActivity.getCamundaCalledElementTenantId()).isEqualTo(TEST_STRING_XML);
+    callActivity.setCamundaCalledElementTenantId(TEST_STRING_API);
+    assertThat(callActivity.getCamundaCalledElementTenantId()).isEqualTo(TEST_STRING_API);
+  }
+
+  @Test
   public void testCaseRef() {
     assertThat(callActivity.getCamundaCaseRef()).isEqualTo(TEST_STRING_XML);
     callActivity.setCamundaCaseRef(TEST_STRING_API);
@@ -269,6 +276,13 @@ public class CamundaExtensionsTest {
   }
 
   @Test
+  public void testCaseTenantId() {
+    assertThat(callActivity.getCamundaCalledElementTenantId()).isEqualTo(TEST_STRING_XML);
+    callActivity.setCamundaCalledElementTenantId(TEST_STRING_API);
+    assertThat(callActivity.getCamundaCalledElementTenantId()).isEqualTo(TEST_STRING_API);
+  }
+
+  @Test
   public void testDecisionRef() {
     assertThat(businessRuleTask.getCamundaDecisionRef()).isEqualTo(TEST_STRING_XML);
     businessRuleTask.setCamundaDecisionRef(TEST_STRING_API);
@@ -287,6 +301,13 @@ public class CamundaExtensionsTest {
     assertThat(businessRuleTask.getCamundaDecisionRefVersion()).isEqualTo(TEST_STRING_XML);
     businessRuleTask.setCamundaDecisionRefVersion(TEST_STRING_API);
     assertThat(businessRuleTask.getCamundaDecisionRefVersion()).isEqualTo(TEST_STRING_API);
+  }
+
+  @Test
+  public void testDecisionRefTenantId() {
+    assertThat(businessRuleTask.getCamundaDecisionRefTenantId()).isEqualTo(TEST_STRING_XML);
+    businessRuleTask.setCamundaDecisionRefTenantId(TEST_STRING_API);
+    assertThat(businessRuleTask.getCamundaDecisionRefTenantId()).isEqualTo(TEST_STRING_API);
   }
 
   @Test
