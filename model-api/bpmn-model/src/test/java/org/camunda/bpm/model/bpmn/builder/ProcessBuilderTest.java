@@ -79,8 +79,10 @@ import org.camunda.bpm.model.bpmn.instance.TimeDuration;
 import org.camunda.bpm.model.bpmn.instance.TimerEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIn;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputOutput;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputParameter;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOutputParameter;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -602,6 +604,8 @@ public class ProcessBuilderTest {
         .camundaCaseRef("case")
         .camundaCaseBinding("deployment")
         .camundaCaseVersion("2")
+        .camundaIn("in-source", "in-target")
+        .camundaOut("out-source", "out-target")
         .notCamundaExclusive()
       .endEvent()
       .done();
@@ -615,6 +619,14 @@ public class ProcessBuilderTest {
     assertThat(callActivity.getCamundaCaseBinding()).isEqualTo("deployment");
     assertThat(callActivity.getCamundaCaseVersion()).isEqualTo("2");
     assertThat(callActivity.isCamundaExclusive()).isFalse();
+
+    CamundaIn camundaIn = (CamundaIn) callActivity.getExtensionElements().getUniqueChildElementByType(CamundaIn.class);
+    assertThat(camundaIn.getCamundaSource()).isEqualTo("in-source");
+    assertThat(camundaIn.getCamundaTarget()).isEqualTo("in-target");
+
+    CamundaOut camundaOut = (CamundaOut) callActivity.getExtensionElements().getUniqueChildElementByType(CamundaOut.class);
+    assertThat(camundaOut.getCamundaSource()).isEqualTo("out-source");
+    assertThat(camundaOut.getCamundaTarget()).isEqualTo("out-target");
   }
 
   @Test

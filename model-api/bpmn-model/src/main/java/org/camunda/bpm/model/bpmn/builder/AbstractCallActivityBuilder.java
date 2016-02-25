@@ -15,6 +15,8 @@ package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIn;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
 
 /**
  * @author Sebastian Menski
@@ -117,6 +119,36 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
    */
   public B camundaCaseVersion(String camundaCaseVersion) {
     element.setCamundaCaseVersion(camundaCaseVersion);
+    return myself;
+  }
+
+  /**
+   * Sets a "camunda in" parameter to pass a variable from the super process instance to the sub process instance
+   *
+   * @param source the name of variable in the super process instance
+   * @param target the name of the variable in the sub process instance
+   * @return
+   */
+  public B camundaIn(String source, String target) {
+    CamundaIn param = modelInstance.newInstance(CamundaIn.class);
+    param.setCamundaSource(source);
+    param.setCamundaTarget(target);
+    addExtensionElement(param);
+    return myself;
+  }
+
+  /**
+   * Sets a "camunda out" parameter to pass a variable from a sub process instance to the super process instance
+   *
+   * @param source the name of variable in the sub process instance
+   * @param target the name of the variable in the super process instance
+   * @return
+   */
+  public B camundaOut(String source, String target) {
+    CamundaOut param = modelInstance.newInstance(CamundaOut.class);
+    param.setCamundaSource(source);
+    param.setCamundaTarget(target);
+    addExtensionElement(param);
     return myself;
   }
 
