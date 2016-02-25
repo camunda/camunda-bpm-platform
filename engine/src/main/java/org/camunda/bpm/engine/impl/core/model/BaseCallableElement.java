@@ -27,6 +27,7 @@ public class BaseCallableElement {
   protected ParameterValueProvider definitionKeyValueProvider;
   protected CallableElementBinding binding;
   protected ParameterValueProvider versionValueProvider;
+  protected ParameterValueProvider tenantIdProvider;
   protected String deploymentId;
 
   public enum CallableElementBinding {
@@ -110,6 +111,10 @@ public class BaseCallableElement {
     this.versionValueProvider = version;
   }
 
+  public void setTenantIdProvider(ParameterValueProvider tenantIdProvider) {
+    this.tenantIdProvider = tenantIdProvider;
+  }
+
   public String getDeploymentId() {
     return deploymentId;
   }
@@ -119,20 +124,23 @@ public class BaseCallableElement {
   }
 
   public String getDefinitionTenantId(CoreExecution execution) {
-    // CAM-5413 - use an expression to resolve the tenant-id 
-
-    if(execution instanceof ExecutionEntity) {
-      ExecutionEntity executionEntity = (ExecutionEntity) execution;
-      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) executionEntity.getProcessDefinition();
-      return processDefinition.getTenantId();
-
-    } else if(execution instanceof CaseExecutionEntity) {
-      CaseExecutionEntity caseExecution = (CaseExecutionEntity) execution;
-      CaseDefinitionEntity caseDefinition = (CaseDefinitionEntity) caseExecution.getCaseDefinition();
-      return caseDefinition.getTenantId();
-
-    } else {
-      throw new IllegalArgumentException("Unexpected execution of type " + execution.getClass().getName());
+    if(tenantIdProvider != null) {
+      return (String) tenantIdProvider.getValue(execution);
+    }
+    else {
+      if(execution instanceof ExecutionEntity) {
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+        ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) executionEntity.getProcessDefinition();
+        return processDefinition.getTenantId();
+      }
+      else if(execution instanceof CaseExecutionEntity) {
+        CaseExecutionEntity caseExecution = (CaseExecutionEntity) execution;
+        CaseDefinitionEntity caseDefinition = (CaseDefinitionEntity) caseExecution.getCaseDefinition();
+        return caseDefinition.getTenantId();
+      }
+      else {
+        throw new IllegalArgumentException("Unexpected execution of type " + execution.getClass().getName());
+      }
     }
   }
 

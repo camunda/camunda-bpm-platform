@@ -2004,6 +2004,7 @@ public class BpmnParse extends Parse {
 
     parseBinding(businessRuleTaskElement, activity, callableElement, "decisionRefBinding");
     parseVersion(businessRuleTaskElement, activity, callableElement, "decisionRefBinding", "decisionRefVersion");
+    parseTenantId(businessRuleTaskElement, activity, callableElement, "decisionTenantId");
 
     String resultVariable = parseResultVariable(businessRuleTaskElement);
     DecisionTableResultMapper decisionTableResultMapper = parseDecisionResultMapper(businessRuleTaskElement);
@@ -3334,6 +3335,7 @@ public class BpmnParse extends Parse {
 
     String bindingAttributeName = "calledElementBinding";
     String versionAttributeName = "calledElementVersion";
+    String tenantIdAttributeName = "calledElementTenantId";
 
     String deploymentId = deployment.getId();
 
@@ -3353,6 +3355,7 @@ public class BpmnParse extends Parse {
       callableElement.setDefinitionKeyValueProvider(definitionKeyProvider);
       bindingAttributeName = "caseBinding";
       versionAttributeName = "caseVersion";
+      tenantIdAttributeName = "caseTenantId";
     }
 
     behavior.setCallableElement(callableElement);
@@ -3362,6 +3365,9 @@ public class BpmnParse extends Parse {
 
     // parse version
     parseVersion(callActivityElement, activity, callableElement, bindingAttributeName, versionAttributeName);
+
+    // parse tenant id
+    parseTenantId(callActivityElement, activity, callableElement, tenantIdAttributeName);
 
     // parse input parameter
     parseInputParameter(callActivityElement, activity, callableElement);
@@ -3396,6 +3402,15 @@ public class BpmnParse extends Parse {
       callableElement.setBinding(CallableElementBinding.LATEST);
     } else if (CallableElementBinding.VERSION.getValue().equals(binding)) {
       callableElement.setBinding(CallableElementBinding.VERSION);
+    }
+  }
+
+  protected void parseTenantId(Element callingActivityElement, ActivityImpl activity, BaseCallableElement callableElement, String attrName) {
+    String tenantId = callingActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, attrName);
+
+    if(tenantId != null && tenantId.length() > 0) {
+      ParameterValueProvider tenantIdValueProvider = createParameterValueProvider(tenantId, expressionManager);
+      callableElement.setTenantIdProvider(tenantIdValueProvider);
     }
   }
 

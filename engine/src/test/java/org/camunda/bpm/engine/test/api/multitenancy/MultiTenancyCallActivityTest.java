@@ -365,6 +365,71 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     }
   }
 
+  public void testCalledElementTenantIdConstant() {
+
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
+        .startEvent()
+        .callActivity()
+          .calledElement("subProcess")
+          .camundaCalledElementTenantId(TENANT_ONE)
+        .endEvent()
+        .done();
+
+    deploymentForTenant(TENANT_ONE, SUB_PROCESS);
+    deployment(callingProcess);
+
+    runtimeService.startProcessInstanceByKey("callingProcess");
+
+  }
+
+  public void testCalledElementTenantIdExpression() {
+
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
+        .startEvent()
+        .callActivity()
+          .calledElement("subProcess")
+          .camundaCalledElementTenantId("${'"+TENANT_ONE+"'}")
+        .endEvent()
+        .done();
+
+    deploymentForTenant(TENANT_ONE, SUB_PROCESS);
+    deployment(callingProcess);
+
+    runtimeService.startProcessInstanceByKey("callingProcess");
+  }
+
+  public void testCaseRefTenantIdConstant() {
+
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
+      .startEvent()
+      .callActivity()
+        .camundaCaseRef("Case_1")
+        .camundaCaseTenantId(TENANT_ONE)
+      .endEvent()
+      .done();
+
+    deploymentForTenant(TENANT_ONE, CMMN);
+    deployment(callingProcess);
+
+    runtimeService.startProcessInstanceByKey("callingProcess");
+  }
+
+  public void testCaseRefTenantIdExpression() {
+
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
+      .startEvent()
+      .callActivity()
+        .camundaCaseRef("Case_1")
+        .camundaCaseTenantId("${'"+TENANT_ONE+"'}")
+      .endEvent()
+      .done();
+
+    deploymentForTenant(TENANT_ONE, CMMN);
+    deployment(callingProcess);
+
+    runtimeService.startProcessInstanceByKey("callingProcess");
+  }
+
   protected void assertThatStartedCaseInstanceForTenant(String tenantId) {
     CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().tenantIdIn(tenantId).singleResult();
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionId(caseDefinition.getId());
