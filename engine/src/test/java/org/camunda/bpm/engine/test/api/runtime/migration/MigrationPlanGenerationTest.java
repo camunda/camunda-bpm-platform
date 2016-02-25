@@ -19,6 +19,7 @@ import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.migrate;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.standalone.deploy.BPMNParseListenerTest;
 import org.camunda.bpm.engine.test.util.MigrationPlanAssert;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
@@ -443,6 +444,16 @@ public class MigrationPlanGenerationTest {
     assertGeneratedMigrationPlan(ProcessModels.SUBPROCESS_PROCESS, testProcess)
       .hasEmptyInstructions();
 
+  }
+
+  @Test
+  public void testNotMigrateActivitiesOfDifferentType() {
+    BpmnModelInstance sourceProcess = ProcessModels.ONE_TASK_PROCESS;
+    BpmnModelInstance targetProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
+      .swapElementIds("userTask", "subProcess");
+
+    assertGeneratedMigrationPlan(sourceProcess, targetProcess)
+      .hasEmptyInstructions();
   }
 
 

@@ -49,6 +49,7 @@ public class DefaultMigrationPlanValidator implements MigrationPlanValidator {
                                            MigrationInstruction instruction, List<MigrationInstruction> instructions) {
     ensureOneToOneMapping(instruction, instructions, sourceProcessDefinition, targetProcessDefinition);
     ensureActivitiesCanBeMigrated(instruction, instructions, sourceProcessDefinition, targetProcessDefinition);
+    ensureSameType(instruction, instructions, sourceProcessDefinition, targetProcessDefinition);
     ensureBoundaryEventsAreMigratedWithEventScope(instruction, instructions, sourceProcessDefinition, targetProcessDefinition);
   }
 
@@ -71,6 +72,12 @@ public class DefaultMigrationPlanValidator implements MigrationPlanValidator {
   protected void ensureActivitiesCanBeMigrated(MigrationInstruction instruction, List<MigrationInstruction> instructions, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
     if (!MigrationInstructionValidators.ACTIVITIES_CAN_BE_MIGRATED.isInstructionValid(instruction, instructions, sourceProcessDefinition, targetProcessDefinition)) {
       throw new BadUserRequestException("the mapped activities are either null or not supported");
+    }
+  }
+
+  protected void ensureSameType(MigrationInstruction instruction, List<MigrationInstruction> instructions, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
+    if (!MigrationInstructionValidators.SAME_TYPE.isInstructionValid(instruction, instructions, sourceProcessDefinition, targetProcessDefinition)) {
+      throw new BadUserRequestException("the mapped activities must have the same type");
     }
   }
 

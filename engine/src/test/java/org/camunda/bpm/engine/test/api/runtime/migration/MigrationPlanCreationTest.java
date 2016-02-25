@@ -17,6 +17,7 @@ import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.migrate;
 import static org.camunda.bpm.engine.test.util.MigrationPlanValidationReportAssert.assertThat;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.RuntimeService;
@@ -84,7 +85,7 @@ public class MigrationPlanCreationTest {
         .createMigrationPlan("aNonExistingProcDefId", processDefinition.getId())
         .mapActivities("userTask", "userTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     } catch (BadUserRequestException e) {
       assertExceptionMessage(e, "source process definition with id aNonExistingProcDefId does not exist");
     }
@@ -99,7 +100,7 @@ public class MigrationPlanCreationTest {
         .createMigrationPlan(null, processDefinition.getId())
         .mapActivities("userTask", "userTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     } catch (BadUserRequestException e) {
       assertExceptionMessage(e, "sourceProcessDefinitionId is null");
     }
@@ -113,7 +114,7 @@ public class MigrationPlanCreationTest {
         .createMigrationPlan(processDefinition.getId(), "aNonExistingProcDefId")
         .mapActivities("userTask", "userTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     } catch (BadUserRequestException e) {
       assertExceptionMessage(e, "target process definition with id aNonExistingProcDefId does not exist");
     }
@@ -128,7 +129,7 @@ public class MigrationPlanCreationTest {
         .createMigrationPlan(processDefinition.getId(), null)
         .mapActivities("userTask", "userTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     } catch (BadUserRequestException e) {
       assertExceptionMessage(e, "targetProcessDefinitionId is null");
     }
@@ -144,7 +145,7 @@ public class MigrationPlanCreationTest {
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
         .mapActivities("thisActivityDoesNotExist", "userTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasFailures(1)
@@ -162,7 +163,7 @@ public class MigrationPlanCreationTest {
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
         .mapActivities(null, "userTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasFailures(1)
@@ -180,7 +181,7 @@ public class MigrationPlanCreationTest {
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
         .mapActivities("userTask", "thisActivityDoesNotExist")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasFailures(1)
@@ -198,7 +199,7 @@ public class MigrationPlanCreationTest {
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
         .mapActivities("userTask", null)
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasFailures(1)
@@ -225,7 +226,7 @@ public class MigrationPlanCreationTest {
   }
 
   @Test
-  public void testMigrateToDifferentActivityType() {
+  public void testMigrateToUnsupportedActivityType() {
 
     ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
     ProcessDefinition targetDefinition = testHelper.deploy(ProcessModels.ONE_RECEIVE_TASK_PROCESS);
@@ -235,11 +236,31 @@ public class MigrationPlanCreationTest {
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
         .mapActivities("userTask", "receiveTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasFailures(1)
         .hasFailure("userTask", "the mapped activities are either null or not supported");
+    }
+  }
+
+  @Test
+  public void testNotMigrateActivitiesOfDifferentType() {
+    ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .swapElementIds("userTask", "subProcess")
+    );
+
+    try {
+      runtimeService
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .build();
+      fail("Should not succeed");
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasFailures(1)
+        .hasFailure("userTask", "the mapped activities must have the same type");
     }
   }
 
@@ -253,7 +274,7 @@ public class MigrationPlanCreationTest {
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
         .mapActivities("subProcess", targetDefinition.getId())
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasFailures(1)
@@ -276,7 +297,7 @@ public class MigrationPlanCreationTest {
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
         .mapActivities("userTask", "userTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
@@ -385,7 +406,7 @@ public class MigrationPlanCreationTest {
         .mapActivities("userTask2", "userTask2")
         .mapActivities("boundary", "boundary")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
@@ -473,7 +494,7 @@ public class MigrationPlanCreationTest {
         .mapActivities("userTask", "userTask")
         .mapActivities("boundary", "boundary")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
@@ -503,7 +524,7 @@ public class MigrationPlanCreationTest {
         .mapActivities("userTask", "userTask")
         .mapActivities("boundary", "boundary")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
@@ -532,7 +553,7 @@ public class MigrationPlanCreationTest {
         .mapActivities("escalation", "escalation")
         .mapActivities("userTask", "userTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
@@ -562,7 +583,7 @@ public class MigrationPlanCreationTest {
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
         .mapActivities("userTask", "userTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
@@ -591,7 +612,7 @@ public class MigrationPlanCreationTest {
         .mapActivities("subProcess", "subProcess")
         .mapActivities("userTask", "userTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
@@ -648,7 +669,7 @@ public class MigrationPlanCreationTest {
         .mapActivities("userTask", "userTask")
         .mapActivities("innerTask", "innerTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())

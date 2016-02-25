@@ -16,6 +16,8 @@ package org.camunda.bpm.engine.impl.migration.validation;
 import java.util.Arrays;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
@@ -114,8 +116,18 @@ public class MigrationInstructionValidators {
     }
   };
 
-  // Helper
+  public static final MigrationInstructionValidator SAME_TYPE = new MigrationInstructionValidator() {
+    public boolean isInstructionValid(MigrationInstruction instruction, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
+      return ONE_TO_ONE_VALIDATOR.isInstructionValid(instruction, sourceProcessDefinition, targetProcessDefinition)
+        && haveSameType(instruction.getSourceActivityIds().get(0), instruction.getTargetActivityIds().get(0), sourceProcessDefinition, targetProcessDefinition);
+    }
 
+    public boolean isInstructionValid(MigrationInstruction instruction, List<MigrationInstruction> instructions, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
+      return isInstructionValid(instruction, sourceProcessDefinition, targetProcessDefinition);
+    }
+  };
+
+  // Helper
 
   protected static boolean haveSameScope(String sourceActivityId, String targetActivityId, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
     ScopeImpl sourceFlowScope = sourceProcessDefinition.findActivity(sourceActivityId).getFlowScope();
@@ -123,6 +135,7 @@ public class MigrationInstructionValidators {
 
     return (isProcessDefinition(sourceFlowScope) && isProcessDefinition(targetFlowScope)) || sourceFlowScope.getId().equals(targetFlowScope.getId());
   }
+
 
   protected static boolean haveSameEventScope(String sourceActivityId, String targetActivityId, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
     ScopeImpl sourceEventScope = sourceProcessDefinition.findActivity(sourceActivityId).getEventScope();
@@ -161,6 +174,13 @@ public class MigrationInstructionValidators {
 
   protected static boolean isProcessDefinition(ScopeImpl scope) {
     return scope.getProcessDefinition() == scope;
+  }
+
+  protected static boolean haveSameType(String sourceActivityId, String targetActivityId, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
+    ActivityBehavior sourceActivityBehavior = sourceProcessDefinition.findActivity(sourceActivityId).getActivityBehavior();
+    ActivityBehavior targetActivityBehavior = targetProcessDefinition.findActivity(targetActivityId).getActivityBehavior();
+
+    return sourceActivityBehavior.getClass().equals(targetActivityBehavior.getClass());
   }
 
 }
