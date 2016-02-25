@@ -264,6 +264,23 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
     assertThat(processInstance.getTenantId(), is(nullValue()));
   }
 
+  public void testTenantIdInheritedFromSuperProcessInstance() {
+
+    String tenantId = "tenant1";
+    SetValueOnRootProcessInstanceTenantIdProvider tenantIdProvider = new SetValueOnRootProcessInstanceTenantIdProvider(tenantId);
+    TestTenantIdProvider.delegate = tenantIdProvider;
+
+    deployment(Bpmn.createExecutableProcess("testProcess").startEvent().userTask().done(),
+        Bpmn.createExecutableProcess("superProcess").startEvent().callActivity().calledElement("testProcess").done());
+
+    // if a process instance is started
+    runtimeService.startProcessInstanceByKey("superProcess");
+
+    // then the tenant id is inherited to the sub process instance even tough it is not set by the provider
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess").singleResult();
+    assertThat(processInstance.getTenantId(), is(tenantId));
+  }
+
   // helpers //////////////////////////////////////////
 
   public static class TestTenantIdProvider implements TenantIdProvider {
