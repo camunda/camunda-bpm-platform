@@ -26,6 +26,8 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInstanceContext;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
@@ -62,10 +64,12 @@ import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDelet
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.FlowElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -382,6 +386,31 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     // Cached entity-state initialized to null, all bits are zero, indicating NO
     // entities present
     execution.cachedEntityState = 0;
+  }
+
+  @Override
+  public void start(Map<String, Object> variables) {
+    // determine tenant Id if null
+    if(tenantId == null) {
+      provideTenantId(variables);
+    }
+    super.start(variables);
+  }
+
+  protected void provideTenantId(Map<String, Object> variables) {
+    TenantIdProvider tenantIdProvider = Context.getProcessEngineConfiguration().getTenantIdProvider();
+
+    if(tenantIdProvider != null) {
+      VariableMap variableMap = Variables.fromMap(variables);
+      TenantIdProviderProcessInstanceContext ctx = null;
+      if(superExecutionId == null) {
+        ctx = new TenantIdProviderProcessInstanceContext((ProcessDefinition) getProcessDefinition(), variableMap);
+      }
+      else {
+        ctx = new TenantIdProviderProcessInstanceContext((ProcessDefinition) getProcessDefinition(), variableMap, getSuperExecution());
+      }
+      tenantId = tenantIdProvider.provideTenantIdForProcessInstance(ctx);
+    }
   }
 
   public void startWithFormProperties(VariableMap properties) {
