@@ -70,6 +70,8 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   public static final String DECISION_COLLECT_SUM_DMN = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionCollectSum.dmn11.xml";
   public static final String DECISION_RETURNS_TRUE = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.returnsTrue.dmn11.xml";
 
+  public static final String DECISION_NO_INPUT_DMN = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.noInput.dmn11.xml";
+
   protected static final String DECISION_DEFINITION_KEY = "testDecision";
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -201,6 +203,27 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
 
     assertThat(query.decisionInstanceId("nonExisting").singleResult(), is(nullValue()));
   }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_NO_INPUT_DMN })
+  public void testQueryIncludeInputsNoInput() {
+
+    startProcessInstanceAndEvaluateDecision();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
+    assertThat(query.includeInputs().singleResult().getInputs().size(), is(0));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_NO_INPUT_DMN })
+  public void testQueryIncludeOutputsNoInput() {
+
+    startProcessInstanceAndEvaluateDecision();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
+    assertThat(query.includeOutputs().singleResult().getOutputs().size(), is(0));
+  }
+
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void testDecisionInputInstanceProperties() {
