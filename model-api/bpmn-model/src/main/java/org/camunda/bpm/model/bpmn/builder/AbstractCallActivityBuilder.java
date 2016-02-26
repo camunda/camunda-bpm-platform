@@ -91,7 +91,7 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
 
   /**
    * Sets the camunda calledElementTenantId attribute
-   * @param camundaCalledElementTenantId
+   * @param camundaCalledElementTenantId the called element tenant id
    * @return the builder object
    */
   public B camundaCalledElementTenantId(String camundaCalledElementTenantId) {
@@ -134,11 +134,11 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
 
   /**
    * Sets the caseTenantId
-   * @param tenantd the tenant id to set
+   * @param tenantId the tenant id to set
    * @return the builder object
    */
-  public B camundaCaseTenantId(String tenantd) {
-    element.setCamundaCaseTenantId(tenantd);
+  public B camundaCaseTenantId(String tenantId) {
+    element.setCamundaCaseTenantId(tenantId);
     return myself;
   }
 
@@ -147,7 +147,7 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
    *
    * @param source the name of variable in the super process instance
    * @param target the name of the variable in the sub process instance
-   * @return
+   * @return the builder object
    */
   public B camundaIn(String source, String target) {
     CamundaIn param = modelInstance.newInstance(CamundaIn.class);
@@ -162,7 +162,7 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
    *
    * @param source the name of variable in the sub process instance
    * @param target the name of the variable in the super process instance
-   * @return
+   * @return the builder object
    */
   public B camundaOut(String source, String target) {
     CamundaOut param = modelInstance.newInstance(CamundaOut.class);
