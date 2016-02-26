@@ -117,7 +117,7 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCa
         .putValue("var1", "a")
         .putValue("var2", "b");
 
-    runtimeService.createSignalEvent("signal").setVariables(variables).send();
+    runtimeService.createSignalEvent("signal").variables(variables).send();
 
     Execution execution = runtimeService.createExecutionQuery().singleResult();
     assertThat(runtimeService.getVariables(execution.getId()), is(variables));
@@ -132,7 +132,7 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCa
         .putValue("var1", "a")
         .putValue("var2", "b");
 
-    runtimeService.createSignalEvent("signal").setVariables(variables).send();
+    runtimeService.createSignalEvent("signal").variables(variables).send();
 
     Execution execution = runtimeService.createExecutionQuery().singleResult();
     assertThat(runtimeService.getVariables(execution.getId()), is(variables));

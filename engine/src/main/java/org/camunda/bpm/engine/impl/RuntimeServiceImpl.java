@@ -396,7 +396,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   public void signalEventReceived(String signalName, Map<String, Object> processVariables) {
-    createSignalEvent(signalName).setVariables(processVariables).send();
+    createSignalEvent(signalName).variables(processVariables).send();
   }
 
   public void signalEventReceived(String signalName, String executionId) {
@@ -404,7 +404,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   public void signalEventReceived(String signalName, String executionId, Map<String, Object> processVariables) {
-    createSignalEvent(signalName).executionId(executionId).setVariables(processVariables).send();
+    createSignalEvent(signalName).executionId(executionId).variables(processVariables).send();
   }
 
   public SignalEventReceivedBuilder createSignalEvent(String signalName) {

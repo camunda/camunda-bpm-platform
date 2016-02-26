@@ -33,7 +33,7 @@ public interface SignalEventReceivedBuilder {
    *          a map of variables added to the executions
    * @return the builder
    */
-  SignalEventReceivedBuilder setVariables(Map<String, Object> variables);
+  SignalEventReceivedBuilder variables(Map<String, Object> variables);
 
   /**
    * Specify a single execution to deliver the signal to.
@@ -61,8 +61,6 @@ public interface SignalEventReceivedBuilder {
    * definitions which belongs to no tenant. Cannot be used in combination with
    * {@link #executionId(String)}.
    *
-   * @param tenantId
-   *          the id of the tenant
    * @return the builder
    */
   SignalEventReceivedBuilder withoutTenantId();
