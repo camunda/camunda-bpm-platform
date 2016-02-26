@@ -20,9 +20,11 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingJobInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
+import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingProcessInstanceValidationReportImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
@@ -31,6 +33,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 
@@ -99,8 +102,6 @@ public class MigratingInstanceParseContext {
     }
     return this;
   }
-
-  // TODO: think about factory methods here that create the instances and directly register them
 
   public void submit(MigratingActivityInstance activityInstance) {
     activityInstances.put(activityInstance.getActivityInstance().getId(), activityInstance);
@@ -193,7 +194,7 @@ public class MigratingInstanceParseContext {
     Map<String, List<MigrationInstruction>> organizedInstructions = new HashMap<String, List<MigrationInstruction>>();
 
     for (MigrationInstruction instruction : migrationPlan.getInstructions()) {
-      CollectionUtil.addToMapOfLists(organizedInstructions, instruction.getSourceActivityIds().get(0), instruction);
+      CollectionUtil.addToMapOfLists(organizedInstructions, instruction.getSourceActivityId(), instruction);
     }
 
     return organizedInstructions;
@@ -203,11 +204,27 @@ public class MigratingInstanceParseContext {
     parser.getDependentJobHandler().handle(this, migratingInstance, jobs);
   }
 
-  public void handleDependentEventsubscriptions(MigratingActivityInstance migratingInstance, List<EventSubscriptionEntity> eventSubscriptions) {
+  public void handleDependentEventSubscriptions(MigratingActivityInstance migratingInstance, List<EventSubscriptionEntity> eventSubscriptions) {
     parser.getDependentEventSubscriptionHandler().handle(this, migratingInstance, eventSubscriptions);
   }
 
   public void handleDependentTasks(MigratingActivityInstance migratingInstance, List<TaskEntity> tasks) {
     parser.getDependentTaskHandler().handle(this, migratingInstance, tasks);
   }
+
+  public void validateNoEntitiesLeft(MigratingProcessInstanceValidationReportImpl processInstanceReport) {
+    processInstanceReport.setMigratingProcessInstance(migratingProcessInstance);
+
+    ensureNoEntitiesAreLeft("tasks", tasks, processInstanceReport);
+    ensureNoEntitiesAreLeft("incidents", incidents, processInstanceReport);
+    ensureNoEntitiesAreLeft("jobs", jobs, processInstanceReport);
+    ensureNoEntitiesAreLeft("event subscriptions", eventSubscriptions, processInstanceReport);
+  }
+
+  public void ensureNoEntitiesAreLeft(String entityName, Collection<? extends DbEntity> dbEntities, MigratingProcessInstanceValidationReportImpl processInstanceReport) {
+    if (!dbEntities.isEmpty()) {
+      processInstanceReport.addFailure("Process instance contains not migrated " + entityName + ": [" + StringUtil.joinDbEntityIds(dbEntities) + "]");
+    }
+  }
+
 }

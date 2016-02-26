@@ -15,13 +15,13 @@ package org.camunda.bpm.engine.test.api.runtime.migration;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
-import static org.camunda.bpm.engine.test.util.MigrationInstructionInstanceValidationReportAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationException;
+import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.task.Task;
@@ -371,11 +371,11 @@ public class MigrationRemoveScopesTest {
     try {
       testHelper.createProcessInstanceAndMigrate(migrationPlan);
       Assert.fail("should not validate");
-    } catch (MigrationInstructionInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       assertThat(e.getValidationReport())
-        .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-        .hasFailure("userTask2", "Closest migrating ancestor activity instance is migrated "
-            + "to activity 'subProcess' which is not an ancestor of target activity 'userTask2'");
+        .hasActivityInstanceFailures("userTask2",
+          "Closest migrating ancestor activity instance is migrated to activity 'subProcess' which is not an ancestor of target activity 'userTask2'"
+        );
     }
   }
 
@@ -467,11 +467,11 @@ public class MigrationRemoveScopesTest {
     try {
       testHelper.createProcessInstanceAndMigrate(migrationPlan);
       Assert.fail("should not validate");
-    } catch (MigrationInstructionInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       assertThat(e.getValidationReport())
-        .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-        .hasFailure("subProcess3", "Closest migrating ancestor activity instance is migrated to activity 'subProcess1' which is "
-            + "not an ancestor of target activity 'subProcess1'");
+        .hasActivityInstanceFailures("subProcess3",
+          "Closest migrating ancestor activity instance is migrated to activity 'subProcess1' which is not an ancestor of target activity 'subProcess1'"
+        );
     }
   }
 

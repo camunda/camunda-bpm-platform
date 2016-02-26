@@ -48,12 +48,8 @@ public class MigrationPlanBuilderImpl implements MigrationPlanBuilder {
   }
 
   public MigrationPlanBuilder mapActivities(String sourceActivityId, String targetActivityId) {
-    return mapActivities(Collections.singletonList(sourceActivityId), Collections.singletonList(targetActivityId));
-  }
-
-  public MigrationPlanBuilder mapActivities(List<String> sourceActivityIds, List<String> targetActivityIds) {
     this.explicitMigrationInstructions.add(
-      new MigrationInstructionImpl(sourceActivityIds, targetActivityIds)
+      new MigrationInstructionImpl(sourceActivityId, targetActivityId)
     );
     return this;
   }

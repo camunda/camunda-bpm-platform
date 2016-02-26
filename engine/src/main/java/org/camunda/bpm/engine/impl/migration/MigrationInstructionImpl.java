@@ -12,9 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.migration;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 
 /**
@@ -23,47 +20,27 @@ import org.camunda.bpm.engine.migration.MigrationInstruction;
  */
 public class MigrationInstructionImpl implements MigrationInstruction {
 
-  protected List<String> sourceActivityIds;
-  protected List<String> targetActivityIds;
+  protected String sourceActivityId;
+  protected String targetActivityId;
 
   public MigrationInstructionImpl(String sourceActivityId, String targetActivityId) {
-    this(Collections.singletonList(sourceActivityId), Collections.singletonList(targetActivityId));
+    this.sourceActivityId = sourceActivityId;
+    this.targetActivityId = targetActivityId;
   }
 
-  public MigrationInstructionImpl(List<String> sourceActivityIds, List<String> targetActivityIds) {
-    this.sourceActivityIds = sourceActivityIds;
-    this.targetActivityIds = targetActivityIds;
+  public String getSourceActivityId() {
+    return sourceActivityId;
   }
 
-  public List<String> getSourceActivityIds() {
-    return sourceActivityIds;
-  }
-
-  public List<String> getTargetActivityIds() {
-    return targetActivityIds;
+  public String getTargetActivityId() {
+    return targetActivityId;
   }
 
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-
-    sb.append("MigrationInstruction[sourceActivities=[");
-    for (int i = 0; i < sourceActivityIds.size(); i++) {
-      sb.append(sourceActivityIds.get(i));
-      if (i < sourceActivityIds.size() - 1) {
-        sb.append(", ");
-      }
-    }
-
-    sb.append("], targetActivityIds=[");
-    for (int i = 0; i < targetActivityIds.size(); i++) {
-      sb.append(targetActivityIds.get(i));
-      if (i < targetActivityIds.size() - 1) {
-        sb.append(", ");
-      }
-    }
-    sb.append("]]");
-
-    return sb.toString();
+    return "MigrationInstructionImpl{" +
+      "sourceActivityId='" + sourceActivityId + '\'' +
+      ", targetActivityId='" + targetActivityId + '\'' +
+      '}';
   }
 
 }

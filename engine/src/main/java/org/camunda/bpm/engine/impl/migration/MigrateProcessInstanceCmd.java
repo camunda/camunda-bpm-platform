@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.migration;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,9 +28,9 @@ import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstanceW
 import org.camunda.bpm.engine.impl.migration.instance.MigratingExecutionBranch;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
 import org.camunda.bpm.engine.impl.migration.instance.parser.MigratingInstanceParser;
-import org.camunda.bpm.engine.impl.migration.validation.AdditionalFlowScopeValidator;
-import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidationReportImpl;
-import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingActivityInstanceValidationReportImpl;
+import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingActivityInstanceValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingProcessInstanceValidationReportImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
@@ -90,12 +89,17 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
     ensureProcessInstanceExist(processInstanceId, processInstance);
     ensureSameProcessDefinition(processInstance, migrationPlan.getSourceProcessDefinitionId());
 
-    // Initialize migration: match migration instructions to activity instances and collect required entities
-    MigratingProcessInstance migratingProcessInstance =
-      new MigratingInstanceParser(Context.getProcessEngineConfiguration().getProcessEngine())
-        .parse(processInstance.getId(), migrationPlan);
+    MigratingProcessInstanceValidationReportImpl processInstanceReport = new MigratingProcessInstanceValidationReportImpl();
 
-    validateInstructions(migratingProcessInstance);
+    // Initialize migration: match migration instructions to activity instances and collect required entities
+    MigratingInstanceParser migratingInstanceParser = new MigratingInstanceParser(Context.getProcessEngineConfiguration().getProcessEngine());
+    MigratingProcessInstance migratingProcessInstance = migratingInstanceParser.parse(processInstance.getId(), migrationPlan, processInstanceReport);
+
+    validateInstructions(commandContext, migratingProcessInstance, processInstanceReport);
+
+    if (processInstanceReport.hasFailures()) {
+      throw LOGGER.failingMigratingProcessInstanceValidation(processInstanceReport);
+    }
 
     deleteUnmappedActivityInstances(migratingProcessInstance);
 
@@ -169,21 +173,24 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
     return leafInstances;
   }
 
-  protected void validateInstructions(MigratingProcessInstance migratingProcessInstance) {
-
-    List<MigrationInstructionInstanceValidator> validators = Collections.<MigrationInstructionInstanceValidator>singletonList(new AdditionalFlowScopeValidator());
-    MigrationInstructionInstanceValidationReportImpl validationReport = new MigrationInstructionInstanceValidationReportImpl(migratingProcessInstance);
+  protected void validateInstructions(CommandContext commandContext, MigratingProcessInstance migratingProcessInstance, MigratingProcessInstanceValidationReportImpl processInstanceReport) {
+    List<MigratingActivityInstanceValidator> migratingActivityInstanceValidators = commandContext.getProcessEngineConfiguration().getMigratingActivityInstanceValidators();
 
     for (MigratingActivityInstance migratingActivityInstance : migratingProcessInstance.getMigratingActivityInstances()) {
-      for (MigrationInstructionInstanceValidator validator : validators) {
-        validator.validate(migratingProcessInstance, migratingActivityInstance, validationReport);
+      MigratingActivityInstanceValidationReportImpl instanceReport = validateActivityInstance(migratingActivityInstance, migratingProcessInstance, migratingActivityInstanceValidators);
+      if (instanceReport.hasFailures()) {
+        processInstanceReport.addInstanceReport(instanceReport);
       }
     }
 
-    if (validationReport.hasFailures()) {
-      throw LOGGER.failingInstructionInstanceValidation(validationReport);
-    }
+  }
 
+  protected MigratingActivityInstanceValidationReportImpl validateActivityInstance(MigratingActivityInstance migratingActivityInstance, MigratingProcessInstance migratingProcessInstance, List<MigratingActivityInstanceValidator> migratingActivityInstanceValidators) {
+    MigratingActivityInstanceValidationReportImpl instanceReport = new MigratingActivityInstanceValidationReportImpl(migratingActivityInstance);
+    for (MigratingActivityInstanceValidator migratingActivityInstanceValidator : migratingActivityInstanceValidators) {
+      migratingActivityInstanceValidator.validate(migratingActivityInstance, migratingProcessInstance, instanceReport);
+    }
+    return instanceReport;
   }
 
   /**
@@ -197,13 +204,12 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
     MigratingExecutionBranch scopeExecutionContext = new MigratingExecutionBranch();
     scopeExecutionContext.visited(rootActivityInstance);
 
-    migrateActivityInstance(migratingProcessInstance, scopeExecutionContext, rootActivityInstance);
+    migrateActivityInstance(scopeExecutionContext, rootActivityInstance);
   }
 
   protected void migrateActivityInstance(
-      MigratingProcessInstance migratingProcessInstance,
-      MigratingExecutionBranch migratingExecutionBranch,
-      MigratingActivityInstance migratingActivityInstance) {
+    MigratingExecutionBranch migratingExecutionBranch,
+    MigratingActivityInstance migratingActivityInstance) {
 
     ActivityInstance activityInstance = migratingActivityInstance.getActivityInstance();
 
@@ -260,7 +266,7 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
     migratingExecutionBranch.visited(migratingActivityInstance);
 
     for (MigratingActivityInstance childInstance : migratingActivityInstance.getChildren()) {
-      migrateActivityInstance(migratingProcessInstance, migratingExecutionBranch, childInstance);
+      migrateActivityInstance(migratingExecutionBranch, childInstance);
     }
 
 }

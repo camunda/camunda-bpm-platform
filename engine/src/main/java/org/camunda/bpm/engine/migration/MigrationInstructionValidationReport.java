@@ -2,7 +2,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,29 +10,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.camunda.bpm.engine.migration;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.migration.MigrationInstruction;
+
 /**
- * @author Thorben Lindhauer
- *
+ * Collects the validation failures for a single migration
+ * instruction.
  */
-public interface MigrationInstructionInstanceValidationFailure {
+public interface MigrationInstructionValidationReport {
 
   /**
-   * @return the reason why the instruction cannot be applied
-   */
-  String getErrorMessage();
-
-  /**
-   * @return the instruction that cannot be applied
+   * @return the migration instruction of this report
    */
   MigrationInstruction getMigrationInstruction();
 
   /**
-   * @return the list of activity instances that cannot be migrated with the given instruction
+   * @return true if the report contains failures, false otherwise
    */
-  List<String> getActivityInstanceIds();
+  boolean hasFailures();
+
+  /**
+   * @return the list of failure messages
+   */
+  List<String> getFailures();
 
 }

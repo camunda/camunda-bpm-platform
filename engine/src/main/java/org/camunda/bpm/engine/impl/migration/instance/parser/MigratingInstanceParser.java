@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
+import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingProcessInstanceValidationReportImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
@@ -55,9 +56,7 @@ public class MigratingInstanceParser {
     this.engine = engine;
   }
 
-  public MigratingProcessInstance parse(String processInstanceId, MigrationPlan migrationPlan) {
-
-    // TODO: validation report befüllen, wenn Entitäten übrig bleiben
+  public MigratingProcessInstance parse(String processInstanceId, MigrationPlan migrationPlan, MigratingProcessInstanceValidationReportImpl processInstanceReport) {
 
     CommandContext commandContext = Context.getCommandContext();
     List<ExecutionEntity> executions = fetchExecutions(commandContext, processInstanceId);
@@ -99,6 +98,8 @@ public class MigratingInstanceParser {
       incidentHandler.handle(parseContext, incidentEntity);
     }
 
+    parseContext.validateNoEntitiesLeft(processInstanceReport);
+
     return parseContext.getMigratingProcessInstance();
   }
 
@@ -122,8 +123,6 @@ public class MigratingInstanceParser {
     return incidentHandler;
   }
 
-  // TODO: das könnte auch in den Code wandern, der den Parser dann aufruft: zuerst alles holen und initialisieren, der
-  // parser parst dann nur
   protected List<ExecutionEntity> fetchExecutions(CommandContext commandContext, final String processInstanceId) {
     return commandContext.getExecutionManager().findExecutionsByProcessInstanceId(processInstanceId);
   }

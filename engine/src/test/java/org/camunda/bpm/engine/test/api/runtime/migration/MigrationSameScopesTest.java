@@ -14,16 +14,16 @@ package org.camunda.bpm.engine.test.api.runtime.migration;
 
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -160,8 +160,9 @@ public class MigrationSameScopesTest {
     try {
       testHelper.createProcessInstanceAndMigrate(migrationPlan);
       Assert.fail("should not succeed because the userTask2 instance is not mapped");
-    } catch (ProcessEngineException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("There are no migration instructions that apply to the following activity instances"));
+    } catch (MigratingProcessInstanceValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasActivityInstanceFailures("userTask2", "Leaf activity was not mapped by the migration");
     }
   }
 

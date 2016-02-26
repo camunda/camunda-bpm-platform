@@ -41,7 +41,7 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
       sourceScope = parseContext.getSourceProcessDefinition().findActivity(element.getActivityId());
 
       if (applyingInstruction != null) {
-        String activityId = applyingInstruction.getTargetActivityIds().get(0);
+        String activityId = applyingInstruction.getTargetActivityId();
         targetScope = parseContext.getTargetProcessDefinition().findActivity(activityId);
       }
     }
@@ -67,9 +67,8 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
   }
 
   public void parseDependentInstances(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance) {
-    // TODO: was ist die beste Art und Weise die dependent handlers aufzurufen? vll dem parse noch ne parseDependent-Methode geben und er gibt das dann an die Handler weiter?
     parseContext.handleDependentJobs(migratingInstance, migratingInstance.resolveRepresentativeExecution().getJobs());
-    parseContext.handleDependentEventsubscriptions(migratingInstance, migratingInstance.resolveRepresentativeExecution().getEventSubscriptions());
+    parseContext.handleDependentEventSubscriptions(migratingInstance, migratingInstance.resolveRepresentativeExecution().getEventSubscriptions());
     parseContext.handleDependentTasks(migratingInstance, migratingInstance.resolveRepresentativeExecution().getTasks());
   }
 

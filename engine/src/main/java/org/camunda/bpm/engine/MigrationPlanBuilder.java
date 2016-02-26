@@ -37,11 +37,6 @@ public interface MigrationPlanBuilder {
   MigrationPlanBuilder mapActivities(String sourceActivityId, String targetActivityId);
 
   /**
-   * Adds a migration instruction that maps a set of activity instances to a set of activity instances.
-   */
-  MigrationPlanBuilder mapActivities(List<String> sourceActivityIds, List<String> targetActivityIds);
-
-  /**
    * @return a migration plan with all previously specified instructions
    *
    * @throws MigrationPlanValidationException if the migration plan contains instructions that are not valid

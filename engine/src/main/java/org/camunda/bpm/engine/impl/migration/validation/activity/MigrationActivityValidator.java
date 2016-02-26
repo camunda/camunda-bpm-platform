@@ -11,15 +11,22 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.impl.migration.validation;
+package org.camunda.bpm.engine.impl.migration.validation.activity;
 
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 
+/**
+ * Check if an activity can be migrated. For example
+ * if the activity type is supported by the migration.
+ */
 public interface MigrationActivityValidator {
 
-  boolean canBeMigrated(String activityId, ProcessDefinitionImpl processDefinition);
-
-  boolean canBeMigrated(ActivityImpl activity, ProcessDefinitionImpl processDefinition);
+  /**
+   * Check that an activity can be migrated.
+   *
+   * @param activity the activity to migrate
+   * @return true if the activity can be migrated, false otherwise
+   */
+  boolean valid(ActivityImpl activity);
 
 }

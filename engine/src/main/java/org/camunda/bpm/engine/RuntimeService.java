@@ -19,7 +19,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationException;
+import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -1699,7 +1699,7 @@ public interface RuntimeService {
    * @param migrationPlan the migration plan to apply
    * @param processInstanceIds the instances to apply the plan to
    *
-   * @throws MigrationInstructionInstanceValidationException if the migration plan contains instructions
+   * @throws MigratingProcessInstanceValidationException if the migration plan contains instructions
    *   that are not applicable to any of the process instances
    */
   void executeMigrationPlan(MigrationPlan migrationPlan, List<String> processInstanceIds);

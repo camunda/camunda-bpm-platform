@@ -16,12 +16,16 @@ package org.camunda.bpm.engine.test.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationReportImpl;
-import org.camunda.bpm.engine.migration.MigrationPlanValidationFailure;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationPlanValidationReportImpl;
+import org.camunda.bpm.engine.migration.MigrationInstructionValidationReport;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationReport;
-import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 
 public class MigrationPlanValidationReportAssert {
@@ -38,42 +42,41 @@ public class MigrationPlanValidationReportAssert {
     return this;
   }
 
-  public MigrationPlanValidationReportAssert hasFailures() {
-    isNotNull();
-    assertTrue("Expected report to contain failures", ((MigrationPlanValidationReportImpl) actual).hasFailures());
-
-    return this;
-  }
-
-  public MigrationPlanValidationReportAssert hasFailures(int numberOfFailures) {
-    isNotNull();
-    assertEquals("Expected report to contain failures", numberOfFailures, actual.getValidationFailures().size());
-
-    return this;
-  }
-
-  public MigrationPlanValidationReportAssert hasFailure(String activityId, String errorMessage) {
+  public MigrationPlanValidationReportAssert hasInstructionFailures(String activityId, String... expectedFailures) {
     isNotNull();
 
-    boolean failureFound = false;
+    List<String> failuresFound = new ArrayList<String>();
 
-    for (MigrationPlanValidationFailure failure : actual.getValidationFailures()) {
-      if (failure.getMigrationInstruction().getSourceActivityIds().contains(activityId)) {
-        Assert.assertThat(failure.getErrorMessage(), CoreMatchers.containsString(errorMessage));
-        failureFound = true;
-        break;
+    for (MigrationInstructionValidationReport instructionReport : actual.getInstructionReports()) {
+      String sourceActivityId = instructionReport.getMigrationInstruction().getSourceActivityId();
+      if ((activityId == null && sourceActivityId == null) || (activityId != null && activityId.equals(sourceActivityId))) {
+        failuresFound.addAll(instructionReport.getFailures());
       }
     }
 
-    if (!failureFound) {
-      fail("Unable to find failure for activity id '" + activityId + "'");
+    Collection<Matcher<? super String>> matchers = new ArrayList<Matcher<? super String>>();
+    for (String expectedFailure : expectedFailures) {
+      matchers.add(Matchers.containsString(expectedFailure));
     }
+
+    Assert.assertThat("Expected failures for activity id '" + activityId + "':\n" + joinFailures(expectedFailures) +
+      "But found failures:\n" + joinFailures(failuresFound.toArray()),
+      failuresFound, Matchers.containsInAnyOrder(matchers));
 
     return this;
   }
 
   public static MigrationPlanValidationReportAssert assertThat(MigrationPlanValidationReport report) {
     return new MigrationPlanValidationReportAssert(report);
+  }
+
+  public String joinFailures(Object[] failures) {
+    StringBuilder builder = new StringBuilder();
+    for (Object failure : failures) {
+      builder.append("\t\t").append(failure).append("\n");
+    }
+
+    return builder.toString();
   }
 
 }

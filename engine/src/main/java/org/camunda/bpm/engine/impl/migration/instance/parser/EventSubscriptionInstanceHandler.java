@@ -36,7 +36,7 @@ public class EventSubscriptionInstanceHandler implements MigratingDependentInsta
       MigrationInstruction eventSubscriptionMigrationInstruction = parseContext.findSingleMigrationInstruction(eventSubscription.getActivityId());
       if (eventSubscriptionMigrationInstruction != null) {
         // the event subscription is migrated
-        ActivityImpl eventSubscriptionTargetActivity = parseContext.getTargetProcessDefinition().findActivity(eventSubscriptionMigrationInstruction.getTargetActivityIds().get(0));
+        ActivityImpl eventSubscriptionTargetActivity = parseContext.getTargetProcessDefinition().findActivity(eventSubscriptionMigrationInstruction.getTargetActivityId());
         migratedEventSubscriptionTargetActivityIds.add(eventSubscriptionTargetActivity.getId());
         owningInstance.addMigratingDependentInstance(new MigratingEventSubscriptionInstance(eventSubscription, eventSubscriptionTargetActivity));
 

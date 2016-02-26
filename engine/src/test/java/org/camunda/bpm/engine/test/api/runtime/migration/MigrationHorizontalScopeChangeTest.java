@@ -12,11 +12,12 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
+
+import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,11 +56,14 @@ public class MigrationHorizontalScopeChangeTest {
       testHelper.createProcessInstanceAndMigrate(migrationPlan);
       Assert.fail("should fail");
     }
-    catch (ProcessEngineException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Closest migrating ancestor activity instance is migrated "
-          + "to activity 'subProcess1' which is not an ancestor of target activity 'userTask2'"));
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Closest migrating ancestor activity instance is migrated "
-          + "to activity 'subProcess2' which is not an ancestor of target activity 'userTask1'"));
+    catch (MigratingProcessInstanceValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasActivityInstanceFailures("userTask1",
+          "Closest migrating ancestor activity instance is migrated to activity 'subProcess1' which is not an ancestor of target activity 'userTask2'"
+        )
+        .hasActivityInstanceFailures("userTask2",
+          "Closest migrating ancestor activity instance is migrated to activity 'subProcess2' which is not an ancestor of target activity 'userTask1'"
+        );
     }
   }
 }

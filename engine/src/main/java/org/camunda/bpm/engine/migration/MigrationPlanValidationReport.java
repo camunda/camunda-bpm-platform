@@ -15,13 +15,24 @@ package org.camunda.bpm.engine.migration;
 import java.util.List;
 
 /**
- * @author Thorben Lindhauer
+ * Collects the migration instruction validation reports for
+ * all instructions of the migration plan which contain failures.
  */
 public interface MigrationPlanValidationReport {
 
   /**
-   * @return all detected failures that prevent applying this migration plan
+   * @return the migration plan of the validation report
    */
-  List<MigrationPlanValidationFailure> getValidationFailures();
+  MigrationPlan getMigrationPlan();
+
+  /**
+   * @return true if instructions reports exist, false otherwise
+   */
+  boolean hasInstructionReports();
+
+  /**
+   * @return all instruction reports
+   */
+  List<MigrationInstructionValidationReport> getInstructionReports();
 
 }

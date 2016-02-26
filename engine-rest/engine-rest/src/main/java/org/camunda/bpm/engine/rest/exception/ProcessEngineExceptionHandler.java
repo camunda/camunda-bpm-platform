@@ -14,12 +14,12 @@ package org.camunda.bpm.engine.rest.exception;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationException;
+import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.rest.dto.AuthorizationExceptionDto;
 import org.camunda.bpm.engine.rest.dto.ExceptionDto;
-import org.camunda.bpm.engine.rest.dto.migration.MigrationExceptionDto.MigrationInstructionInstanceValidationExceptionDto;
-import org.camunda.bpm.engine.rest.dto.migration.MigrationExceptionDto.MigrationPlanValidationExceptionDto;
+import org.camunda.bpm.engine.rest.dto.migration.MigratingProcessInstanceValidationExceptionDto;
+import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanValidationExceptionDto;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -74,9 +74,9 @@ public class ProcessEngineExceptionHandler implements ExceptionMapper<ProcessEng
         .type(MediaType.APPLICATION_JSON_TYPE)
         .build();
     }
-    else if (exception instanceof MigrationInstructionInstanceValidationException) {
-      MigrationInstructionInstanceValidationExceptionDto dto = MigrationInstructionInstanceValidationExceptionDto
-        .from((MigrationInstructionInstanceValidationException) exception);
+    else if (exception instanceof MigratingProcessInstanceValidationException) {
+      MigratingProcessInstanceValidationExceptionDto dto = MigratingProcessInstanceValidationExceptionDto
+        .from((MigratingProcessInstanceValidationException) exception);
       return Response
         .status(Status.BAD_REQUEST)
         .entity(dto)

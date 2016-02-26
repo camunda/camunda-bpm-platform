@@ -30,10 +30,10 @@ import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -46,13 +46,14 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.MigrationPlanBuilder;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
+import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingActivityInstanceValidationReport;
+import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
+import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationReport;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
-import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationException;
-import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationFailure;
-import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationReport;
+import org.camunda.bpm.engine.migration.MigrationInstructionValidationReport;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
-import org.camunda.bpm.engine.migration.MigrationPlanValidationFailure;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationReport;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationInstructionDto;
@@ -359,7 +360,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   @Test
   public void executeMigrationPlanWithNullSourceActivityId() {
     String message = "sourceActivityId is null";
-    when(migrationPlanBuilderMock.mapActivities(eq(Collections.singletonList((String) null)), anyListOf(String.class)))
+    when(migrationPlanBuilderMock.mapActivities(isNull(String.class), anyString()))
       .thenThrow(new BadUserRequestException(message));
 
     MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
@@ -383,7 +384,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   @Test
   public void executeMigrationPlanWithNonExistingSourceActivityId() {
     String message = "sourceActivity is null";
-    when(migrationPlanBuilderMock.mapActivities(eq(Collections.singletonList(NON_EXISTING_ACTIVITY_ID)), anyListOf(String.class)))
+    when(migrationPlanBuilderMock.mapActivities(eq(NON_EXISTING_ACTIVITY_ID), anyString()))
       .thenThrow(new BadUserRequestException(message));
 
     MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
@@ -407,7 +408,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   @Test
   public void executeMigrationPlanWithNullTargetActivityId() {
     String message = "targetActivityId is null";
-    when(migrationPlanBuilderMock.mapActivities(anyListOf(String.class), eq(Collections.singletonList((String) null))))
+    when(migrationPlanBuilderMock.mapActivities(anyString(), isNull(String.class)))
       .thenThrow(new BadUserRequestException(message));
 
     MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
@@ -431,7 +432,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   @Test
   public void executeMigrationPlanWithNonExistingTargetActivityId() {
     String message = "targetActivity is null";
-    when(migrationPlanBuilderMock.mapActivities(anyListOf(String.class), eq(Collections.singletonList(NON_EXISTING_ACTIVITY_ID))))
+    when(migrationPlanBuilderMock.mapActivities(anyString(), eq(NON_EXISTING_ACTIVITY_ID)))
       .thenThrow(new BadUserRequestException(message));
 
     MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
@@ -456,15 +457,19 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   public void executeMigrationPlanValidationException() {
 
     MigrationInstruction migrationInstruction = mock(MigrationInstruction.class);
-    when(migrationInstruction.getSourceActivityIds()).thenReturn(Arrays.asList(EXAMPLE_ACTIVITY_ID));
-    when(migrationInstruction.getTargetActivityIds()).thenReturn(Arrays.asList(ANOTHER_EXAMPLE_ACTIVITY_ID));
+    when(migrationInstruction.getSourceActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
+    when(migrationInstruction.getTargetActivityId()).thenReturn(ANOTHER_EXAMPLE_ACTIVITY_ID);
 
-    MigrationPlanValidationFailure validationFailure = mock(MigrationPlanValidationFailure.class);
-    when(validationFailure.getMigrationInstruction()).thenReturn(migrationInstruction);
-    when(validationFailure.getErrorMessage()).thenReturn("anErrorMessage");
+    MigrationInstructionValidationReport instructionReport1 = mock(MigrationInstructionValidationReport.class);
+    when(instructionReport1.getMigrationInstruction()).thenReturn(migrationInstruction);
+    when(instructionReport1.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
+
+    MigrationInstructionValidationReport instructionReport2 = mock(MigrationInstructionValidationReport.class);
+    when(instructionReport2.getMigrationInstruction()).thenReturn(migrationInstruction);
+    when(instructionReport2.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
 
     MigrationPlanValidationReport validationReport = mock(MigrationPlanValidationReport.class);
-    when(validationReport.getValidationFailures()).thenReturn(Arrays.asList(validationFailure));
+    when(validationReport.getInstructionReports()).thenReturn(Arrays.asList(instructionReport1, instructionReport2));
 
     when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
 
@@ -482,34 +487,44 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(MigrationPlanValidationException.class.getSimpleName()))
       .body("message", is("fooo"))
-      .body("errorReport.validationErrors", hasSize(1))
-      .body("errorReport.validationErrors[0].message", is("anErrorMessage"))
-      .body("errorReport.validationErrors[0].instruction.sourceActivityIds", hasSize(1))
-      .body("errorReport.validationErrors[0].instruction.sourceActivityIds[0]", is(EXAMPLE_ACTIVITY_ID))
-      .body("errorReport.validationErrors[0].instruction.targetActivityIds", hasSize(1))
-      .body("errorReport.validationErrors[0].instruction.targetActivityIds[0]", is(ANOTHER_EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.instructionReports", hasSize(2))
+      .body("validationReport.instructionReports[0].instruction.sourceActivityIds", hasSize(1))
+      .body("validationReport.instructionReports[0].instruction.sourceActivityIds[0]", is(EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.instructionReports[0].instruction.targetActivityIds", hasSize(1))
+      .body("validationReport.instructionReports[0].instruction.targetActivityIds[0]", is(ANOTHER_EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.instructionReports[0].failures", hasSize(2))
+      .body("validationReport.instructionReports[0].failures[0]", is("failure1"))
+      .body("validationReport.instructionReports[0].failures[1]", is("failure2"))
     .when()
       .post(EXECUTE_MIGRATION_URL);
   }
 
   @Test
-  public void executeMigrationPlanInstanceValidationException() {
+  public void executeMigratingProcessInstanceValidationException() {
 
     MigrationInstruction migrationInstruction = mock(MigrationInstruction.class);
-    when(migrationInstruction.getSourceActivityIds()).thenReturn(Arrays.asList(EXAMPLE_ACTIVITY_ID));
-    when(migrationInstruction.getTargetActivityIds()).thenReturn(Arrays.asList(ANOTHER_EXAMPLE_ACTIVITY_ID));
+    when(migrationInstruction.getSourceActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
+    when(migrationInstruction.getTargetActivityId()).thenReturn(ANOTHER_EXAMPLE_ACTIVITY_ID);
 
-    MigrationInstructionInstanceValidationFailure validationFailure = mock(MigrationInstructionInstanceValidationFailure.class);
-    when(validationFailure.getActivityInstanceIds()).thenReturn(Arrays.asList(EXAMPLE_ACTIVITY_INSTANCE_ID));
-    when(validationFailure.getMigrationInstruction()).thenReturn(migrationInstruction);
-    when(validationFailure.getErrorMessage()).thenReturn("anErrorMessage");
+    MigratingActivityInstanceValidationReport instanceReport1 = mock(MigratingActivityInstanceValidationReport.class);
+    when(instanceReport1.getMigratingActivityInstanceId()).thenReturn(EXAMPLE_ACTIVITY_INSTANCE_ID);
+    when(instanceReport1.getMigrationInstruction()).thenReturn(migrationInstruction);
+    when(instanceReport1.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
 
-    MigrationInstructionInstanceValidationReport validationReport = mock(MigrationInstructionInstanceValidationReport.class);
-    when(validationReport.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
-    when(validationReport.getValidationFailures()).thenReturn(Arrays.asList(validationFailure));
+    MigratingActivityInstanceValidationReport instanceReport2 = mock(MigratingActivityInstanceValidationReport.class);
+    when(instanceReport2.getMigratingActivityInstanceId()).thenReturn(EXAMPLE_ACTIVITY_INSTANCE_ID);
+    when(instanceReport2.getMigrationInstruction()).thenReturn(migrationInstruction);
+    when(instanceReport2.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
 
-    doThrow(new MigrationInstructionInstanceValidationException("fooo", validationReport))
-      .when(runtimeServiceMock).executeMigrationPlan(any(MigrationPlan.class), any(List.class));
+    MigratingProcessInstanceValidationReport processInstanceReport = mock(MigratingProcessInstanceValidationReport.class);
+    MigratingProcessInstance migratingProcessInstance = mock(MigratingProcessInstance.class);
+    when(migratingProcessInstance.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+    when(processInstanceReport.getMigratingProcessInstance()).thenReturn(migratingProcessInstance);
+    when(processInstanceReport.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
+    when(processInstanceReport.getReports()).thenReturn(Arrays.asList(instanceReport1, instanceReport2));
+
+    doThrow(new MigratingProcessInstanceValidationException("fooo", processInstanceReport))
+      .when(runtimeServiceMock).executeMigrationPlan(any(MigrationPlan.class), anyListOf(String.class));
 
     MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
@@ -523,17 +538,29 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .body(migrationExecution)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(MigrationInstructionInstanceValidationException.class.getSimpleName()))
+      .body("type", equalTo(MigratingProcessInstanceValidationException.class.getSimpleName()))
       .body("message", is("fooo"))
-      .body("errorReport.processInstanceId", is(EXAMPLE_PROCESS_INSTANCE_ID))
-      .body("errorReport.validationErrors", hasSize(1))
-      .body("errorReport.validationErrors[0].message", is("anErrorMessage"))
-      .body("errorReport.validationErrors[0].activityInstanceIds", hasSize(1))
-      .body("errorReport.validationErrors[0].activityInstanceIds[0]", is(EXAMPLE_ACTIVITY_INSTANCE_ID))
-      .body("errorReport.validationErrors[0].instruction.sourceActivityIds", hasSize(1))
-      .body("errorReport.validationErrors[0].instruction.sourceActivityIds[0]", is(EXAMPLE_ACTIVITY_ID))
-      .body("errorReport.validationErrors[0].instruction.targetActivityIds", hasSize(1))
-      .body("errorReport.validationErrors[0].instruction.targetActivityIds[0]", is(ANOTHER_EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.processInstanceId", is(EXAMPLE_PROCESS_INSTANCE_ID))
+      .body("validationReport.failures", hasSize(2))
+      .body("validationReport.failures[0]", is("failure1"))
+      .body("validationReport.failures[1]", is("failure2"))
+      .body("validationReport.instanceValidationReports", hasSize(2))
+      .body("validationReport.instanceValidationReports[0].migrationInstruction.sourceActivityIds", hasSize(1))
+      .body("validationReport.instanceValidationReports[0].migrationInstruction.sourceActivityIds[0]", is(EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.instanceValidationReports[0].migrationInstruction.targetActivityIds", hasSize(1))
+      .body("validationReport.instanceValidationReports[0].migrationInstruction.targetActivityIds[0]", is(ANOTHER_EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.instanceValidationReports[0].activityInstanceId", is(EXAMPLE_ACTIVITY_INSTANCE_ID))
+      .body("validationReport.instanceValidationReports[0].failures", hasSize(2))
+      .body("validationReport.instanceValidationReports[0].failures[0]", is("failure1"))
+      .body("validationReport.instanceValidationReports[0].failures[1]", is("failure2"))
+      .body("validationReport.instanceValidationReports[1].migrationInstruction.sourceActivityIds", hasSize(1))
+      .body("validationReport.instanceValidationReports[1].migrationInstruction.sourceActivityIds[0]", is(EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.instanceValidationReports[1].migrationInstruction.targetActivityIds", hasSize(1))
+      .body("validationReport.instanceValidationReports[1].migrationInstruction.targetActivityIds[0]", is(ANOTHER_EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.instanceValidationReports[1].activityInstanceId", is(EXAMPLE_ACTIVITY_INSTANCE_ID))
+      .body("validationReport.instanceValidationReports[1].failures", hasSize(2))
+      .body("validationReport.instanceValidationReports[1].failures[0]", is("failure1"))
+      .body("validationReport.instanceValidationReports[1].failures[1]", is("failure2"))
     .when()
       .post(EXECUTE_MIGRATION_URL);
   }
@@ -565,7 +592,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     // the map equal activities method should be called
     verify(migrationPlanBuilderMock).mapEqualActivities();
     // other instructions are ignored
-    verify(migrationPlanBuilderMock, never()).mapActivities(anyListOf(String.class), anyListOf(String.class));
+    verify(migrationPlanBuilderMock, never()).mapActivities(anyString(), anyString());
     verify(migrationPlanBuilderMock, never()).mapActivities(anyString(), anyString());
   }
 
@@ -576,7 +603,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     verify(migrationPlanBuilderMock, never()).mapEqualActivities();
     // all instructions are added
     for (MigrationInstructionDto migrationInstructionDto : migrationPlan.getInstructions()) {
-      verify(migrationPlanBuilderMock).mapActivities(eq(migrationInstructionDto.getSourceActivityIds()), eq(migrationInstructionDto.getTargetActivityIds()));
+      verify(migrationPlanBuilderMock).mapActivities(eq(migrationInstructionDto.getSourceActivityIds().get(0)), eq(migrationInstructionDto.getTargetActivityIds().get(0)));
     }
   }
 

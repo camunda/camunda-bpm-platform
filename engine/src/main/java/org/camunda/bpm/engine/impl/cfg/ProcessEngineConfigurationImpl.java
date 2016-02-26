@@ -183,6 +183,25 @@ import org.camunda.bpm.engine.impl.metrics.SimpleIpBasedProvider;
 import org.camunda.bpm.engine.impl.metrics.parser.MetricsBpmnParseListener;
 import org.camunda.bpm.engine.impl.metrics.parser.MetricsCmmnTransformListener;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
+import org.camunda.bpm.engine.impl.migration.DefaultMigrationActivityMatcher;
+import org.camunda.bpm.engine.impl.migration.DefaultMigrationInstructionGenerator;
+import org.camunda.bpm.engine.impl.migration.MigrationActivityMatcher;
+import org.camunda.bpm.engine.impl.migration.MigrationInstructionGenerator;
+import org.camunda.bpm.engine.impl.migration.validation.activity.HasNoEventSubProcessChildActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.activity.HasNoEventSubProcessParentActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.activity.MigrationActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.activity.NotMultiInstanceChildActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedBoundaryEventActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instance.AdditionalFlowScopeActivityInstanceValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingActivityInstanceValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instance.NoActiveTransitionsActivityInstanceValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instance.NoUnmappedLeafActivityInstanceValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.OnlyOnceMappedActivityInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.SameEventScopeInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.SameTypeInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.SupportedActivitiesInstructionValidator;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
@@ -202,7 +221,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ReportManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricStatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceManager;
@@ -214,6 +232,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MeterLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ReportManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
@@ -519,6 +538,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected TenantIdProvider tenantIdProvider = null;
 
+  // Migration
+  protected MigrationActivityMatcher migrationActivityMatcher;
+
+  protected List<MigrationActivityValidator> customPreMigrationActivityValidators;
+  protected List<MigrationActivityValidator> customPostMigrationActivityValidators;
+  protected MigrationInstructionGenerator migrationInstructionGenerator;
+
+  protected List<MigrationInstructionValidator> customPreMigrationInstructionValidators;
+  protected List<MigrationInstructionValidator> customPostMigrationInstructionValidators;
+  protected List<MigrationInstructionValidator> migrationInstructionValidators;
+
+  protected List<MigratingActivityInstanceValidator> customPreMigratingActivityInstanceValidators;
+  protected List<MigratingActivityInstanceValidator> customPostMigratingActivityInstanceValidators;
+  protected List<MigratingActivityInstanceValidator> migratingActivityInstanceValidators;
+
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   @Override
@@ -574,6 +609,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initDeploymentRegistration();
     initResourceAuthorizationProvider();
     initMetrics();
+    initMigrationActivityComparator();
+    initMigrationInstructionGenerator();
+    initMigrationInstructionValidators();
+    initMigratingActivityInstanceValidators();
 
     invokePostInit();
   }
@@ -998,6 +1037,56 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     addSessionFactory(dbSqlSessionFactory);
     addSessionFactory(new DbSqlPersistenceProviderFactory());
   }
+
+  protected void initMigrationActivityComparator() {
+    if (migrationActivityMatcher == null) {
+      migrationActivityMatcher = new DefaultMigrationActivityMatcher();
+    }
+  }
+
+  protected void initMigrationInstructionGenerator() {
+    if (migrationInstructionGenerator == null) {
+      migrationInstructionGenerator = new DefaultMigrationInstructionGenerator(migrationActivityMatcher);
+    }
+
+    List<MigrationActivityValidator> migrationActivityValidators = new ArrayList<MigrationActivityValidator>();
+    if (customPreMigrationActivityValidators != null) {
+      migrationActivityValidators.addAll(customPreMigrationActivityValidators);
+    }
+    migrationActivityValidators.addAll(getDefaultMigrationActivityValidators());
+    if (customPostMigrationActivityValidators != null) {
+      migrationActivityValidators.addAll(customPostMigrationActivityValidators);
+    }
+    migrationInstructionGenerator.migrationActivityValidators(migrationActivityValidators);
+  }
+
+  protected void initMigrationInstructionValidators() {
+    if (migrationInstructionValidators == null) {
+      migrationInstructionValidators = new ArrayList<MigrationInstructionValidator>();
+      if (customPreMigrationInstructionValidators != null) {
+        migrationInstructionValidators.addAll(customPreMigrationInstructionValidators);
+      }
+      migrationInstructionValidators.addAll(getDefaultMigrationInstructionValidators());
+      if (customPostMigrationInstructionValidators != null) {
+        migrationInstructionValidators.addAll(customPostMigrationInstructionValidators);
+      }
+    }
+  }
+
+  protected void initMigratingActivityInstanceValidators() {
+    if (migratingActivityInstanceValidators == null) {
+      migratingActivityInstanceValidators = new ArrayList<MigratingActivityInstanceValidator>();
+      if (customPreMigratingActivityInstanceValidators != null) {
+        migratingActivityInstanceValidators.addAll(customPreMigratingActivityInstanceValidators);
+      }
+      migratingActivityInstanceValidators.addAll(getDefaultMigratingActivityInstanceValidators());
+      if (customPostMigratingActivityInstanceValidators != null) {
+        migratingActivityInstanceValidators.addAll(customPostMigratingActivityInstanceValidators);
+      }
+
+    }
+  }
+
 
   /**
    * When providing a schema and a prefix  the prefix has to be the schema ending with a dot.
@@ -2897,6 +2986,117 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public TenantIdProvider getTenantIdProvider() {
     return this.tenantIdProvider;
+  }
+
+  public void setMigrationActivityMatcher(MigrationActivityMatcher migrationActivityMatcher) {
+    this.migrationActivityMatcher = migrationActivityMatcher;
+  }
+
+  public MigrationActivityMatcher getMigrationActivityMatcher() {
+    return migrationActivityMatcher;
+  }
+
+
+  public void setCustomPreMigrationActivityValidators(List<MigrationActivityValidator> customPreMigrationActivityValidators) {
+    this.customPreMigrationActivityValidators = customPreMigrationActivityValidators;
+  }
+
+  public List<MigrationActivityValidator> getCustomPreMigrationActivityValidators() {
+    return customPreMigrationActivityValidators;
+  }
+
+  public void setCustomPostMigrationActivityValidators(List<MigrationActivityValidator> customPostMigrationActivityValidators) {
+    this.customPostMigrationActivityValidators = customPostMigrationActivityValidators;
+  }
+
+  public List<MigrationActivityValidator> getCustomPostMigrationActivityValidators() {
+    return customPostMigrationActivityValidators;
+  }
+
+  public List<MigrationActivityValidator> getDefaultMigrationActivityValidators() {
+    List<MigrationActivityValidator> migrationActivityValidators = new ArrayList<MigrationActivityValidator>();
+    migrationActivityValidators.add(SupportedActivityValidator.INSTANCE);
+    migrationActivityValidators.add(SupportedBoundaryEventActivityValidator.INSTANCE);
+    migrationActivityValidators.add(NotMultiInstanceChildActivityValidator.INSTANCE);
+    migrationActivityValidators.add(HasNoEventSubProcessParentActivityValidator.INSTANCE);
+    migrationActivityValidators.add(HasNoEventSubProcessChildActivityValidator.INSTANCE);
+    return migrationActivityValidators;
+  }
+
+  public void setMigrationInstructionGenerator(MigrationInstructionGenerator migrationInstructionGenerator) {
+    this.migrationInstructionGenerator = migrationInstructionGenerator;
+  }
+
+  public MigrationInstructionGenerator getMigrationInstructionGenerator() {
+    return migrationInstructionGenerator;
+  }
+
+  public void setMigrationInstructionValidators(List<MigrationInstructionValidator> migrationInstructionValidators) {
+    this.migrationInstructionValidators = migrationInstructionValidators;
+  }
+
+  public List<MigrationInstructionValidator> getMigrationInstructionValidators() {
+    return migrationInstructionValidators;
+  }
+
+  public void setCustomPostMigrationInstructionValidators(List<MigrationInstructionValidator> customPostMigrationInstructionValidators) {
+    this.customPostMigrationInstructionValidators = customPostMigrationInstructionValidators;
+  }
+
+  public List<MigrationInstructionValidator> getCustomPostMigrationInstructionValidators() {
+    return customPostMigrationInstructionValidators;
+  }
+
+  public void setCustomPreMigrationInstructionValidators(List<MigrationInstructionValidator> customPreMigrationInstructionValidators) {
+    this.customPreMigrationInstructionValidators = customPreMigrationInstructionValidators;
+  }
+
+  public List<MigrationInstructionValidator> getCustomPreMigrationInstructionValidators() {
+    return customPreMigrationInstructionValidators;
+
+  }
+
+  public List<MigrationInstructionValidator> getDefaultMigrationInstructionValidators() {
+    List<MigrationInstructionValidator> migrationInstructionValidators  = new ArrayList<MigrationInstructionValidator>();
+    migrationInstructionValidators.add(new SupportedActivitiesInstructionValidator());
+    migrationInstructionValidators.add(new SameTypeInstructionValidator());
+    migrationInstructionValidators.add(new SameEventScopeInstructionValidator());
+    migrationInstructionValidators.add(new OnlyOnceMappedActivityInstructionValidator());
+    return migrationInstructionValidators;
+  }
+
+  public void setMigratingActivityInstanceValidators(List<MigratingActivityInstanceValidator> migratingActivityInstanceValidators) {
+    this.migratingActivityInstanceValidators = migratingActivityInstanceValidators;
+  }
+
+  public List<MigratingActivityInstanceValidator> getMigratingActivityInstanceValidators() {
+    return migratingActivityInstanceValidators;
+  }
+
+  public void setCustomPostMigratingActivityInstanceValidators(List<MigratingActivityInstanceValidator> customPostMigratingActivityInstanceValidators) {
+    this.customPostMigratingActivityInstanceValidators = customPostMigratingActivityInstanceValidators;
+  }
+
+  public List<MigratingActivityInstanceValidator> getCustomPostMigratingActivityInstanceValidators() {
+    return customPostMigratingActivityInstanceValidators;
+  }
+
+  public void setCustomPreMigratingActivityInstanceValidators(List<MigratingActivityInstanceValidator> customPreMigratingActivityInstanceValidators) {
+    this.customPreMigratingActivityInstanceValidators = customPreMigratingActivityInstanceValidators;
+  }
+
+  public List<MigratingActivityInstanceValidator> getCustomPreMigratingActivityInstanceValidators() {
+    return customPreMigratingActivityInstanceValidators;
+  }
+
+  public List<MigratingActivityInstanceValidator> getDefaultMigratingActivityInstanceValidators() {
+    List<MigratingActivityInstanceValidator> migratingActivityInstanceValidators = new ArrayList<MigratingActivityInstanceValidator>();
+
+    migratingActivityInstanceValidators.add(new AdditionalFlowScopeActivityInstanceValidator());
+    migratingActivityInstanceValidators.add(new NoUnmappedLeafActivityInstanceValidator());
+    migratingActivityInstanceValidators.add(new NoActiveTransitionsActivityInstanceValidator());
+
+    return migratingActivityInstanceValidators;
   }
 
 }

@@ -14,15 +14,38 @@ package org.camunda.bpm.engine.impl.migration;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.migration.validation.activity.MigrationActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstruction;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.camunda.bpm.engine.migration.MigrationInstruction;
 
 /**
+ * Generates all migration instructions which represent a direct one
+ * to one mapping of mapped entities in two process definitions. See
+ * also {@link MigrationActivityMatcher}.
+ *
  * @author Thorben Lindhauer
  *
  */
 public interface MigrationInstructionGenerator {
 
-  List<MigrationInstruction> generate(ProcessDefinitionImpl sourceProcessDefinition,
-      ProcessDefinitionImpl targetProcessDefinition);
+  /**
+   * Sets the list of migration activity validators which validate that a activity
+   * is a candidate for the migration.
+   *
+   * @param migrationActivityValidators the list of validators to check
+   * @return this generator instance
+   */
+  MigrationInstructionGenerator migrationActivityValidators(List<MigrationActivityValidator> migrationActivityValidators);
+
+  /**
+   * Generate all migration instructions for mapped activities between two process definitions. A activity can be mapped
+   * if the {@link MigrationActivityMatcher} matches it with an activity from the target process definition.
+   *
+   * @param sourceProcessDefinition the source process definition
+   * @param targetProcessDefinition the target process definiton
+   * @return the list of generated instructions
+   */
+  List<ValidatingMigrationInstruction> generate(ProcessDefinitionImpl sourceProcessDefinition,
+                                                ProcessDefinitionImpl targetProcessDefinition);
+
 }

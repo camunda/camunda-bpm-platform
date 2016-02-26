@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.migration.MigrationInstructionImpl;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -71,11 +72,11 @@ public class MigrationPlanAssert {
 
     for (MigrationInstructionAssert instructionAssert : instructionAsserts) {
       for (MigrationInstruction instruction : actual.getInstructions()) {
-        if (instructionAssert.sourceActivityIds.equals(instruction.getSourceActivityIds())) {
+        if (instructionAssert.sourceActivityId.equals(instruction.getSourceActivityId())) {
           notFound.remove(instructionAssert);
           notExpected.remove(instruction);
           assertEquals("Target activity ids do not match for instruction " + instruction,
-            instructionAssert.targetActivityIds, instruction.getTargetActivityIds());
+            instructionAssert.targetActivityId, instruction.getTargetActivityId());
         }
       }
     }
@@ -108,41 +109,28 @@ public class MigrationPlanAssert {
     return new MigrationPlanAssert(migrationPlan);
   }
 
-  public static MigrationInstructionAssert migrate(String... sourceActivityIds) {
-    return new MigrationInstructionAssert().from(sourceActivityIds);
+  public static MigrationInstructionAssert migrate(String sourceActivityId) {
+    return new MigrationInstructionAssert().from(sourceActivityId);
   }
 
   public static class MigrationInstructionAssert {
-    protected List<String> sourceActivityIds = new ArrayList<String>();
-    protected List<String> targetActivityIds = new ArrayList<String>();
+    protected String sourceActivityId;
+    protected String targetActivityId;
 
-    public MigrationInstructionAssert from(String... sourceActivityIds) {
-      Collections.addAll(this.sourceActivityIds, sourceActivityIds);
+    public MigrationInstructionAssert from(String sourceActivityId) {
+      this.sourceActivityId = sourceActivityId;
       return this;
     }
 
-    public MigrationInstructionAssert to(String... targetActivityIds) {
-      Collections.addAll(this.targetActivityIds, targetActivityIds);
+    public MigrationInstructionAssert to(String targetActivityId) {
+      this.targetActivityId = targetActivityId;
       return this;
     }
 
     public String toString() {
-      StringBuilder builder = new StringBuilder();
-      builder.append("MigrationInstructionAssert[sourceActivities=[");
-      joinActivityIds(builder, sourceActivityIds);
-      builder.append("], targetActivityIds=[");
-      joinActivityIds(builder, targetActivityIds);
-      return  builder.append("]]").toString();
+      return new MigrationInstructionImpl(sourceActivityId, targetActivityId).toString();
     }
 
-    protected void joinActivityIds(StringBuilder builder, List<String> activityIds) {
-      for (int i = 0; i < activityIds.size(); i++) {
-        builder.append(activityIds.get(i));
-        if (i < activityIds.size() - 1) {
-          builder.append(", ");
-        }
-      }
-    }
   }
 
 }

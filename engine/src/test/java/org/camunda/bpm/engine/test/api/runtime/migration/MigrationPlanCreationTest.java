@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
 import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -149,8 +148,7 @@ public class MigrationPlanCreationTest {
       fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(1)
-        .hasFailure("thisActivityDoesNotExist", "the mapped activities are either null or not supported");
+        .hasInstructionFailures("thisActivityDoesNotExist", "Source activity 'thisActivityDoesNotExist' does not exist");
     }
   }
 
@@ -167,8 +165,7 @@ public class MigrationPlanCreationTest {
       fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(1)
-        .hasFailure(null, "the mapped activities are either null or not supported");
+        .hasInstructionFailures(null, "Source activity id is null");
     }
   }
 
@@ -185,8 +182,7 @@ public class MigrationPlanCreationTest {
       fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(1)
-        .hasFailure("userTask", "the mapped activities are either null or not supported");
+        .hasInstructionFailures("userTask", "Target activity 'thisActivityDoesNotExist' does not exist");
     }
   }
 
@@ -203,8 +199,7 @@ public class MigrationPlanCreationTest {
       fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(1)
-        .hasFailure("userTask", "the mapped activities are either null or not supported");
+        .hasInstructionFailures("userTask", "Target activity id is null");
     }
   }
 
@@ -240,8 +235,10 @@ public class MigrationPlanCreationTest {
       fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(1)
-        .hasFailure("userTask", "the mapped activities are either null or not supported");
+        .hasInstructionFailures("userTask",
+          "Type of the target activity 'receiveTask' is not supported by the migration",
+          "Activities are of different type which is not supported by the migration (userTask != receiveTask)"
+        );
     }
   }
 
@@ -260,8 +257,7 @@ public class MigrationPlanCreationTest {
       fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(1)
-        .hasFailure("userTask", "the mapped activities must have the same type");
+        .hasInstructionFailures("userTask", "Activities are of different type which is not supported by the migration (userTask != subProcess)");
     }
   }
 
@@ -287,8 +283,7 @@ public class MigrationPlanCreationTest {
       fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(1)
-        .hasFailure("boundary", "the mapped activities must have the same type");
+        .hasInstructionFailures("boundary", "Activities are of different type which is not supported by the migration (boundaryMessage != boundarySignal)");
     }
   }
 
@@ -305,8 +300,7 @@ public class MigrationPlanCreationTest {
       fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(1)
-        .hasFailure("subProcess", "the mapped activities are either null or not supported");
+        .hasInstructionFailures("subProcess", "Target activity '" + targetDefinition.getId() + "' does not exist");
     }
   }
 
@@ -329,8 +323,10 @@ public class MigrationPlanCreationTest {
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(1)
-        .hasFailure("userTask", "the mapped activities are either null or not supported");
+        .hasInstructionFailures("userTask",
+          "Source activity 'userTask' is child of a multi instances",
+          "Target activity 'userTask' is child of a multi instances"
+        );
     }
   }
 
@@ -438,8 +434,7 @@ public class MigrationPlanCreationTest {
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(1)
-        .hasFailure("boundary", "the mapped boundary event has be migrated together with the activity it is attached to");
+        .hasInstructionFailures("boundary", "Event scope of the activity has changed and wasn't migrated");
     }
   }
 
@@ -526,8 +521,7 @@ public class MigrationPlanCreationTest {
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(1)
-        .hasFailure("boundary", "the mapped boundary event has be migrated together with the activity it is attached to");
+        .hasInstructionFailures("boundary", "Event scope of the activity has changed and wasn't migrated");
     }
   }
 
@@ -556,8 +550,7 @@ public class MigrationPlanCreationTest {
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(1)
-        .hasFailure("boundary", "the mapped boundary event has be migrated together with the activity it is attached to");
+        .hasInstructionFailures("boundary", "Event scope of the activity has changed and wasn't migrated");
     }
   }
 
@@ -585,9 +578,14 @@ public class MigrationPlanCreationTest {
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(2)
-        .hasFailure("error", "the mapped activities are either null or not supported")
-        .hasFailure("escalation", "the mapped activities are either null or not supported");
+        .hasInstructionFailures("error",
+          "Type of the source boundary event 'error' is not supported by migration",
+          "Type of the target boundary event 'error' is not supported by migration"
+        )
+        .hasInstructionFailures("escalation",
+          "Type of the source boundary event 'escalation' is not supported by migration",
+          "Type of the target boundary event 'escalation' is not supported by migration"
+        );
     }
 
   }
@@ -615,8 +613,10 @@ public class MigrationPlanCreationTest {
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(1)
-        .hasFailure("userTask", "the mapped activities are either null or not supported");
+        .hasInstructionFailures("userTask",
+          "Source activity 'userTask' has an event sub process child",
+          "Target activity 'userTask' has an event sub process child"
+        );
     }
   }
 
@@ -644,8 +644,10 @@ public class MigrationPlanCreationTest {
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(1)
-        .hasFailure("subProcess", "the mapped activities are either null or not supported");
+        .hasInstructionFailures("subProcess",
+          "Source activity 'subProcess' has an event sub process child",
+          "Target activity 'subProcess' has an event sub process child"
+        );
     }
   }
 
@@ -701,8 +703,32 @@ public class MigrationPlanCreationTest {
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasFailures(1)
-        .hasFailure("innerTask", "the mapped activities are either null or not supported");
+        .hasInstructionFailures("innerTask",
+          "Source activity 'innerTask' is child of an event sub process",
+          "Target activity 'innerTask' is child of an event sub process"
+        );
+    }
+  }
+
+  @Test
+  public void testNotMapActivitiesMoreThanOnce() {
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+
+    try {
+      runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1")
+        .mapActivities("userTask1", "userTask2")
+        .build();
+      fail("Should not succeed");
+    }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("userTask1",
+          "There are multiple mappings for source activity id 'userTask1'",
+          "There are multiple mappings for source activity id 'userTask1'"
+        );
     }
   }
 

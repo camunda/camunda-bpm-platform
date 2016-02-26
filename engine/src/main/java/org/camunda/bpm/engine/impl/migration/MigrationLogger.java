@@ -12,20 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.migration;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidationReportImpl;
-import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationReportImpl;
+import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingProcessInstanceValidationReportImpl;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationPlanValidationReportImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationException;
+import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
-import org.camunda.bpm.engine.runtime.ActivityInstance;
-import org.camunda.bpm.engine.runtime.ProcessElementInstance;
-import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 /**
  * @author Thorben Lindhauer
@@ -33,11 +26,14 @@ import org.camunda.bpm.engine.runtime.TransitionInstance;
  */
 public class MigrationLogger extends ProcessEngineLogger {
 
-  public ProcessEngineException unmappedActivityInstances(String processInstanceId, Set<ActivityInstance> unmappedInstances) {
-    return new ProcessEngineException(exceptionMessage(
-        "001",
-        "Process instance '{}' cannot be migrated. There are no migration instructions that apply to the following activity instances: {}",
-        processInstanceId, formatProcessElementInstances(unmappedInstances)));
+  public MigrationPlanValidationException failingMigrationPlanValidation(MigrationPlanValidationReportImpl validationReport) {
+    StringBuilder sb = new StringBuilder();
+    validationReport.writeTo(sb);
+    return new MigrationPlanValidationException(exceptionMessage(
+      "001",
+      "{}",
+      sb.toString()),
+      validationReport);
   }
 
   public ProcessEngineException processDefinitionOfInstanceDoesNotMatchMigrationPlan(ExecutionEntity processInstance, String processDefinitionId) {
@@ -48,50 +44,22 @@ public class MigrationLogger extends ProcessEngineLogger {
     ));
   }
 
-  public MigrationInstructionInstanceValidationException failingInstructionInstanceValidation(MigrationInstructionInstanceValidationReportImpl validationReport) {
-    StringBuilder sb = new StringBuilder();
-    validationReport.writeTo(sb);
-    return new MigrationInstructionInstanceValidationException(exceptionMessage("003", "Cannot migrate process instance '{}': {}",
-      validationReport.getMigratingProcessInstance().getProcessInstanceId(),
-      sb.toString()), validationReport);
-  }
-
-  public MigrationPlanValidationException failingMigrationPlanValidation(MigrationPlanValidationReportImpl validationReport) {
-    StringBuilder sb = new StringBuilder();
-    validationReport.writeTo(sb);
-    return new MigrationPlanValidationException(exceptionMessage("004", "Cannot migrate process definition '{}' to '{}': {}",
-      validationReport.getMigrationPlan().getSourceProcessDefinitionId(),
-      validationReport.getMigrationPlan().getTargetProcessDefinitionId(),
-      sb.toString()), validationReport);
-  }
-
   public ProcessEngineException processInstanceDoesNotExist(String processInstanceId) {
     return new ProcessEngineException(exceptionMessage(
-      "005",
+      "003",
       "Process instance '{}' cannot be migrated. The process instance does not exist",
       processInstanceId
     ));
   }
 
-  public ProcessEngineException processInstanceContainsAsyncTransitions(String processInstanceId, Set<TransitionInstance> transitionInstances) {
-    return new ProcessEngineException(exceptionMessage(
-      "006",
-      "Process instance '{}' cannot be migrated. There are asynchronous transitions active in the process instance: {}",
-        processInstanceId, formatProcessElementInstances(transitionInstances)
-    ));
-  }
-
-  protected String formatProcessElementInstances(Collection<? extends  ProcessElementInstance> processElementInstance) {
+  public MigratingProcessInstanceValidationException failingMigratingProcessInstanceValidation(MigratingProcessInstanceValidationReportImpl validationReport) {
     StringBuilder sb = new StringBuilder();
-
-    Iterator<? extends ProcessElementInstance> iterator = processElementInstance.iterator();
-    while (iterator.hasNext()) {
-      sb.append(iterator.next().getId());
-      if (iterator.hasNext()) {
-        sb.append(", ");
-      }
-    }
-
-    return sb.toString();
+    validationReport.writeTo(sb);
+    return new MigratingProcessInstanceValidationException(exceptionMessage(
+      "004",
+      "{}",
+      sb.toString()),
+      validationReport);
   }
+
 }

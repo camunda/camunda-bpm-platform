@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -20,9 +21,11 @@ import java.util.Collections;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
@@ -80,7 +83,7 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.startsWith("ENGINE-23005"));
+      assertThat(e.getMessage(), CoreMatchers.startsWith("ENGINE-23003"));
     }
   }
 
@@ -119,8 +122,10 @@ public class MigrationProcessInstanceTest {
       testHelper.createProcessInstanceAndMigrate(migrationPlan);
       fail("Should not be able to migrate");
     }
-    catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.startsWith("ENGINE-23006"));
+    catch (MigratingProcessInstanceValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasFailures("Process instance contains not migrated jobs")
+        .hasActivityInstanceFailures(sourceProcessDefinition.getId(), "Has active asynchronous child transitions");
     }
   }
 
@@ -141,8 +146,10 @@ public class MigrationProcessInstanceTest {
       testHelper.createProcessInstanceAndMigrate(migrationPlan);
       fail("Should not be able to migrate");
     }
-    catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.startsWith("ENGINE-23006"));
+    catch (MigratingProcessInstanceValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasFailures("Process instance contains not migrated jobs")
+        .hasActivityInstanceFailures("subProcess3", "Has active asynchronous child transitions");
     }
   }
 

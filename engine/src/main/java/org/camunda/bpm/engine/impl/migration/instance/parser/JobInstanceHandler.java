@@ -46,7 +46,7 @@ public class JobInstanceHandler implements MigratingDependentInstanceParseHandle
 
       if (timerJobMigrationInstruction != null) {
         // the timer job is migrated
-        ActivityImpl timerJobTargetActivity = parseContext.getTargetProcessDefinition().findActivity(timerJobMigrationInstruction.getTargetActivityIds().get(0));
+        ActivityImpl timerJobTargetActivity = parseContext.getTargetProcessDefinition().findActivity(timerJobMigrationInstruction.getTargetActivityId());
         migratingActivityIds.add(timerJobTargetActivity.getId());
         JobDefinitionEntity targetJobDefinitionEntity = parseContext.getTargetJobDefinition(timerJobTargetActivity.getActivityId(), job.getJobHandlerType());
         MigratingJobInstance migratingTimerJobInstance = new MigratingJobInstance(job, targetJobDefinitionEntity, timerJobTargetActivity);

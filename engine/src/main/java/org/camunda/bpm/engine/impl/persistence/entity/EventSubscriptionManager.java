@@ -65,7 +65,7 @@ public class EventSubscriptionManager extends AbstractManager {
     getDbEntityManager().flushEntity(persistentObject);
   }
 
-  public EventSubscriptionEntity findEventSubscriptionbyId(String id) {
+  public EventSubscriptionEntity findEventSubscriptionById(String id) {
     return (EventSubscriptionEntity) getDbEntityManager().selectOne("selectEventSubscription", id);
   }
 
