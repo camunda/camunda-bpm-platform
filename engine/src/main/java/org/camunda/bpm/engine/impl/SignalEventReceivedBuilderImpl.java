@@ -44,7 +44,7 @@ public class SignalEventReceivedBuilderImpl implements SignalEventReceivedBuilde
   }
 
   @Override
-  public SignalEventReceivedBuilder variables(Map<String, Object> variables) {
+  public SignalEventReceivedBuilder setVariables(Map<String, Object> variables) {
     if (variables != null) {
 
       if (this.variables == null) {

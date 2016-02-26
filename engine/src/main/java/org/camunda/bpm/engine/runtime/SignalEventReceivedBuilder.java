@@ -33,7 +33,7 @@ public interface SignalEventReceivedBuilder {
    *          a map of variables added to the executions
    * @return the builder
    */
-  SignalEventReceivedBuilder variables(Map<String, Object> variables);
+  SignalEventReceivedBuilder setVariables(Map<String, Object> variables);
 
   /**
    * Specify a single execution to deliver the signal to.
