@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.variable.value.ObjectValue;
 
 /**
  * @author Daniel Meyer
+ * @author Jan Vladimir Mostert
  */
 public class SignalEventTest extends PluggableProcessEngineTestCase {
 
@@ -513,5 +514,97 @@ public class SignalEventTest extends PluggableProcessEngineTestCase {
     assertEquals(FailingJavaSerializable.class.getName(), variableTyped.getObjectTypeName());
     assertEquals(SerializationDataFormats.JAVA.getName(), variableTyped.getSerializationDataFormat());
   }
+
+  /**
+   * Test that signal can be caught in a multi-tenant context given that both process instances
+   * are using a tenant id of null
+   */
+  public void testSignalCatchIntermediateInsideMultiTenantContextWithNullTenantId(){
+
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml").
+        tenantId(null).deploy();
+
+    runtimeService.startProcessInstanceByKey("catchSignal");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml").
+        tenantId(null).deploy();
+
+    runtimeService.startProcessInstanceByKey("throwSignal");
+
+    // we're expecting the signal to be caught due to tenants having the same id
+    assertEquals(0, createEventSubscriptionQuery().count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+
+  }
+
+  /**
+   * Test that signal can be caught in a multi-tenant context given that both process instances
+   * are using the same tenant id
+   */
+  public void testSignalCatchIntermediateInsideMultiTenantContextWithSameTenantId(){
+
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml").
+        tenantId("3").deploy();
+
+    runtimeService.startProcessInstanceByKey("catchSignal");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml").
+        tenantId("3").deploy();
+
+    runtimeService.startProcessInstanceByKey("throwSignal");
+
+    // we're expecting the signal to be caught due to tenants having the same id
+    assertEquals(0, createEventSubscriptionQuery().count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+
+  }
+
+  /**
+   * Test that signal is not caught in a multi-tenant context given that both process instances
+   * are using different tenant ids
+   */
+  public void testSignalCatchIntermediateInsideMultiTenantContextWithDifferentTenantId(){
+
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml").
+        tenantId("2").deploy();
+
+    runtimeService.startProcessInstanceByKey("catchSignal");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml").
+        tenantId("1").deploy();
+
+    runtimeService.startProcessInstanceByKey("throwSignal");
+
+    // we're expecting the signal to be caught due to tenants having the same id
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+
+  }
+
+
 
 }
