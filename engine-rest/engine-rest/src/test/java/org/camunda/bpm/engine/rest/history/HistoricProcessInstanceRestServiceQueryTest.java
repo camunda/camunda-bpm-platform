@@ -396,7 +396,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID, returnedSuperProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_CASE_INSTANCE_ID, returnedSuperCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID, returnedCaseInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_TENANT_ID, returnedTenantId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
   }
 
   @Test
@@ -989,7 +989,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
 
   @Test
   public void testTenantIdListParameter() {
-    mockedQuery = setUpMockHistoricProcessInstanceQuery(createMockExecutionsTwoTenants());
+    mockedQuery = setUpMockHistoricProcessInstanceQuery(createMockHistoricProcessInstancesTwoTenants());
 
     Response response = given()
       .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
@@ -1014,7 +1014,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
 
   @Test
   public void testTenantIdListPostParameter() {
-    mockedQuery = setUpMockHistoricProcessInstanceQuery(createMockExecutionsTwoTenants());
+    mockedQuery = setUpMockHistoricProcessInstanceQuery(createMockHistoricProcessInstancesTwoTenants());
 
     Map<String, Object> queryParameters = new HashMap<String, Object>();
     queryParameters.put("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST.split(","));
@@ -1041,7 +1041,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
   }
 
-  private List<HistoricProcessInstance> createMockExecutionsTwoTenants() {
+  private List<HistoricProcessInstance> createMockHistoricProcessInstancesTwoTenants() {
     return Arrays.asList(
         MockProvider.createMockHistoricProcessInstance(MockProvider.EXAMPLE_TENANT_ID),
         MockProvider.createMockHistoricProcessInstance(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));

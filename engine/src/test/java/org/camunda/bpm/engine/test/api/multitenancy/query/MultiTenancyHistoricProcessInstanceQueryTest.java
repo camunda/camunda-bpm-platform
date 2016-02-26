@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
@@ -36,18 +35,14 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
   protected void setUp() {
     BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
       .startEvent()
-      .userTask()
       .endEvent()
     .done();
 
     deploymentForTenant(TENANT_ONE, oneTaskProcess);
     deploymentForTenant(TENANT_TWO, oneTaskProcess);
 
-    ProcessInstance processInstanceOne = startProcessInstanceForTenant(TENANT_ONE);
-    ProcessInstance processInstanceTwo = startProcessInstanceForTenant(TENANT_TWO);
-    
-    completeProcessInstance(processInstanceOne);
-    completeProcessInstance(processInstanceTwo);
+    startProcessInstanceForTenant(TENANT_ONE);
+    startProcessInstanceForTenant(TENANT_TWO);
   }
 
   public void testQueryWithoutTenantId() {
@@ -120,19 +115,9 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
   }
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant) {
-    String processDefinitionId = repositoryService
-      .createProcessDefinitionQuery()
-      .tenantIdIn(tenant)
-      .singleResult()
-      .getId();
-
-    return runtimeService.startProcessInstanceById(processDefinitionId);
-  }
-  
-  protected void completeProcessInstance(ProcessInstance processInstance) {
-    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-    assertEquals(1, tasks.size());
-    taskService.complete(tasks.get(0).getId());
+    return runtimeService.createProcessInstanceByKey("testProcess")
+        .processDefinitionTenantId(tenant)
+        .execute();
   }
 
 }

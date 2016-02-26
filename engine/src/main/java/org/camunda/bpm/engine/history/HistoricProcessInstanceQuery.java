@@ -210,7 +210,7 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
 
   /**
    * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of process instances without tenant id is database-specific.
+   * Note that the ordering of historic process instances without tenant id is database-specific.
    */
   HistoricProcessInstanceQuery orderByTenantId();
 
@@ -219,19 +219,23 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   /** Only select historic process instances that were started as of the provided
    * date. (Date will be adjusted to reflect midnight)
    * @deprecated will be removed in 5.12, use {@link #startedAfter(Date)} and {@link #startedBefore(Date)} instead */
+  @Deprecated
   HistoricProcessInstanceQuery startDateBy(Date date);
 
   /** Only select historic process instances that were started on the provided date.
    * @deprecated will be removed in 5.12, use {@link #startedAfter(Date)} and {@link #startedBefore(Date)} instead */
+  @Deprecated
   HistoricProcessInstanceQuery startDateOn(Date date);
 
   /** Only select historic process instances that were finished as of the
    * provided date. (Date will be adjusted to reflect one second before midnight)
    * @deprecated will be removed in 5.12, use {@link #startedAfter(Date)} and {@link #startedBefore(Date)} instead */
+  @Deprecated
   HistoricProcessInstanceQuery finishDateBy(Date date);
 
   /** Only select historic process instances that were finished on provided date.
    * @deprecated will be removed in 5.12, use {@link #startedAfter(Date)} and {@link #startedBefore(Date)} instead */
+  @Deprecated
   HistoricProcessInstanceQuery finishDateOn(Date date);
 
 }
