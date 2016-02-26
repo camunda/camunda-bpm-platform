@@ -111,6 +111,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String executionId = execution.getId();
     // the given execution is the process instance!
     String caseInstanceId = execution.getCaseInstanceId();
+    String tenantId = execution.getTenantId();
 
     ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
     String processDefinitionKey = null;
@@ -126,6 +127,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setExecutionId(executionId);
     evt.setBusinessKey(execution.getProcessBusinessKey());
     evt.setCaseInstanceId(caseInstanceId);
+    evt.setTenantId(tenantId);
 
     if (execution.getSuperCaseExecution() != null) {
       evt.setSuperCaseInstanceId(execution.getSuperCaseExecution().getCaseInstanceId());

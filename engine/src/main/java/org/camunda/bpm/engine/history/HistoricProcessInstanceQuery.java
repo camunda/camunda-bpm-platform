@@ -205,6 +205,15 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
    */
   HistoricProcessInstanceQuery subCaseInstanceId(String subCaseInstanceId);
 
+  /** Only select historic process instances with one of the given tenant ids. */
+  HistoricProcessInstanceQuery tenantIdIn(String... tenantIds);
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of process instances without tenant id is database-specific.
+   */
+  HistoricProcessInstanceQuery orderByTenantId();
+
   // below is deprecated and should be removed in 5.12
 
   /** Only select historic process instances that were started as of the provided

@@ -29,5 +29,6 @@ public interface HistoricProcessInstanceQueryProperty {
   public static final QueryProperty START_TIME = new QueryPropertyImpl("START_TIME_");
   public static final QueryProperty END_TIME = new QueryPropertyImpl("END_TIME_");
   public static final QueryProperty DURATION = new QueryPropertyImpl("DURATION_");
+  public static final QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
 
 }

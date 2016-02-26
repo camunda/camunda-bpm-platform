@@ -431,6 +431,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUB_PROCESS_INSTANCE_ID = "aSubProcessInstanceId";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID = "aCaseInstanceId";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUB_CASE_INSTANCE_ID = "aSubCaseInstanceId";
+  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_TENANT_ID = "aTenantId";
 
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER = "2013-04-23T13:42:43";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE = "2013-01-23T13:42:43";
@@ -1635,6 +1636,10 @@ public abstract class MockProvider {
   }
 
   public static HistoricProcessInstance createMockHistoricProcessInstance() {
+    return createMockHistoricProcessInstance(EXAMPLE_TENANT_ID);
+  }
+
+  public static HistoricProcessInstance createMockHistoricProcessInstance(String tenantId) {
     HistoricProcessInstance mock = mock(HistoricProcessInstance.class);
 
     when(mock.getId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
@@ -1650,6 +1655,7 @@ public abstract class MockProvider {
     when(mock.getSuperProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID);
     when(mock.getSuperCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_CASE_INSTANCE_ID);
     when(mock.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID);
+    when(mock.getTenantId()).thenReturn(tenantId);
 
     return mock;
   }

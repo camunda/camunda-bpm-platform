@@ -44,6 +44,9 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
   /** id of the activity which ended the process instance */
   protected String startActivityId;
 
+  /** id of the tenant which belongs to the process instance  */
+  protected String tenantId;
+
   // getters / setters ////////////////////////////////////////
 
   public String getEndActivityId() {
@@ -102,6 +105,14 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
     this.deleteReason = deleteReason;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -120,6 +131,7 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
            + ", executionId=" + executionId
            + ", processDefinitionId=" + processDefinitionId
            + ", processInstanceId=" + processInstanceId
+           + ", tenantId=" + tenantId
            + "]";
   }
 

@@ -43,6 +43,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private static final String SORT_BY_PROCESS_INSTANCE_START_TIME_VALUE = "startTime";
   private static final String SORT_BY_PROCESS_INSTANCE_END_TIME_VALUE = "endTime";
   private static final String SORT_BY_PROCESS_INSTANCE_DURATION_VALUE = "duration";
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -53,6 +54,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_START_TIME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_END_TIME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_DURATION_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   private String processInstanceId;
@@ -76,6 +78,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private String superCaseInstanceId;
   private String subCaseInstanceId;
   private String caseInstanceId;
+  private List<String> tenantIds;
 
   private List<VariableQueryParameterDto> variables;
 
@@ -195,6 +198,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.variables = variables;
   }
 
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -271,6 +279,9 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     if (caseInstanceId != null) {
       query.caseInstanceId(caseInstanceId);
     }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
 
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {
@@ -313,6 +324,8 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
       query.orderByProcessInstanceEndTime();
     } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_DURATION_VALUE)) {
       query.orderByProcessInstanceDuration();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 
