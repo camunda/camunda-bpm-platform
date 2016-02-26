@@ -96,7 +96,7 @@ public class EventSubscriptionManager extends AbstractManager {
   }
 
   /**
-   * Find all signal event subscriptions with the given event name and tenant.
+   * find all signal event subscriptions with the given event name and tenant.
    */
   @SuppressWarnings("unchecked")
   public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByEventNameAndTenantId(String eventName, String tenantId) {
@@ -105,7 +105,8 @@ public class EventSubscriptionManager extends AbstractManager {
     Map<String, Object> parameter = new HashMap<String, Object>();
     parameter.put("eventName", eventName);
     parameter.put("tenantId", tenantId);
-    Set<SignalEventSubscriptionEntity> eventSubscriptions = new HashSet<SignalEventSubscriptionEntity>( getDbEntityManager().selectList(query, parameter));
+    Set<SignalEventSubscriptionEntity> eventSubscriptions =
+        new HashSet<SignalEventSubscriptionEntity>( getDbEntityManager().selectList(query, parameter));
 
     // add events created in this command (not visible yet in query)
     for (SignalEventSubscriptionEntity entity : createdSignalSubscriptions) {

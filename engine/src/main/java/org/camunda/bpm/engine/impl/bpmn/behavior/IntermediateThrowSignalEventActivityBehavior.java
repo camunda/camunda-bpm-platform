@@ -48,8 +48,8 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
     final EventSubscriptionManager eventSubscriptionManager = Context.getCommandContext().getEventSubscriptionManager();
 
     // trigger all event subscriptions for the signal (start and intermediate)
-    List<SignalEventSubscriptionEntity> catchSignalEventSubscription = eventSubscriptionManager
-      .findSignalEventSubscriptionsByEventName(signalDefinition.getEventName());
+    List<SignalEventSubscriptionEntity> catchSignalEventSubscription = eventSubscriptionManager.
+        findSignalEventSubscriptionsByEventNameAndTenantId(signalDefinition.getEventName(), execution.getTenantId());
     for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : catchSignalEventSubscription) {
       if(isActiveEventSubscription(signalEventSubscriptionEntity)){
         signalEventSubscriptionEntity.eventReceived(null, signalDefinition.isAsync());
