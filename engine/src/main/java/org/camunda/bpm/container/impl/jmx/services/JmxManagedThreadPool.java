@@ -51,7 +51,7 @@ public class JmxManagedThreadPool extends SeExecutorService implements JmxManage
     // Waits for 1 minute to finish all currently executing jobs
     try {
       if(!threadPoolExecutor.awaitTermination(60L, TimeUnit.SECONDS)) {
-        LOG.timeoutDuringSutdownOfThreadPool(60, TimeUnit.SECONDS);
+        LOG.timeoutDuringShutdownOfThreadPool(60, TimeUnit.SECONDS);
       }
     }
     catch (InterruptedException e) {
