@@ -25,7 +25,7 @@ import org.camunda.bpm.container.impl.spi.ServiceTypes;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
- * <p>Deployment operation step that is responsible for stopping all process applications</p>
+ * <p>Deployment operation step that is responsible for stopping (undeploying) all process applications</p>
  *
  * @author Daniel Meyer
  *
