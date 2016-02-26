@@ -100,6 +100,7 @@ drop index ACT_IDX_TASK_PROC_DEF_ID;
 drop index ACT_IDX_METER_LOG;
 drop index ACT_IDX_AUTH_RESOURCE_ID;
 drop index ACT_IDX_EXT_TASK_TOPIC;
+drop index ACT_IDX_EXT_TASK_EXEC;
 
 drop index ACT_IDX_BYTEARRAY_NAME;
 drop index ACT_IDX_DEPLOYMENT_NAME;
