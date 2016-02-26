@@ -536,7 +536,7 @@ public class SignalEventTest extends PluggableProcessEngineTestCase {
 
     runtimeService.startProcessInstanceByKey("throwSignal");
 
-    // we're expecting the signal to be caught due to tenants having the same id
+    // we're expecting the signal to be caught due to tenants having the same null id
     assertEquals(0, createEventSubscriptionQuery().count());
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
@@ -596,7 +596,7 @@ public class SignalEventTest extends PluggableProcessEngineTestCase {
 
     runtimeService.startProcessInstanceByKey("throwSignal");
 
-    // we're expecting the signal to be caught due to tenants having the same id
+    // we're expecting the signal to be caught due to tenants having the different ids
     assertEquals(1, createEventSubscriptionQuery().count());
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
 
