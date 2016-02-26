@@ -14,6 +14,7 @@ create table ACT_HI_PROCINST (
     SUPER_CASE_INSTANCE_ID_ varchar(64),
     CASE_INST_ID_ varchar(64),
     DELETE_REASON_ varchar(4000),
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -38,6 +39,7 @@ create table ACT_HI_ACTINST (
     DURATION_ bigint,
     ACT_INST_STATE_ integer,
     SEQUENCE_COUNTER_ bigint,
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -65,6 +67,7 @@ create table ACT_HI_TASKINST (
     PRIORITY_ integer,
     DUE_DATE_ timestamp,
     FOLLOW_UP_DATE_ timestamp,
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -88,6 +91,7 @@ create table ACT_HI_VARINST (
     LONG_ bigint,
     TEXT_ varchar(4000),
     TEXT2_ varchar(4000),
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -115,6 +119,7 @@ create table ACT_HI_DETAIL (
     TEXT_ varchar(4000),
     TEXT2_ varchar(4000),
     SEQUENCE_COUNTER_ bigint,
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -184,6 +189,7 @@ create table ACT_HI_INCIDENT (
   ROOT_CAUSE_INCIDENT_ID_ varchar(64),
   CONFIGURATION_ varchar(255),
   INCIDENT_STATE_ integer,
+  TENANT_ID_ varchar(64),
   primary key (ID_)
 );
 
@@ -207,17 +213,22 @@ create table ACT_HI_JOB_LOG (
     PROCESS_DEF_KEY_ varchar(255),
     DEPLOYMENT_ID_ varchar(64),
     SEQUENCE_COUNTER_ bigint,
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
 create index ACT_IDX_HI_PRO_INST_END on ACT_HI_PROCINST(END_TIME_);
 create index ACT_IDX_HI_PRO_I_BUSKEY on ACT_HI_PROCINST(BUSINESS_KEY_);
+create index ACT_IDX_HI_PRO_INST_TENANT_ID on ACT_HI_PROCINST(TENANT_ID_);
 
 create index ACT_IDX_HI_ACT_INST_START on ACT_HI_ACTINST(START_TIME_);
 create index ACT_IDX_HI_ACT_INST_END on ACT_HI_ACTINST(END_TIME_);
 create index ACT_IDX_HI_ACT_INST_PROCINST on ACT_HI_ACTINST(PROC_INST_ID_, ACT_ID_);
 create index ACT_IDX_HI_ACT_INST_COMP on ACT_HI_ACTINST(EXECUTION_ID_, ACT_ID_, END_TIME_, ID_);
 create index ACT_IDX_HI_ACT_INST_STATS on ACT_HI_ACTINST(PROC_DEF_ID_, ACT_ID_, END_TIME_, ACT_INST_STATE_);
+create index ACT_IDX_HI_ACT_INST_TENANT_ID on ACT_HI_ACTINST(TENANT_ID_);
+
+create index ACT_IDX_HI_TASK_INST_TENANT_ID on ACT_HI_TASKINST(TENANT_ID_);
 
 create index ACT_IDX_HI_DETAIL_PROC_INST on ACT_HI_DETAIL(PROC_INST_ID_);
 create index ACT_IDX_HI_DETAIL_ACT_INST on ACT_HI_DETAIL(ACT_INST_ID_);
@@ -226,10 +237,15 @@ create index ACT_IDX_HI_DETAIL_CASE_EXEC on ACT_HI_DETAIL(CASE_EXECUTION_ID_);
 create index ACT_IDX_HI_DETAIL_TIME on ACT_HI_DETAIL(TIME_);
 create index ACT_IDX_HI_DETAIL_NAME on ACT_HI_DETAIL(NAME_);
 create index ACT_IDX_HI_DETAIL_TASK_ID on ACT_HI_DETAIL(TASK_ID_);
+create index ACT_IDX_HI_DETAIL_TENANT_ID on ACT_HI_DETAIL(TENANT_ID_);
 
 create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_VARINST(PROC_INST_ID_);
 create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_VARINST(NAME_, VAR_TYPE_);
 create index ACT_IDX_HI_CASEVAR_CASE_INST on ACT_HI_VARINST(CASE_INST_ID_);
+create index ACT_IDX_HI_VAR_INST_TENANT_ID on ACT_HI_VARINST(TENANT_ID_);
+
+create index ACT_IDX_HI_INCIDENT_TENANT_ID on ACT_HI_INCIDENT(TENANT_ID_);
 
 create index ACT_IDX_HI_JOB_LOG_PROCINST on ACT_HI_JOB_LOG(PROCESS_INSTANCE_ID_);
 create index ACT_IDX_HI_JOB_LOG_PROCDEF on ACT_HI_JOB_LOG(PROCESS_DEF_ID_);
+create index ACT_IDX_HI_JOB_LOG_TENANT_ID on ACT_HI_JOB_LOG(TENANT_ID_);
