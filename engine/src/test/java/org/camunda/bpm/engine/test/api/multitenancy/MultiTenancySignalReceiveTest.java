@@ -23,7 +23,6 @@ import java.util.List;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -92,11 +91,10 @@ public class MultiTenancySignalReceiveTest extends PluggableProcessEngineTestCas
   }
 
   public void testSendSignalToIntermediateCatchEventForNonTenant() {
-    String deploymentId = deployment(SIGNAL_CATCH_PROCESS);
+    deployment(SIGNAL_CATCH_PROCESS);
     deploymentForTenant(TENANT_ONE, SIGNAL_CATCH_PROCESS);
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult();
-    runtimeService.createProcessInstanceById(processDefinition.getId()).execute();
+    runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionWithoutTenantId().execute();
     runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
 
     runtimeService.createSignalEvent("signal").withoutTenantId().send();
@@ -144,11 +142,10 @@ public class MultiTenancySignalReceiveTest extends PluggableProcessEngineTestCas
   }
 
   public void testSendSignalToStartAndIntermediateCatchEventForNonTenant() {
-    String deploymentId = deployment(SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
+    deployment(SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
     deploymentForTenant(TENANT_ONE, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).processDefinitionKey("signalCatch").singleResult();
-    runtimeService.createProcessInstanceById(processDefinition.getId()).execute();
+    runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionWithoutTenantId().execute();
     runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
 
     runtimeService.createSignalEvent("signal").withoutTenantId().send();
