@@ -44,34 +44,41 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     super(engineName, objectMapper);
   }
 
-	@Override
 	public ProcessDefinitionResource getProcessDefinitionByKey(String processDefinitionKey) {
-    if(processDefinitionKey == null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Query parameter 'processDefinitionKey' cannot be null");
-    }
 
-    List<ProcessDefinition> processDefinitions = getProcessEngine()
+	  ProcessDefinition processDefinition = getProcessEngine()
         .getRepositoryService()
         .createProcessDefinitionQuery()
         .processDefinitionKey(processDefinitionKey)
+        .withoutTenantId()
         .latestVersion()
-        .list();
+        .singleResult();
 
-    if(processDefinitions.isEmpty()){
-      String errorMessage = String.format("No matching process definition with key: %s ", processDefinitionKey);
+    if(processDefinition == null){
+      String errorMessage = String.format("No matching process definition with key: %s and no tenant-id", processDefinitionKey);
       throw new RestException(Status.NOT_FOUND, errorMessage);
 
-    } else if(processDefinitions.size() > 1) {
-      String errorMessage = String.format(
-          "Found multiple process definition with key '%s' for different tenants. You have to request the process definition by id instead of key.",
-          processDefinitionKey);
-      throw new RestException(Status.BAD_REQUEST, errorMessage);
+    } else {
+      return getProcessDefinitionById(processDefinition.getId());
+    }
+	}
+
+	public ProcessDefinitionResource getProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
+
+    ProcessDefinition processDefinition = getProcessEngine()
+        .getRepositoryService()
+        .createProcessDefinitionQuery()
+        .processDefinitionKey(processDefinitionKey)
+        .tenantIdIn(tenantId)
+        .latestVersion()
+        .singleResult();
+
+    if (processDefinition == null) {
+      String errorMessage = String.format("No matching process definition with key: %s and tenant-id: %s", processDefinitionKey, tenantId);
+      throw new RestException(Status.NOT_FOUND, errorMessage);
 
     } else {
-      ProcessDefinition processDefinition = processDefinitions.get(0);
-      ProcessDefinitionResource processDefinitionResource = getProcessDefinitionById(processDefinition.getId());
-
-      return processDefinitionResource;
+      return getProcessDefinitionById(processDefinition.getId());
     }
   }
 

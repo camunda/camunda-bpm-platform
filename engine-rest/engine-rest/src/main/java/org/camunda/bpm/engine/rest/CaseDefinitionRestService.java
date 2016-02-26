@@ -12,16 +12,21 @@
  */
 package org.camunda.bpm.engine.rest;
 
+import java.util.List;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
+
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.CaseDefinitionDto;
 import org.camunda.bpm.engine.rest.sub.repository.CaseDefinitionResource;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
-import java.util.List;
 
 /**
  *
@@ -38,6 +43,10 @@ public interface CaseDefinitionRestService {
 
   @Path("/key/{key}")
   CaseDefinitionResource getCaseDefinitionByKey(@PathParam("key") String caseDefinitionKey);
+
+  @Path("/key/{key}/tenant-id/{tenantId}")
+  CaseDefinitionResource getCaseDefinitionByKeyAndTenantId(@PathParam("key") String caseDefinitionKey,
+                                                           @PathParam("tenantId") String tenantId);
 
   /**
    * Exposes the {@link CaseDefinitionQuery} interface as a REST service.

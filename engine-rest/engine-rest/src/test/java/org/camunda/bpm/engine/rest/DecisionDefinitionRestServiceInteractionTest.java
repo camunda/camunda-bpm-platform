@@ -32,7 +32,6 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
@@ -74,6 +73,7 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
   protected static final String DECISION_DEFINITION_URL = TEST_RESOURCE_ROOT_PATH + "/decision-definition";
   protected static final String SINGLE_DECISION_DEFINITION_URL = DECISION_DEFINITION_URL + "/{id}";
   protected static final String SINGLE_DECISION_DEFINITION_BY_KEY_URL = DECISION_DEFINITION_URL + "/key/{key}";
+  protected static final String SINGLE_DECISION_DEFINITION_BY_KEY_AND_TENANT_ID_URL = DECISION_DEFINITION_URL + "/key/{key}/tenant-id/{tenant-id}";
 
   protected static final String XML_DEFINITION_URL = SINGLE_DECISION_DEFINITION_URL + "/xml";
   protected static final String XML_DEFINITION_BY_KEY_URL = SINGLE_DECISION_DEFINITION_BY_KEY_URL + "/xml";
@@ -82,6 +82,7 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
 
   protected static final String EVALUATE_DECISION_URL = SINGLE_DECISION_DEFINITION_URL + "/evaluate";
   protected static final String EVALUATE_DECISION_BY_KEY_URL = SINGLE_DECISION_DEFINITION_BY_KEY_URL + "/evaluate";
+  protected static final String EVALUATE_DECISION_BY_KEY_AND_TENANT_ID_URL = SINGLE_DECISION_DEFINITION_BY_KEY_AND_TENANT_ID_URL + "/evaluate";
 
   private RepositoryService repositoryServiceMock;
   private DecisionDefinitionQuery decisionDefinitionQueryMock;
@@ -91,6 +92,13 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
   public void setUpRuntime() {
     DecisionDefinition mockDecisionDefinition = MockProvider.createMockDecisionDefinition();
 
+    setUpRuntimeData(mockDecisionDefinition);
+
+    decisionServiceMock = mock(DecisionService.class);
+    when(processEngine.getDecisionService()).thenReturn(decisionServiceMock);
+  }
+
+  private void setUpRuntimeData(DecisionDefinition mockDecisionDefinition) {
     repositoryServiceMock = mock(RepositoryService.class);
 
     when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
@@ -99,13 +107,12 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
 
     decisionDefinitionQueryMock = mock(DecisionDefinitionQuery.class);
     when(decisionDefinitionQueryMock.decisionDefinitionKey(MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)).thenReturn(decisionDefinitionQueryMock);
+    when(decisionDefinitionQueryMock.tenantIdIn(anyString())).thenReturn(decisionDefinitionQueryMock);
+    when(decisionDefinitionQueryMock.withoutTenantId()).thenReturn(decisionDefinitionQueryMock);
     when(decisionDefinitionQueryMock.latestVersion()).thenReturn(decisionDefinitionQueryMock);
     when(decisionDefinitionQueryMock.singleResult()).thenReturn(mockDecisionDefinition);
     when(decisionDefinitionQueryMock.list()).thenReturn(Collections.singletonList(mockDecisionDefinition));
     when(repositoryServiceMock.createDecisionDefinitionQuery()).thenReturn(decisionDefinitionQueryMock);
-
-    decisionServiceMock = mock(DecisionService.class);
-    when(processEngine.getDecisionService()).thenReturn(decisionServiceMock);
   }
 
   private InputStream createMockDecisionDefinitionDmnXml() {
@@ -144,7 +151,7 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
         .body("deploymentId", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_ID))
         .body("version", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_VERSION))
         .body("resource", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME))
-        .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+        .body("tenantId", equalTo(null))
     .when()
       .get(SINGLE_DECISION_DEFINITION_URL);
 
@@ -180,10 +187,11 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
         .body("deploymentId", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_ID))
         .body("version", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_VERSION))
         .body("resource", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME))
-        .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+        .body("tenantId", equalTo(null))
     .when()
       .get(SINGLE_DECISION_DEFINITION_BY_KEY_URL);
 
+    verify(decisionDefinitionQueryMock).withoutTenantId();
     verify(repositoryServiceMock).getDecisionDefinition(MockProvider.EXAMPLE_DECISION_DEFINITION_ID);
   }
 
@@ -208,20 +216,80 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
   }
 
   @Test
-  public void testDecisionDefinitionRetrievalForMultipleTenants_ByKey() {
-    // decision definition is deployed for two tenants
-    List<DecisionDefinition> decisionDefinitions = MockProvider.createMockTwoDecisionDefinitions();
+  public void testDefinitionRetrieval_ByKeyAndTenantId() {
+    DecisionDefinition mockDefinition = MockProvider.mockDecisionDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build();
+    setUpRuntimeData(mockDefinition);
 
-    when(decisionDefinitionQueryMock.list()).thenReturn(decisionDefinitions);
-    when(decisionDefinitionQueryMock.count()).thenReturn(2L);
-    when(decisionDefinitionQueryMock.singleResult()).thenThrow(new ProcessEngineException("not a unique result"));
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+      .pathParam("tenant-id", MockProvider.EXAMPLE_TENANT_ID)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_ID))
+        .body("key", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_KEY))
+        .body("category", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_CATEGORY))
+        .body("name", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_NAME))
+        .body("deploymentId", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_ID))
+        .body("version", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_VERSION))
+        .body("resource", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME))
+        .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+    .when()
+      .get(SINGLE_DECISION_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
 
-    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+    verify(decisionDefinitionQueryMock).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID);
+    verify(repositoryServiceMock).getDecisionDefinition(MockProvider.EXAMPLE_DECISION_DEFINITION_ID);
+  }
+
+  @Test
+  public void testNonExistingDecisionDefinitionRetrieval_ByKeyAndTenantId() {
+    String nonExistingKey = "aNonExistingDefinitionKey";
+    String nonExistingTenantId = "aNonExistingTenantId";
+
+    when(repositoryServiceMock.createDecisionDefinitionQuery().decisionDefinitionKey(nonExistingKey)).thenReturn(decisionDefinitionQueryMock);
+    when(decisionDefinitionQueryMock.singleResult()).thenReturn(null);
+
+    given()
+      .pathParam("key", nonExistingKey)
+      .pathParam("tenant-id", nonExistingTenantId)
     .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
       .body("type", is(RestException.class.getSimpleName()))
-      .body("message", containsString("Found multiple decision definition with key '"+MockProvider.EXAMPLE_DECISION_DEFINITION_KEY+"' for different tenants"))
-    .when().get(SINGLE_DECISION_DEFINITION_BY_KEY_URL);
+      .body("message", containsString("No matching decision definition with key: " + nonExistingKey + " and tenant-id: " + nonExistingTenantId))
+    .when().get(SINGLE_DECISION_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+  }
+
+  @Test
+  public void testEvaluateDecisionByKeyAndTenantId() {
+    DecisionDefinition mockDefinition = MockProvider.mockDecisionDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build();
+    setUpRuntimeData(mockDefinition);
+
+    DmnDecisionTableResult decisionResult = MockProvider.createMockDecisionResult();
+    when(decisionServiceMock.evaluateDecisionTableById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
+        .thenReturn(decisionResult);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables",
+        VariablesBuilder.create()
+          .variable("amount", 420)
+          .variable("invoiceCategory", "MISC")
+          .getVariables()
+    );
+
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+      .pathParam("tenant-id", MockProvider.EXAMPLE_TENANT_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+    .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when().post(EVALUATE_DECISION_BY_KEY_AND_TENANT_ID_URL);
+
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("amount", 420);
+    expectedVariables.put("invoiceCategory", "MISC");
+
+    verify(decisionDefinitionQueryMock).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID);
+    verify(decisionServiceMock).evaluateDecisionTableById(MockProvider.EXAMPLE_DECISION_DEFINITION_ID, expectedVariables);
   }
 
   @Test

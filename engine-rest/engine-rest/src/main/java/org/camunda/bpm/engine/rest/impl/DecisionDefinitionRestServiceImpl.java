@@ -19,14 +19,12 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 import org.camunda.bpm.engine.rest.DecisionDefinitionRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionQueryDto;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.DecisionDefinitionResource;
 import org.camunda.bpm.engine.rest.sub.repository.impl.DecisionDefinitionResourceImpl;
@@ -41,31 +39,39 @@ public class DecisionDefinitionRestServiceImpl extends AbstractRestProcessEngine
 
   @Override
   public DecisionDefinitionResource getDecisionDefinitionByKey(String decisionDefinitionKey) {
-    if(decisionDefinitionKey == null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Query parameter 'decisionDefinitionKey' cannot be null");
-    }
 
-    ProcessEngine engine = getProcessEngine();
-    RepositoryService repositoryService = engine.getRepositoryService();
+    DecisionDefinition decisionDefinition = getProcessEngine()
+        .getRepositoryService()
+        .createDecisionDefinitionQuery()
+        .decisionDefinitionKey(decisionDefinitionKey)
+        .withoutTenantId()
+        .latestVersion()
+        .singleResult();
 
-    List<DecisionDefinition> decisionDefinitions = repositoryService
-      .createDecisionDefinitionQuery()
-      .decisionDefinitionKey(decisionDefinitionKey)
-      .latestVersion()
-      .list();
-
-    if (decisionDefinitions.isEmpty()) {
+    if (decisionDefinition == null) {
       String errorMessage = String.format("No matching decision definition with key: %s ", decisionDefinitionKey);
       throw new RestException(Status.NOT_FOUND, errorMessage);
 
-    } else if(decisionDefinitions.size() > 1) {
-      String errorMessage = String.format(
-          "Found multiple decision definition with key '%s' for different tenants. You have to request the decision definition by id instead of key.",
-          decisionDefinitionKey);
-      throw new RestException(Status.BAD_REQUEST, errorMessage);
+    } else {
+      return getDecisionDefinitionById(decisionDefinition.getId());
+    }
+  }
+
+  public DecisionDefinitionResource getDecisionDefinitionByKeyAndTenantId(String decisionDefinitionKey, String tenantId) {
+
+    DecisionDefinition decisionDefinition = getProcessEngine()
+        .getRepositoryService()
+        .createDecisionDefinitionQuery()
+        .decisionDefinitionKey(decisionDefinitionKey)
+        .tenantIdIn(tenantId)
+        .latestVersion()
+        .singleResult();
+
+    if (decisionDefinition == null) {
+      String errorMessage = String.format("No matching decision definition with key: %s and tenant-id: %s", decisionDefinitionKey, tenantId);
+      throw new RestException(Status.NOT_FOUND, errorMessage);
 
     } else {
-      DecisionDefinition decisionDefinition = decisionDefinitions.get(0);
       return getDecisionDefinitionById(decisionDefinition.getId());
     }
   }

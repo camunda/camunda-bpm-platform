@@ -19,14 +19,12 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.CaseDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.CaseDefinitionQueryDto;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.CaseDefinitionResource;
 import org.camunda.bpm.engine.rest.sub.repository.impl.CaseDefinitionResourceImpl;
@@ -46,31 +44,39 @@ public class CaseDefinitionRestServiceImpl extends AbstractRestProcessEngineAwar
 
   @Override
   public CaseDefinitionResource getCaseDefinitionByKey(String caseDefinitionKey) {
-    if(caseDefinitionKey == null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Query parameter 'caseDefinitionKey' cannot be null");
-    }
 
-    ProcessEngine engine = getProcessEngine();
-    RepositoryService repositoryService = engine.getRepositoryService();
+    CaseDefinition caseDefinition = getProcessEngine()
+        .getRepositoryService()
+        .createCaseDefinitionQuery()
+        .caseDefinitionKey(caseDefinitionKey)
+        .withoutTenantId()
+        .latestVersion()
+        .singleResult();
 
-    List<CaseDefinition> caseDefinitions = repositoryService
-      .createCaseDefinitionQuery()
-      .caseDefinitionKey(caseDefinitionKey)
-      .latestVersion()
-      .list();
-
-    if (caseDefinitions.isEmpty()) {
+    if (caseDefinition == null) {
       String errorMessage = String.format("No matching case definition with key: %s ", caseDefinitionKey);
       throw new RestException(Status.NOT_FOUND, errorMessage);
 
-    } else if(caseDefinitions.size() > 1) {
-      String errorMessage = String.format(
-          "Found multiple case definition with key '%s' for different tenants. You have to request the case definition by id instead of key.",
-          caseDefinitionKey);
-      throw new RestException(Status.BAD_REQUEST, errorMessage);
+    } else {
+      return getCaseDefinitionById(caseDefinition.getId());
+    }
+  }
+
+  public CaseDefinitionResource getCaseDefinitionByKeyAndTenantId(String caseDefinitionKey, String tenantId) {
+
+    CaseDefinition caseDefinition = getProcessEngine()
+        .getRepositoryService()
+        .createCaseDefinitionQuery()
+        .caseDefinitionKey(caseDefinitionKey)
+        .tenantIdIn(tenantId)
+        .latestVersion()
+        .singleResult();
+
+    if (caseDefinition == null) {
+      String errorMessage = String.format("No matching case definition with key: %s and tenant-id: %s", caseDefinitionKey, tenantId);
+      throw new RestException(Status.NOT_FOUND, errorMessage);
 
     } else {
-      CaseDefinition caseDefinition = caseDefinitions.get(0);
       return getCaseDefinitionById(caseDefinition.getId());
     }
   }

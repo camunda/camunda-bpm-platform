@@ -1047,28 +1047,19 @@ public abstract class MockProvider {
     return mocks;
   }
 
-  public static ProcessDefinition createMockDefinition() {
-    return createMockDefinition(EXAMPLE_TENANT_ID);
-  }
-
-  public static ProcessDefinition createMockDefinition(String tenantId) {
-    MockDefinitionBuilder builder = new MockDefinitionBuilder();
-    ProcessDefinition mockDefinition = builder.id(EXAMPLE_PROCESS_DEFINITION_ID).category(EXAMPLE_PROCESS_DEFINITION_CATEGORY)
+  public static MockDefinitionBuilder mockDefinition() {
+    return new MockDefinitionBuilder().id(EXAMPLE_PROCESS_DEFINITION_ID).category(EXAMPLE_PROCESS_DEFINITION_CATEGORY)
         .name(EXAMPLE_PROCESS_DEFINITION_NAME).key(EXAMPLE_PROCESS_DEFINITION_KEY).description(EXAMPLE_PROCESS_DEFINITION_DESCRIPTION)
         .version(EXAMPLE_PROCESS_DEFINITION_VERSION).resource(EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME).deploymentId(EXAMPLE_DEPLOYMENT_ID)
-        .diagram(EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME).suspended(EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED).tenantId(tenantId).build();
+        .diagram(EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME).suspended(EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED);
+  }
 
-    return mockDefinition;
+  public static ProcessDefinition createMockDefinition() {
+    return mockDefinition().build();
   }
 
   public static ProcessDefinition createMockAnotherDefinition() {
-    MockDefinitionBuilder builder = new MockDefinitionBuilder();
-    ProcessDefinition mockDefinition = builder.id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).category(EXAMPLE_PROCESS_DEFINITION_CATEGORY)
-      .name(EXAMPLE_PROCESS_DEFINITION_NAME).key(EXAMPLE_PROCESS_DEFINITION_KEY).description(EXAMPLE_PROCESS_DEFINITION_DESCRIPTION)
-      .version(EXAMPLE_PROCESS_DEFINITION_VERSION).resource(EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME).deploymentId(EXAMPLE_DEPLOYMENT_ID)
-      .diagram(EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME).suspended(EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED).build();
-
-    return mockDefinition;
+    return mockDefinition().id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).build();
   }
 
   // deployments
@@ -2073,8 +2064,7 @@ public abstract class MockProvider {
         .version(EXAMPLE_CASE_DEFINITION_VERSION)
         .resource(EXAMPLE_CASE_DEFINITION_RESOURCE_NAME)
         .diagram(EXAMPLE_CASE_DEFINITION_DIAGRAM_RESOURCE_NAME)
-        .deploymentId(EXAMPLE_DEPLOYMENT_ID)
-        .tenantId(EXAMPLE_TENANT_ID);
+        .deploymentId(EXAMPLE_DEPLOYMENT_ID);
   }
 
   public static CaseDefinition createMockCaseDefinition() {
@@ -2240,8 +2230,7 @@ public abstract class MockProvider {
       .version(EXAMPLE_DECISION_DEFINITION_VERSION)
       .resource(EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME)
       .diagram(EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME)
-      .deploymentId(EXAMPLE_DEPLOYMENT_ID)
-      .tenantId(EXAMPLE_TENANT_ID);
+      .deploymentId(EXAMPLE_DEPLOYMENT_ID);
   }
 
   public static DecisionDefinition createMockDecisionDefinition() {

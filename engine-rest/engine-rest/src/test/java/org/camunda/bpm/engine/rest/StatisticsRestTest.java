@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -69,6 +70,8 @@ public class StatisticsRestTest extends AbstractRestServiceTest {
     ProcessDefinition mockDefinition = MockProvider.createMockDefinition();
     processDefinitionQueryMock = mock(ProcessDefinitionQuery.class);
     when(processDefinitionQueryMock.processDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)).thenReturn(processDefinitionQueryMock);
+    when(processDefinitionQueryMock.tenantIdIn(anyString())).thenReturn(processDefinitionQueryMock);
+    when(processDefinitionQueryMock.withoutTenantId()).thenReturn(processDefinitionQueryMock);
     when(processDefinitionQueryMock.latestVersion()).thenReturn(processDefinitionQueryMock);
     when(processDefinitionQueryMock.singleResult()).thenReturn(mockDefinition);
     when(processDefinitionQueryMock.list()).thenReturn(Collections.singletonList(mockDefinition));

@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -320,8 +319,8 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
   @Test
   public void testProcessDefinitionTenantIdList() {
     List<ProcessDefinition> processDefinitions = Arrays.asList(
-        MockProvider.createMockDefinition(MockProvider.EXAMPLE_TENANT_ID),
-        MockProvider.createMockDefinition(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
+        MockProvider.mockDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build(),
+        MockProvider.mockDefinition().id(MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).tenantId(MockProvider.ANOTHER_EXAMPLE_TENANT_ID).build());
     mockedQuery = setUpMockDefinitionQuery(processDefinitions);
 
     Response response = given()
@@ -347,8 +346,6 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
 
   @Test
   public void testProcessDefinitionWithoutTenantId() {
-    mockedQuery = setUpMockDefinitionQuery(Collections.singletonList(MockProvider.createMockDefinition(null)));
-
     Response response = given()
       .queryParam("withoutTenantId", true)
     .then().expect()
@@ -370,8 +367,8 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
   @Test
   public void testProcessDefinitionTenantIdIncludeDefinitionsWithoutTenantid() {
     List<ProcessDefinition> processDefinitions = Arrays.asList(
-        MockProvider.createMockDefinition(null),
-        MockProvider.createMockDefinition(MockProvider.EXAMPLE_TENANT_ID));
+        MockProvider.mockDefinition().tenantId(null).build(),
+        MockProvider.mockDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build());
     mockedQuery = setUpMockDefinitionQuery(processDefinitions);
 
     Response response = given()

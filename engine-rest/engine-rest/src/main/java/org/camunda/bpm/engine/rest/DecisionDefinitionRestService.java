@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest;
 
 import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -36,6 +37,10 @@ public interface DecisionDefinitionRestService {
 
   @Path("/key/{key}")
   DecisionDefinitionResource getDecisionDefinitionByKey(@PathParam("key") String decisionDefinitionKey);
+
+  @Path("/key/{key}/tenant-id/{tenantId}")
+  DecisionDefinitionResource getDecisionDefinitionByKeyAndTenantId(@PathParam("key") String decisionDefinitionKey,
+                                                                   @PathParam("tenantId") String tenantId);
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)

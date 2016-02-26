@@ -23,7 +23,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -317,7 +316,7 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     assertThat(returnedVersion).isEqualTo(MockProvider.EXAMPLE_DECISION_DEFINITION_VERSION);
     assertThat(returnedResource).isEqualTo(MockProvider.EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME);
     assertThat(returnedDeploymentId).isEqualTo(MockProvider.EXAMPLE_DEPLOYMENT_ID);
-    assertThat(returnedTenantId).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId).isEqualTo(null);
   }
 
   @Test
@@ -391,7 +390,10 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
 
   @Test
   public void testDecisionDefinitionTenantIdList() {
-    mockedQuery = createMockDecisionDefinitionQuery(MockProvider.createMockTwoDecisionDefinitions());
+    List<DecisionDefinition> decisionDefinitions = Arrays.asList(
+        MockProvider.mockDecisionDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build(),
+        MockProvider.mockDecisionDefinition().id(MockProvider.ANOTHER_EXAMPLE_CASE_DEFINITION_ID).tenantId(MockProvider.ANOTHER_EXAMPLE_TENANT_ID).build());
+    mockedQuery = createMockDecisionDefinitionQuery(decisionDefinitions);
 
     Response response = given()
       .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
@@ -416,9 +418,6 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
 
   @Test
   public void testDecisionDefinitionWithoutTenantId() {
-    DecisionDefinition decisionDefinition = MockProvider.mockDecisionDefinition().tenantId(null).build();
-    mockedQuery = createMockDecisionDefinitionQuery(Collections.singletonList(decisionDefinition));
-
     Response response = given()
       .queryParam("withoutTenantId", true)
     .then().expect()
@@ -441,7 +440,7 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
   public void testDecisionDefinitionTenantIdIncludeDefinitionsWithoutTenantid() {
     List<DecisionDefinition> decisionDefinitions = Arrays.asList(
         MockProvider.mockDecisionDefinition().tenantId(null).build(),
-        MockProvider.createMockDecisionDefinition());
+        MockProvider.mockDecisionDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build());
     mockedQuery = createMockDecisionDefinitionQuery(decisionDefinitions);
 
     Response response = given()

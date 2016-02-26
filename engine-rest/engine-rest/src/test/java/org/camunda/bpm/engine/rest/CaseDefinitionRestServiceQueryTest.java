@@ -23,7 +23,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -321,7 +320,7 @@ public class CaseDefinitionRestServiceQueryTest extends AbstractRestServiceTest 
     assertThat(returnedVersion).isEqualTo(MockProvider.EXAMPLE_CASE_DEFINITION_VERSION);
     assertThat(returnedResource).isEqualTo(MockProvider.EXAMPLE_CASE_DEFINITION_RESOURCE_NAME);
     assertThat(returnedDeploymentId).isEqualTo(MockProvider.EXAMPLE_DEPLOYMENT_ID);
-    assertThat(returnedTenantId).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId).isEqualTo(null);
   }
 
   @Test
@@ -395,7 +394,10 @@ public class CaseDefinitionRestServiceQueryTest extends AbstractRestServiceTest 
 
   @Test
   public void testCaseDefinitionTenantIdList() {
-    mockedQuery = createMockCaseDefinitionQuery(MockProvider.createMockTwoCaseDefinitions());
+    List<CaseDefinition> caseDefinitions = Arrays.asList(
+        MockProvider.mockCaseDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build(),
+        MockProvider.mockCaseDefinition().id(MockProvider.ANOTHER_EXAMPLE_CASE_DEFINITION_ID).tenantId(MockProvider.ANOTHER_EXAMPLE_TENANT_ID).build());
+    mockedQuery = createMockCaseDefinitionQuery(caseDefinitions);
 
     Response response = given()
       .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
@@ -420,9 +422,6 @@ public class CaseDefinitionRestServiceQueryTest extends AbstractRestServiceTest 
 
   @Test
   public void testCaseDefinitionWithoutTenantId() {
-    CaseDefinition caseDefinition = MockProvider.mockCaseDefinition().tenantId(null).build();
-    mockedQuery = createMockCaseDefinitionQuery(Collections.singletonList(caseDefinition));
-
     Response response = given()
       .queryParam("withoutTenantId", true)
     .then().expect()
@@ -445,7 +444,7 @@ public class CaseDefinitionRestServiceQueryTest extends AbstractRestServiceTest 
   public void testCaseDefinitionTenantIdIncludeDefinitionsWithoutTenantid() {
     List<CaseDefinition> caseDefinitions = Arrays.asList(
         MockProvider.mockCaseDefinition().tenantId(null).build(),
-        MockProvider.createMockCaseDefinition());
+        MockProvider.mockCaseDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build());
     mockedQuery = createMockCaseDefinitionQuery(caseDefinitions);
 
     Response response = given()
