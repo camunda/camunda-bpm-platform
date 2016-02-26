@@ -275,7 +275,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       subProcessInstance.setTenantId(tenantId);
     }
     else {
-      // if process definition has no tenant id, inherit this process instnace's tenant id
+      // if process definition has no tenant id, inherit this process instance's tenant id
       subProcessInstance.setTenantId(this.tenantId);
     }
 
