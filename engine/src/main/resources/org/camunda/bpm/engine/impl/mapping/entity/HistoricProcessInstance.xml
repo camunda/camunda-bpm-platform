@@ -54,7 +54,7 @@
         #{superCaseInstanceId, jdbcType=VARCHAR},
         #{caseInstanceId, jdbcType=VARCHAR},
         #{deleteReason, jdbcType=VARCHAR},
-        #{tenantId, jdbcType=VARCHAR},
+        #{tenantId, jdbcType=VARCHAR}
       )
   </insert>
 
