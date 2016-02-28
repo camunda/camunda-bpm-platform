@@ -121,7 +121,6 @@ public class MigratingProcessInstance {
 
     for (ActivityInstance instance : activityInstances) {
 		ActivityImpl sourceActivity = sourceProcessDefinition.findActivity(instance.getActivityId());
-
 		List<MigrationInstruction> instructionCandidates = organizedInstructions.get(sourceActivity.getId());
 		MigrationInstruction applyingInstruction = null;
 		ActivityImpl targetActivity = null;

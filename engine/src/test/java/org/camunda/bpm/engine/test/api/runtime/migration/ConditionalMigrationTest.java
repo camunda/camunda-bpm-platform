@@ -5,8 +5,12 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeAc
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 import static org.junit.Assert.*;
+
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.Condition;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -24,12 +28,18 @@ import org.junit.rules.RuleChain;
 public class ConditionalMigrationTest {
 	protected ProcessEngineRule rule = new ProcessEngineRule();
 	protected MigrationTestRule testHelper = new MigrationTestRule(rule);
-
+	
 	@Rule
 	public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
 
 	@Test
-	public void basicConditionalMigrationTestCase()
+	public void testCase1()
+	{
+		basicConditionalMigrationTestCase(120);
+		basicConditionalMigrationTestCase(100);
+		basicConditionalMigrationTestCase(90);
+	}
+	public void basicConditionalMigrationTestCase(int amount)
 	{
 		ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.BASIC_CONDITONAL_SOURCE_PROCESS);
 		ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.BASIC_CONDITIONAL_TARGET_PROCESS);
@@ -53,11 +63,13 @@ public class ConditionalMigrationTest {
 				.build();
 		assertNotNull(migrationPlan);
 		
-		ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+		Map<String, Object> variables = new HashMap<String, Object>();
+		variables.put("amount", amount);
+		ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId(), variables);
 		assertNotNull(processInstance);
 		ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
 		assertNotNull(activityInstance);
-
+		
 		rule.getRuntimeService().executeMigrationPlan(migrationPlan, Collections.singletonList(processInstance.getId()));
 		String variableName = "amount";
 		int value = (Integer)rule.getRuntimeService().getVariable(processInstance.getId(), variableName);
@@ -69,15 +81,13 @@ public class ConditionalMigrationTest {
 			assertNotNull(executionTree);
 			assertThat(executionTree)
 			.matches(
-					describeExecutionTree(null).scope().id(processInstance.getId())
-					.child("freeShipment").scope()
+					describeExecutionTree("freeShipment")
 					.done());
 			assertThat(executionTree).hasProcessDefinitionId(targetProcessDefinition.getId());
 
 			ActivityInstance updatedTree = rule.getRuntimeService().getActivityInstance(processInstance.getId());
 			assertThat(updatedTree).hasStructure(
 					describeActivityInstanceTree(targetProcessDefinition.getId())
-					.beginScope("subProcess")
 					.activity("freeShipment", testHelper.getSingleActivityInstance(activityInstance, "freeShipment").getId())
 					.done());
 
@@ -94,16 +104,14 @@ public class ConditionalMigrationTest {
 			assertNotNull(executionTree);
 			assertThat(executionTree)
 			.matches(
-					describeExecutionTree(null).scope().id(processInstance.getId())
-					.child("costShipment").scope()
+					describeExecutionTree("costShipment")
 					.done());
 			assertThat(executionTree).hasProcessDefinitionId(targetProcessDefinition.getId());
-
+			
 			ActivityInstance updatedTree = rule.getRuntimeService().getActivityInstance(processInstance.getId());
 			assertThat(updatedTree).hasStructure(
 					describeActivityInstanceTree(targetProcessDefinition.getId())
-					.beginScope("subProcess")
-					.activity("costShipment", testHelper.getSingleActivityInstance(activityInstance, "costShipment").getId())
+					.activity("costShipment", testHelper.getSingleActivityInstance(activityInstance, "freeShipment").getId())
 					.done());
 
 			Task migratedTask = rule.getTaskService().createTaskQuery().singleResult();
@@ -115,11 +123,18 @@ public class ConditionalMigrationTest {
 	
 		}
 	}
+	
 	@Test
-	public void singleConditionMultipleExecutionPathTestCase()
+	public void testCase2()
 	{
-		ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SINGLE_CONDITIONAL_SOURCE_PROCESS);
-		ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SINGLE_CONDITONAL_TARGET_PROCESS);
+		singleConditionMultipleProcessTestCase(true);
+		singleConditionMultipleProcessTestCase(false);
+		
+	}
+	public void singleConditionMultipleProcessTestCase(boolean valid)
+	{
+		ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUB_PROCESS_CONDITIONAL_SOURCE_PROCESS);
+		ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUB_PROCESS_CONDITIONAL_TARGET_PROCESS);
 
 		Condition trueCondition = new Condition(){
 			@Override
@@ -135,51 +150,51 @@ public class ConditionalMigrationTest {
 		};
 		MigrationPlan migrationPlan = rule.getRuntimeService()
 				.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-				.mapActivities("receiveLoanForm", "receiveLoanForm")
-				.mapActivitiesConditionally("acceptLoan", "acceptLoan", trueCondition) 
-				.mapActivitiesConditionally("givecheque", "givecheque", trueCondition)
-				.mapActivitiesConditionally("acceptLoan", "rejectLoan", falseCondition)
+				.mapActivities("subProcess", "subProcess")
+				.mapActivitiesConditionally("TaskA", "TaskA", trueCondition) 
+				.mapActivitiesConditionally("TaskA", "TaskC", falseCondition)
+				.mapActivities("TaskB", "TaskB")
 				.build();
 		assertNotNull(migrationPlan);
-
-		ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
-		assertNotNull(processInstance);
-		ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
-		assertNotNull(activityInstance);
 		
+		Map<String, Object> variables = new HashMap<String, Object>();
+		variables.put("documentvalid", valid);
+		ProcessInstance processInstance =rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId(), variables);
+		assertNotNull(processInstance);
+		
+		ExecutionTree executionTree = null; 
+		executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+	
+		ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
 		rule.getRuntimeService().executeMigrationPlan(migrationPlan, Collections.singletonList(processInstance.getId()));
-
 		String variableName = "documentvalid";
 		boolean value = (Boolean)rule.getRuntimeService().getVariable(processInstance.getId(), variableName);
 		assertNotNull(value);
-
-		ExecutionTree executionTree = null; 
+		
 		if(value == true)		
 		{			
 			executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
-			assertNotNull(executionTree);
-			assertThat(executionTree)
-			.matches(
-					describeExecutionTree(null).scope().id(processInstance.getId())
-					.child(null).scope()
-					.child("receiveLoanForm").scope().id(activityInstance.getActivityInstances("receiveLoanForm")[0].getExecutionIds()[0])
-					.child("acceptLoan").scope().id(activityInstance.getActivityInstances("acceptLoan")[0].getExecutionIds()[0])
-					.child("giveCheque").scope().id(activityInstance.getActivityInstances("rejectLoan")[0].getExecutionIds()[0])
-					.done());
-
+		    assertThat(executionTree)
+		    .matches(
+		    	   describeExecutionTree(null).scope()
+		          .child(null).concurrent().noScope()
+		          .child("TaskA").scope().up().up()
+		          .child("TaskB").concurrent().noScope()
+		      .done());
+		    
 			assertThat(executionTree).hasProcessDefinitionId(targetProcessDefinition.getId());
 
 			ActivityInstance updatedTree = rule.getRuntimeService().getActivityInstance(processInstance.getId());
-			assertThat(updatedTree).hasStructure(
-					describeActivityInstanceTree(targetProcessDefinition.getId())
-					.beginScope("subProcess")
-					.activity("receiveLoanForm", testHelper.getSingleActivityInstance(activityInstance, "receiveLoanForm").getId())
-					.activity("acceptLoan", testHelper.getSingleActivityInstance(activityInstance, "acceptLoan").getId())
-					.activity("giveCheque", testHelper.getSingleActivityInstance(activityInstance, "giveCheque").getId())
-					.done());
-
+		    assertThat(updatedTree).hasStructure(
+		        describeActivityInstanceTree(targetProcessDefinition.getId())
+		          .beginScope("subProcess", testHelper.getSingleActivityInstance(activityInstance, "subProcess").getId())
+		            .activity("TaskA", testHelper.getSingleActivityInstance(activityInstance, "TaskA").getId())
+		          .endScope()
+		            .activity("TaskB", testHelper.getSingleActivityInstance(activityInstance, "TaskB").getId())
+		        .done());
+		    
 			List<Task> migratedTasks = rule.getTaskService().createTaskQuery().list();
-			assertEquals(3, migratedTasks.size());
+			assertEquals(2, migratedTasks.size());
 
 			for (Task migratedTask : migratedTasks) {
 				assertEquals(targetProcessDefinition.getId(), migratedTask.getProcessDefinitionId());
@@ -191,25 +206,25 @@ public class ConditionalMigrationTest {
 		else
 		{
 			executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
-			assertNotNull(executionTree);
-			assertThat(executionTree)
-			.matches(
-					describeExecutionTree(null).scope().id(processInstance.getId())
-					.child(null).scope()
-					.child("receiveLoanForm").scope().id(activityInstance.getActivityInstances("receiveLoanForm")[0].getExecutionIds()[0])
-					.child("rejectLoan").scope().id(activityInstance.getActivityInstances("rejectLoan")[0].getExecutionIds()[0])
-					.done());
-
+		    assertThat(executionTree)
+		    .matches(
+		    	   describeExecutionTree(null).scope()
+		          .child(null).concurrent().noScope()
+		          .child("TaskC").scope().up().up()
+		          .child("TaskB").concurrent().noScope()
+		      .done());
+		    
 			assertThat(executionTree).hasProcessDefinitionId(targetProcessDefinition.getId());
 
 			ActivityInstance updatedTree = rule.getRuntimeService().getActivityInstance(processInstance.getId());
-			assertThat(updatedTree).hasStructure(
-					describeActivityInstanceTree(targetProcessDefinition.getId())
-					.beginScope("subProcess")
-					.activity("receiveLoanForm", testHelper.getSingleActivityInstance(activityInstance, "receiveLoanForm").getId())
-					.activity("rejectLoan", testHelper.getSingleActivityInstance(activityInstance, "rejectLoan").getId())
-					.done());
-
+		    assertThat(updatedTree).hasStructure(
+		        describeActivityInstanceTree(targetProcessDefinition.getId())
+		          .beginScope("subProcess", testHelper.getSingleActivityInstance(activityInstance, "subProcess").getId())
+		            .activity("TaskC", testHelper.getSingleActivityInstance(activityInstance, "TaskA").getId())
+		          .endScope()
+		            .activity("TaskB", testHelper.getSingleActivityInstance(activityInstance, "TaskB").getId())
+		        .done());
+		    
 			List<Task> migratedTasks = rule.getTaskService().createTaskQuery().list();
 			assertEquals(2, migratedTasks.size());
 
@@ -225,92 +240,93 @@ public class ConditionalMigrationTest {
 	}
 
 	@Test
-	public void multipleConditionMultipleExecutionPathTestCase()
+	public void testCase3()
+	{
+		multipleConditionMultipleProcessTestCase(true,true);
+		multipleConditionMultipleProcessTestCase(true,false);
+		multipleConditionMultipleProcessTestCase(false,true);
+		multipleConditionMultipleProcessTestCase(false,false);
+	}
+	public void multipleConditionMultipleProcessTestCase(boolean firstcondition, boolean secondcondition)
 	{
 		ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.MULTIPLE_CONDITION_SOURCE_PROCESS);
 		ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.MULTIPLE_CONDITION_TARGET_PROCESS);
 
-		Condition hungryTrueCondition = new Condition(){
+		Condition firstTrueCondition = new Condition(){
 			@Override
 			public boolean shouldMap(DelegateExecution e) {
-				return ((Boolean)e.getVariable("hungry")) == true;
+				return ((Boolean)e.getVariable("firstcondition")) == true;
 			}
 		};
-		Condition hungryFalseCondition = new Condition(){
+		Condition firstFalseCondition = new Condition(){
 			@Override
 			public boolean shouldMap(DelegateExecution e) {
-				return ((Boolean)e.getVariable("hungry")) == false;
-			}
-		};
-
-		Condition cashPaymentTrueCondition = new Condition(){
-			@Override
-			public boolean shouldMap(DelegateExecution e) {
-				return ((Boolean)e.getVariable("cashinhand")) == true;
-			}
-		};
-		Condition cashPaymentFalseCondition = new Condition(){
-			@Override
-			public boolean shouldMap(DelegateExecution e) {
-				return ((Boolean)e.getVariable("cashinhand")) == false;
+				return ((Boolean)e.getVariable("firstcondition")) == false;
 			}
 		};
 
-		ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+		Condition secondTrueCondition = new Condition(){
+			@Override
+			public boolean shouldMap(DelegateExecution e) {
+				return ((Boolean)e.getVariable("secondcondition")) == true;
+			}
+		};
+		Condition secondFalseCondition = new Condition(){
+			@Override
+			public boolean shouldMap(DelegateExecution e) {
+				return ((Boolean)e.getVariable("secondcondition")) == false;
+			}
+		};
+		Map<String, Object> variables = new HashMap<String, Object>();
+		variables.put("firstcondition", firstcondition);
+		variables.put("secondcondition", secondcondition);
+		ProcessInstance processInstance =rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId(), variables);
 		assertNotNull(processInstance);
+		ExecutionTree executionTree = null; 
+		executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
 		ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
 		assertNotNull(activityInstance);
 
 		MigrationPlan migrationPlan = rule.getRuntimeService()
 				.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-				.mapActivities("gotoRestaurant", "gotoRestaurant")
-				.mapActivitiesConditionally("orderPizza", "orderPizza", hungryTrueCondition) 
-				.mapActivitiesConditionally("orderPizza", "orderSnack", hungryFalseCondition)
-				.mapActivities("eat", "eat")
-				.mapActivitiesConditionally("payByCash", "payByCash", cashPaymentTrueCondition)
-				.mapActivitiesConditionally("payByCash", "payByCard", cashPaymentFalseCondition)
+				.mapActivities("subProcessOne", "subProcessOne")
+				.mapActivitiesConditionally("TaskA", "TaskA", firstTrueCondition) 
+				.mapActivitiesConditionally("TaskA", "TaskC", firstFalseCondition)
+				.mapActivities("subProcessTwo", "subProcessTwo")
+				.mapActivitiesConditionally("TaskB", "TaskB", secondTrueCondition)
+				.mapActivitiesConditionally("TaskB", "TaskD", secondFalseCondition)
 				.build();
 		assertNotNull(migrationPlan);
 
 		rule.getRuntimeService().executeMigrationPlan(migrationPlan, Collections.singletonList(processInstance.getId()));
 
-		String variableName = "hungry";
-		boolean hungry = (Boolean)rule.getRuntimeService().getVariable(processInstance.getId(), variableName);
-		assertNotNull(hungry);
-
-		variableName = "cashInHand";
-		boolean cashInHand = (Boolean)rule.getRuntimeService().getVariable(processInstance.getId(), variableName);
-		assertNotNull(cashInHand);
-
-		ExecutionTree executionTree = null; 
-		if(hungry == true && cashInHand == true)		
+		if(firstcondition == true && secondcondition == true)		
 		{			
 			executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
-			assertNotNull(executionTree);
-			assertThat(executionTree)
-			.matches(
-					describeExecutionTree(null).scope().id(processInstance.getId())
-					.child(null).scope()
-					.child("gotoRestaurant").scope().id(activityInstance.getActivityInstances("gotoRestaurant")[0].getExecutionIds()[0])
-					.child("orderPizza").scope().id(activityInstance.getActivityInstances("orderPizza")[0].getExecutionIds()[0])
-					.child("eat").scope().id(activityInstance.getActivityInstances("eat")[0].getExecutionIds()[0])
-					.child("payByCash").scope().id(activityInstance.getActivityInstances("payByCash")[0].getExecutionIds()[0])
-					.done());
-
+		    assertThat(executionTree)
+		    .matches(
+		    	   describeExecutionTree(null).scope()
+		          .child(null).concurrent().noScope()
+		          .child("TaskB").scope().up().up()
+		          .child(null).concurrent().noScope()
+		          .child("TaskA").scope()
+		      .done());
+		    
 			assertThat(executionTree).hasProcessDefinitionId(targetProcessDefinition.getId());
 
 			ActivityInstance updatedTree = rule.getRuntimeService().getActivityInstance(processInstance.getId());
-			assertThat(updatedTree).hasStructure(
-					describeActivityInstanceTree(targetProcessDefinition.getId())
-					.beginScope("subProcess")
-					.activity("gotoRestaurant", testHelper.getSingleActivityInstance(activityInstance, "gotoRestaurant").getId())
-					.activity("orderPizza", testHelper.getSingleActivityInstance(activityInstance, "orderPizza").getId())
-					.activity("eat", testHelper.getSingleActivityInstance(activityInstance, "eat").getId())
-					.activity("payByCash", testHelper.getSingleActivityInstance(activityInstance, "payByCash").getId())
-					.done());
-
+		    assertThat(updatedTree).hasStructure(
+		        describeActivityInstanceTree(targetProcessDefinition.getId())
+		          .beginScope("subProcessOne", testHelper.getSingleActivityInstance(activityInstance, "subProcessOne").getId())
+		            .activity("TaskA", testHelper.getSingleActivityInstance(activityInstance, "TaskA").getId())
+		          .endScope()
+		          .beginScope("subProcessTwo", testHelper.getSingleActivityInstance(activityInstance, "subProcessTwo").getId())
+		            .activity("TaskB", testHelper.getSingleActivityInstance(activityInstance, "TaskB").getId())
+		           .endScope() 
+		        .done());
+		    
 			List<Task> migratedTasks = rule.getTaskService().createTaskQuery().list();
-			assertEquals(4, migratedTasks.size());
+			assertEquals(2, migratedTasks.size());
 
 			for (Task migratedTask : migratedTasks) {
 				assertEquals(targetProcessDefinition.getId(), migratedTask.getProcessDefinitionId());
@@ -319,34 +335,33 @@ public class ConditionalMigrationTest {
 				rule.getTaskService().complete(migratedTask.getId());
 			}
 		}
-		else if(hungry == true && cashInHand == false)
+		else if(firstcondition == true && secondcondition == false)
 		{
 			executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
-			assertNotNull(executionTree);
-			assertThat(executionTree)
-			.matches(
-					describeExecutionTree(null).scope().id(processInstance.getId())
-					.child(null).scope()
-					.child("gotoRestaurant").scope().id(activityInstance.getActivityInstances("gotoRestaurant")[0].getExecutionIds()[0])
-					.child("orderPizza").scope().id(activityInstance.getActivityInstances("orderPizza")[0].getExecutionIds()[0])
-					.child("eat").scope().id(activityInstance.getActivityInstances("eat")[0].getExecutionIds()[0])
-					.child("payByCard").scope().id(activityInstance.getActivityInstances("payByCard")[0].getExecutionIds()[0])
-					.done());
-
+		    assertThat(executionTree)
+		    .matches(
+		    	   describeExecutionTree(null).scope()
+		          .child(null).concurrent().noScope()
+		          .child("TaskD").scope().up().up()
+		          .child(null).concurrent().noScope()
+		          .child("TaskA").scope()
+		      .done());
+		    
 			assertThat(executionTree).hasProcessDefinitionId(targetProcessDefinition.getId());
 
 			ActivityInstance updatedTree = rule.getRuntimeService().getActivityInstance(processInstance.getId());
-			assertThat(updatedTree).hasStructure(
-					describeActivityInstanceTree(targetProcessDefinition.getId())
-					.beginScope("subProcess")
-					.activity("gotoRestaurant", testHelper.getSingleActivityInstance(activityInstance, "gotoRestaurant").getId())
-					.activity("orderPizza", testHelper.getSingleActivityInstance(activityInstance, "orderPizza").getId())
-					.activity("eat", testHelper.getSingleActivityInstance(activityInstance, "eat").getId())
-					.activity("payByCard", testHelper.getSingleActivityInstance(activityInstance, "payByCard").getId())
-					.done());
-
+		    assertThat(updatedTree).hasStructure(
+		        describeActivityInstanceTree(targetProcessDefinition.getId())
+		          .beginScope("subProcessOne", testHelper.getSingleActivityInstance(activityInstance, "subProcessOne").getId())
+		            .activity("TaskA", testHelper.getSingleActivityInstance(activityInstance, "TaskA").getId())
+		          .endScope()
+		          .beginScope("subProcessTwo", testHelper.getSingleActivityInstance(activityInstance, "subProcessTwo").getId())
+		            .activity("TaskD", testHelper.getSingleActivityInstance(activityInstance, "TaskB").getId())
+		           .endScope() 
+		        .done());
+		    
 			List<Task> migratedTasks = rule.getTaskService().createTaskQuery().list();
-			assertEquals(4, migratedTasks.size());
+			assertEquals(2, migratedTasks.size());
 
 			for (Task migratedTask : migratedTasks) {
 				assertEquals(targetProcessDefinition.getId(), migratedTask.getProcessDefinitionId());
@@ -355,34 +370,33 @@ public class ConditionalMigrationTest {
 				rule.getTaskService().complete(migratedTask.getId());
 			}
 		}
-		else if(hungry == false && cashInHand == true)
+		else if(firstcondition == false && secondcondition == true)
 		{
 			executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
-			assertNotNull(executionTree);
-			assertThat(executionTree)
-			.matches(
-					describeExecutionTree(null).scope().id(processInstance.getId())
-					.child(null).scope()
-					.child("gotoRestaurant").scope().id(activityInstance.getActivityInstances("gotoRestaurant")[0].getExecutionIds()[0])
-					.child("orderSnack").scope().id(activityInstance.getActivityInstances("orderSnack")[0].getExecutionIds()[0])
-					.child("eat").scope().id(activityInstance.getActivityInstances("eat")[0].getExecutionIds()[0])
-					.child("payByCash").scope().id(activityInstance.getActivityInstances("payByCash")[0].getExecutionIds()[0])
-					.done());
-
+		    assertThat(executionTree)
+		    .matches(
+		    	   describeExecutionTree(null).scope()
+		          .child(null).concurrent().noScope()
+		          .child("TaskB").scope().up().up()
+		          .child(null).concurrent().noScope()
+		          .child("TaskC").scope()
+		      .done());
+		    
 			assertThat(executionTree).hasProcessDefinitionId(targetProcessDefinition.getId());
 
 			ActivityInstance updatedTree = rule.getRuntimeService().getActivityInstance(processInstance.getId());
-			assertThat(updatedTree).hasStructure(
-					describeActivityInstanceTree(targetProcessDefinition.getId())
-					.beginScope("subProcess")
-					.activity("gotoRestaurant", testHelper.getSingleActivityInstance(activityInstance, "gotoRestaurant").getId())
-					.activity("orderSnack", testHelper.getSingleActivityInstance(activityInstance, "orderSnack").getId())
-					.activity("eat", testHelper.getSingleActivityInstance(activityInstance, "eat").getId())
-					.activity("payByCash", testHelper.getSingleActivityInstance(activityInstance, "payByCash").getId())
-					.done());
-
+		    assertThat(updatedTree).hasStructure(
+		        describeActivityInstanceTree(targetProcessDefinition.getId())
+		          .beginScope("subProcessOne", testHelper.getSingleActivityInstance(activityInstance, "subProcessOne").getId())
+		            .activity("TaskC", testHelper.getSingleActivityInstance(activityInstance, "TaskA").getId())
+		          .endScope()
+		          .beginScope("subProcessTwo", testHelper.getSingleActivityInstance(activityInstance, "subProcessTwo").getId())
+		            .activity("TaskB", testHelper.getSingleActivityInstance(activityInstance, "TaskB").getId())
+		           .endScope() 
+		        .done());
+		    
 			List<Task> migratedTasks = rule.getTaskService().createTaskQuery().list();
-			assertEquals(4, migratedTasks.size());
+			assertEquals(2, migratedTasks.size());
 
 			for (Task migratedTask : migratedTasks) {
 				assertEquals(targetProcessDefinition.getId(), migratedTask.getProcessDefinitionId());
@@ -391,34 +405,33 @@ public class ConditionalMigrationTest {
 				rule.getTaskService().complete(migratedTask.getId());
 			}
 		}		
-		else if(hungry == false && cashInHand == false)
+		else if(firstcondition == false && secondcondition == false)
 		{
 			executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
-			assertNotNull(executionTree);
-			assertThat(executionTree)
-			.matches(
-					describeExecutionTree(null).scope().id(processInstance.getId())
-					.child(null).scope()
-					.child("gotoRestaurant").scope().id(activityInstance.getActivityInstances("gotoRestaurant")[0].getExecutionIds()[0])
-					.child("orderSnack").scope().id(activityInstance.getActivityInstances("orderSnack")[0].getExecutionIds()[0])
-					.child("eat").scope().id(activityInstance.getActivityInstances("eat")[0].getExecutionIds()[0])
-					.child("payByCard").scope().id(activityInstance.getActivityInstances("payByCard")[0].getExecutionIds()[0])
-					.done());
-
+		    assertThat(executionTree)
+		    .matches(
+		    	   describeExecutionTree(null).scope()
+		          .child(null).concurrent().noScope()
+		          .child("TaskD").scope().up().up()
+		          .child(null).concurrent().noScope()
+		          .child("TaskC").scope()
+		      .done());
+		    
 			assertThat(executionTree).hasProcessDefinitionId(targetProcessDefinition.getId());
 
 			ActivityInstance updatedTree = rule.getRuntimeService().getActivityInstance(processInstance.getId());
-			assertThat(updatedTree).hasStructure(
-					describeActivityInstanceTree(targetProcessDefinition.getId())
-					.beginScope("subProcess")
-					.activity("gotoRestaurant", testHelper.getSingleActivityInstance(activityInstance, "gotoRestaurant").getId())
-					.activity("orderSnack", testHelper.getSingleActivityInstance(activityInstance, "orderSnack").getId())
-					.activity("eat", testHelper.getSingleActivityInstance(activityInstance, "eat").getId())
-					.activity("payByCard", testHelper.getSingleActivityInstance(activityInstance, "payByCard").getId())
-					.done());
-
+		    assertThat(updatedTree).hasStructure(
+		        describeActivityInstanceTree(targetProcessDefinition.getId())
+		          .beginScope("subProcessOne", testHelper.getSingleActivityInstance(activityInstance, "subProcessOne").getId())
+		            .activity("TaskC", testHelper.getSingleActivityInstance(activityInstance, "TaskA").getId())
+		          .endScope()
+		          .beginScope("subProcessTwo", testHelper.getSingleActivityInstance(activityInstance, "subProcessTwo").getId())
+		            .activity("TaskD", testHelper.getSingleActivityInstance(activityInstance, "TaskB").getId())
+		           .endScope() 
+		        .done());
+		    
 			List<Task> migratedTasks = rule.getTaskService().createTaskQuery().list();
-			assertEquals(4, migratedTasks.size());
+			assertEquals(2, migratedTasks.size());
 
 			for (Task migratedTask : migratedTasks) {
 				assertEquals(targetProcessDefinition.getId(), migratedTask.getProcessDefinitionId());
@@ -426,6 +439,7 @@ public class ConditionalMigrationTest {
 			for (Task migratedTask : migratedTasks) {
 				rule.getTaskService().complete(migratedTask.getId());
 			}
+
 		}
 		testHelper.assertProcessEnded(processInstance.getId());
 	}

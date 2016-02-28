@@ -34,7 +34,8 @@ public class DefaultMigrationPlanValidator implements MigrationPlanValidator {
     for (MigrationInstruction instruction : migrationPlan.getInstructions()) {
       try {
         validateMigrationInstruction(sourceProcessDefinition, targetProcessDefinition, instruction);
-        validateEveryActivityIsOnlyOnceMapped(instruction, alreadyMappedSourceActivityIds);
+        if(instruction.getCondition() == null)
+        	validateEveryActivityIsOnlyOnceMapped(instruction, alreadyMappedSourceActivityIds);
       }
       catch (BadUserRequestException e) {
         validationReport.addValidationFailure(instruction, e.getMessage());
