@@ -162,15 +162,12 @@ public class ConditionalMigrationTest {
 		ProcessInstance processInstance =rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId(), variables);
 		assertNotNull(processInstance);
 		
-		ExecutionTree executionTree = null; 
-		executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
-	
 		ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
 		rule.getRuntimeService().executeMigrationPlan(migrationPlan, Collections.singletonList(processInstance.getId()));
 		String variableName = "documentvalid";
 		boolean value = (Boolean)rule.getRuntimeService().getVariable(processInstance.getId(), variableName);
 		assertNotNull(value);
-		
+		ExecutionTree executionTree = null;
 		if(value == true)		
 		{			
 			executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
@@ -282,8 +279,6 @@ public class ConditionalMigrationTest {
 		variables.put("secondcondition", secondcondition);
 		ProcessInstance processInstance =rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId(), variables);
 		assertNotNull(processInstance);
-		ExecutionTree executionTree = null; 
-		executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
 		ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
 		assertNotNull(activityInstance);
 
@@ -299,7 +294,7 @@ public class ConditionalMigrationTest {
 		assertNotNull(migrationPlan);
 
 		rule.getRuntimeService().executeMigrationPlan(migrationPlan, Collections.singletonList(processInstance.getId()));
-
+		ExecutionTree executionTree = null;
 		if(firstcondition == true && secondcondition == true)		
 		{			
 			executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
