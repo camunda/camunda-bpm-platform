@@ -514,7 +514,4 @@ public class SignalEventTest extends PluggableProcessEngineTestCase {
     assertEquals(SerializationDataFormats.JAVA.getName(), variableTyped.getSerializationDataFormat());
   }
 
-
-
-
 }
