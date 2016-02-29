@@ -25,23 +25,15 @@ button {
     margin: 0;
     padding: 0;
 
-    .icon-bar {
-      display: block;
-      width: @column-top-height;
-      height: 3px;
-      background-color: @link-color;
-    }
-
-    .icon-bar + .icon-bar {
-      margin-top: 3px;
+    > .glyphicon {
+      // min-width: 1em;
+      &:before {
+        content: '\e257';
+      }
     }
 
     &:focus {
       outline: none;
-    }
-
-    &:hover span {
-      background-color: @link-hover-color;
     }
   }
 
@@ -55,6 +47,15 @@ button {
   &.reset-regions {
     margin: 0 (@grid-gutter-width / 3);
   }
+}
+
+.filters-column-close .column-left .region-toggle .glyphicon:before,
+.list-column-close .column-center .region-toggle .glyphicon:before ,
+.column-right .region-toggle .glyphicon:before{
+  content: '\e258';
+}
+.task-column-close .column-right .region-toggle .glyphicon:before{
+  content: '\e257';
 }
 
 
