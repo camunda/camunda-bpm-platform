@@ -230,6 +230,11 @@ public class EventSubscriptionManager extends AbstractManager {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceId(String processInstanceId) {
+    return getDbEntityManager().selectList("selectEventSubscriptionsByProcessInstanceId", processInstanceId);
+  }
+
   /**
    * @return the message start event subscriptions with the given message name (from any tenant)
    *

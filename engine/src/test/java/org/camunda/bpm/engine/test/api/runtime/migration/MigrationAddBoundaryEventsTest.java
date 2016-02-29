@@ -853,7 +853,7 @@ public class MigrationAddBoundaryEventsTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    testHelper.assertTimerJobCreated("boundary");
+    testHelper.assertBoundaryTimerJobCreated("boundary");
 
     // and it is possible to successfully complete the migrated instance
     testHelper.completeTask("userTask");
@@ -907,7 +907,7 @@ public class MigrationAddBoundaryEventsTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    testHelper.assertTimerJobCreated("boundary");
+    testHelper.assertBoundaryTimerJobCreated("boundary");
 
     // and it is possible to successfully complete the migrated instance
     testHelper.completeTask("userTask");
@@ -962,7 +962,7 @@ public class MigrationAddBoundaryEventsTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    testHelper.assertTimerJobCreated("boundary");
+    testHelper.assertBoundaryTimerJobCreated("boundary");
 
     // and it is possible to successfully complete the migrated instance
     testHelper.completeTask("userTask1");
@@ -1020,7 +1020,7 @@ public class MigrationAddBoundaryEventsTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    testHelper.assertTimerJobCreated("boundary");
+    testHelper.assertBoundaryTimerJobCreated("boundary");
 
     // and it is possible to successfully complete the migrated instance
     testHelper.completeTask("userTask1");
@@ -1078,7 +1078,7 @@ public class MigrationAddBoundaryEventsTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    testHelper.assertTimerJobCreated("boundary");
+    testHelper.assertBoundaryTimerJobCreated("boundary");
 
     // and it is possible to successfully complete the migrated instance
     testHelper.completeTask("userTask");
@@ -1134,7 +1134,7 @@ public class MigrationAddBoundaryEventsTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    testHelper.assertTimerJobCreated("boundary");
+    testHelper.assertBoundaryTimerJobCreated("boundary");
 
     // and it is possible to successfully complete the migrated instance
     testHelper.completeTask("userTask");
@@ -1192,7 +1192,7 @@ public class MigrationAddBoundaryEventsTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    testHelper.assertTimerJobCreated("boundary");
+    testHelper.assertBoundaryTimerJobCreated("boundary");
 
     // and it is possible to successfully complete the migrated instance
     testHelper.completeTask("userTask1");
@@ -1256,7 +1256,7 @@ public class MigrationAddBoundaryEventsTest {
     // then
     testHelper.assertEventSubscriptionCreated("messageBoundary", MESSAGE_NAME);
     testHelper.assertEventSubscriptionCreated("signalBoundary", SIGNAL_NAME);
-    testHelper.assertTimerJobCreated("timerBoundary");
+    testHelper.assertBoundaryTimerJobCreated("timerBoundary");
 
     // and it is possible to successfully complete the migrated instance
     testHelper.completeTask("userTask");

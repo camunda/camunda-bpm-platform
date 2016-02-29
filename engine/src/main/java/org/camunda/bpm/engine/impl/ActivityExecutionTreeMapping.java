@@ -65,8 +65,17 @@ public class ActivityExecutionTreeMapping {
   }
 
   public ExecutionEntity getExecution(ActivityInstance activityInstance) {
+    ScopeImpl scope = null;
+
+    if (activityInstance.getId().equals(activityInstance.getProcessInstanceId())) {
+      scope = processDefinition;
+    }
+    else {
+      scope = processDefinition.findActivity(activityInstance.getActivityId());
+    }
+
     return intersect(
-        getExecutions(processDefinition.findActivity(activityInstance.getActivityId())),
+        getExecutions(scope),
         activityInstance.getExecutionIds());
   }
 

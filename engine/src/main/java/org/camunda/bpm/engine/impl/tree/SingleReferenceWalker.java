@@ -12,18 +12,29 @@
  */
 package org.camunda.bpm.engine.impl.tree;
 
-/**
- * A visitor for {@link SingleReferenceWalker}.
- *
- * @author Thorben Lindhauer
- *
- */
-public interface TreeVisitor<T> {
+import java.util.Collection;
+import java.util.Collections;
 
-  /**
-   * Invoked for a node in tree.
-   *
-   * @param obj a reference to the node
-   */
-  void visit(T obj);
+/**
+ * @author Thorben Lindhauer
+ */
+public abstract class SingleReferenceWalker<T> extends ReferenceWalker<T> {
+
+  public SingleReferenceWalker(T initialElement) {
+    super(initialElement);
+  }
+
+  @Override
+  protected Collection<T> nextElements() {
+    T nextElement = nextElement();
+
+    if (nextElement != null) {
+      return Collections.singleton(nextElement);
+    }
+    else {
+      return Collections.emptyList();
+    }
+  }
+
+  protected abstract T nextElement();
 }

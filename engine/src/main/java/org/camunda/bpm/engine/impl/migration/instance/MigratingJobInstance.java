@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.migration.instance;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
@@ -24,28 +23,26 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
-public class MigratingTimerJobInstance implements MigratingInstance, RemovingInstance, EmergingInstance {
+public class MigratingJobInstance implements MigratingInstance, RemovingInstance {
 
   protected JobEntity jobEntity;
   protected JobDefinitionEntity targetJobDefinitionEntity;
   protected ScopeImpl targetScope;
 
-  protected TimerDeclarationImpl timerDeclaration;
-
   protected List<MigratingInstance> migratingDependentInstances = new ArrayList<MigratingInstance>();
 
-  public MigratingTimerJobInstance(JobEntity jobEntity, JobDefinitionEntity jobDefinitionEntity, ScopeImpl targetScope) {
+  public MigratingJobInstance(JobEntity jobEntity, JobDefinitionEntity jobDefinitionEntity, ScopeImpl targetScope) {
     this.jobEntity = jobEntity;
     this.targetJobDefinitionEntity = jobDefinitionEntity;
     this.targetScope = targetScope;
   }
 
-  public MigratingTimerJobInstance(JobEntity jobEntity) {
+  public MigratingJobInstance(JobEntity jobEntity) {
     this(jobEntity, null, null);
   }
 
-  public MigratingTimerJobInstance(TimerDeclarationImpl timerDeclaration) {
-    this.timerDeclaration = timerDeclaration;
+  public JobEntity getJobEntity() {
+    return jobEntity;
   }
 
   public void addMigratingDependentInstance(MigratingInstance migratingInstance) {
@@ -89,12 +86,12 @@ public class MigratingTimerJobInstance implements MigratingInstance, RemovingIns
     }
   }
 
-  public void create(ExecutionEntity scopeExecution) {
-    timerDeclaration.createTimer(scopeExecution);
-  }
-
   public void remove() {
     jobEntity.delete();
+  }
+
+  public ScopeImpl getTargetScope() {
+    return targetScope;
   }
 
   protected void updateJobConfiguration(String activityId) {

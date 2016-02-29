@@ -50,10 +50,11 @@ import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 import org.camunda.bpm.engine.impl.tree.ExecutionWalker;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
 import org.camunda.bpm.engine.impl.tree.LeafActivityInstanceExecutionCollector;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker.WalkCondition;
 import org.camunda.bpm.engine.impl.tree.ScopeCollector;
 import org.camunda.bpm.engine.impl.tree.ScopeExecutionCollector;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
-import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
@@ -1424,7 +1425,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     ScopeExecutionCollector scopeExecutionCollector = new ScopeExecutionCollector();
     new ExecutionWalker(this)
       .addPreVisitor(scopeExecutionCollector)
-      .walkWhile(new WalkCondition<PvmExecutionImpl>() {
+      .walkWhile(new ReferenceWalker.WalkCondition<PvmExecutionImpl>() {
         public boolean isFulfilled(PvmExecutionImpl element) {
           return element == null || mapping.containsValue(element);
         }
@@ -1435,7 +1436,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     ScopeCollector scopeCollector = new ScopeCollector();
     new FlowScopeWalker(currentScope)
       .addPreVisitor(scopeCollector)
-      .walkWhile(new WalkCondition<ScopeImpl>() {
+      .walkWhile(new ReferenceWalker.WalkCondition<ScopeImpl>() {
         public boolean isFulfilled(ScopeImpl element) {
           return element == null || mapping.containsKey(element);
         }

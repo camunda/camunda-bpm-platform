@@ -223,8 +223,8 @@ public class MigrationEventSubProcessTest {
         .activity("userTask", testHelper.getSingleActivityInstanceBeforeMigration("userTask").getId())
         .done());
 
-    testHelper.assertTimerJobRemoved("eventStart");
-    testHelper.assertTimerJobCreated("eventStart");
+    testHelper.assertEventSubProcessTimerJobRemoved("eventStart");
+    testHelper.assertEventSubProcessTimerJobCreated("eventStart");
 
     // and it is possible to successfully complete the migrated instance
     testHelper.completeTask("userTask");

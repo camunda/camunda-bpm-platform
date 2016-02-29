@@ -10,20 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.tree;
+package org.camunda.bpm.engine.impl.migration.instance.parser;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 /**
- * A visitor for {@link SingleReferenceWalker}.
- *
  * @author Thorben Lindhauer
  *
  */
-public interface TreeVisitor<T> {
+public class ActivityInstanceWalker extends ReferenceWalker<ActivityInstance> {
 
-  /**
-   * Invoked for a node in tree.
-   *
-   * @param obj a reference to the node
-   */
-  void visit(T obj);
+  public ActivityInstanceWalker(ActivityInstance initialElement) {
+    super(initialElement);
+  }
+
+  protected Collection<ActivityInstance> nextElements() {
+    ActivityInstance[] children = getCurrentElement().getChildActivityInstances();
+    return Arrays.asList(children);
+  }
+
 }

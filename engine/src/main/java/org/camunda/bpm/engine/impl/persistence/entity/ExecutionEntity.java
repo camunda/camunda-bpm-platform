@@ -1166,7 +1166,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   protected void ensureExecutionTreeInitialized() {
     List<ExecutionEntity> executions = Context.getCommandContext()
       .getExecutionManager()
-      .findChildExecutionsByProcessInstanceId(processInstanceId);
+      .findExecutionsByProcessInstanceId(processInstanceId);
 
     ExecutionEntity processInstance = isProcessInstanceExecution() ? this : null;
 
@@ -1178,12 +1178,11 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       }
     }
 
-    processInstance.restoreProcessInstance(executions, null, null);
+    processInstance.restoreProcessInstance(executions, null, null, null, null, null);
   }
 
   /**
    * Restores a complete process instance tree including referenced entities.
-   * Note: currently only the restoring of variables and event subscriptions is supported.
    *
    * @param executions
    *   the list of all executions that are part of this process instance.
@@ -1194,10 +1193,16 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
    * @param variables
    *   the list of all variables that are linked to executions which are part of this process instance
    *   If null, variables are not initialized and are lazy loaded on demand
+   * @param jobs
+   * @param tasks
+   * @param incidents
    */
   public void restoreProcessInstance(Collection<ExecutionEntity> executions,
       Collection<EventSubscriptionEntity> eventSubscriptions,
-      Collection<VariableInstanceEntity> variables) {
+      Collection<VariableInstanceEntity> variables,
+      Collection<TaskEntity> tasks,
+      Collection<JobEntity> jobs,
+      Collection<IncidentEntity> incidents) {
 
     if(!isProcessInstanceExecution()) {
       throw LOG.restoreProcessInstanceException(this);
@@ -1251,6 +1256,28 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       for (VariableInstanceEntity variable : variables) {
         ExecutionEntity executionEntity = executionsMap.get(variable.getExecutionId());
         executionEntity.getVariableStore().getVariableInstances().put(variable.getName(), variable);
+      }
+    }
+
+    if (jobs != null) {
+      for (JobEntity job : jobs) {
+        ExecutionEntity execution = executionsMap.get(job.getExecutionId());
+        job.setExecution(execution);
+      }
+    }
+
+    if (tasks != null) {
+      for (TaskEntity task : tasks) {
+        ExecutionEntity execution = executionsMap.get(task.getExecutionId());
+        task.setExecution(execution);
+        execution.addTask(task);
+      }
+    }
+
+    if (incidents != null) {
+      for (IncidentEntity incident : incidents) {
+        ExecutionEntity execution = executionsMap.get(incident.getExecutionId());
+        incident.setExecution(execution);
       }
     }
   }

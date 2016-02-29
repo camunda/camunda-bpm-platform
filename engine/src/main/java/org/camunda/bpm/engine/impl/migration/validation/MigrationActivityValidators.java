@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
-import org.camunda.bpm.engine.impl.tree.TreeWalker;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
 
 public class MigrationActivityValidators {
 
@@ -89,7 +89,7 @@ public class MigrationActivityValidators {
 
   protected static boolean hasMultiInstanceParent(ActivityImpl activity) {
     FlowScopeWalker flowScopeWalker = new FlowScopeWalker(activity);
-    flowScopeWalker.walkUntil(new TreeWalker.WalkCondition<ScopeImpl>() {
+    flowScopeWalker.walkUntil(new ReferenceWalker.WalkCondition<ScopeImpl>() {
       public boolean isFulfilled(ScopeImpl element) {
         return isProcessDefinition(element) || isMultiInstance(element);
       }
@@ -104,7 +104,7 @@ public class MigrationActivityValidators {
 
   protected static boolean hasEventSubProcessParent(ActivityImpl activity) {
     FlowScopeWalker flowScopeWalker = new FlowScopeWalker(activity);
-    flowScopeWalker.walkUntil(new TreeWalker.WalkCondition<ScopeImpl>() {
+    flowScopeWalker.walkUntil(new ReferenceWalker.WalkCondition<ScopeImpl>() {
       public boolean isFulfilled(ScopeImpl element) {
         return isProcessDefinition(element) || isEventSubProcess(element);
       }

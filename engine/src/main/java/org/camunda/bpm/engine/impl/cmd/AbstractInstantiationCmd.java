@@ -37,7 +37,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.tree.ActivityStackCollector;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
-import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -127,7 +127,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
     // if no explicit ancestor activity instance is set
     if (ancestorActivityInstanceId == null) {
       // walk until a scope is reached for which executions exist
-      walker.walkWhile(new WalkCondition<ScopeImpl>() {
+      walker.walkWhile(new ReferenceWalker.WalkCondition<ScopeImpl>() {
         public boolean isFulfilled(ScopeImpl element) {
           return !mapping.getExecutions(element).isEmpty() || element == processDefinition;
         }
@@ -160,7 +160,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
       final PvmScope ancestorScope = getScopeForActivityInstance(processDefinition, ancestorInstance);
 
       // walk until the scope of the ancestor scope execution is reached
-      walker.walkWhile(new WalkCondition<ScopeImpl>() {
+      walker.walkWhile(new ReferenceWalker.WalkCondition<ScopeImpl>() {
         public boolean isFulfilled(ScopeImpl element) {
           return (
               mapping.getExecutions(element).contains(ancestorScopeExecution)

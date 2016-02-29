@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  * @author Philipp Ossler
  *
  */
-public class ActivityExecutionHierarchyWalker extends TreeWalker<ActivityExecutionTuple> {
+public class ActivityExecutionHierarchyWalker extends SingleReferenceWalker<ActivityExecutionTuple> {
 
   private Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping;
 
@@ -39,7 +39,7 @@ public class ActivityExecutionHierarchyWalker extends TreeWalker<ActivityExecuti
 
   @Override
   protected ActivityExecutionTuple nextElement() {
-    PvmScope currentScope = currentElement.getScope();
+    PvmScope currentScope = getCurrentElement().getScope();
     PvmScope flowScope = currentScope.getFlowScope();
 
     if (flowScope != null) {
@@ -85,19 +85,19 @@ public class ActivityExecutionHierarchyWalker extends TreeWalker<ActivityExecuti
     }
   }
 
-  public TreeWalker<ActivityExecutionTuple> addScopePreVisitor(TreeVisitor<PvmScope> visitor) {
+  public ReferenceWalker<ActivityExecutionTuple> addScopePreVisitor(TreeVisitor<PvmScope> visitor) {
     return addPreVisitor(new ScopeVisitorWrapper(visitor));
   }
 
-  public TreeWalker<ActivityExecutionTuple> addScopePostVisitor(TreeVisitor<PvmScope> visitor) {
+  public ReferenceWalker<ActivityExecutionTuple> addScopePostVisitor(TreeVisitor<PvmScope> visitor) {
     return addPostVisitor(new ScopeVisitorWrapper(visitor));
   }
 
-  public TreeWalker<ActivityExecutionTuple> addExecutionPreVisitor(TreeVisitor<ActivityExecution> visitor) {
+  public ReferenceWalker<ActivityExecutionTuple> addExecutionPreVisitor(TreeVisitor<ActivityExecution> visitor) {
     return addPreVisitor(new ExecutionVisitorWrapper(visitor));
   }
 
-  public TreeWalker<ActivityExecutionTuple> addExecutionPostVisitor(TreeVisitor<ActivityExecution> visitor) {
+  public ReferenceWalker<ActivityExecutionTuple> addExecutionPostVisitor(TreeVisitor<ActivityExecution> visitor) {
     return addPostVisitor(new ExecutionVisitorWrapper(visitor));
   }
 

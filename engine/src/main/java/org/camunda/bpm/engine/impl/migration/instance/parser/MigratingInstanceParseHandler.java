@@ -10,20 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.tree;
+package org.camunda.bpm.engine.impl.migration.instance.parser;
 
 /**
- * A visitor for {@link SingleReferenceWalker}.
- *
  * @author Thorben Lindhauer
  *
  */
-public interface TreeVisitor<T> {
+public interface MigratingInstanceParseHandler<T> {
 
-  /**
-   * Invoked for a node in tree.
-   *
-   * @param obj a reference to the node
-   */
-  void visit(T obj);
+  void handle(MigratingInstanceParseContext parseContext, T element);
 }

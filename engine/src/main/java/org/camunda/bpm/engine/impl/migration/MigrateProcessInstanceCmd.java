@@ -20,14 +20,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstanceWalker;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingExecutionBranch;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
+import org.camunda.bpm.engine.impl.migration.instance.parser.MigratingInstanceParser;
 import org.camunda.bpm.engine.impl.migration.validation.AdditionalFlowScopeValidator;
 import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidationReportImpl;
 import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidator;
@@ -37,8 +38,8 @@ import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
-import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -90,8 +91,9 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
     ensureSameProcessDefinition(processInstance, migrationPlan.getSourceProcessDefinitionId());
 
     // Initialize migration: match migration instructions to activity instances and collect required entities
-    MigratingProcessInstance migratingProcessInstance = MigratingProcessInstance.initializeFrom(
-        commandContext, migrationPlan, processInstance, targetProcessDefinition);
+    MigratingProcessInstance migratingProcessInstance =
+      new MigratingInstanceParser(Context.getProcessEngineConfiguration().getProcessEngine())
+        .parse(processInstance.getId(), migrationPlan);
 
     validateInstructions(migratingProcessInstance);
 
@@ -143,7 +145,7 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
         }
       });
 
-      walker.walkUntil(new WalkCondition<MigratingActivityInstance>() {
+      walker.walkUntil(new ReferenceWalker.WalkCondition<MigratingActivityInstance>() {
 
         @Override
         public boolean isFulfilled(MigratingActivityInstance element) {
@@ -279,7 +281,7 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
       }
     });
 
-    walker.walkWhile(new WalkCondition<ScopeImpl>() {
+    walker.walkWhile(new ReferenceWalker.WalkCondition<ScopeImpl>() {
 
       @Override
       public boolean isFulfilled(ScopeImpl element) {

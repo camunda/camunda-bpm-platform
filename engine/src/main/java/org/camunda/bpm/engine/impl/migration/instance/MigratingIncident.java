@@ -17,12 +17,12 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
-public class MigratingFailedJobIncident implements MigratingInstance {
+public class MigratingIncident implements MigratingInstance {
 
   protected IncidentEntity incident;
   protected ScopeImpl targetScope;
 
-  protected MigratingFailedJobIncident(IncidentEntity incident, ScopeImpl targetScope) {
+  public MigratingIncident(IncidentEntity incident, ScopeImpl targetScope) {
     this.incident = incident;
     this.targetScope = targetScope;
   }

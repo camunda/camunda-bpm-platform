@@ -10,20 +10,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.tree;
+package org.camunda.bpm.engine.impl.migration.instance;
+
+import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
- * A visitor for {@link SingleReferenceWalker}.
- *
  * @author Thorben Lindhauer
  *
  */
-public interface TreeVisitor<T> {
+public class EmergingJobInstance implements EmergingInstance {
 
-  /**
-   * Invoked for a node in tree.
-   *
-   * @param obj a reference to the node
-   */
-  void visit(T obj);
+  protected TimerDeclarationImpl timerDeclaration;
+
+  public EmergingJobInstance(TimerDeclarationImpl timerDeclaration) {
+    this.timerDeclaration = timerDeclaration;
+  }
+
+  @Override
+  public void create(ExecutionEntity scopeExecution) {
+    timerDeclaration.createTimer(scopeExecution);
+  }
 }

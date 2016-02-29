@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
@@ -99,7 +98,7 @@ public class ExecutionManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<ExecutionEntity> findChildExecutionsByProcessInstanceId(String processInstanceId) {
+  public List<ExecutionEntity> findExecutionsByProcessInstanceId(String processInstanceId) {
     return getDbEntityManager().selectList("selectExecutionsByProcessInstanceId", processInstanceId);
   }
 

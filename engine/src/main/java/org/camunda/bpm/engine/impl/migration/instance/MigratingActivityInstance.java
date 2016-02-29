@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.migration.instance;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -42,7 +43,7 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
   protected ScopeImpl sourceScope;
   protected ScopeImpl targetScope;
 
-  protected Set<MigratingActivityInstance> childInstances;
+  protected Set<MigratingActivityInstance> childInstances = new HashSet<MigratingActivityInstance>();
   protected MigratingActivityInstance parentInstance;
 
   // behaves differently if the current activity is scope or not

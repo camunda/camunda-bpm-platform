@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -101,12 +102,24 @@ public class ProcessInstanceSnapshot {
   }
 
   public EventSubscription getEventSubscriptionForActivityIdAndEventName(String activityId, String eventName) {
+
+    List<EventSubscription> collectedEventsubscriptions = new ArrayList<EventSubscription>();
+
     for (EventSubscription eventSubscription : getEventSubscriptions()) {
       if (activityId.equals(eventSubscription.getActivityId()) && eventName.equals(eventSubscription.getEventName())) {
-        return eventSubscription;
+        collectedEventsubscriptions.add(eventSubscription);
       }
     }
-    return null;
+
+    if (collectedEventsubscriptions.isEmpty()) {
+      return null;
+    }
+    else if (collectedEventsubscriptions.size() == 1) {
+      return collectedEventsubscriptions.get(0);
+    }
+    else {
+      throw new RuntimeException("There is more than one event subscription for activity " + activityId + " and event " + eventName);
+    }
   }
 
   public void setEventSubscriptions(List<EventSubscription> eventSubscriptions) {
@@ -119,12 +132,23 @@ public class ProcessInstanceSnapshot {
   }
 
   public Job getJobForDefinitionId(String jobDefinitionId) {
+    List<Job> collectedJobs = new ArrayList<Job>();
+
     for (Job job : getJobs()) {
       if (jobDefinitionId.equals(job.getJobDefinitionId())) {
-        return job;
+        collectedJobs.add(job);
       }
     }
-    return null;
+
+    if (collectedJobs.isEmpty()) {
+      return null;
+    }
+    else if (collectedJobs.size() == 1) {
+      return collectedJobs.get(0);
+    }
+    else {
+      throw new RuntimeException("There is more than one job for job definition " + jobDefinitionId);
+    }
   }
 
   public void setJobs(List<Job> jobs) {
@@ -136,13 +160,24 @@ public class ProcessInstanceSnapshot {
     return jobDefinitions;
   }
 
-  public JobDefinition getJobDefinitionForActivityId(String activityId) {
+  public JobDefinition getJobDefinitionForActivityIdAndType(String activityId, String jobHandlerType) {
+
+    List<JobDefinition> collectedDefinitions = new ArrayList<JobDefinition>();
     for (JobDefinition jobDefinition : getJobDefinitions()) {
-      if (activityId.equals(jobDefinition.getActivityId())) {
-        return jobDefinition;
+      if (activityId.equals(jobDefinition.getActivityId()) && jobHandlerType.equals(jobDefinition.getJobType())) {
+        collectedDefinitions.add(jobDefinition);
       }
     }
-    return null;
+
+    if (collectedDefinitions.isEmpty()) {
+      return null;
+    }
+    else if (collectedDefinitions.size() == 1) {
+      return collectedDefinitions.get(0);
+    }
+    else {
+      throw new RuntimeException("There is more than one job definition for activity " + activityId + " and job handler type " + jobHandlerType);
+    }
   }
 
   public void setJobDefinitions(List<JobDefinition> jobDefinitions) {

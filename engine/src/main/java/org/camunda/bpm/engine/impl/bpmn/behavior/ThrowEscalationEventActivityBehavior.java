@@ -25,8 +25,9 @@ import org.camunda.bpm.engine.impl.tree.ActivityExecutionHierarchyWalker;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionMappingCollector;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionTuple;
 import org.camunda.bpm.engine.impl.tree.OutputVariablesPropagator;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker.WalkCondition;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
-import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 
 /**
  * The activity behavior for an intermediate throwing escalation event and an escalation end event.
@@ -54,7 +55,7 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
     walker.addExecutionPreVisitor(activityExecutionMappingCollector);
     walker.addExecutionPreVisitor(new OutputVariablesPropagator());
 
-    walker.walkUntil(new WalkCondition<ActivityExecutionTuple>() {
+    walker.walkUntil(new ReferenceWalker.WalkCondition<ActivityExecutionTuple>() {
 
       @Override
       public boolean isFulfilled(ActivityExecutionTuple element) {

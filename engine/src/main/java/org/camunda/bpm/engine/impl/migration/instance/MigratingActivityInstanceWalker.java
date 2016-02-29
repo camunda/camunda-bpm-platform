@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.migration.instance;
 
-import org.camunda.bpm.engine.impl.tree.TreeWalker;
+import org.camunda.bpm.engine.impl.tree.SingleReferenceWalker;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class MigratingActivityInstanceWalker extends TreeWalker<MigratingActivityInstance> {
+public class MigratingActivityInstanceWalker extends SingleReferenceWalker<MigratingActivityInstance> {
 
   public MigratingActivityInstanceWalker(MigratingActivityInstance initialElement) {
     super(initialElement);
@@ -26,6 +26,6 @@ public class MigratingActivityInstanceWalker extends TreeWalker<MigratingActivit
 
   @Override
   protected MigratingActivityInstance nextElement() {
-    return currentElement.getParent();
+    return getCurrentElement().getParent();
   }
 }

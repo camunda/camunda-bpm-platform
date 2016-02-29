@@ -132,7 +132,7 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
 
     // switch all sub-executions of the process instance to the new process definition version
     List<ExecutionEntity> childExecutions = executionManager
-      .findChildExecutionsByProcessInstanceId(processInstanceId);
+      .findExecutionsByProcessInstanceId(processInstanceId);
     for (ExecutionEntity executionEntity : childExecutions) {
       validateAndSwitchVersionOfExecution(commandContext, executionEntity, newProcessDefinition);
     }

@@ -18,14 +18,14 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  * @author Daniel Meyer
  *
  */
-public class ExecutionWalker extends TreeWalker<PvmExecutionImpl> {
+public class ExecutionWalker extends SingleReferenceWalker<PvmExecutionImpl> {
 
   public ExecutionWalker(PvmExecutionImpl initialElement) {
     super(initialElement);
   }
 
   protected PvmExecutionImpl nextElement() {
-    return currentElement.getParent();
+    return getCurrentElement().getParent();
   }
 
 }

@@ -159,7 +159,12 @@
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EXECUTION_ID_ = #{parameter})
   </select>
-
+  
+  <select id="selectEventSubscriptionsByProcessInstanceId"  resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    select *
+    from ${prefix}ACT_RU_EVENT_SUBSCR
+    where (PROC_INST_ID_ = #{parameter})
+  </select>
 
   <select id="selectEventSubscriptionsByExecutionAndType" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select *

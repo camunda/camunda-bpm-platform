@@ -48,7 +48,8 @@ import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.tree.ExecutionWalker;
-import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker.WalkCondition;
 
 /**
  * This class encapsulates legacy runtime behavior for the process engine.
@@ -622,7 +623,7 @@ public class LegacyBehavior {
 
   protected static PvmExecutionImpl findCompensationThrowingAncestorExecution(PvmExecutionImpl execution) {
     ExecutionWalker walker = new ExecutionWalker(execution);
-    walker.walkUntil(new WalkCondition<PvmExecutionImpl>() {
+    walker.walkUntil(new ReferenceWalker.WalkCondition<PvmExecutionImpl>() {
       public boolean isFulfilled(PvmExecutionImpl element) {
         return element == null || CompensationBehavior.isCompensationThrowing(element);
       }
