@@ -183,7 +183,7 @@ public class AuthorizationManager extends AbstractManager {
     if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
       String userId = currentAuthentication.getUserId();
-      boolean isAuthorized = isAuthorized(userId, filterAuthenticatedGroupIds(currentAuthentication.getGroupIds()), permissionChecks);
+      boolean isAuthorized = isAuthorized(userId, currentAuthentication.getGroupIds(), permissionChecks);
       if (!isAuthorized) {
 
         List<MissingAuthorization> info = new ArrayList<MissingAuthorization>();
@@ -213,7 +213,7 @@ public class AuthorizationManager extends AbstractManager {
 
     if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
-      boolean isAuthorized = isAuthorized(currentAuthentication.getUserId(), filterAuthenticatedGroupIds(currentAuthentication.getGroupIds()), permission, resource, resourceId);
+      boolean isAuthorized = isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
       if (!isAuthorized) {
         throw new AuthorizationException(
             currentAuthentication.getUserId(),
@@ -232,7 +232,7 @@ public class AuthorizationManager extends AbstractManager {
     final Authentication currentAuthentication = getCurrentAuthentication();
 
     if(isAuthorizationEnabled() && currentAuthentication != null) {
-      return isAuthorized(currentAuthentication.getUserId(), filterAuthenticatedGroupIds(currentAuthentication.getGroupIds()), permission, resource, resourceId);
+      return isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
 
     } else {
       return true;
@@ -253,9 +253,11 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   public boolean isAuthorized(String userId, List<String> groupIds, List<PermissionCheck> permissionChecks) {
+    List<String> filteredGroupIds = filterAuthenticatedGroupIds(groupIds);
+
     AuthorizationCheck authCheck = new AuthorizationCheck();
     authCheck.setAuthUserId(userId);
-    authCheck.setAuthGroupIds(groupIds);
+    authCheck.setAuthGroupIds(filteredGroupIds);
     authCheck.setAtomicPermissionChecks(permissionChecks);
     return getDbEntityManager().selectBoolean("isUserAuthorizedForResource", authCheck);
   }
