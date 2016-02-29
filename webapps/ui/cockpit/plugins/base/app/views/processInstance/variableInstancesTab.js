@@ -66,6 +66,10 @@ var instancesTemplate = fs.readFileSync(__dirname + '/variable-instances-tab.htm
           return promise.promise;
         };
 
+        $scope.downloadVariable = function(info) {
+          return Uri.appUri('engine://engine/:engine/variable-instance/' + info.variable.id +'/data');
+        };
+
         $scope.deleteVariable = function(info) {
           var promise = $q.defer();
 
