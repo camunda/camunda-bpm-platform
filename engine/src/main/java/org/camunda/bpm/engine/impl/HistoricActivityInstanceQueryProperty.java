@@ -35,4 +35,5 @@ public interface HistoricActivityInstanceQueryProperty {
   public static final QueryProperty END = new QueryPropertyImpl("END_TIME_");
   public static final QueryProperty DURATION = new QueryPropertyImpl("DURATION_");
   public static final QueryProperty SEQUENCE_COUNTER = new QueryPropertyImpl("SEQUENCE_COUNTER_");
+  public static final QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
 }

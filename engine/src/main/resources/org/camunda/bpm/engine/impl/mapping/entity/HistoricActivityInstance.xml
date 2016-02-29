@@ -39,7 +39,8 @@
         END_TIME_,
         DURATION_,
         ACT_INST_STATE_,
-        SEQUENCE_COUNTER_
+        SEQUENCE_COUNTER_,
+        TENANT_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{parentActivityInstanceId ,jdbcType=VARCHAR},
@@ -58,7 +59,8 @@
         #{endTime, jdbcType=TIMESTAMP},
         #{durationInMillis ,jdbcType=BIGINT},
         #{activityInstanceState,jdbcType=INTEGER},
-        #{sequenceCounter,jdbcType=BIGINT}
+        #{sequenceCounter,jdbcType=BIGINT},
+        #{tenantId, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -116,6 +118,7 @@
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
     <result property="activityInstanceState" column="ACT_INST_STATE_" jdbcType="INTEGER" />
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- HISTORIC ACTIVITY INSTANCE SELECT -->
@@ -186,6 +189,13 @@
       </if>
       <if test="activityInstanceState != null">
         and RES.ACT_INST_STATE_ = #{activityInstanceState.stateCode}
+      </if>
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />

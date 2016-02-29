@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest.history;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.inOrder;
@@ -11,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -256,6 +258,11 @@ public class HistoricActivityInstanceRestServiceQueryTest extends AbstractRestSe
     executeAndVerifySorting("occurrence", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderPartiallyByOccurrence();
     inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
+    inOrder.verify(mockedQuery).asc();
   }
 
   @Test
@@ -388,6 +395,7 @@ public class HistoricActivityInstanceRestServiceQueryTest extends AbstractRestSe
     long returnedDurationInMillis = from(content).getLong("[0].durationInMillis");
     boolean canceled = from(content).getBoolean("[0].canceled");
     boolean completeScope = from(content).getBoolean("[0].completeScope");
+    String returnedTenantId = from(content).getString("[0].tenantId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_PARENT_ACTIVITY_INSTANCE_ID, returnedParentActivityInstanceId);
@@ -407,6 +415,7 @@ public class HistoricActivityInstanceRestServiceQueryTest extends AbstractRestSe
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_DURATION, returnedDurationInMillis);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED, canceled);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE, completeScope);
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
   }
 
   @Test
@@ -745,5 +754,65 @@ public class HistoricActivityInstanceRestServiceQueryTest extends AbstractRestSe
     verify(mockedQuery).finishedBefore(finishedDateParameters.get("finishedBefore"));
 
     verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testTenantIdListParameter() {
+    mockedQuery = setUpMockHistoricActivityInstanceQuery(createMockHistoricActivityInstancesTwoTenants());
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_ACTIVITY_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> executions = from(content).getList("");
+    assertThat(executions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void testTenantIdListPostParameter() {
+    mockedQuery = setUpMockHistoricActivityInstanceQuery(createMockHistoricActivityInstancesTwoTenants());
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST.split(","));
+
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_ACTIVITY_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> executions = from(content).getList("");
+    assertThat(executions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  private List<HistoricActivityInstance> createMockHistoricActivityInstancesTwoTenants() {
+    return Arrays.asList(
+        MockProvider.createMockHistoricActivityInstance(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockHistoricActivityInstance(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
   }
 }

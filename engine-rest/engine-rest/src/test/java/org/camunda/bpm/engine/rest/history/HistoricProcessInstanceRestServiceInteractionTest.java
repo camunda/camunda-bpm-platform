@@ -101,7 +101,7 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID, returnedSuperProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_CASE_INSTANCE_ID, returnedSuperCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID, returnedCaseInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_TENANT_ID, returnedTenantId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
 
   }
 

@@ -77,4 +77,11 @@ public interface HistoricActivityInstance {
 
   /** Was this activity instance canceled */
   boolean isCanceled();
+
+  /**
+   * The id of the tenant this historic activity instance belongs to. Can be <code>null</code>
+   * if the historic activity instance belongs to no single tenant.
+   */
+  String getTenantId();
+
 }

@@ -64,7 +64,7 @@ public class HistoricActivityInstanceRestServiceInteractionTest extends Abstract
   }
 
   @Test
-  public void testGetSingleHistoricCaseInstance() {
+  public void testGetSingleHistoricActivityInstance() {
     Response response = given()
         .pathParam("id", MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_ID)
       .then().expect()
@@ -92,6 +92,7 @@ public class HistoricActivityInstanceRestServiceInteractionTest extends Abstract
     long returnedDurationInMillis = from(content).getLong("durationInMillis");
     boolean canceled = from(content).getBoolean("canceled");
     boolean completeScope = from(content).getBoolean("completeScope");
+    String returnedTenantId = from(content).getString("tenantId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_PARENT_ACTIVITY_INSTANCE_ID, returnedParentActivityInstanceId);
@@ -111,6 +112,7 @@ public class HistoricActivityInstanceRestServiceInteractionTest extends Abstract
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_DURATION, returnedDurationInMillis);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED, canceled);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE, completeScope);
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
   }
 
   @Test

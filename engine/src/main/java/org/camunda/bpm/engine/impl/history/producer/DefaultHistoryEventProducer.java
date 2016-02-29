@@ -70,6 +70,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     String parentActivityInstanceId = null;
     ExecutionEntity parentExecution = execution.getParent();
+    String tenantId = execution.getTenantId();
 
     if (parentExecution != null && CompensationBehavior.isCompensationThrowing(parentExecution)) {
       parentActivityInstanceId = CompensationBehavior.getParentActivityInstanceId(execution);
@@ -85,6 +86,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setProcessDefinitionId(execution.getProcessDefinitionId());
     evt.setProcessInstanceId(execution.getProcessInstanceId());
     evt.setExecutionId(execution.getId());
+    evt.setTenantId(tenantId);
 
     ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
     if (definition != null) {

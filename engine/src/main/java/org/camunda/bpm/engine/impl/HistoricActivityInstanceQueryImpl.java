@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.Date;
 import java.util.List;
 
@@ -46,6 +48,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   protected Date finishedBefore;
   protected Date finishedAfter;
   protected ActivityInstanceState activityInstanceState;
+  protected String[] tenantIds;
 
   public HistoricActivityInstanceQueryImpl() {
   }
@@ -152,6 +155,12 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     return this;
   }
 
+  public HistoricActivityInstanceQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   @Override
   protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions()
@@ -214,6 +223,10 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   public HistoricActivityInstanceQuery orderPartiallyByOccurrence() {
     orderBy(HistoricActivityInstanceQueryProperty.SEQUENCE_COUNTER);
     return this;
+  }
+
+  public HistoricActivityInstanceQuery orderByTenantId() {
+    return orderBy(HistoricActivityInstanceQueryProperty.TENANT_ID);
   }
 
   public HistoricActivityInstanceQueryImpl activityInstanceId(String activityInstanceId) {
