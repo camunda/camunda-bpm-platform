@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
@@ -48,6 +49,10 @@ public class MultiTenancySignalReceiveTest extends PluggableProcessEngineTestCas
       .userTask()
       .endEvent()
       .done();
+
+  private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
+    return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutorTxRequired());
+  }
 
   public void testSendSignalToStartEventForNonTenant() {
     deployment(SIGNAL_START_PROCESS);
@@ -225,5 +230,330 @@ public class MultiTenancySignalReceiveTest extends PluggableProcessEngineTestCas
       assertThat(e.getMessage(), containsString("Cannot specify a tenant-id when deliver a signal to a single execution."));
     }
   }
+
+  public void testIntermediateSignalThrowTenantXCatchTenantX(){
+
+    // TenantX=1
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml").
+        tenantId("1").deploy();
+
+    runtimeService.startProcessInstanceByKey("catchSignal");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    // TenantX=1
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml").
+        tenantId("1").deploy();
+
+    runtimeService.startProcessInstanceByKey("throwSignal");
+
+    assertEquals(0, createEventSubscriptionQuery().count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+
+  }
+
+  public void testIntermediateSignalThrowTenantXCatchTenantNull(){
+
+    // TenantX=1
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml").
+        tenantId("1").deploy();
+
+    runtimeService.startProcessInstanceByKey("catchSignal");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    // TenantNull=null
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml").
+        tenantId(null).deploy();
+
+    runtimeService.startProcessInstanceByKey("throwSignal");
+
+    assertEquals(0, createEventSubscriptionQuery().count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+
+  }
+
+  public void testIntermediateSignalThrowTenantXCatchTenantY(){
+
+    // TenantX=1
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml").
+        tenantId("1").deploy();
+
+    runtimeService.startProcessInstanceByKey("catchSignal");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    // TenantY=2
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml").
+        tenantId("2").deploy();
+
+    runtimeService.startProcessInstanceByKey("throwSignal");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+
+  }
+
+  public void testIntermediateSignalThrowTenantNullCatchTenantNull(){
+
+    // TenantNull=null
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml").
+        tenantId(null).deploy();
+
+    runtimeService.startProcessInstanceByKey("catchSignal");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    // TenantNull=null
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml").
+        tenantId(null).deploy();
+
+    runtimeService.startProcessInstanceByKey("throwSignal");
+
+    assertEquals(0, createEventSubscriptionQuery().count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+
+  }
+
+  public void testIntermediateSignalThrowTenantNullCatchTenantX(){
+
+    // TenantNull=null
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml").
+        tenantId(null).deploy();
+
+    runtimeService.startProcessInstanceByKey("catchSignal");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    // TenantX=1
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml").
+        tenantId("1").deploy();
+
+    runtimeService.startProcessInstanceByKey("throwSignal");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+
+  }
+
+  public void testIntermediateSignalThrowTenantNullCatchTenantY(){
+
+    // TenantNull=null
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml").
+        tenantId(null).deploy();
+
+    runtimeService.startProcessInstanceByKey("catchSignal");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    // TenantY=2
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml").
+        tenantId("2").deploy();
+
+    runtimeService.startProcessInstanceByKey("throwSignal");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+
+  }
+
+  public void testEndSignalThrowTenantXCatchTenantX(){
+
+    // TenantX=1
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.catchSignalEndEvent.bpmn20.xml").
+        tenantId("1").deploy();
+
+    runtimeService.startProcessInstanceByKey("catchSignalEndEvent");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    // TenantX=1
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.processWithSignalEndEvent.bpmn20.xml").
+        tenantId("1").deploy();
+
+    runtimeService.startProcessInstanceByKey("processWithSignalEndEvent");
+
+    assertEquals(0, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+
+  }
+
+  public void testEndSignalThrowTenantXCatchTenantNull(){
+
+    // TenantX=1
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.catchSignalEndEvent.bpmn20.xml").
+        tenantId("1").deploy();
+
+    runtimeService.startProcessInstanceByKey("catchSignalEndEvent");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    // TenantNull=null
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.processWithSignalEndEvent.bpmn20.xml").
+        tenantId(null).deploy();
+
+    runtimeService.startProcessInstanceByKey("processWithSignalEndEvent");
+
+    assertEquals(0, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+
+  }
+
+  public void testEndSignalThrowTenantXCatchTenantY(){
+
+    // TenantX=1
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.catchSignalEndEvent.bpmn20.xml").
+        tenantId("1").deploy();
+
+    runtimeService.startProcessInstanceByKey("catchSignalEndEvent");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    // TenantY=2
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.processWithSignalEndEvent.bpmn20.xml").
+        tenantId("2").deploy();
+
+    runtimeService.startProcessInstanceByKey("processWithSignalEndEvent");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+
+  }
+
+  public void testEndSignalThrowTenantNullCatchTenantNull(){
+
+    // TenantNull=null
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.catchSignalEndEvent.bpmn20.xml").
+        tenantId(null).deploy();
+
+    runtimeService.startProcessInstanceByKey("catchSignalEndEvent");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    // TenantNull=null
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.processWithSignalEndEvent.bpmn20.xml").
+        tenantId(null).deploy();
+
+    runtimeService.startProcessInstanceByKey("processWithSignalEndEvent");
+
+    assertEquals(0, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+
+  }
+
+  public void testEndSignalThrowTenantNullCatchTenantX(){
+
+    // TenantNull=null
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.catchSignalEndEvent.bpmn20.xml").
+        tenantId(null).deploy();
+
+    runtimeService.startProcessInstanceByKey("catchSignalEndEvent");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    // TenantX=1
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.processWithSignalEndEvent.bpmn20.xml").
+        tenantId("1").deploy();
+
+    runtimeService.startProcessInstanceByKey("processWithSignalEndEvent");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+
+  }
+
+  public void testEndSignalThrowTenantNullCatchTenantY(){
+
+    // TenantNull=null
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.catchSignalEndEvent.bpmn20.xml").
+        tenantId(null).deploy();
+
+    runtimeService.startProcessInstanceByKey("catchSignalEndEvent");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    // TenantY=2
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment().
+        addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.processWithSignalEndEvent.bpmn20.xml").
+        tenantId("2").deploy();
+
+    runtimeService.startProcessInstanceByKey("processWithSignalEndEvent");
+
+    assertEquals(1, createEventSubscriptionQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    repositoryService.deleteDeployment(deployment1.getId(), true);
+    repositoryService.deleteDeployment(deployment2.getId(), true);
+
+  }
+
 
 }
