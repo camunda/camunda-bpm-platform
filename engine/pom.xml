@@ -516,6 +516,7 @@
                 <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompensateEventHistoryTest.java</exclude>
+                <exclude>**/MultiTenancyHistoric*QueryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
