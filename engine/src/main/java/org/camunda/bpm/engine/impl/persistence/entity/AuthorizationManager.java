@@ -100,6 +100,10 @@ public class AuthorizationManager extends AbstractManager {
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
   public static final String DEFAULT_AUTHORIZATION_CHECK = "defaultAuthorizationCheck";
 
+  // Used instead of Collections.emptyList() as mybatis uses reflection to call methods
+  // like size() which can lead to problems as Collections.EmptyList is a private implementation
+  protected static final List<String> EMPTY_LIST = new ArrayList<String>();
+
   /**
    * Group ids for which authorizations exist in the database.
    * This is initialized once per command by the {@link #filterAuthenticatedGroupIds(List)} method. (Manager
@@ -1089,7 +1093,7 @@ public class AuthorizationManager extends AbstractManager {
 
   public List<String> filterAuthenticatedGroupIds(List<String> authenticatedGroupIds) {
     if(authenticatedGroupIds == null || authenticatedGroupIds.isEmpty()) {
-      return Collections.emptyList();
+      return EMPTY_LIST;
     }
     else {
       if(availableAuthorizedGroupIds == null) {
