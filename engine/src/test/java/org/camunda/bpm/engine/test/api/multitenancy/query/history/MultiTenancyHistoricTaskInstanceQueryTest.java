@@ -11,9 +11,10 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.test.api.multitenancy.query;
+package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
@@ -45,9 +46,9 @@ public class MultiTenancyHistoricTaskInstanceQueryTest extends PluggableProcessE
 
     ProcessInstance processInstanceOne = startProcessInstanceForTenant(TENANT_ONE);
     ProcessInstance processInstanceTwo = startProcessInstanceForTenant(TENANT_TWO);
-    
-    completeProcessInstance(processInstanceOne);
-    completeProcessInstance(processInstanceTwo);
+
+    completeUserTask(processInstanceOne);
+    completeUserTask(processInstanceTwo);
   }
 
   public void testQueryWithoutTenantId() {
@@ -125,9 +126,9 @@ public class MultiTenancyHistoricTaskInstanceQueryTest extends PluggableProcessE
         .execute();
   }
 
-  protected void completeProcessInstance(ProcessInstance processInstance) {
+  protected void completeUserTask(ProcessInstance processInstance) {
    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-   assertNotNull(task);
+   assertThat(task, is(notNullValue()));
    taskService.complete(task.getId());
  }
 
