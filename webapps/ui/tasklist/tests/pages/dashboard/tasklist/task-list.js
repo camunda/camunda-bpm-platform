@@ -185,7 +185,7 @@ module.exports = Page.extend({
 
   showMoreVariables: function(idxOrName) {
     function callPageObject(idx) {
-      this.taskList().get(idx).element(by.css('.shutter .glyphicon-chevron-down')).click();
+      this.taskList().get(idx).element(by.css('.shutter .glyphicon-menu-down')).click();
     }
 
     if (typeof idxOrName === 'number') {
