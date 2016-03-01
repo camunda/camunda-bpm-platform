@@ -36,13 +36,20 @@ public class SignalEndEventActivityBehavior extends FlowNodeActivityBehavior {
     
     CommandContext commandContext = Context.getCommandContext();
     
-    List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByEventName = commandContext
-        .getEventSubscriptionManager()
-        .findSignalEventSubscriptionsByEventName(signalDefinition.getEventName());
-      
-      for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : findSignalEventSubscriptionsByEventName) {
-        signalEventSubscriptionEntity.eventReceived(null, signalDefinition.isAsync());
-      }
+    List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByEventName;
+
+    // if tenantId included, include tenantId in subscription lookup
+    if (execution.getTenantId() == null){
+      findSignalEventSubscriptionsByEventName = commandContext.getEventSubscriptionManager()
+          .findSignalEventSubscriptionsByEventName(signalDefinition.getEventName());
+    } else {
+      findSignalEventSubscriptionsByEventName = commandContext.getEventSubscriptionManager()
+          .findSignalEventSubscriptionsByEventNameAndTenantId(signalDefinition.getEventName(), execution.getTenantId());
+    }
+
+    for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : findSignalEventSubscriptionsByEventName) {
+      signalEventSubscriptionEntity.eventReceived(null, signalDefinition.isAsync());
+    }
 
     leave(execution);
   }
