@@ -53,7 +53,7 @@ public class JobExecutorLogger extends ProcessEngineLogger {
     logWarn(
         "006", "Exception while executing job {}: ", nextJobId, t);
   }
-
+  
   public void couldNotDeterminePriority(ExecutionEntity execution, Object value, ProcessEngineException e) {
     logWarn(
         "007",
@@ -126,5 +126,12 @@ public class JobExecutorLogger extends ProcessEngineLogger {
     logInfo(
         "020", "{} stopped job acquisition", name);
   }
+
+  public void exceptionWhileUnlockingJob(String jobId, Throwable t) {
+	    logWarn(
+	        "021", "Exception while unaquiring job {}: ", jobId, t);
+	  }
+
+
 
 }
