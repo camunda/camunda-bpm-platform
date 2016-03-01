@@ -520,7 +520,6 @@ describe('Repository Spec', function() {
       resourcesPage.selectResource(0);
 
       // then
-      expect(resourcePage.definitions.isTabSelected()).to.eventually.be.true;
       expect(resourcePage.definitions.table().count()).to.eventually.eql(1);
 
       expect(resourcePage.definitions.name(0).getText()).to.eventually.eql('User Tasks');
@@ -536,7 +535,6 @@ describe('Repository Spec', function() {
       resourcesPage.selectResource(0);
 
       // then
-      expect(resourcePage.definitions.isTabSelected()).to.eventually.be.true;
       expect(resourcePage.definitions.table().count()).to.eventually.eql(0);
     });
 
@@ -547,7 +545,6 @@ describe('Repository Spec', function() {
       resourcesPage.selectResource(0);
 
       // then
-      expect(resourcePage.definitions.isTabSelected()).to.eventually.be.true;
       expect(resourcePage.definitions.table().count()).to.eventually.eql(1);
 
       expect(resourcePage.definitions.name(0).getText()).to.eventually.eql('Loan Application');
@@ -562,7 +559,6 @@ describe('Repository Spec', function() {
       resourcesPage.selectResource(0);
 
       // then
-      expect(resourcePage.definitions.isTabSelected()).to.eventually.be.true;
       expect(resourcePage.definitions.table().count()).to.eventually.eql(1);
 
       expect(resourcePage.definitions.name(0).getText()).to.eventually.eql('Assign Approver');
