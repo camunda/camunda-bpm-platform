@@ -35,11 +35,15 @@ import org.camunda.bpm.engine.test.concurrency.ControllableThread;
 public class ControllableJobExecutor extends JobExecutor {
 
   protected ThreadControl acquisitionThreadControl;
+  protected ThreadControl executionThreadControl;
+
+  protected boolean syncOnShutdown = true;
 
   public ControllableJobExecutor() {
     acquireJobsRunnable = new RecordingAcquireJobsRunnable(this);
     jobAcquisitionThread = new Thread(acquireJobsRunnable);
     acquisitionThreadControl = new ThreadControl(jobAcquisitionThread);
+    executionThreadControl = new ThreadControl(jobAcquisitionThread); // execution thread is same as acquisition thread
     acquireJobsCmdFactory = new ControllableJobAcquisitionCommandFactory();
   }
 
@@ -55,6 +59,15 @@ public class ControllableJobExecutor extends JobExecutor {
     processEngines.add(processEngine);
   }
 
+  /**
+   * <p>true: behave like embedded job executor where shutdown waits for all jobs to end
+   * <p>false: behave like runtime container job executor where shutdown does not influence job execution
+   */
+  public ControllableJobExecutor proceeedAndWaitOnShutdown(boolean syncOnShutdown) {
+    this.syncOnShutdown = syncOnShutdown;
+    return this;
+  }
+
   protected void ensureInitialization() {
     // already initialized in constructor
   }
@@ -63,12 +76,18 @@ public class ControllableJobExecutor extends JobExecutor {
     return acquisitionThreadControl;
   }
 
+  public ThreadControl getExecutionThreadControl() {
+    return executionThreadControl;
+  }
+
   protected void startExecutingJobs() {
     jobAcquisitionThread.start();
   }
 
   protected void stopExecutingJobs() {
-    acquisitionThreadControl.waitUntilDone(true);
+    if (syncOnShutdown) {
+      acquisitionThreadControl.waitUntilDone(true);
+    }
   }
 
   @Override
@@ -77,7 +96,6 @@ public class ControllableJobExecutor extends JobExecutor {
   }
 
   public void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine) {
-    // TODO: could use controllable threads for job execution
     getExecuteJobsRunnable(jobIds, processEngine).run();
   }
 

@@ -80,7 +80,7 @@ public class ExecuteJobsRunnable implements Runnable {
 
         }
       }
-      
+
     } finally {
       Context.removeJobExecutorContext();
     }
@@ -89,7 +89,7 @@ public class ExecuteJobsRunnable implements Runnable {
   protected void executeJob(String nextJobId, CommandExecutor commandExecutor) {
     commandExecutor.execute(new ExecuteJobsCmd(nextJobId));
   }
-  
+
   protected void unlockJob(String nextJobId, CommandExecutor commandExecutor) {
 	commandExecutor.execute(new UnlockJobCmd(nextJobId));
   }
