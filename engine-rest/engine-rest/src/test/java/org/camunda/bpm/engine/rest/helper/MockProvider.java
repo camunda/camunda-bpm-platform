@@ -1954,6 +1954,10 @@ public abstract class MockProvider {
   }
 
   public static HistoricTaskInstance createMockHistoricTaskInstance() {
+    return createMockHistoricTaskInstance(EXAMPLE_TENANT_ID);
+  }
+
+  public static HistoricTaskInstance createMockHistoricTaskInstance(String tenantId) {
     HistoricTaskInstance taskInstance = mock(HistoricTaskInstance.class);
 
     when(taskInstance.getId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_ID);
@@ -1979,6 +1983,7 @@ public abstract class MockProvider {
     when(taskInstance.getCaseDefinitionId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_ID);
     when(taskInstance.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_INST_ID);
     when(taskInstance.getCaseExecutionId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_EXEC_ID);
+    when(taskInstance.getTenantId()).thenReturn(tenantId);
 
     return taskInstance;
   }

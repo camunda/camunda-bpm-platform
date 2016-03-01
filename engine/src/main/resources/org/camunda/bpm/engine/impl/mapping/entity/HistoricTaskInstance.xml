@@ -44,7 +44,8 @@
         TASK_DEF_KEY_,
         PRIORITY_,
         DUE_DATE_,
-        FOLLOW_UP_DATE_
+        FOLLOW_UP_DATE_,
+        TENANT_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{processDefinitionKey, jdbcType=VARCHAR},
@@ -68,7 +69,8 @@
         #{taskDefinitionKey ,jdbcType=VARCHAR},
         #{priority, jdbcType=INTEGER},
         #{dueDate, jdbcType=TIMESTAMP},
-        #{followUpDate, jdbcType=TIMESTAMP}
+        #{followUpDate, jdbcType=TIMESTAMP},
+        #{tenantId, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -135,6 +137,7 @@
     <result property="priority" column="PRIORITY_" jdbcType="INTEGER" />
     <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
     <result property="followUpDate" column="FOLLOW_UP_DATE_" jdbcType="TIMESTAMP" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- HISTORIC TASK INSTANCE SELECT -->
@@ -303,6 +306,13 @@
       </if>
       <if test="followUpDate != null || followUpBefore != null || followUpAfter != null">
         and RES.FOLLOW_UP_DATE_ is not null
+      </if>
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
       </if>
       <foreach collection="variables" index="index" item="queryVariableValue">
         and exists (

@@ -96,4 +96,9 @@ public interface HistoricTaskInstance {
   /** Task follow-up date */
   Date getFollowUpDate();
 
+  /**
+   * The id of the tenant this historic task instance belongs to. Can be <code>null</code>
+   * if the historic task instance belongs to no single tenant.
+   */
+  String getTenantId();
 }

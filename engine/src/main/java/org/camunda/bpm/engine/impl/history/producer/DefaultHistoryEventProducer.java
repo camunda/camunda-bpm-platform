@@ -160,6 +160,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String caseDefinitionId = taskEntity.getCaseDefinitionId();
     String caseExecutionId = taskEntity.getCaseExecutionId();
     String caseInstanceId = taskEntity.getCaseInstanceId();
+    String tenantId = taskEntity.getTenantId();
 
     evt.setId(taskEntity.getId());
     evt.setEventType(eventType.getEventName());
@@ -184,6 +185,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setParentTaskId(taskEntity.getParentTaskId());
     evt.setPriority(taskEntity.getPriority());
     evt.setTaskDefinitionKey(taskEntity.getTaskDefinitionKey());
+    evt.setTenantId(tenantId);
 
     ExecutionEntity execution = taskEntity.getExecution();
     if (execution != null) {

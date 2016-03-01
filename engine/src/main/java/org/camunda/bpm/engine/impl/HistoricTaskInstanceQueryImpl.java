@@ -65,6 +65,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected Date followUpDate;
   protected Date followUpBefore;
   protected Date followUpAfter;
+  protected String[] tenantIds;
 
   protected String caseDefinitionId;
   protected String caseDefinitionKey;
@@ -290,6 +291,12 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return this;
   }
 
+  public HistoricTaskInstanceQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   @Override
   protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions()
@@ -399,6 +406,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   public HistoricTaskInstanceQuery orderByCaseExecutionId() {
     orderBy(HistoricTaskInstanceQueryProperty.CASE_EXECUTION_ID);
     return this;
+  }
+
+  public HistoricTaskInstanceQuery orderByTenantId() {
+    return orderBy(HistoricTaskInstanceQueryProperty.TENANT_ID);
   }
 
   // getters and setters //////////////////////////////////////////////////////
