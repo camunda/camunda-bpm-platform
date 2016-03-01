@@ -105,6 +105,7 @@ public class HistoricVariableInstanceRestServiceInteractionTest extends Abstract
       .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
       .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
       .body("taskId", equalTo(builder.getTaskId()))
+      .body("tenantId", equalTo(builder.getTenantId()))
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
@@ -145,6 +146,7 @@ public class HistoricVariableInstanceRestServiceInteractionTest extends Abstract
       .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
       .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
       .body("taskId", equalTo(builder.getTaskId()))
+      .body("tenantId", equalTo(builder.getTenantId()))
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
@@ -186,6 +188,7 @@ public class HistoricVariableInstanceRestServiceInteractionTest extends Abstract
       .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
       .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
       .body("taskId", equalTo(builder.getTaskId()))
+      .body("tenantId", equalTo(builder.getTenantId()))
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();

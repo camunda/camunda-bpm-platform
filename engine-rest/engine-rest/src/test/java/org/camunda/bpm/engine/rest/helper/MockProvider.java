@@ -1754,10 +1754,14 @@ public abstract class MockProvider {
   }
 
   public static HistoricVariableInstance createMockHistoricVariableInstance() {
-    return mockHistoricVariableInstance().build();
+    return mockHistoricVariableInstance(EXAMPLE_TENANT_ID).build();
   }
 
   public static MockHistoricVariableInstanceBuilder mockHistoricVariableInstance() {
+    return mockHistoricVariableInstance(EXAMPLE_TENANT_ID);
+  }
+
+  public static MockHistoricVariableInstanceBuilder mockHistoricVariableInstance(String tenantId) {
     return new MockHistoricVariableInstanceBuilder()
         .id(EXAMPLE_VARIABLE_INSTANCE_ID)
         .name(EXAMPLE_VARIABLE_INSTANCE_NAME)
@@ -1772,6 +1776,7 @@ public abstract class MockProvider {
         .caseInstanceId(EXAMPLE_VARIABLE_INSTANCE_CASE_INST_ID)
         .caseExecutionId(EXAMPLE_VARIABLE_INSTANCE_CASE_EXECUTION_ID)
         .taskId(EXAMPLE_VARIABLE_INSTANCE_TASK_ID)
+        .tenantId(tenantId)
         .errorMessage(null);
   }
 

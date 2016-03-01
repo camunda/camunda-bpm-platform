@@ -61,6 +61,15 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
   /** Only select historic variable instances which have one of the activity instance ids. **/
   HistoricVariableInstanceQuery activityInstanceIdIn(String... activityInstanceIds);
 
+  /** Only select historic variable instances with one of the given tenant ids. */
+  HistoricVariableInstanceQuery tenantIdIn(String... tenantIds);
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of historic variable instances without tenant id is database-specific.
+   */
+  HistoricVariableInstanceQuery orderByTenantId();
+
   /**
    * Disable fetching of byte array and file values. By default, the query will fetch such values.
    * By calling this method you can prevent the values of (potentially large) blob data chunks

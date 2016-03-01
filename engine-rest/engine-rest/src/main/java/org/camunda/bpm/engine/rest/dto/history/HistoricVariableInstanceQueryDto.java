@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,12 +33,14 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
 
   private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
   private static final String SORT_BY_VARIABLE_NAME_VALUE = "variableName";
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
     VALID_SORT_BY_VALUES = new ArrayList<String>();
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_VARIABLE_NAME_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   protected String processInstanceId;
@@ -49,6 +52,7 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   protected String[] taskIdIn;
   protected String[] activityInstanceIdIn;
   protected String[] caseExecutionIdIn;
+  private List<String> tenantIds;
 
   public HistoricVariableInstanceQueryDto() {
   }
@@ -102,6 +106,11 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     this.caseExecutionIdIn = caseExecutionIdIn;
   }
 
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -146,6 +155,9 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     if (caseExecutionIdIn != null && caseExecutionIdIn.length > 0) {
       query.caseExecutionIdIn(caseExecutionIdIn);
     }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
   }
 
   @Override
@@ -154,6 +166,8 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
       query.orderByProcessInstanceId();
     } else if (sortBy.equals(SORT_BY_VARIABLE_NAME_VALUE)) {
       query.orderByVariableName();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 

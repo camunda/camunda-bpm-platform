@@ -48,6 +48,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   protected String taskId;
   protected String executionId;
   protected String activityInstanceId;
+  protected String tenantId;
 
   protected String caseDefinitionKey;
   protected String caseDefinitionId;
@@ -81,6 +82,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.taskId = historyEvent.getTaskId();
     this.executionId = historyEvent.getExecutionId();
     this.activityInstanceId = historyEvent.getScopeActivityInstanceId();
+    this.tenantId = historyEvent.getTenantId();
     this.caseDefinitionKey = historyEvent.getCaseDefinitionKey();
     this.caseDefinitionId = historyEvent.getCaseDefinitionId();
     this.caseInstanceId = historyEvent.getCaseInstanceId();
@@ -339,6 +341,14 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     return typedValueField.getErrorMessage();
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -348,6 +358,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
       + ", processInstanceId=" + processInstanceId
       + ", taskId=" + taskId
       + ", executionId=" + executionId
+      + ", tenantId=" + tenantId
       + ", activityInstanceId=" + activityInstanceId
       + ", caseDefinitionKey=" + caseDefinitionKey
       + ", caseDefinitionId=" + caseDefinitionId

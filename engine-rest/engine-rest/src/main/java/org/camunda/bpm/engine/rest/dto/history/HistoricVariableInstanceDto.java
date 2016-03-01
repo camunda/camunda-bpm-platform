@@ -30,6 +30,7 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
   private String caseExecutionId;
   private String taskId;
   private String errorMessage;
+  private String tenantId;
 
   public String getId() {
     return id;
@@ -83,6 +84,10 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
     return errorMessage;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
   public static HistoricVariableInstanceDto fromHistoricVariableInstance(HistoricVariableInstance historicVariableInstance) {
 
     HistoricVariableInstanceDto dto = new HistoricVariableInstanceDto();
@@ -99,6 +104,7 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
     dto.caseInstanceId = historicVariableInstance.getCaseInstanceId();
     dto.caseExecutionId = historicVariableInstance.getCaseExecutionId();
     dto.taskId = historicVariableInstance.getTaskId();
+    dto.tenantId = historicVariableInstance.getTenantId();
 
     if(historicVariableInstance.getErrorMessage() == null) {
       VariableValueDto.fromTypedValue(dto, historicVariableInstance.getTypedValue());

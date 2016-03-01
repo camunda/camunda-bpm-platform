@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
+
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
@@ -46,6 +47,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   protected String[] executionIds;
   protected String[] caseExecutionIds;
   protected String[] activityInstanceIds;
+  protected String[] tenantIds;
 
   protected boolean isByteArrayFetchingEnabled = true;
   protected boolean isCustomObjectDeserializationEnabled = true;
@@ -136,6 +138,12 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return this;
   }
 
+  public HistoricVariableInstanceQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -183,6 +191,11 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   public HistoricVariableInstanceQuery orderByVariableName() {
     orderBy(HistoricVariableInstanceQueryProperty.VARIABLE_NAME);
+    return this;
+  }
+
+  public HistoricVariableInstanceQuery orderByTenantId() {
+    orderBy(HistoricVariableInstanceQueryProperty.TENANT_ID);
     return this;
   }
 
