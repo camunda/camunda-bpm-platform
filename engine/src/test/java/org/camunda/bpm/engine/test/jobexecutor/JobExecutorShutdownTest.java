@@ -51,7 +51,7 @@ public class JobExecutorShutdownTest {
   public ProcessEngineRule engineRule = new ProcessEngineRule(
       ((ProcessEngineConfigurationImpl) ProcessEngineConfiguration
           .createProcessEngineConfigurationFromResource("camunda.cfg.xml"))
-          .setJobExecutor(buildControllabeJobExecutor())
+          .setJobExecutor(buildControllableJobExecutor())
           .buildProcessEngine()
       );
 
@@ -59,7 +59,7 @@ public class JobExecutorShutdownTest {
   protected ThreadControl acquisitionThread;
   protected static ThreadControl executionThread;
 
-  protected static ControllableJobExecutor buildControllabeJobExecutor() {
+  protected static ControllableJobExecutor buildControllableJobExecutor() {
     ControllableJobExecutor jobExecutor = new ControllableJobExecutor();
     jobExecutor.setMaxJobsPerAcquisition(1);
     jobExecutor.proceeedAndWaitOnShutdown(false);

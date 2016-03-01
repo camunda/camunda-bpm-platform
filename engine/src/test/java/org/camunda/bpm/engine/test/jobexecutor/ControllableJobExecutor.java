@@ -48,11 +48,15 @@ public class ControllableJobExecutor extends JobExecutor {
   }
 
   /**
-   * Creates the job executor and registers the given process engine
+   * <p>Creates the job executor and registers the given process engine
    * with it.
    *
-   * Use this constructor if the process engine is not registered
+   * <p>Use this constructor if the process engine is not registered
    * with the job executor when the process engine is bootstrapped.
+   *
+   * <p>Note: this is a hack since it enables to use multiple job executors with
+   * the same engine which is not a supported feature (and for example clashes with
+   * processEngineConfiguration#getJobExecutor)
    */
   public ControllableJobExecutor(ProcessEngineImpl processEngine) {
     this();

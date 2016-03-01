@@ -18,12 +18,10 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.CallerRunsRejectedJobsHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.jobexecutor.ThreadPoolJobExecutor;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
@@ -80,6 +78,7 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
 
     // replace job executor
     ControllableJobExecutor jobExecutor1 = new ControllableJobExecutor((ProcessEngineImpl) processEngine);
+    processEngineConfiguration.setJobExecutor(jobExecutor1);
     ControllableJobExecutor jobExecutor2 = new ControllableJobExecutor((ProcessEngineImpl) processEngine);
 
     ThreadControl jobAcquisitionThread1 = jobExecutor1.getAcquisitionThreadControl();

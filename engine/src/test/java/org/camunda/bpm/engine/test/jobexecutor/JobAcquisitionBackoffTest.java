@@ -14,18 +14,25 @@ package org.camunda.bpm.engine.test.jobexecutor;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
 import org.camunda.bpm.engine.test.jobexecutor.RecordingAcquireJobsRunnable.RecordedAcquisitionEvent;
 import org.camunda.bpm.engine.test.jobexecutor.RecordingAcquireJobsRunnable.RecordedWaitEvent;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class JobAcquisitionBackoffTest extends PluggableProcessEngineTestCase {
+public class JobAcquisitionBackoffTest {
 
   protected static final int BASE_BACKOFF_TIME = 1000;
   protected static final int MAX_BACKOFF_TIME = 5000;
@@ -33,21 +40,32 @@ public class JobAcquisitionBackoffTest extends PluggableProcessEngineTestCase {
   protected static final int BACKOFF_DECREASE_THRESHOLD = 2;
   protected static final int DEFAULT_NUM_JOBS_TO_ACQUIRE = 3;
 
+  @Rule
+  public ProcessEngineRule engineRule = new ProcessEngineRule(
+      ((ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+          .createProcessEngineConfigurationFromResource("camunda.cfg.xml"))
+          .setJobExecutor(new ControllableJobExecutor())
+          .buildProcessEngine()
+      );
+
   protected ControllableJobExecutor jobExecutor1;
   protected ControllableJobExecutor jobExecutor2;
 
   protected ThreadControl acquisitionThread1;
   protected ThreadControl acquisitionThread2;
 
-  protected void setUp() throws Exception {
-    jobExecutor1 = new ControllableJobExecutor((ProcessEngineImpl) processEngine);
+  @Before
+  public void setUp() throws Exception {
+    jobExecutor1 = (ControllableJobExecutor)
+        ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration())
+          .getJobExecutor();
     jobExecutor1.setMaxJobsPerAcquisition(DEFAULT_NUM_JOBS_TO_ACQUIRE);
     jobExecutor1.setBackoffTimeInMillis(BASE_BACKOFF_TIME);
     jobExecutor1.setMaxBackoff(MAX_BACKOFF_TIME);
     jobExecutor1.setBackoffDecreaseThreshold(BACKOFF_DECREASE_THRESHOLD);
     acquisitionThread1 = jobExecutor1.getAcquisitionThreadControl();
 
-    jobExecutor2 = new ControllableJobExecutor((ProcessEngineImpl) processEngine);
+    jobExecutor2 = new ControllableJobExecutor((ProcessEngineImpl) engineRule.getProcessEngine());
     jobExecutor2.setMaxJobsPerAcquisition(DEFAULT_NUM_JOBS_TO_ACQUIRE);
     jobExecutor2.setBackoffTimeInMillis(BASE_BACKOFF_TIME);
     jobExecutor2.setMaxBackoff(MAX_BACKOFF_TIME);
@@ -55,21 +73,22 @@ public class JobAcquisitionBackoffTest extends PluggableProcessEngineTestCase {
     acquisitionThread2 = jobExecutor2.getAcquisitionThreadControl();
   }
 
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     jobExecutor1.shutdown();
     jobExecutor2.shutdown();
-    super.tearDown();
   }
 
+  @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")
   public void testBackoffOnOptimisticLocking() {
     // when starting a number of process instances process instance
     for (int i = 0; i < 9; i++) {
-      runtimeService.startProcessInstanceByKey("simpleAsyncProcess").getId();
+      engineRule.getRuntimeService().startProcessInstanceByKey("simpleAsyncProcess").getId();
     }
 
     // ensure that both acquisition threads acquire the same jobs thereby provoking an optimistic locking exception
-    JobAcquisitionTestHelper.suspendInstances(processEngine, 6);
+    JobAcquisitionTestHelper.suspendInstances(engineRule.getProcessEngine(), 6);
 
     // when starting job execution, both acquisition threads wait before acquiring something
     jobExecutor1.start();
@@ -87,22 +106,22 @@ public class JobAcquisitionBackoffTest extends PluggableProcessEngineTestCase {
 
     // then it has not performed waiting since it was able to acquire and execute all jobs
     List<RecordedWaitEvent> jobExecutor1WaitEvents = jobExecutor1.getAcquireJobsRunnable().getWaitEvents();
-    assertEquals(1, jobExecutor1WaitEvents.size());
-    assertEquals(0, jobExecutor1WaitEvents.get(0).getTimeBetweenAcquisitions());
+    Assert.assertEquals(1, jobExecutor1WaitEvents.size());
+    Assert.assertEquals(0, jobExecutor1WaitEvents.get(0).getTimeBetweenAcquisitions());
 
     // when continuing acquisition thread 2, acquisition fails with an OLE
     acquisitionThread2.makeContinueAndWaitForSync();
 
     // and has performed backoff
     List<RecordedWaitEvent> jobExecutor2WaitEvents = jobExecutor2.getAcquireJobsRunnable().getWaitEvents();
-    assertEquals(1, jobExecutor2WaitEvents.size());
+    Assert.assertEquals(1, jobExecutor2WaitEvents.size());
     RecordedWaitEvent waitEvent = jobExecutor2WaitEvents.get(0);
     // we don't know the exact wait time,
     // since there is random jitter applied
     JobAcquisitionTestHelper.assertInBetween(BASE_BACKOFF_TIME, BASE_BACKOFF_TIME + BASE_BACKOFF_TIME / 2, waitEvent.getTimeBetweenAcquisitions());
 
     // when performing another cycle of acquisition
-    JobAcquisitionTestHelper.activateInstances(processEngine, 6);
+    JobAcquisitionTestHelper.activateInstances(engineRule.getProcessEngine(), 6);
     acquisitionThread1.makeContinueAndWaitForSync();
     acquisitionThread2.makeContinueAndWaitForSync();
 
@@ -115,35 +134,36 @@ public class JobAcquisitionBackoffTest extends PluggableProcessEngineTestCase {
     // then thread 1 has tried to acquired 3 jobs again
     List<RecordedAcquisitionEvent> jobExecutor1AcquisitionEvents = jobExecutor1.getAcquireJobsRunnable().getAcquisitionEvents();
     RecordedAcquisitionEvent secondAcquisitionAttempt = jobExecutor1AcquisitionEvents.get(1);
-    assertEquals(3, secondAcquisitionAttempt.getNumJobsToAcquire());
+    Assert.assertEquals(3, secondAcquisitionAttempt.getNumJobsToAcquire());
 
     // and not waited
     jobExecutor1WaitEvents = jobExecutor1.getAcquireJobsRunnable().getWaitEvents();
-    assertEquals(2, jobExecutor1WaitEvents.size());
-    assertEquals(0, jobExecutor1WaitEvents.get(1).getTimeBetweenAcquisitions());
+    Assert.assertEquals(2, jobExecutor1WaitEvents.size());
+    Assert.assertEquals(0, jobExecutor1WaitEvents.get(1).getTimeBetweenAcquisitions());
 
     // then thread 2 has tried to acquire 6 jobs this time
     List<RecordedAcquisitionEvent> jobExecutor2AcquisitionEvents = jobExecutor2.getAcquireJobsRunnable().getAcquisitionEvents();
     secondAcquisitionAttempt = jobExecutor2AcquisitionEvents.get(1);
-    assertEquals(6, secondAcquisitionAttempt.getNumJobsToAcquire());
+    Assert.assertEquals(6, secondAcquisitionAttempt.getNumJobsToAcquire());
 
     // and again increased its backoff
     jobExecutor2WaitEvents = jobExecutor2.getAcquireJobsRunnable().getWaitEvents();
-    assertEquals(2, jobExecutor2WaitEvents.size());
+    Assert.assertEquals(2, jobExecutor2WaitEvents.size());
     RecordedWaitEvent secondWaitEvent = jobExecutor2WaitEvents.get(1);
     long expectedBackoffTime = BASE_BACKOFF_TIME * BACKOFF_FACTOR; // 1000 * 2^1
     JobAcquisitionTestHelper.assertInBetween(expectedBackoffTime, expectedBackoffTime + expectedBackoffTime / 2, secondWaitEvent.getTimeBetweenAcquisitions());
   }
 
+  @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")
   public void testBackoffDecrease() {
     // when starting a number of process instances process instance
     for (int i = 0; i < 15; i++) {
-      runtimeService.startProcessInstanceByKey("simpleAsyncProcess").getId();
+      engineRule.getRuntimeService().startProcessInstanceByKey("simpleAsyncProcess").getId();
     }
 
     // ensure that both acquisition threads acquire the same jobs thereby provoking an optimistic locking exception
-    JobAcquisitionTestHelper.suspendInstances(processEngine, 12);
+    JobAcquisitionTestHelper.suspendInstances(engineRule.getProcessEngine(), 12);
 
     // when starting job execution, both acquisition threads wait before acquiring something
     jobExecutor1.start();
@@ -165,14 +185,14 @@ public class JobAcquisitionBackoffTest extends PluggableProcessEngineTestCase {
 
     // such that acquisition thread 2 performs backoff
     List<RecordedWaitEvent> jobExecutor2WaitEvents = jobExecutor2.getAcquireJobsRunnable().getWaitEvents();
-    assertEquals(1, jobExecutor2WaitEvents.size());
+    Assert.assertEquals(1, jobExecutor2WaitEvents.size());
 
     // when in the next cycles acquisition thread2 successfully acquires jobs without OLE for n times
-    JobAcquisitionTestHelper.activateInstances(processEngine, 12);
+    JobAcquisitionTestHelper.activateInstances(engineRule.getProcessEngine(), 12);
 
     for (int i = 0; i < BACKOFF_DECREASE_THRESHOLD; i++) {
       // backoff has not decreased yet
-      assertTrue(jobExecutor2WaitEvents.get(i).getTimeBetweenAcquisitions() > 0);
+      Assert.assertTrue(jobExecutor2WaitEvents.get(i).getTimeBetweenAcquisitions() > 0);
 
       acquisitionThread2.makeContinueAndWaitForSync(); // acquire
       acquisitionThread2.makeContinueAndWaitForSync(); // continue after acquisition with next cycle
@@ -180,7 +200,7 @@ public class JobAcquisitionBackoffTest extends PluggableProcessEngineTestCase {
 
     // it decreases its backoff again
     long lastBackoff = jobExecutor2WaitEvents.get(BACKOFF_DECREASE_THRESHOLD).getTimeBetweenAcquisitions();
-    assertEquals(0, lastBackoff);
+    Assert.assertEquals(0, lastBackoff);
   }
 
 
