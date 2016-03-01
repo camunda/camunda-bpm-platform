@@ -34,27 +34,16 @@ public class ExecuteJobsRunnable implements Runnable {
   protected JobExecutor jobExecutor;
   protected ProcessEngineImpl processEngine;
 
-  public ExecuteJobsRunnable(JobExecutor jobExecutor, List<String> jobIds) {
-    this.jobExecutor = jobExecutor;
-    this.jobIds = jobIds;
-  }
-
   public ExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
     this.jobIds = jobIds;
     this.processEngine = processEngine;
+    this.jobExecutor = processEngine.getProcessEngineConfiguration().getJobExecutor();
   }
 
   public void run() {
     final JobExecutorContext jobExecutorContext = new JobExecutorContext();
     final List<String> currentProcessorJobQueue = jobExecutorContext.getCurrentProcessorJobQueue();
-    CommandExecutor commandExecutor = null;
-
-    if(processEngine == null) {
-      // temporary hack to maintain API compatibility
-      commandExecutor = jobExecutor.getCommandExecutor();
-    } else {
-      commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutorTxRequired();
-    }
+    CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutorTxRequired();
 
     currentProcessorJobQueue.addAll(jobIds);
 
@@ -63,16 +52,16 @@ public class ExecuteJobsRunnable implements Runnable {
       while (!currentProcessorJobQueue.isEmpty()) {
 
         String nextJobId = currentProcessorJobQueue.remove(0);
-        if((jobExecutor == null || jobExecutor.isActive())) {
-	        try {
-	       	  executeJob(nextJobId, commandExecutor);
-	        }
-	        catch(Throwable t) {
-	          LOG.exceptionWhileExecutingJob(nextJobId, t);
-	        }
+        if(jobExecutor.isActive()) {
+          try {
+             executeJob(nextJobId, commandExecutor);
+          }
+          catch(Throwable t) {
+            LOG.exceptionWhileExecutingJob(nextJobId, t);
+          }
         } else {
             try {
-          	  unlockJob(nextJobId, commandExecutor);
+              unlockJob(nextJobId, commandExecutor);
             }
             catch(Throwable t) {
               LOG.exceptionWhileUnlockingJob(nextJobId, t);
@@ -91,7 +80,7 @@ public class ExecuteJobsRunnable implements Runnable {
   }
 
   protected void unlockJob(String nextJobId, CommandExecutor commandExecutor) {
-	commandExecutor.execute(new UnlockJobCmd(nextJobId));
+  commandExecutor.execute(new UnlockJobCmd(nextJobId));
   }
 
 }
