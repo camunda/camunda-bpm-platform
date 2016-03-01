@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.ErrorMessageHelper;
+import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
@@ -41,7 +42,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
-  
+
   protected static final String MESSAGE_URL = TEST_RESOURCE_ROOT_PATH + "/message";
 
   private RuntimeService runtimeServiceMock;
@@ -258,6 +259,43 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("No message name supplied"))
       .when().post(MESSAGE_URL);
+  }
+
+  @Test
+  public void testMessageCorrelationWithTenantId() {
+    String messageName = "aMessageName";
+
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("tenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(MESSAGE_URL);
+
+    verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
+    verify(messageCorrelationBuilderMock).processInstanceBusinessKey(eq((String) null));
+    verify(messageCorrelationBuilderMock).setVariables(argThat(new EqualsMap(null)));
+    verify(messageCorrelationBuilderMock).tenantId(MockProvider.EXAMPLE_TENANT_ID);
+    verify(messageCorrelationBuilderMock).correlate();
+  }
+
+  @Test
+  public void testMessageCorrelationWithoutTenantId() {
+    String messageName = "aMessageName";
+
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(MESSAGE_URL);
+
+    verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
+    verify(messageCorrelationBuilderMock).processInstanceBusinessKey(eq((String) null));
+    verify(messageCorrelationBuilderMock).setVariables(argThat(new EqualsMap(null)));
+    verify(messageCorrelationBuilderMock).withoutTenantId();
+    verify(messageCorrelationBuilderMock).correlate();
   }
 
   @Test
@@ -562,4 +600,5 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .when()
       .post(MESSAGE_URL);
   }
+
 }

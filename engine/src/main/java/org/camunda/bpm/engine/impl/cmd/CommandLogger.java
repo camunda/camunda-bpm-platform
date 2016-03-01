@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.application.impl.ProcessApplicationIdentifier;
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -173,6 +174,29 @@ public class CommandLogger extends ProcessEngineLogger {
   public BadUserRequestException exceptionDeliverSignalToSingleExecutionWithTenantId() {
     return new BadUserRequestException(exceptionMessage(
         "028", "Cannot specify a tenant-id when deliver a signal to a single execution."));
+  }
+
+  public MismatchingMessageCorrelationException exceptionCorrelateMessageToMultipleTenants(String messageName) {
+    return new MismatchingMessageCorrelationException(exceptionMessage(
+        "029", "Cannot correlate a message with name '{}' to multiple tenants.", messageName));
+  }
+
+  public BadUserRequestException exceptionCorrelateMessageWithProcessInstanceAndTenantId() {
+    return new BadUserRequestException(exceptionMessage(
+        "030", "Cannot specify a tenant-id when correlate a message to a single process instance."));
+  }
+
+  public BadUserRequestException exceptionCorrelateMessageWithProcessDefinitionAndTenantId() {
+    return new BadUserRequestException(exceptionMessage(
+        "031", "Cannot specify a tenant-id when correlate a start message to a specific version of a process definition."));
+  }
+
+  public MismatchingMessageCorrelationException multipleTenantsForMessageNameException(String messageName) {
+    return new MismatchingMessageCorrelationException(exceptionMessage(
+        "032",
+        "Cannot resolve a unique message start event subscription for message name '{}' because it exists for multiple tenants.",
+        messageName
+        ));
   }
 
 }

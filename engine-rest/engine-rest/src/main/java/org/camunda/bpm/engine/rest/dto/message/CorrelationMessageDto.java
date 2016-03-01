@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.message;
 
-import org.camunda.bpm.engine.rest.dto.VariableValueDto;
-
 import java.util.Map;
+
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 
 public class CorrelationMessageDto {
 
@@ -22,7 +22,8 @@ public class CorrelationMessageDto {
   private String businessKey;
   private Map<String, VariableValueDto> correlationKeys;
   private Map<String, VariableValueDto> processVariables;
-  private boolean all;
+  private String tenantId;
+  private boolean all = false;
 
   public String getMessageName() {
     return messageName;
@@ -62,6 +63,14 @@ public class CorrelationMessageDto {
 
   public void setAll(boolean all) {
     this.all = all;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 
 }

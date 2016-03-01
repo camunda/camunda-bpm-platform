@@ -15,18 +15,24 @@ package org.camunda.bpm.engine.impl.runtime;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
+
 public class CorrelationSet {
 
   protected final String businessKey;
   protected final Map<String, Object> correlationKeys;
   protected final String processInstanceId;
   protected final String processDefinitionId;
+  protected final String tenantId;
+  protected final boolean isTenantIdSet;
 
-  public CorrelationSet(String businessKey, String processInstanceId, Map<String, Object> correlationKeys, String processDefinitionId) {
-    this.businessKey = businessKey;
-    this.processInstanceId = processInstanceId;
-    this.correlationKeys = correlationKeys;
-    this.processDefinitionId = processDefinitionId;
+  public CorrelationSet(MessageCorrelationBuilderImpl builder) {
+    this.businessKey = builder.getBusinessKey();
+    this.processInstanceId = builder.getProcessInstanceId();
+    this.correlationKeys = builder.getCorrelationProcessInstanceVariables();
+    this.processDefinitionId = builder.getProcessDefinitionId();
+    this.tenantId = builder.getTenantId();
+    this.isTenantIdSet = builder.isTenantIdSet();
   }
 
   public String getBusinessKey() {
@@ -44,4 +50,13 @@ public class CorrelationSet {
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
+
 }

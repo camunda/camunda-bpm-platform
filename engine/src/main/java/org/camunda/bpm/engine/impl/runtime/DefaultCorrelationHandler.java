@@ -14,8 +14,10 @@
 package org.camunda.bpm.engine.impl.runtime;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
@@ -25,6 +27,7 @@ import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -68,6 +71,8 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
       result.add(processDefinitionCorrelation);
     }
 
+    ensureCorrelateMessageOnlyForOneTenant(result, messageName);
+
     return result;
   }
 
@@ -98,6 +103,15 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
       query.messageEventSubscription();
     }
 
+    if (correlationSet.isTenantIdSet) {
+      String tenantId = correlationSet.getTenantId();
+      if (tenantId != null) {
+        query.tenantIdIn(tenantId);
+      } else {
+        // find executions without tenant id - CAM-5412
+      }
+    }
+
     // restrict to active executions
     query.active();
 
@@ -106,7 +120,13 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
     List<MessageCorrelationResult> result = new ArrayList<MessageCorrelationResult>(matchingExecutions.size());
 
     for (Execution matchingExecution : matchingExecutions) {
-      result.add(MessageCorrelationResult.matchedExecution((ExecutionEntity) matchingExecution));
+
+      // TODO replace by query criteria - CAM-5412
+      if (!correlationSet.isTenantIdSet || correlationSet.getTenantId() != null || matchingExecution.getTenantId() == null) {
+
+        MessageCorrelationResult correlationResult = MessageCorrelationResult.matchedExecution((ExecutionEntity) matchingExecution);
+        result.add(correlationResult);
+      }
     }
 
     return result;
@@ -119,15 +139,15 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
     }
 
     if (correlationSet.getProcessDefinitionId() == null) {
-      return correlateStartMessageByEventSubscription(commandContext, messageName);
+      return correlateStartMessageByEventSubscription(commandContext, messageName, correlationSet);
 
     } else {
       return correlateStartMessageByProcessDefinitionId(commandContext, messageName, correlationSet.getProcessDefinitionId());
     }
   }
 
-  protected MessageCorrelationResult correlateStartMessageByEventSubscription(CommandContext commandContext, String messageName) {
-    MessageEventSubscriptionEntity messageEventSubscription = commandContext.getEventSubscriptionManager().findMessageStartEventSubscriptionByName(messageName);
+  protected MessageCorrelationResult correlateStartMessageByEventSubscription(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
+    MessageEventSubscriptionEntity messageEventSubscription = findMessageStartEventSubscription(commandContext, messageName, correlationSet);
 
     if (messageEventSubscription != null && messageEventSubscription.getConfiguration() != null) {
       DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentCache();
@@ -143,6 +163,26 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
       }
     }
     return null;
+  }
+
+  protected MessageEventSubscriptionEntity findMessageStartEventSubscription(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
+    EventSubscriptionManager eventSubscriptionManager = commandContext.getEventSubscriptionManager();
+
+    if (correlationSet.isTenantIdSet) {
+      return eventSubscriptionManager.findMessageStartEventSubscriptionByNameAndTenantId(messageName, correlationSet.getTenantId());
+
+    } else {
+      List<MessageEventSubscriptionEntity> eventSubscriptions = eventSubscriptionManager.findMessageStartEventSubscriptionByName(messageName);
+      if (eventSubscriptions.isEmpty()) {
+        return null;
+
+      } else if (eventSubscriptions.size() == 1) {
+        return eventSubscriptions.iterator().next();
+
+      } else {
+        throw LOG.multipleTenantsForMessageNameException(messageName);
+      }
+    }
   }
 
   protected MessageCorrelationResult correlateStartMessageByProcessDefinitionId(CommandContext commandContext, String messageName, String processDefinitionId) {
@@ -171,6 +211,21 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
   protected boolean isMessageStartEventWithName(EventSubscriptionDeclaration declaration, String messageName) {
     return MessageEventHandler.EVENT_HANDLER_TYPE.equals(declaration.getEventType()) && declaration.isStartEvent()
         && messageName.equals(declaration.getEventName());
+  }
+
+  protected void ensureCorrelateMessageOnlyForOneTenant(List<MessageCorrelationResult> result, String messageName) {
+    Set<String> tenantIds = new HashSet<String>();
+
+    for (MessageCorrelationResult correlationResult : result) {
+      if (MessageCorrelationResult.TYPE_EXECUTION.equals(correlationResult.getResultType())) {
+        tenantIds.add(correlationResult.getExecutionEntity().getTenantId());
+      } else {
+        tenantIds.add(correlationResult.getProcessDefinitionEntity().getTenantId());
+      }
+    }
+    if (tenantIds.size() > 1) {
+      throw LOG.exceptionCorrelateMessageToMultipleTenants(messageName);
+    }
   }
 
 }

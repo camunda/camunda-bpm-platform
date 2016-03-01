@@ -22,6 +22,8 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.EventSubscription;
@@ -32,6 +34,8 @@ import org.camunda.commons.utils.EnsureUtil;
  * @author Daniel Meyer
  */
 public class EventSubscriptionManager extends AbstractManager {
+
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   /** keep track of subscriptions created in the current command */
   protected List<SignalEventSubscriptionEntity> createdSignalSubscriptions = new ArrayList<SignalEventSubscriptionEntity>();
@@ -226,9 +230,27 @@ public class EventSubscriptionManager extends AbstractManager {
     }
   }
 
-  public MessageEventSubscriptionEntity findMessageStartEventSubscriptionByName(String messageName) {
-    MessageEventSubscriptionEntity entity = (MessageEventSubscriptionEntity) getDbEntityManager().selectOne("selectMessageStartEventSubscriptionByName", messageName);
-    return entity;
+  /**
+   * @return the message start event subscriptions with the given message name (from any tenant)
+   *
+   * @see #findMessageStartEventSubscriptionByNameAndTenantId(String, String)
+   */
+  @SuppressWarnings("unchecked")
+  public List<MessageEventSubscriptionEntity> findMessageStartEventSubscriptionByName(String messageName) {
+    return getDbEntityManager().selectList("selectMessageStartEventSubscriptionByName", messageName);
+  }
+
+  /**
+   * @return the message start event subscription with the given message name and tenant id
+   *
+   * @see #findMessageStartEventSubscriptionByName(String)
+   */
+  public MessageEventSubscriptionEntity findMessageStartEventSubscriptionByNameAndTenantId(String messageName, String tenantId) {
+    Map<String, String> parameters = new HashMap<String, String>();
+    parameters.put("messageName", messageName);
+    parameters.put("tenantId", tenantId);
+
+    return (MessageEventSubscriptionEntity) getDbEntityManager().selectOne("selectMessageStartEventSubscriptionByNameAndTenantId", parameters);
   }
 
   protected void configureAuthorizationCheck(EventSubscriptionQueryImpl query) {

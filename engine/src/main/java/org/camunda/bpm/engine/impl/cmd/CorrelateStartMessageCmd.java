@@ -37,7 +37,7 @@ public class CorrelateStartMessageCmd extends AbstractCorrelateMessageCmd implem
     ensureNotNull("messageName", messageName);
 
     final CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
-    final CorrelationSet correlationSet = new CorrelationSet(businessKey, processInstanceId, correlationKeys, processDefinitionId);
+    final CorrelationSet correlationSet = new CorrelationSet(builder);
 
     MessageCorrelationResult correlationResult = commandContext.runWithoutAuthorization(new Callable<MessageCorrelationResult>() {
       public MessageCorrelationResult call() throws Exception {

@@ -49,6 +49,9 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   protected VariableMap correlationProcessInstanceVariables;
   protected VariableMap payloadProcessInstanceVariables;
 
+  protected String tenantId = null;
+  protected boolean isTenantIdSet = false;
+
   public MessageCorrelationBuilderImpl(CommandExecutor commandExecutor, String messageName) {
     this(messageName);
     ensureNotNull("commandExecutor", commandExecutor);
@@ -126,8 +129,25 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     }
   }
 
+  public MessageCorrelationBuilder tenantId(String tenantId) {
+    ensureNotNull(
+        "The tenant-id cannot be null. Use 'withoutTenantId()' if you want to correlate the message to a process definition or an execution which has no tenant-id.",
+        "tenantId", tenantId);
+
+    isTenantIdSet = true;
+    this.tenantId = tenantId;
+    return this;
+  }
+
+  public MessageCorrelationBuilder withoutTenantId() {
+    isTenantIdSet = true;
+    tenantId = null;
+    return this;
+  }
+
   public void correlate() {
     ensureProcessDefinitionIdNotSet();
+    ensureProcessInstanceAndTenantIdNotSet();
 
     execute(new CorrelateMessageCmd(this));
   }
@@ -140,14 +160,14 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   public void correlateAll() {
     ensureProcessDefinitionIdNotSet();
+    ensureProcessInstanceAndTenantIdNotSet();
 
     execute(new CorrelateAllMessageCmd(this));
   }
 
   public ProcessInstance correlateStartMessage() {
-    if (correlationProcessInstanceVariables != null) {
-      throw LOG.exceptionCorrelateStartMessageWithCorrelationVariables();
-    }
+    ensureCorrelationVariablesNotSet();
+    ensureProcessDefinitionAndTenantIdNotSet();
 
     return execute(new CorrelateStartMessageCmd(this));
   }
@@ -155,6 +175,24 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   protected void ensureProcessDefinitionIdNotSet() {
     if(processDefinitionId != null) {
       throw LOG.exceptionCorrelateMessageWithProcessDefinitionId();
+    }
+  }
+
+  protected void ensureProcessInstanceAndTenantIdNotSet() {
+    if (processInstanceId != null && isTenantIdSet) {
+      throw LOG.exceptionCorrelateMessageWithProcessInstanceAndTenantId();
+    }
+  }
+
+  protected void ensureCorrelationVariablesNotSet() {
+    if (correlationProcessInstanceVariables != null) {
+      throw LOG.exceptionCorrelateStartMessageWithCorrelationVariables();
+    }
+  }
+
+  protected void ensureProcessDefinitionAndTenantIdNotSet() {
+    if (processDefinitionId != null && isTenantIdSet) {
+      throw LOG.exceptionCorrelateMessageWithProcessDefinitionAndTenantId();
     }
   }
 
@@ -202,6 +240,14 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   public boolean isExclusiveCorrelation() {
     return isExclusiveCorrelation;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
   }
 
 }

@@ -36,31 +36,27 @@ public abstract class AbstractCorrelateMessageCmd {
   protected final String businessKey;
   protected final Map<String, Object> correlationKeys;
   protected final Map<String, Object> processVariables;
-  protected String processInstanceId;
-  protected String processDefinitionId;
-  protected boolean isExclusiveCorrelation = false;
+  protected final String processInstanceId;
+  protected final String processDefinitionId;
+  protected final boolean isExclusiveCorrelation;
 
-  protected AbstractCorrelateMessageCmd(String messageName, String businessKey,
-      Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
-    this.messageName = messageName;
-    this.businessKey = businessKey;
-    this.correlationKeys = correlationKeys;
-    this.processVariables = processVariables;
-  }
+  protected final MessageCorrelationBuilderImpl builder;
 
   /**
    * Initialize the command with a builder
    *
-   * @param messageCorrelationBuilderImpl
+   * @param builder
    */
-  protected AbstractCorrelateMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl) {
-    this.messageName = messageCorrelationBuilderImpl.getMessageName();
-    this.processVariables = messageCorrelationBuilderImpl.getPayloadProcessInstanceVariables();
-    this.correlationKeys = messageCorrelationBuilderImpl.getCorrelationProcessInstanceVariables();
-    this.businessKey = messageCorrelationBuilderImpl.getBusinessKey();
-    this.processInstanceId = messageCorrelationBuilderImpl.getProcessInstanceId();
-    this.processDefinitionId = messageCorrelationBuilderImpl.getProcessDefinitionId();
-    this.isExclusiveCorrelation = messageCorrelationBuilderImpl.isExclusiveCorrelation();
+  protected AbstractCorrelateMessageCmd(MessageCorrelationBuilderImpl builder) {
+    this.messageName = builder.getMessageName();
+    this.processVariables = builder.getPayloadProcessInstanceVariables();
+    this.correlationKeys = builder.getCorrelationProcessInstanceVariables();
+    this.businessKey = builder.getBusinessKey();
+    this.processInstanceId = builder.getProcessInstanceId();
+    this.processDefinitionId = builder.getProcessDefinitionId();
+    this.isExclusiveCorrelation = builder.isExclusiveCorrelation();
+
+    this.builder = builder;
   }
 
   protected void triggerExecution(CommandContext commandContext, MessageCorrelationResult correlationResult) {

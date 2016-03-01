@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
 
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
@@ -34,12 +33,7 @@ import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
  */
 public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd implements Command<Void> {
 
-  public CorrelateMessageCmd(String messageName, String businessKey,
-      Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
-    super(messageName, businessKey, correlationKeys, processVariables);
-  }
-
-  /**
+   /**
    * Initialize the command with a builder
    *
    * @param messageCorrelationBuilderImpl
@@ -53,7 +47,7 @@ public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd implements 
         + "messageName, businessKey, correlationKeys, processInstanceId", messageName, businessKey, correlationKeys, processInstanceId);
 
     final CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
-    final CorrelationSet correlationSet = new CorrelationSet(businessKey, processInstanceId, correlationKeys, null);
+    final CorrelationSet correlationSet = new CorrelationSet(builder);
     MessageCorrelationResult correlationResult = commandContext.runWithoutAuthorization(new Callable<MessageCorrelationResult>() {
       public MessageCorrelationResult call() throws Exception {
         return correlationHandler.correlateMessage(commandContext, messageName, correlationSet);

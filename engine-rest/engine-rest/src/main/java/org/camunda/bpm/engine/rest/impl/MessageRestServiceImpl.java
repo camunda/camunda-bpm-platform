@@ -12,7 +12,11 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.MessageRestService;
@@ -22,9 +26,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 
-import javax.ws.rs.core.Response.Status;
-import java.util.Map;
-import java.util.Map.Entry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class MessageRestServiceImpl extends AbstractRestProcessEngineAware implements MessageRestService {
 
@@ -34,30 +36,12 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
 
   @Override
   public void deliverMessage(CorrelationMessageDto messageDto) {
-
     if (messageDto.getMessageName() == null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "No message name supplied");
     }
 
-    RuntimeService runtimeService = processEngine.getRuntimeService();
-
     try {
-      ObjectMapper objectMapper = getObjectMapper();
-      Map<String, Object> correlationKeys = VariableValueDto.toMap(messageDto.getCorrelationKeys(), processEngine, objectMapper);
-      Map<String, Object> processVariables = VariableValueDto.toMap(messageDto.getProcessVariables(), processEngine, objectMapper);
-
-      MessageCorrelationBuilder correlation = runtimeService
-          .createMessageCorrelation(messageDto.getMessageName())
-          .setVariables(processVariables)
-          .processInstanceBusinessKey(messageDto.getBusinessKey());
-
-      if (correlationKeys != null && !correlationKeys.isEmpty()) {
-        for (Entry<String, Object> correlationKey  : correlationKeys.entrySet()) {
-          String name = correlationKey.getKey();
-          Object value = correlationKey.getValue();
-          correlation.processInstanceVariableEquals(name, value);
-        }
-      }
+      MessageCorrelationBuilder correlation = createMessageCorrelationBuilder(messageDto);
 
       if (!messageDto.isAll()) {
         correlation.correlate();
@@ -71,9 +55,37 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
 
     } catch (MismatchingMessageCorrelationException e) {
       throw new RestException(Status.BAD_REQUEST, e);
+    }
+  }
 
+  protected MessageCorrelationBuilder createMessageCorrelationBuilder(CorrelationMessageDto messageDto) {
+    RuntimeService runtimeService = processEngine.getRuntimeService();
+
+    ObjectMapper objectMapper = getObjectMapper();
+    Map<String, Object> correlationKeys = VariableValueDto.toMap(messageDto.getCorrelationKeys(), processEngine, objectMapper);
+    Map<String, Object> processVariables = VariableValueDto.toMap(messageDto.getProcessVariables(), processEngine, objectMapper);
+
+    MessageCorrelationBuilder builder = runtimeService
+        .createMessageCorrelation(messageDto.getMessageName())
+        .setVariables(processVariables)
+        .processInstanceBusinessKey(messageDto.getBusinessKey());
+
+    if (correlationKeys != null && !correlationKeys.isEmpty()) {
+      for (Entry<String, Object> correlationKey  : correlationKeys.entrySet()) {
+        String name = correlationKey.getKey();
+        Object value = correlationKey.getValue();
+        builder.processInstanceVariableEquals(name, value);
+      }
     }
 
+    String tenantId = messageDto.getTenantId();
+    if (tenantId != null) {
+      builder.tenantId(tenantId);
+    } else {
+      builder.withoutTenantId();
+    }
+
+    return builder;
   }
 
 }

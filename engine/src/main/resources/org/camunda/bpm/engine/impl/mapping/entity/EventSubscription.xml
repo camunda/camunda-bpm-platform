@@ -230,6 +230,20 @@
     	and (EVENT_NAME_ = #{parameter})
     	and EXECUTION_ID_ is null
   </select>
+  
+  <select id="selectMessageStartEventSubscriptionByNameAndTenantId" resultMap="eventSubscriptionResultMap" parameterType="string">
+    select *
+    from ${prefix}ACT_RU_EVENT_SUBSCR
+    where (EVENT_TYPE_ = 'message')
+      and (EVENT_NAME_ = #{messageName})
+      and EXECUTION_ID_ is null
+      <if test="tenantId != null">
+        and TENANT_ID_ = #{tenantId}
+      </if>
+      <if test="tenantId == null">
+        and TENANT_ID_ is null
+      </if>
+  </select>
 
   <!-- MESSAGE INSERT -->
 

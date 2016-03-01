@@ -99,6 +99,27 @@ public interface MessageCorrelationBuilder {
   MessageCorrelationBuilder setVariables(Map<String, Object> variables);
 
   /**
+   * Specify a tenant to deliver the message to. The message can only be
+   * received on executions or process definitions which belongs to the given
+   * tenant. Cannot be used in combination with
+   * {@link #processInstanceId(String)} or {@link #processDefinitionId(String)}.
+   *
+   * @param tenantId
+   *          the id of the tenant
+   * @return the builder
+   */
+  MessageCorrelationBuilder tenantId(String tenantId);
+
+  /**
+   * Specify that the message can only be received on executions or process
+   * definitions which belongs to no tenant. Cannot be used in combination with
+   * {@link #processInstanceId(String)} or {@link #processDefinitionId(String)}.
+   *
+   * @return the builder
+   */
+  MessageCorrelationBuilder withoutTenantId();
+
+  /**
    * Executes the message correlation.
    *
    * <p>This will result in either:
@@ -112,14 +133,15 @@ public interface MessageCorrelationBuilder {
    * </p>
    *
    * @throws MismatchingMessageCorrelationException
-   *          if none or more than one execution or process definition is matched by the correlation
+   *          <li>if none or more than one execution or process definition is matched by the correlation</li>
+   *          <li>if no tenant-id is specified and multiple process definitions from different tenants are matched by the correlation</li>
    * @throws AuthorizationException
-   *          if one execution is matched and the user has no {@link Permissions#UPDATE} permission on
+   *          <li>if one execution is matched and the user has no {@link Permissions#UPDATE} permission on
    *          {@link Resources#PROCESS_INSTANCE} or no {@link Permissions#UPDATE_INSTANCE} permission on
-   *          {@link Resources#PROCESS_DEFINITION}.
-   *          if one process definition is matched and the user has no {@link Permissions#CREATE} permission on
+   *          {@link Resources#PROCESS_DEFINITION}.</li>
+   *          <li>if one process definition is matched and the user has no {@link Permissions#CREATE} permission on
    *          {@link Resources#PROCESS_INSTANCE} and no {@link Permissions#CREATE_INSTANCE} permission on
-   *          {@link Resources#PROCESS_DEFINITION}.
+   *          {@link Resources#PROCESS_DEFINITION}.</li>
    */
   void correlate();
 
@@ -155,13 +177,15 @@ public interface MessageCorrelationBuilder {
    * </ul>
    * </p>
    *
+   * @throws MismatchingMessageCorrelationException
+   *          if no tenant-id is specified and multiple executions or process definitions from different tenants are matched by the correlation
    * @throws AuthorizationException
-   *          if at least one execution is matched and the user has no {@link Permissions#UPDATE} permission on
+   *          <li>if at least one execution is matched and the user has no {@link Permissions#UPDATE} permission on
    *          {@link Resources#PROCESS_INSTANCE} or no {@link Permissions#UPDATE_INSTANCE} permission on
-   *          {@link Resources#PROCESS_DEFINITION}.
-   *          if one process definition is matched and the user has no {@link Permissions#CREATE} permission on
+   *          {@link Resources#PROCESS_DEFINITION}.</li>
+   *          <li>if one process definition is matched and the user has no {@link Permissions#CREATE} permission on
    *          {@link Resources#PROCESS_INSTANCE} and no {@link Permissions#CREATE_INSTANCE} permission on
-   *          {@link Resources#PROCESS_DEFINITION}.
+   *          {@link Resources#PROCESS_DEFINITION}.</li>
    *
    */
   void correlateAll();
@@ -180,7 +204,8 @@ public interface MessageCorrelationBuilder {
    * @return the newly created process instance
    *
    * @throws MismatchingMessageCorrelationException
-   *          if none process definition is matched by the correlation
+   *          <li>if none process definition is matched by the correlation</li>
+   *          <li>if no tenant-id is specified and multiple process definitions from different tenants are matched by the correlation</li>
    * @throws AuthorizationException
    *          if one process definition is matched and the user has no {@link Permissions#CREATE} permission on
    *          {@link Resources#PROCESS_INSTANCE} and no {@link Permissions#CREATE_INSTANCE} permission on

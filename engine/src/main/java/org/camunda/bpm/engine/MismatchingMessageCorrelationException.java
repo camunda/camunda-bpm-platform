@@ -23,19 +23,23 @@ public class MismatchingMessageCorrelationException extends
 
   private static final long serialVersionUID = 1L;
 
+  public MismatchingMessageCorrelationException(String message) {
+    super(message);
+  }
+
   public MismatchingMessageCorrelationException(String messageName, String reason) {
-    super("Cannot correlate message '" + messageName + "': " + reason);
+    this("Cannot correlate message '" + messageName + "': " + reason);
   }
 
   public MismatchingMessageCorrelationException(String messageName,
       String businessKey, Map<String, Object> correlationKeys) {
-    super("Cannot correlate message '" + messageName + "' with process instance business key '" + businessKey
+    this("Cannot correlate message '" + messageName + "' with process instance business key '" + businessKey
         + "' and correlation keys " + correlationKeys);
   }
 
   public MismatchingMessageCorrelationException(String messageName,
       String businessKey, Map<String, Object> correlationKeys, String reason) {
-    super("Cannot correlate message '" + messageName + "' with process instance business key '" + businessKey
+    this("Cannot correlate message '" + messageName + "' with process instance business key '" + businessKey
         + "' and correlation keys " + correlationKeys + ": " + reason);
   }
 }
