@@ -475,6 +475,7 @@
                 <exclude>**/CompensateEventHistoryTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceAuthorizationTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceTest.java</exclude>
+                <exclude>**/MultiTenancyHistoricVariableInstanceQueryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
