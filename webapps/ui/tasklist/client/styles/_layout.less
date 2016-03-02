@@ -57,6 +57,14 @@ button {
 .task-column-close .column-right .region-toggle .glyphicon:before{
   content: '\e257';
 }
+// prevent "tab navigation focus" glitch
+.task-column-close .column-right {
+  .reset-regions,
+  .maximize,
+  .task-actions {
+    display: none;
+  }
+}
 
 
 
