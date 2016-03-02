@@ -59,9 +59,14 @@ button {
 }
 // prevent "tab navigation focus" glitch
 .task-column-close .column-right {
-  .reset-regions,
-  .maximize,
-  .task-actions {
+  .cell.top {
+    .reset-regions,
+    .maximize,
+    .task-actions {
+      display: none;
+    }
+  }
+  .cell.content {
     display: none;
   }
 }
