@@ -108,7 +108,7 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
       if (tenantId != null) {
         query.tenantIdIn(tenantId);
       } else {
-        // find executions without tenant id - CAM-5412
+        query.withoutTenantId();
       }
     }
 
@@ -120,13 +120,8 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
     List<MessageCorrelationResult> result = new ArrayList<MessageCorrelationResult>(matchingExecutions.size());
 
     for (Execution matchingExecution : matchingExecutions) {
-
-      // TODO replace by query criteria - CAM-5412
-      if (!correlationSet.isTenantIdSet || correlationSet.getTenantId() != null || matchingExecution.getTenantId() == null) {
-
-        MessageCorrelationResult correlationResult = MessageCorrelationResult.matchedExecution((ExecutionEntity) matchingExecution);
-        result.add(correlationResult);
-      }
+      MessageCorrelationResult correlationResult = MessageCorrelationResult.matchedExecution((ExecutionEntity) matchingExecution);
+      result.add(correlationResult);
     }
 
     return result;

@@ -124,6 +124,15 @@ public interface JobQuery extends Query<JobQuery, Job> {
   /** Only select jobs that belong to one of the given tenant ids. */
   JobQuery tenantIdIn(String... tenantIds);
 
+  /** Only select jobs which have no tenant id. */
+  JobQuery withoutTenantId();
+
+  /**
+   * Select jobs which have no tenant id. Can be used in combination
+   * with {@link #tenantIdIn(String...)}.
+   */
+  JobQuery includeJobsWithoutTenantId();
+
   //sorting //////////////////////////////////////////
 
   /** Order by job id (needs to be followed by {@link #asc()} or {@link #desc()}). */

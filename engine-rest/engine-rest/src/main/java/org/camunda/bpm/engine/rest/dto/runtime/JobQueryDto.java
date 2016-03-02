@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -79,7 +81,9 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   protected Long priorityHigherThanOrEquals;
   protected Long priorityLowerThanOrEquals;
   protected String jobDefinitionId;
-  private List<String> tenantIds;
+  protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
+  protected Boolean includeJobsWithoutTenantId;
 
   protected List<ConditionQueryParameterDto> dueDates;
 
@@ -189,6 +193,16 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
+  @CamundaQueryParam(value = "includeJobsWithoutTenantId", converter = BooleanConverter.class)
+  public void setIncludeJobsWithoutTenantId(Boolean includeJobsWithoutTenantId) {
+    this.includeJobsWithoutTenantId = includeJobsWithoutTenantId;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -225,29 +239,29 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
       query.processDefinitionKey(processDefinitionKey);
     }
 
-    if (withRetriesLeft != null && withRetriesLeft) {
+    if (TRUE.equals(withRetriesLeft)) {
       query.withRetriesLeft();
     }
 
-    if (executable != null && executable) {
+    if (TRUE.equals(executable)) {
       query.executable();
     }
 
-    if (timers != null && timers) {
+    if (TRUE.equals(timers)) {
       if (messages != null && messages) {
         throw new InvalidRequestException(Status.BAD_REQUEST, "Parameter timers cannot be used together with parameter messages.");
       }
       query.timers();
     }
 
-    if (messages != null && messages) {
+    if (TRUE.equals(messages)) {
       if (timers != null && timers) {
         throw new InvalidRequestException(Status.BAD_REQUEST, "Parameter messages cannot be used together with parameter timers.");
       }
       query.messages();
     }
 
-    if (withException != null && withException) {
+    if (TRUE.equals(withException)) {
       query.withException();
     }
 
@@ -255,15 +269,15 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
       query.exceptionMessage(exceptionMessage);
     }
 
-    if (noRetriesLeft != null && noRetriesLeft) {
+    if (TRUE.equals(noRetriesLeft)) {
       query.noRetriesLeft();
     }
 
-    if (active != null && active) {
+    if (TRUE.equals(active)) {
       query.active();
     }
 
-    if (suspended != null && suspended) {
+    if (TRUE.equals(suspended)) {
       query.suspended();
     }
 
@@ -305,6 +319,12 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
+    }
+    if (TRUE.equals(includeJobsWithoutTenantId)) {
+      query.includeJobsWithoutTenantId();
     }
   }
 

@@ -573,6 +573,59 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
+  public void testWithoutTenantIdParameter() {
+    Job mockJob = MockProvider.mockJob().tenantId(null).build();
+    mockQuery = setUpMockJobQuery(Arrays.asList(mockJob));
+
+    Response response = given()
+      .queryParam("withoutTenantId", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(JOBS_RESOURCE_URL);
+
+    verify(mockQuery).withoutTenantId();
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> jobs = from(content).getList("");
+    assertThat(jobs).hasSize(1);
+
+    String returnedTenantId = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId).isEqualTo(null);
+  }
+
+  @Test
+  public void testIncludeJobsWithoutTenantIdParameter() {
+    List<Job> jobs = Arrays.asList(
+        MockProvider.mockJob().tenantId(null).build(),
+        MockProvider.mockJob().tenantId(MockProvider.EXAMPLE_TENANT_ID).build());
+    mockQuery = setUpMockJobQuery(jobs);
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID)
+      .queryParam("includeJobsWithoutTenantId", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(JOBS_RESOURCE_URL);
+
+    verify(mockQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID);
+    verify(mockQuery).includeJobsWithoutTenantId();
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(null);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+  }
+
+  @Test
   public void testTenantIdListPostParameter() {
     mockQuery = setUpMockJobQuery(createMockJobsTwoTenants());
 
@@ -601,10 +654,68 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
   }
 
+  @Test
+  public void testWithoutTenantIdPostParameter() {
+    Job mockJob = MockProvider.mockJob().tenantId(null).build();
+    mockQuery = setUpMockJobQuery(Arrays.asList(mockJob));
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("withoutTenantId", true);
+
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(JOBS_RESOURCE_URL);
+
+    String content = response.asString();
+    List<String> jobs = from(content).getList("");
+    assertThat(jobs).hasSize(1);
+
+    String returnedTenantId = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId).isEqualTo(null);
+  }
+
+  @Test
+  public void testIncludeJobsWithoutTenantIdPostParameter() {
+    List<Job> jobs = Arrays.asList(
+        MockProvider.mockJob().tenantId(null).build(),
+        MockProvider.mockJob().tenantId(MockProvider.EXAMPLE_TENANT_ID).build());
+    mockQuery = setUpMockJobQuery(jobs);
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("tenantIdIn", new String[] { MockProvider.EXAMPLE_TENANT_ID });
+    queryParameters.put("includeJobsWithoutTenantId", true);
+
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(JOBS_RESOURCE_URL);
+
+    verify(mockQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID);
+    verify(mockQuery).includeJobsWithoutTenantId();
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(null);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+  }
+
   private List<Job> createMockJobsTwoTenants() {
     return Arrays.asList(
-        MockProvider.createMockJob(MockProvider.EXAMPLE_TENANT_ID),
-        MockProvider.createMockJob(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
+        MockProvider.mockJob().tenantId(MockProvider.EXAMPLE_TENANT_ID).build(),
+        MockProvider.mockJob().tenantId(MockProvider.ANOTHER_EXAMPLE_TENANT_ID).build());
   }
 
 }

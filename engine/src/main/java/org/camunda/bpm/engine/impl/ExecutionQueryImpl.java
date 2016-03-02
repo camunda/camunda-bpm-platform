@@ -45,6 +45,8 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   protected String incidentId;
   protected String incidentMessage;
   protected String incidentMessageLike;
+
+  protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
 
   // Not used by end-users, but needed for dynamic ibatis query
@@ -178,6 +180,13 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   public ExecutionQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public ExecutionQuery withoutTenantId() {
+    this.tenantIds = null;
+    isTenantIdSet = true;
     return this;
   }
 

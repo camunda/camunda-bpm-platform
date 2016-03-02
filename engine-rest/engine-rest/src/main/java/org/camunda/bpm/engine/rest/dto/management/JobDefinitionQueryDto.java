@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.management;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +65,9 @@ public class JobDefinitionQueryDto extends AbstractQueryDto<JobDefinitionQuery> 
   protected Boolean active;
   protected Boolean suspended;
   protected Boolean withOverridingJobPriority;
-  private List<String> tenantIds;
+  protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
+  protected Boolean includeJobDefinitionsWithoutTenantId;
 
   public JobDefinitionQueryDto() {}
 
@@ -121,6 +125,16 @@ public class JobDefinitionQueryDto extends AbstractQueryDto<JobDefinitionQuery> 
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
+  @CamundaQueryParam(value = "includeJobDefinitionsWithoutTenantId", converter = BooleanConverter.class)
+  public void setIncludeJobDefinitionsWithoutTenantId(Boolean includeJobDefinitionsWithoutTenantId) {
+    this.includeJobDefinitionsWithoutTenantId = includeJobDefinitionsWithoutTenantId;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -157,20 +171,26 @@ public class JobDefinitionQueryDto extends AbstractQueryDto<JobDefinitionQuery> 
       query.jobConfiguration(jobConfiguration);
     }
 
-    if (active != null && active) {
+    if (TRUE.equals(active)) {
       query.active();
     }
 
-    if (suspended != null && suspended) {
+    if (TRUE.equals(suspended)) {
       query.suspended();
     }
 
-    if (withOverridingJobPriority != null && withOverridingJobPriority) {
+    if (TRUE.equals(withOverridingJobPriority)) {
       query.withOverridingJobPriority();
     }
 
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
+    }
+    if (TRUE.equals(includeJobDefinitionsWithoutTenantId)) {
+      query.includeJobDefinitionsWithoutTenantId();
     }
   }
 

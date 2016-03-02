@@ -39,6 +39,7 @@ public class MultiTenancyJobDefinitionQueryTest extends PluggableProcessEngineTe
       .endEvent()
       .done();
 
+    deployment(process);
     deploymentForTenant(TENANT_ONE, process);
     deploymentForTenant(TENANT_TWO, process);
 
@@ -46,11 +47,11 @@ public class MultiTenancyJobDefinitionQueryTest extends PluggableProcessEngineTe
     // - so a job definition is created on deployment.
   }
 
-  public void testQueryWithoutTenantId() {
+  public void testQueryNoTenantIdSet() {
     JobDefinitionQuery query = managementService
         .createJobDefinitionQuery();
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count(), is(3L));
   }
 
   public void testQueryByTenantId() {
@@ -75,6 +76,37 @@ public class MultiTenancyJobDefinitionQueryTest extends PluggableProcessEngineTe
     assertThat(query.count(), is(2L));
   }
 
+  public void testQueryByDefinitionsWithoutTenantIds() {
+    JobDefinitionQuery query = managementService
+        .createJobDefinitionQuery()
+        .withoutTenantId();
+
+    assertThat(query.count(), is(1L));
+  }
+
+  public void testQueryByTenantIdsIncludeDefinitionsWithoutTenantId() {
+    JobDefinitionQuery query = managementService
+        .createJobDefinitionQuery()
+        .tenantIdIn(TENANT_ONE)
+        .includeJobDefinitionsWithoutTenantId();
+
+    assertThat(query.count(), is(2L));
+
+    query = managementService
+        .createJobDefinitionQuery()
+        .tenantIdIn(TENANT_TWO)
+        .includeJobDefinitionsWithoutTenantId();
+
+    assertThat(query.count(), is(2L));
+
+    query = managementService
+        .createJobDefinitionQuery()
+        .tenantIdIn(TENANT_ONE, TENANT_TWO)
+        .includeJobDefinitionsWithoutTenantId();
+
+    assertThat(query.count(), is(3L));
+  }
+
   public void testQueryByNonExistingTenantId() {
     JobDefinitionQuery query = managementService
         .createJobDefinitionQuery()
@@ -94,7 +126,9 @@ public class MultiTenancyJobDefinitionQueryTest extends PluggableProcessEngineTe
   }
 
   public void testQuerySortingAsc() {
+    // exclude job definitions without tenant id because of database-specific ordering
     List<JobDefinition> jobDefinitions = managementService.createJobDefinitionQuery()
+        .tenantIdIn(TENANT_ONE, TENANT_TWO)
         .orderByTenantId()
         .asc()
         .list();
@@ -105,7 +139,9 @@ public class MultiTenancyJobDefinitionQueryTest extends PluggableProcessEngineTe
   }
 
   public void testQuerySortingDesc() {
+    // exclude job definitions without tenant id because of database-specific ordering
     List<JobDefinition> jobDefinitions = managementService.createJobDefinitionQuery()
+        .tenantIdIn(TENANT_ONE, TENANT_TWO)
         .orderByTenantId()
         .desc()
         .list();

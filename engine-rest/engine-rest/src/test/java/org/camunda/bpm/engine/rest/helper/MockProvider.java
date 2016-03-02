@@ -1368,11 +1368,11 @@ public abstract class MockProvider {
 
   // jobs
   public static Job createMockJob() {
-    return createMockJob(EXAMPLE_TENANT_ID);
+    return mockJob().tenantId(EXAMPLE_TENANT_ID).build();
   }
 
-  public static Job createMockJob(String tenantId) {
-    Job mock = new MockJobBuilder()
+  public static MockJobBuilder mockJob() {
+    return new MockJobBuilder()
       .id(EXAMPLE_JOB_ID)
       .processInstanceId(EXAMPLE_PROCESS_INSTANCE_ID)
       .executionId(EXAMPLE_EXECUTION_ID)
@@ -1383,10 +1383,7 @@ public abstract class MockProvider {
       .dueDate(DateTimeUtil.parseDate(EXAMPLE_DUE_DATE))
       .suspended(EXAMPLE_JOB_IS_SUSPENDED)
       .priority(EXAMPLE_JOB_PRIORITY)
-      .jobDefinitionId(EXAMPLE_JOB_DEFINITION_ID)
-      .tenantId(tenantId)
-      .build();
-    return mock;
+      .jobDefinitionId(EXAMPLE_JOB_DEFINITION_ID);
   }
 
   public static List<Job> createMockJobs() {
@@ -1848,10 +1845,10 @@ public abstract class MockProvider {
   }
 
   public static JobDefinition createMockJobDefinition() {
-    return createMockJobDefinition(EXAMPLE_TENANT_ID);
+    return mockJobDefinition().build();
   }
 
-  public static JobDefinition createMockJobDefinition(String tenantId) {
+  public static MockJobDefinitionBuilder mockJobDefinition() {
     return new MockJobDefinitionBuilder()
       .id(EXAMPLE_JOB_DEFINITION_ID)
       .activityId(EXAMPLE_ACTIVITY_ID)
@@ -1860,9 +1857,7 @@ public abstract class MockProvider {
       .jobPriority(EXAMPLE_JOB_DEFINITION_PRIORITY)
       .suspended(EXAMPLE_JOB_DEFINITION_IS_SUSPENDED)
       .processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
-      .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY)
-      .tenantId(tenantId)
-      .build();
+      .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY);
   }
 
   public static List<UserOperationLogEntry> createUserOperationLogEntries() {

@@ -191,8 +191,11 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
    */
   ExecutionQuery incidentMessageLike(String incidentMessageLike);
 
-   /** Only select process instances with one of the given tenant ids. */
+   /** Only selects executions with one of the given tenant ids. */
   ExecutionQuery tenantIdIn(String... tenantIds);
+
+  /** Only selects executions which have no tenant id. */
+  ExecutionQuery withoutTenantId();
 
   //ordering //////////////////////////////////////////////////////////////
 
