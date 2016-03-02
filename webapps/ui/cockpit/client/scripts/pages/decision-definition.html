@@ -97,18 +97,20 @@
       <!-- content bottom pane -->
       <div class="ctn-row ctn-content-bottom ctn-tabbed"
            ctn-collapsable="bottom">
-        <div ng-show="decisionDefinitionTabs.length">
-          <ul class="nav nav-tabs">
-            <li ng-class="{ active: selectedTab == tabProvider }"
-                ng-repeat="tabProvider in decisionDefinitionTabs">
-              <a href ng-click="selectTab(tabProvider)">{{ tabProvider.label }}</a>
-            </li>
-          </ul>
+        <ul class="nav nav-tabs"
+            ng-if="decisionDefinitionTabs.length > 1">
+          <li ng-class="{ active: selectedTab == tabProvider }"
+              ng-repeat="tabProvider in decisionDefinitionTabs">
+            <a href ng-click="selectTab(tabProvider)">{{ tabProvider.label }}</a>
+          </li>
+        </ul>
 
-          <div class="ctn-tabbed-content ctn-scroll">
-            <view provider="selectedTab"
-                  vars="decisionDefinitionVars" />
-          </div>
+        <h4 ng-if="decisionDefinitionTabs.length === 1">{{ decisionDefinitionTabs[0].label }}:</h4>
+
+        <div class="ctn-tabbed-content ctn-scroll"
+             ng-if="decisionDefinitionTabs.length">
+          <view provider="selectedTab"
+                vars="decisionDefinitionVars" />
         </div>
       </div>
 
