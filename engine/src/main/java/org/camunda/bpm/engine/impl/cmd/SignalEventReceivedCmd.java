@@ -18,10 +18,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.SignalEventReceivedBuilderImpl;
@@ -91,20 +89,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
       return eventSubscriptionManager.findSignalEventSubscriptionsByEventNameAndTenantId(signalName, builder.getTenantId());
 
     } else {
-      List<SignalEventSubscriptionEntity> signalEventSubscriptions = eventSubscriptionManager.findSignalEventSubscriptionsByEventName(signalName);
-      ensureSubscriptionsOnlyForOneTenant(signalEventSubscriptions);
-      return signalEventSubscriptions;
-    }
-  }
-
-  protected void ensureSubscriptionsOnlyForOneTenant(List<SignalEventSubscriptionEntity> signalEventSubscriptions) {
-    Set<String> tenantIds = new HashSet<String>();
-
-    for(SignalEventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
-      tenantIds.add(signalEventSubscription.getTenantId());
-    }
-    if(tenantIds.size() > 1) {
-      throw LOG.exceptionDeliverSignalToMultipleTenants(builder.getSignalName());
+      return eventSubscriptionManager.findSignalEventSubscriptionsByEventName(signalName);
     }
   }
 

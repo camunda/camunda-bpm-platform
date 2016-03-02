@@ -66,8 +66,15 @@ public interface SignalEventReceivedBuilder {
   SignalEventReceivedBuilder withoutTenantId();
 
   /**
-   * Delivers the signal. Note that the notification and instantiation happen
+   * <p>
+   * Delivers the signal to waiting executions and process definitions. The notification and instantiation happen
    * synchronously.
+   * </p>
+   *
+   * <p>
+   * Note that the signal delivers to all tenants if no tenant is specified
+   * using {@link #tenantId(String)} or {@link #withoutTenantId()}.
+   * </p>
    *
    * @throws ProcessEngineException
    *           if a single execution is specified and no such execution exists

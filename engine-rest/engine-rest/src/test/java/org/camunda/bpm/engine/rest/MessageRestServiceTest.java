@@ -286,6 +286,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     Map<String, Object> messageParameters = new HashMap<String, Object>();
     messageParameters.put("messageName", messageName);
+    messageParameters.put("withoutTenantId", true);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
@@ -296,6 +297,27 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     verify(messageCorrelationBuilderMock).setVariables(argThat(new EqualsMap(null)));
     verify(messageCorrelationBuilderMock).withoutTenantId();
     verify(messageCorrelationBuilderMock).correlate();
+  }
+
+  @Test
+  public void testFailingInvalidTenantParameters() {
+    String messageName = "aMessageName";
+
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("tenantId", MockProvider.EXAMPLE_TENANT_ID);
+    messageParameters.put("withoutTenantId", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(messageParameters)
+    .then()
+      .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Parameter 'tenantId' cannot be used together with parameter 'withoutTenantId'."))
+    .when()
+      .post(MESSAGE_URL);
   }
 
   @Test

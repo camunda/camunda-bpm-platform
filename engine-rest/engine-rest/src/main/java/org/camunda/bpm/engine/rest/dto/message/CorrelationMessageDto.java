@@ -23,6 +23,7 @@ public class CorrelationMessageDto {
   private Map<String, VariableValueDto> correlationKeys;
   private Map<String, VariableValueDto> processVariables;
   private String tenantId;
+  private boolean withoutTenantId;
   private boolean all = false;
 
   public String getMessageName() {
@@ -71,6 +72,14 @@ public class CorrelationMessageDto {
 
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
+  }
+
+  public boolean isWithoutTenantId() {
+    return withoutTenantId;
+  }
+
+  public void setWithoutTenantId(boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
   }
 
 }

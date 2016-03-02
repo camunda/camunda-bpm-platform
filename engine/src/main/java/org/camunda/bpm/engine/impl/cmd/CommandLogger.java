@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 
 /**
@@ -166,36 +167,34 @@ public class CommandLogger extends ProcessEngineLogger {
         "026", "Cannot specify correlation variables of a process instance when correlate a start message."));
   }
 
-  public ProcessEngineException exceptionDeliverSignalToMultipleTenants(String signalName) {
-    return new ProcessEngineException(exceptionMessage(
-        "027", "Cannot deliver a signal with name '{}' to multiple tenants.", signalName));
-  }
-
   public BadUserRequestException exceptionDeliverSignalToSingleExecutionWithTenantId() {
     return new BadUserRequestException(exceptionMessage(
-        "028", "Cannot specify a tenant-id when deliver a signal to a single execution."));
-  }
-
-  public MismatchingMessageCorrelationException exceptionCorrelateMessageToMultipleTenants(String messageName) {
-    return new MismatchingMessageCorrelationException(exceptionMessage(
-        "029", "Cannot correlate a message with name '{}' to multiple tenants.", messageName));
+        "027", "Cannot specify a tenant-id when deliver a signal to a single execution."));
   }
 
   public BadUserRequestException exceptionCorrelateMessageWithProcessInstanceAndTenantId() {
     return new BadUserRequestException(exceptionMessage(
-        "030", "Cannot specify a tenant-id when correlate a message to a single process instance."));
+        "028", "Cannot specify a tenant-id when correlate a message to a single process instance."));
   }
 
   public BadUserRequestException exceptionCorrelateMessageWithProcessDefinitionAndTenantId() {
     return new BadUserRequestException(exceptionMessage(
-        "031", "Cannot specify a tenant-id when correlate a start message to a specific version of a process definition."));
+        "029", "Cannot specify a tenant-id when correlate a start message to a specific version of a process definition."));
   }
 
-  public MismatchingMessageCorrelationException multipleTenantsForMessageNameException(String messageName) {
+  public MismatchingMessageCorrelationException exceptionCorrelateMessageToSingleProcessDefinition(String messageName, long processDefinitionCound, CorrelationSet correlationSet) {
     return new MismatchingMessageCorrelationException(exceptionMessage(
-        "032",
-        "Cannot resolve a unique message start event subscription for message name '{}' because it exists for multiple tenants.",
-        messageName
+        "030",
+        "Cannot correlate a message with name '{}' to a single process definition. {} process definitions match the correlations keys: {}",
+        messageName, processDefinitionCound, correlationSet
+        ));
+  }
+
+  public MismatchingMessageCorrelationException exceptionCorrelateMessageToSingleExecution(String messageName, long executionCound, CorrelationSet correlationSet) {
+    return new MismatchingMessageCorrelationException(exceptionMessage(
+        "031",
+        "Cannot correlate a message with name '{}' to a single execution. {} executions match the correlation keys: {}",
+        messageName, executionCound, correlationSet
         ));
   }
 

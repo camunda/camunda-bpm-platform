@@ -39,6 +39,9 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
     if (messageDto.getMessageName() == null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "No message name supplied");
     }
+    if (messageDto.getTenantId() != null && messageDto.isWithoutTenantId()) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Parameter 'tenantId' cannot be used together with parameter 'withoutTenantId'.");
+    }
 
     try {
       MessageCorrelationBuilder correlation = createMessageCorrelationBuilder(messageDto);
@@ -78,10 +81,10 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
       }
     }
 
-    String tenantId = messageDto.getTenantId();
-    if (tenantId != null) {
-      builder.tenantId(tenantId);
-    } else {
+    if (messageDto.getTenantId() != null) {
+      builder.tenantId(messageDto.getTenantId());
+
+    } else if (messageDto.isWithoutTenantId()) {
       builder.withoutTenantId();
     }
 

@@ -59,4 +59,10 @@ public class CorrelationSet {
     return isTenantIdSet;
   }
 
+  @Override
+  public String toString() {
+    return "CorrelationSet [businessKey=" + businessKey + ", processInstanceId=" + processInstanceId + ", processDefinitionId=" + processDefinitionId
+        + ", correlationKeys=" + correlationKeys + ", tenantId=" + tenantId + ", isTenantIdSet=" + isTenantIdSet + "]";
+  }
+
 }

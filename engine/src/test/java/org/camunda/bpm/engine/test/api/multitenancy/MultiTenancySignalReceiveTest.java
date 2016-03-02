@@ -21,7 +21,6 @@ import static org.junit.Assert.assertThat;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
@@ -171,48 +170,42 @@ public class MultiTenancySignalReceiveTest extends PluggableProcessEngineTestCas
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(2L));
   }
 
-  public void testFailToSendSignalToStartEventForMultipleTenants() {
+  public void testSendSignalToStartEventsForMultipleTenants() {
     deploymentForTenant(TENANT_ONE, SIGNAL_START_PROCESS);
     deploymentForTenant(TENANT_TWO, SIGNAL_START_PROCESS);
 
-    try {
-      runtimeService.createSignalEvent("signal").send();
+    runtimeService.createSignalEvent("signal").send();
 
-      fail("expected exception");
-    } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot deliver a signal with name 'signal' to multiple tenants."));
-    }
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
-  public void testFailToSendSignalToIntermediateCatchEventForMultipleTenants() {
+  public void testSendSignalToIntermediateCatchEventsForMultipleTenants() {
     deploymentForTenant(TENANT_ONE, SIGNAL_CATCH_PROCESS);
     deploymentForTenant(TENANT_TWO, SIGNAL_CATCH_PROCESS);
 
     runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
     runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_TWO).execute();
 
-    try {
-      runtimeService.createSignalEvent("signal").send();
+    runtimeService.createSignalEvent("signal").send();
 
-      fail("expected exception");
-    } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot deliver a signal with name 'signal' to multiple tenants."));
-    }
+    TaskQuery query = taskService.createTaskQuery();
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
-  public void testFailToSendSignalToStartAndIntermediateCatchEventForMultipleTenants() {
+  public void testSendSignalToStartAndIntermediateCatchEventForMultipleTenants() {
     deploymentForTenant(TENANT_ONE, SIGNAL_CATCH_PROCESS);
     deploymentForTenant(TENANT_TWO, SIGNAL_START_PROCESS);
 
     runtimeService.createProcessInstanceByKey("signalCatch").execute();
 
-    try {
-      runtimeService.createSignalEvent("signal").send();
+    runtimeService.createSignalEvent("signal").send();
 
-      fail("expected exception");
-    } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot deliver a signal with name 'signal' to multiple tenants."));
-    }
+    TaskQuery query = taskService.createTaskQuery();
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
   public void testFailToSendSignalWithExecutionIdForTenant() {

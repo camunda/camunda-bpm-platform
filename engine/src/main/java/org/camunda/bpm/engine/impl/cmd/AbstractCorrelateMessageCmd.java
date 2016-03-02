@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.Map;
-
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -33,12 +31,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 public abstract class AbstractCorrelateMessageCmd {
 
   protected final String messageName;
-  protected final String businessKey;
-  protected final Map<String, Object> correlationKeys;
-  protected final Map<String, Object> processVariables;
-  protected final String processInstanceId;
-  protected final String processDefinitionId;
-  protected final boolean isExclusiveCorrelation;
 
   protected final MessageCorrelationBuilderImpl builder;
 
@@ -48,21 +40,14 @@ public abstract class AbstractCorrelateMessageCmd {
    * @param builder
    */
   protected AbstractCorrelateMessageCmd(MessageCorrelationBuilderImpl builder) {
-    this.messageName = builder.getMessageName();
-    this.processVariables = builder.getPayloadProcessInstanceVariables();
-    this.correlationKeys = builder.getCorrelationProcessInstanceVariables();
-    this.businessKey = builder.getBusinessKey();
-    this.processInstanceId = builder.getProcessInstanceId();
-    this.processDefinitionId = builder.getProcessDefinitionId();
-    this.isExclusiveCorrelation = builder.isExclusiveCorrelation();
-
     this.builder = builder;
+    this.messageName = builder.getMessageName();
   }
 
   protected void triggerExecution(CommandContext commandContext, MessageCorrelationResult correlationResult) {
     String executionId = correlationResult.getExecutionEntity().getId();
 
-    MessageEventReceivedCmd command = new MessageEventReceivedCmd(messageName, executionId, processVariables, isExclusiveCorrelation);
+    MessageEventReceivedCmd command = new MessageEventReceivedCmd(messageName, executionId, builder.getPayloadProcessInstanceVariables(), builder.isExclusiveCorrelation());
     command.execute(commandContext);
   }
 
@@ -70,8 +55,8 @@ public abstract class AbstractCorrelateMessageCmd {
     ProcessDefinitionEntity processDefinitionEntity = correlationResult.getProcessDefinitionEntity();
 
     ActivityImpl messageStartEvent = processDefinitionEntity.findActivity(correlationResult.getStartEventActivityId());
-    ExecutionEntity processInstance = processDefinitionEntity.createProcessInstance(businessKey, messageStartEvent);
-    processInstance.start(processVariables);
+    ExecutionEntity processInstance = processDefinitionEntity.createProcessInstance(builder.getBusinessKey(), messageStartEvent);
+    processInstance.start(builder.getPayloadProcessInstanceVariables());
 
     return processInstance;
   }

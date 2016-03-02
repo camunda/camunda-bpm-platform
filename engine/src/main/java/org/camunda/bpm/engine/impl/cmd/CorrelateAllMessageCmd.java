@@ -43,8 +43,9 @@ public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd implemen
   }
 
   public Void execute(final CommandContext commandContext) {
-    ensureAtLeastOneNotNull("At least one of the following correlation criteria has to be present: "
-        + "messageName, businessKey, correlationKeys, processInstanceId", messageName, businessKey, correlationKeys, processInstanceId);
+    ensureAtLeastOneNotNull(
+        "At least one of the following correlation criteria has to be present: " + "messageName, businessKey, correlationKeys, processInstanceId", messageName,
+        builder.getBusinessKey(), builder.getCorrelationProcessInstanceVariables(), builder.getProcessInstanceId());
 
     final CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
     final CorrelationSet correlationSet = new CorrelationSet(builder);

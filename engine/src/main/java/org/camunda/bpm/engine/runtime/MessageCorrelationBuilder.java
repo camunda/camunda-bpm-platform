@@ -127,14 +127,13 @@ public interface MessageCorrelationBuilder {
    * <li>Exactly one waiting execution is notified to continue. The notification is performed synchronously.</li>
    * <li>Exactly one Process Instance is started in case the message name matches a message start event of a
    *     process. The instantiation is performed synchronously.</li>
-   * <li>MismatchingMessageCorrelationException is thrown. This means that either too many executions match the
-   *     correlation or that no execution matches the correlation.</li>
+   * <li>MismatchingMessageCorrelationException is thrown. This means that either too many executions / process definitions match the
+   *     correlation or that no execution and process definition matches the correlation.</li>
    * </ul>
    * </p>
    *
    * @throws MismatchingMessageCorrelationException
-   *          <li>if none or more than one execution or process definition is matched by the correlation</li>
-   *          <li>if no tenant-id is specified and multiple process definitions from different tenants are matched by the correlation</li>
+   *          if none or more than one execution or process definition is matched by the correlation
    * @throws AuthorizationException
    *          <li>if one execution is matched and the user has no {@link Permissions#UPDATE} permission on
    *          {@link Resources#PROCESS_INSTANCE} or no {@link Permissions#UPDATE_INSTANCE} permission on
@@ -172,13 +171,11 @@ public interface MessageCorrelationBuilder {
    * <p>This will result in any number of the following:
    * <ul>
    * <li>Any number of waiting executions are notified to continue. The notification is performed synchronously.</li>
-   * <li>Zero or one Process Instance is started in case the message name matches a message start event of a
-   *     process. The instantiation is performed synchronously.</li>
+   * <li>Any number of process instances are started which have a message start event that matches the message name. The instantiation is performed synchronously.</li>
    * </ul>
    * </p>
+   * <p>Note that the message correlates to all tenants if no tenant is specified using {@link #tenantId(String)} or {@link #withoutTenantId()}.</p>
    *
-   * @throws MismatchingMessageCorrelationException
-   *          if no tenant-id is specified and multiple executions or process definitions from different tenants are matched by the correlation
    * @throws AuthorizationException
    *          <li>if at least one execution is matched and the user has no {@link Permissions#UPDATE} permission on
    *          {@link Resources#PROCESS_INSTANCE} or no {@link Permissions#UPDATE_INSTANCE} permission on
@@ -193,23 +190,28 @@ public interface MessageCorrelationBuilder {
   /**
    * Executes the message correlation.
    *
-   * <p>This will result in either:
+   * <p>
+   * This will result in either:
    * <ul>
-   * <li>Exactly one Process Instance is started in case the message name matches a message start event of a
-   *     process. The instantiation is performed synchronously.</li>
-   * <li>MismatchingMessageCorrelationException is thrown. This means that no process definition matches the correlation.</li>
+   * <li>Exactly one Process Instance is started in case the message name
+   * matches a message start event of a process. The instantiation is performed
+   * synchronously.</li>
+   * <li>MismatchingMessageCorrelationException is thrown. This means that
+   * either no process definition or more than one process definition matches
+   * the correlation.</li>
    * </ul>
    * </p>
    *
    * @return the newly created process instance
    *
    * @throws MismatchingMessageCorrelationException
-   *          <li>if none process definition is matched by the correlation</li>
-   *          <li>if no tenant-id is specified and multiple process definitions from different tenants are matched by the correlation</li>
+   *           if none or more than one process definition is matched by the correlation
    * @throws AuthorizationException
-   *          if one process definition is matched and the user has no {@link Permissions#CREATE} permission on
-   *          {@link Resources#PROCESS_INSTANCE} and no {@link Permissions#CREATE_INSTANCE} permission on
-   *          {@link Resources#PROCESS_DEFINITION}.
+   *           if one process definition is matched and the user has no
+   *           {@link Permissions#CREATE} permission on
+   *           {@link Resources#PROCESS_INSTANCE} and no
+   *           {@link Permissions#CREATE_INSTANCE} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessInstance correlateStartMessage();
 

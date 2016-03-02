@@ -157,7 +157,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
       runtimeService.correlateMessage(messageName, correlationKeys);
       fail("Expected an Exception");
     } catch (MismatchingMessageCorrelationException e) {
-      assertTextPresent("2 executions match the correlation keys.", e.getMessage());
+      assertTextPresent("2 executions match the correlation keys", e.getMessage());
     }
 
     // fluent builder fails as well
@@ -167,7 +167,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
         .correlate();
       fail("Expected an Exception");
     } catch (MismatchingMessageCorrelationException e) {
-      assertTextPresent("2 executions match the correlation keys.", e.getMessage());
+      assertTextPresent("2 executions match the correlation keys", e.getMessage());
     }
   }
 

@@ -37,8 +37,8 @@ public interface CorrelationHandler {
   public MessageCorrelationResult correlateMessage(CommandContext commandContext, String messageName, CorrelationSet correlationSet);
 
   /**
-   * Correlate the given message to all waiting executions and a process
-   * definition with a message start event.
+   * Correlate the given message to all waiting executions and all process
+   * definitions which have a message start event.
    *
    * @param correlationSet
    *          any of its members may be <code>null</code>
@@ -49,15 +49,15 @@ public interface CorrelationHandler {
   public List<MessageCorrelationResult> correlateMessages(CommandContext commandContext, String messageName, CorrelationSet correlationSet);
 
   /**
-   * Correlate the given message to a process definition with a message start
+   * Correlate the given message to process definitions with a message start
    * event.
    *
    * @param correlationSet
    *          any of its members may be <code>null</code>
    *
-   * @return the matched correlation target or <code>null</code> if the message
+   * @return the matched correlation targets or an empty list if the message
    *         could not be correlated.
    */
-  public MessageCorrelationResult correlateStartMessage(CommandContext commandContext, String messageName, CorrelationSet correlationSet);
+  public List<MessageCorrelationResult> correlateStartMessages(CommandContext commandContext, String messageName, CorrelationSet correlationSet);
 
 }

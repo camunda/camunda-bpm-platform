@@ -245,20 +245,73 @@ public class MultiTenancyMessageCorrelationTest extends PluggableProcessEngineTe
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
   }
 
-  public void testFailToCorrelateMessageToStartEventsForDifferentsTenants() {
+  public void testCorrelateMessagesToStartEventsForMultipleTenants() {
+    deploymentForTenant(TENANT_ONE, MESSAGE_START_PROCESS);
+    deploymentForTenant(TENANT_TWO, MESSAGE_START_PROCESS);
+
+    runtimeService.createMessageCorrelation("message").correlateAll();
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+  }
+
+  public void testCorrelateMessagesToIntermediateCatchEventsForMultipleTenants() {
+    deploymentForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
+    deploymentForTenant(TENANT_TWO, MESSAGE_CATCH_PROCESS);
+
+    runtimeService.createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
+
+    runtimeService.createMessageCorrelation("message").correlateAll();
+
+    TaskQuery query = taskService.createTaskQuery();
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+  }
+
+  public void testCorrelateMessagesToStartAndIntermediateCatchEventForMultipleTenants() {
+    deploymentForTenant(TENANT_ONE, MESSAGE_START_PROCESS);
+    deploymentForTenant(TENANT_TWO, MESSAGE_CATCH_PROCESS);
+
+    runtimeService.createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
+
+    runtimeService.createMessageCorrelation("message").correlateAll();
+
+    assertThat(runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(taskService.createTaskQuery().tenantIdIn(TENANT_TWO).count(), is(1L));
+  }
+
+  public void testFailToCorrelateMessageToIntermediateCatchEventsForMultipleTenants() {
+    deploymentForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
+    deploymentForTenant(TENANT_TWO, MESSAGE_CATCH_PROCESS);
+
+    runtimeService.createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
+
+    try {
+      runtimeService.createMessageCorrelation("message").correlate();
+
+      fail("expected exception");
+    } catch (MismatchingMessageCorrelationException e) {
+      assertThat(e.getMessage(), containsString("Cannot correlate a message with name 'message' to a single execution"));
+    }
+  }
+
+  public void testFailToCorrelateMessageToStartEventsForMultipleTenants() {
     deploymentForTenant(TENANT_ONE, MESSAGE_START_PROCESS);
     deploymentForTenant(TENANT_TWO, MESSAGE_START_PROCESS);
 
     try {
-      runtimeService.createMessageCorrelation("message").correlateAll();
+      runtimeService.createMessageCorrelation("message").correlate();
 
       fail("expected exception");
     } catch (MismatchingMessageCorrelationException e) {
-      assertThat(e.getMessage(), containsString("Cannot resolve a unique message start event subscription"));
+      assertThat(e.getMessage(), containsString("Cannot correlate a message with name 'message' to a single process definition"));
     }
   }
 
-  public void testFailToCorrelateStartMessageForDifferentsTenants() {
+  public void testFailToCorrelateStartMessageForMultipleTenants() {
     deploymentForTenant(TENANT_ONE, MESSAGE_START_PROCESS);
     deploymentForTenant(TENANT_TWO, MESSAGE_START_PROCESS);
 
@@ -267,38 +320,7 @@ public class MultiTenancyMessageCorrelationTest extends PluggableProcessEngineTe
 
       fail("expected exception");
     } catch (MismatchingMessageCorrelationException e) {
-      assertThat(e.getMessage(), containsString("Cannot resolve a unique message start event subscription"));
-    }
-  }
-
-  public void testFailToCorrelateMessageToIntermediateCatchEventsForDifferentsTenants() {
-    deploymentForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
-    deploymentForTenant(TENANT_TWO, MESSAGE_CATCH_PROCESS);
-
-    runtimeService.createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
-    runtimeService.createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
-
-    try {
-      runtimeService.createMessageCorrelation("message").correlateAll();
-
-      fail("expected exception");
-    } catch (MismatchingMessageCorrelationException e) {
-      assertThat(e.getMessage(), containsString("Cannot correlate a message with name 'message' to multiple tenants"));
-    }
-  }
-
-  public void testFailToCorrelateMessageToStartAndIntermediateCatchEventForDifferentsTenants() {
-    deploymentForTenant(TENANT_ONE, MESSAGE_START_PROCESS);
-    deploymentForTenant(TENANT_TWO, MESSAGE_CATCH_PROCESS);
-
-    runtimeService.createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
-
-    try {
-      runtimeService.createMessageCorrelation("message").correlateAll();
-
-      fail("expected exception");
-    } catch (MismatchingMessageCorrelationException e) {
-      assertThat(e.getMessage(), containsString("Cannot correlate a message with name 'message' to multiple tenants"));
+      assertThat(e.getMessage(), containsString("Cannot correlate a message with name 'message' to a single process definition"));
     }
   }
 
