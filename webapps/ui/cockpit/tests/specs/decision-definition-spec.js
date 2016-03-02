@@ -48,7 +48,6 @@ describe('Cockpit Decision Definition Spec', function() {
     });
 
     it('should display a list of evaluated decision instances', function() {
-      expect(definitionPage.decisionInstancesTab.isTabSelected()).to.eventually.be.true;
       expect(definitionPage.decisionInstancesTab.table().count()).to.eventually.eql(1);
     });
 
