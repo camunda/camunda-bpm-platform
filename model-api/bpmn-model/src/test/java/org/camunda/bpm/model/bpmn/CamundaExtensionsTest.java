@@ -277,9 +277,9 @@ public class CamundaExtensionsTest {
 
   @Test
   public void testCaseTenantId() {
-    assertThat(callActivity.getCamundaCalledElementTenantId()).isEqualTo(TEST_STRING_XML);
-    callActivity.setCamundaCalledElementTenantId(TEST_STRING_API);
-    assertThat(callActivity.getCamundaCalledElementTenantId()).isEqualTo(TEST_STRING_API);
+    assertThat(callActivity.getCamundaCaseTenantId()).isEqualTo(TEST_STRING_XML);
+    callActivity.setCamundaCaseTenantId(TEST_STRING_API);
+    assertThat(callActivity.getCamundaCaseTenantId()).isEqualTo(TEST_STRING_API);
   }
 
   @Test
