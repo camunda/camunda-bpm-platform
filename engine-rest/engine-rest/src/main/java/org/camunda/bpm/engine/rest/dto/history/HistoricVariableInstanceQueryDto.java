@@ -52,7 +52,7 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   protected String[] taskIdIn;
   protected String[] activityInstanceIdIn;
   protected String[] caseExecutionIdIn;
-  private List<String> tenantIds;
+  protected List<String> tenantIds;
 
   public HistoricVariableInstanceQueryDto() {
   }

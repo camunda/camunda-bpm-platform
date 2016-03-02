@@ -61,12 +61,14 @@ public class MultiTenancyHistoricVariableInstanceQueryTest extends PluggableProc
         .tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
+    assertEquals(query.list().get(0).getValue(), TENANT_ONE_VAR);
 
     query = historyService
         .createHistoricVariableInstanceQuery()
         .tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
+    assertEquals(query.list().get(0).getValue(), TENANT_TWO_VAR);
   }
 
   public void testQueryByTenantIds() {
@@ -103,7 +105,9 @@ public class MultiTenancyHistoricVariableInstanceQueryTest extends PluggableProc
 
     assertThat(historicVariableInstances.size(), is(2));
     assertThat(historicVariableInstances.get(0).getTenantId(), is(TENANT_ONE));
+    assertEquals(historicVariableInstances.get(0).getValue(), TENANT_ONE_VAR);
     assertThat(historicVariableInstances.get(1).getTenantId(), is(TENANT_TWO));
+    assertEquals(historicVariableInstances.get(1).getValue(), TENANT_TWO_VAR);
   }
 
   public void testQuerySortingDesc() {
@@ -114,7 +118,9 @@ public class MultiTenancyHistoricVariableInstanceQueryTest extends PluggableProc
 
     assertThat(historicVariableInstances.size(), is(2));
     assertThat(historicVariableInstances.get(0).getTenantId(), is(TENANT_TWO));
+    assertEquals(historicVariableInstances.get(0).getValue(), TENANT_TWO_VAR);
     assertThat(historicVariableInstances.get(1).getTenantId(), is(TENANT_ONE));
+    assertEquals(historicVariableInstances.get(1).getValue(), TENANT_ONE_VAR);
   }
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant, String var) {
