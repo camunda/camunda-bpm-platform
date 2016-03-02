@@ -2004,7 +2004,7 @@ public class BpmnParse extends Parse {
 
     parseBinding(businessRuleTaskElement, activity, callableElement, "decisionRefBinding");
     parseVersion(businessRuleTaskElement, activity, callableElement, "decisionRefBinding", "decisionRefVersion");
-    parseTenantId(businessRuleTaskElement, activity, callableElement, "decisionTenantId");
+    parseTenantId(businessRuleTaskElement, activity, callableElement, "decisionRefTenantId");
 
     String resultVariable = parseResultVariable(businessRuleTaskElement);
     DecisionTableResultMapper decisionTableResultMapper = parseDecisionResultMapper(businessRuleTaskElement);

@@ -380,6 +380,8 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
     runtimeService.startProcessInstanceByKey("callingProcess");
 
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess");
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
   public void testCalledElementTenantIdExpression() {
@@ -396,6 +398,9 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     deployment(callingProcess);
 
     runtimeService.startProcessInstanceByKey("callingProcess");
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess");
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
   public void testCaseRefTenantIdConstant() {
@@ -412,6 +417,8 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     deployment(callingProcess);
 
     runtimeService.startProcessInstanceByKey("callingProcess");
+
+    assertThatStartedCaseInstanceForTenant(TENANT_ONE);
   }
 
   public void testCaseRefTenantIdExpression() {
@@ -428,6 +435,8 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     deployment(callingProcess);
 
     runtimeService.startProcessInstanceByKey("callingProcess");
+
+    assertThatStartedCaseInstanceForTenant(TENANT_ONE);
   }
 
   protected void assertThatStartedCaseInstanceForTenant(String tenantId) {
