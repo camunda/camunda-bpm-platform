@@ -53,9 +53,9 @@ public class BpmPlatformExtension implements Extension {
   public static final String RESOURCE_NAME = BpmPlatformExtension.class.getPackage().getName() + ".LocalDescriptions";
 
   private static final PathElement SUBSYSTEM_PATH = PathElement.pathElement(SUBSYSTEM, SUBSYSTEM_NAME);
-  private static final PathElement PROCESS_ENGINES_PATH  = PathElement.pathElement(ModelConstants.PROCESS_ENGINES);
-  private static final PathElement JOB_EXECUTOR_PATH  = PathElement.pathElement(ModelConstants.JOB_EXECUTOR);
-  private static final PathElement JOB_ACQUISTIONS_PATH  = PathElement.pathElement(ModelConstants.JOB_ACQUISITIONS);
+  private static final PathElement PROCESS_ENGINES_PATH = PathElement.pathElement(ModelConstants.PROCESS_ENGINES);
+  private static final PathElement JOB_EXECUTOR_PATH = PathElement.pathElement(ModelConstants.JOB_EXECUTOR);
+  private static final PathElement JOB_ACQUISTIONS_PATH = PathElement.pathElement(ModelConstants.JOB_ACQUISITIONS);
 
 
   public void initialize(ExtensionContext context) {
