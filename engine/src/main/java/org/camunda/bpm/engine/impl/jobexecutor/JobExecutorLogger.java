@@ -128,10 +128,9 @@ public class JobExecutorLogger extends ProcessEngineLogger {
   }
 
   public void exceptionWhileUnlockingJob(String jobId, Throwable t) {
-	    logWarn(
-	        "021", "Exception while unaquiring job {}: ", jobId, t);
-	  }
-
-
+    logWarn(
+        "021", 
+        "Exception while unaquiring job {}: ", jobId, t);
+  }
 
 }

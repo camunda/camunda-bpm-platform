@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
@@ -22,16 +24,23 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
  * @author Thomas Skjolberg
  */
 
-public class UnlockJobCmd extends AbstractUnlockJobCmd {
+public class UnlockJobCmd implements Command<Object> {
+
+  protected static final long serialVersionUID = 1L;
+  protected String jobId;
 
   public UnlockJobCmd(String jobId) {
-	super(jobId);
-  }	
-	
+    this.jobId = jobId;
+  }
+
+  protected JobEntity getJob() {
+    return Context.getCommandContext().getJobManager().findJobById(jobId);
+  }
+
   public Object execute(CommandContext commandContext) {
     JobEntity job = getJob();
 
-    unlockJob(job);
+    job.unlock();
 
     return null;
   }

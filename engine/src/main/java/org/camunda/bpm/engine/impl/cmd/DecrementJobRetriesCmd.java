@@ -29,11 +29,10 @@ public class DecrementJobRetriesCmd extends JobRetryCmd {
   public Object execute(CommandContext commandContext) {
     JobEntity job = getJob();
 
-    unlockJob(job);
+    job.unlock();
     logException(job);
     decrementRetries(job);
     notifyAcquisition(commandContext);
-
 
     return null;
   }
