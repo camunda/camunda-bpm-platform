@@ -47,6 +47,17 @@ var moment = require('camunda-commons-ui/vendor/moment');
 
         $scope.filterProperties = null;
 
+        function setScrollableTop() {
+          var height = 0;
+          angular.forEach(angular.element('.content view'), function (el) {
+            height += angular.element(el).outerHeight();
+          });
+          var $scrollable = angular.element('.content [cam-tasks]');
+          $scrollable[0].style.top = height + 'px';
+        }
+        // the search plugin $broadcast from $scope.$root ($emit doesn't work)
+        $scope.$on('plugin:search:change', setScrollableTop);
+
         var tasksData = $scope.tasklistData.newChild($scope);
 
         $scope.query = {};
