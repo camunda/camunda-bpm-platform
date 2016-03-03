@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.persistence.entity.util;
 
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.Nameable;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
 
 /**
@@ -28,9 +29,9 @@ public class ByteArrayField {
   protected ByteArrayEntity byteArrayValue;
   protected String byteArrayId;
 
-  protected final ValueFields valueFields;
+  protected final Nameable valueFields;
 
-  public ByteArrayField(ValueFields valueFields) {
+  public ByteArrayField(Nameable valueFields) {
     this.valueFields = valueFields;
   }
 

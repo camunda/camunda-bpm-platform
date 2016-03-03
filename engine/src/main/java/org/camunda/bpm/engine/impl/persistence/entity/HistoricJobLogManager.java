@@ -91,6 +91,11 @@ public class HistoricJobLogManager extends AbstractManager {
     getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByHandlerType", handlerType);
   }
 
+  public void deleteHistoricJobLogsByJobDefinitionId(String jobDefinitionId) {
+    deleteExceptionByteArrayByParameterMap("jobDefinitionId", jobDefinitionId);
+    getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByJobDefinitionId", jobDefinitionId);
+  }
+
   // byte array delete ////////////////////////////////////////////////////////
 
   protected void deleteExceptionByteArrayByParameterMap(String key, String value) {

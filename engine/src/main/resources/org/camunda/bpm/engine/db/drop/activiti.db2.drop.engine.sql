@@ -74,6 +74,15 @@ alter table ACT_RU_INCIDENT
 alter table ACT_RU_EXT_TASK
     drop foreign key ACT_FK_EXT_TASK_EXE;
 
+alter table ACT_RU_BATCH
+    drop foreign key ACT_FK_BATCH_SEED_JOB_DEF;
+
+alter table ACT_RU_BATCH
+    drop foreign key ACT_FK_BATCH_MONITOR_JOB_DEF;
+
+alter table ACT_RU_BATCH
+    drop foreign key ACT_FK_BATCH_JOB_DEF;
+
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
 
@@ -120,6 +129,11 @@ drop index ACT_IDX_EXEC_TENANT_ID;
 drop index ACT_IDX_PROCDEF_TENANT_ID;
 drop index ACT_IDX_DEPLOYMENT_TENANT_ID;
 
+drop index ACT_IDX_JOB_JOB_DEF_ID;
+drop index ACT_IDX_BATCH_SEED_JOB_DEF;
+drop index ACT_IDX_BATCH_MONITOR_JOB_DEF;
+drop index ACT_IDX_BATCH_JOB_DEF;
+
 drop table ACT_GE_PROPERTY;
 drop table ACT_GE_BYTEARRAY;
 drop table ACT_RE_DEPLOYMENT;
@@ -136,4 +150,4 @@ drop table ACT_RU_AUTHORIZATION;
 drop table ACT_RU_FILTER;
 drop table ACT_RU_METER_LOG;
 drop table ACT_RU_EXT_TASK;
-
+drop table ACT_RU_BATCH;

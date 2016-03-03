@@ -162,7 +162,7 @@ public class MigrationTestRule extends TestWatcher {
     snapshotBeforeMigration = takeFullProcessInstanceSnapshot(processInstance);
 
     processEngine.getRuntimeService()
-      .executeMigrationPlan(migrationPlan, Collections.singletonList(snapshotBeforeMigration.getProcessInstanceId()));
+      .executeMigrationPlan(migrationPlan).processInstanceIds(Collections.singletonList(snapshotBeforeMigration.getProcessInstanceId())).execute();
 
     snapshotAfterMigration = takeFullProcessInstanceSnapshot(processInstance);
   }

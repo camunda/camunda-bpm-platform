@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEntity">
 
@@ -76,6 +76,10 @@
 
   <delete id="deleteHistoricJobLogByHandlerType">
     delete from ${prefix}ACT_HI_JOB_LOG where JOB_DEF_TYPE_ = #{handlerType}
+  </delete>
+
+  <delete id="deleteHistoricJobLogByJobDefinitionId">
+    delete from ${prefix}ACT_HI_JOB_LOG where JOB_DEF_ID_ = #{jobDefinitionId}
   </delete>
 
   <!-- BYTE ARRAY DELETE -->

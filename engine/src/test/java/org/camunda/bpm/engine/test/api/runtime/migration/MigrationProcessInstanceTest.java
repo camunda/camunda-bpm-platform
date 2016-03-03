@@ -15,10 +15,12 @@ package org.camunda.bpm.engine.test.api.runtime.migration;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Collections;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
@@ -49,6 +51,33 @@ public class MigrationProcessInstanceTest {
   }
 
   @Test
+  public void testNullMigrationPlan() {
+    try {
+      runtimeService.executeMigrationPlan(null).processInstanceIds(Collections.<String>emptyList()).execute();
+      fail("Should not be able to migrate");
+    }
+    catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), CoreMatchers.containsString("migration plan is null"));
+    }
+  }
+
+  @Test
+  public void testNullProcessInstanceIds() {
+    ProcessDefinition testProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    try {
+      runtimeService.executeMigrationPlan(migrationPlan).processInstanceIds(null).execute();
+      fail("Should not be able to migrate");
+    }
+    catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids is null"));
+    }
+  }
+
+  @Test
   public void testNotMigrateProcessInstanceOfWrongProcessDefinition() {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
@@ -61,7 +90,7 @@ public class MigrationProcessInstanceTest {
       .build();
 
     try {
-      runtimeService.executeMigrationPlan(migrationPlan, Collections.singletonList(processInstance.getId()));
+      runtimeService.executeMigrationPlan(migrationPlan).processInstanceIds(Collections.singletonList(processInstance.getId())).execute();
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
@@ -79,7 +108,7 @@ public class MigrationProcessInstanceTest {
       .build();
 
     try {
-      runtimeService.executeMigrationPlan(migrationPlan, Collections.singletonList("unknown"));
+      runtimeService.executeMigrationPlan(migrationPlan).processInstanceIds(Collections.singletonList("unknown")).execute();
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
@@ -97,7 +126,7 @@ public class MigrationProcessInstanceTest {
       .build();
 
     try {
-      runtimeService.executeMigrationPlan(migrationPlan, Collections.<String>singletonList(null));
+      runtimeService.executeMigrationPlan(migrationPlan).processInstanceIds(Collections.<String>singletonList(null)).execute();
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {

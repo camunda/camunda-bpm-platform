@@ -45,6 +45,8 @@
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Metrics.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/ExternalTask.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Report.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Batch.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricBatch.xml" />
 
     <!-- CMMN -->
 

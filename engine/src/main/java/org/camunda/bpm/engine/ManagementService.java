@@ -22,6 +22,7 @@ import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.batch.BatchQuery;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
@@ -981,5 +982,22 @@ public interface ManagementService {
    * reporter is deactivated
    */
   void reportDbMetricsNow();
+
+  /**
+   * Creates a query to search for {@link org.camunda.bpm.engine.batch.Batch} instances.
+   *
+   * @since 7.5
+   */
+  BatchQuery createBatchQuery();
+
+  /**
+   * Deletes a batch instance and the corresponding job definitions.
+   *
+   * If cascade is set to true the historic batch instances and the
+   * historic jobs logs are also removed.
+   *
+   * @since 7.5
+   */
+  void deleteBatch(String batchId, boolean cascade);
 
 }

@@ -80,6 +80,15 @@ alter table ACT_RU_VARIABLE
 alter table ACT_RU_EXT_TASK
     drop constraint ACT_FK_EXT_TASK_EXE;
 
+alter table ACT_RU_BATCH
+    drop constraint ACT_FK_BATCH_SEED_JOB_DEF;
+
+alter table ACT_RU_BATCH
+    drop constraint ACT_FK_BATCH_MONITOR_JOB_DEF;
+
+alter table ACT_RU_BATCH
+    drop constraint ACT_FK_BATCH_JOB_DEF;
+
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
 
@@ -113,6 +122,11 @@ drop index ACT_IDX_EXEC_TENANT_ID;
 drop index ACT_IDX_PROCDEF_TENANT_ID;
 drop index ACT_IDX_DEPLOYMENT_TENANT_ID;
 
+drop index ACT_IDX_JOB_JOB_DEF_ID;
+drop index ACT_IDX_BATCH_SEED_JOB_DEF;
+drop index ACT_IDX_BATCH_MONITOR_JOB_DEF;
+drop index ACT_IDX_BATCH_JOB_DEF;
+
 drop table ACT_GE_PROPERTY if exists;
 drop table ACT_GE_BYTEARRAY if exists;
 drop table ACT_RE_DEPLOYMENT if exists;
@@ -129,4 +143,5 @@ drop table ACT_RU_AUTHORIZATION if exists;
 drop table ACT_RU_FILTER if exists;
 drop table ACT_RU_METER_LOG if exists;
 drop table ACT_RU_EXT_TASK if exists;
+drop table ACT_RU_BATCH if exists;
 

@@ -30,6 +30,7 @@ drop index ACT_IDX_HI_INCIDENT_TENANT_ID;
 drop index ACT_IDX_HI_JOB_LOG_PROCINST;
 drop index ACT_IDX_HI_JOB_LOG_PROCDEF;
 drop index ACT_IDX_HI_JOB_LOG_TENANT_ID;
+drop index ACT_IDX_HI_JOB_LOG_JOB_DEF_ID;
 
 drop table ACT_HI_PROCINST if exists;
 drop table ACT_HI_ACTINST if exists;
@@ -41,3 +42,4 @@ drop table ACT_HI_ATTACHMENT if exists;
 drop table ACT_HI_OP_LOG if exists;
 drop table ACT_HI_INCIDENT if exists;
 drop table ACT_HI_JOB_LOG if exists;
+drop table ACT_HI_BATCH if exists;

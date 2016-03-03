@@ -13,14 +13,13 @@
 
 package org.camunda.bpm.engine.rest.helper;
 
-import org.camunda.bpm.engine.MigrationPlanBuilder;
+import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

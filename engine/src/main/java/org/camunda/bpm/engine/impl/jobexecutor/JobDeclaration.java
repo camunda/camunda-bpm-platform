@@ -61,7 +61,6 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
 
   /**
    *
-   * @param execution can be null in case of a timer start event.
    * @return the created Job instances
    */
   public T createJobInstance(S context) {
@@ -95,6 +94,9 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
     job.setRetries(resolveRetries(context));
     job.setDuedate(resolveDueDate(context));
 
+
+    // contentExecution can be null in case of a timer start event or
+    // and batch jobs unrelated to executions
     ExecutionEntity contextExecution = resolveExecution(context);
 
     if (Context.getProcessEngineConfiguration().isProducePrioritizedJobs()) {
@@ -117,6 +119,11 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
   protected void postInitialize(S context, T job) {
   }
 
+  /**
+   * Returns the execution in which context the job is created. The execution
+   * is used to determine the job's priority based on a BPMN activity
+   * the execution is currently executing. May be null.
+   */
   protected abstract ExecutionEntity resolveExecution(S context);
 
   protected abstract T newJobInstance(S context);

@@ -13,10 +13,9 @@
 package org.camunda.bpm.engine.impl.migration;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import org.camunda.bpm.engine.MigrationPlanBuilder;
+import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.impl.cmd.CreateMigrationPlanCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -71,7 +70,6 @@ public class MigrationPlanBuilderImpl implements MigrationPlanBuilder {
   }
 
   public MigrationPlan build() {
-
     return commandExecutor.execute(new CreateMigrationPlanCmd(this));
   }
 

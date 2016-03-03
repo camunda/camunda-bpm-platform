@@ -90,9 +90,9 @@ create table ACT_RU_JOB (
 create table ACT_RU_JOBDEF (
     ID_ nvarchar(64) NOT NULL,
     REV_ integer,
-    PROC_DEF_ID_ nvarchar(64) NOT NULL,
-    PROC_DEF_KEY_ nvarchar(255) NOT NULL,
-    ACT_ID_ nvarchar(255) NOT NULL,
+    PROC_DEF_ID_ nvarchar(64),
+    PROC_DEF_KEY_ nvarchar(255),
+    ACT_ID_ nvarchar(255),
     JOB_TYPE_ nvarchar(255) NOT NULL,
     JOB_CONFIGURATION_ nvarchar(255),
     SUSPENSION_STATE_ tinyint,
@@ -257,6 +257,21 @@ create table ACT_RU_EXT_TASK (
   primary key (ID_)
 );
 
+create table ACT_RU_BATCH (
+  ID_ nvarchar(64) not null,
+  REV_ int not null,
+  TYPE_ nvarchar(255),
+  SIZE_ int,
+  JOBS_PER_SEED_ int,
+  INVOCATIONS_PER_JOB_ int,
+  SEED_JOB_DEF_ID_ nvarchar(64),
+  BATCH_JOB_DEF_ID_ nvarchar(64),
+  MONITOR_JOB_DEF_ID_ nvarchar(64),
+  CONFIGURATION_ nvarchar(255),
+  TENANT_ID_ nvarchar(64),
+  primary key (ID_)
+);
+
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_EXEC_TENANT_ID on ACT_RU_EXECUTION(TENANT_ID_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
@@ -281,6 +296,7 @@ create index ACT_IDX_METER_LOG on ACT_RU_METER_LOG(NAME_,TIMESTAMP_);
 create index ACT_IDX_EXT_TASK_TOPIC on ACT_RU_EXT_TASK(TOPIC_NAME_);
 create index ACT_IDX_EXT_TASK_TENANT_ID on ACT_RU_EXT_TASK(TENANT_ID_);
 create index ACT_IDX_AUTH_GROUP_ID on ACT_RU_AUTHORIZATION(GROUP_ID_);
+create index ACT_IDX_JOB_JOB_DEF_ID on ACT_RU_JOB(JOB_DEF_ID_);
 
 alter table ACT_GE_BYTEARRAY
     add constraint ACT_FK_BYTEARR_DEPL 
@@ -386,6 +402,24 @@ alter table ACT_RU_EXT_TASK
     add constraint ACT_FK_EXT_TASK_EXE 
     foreign key (EXECUTION_ID_) 
     references ACT_RU_EXECUTION (ID_);
+
+create index ACT_IDX_BATCH_SEED_JOB_DEF ON ACT_RU_BATCH(SEED_JOB_DEF_ID_);
+alter table ACT_RU_BATCH
+    add constraint ACT_FK_BATCH_SEED_JOB_DEF
+    foreign key (SEED_JOB_DEF_ID_)
+    references ACT_RU_JOBDEF (ID_);
+
+create index ACT_IDX_BATCH_MONITOR_JOB_DEF ON ACT_RU_BATCH(MONITOR_JOB_DEF_ID_);
+alter table ACT_RU_BATCH
+    add constraint ACT_FK_BATCH_MONITOR_JOB_DEF
+    foreign key (MONITOR_JOB_DEF_ID_)
+    references ACT_RU_JOBDEF (ID_);
+
+create index ACT_IDX_BATCH_JOB_DEF ON ACT_RU_BATCH(BATCH_JOB_DEF_ID_);
+alter table ACT_RU_BATCH
+    add constraint ACT_FK_BATCH_JOB_DEF
+    foreign key (BATCH_JOB_DEF_ID_)
+    references ACT_RU_JOBDEF (ID_);
 
 -- indexes for concurrency problems - https://app.camunda.com/jira/browse/CAM-1646 --
 create index ACT_IDX_EXECUTION_PROC on ACT_RU_EXECUTION(PROC_DEF_ID_);

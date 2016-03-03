@@ -18,9 +18,12 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
+import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -1693,15 +1696,19 @@ public interface RuntimeService {
   MigrationPlanBuilder createMigrationPlan(String sourceProcessDefinitionId, String targetProcessDefinitionId);
 
   /**
-   * Applies a migration plan to the given process instances. Migration can only be successful if
-   * all active activity instances can be migrated, i.e. there is a migration instruction that applies.
+   * Executes a migration plan for a given list of process instances. The migration can
+   * either be executed synchronously or asynchronously. A synchronously migration
+   * blocks the caller until the migration was completed. The migration can only be
+   * successfully completed if all process instances can be migrated.
    *
-   * @param migrationPlan the migration plan to apply
-   * @param processInstanceIds the instances to apply the plan to
+   * If the migration is executed asynchronously a {@link Batch} is immediately returned.
+   * The migration is then executed as jobs from the process engine and the batch can
+   * be used to track the progress of the migration. The Batch splits the migration
+   * in smaller chunks which will be executed independently.
    *
-   * @throws MigratingProcessInstanceValidationException if the migration plan contains instructions
-   *   that are not applicable to any of the process instances
+   * @param migrationPlan the migration plan to executed
+   * @return a fluent builder
    */
-  void executeMigrationPlan(MigrationPlan migrationPlan, List<String> processInstanceIds);
+  MigrationPlanExecutionBuilder executeMigrationPlan(MigrationPlan migrationPlan);
 
 }

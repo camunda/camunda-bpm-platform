@@ -13,13 +13,13 @@
 
 package org.camunda.bpm.engine.impl.variable.serializer;
 
+import org.camunda.bpm.engine.impl.persistence.entity.Nameable;
+
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
  */
-public interface ValueFields {
-
-  String getName();
+public interface ValueFields extends Nameable {
 
   String getTextValue();
   void setTextValue(String textValue);

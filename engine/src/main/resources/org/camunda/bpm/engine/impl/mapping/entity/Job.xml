@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
@@ -30,7 +30,7 @@
       </if>
       <if test="jobDefinitionId != null">
         and JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
-      </if>    
+      </if>
       <if test="processInstanceId != null">
         and PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
       </if>
@@ -59,7 +59,7 @@
       </if>
     </where>
   </update>
-  
+
   <update id="updateJobPriorityByDefinitionId" parameterType="java.util.Map">
     <!-- this does not increment revision; it is ok if this update is overwritten by parallel operations -->
     update ${prefix}ACT_RU_JOB set
@@ -181,6 +181,12 @@
     where J.PROCESS_INSTANCE_ID_ = #{parameter}
   </select>
 
+  <select id="selectJobsByJobDefinitionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    select *
+    from ${prefix}ACT_RU_JOB J
+    where J.JOB_DEF_ID_ = #{parameter}
+  </select>
+
   <select id="selectJobByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobQueryImpl" resultMap="jobResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
@@ -202,7 +208,7 @@
         LEFT OUTER JOIN ${prefix}ACT_RU_EXECUTION PI ON PI.ID_ = RES.PROCESS_INSTANCE_ID_
     </if>
     <if test="activityId != null">
-      LEFT OUTER JOIN ${prefix}ACT_RU_JOBDEF JD ON JD.ID_ = RES.JOB_DEF_ID_ 
+      LEFT OUTER JOIN ${prefix}ACT_RU_JOBDEF JD ON JD.ID_ = RES.JOB_DEF_ID_
     </if>
     <where>
       <if test="id != null">
@@ -282,7 +288,7 @@
             #{tenantId}
           </foreach>
           <if test="includeJobsWithoutTenantId">
-            or RES.TENANT_ID_ is null 
+            or RES.TENANT_ID_ is null
           </if>
           )
         </if>
@@ -422,7 +428,7 @@
             PROCESS_INSTANCE_ID_,
             PROCESS_DEF_ID_,
             PROCESS_DEF_KEY_,
-            RETRIES_, 
+            RETRIES_,
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
             DUEDATE_,

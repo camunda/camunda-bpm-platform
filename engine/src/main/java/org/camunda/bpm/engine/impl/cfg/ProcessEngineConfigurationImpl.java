@@ -78,6 +78,9 @@ import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.ServiceImpl;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
+import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
+import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler;
+import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
@@ -202,11 +205,13 @@ import org.camunda.bpm.engine.impl.migration.validation.instruction.OnlyOnceMapp
 import org.camunda.bpm.engine.impl.migration.validation.instruction.SameEventScopeInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.SameTypeInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.SupportedActivitiesInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.batch.MigrationBatchJobHandler;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.BatchManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
@@ -215,6 +220,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskManager;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricBatchManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
@@ -372,6 +378,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Map<String, IncidentHandler> incidentHandlers;
   protected List<IncidentHandler> customIncidentHandlers;
 
+  // BATCH ////////////////////////////////////////////////////////////////////
+
+  protected Map<String, BatchJobHandler<?>> batchHandlers;
+  protected List<BatchJobHandler<?>> customBatchJobHandlers;
+
+  /** Number of jobs created by a batch seed job invocation */
+  protected int batchJobsPerSeed = 10;
+  /** Number of invocations executed by a single batch job */
+  protected int invocationsPerBatchJob = 1;
+  /** seconds to wait between polling for batch completion */
+  protected int batchPollTime = 30;
 
   // OTHER ////////////////////////////////////////////////////////////////////
   protected List<FormEngine> customFormEngines;
@@ -590,6 +607,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initIdGenerator();
     initDeployers();
     initJobProvider();
+    initBatchHandlers();
     initJobExecutor();
     initDataSource();
     initTransactionFactory();
@@ -660,6 +678,23 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if(customIncidentHandlers != null) {
       for (IncidentHandler incidentHandler : customIncidentHandlers) {
         incidentHandlers.put(incidentHandler.getIncidentHandlerType(), incidentHandler);
+      }
+    }
+  }
+
+  // batch ///////////////////////////////////////////////////////////////////////
+
+  protected void initBatchHandlers() {
+    if (batchHandlers == null) {
+      batchHandlers = new HashMap<String, BatchJobHandler<?>>();
+
+      MigrationBatchJobHandler migrationHandler = new MigrationBatchJobHandler();
+      batchHandlers.put(migrationHandler.getType(), migrationHandler);
+    }
+
+    if (customBatchJobHandlers != null) {
+      for (BatchJobHandler<?> customBatchJobHandler : customBatchJobHandlers) {
+        batchHandlers.put(customBatchJobHandler.getType(), customBatchJobHandler);
       }
     }
   }
@@ -998,6 +1033,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(MeterLogManager.class));
       addSessionFactory(new GenericManagerFactory(ExternalTaskManager.class));
       addSessionFactory(new GenericManagerFactory(ReportManager.class));
+      addSessionFactory(new GenericManagerFactory(BatchManager.class));
+      addSessionFactory(new GenericManagerFactory(HistoricBatchManager.class));
 
       addSessionFactory(new GenericManagerFactory(CaseDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(CaseExecutionManager.class));
@@ -1284,6 +1321,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     TimerActivateJobDefinitionHandler activateJobDefinitionHandler = new TimerActivateJobDefinitionHandler();
     jobHandlers.put(activateJobDefinitionHandler.getType(), activateJobDefinitionHandler);
+
+    BatchSeedJobHandler batchSeedJobHandler = new BatchSeedJobHandler();
+    jobHandlers.put(batchSeedJobHandler.getType(), batchSeedJobHandler);
+
+    BatchMonitorJobHandler batchMonitorJobHandler = new BatchMonitorJobHandler();
+    jobHandlers.put(batchMonitorJobHandler.getType(), batchMonitorJobHandler);
+
+    for (JobHandler batchHandler : batchHandlers.values()) {
+      jobHandlers.put(batchHandler.getType(), batchHandler);
+    }
 
     // if we have custom job handlers, register them
     if (getCustomJobHandlers()!=null) {
@@ -2592,6 +2639,46 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setCustomIncidentHandlers(List<IncidentHandler> customIncidentHandlers) {
     this.customIncidentHandlers = customIncidentHandlers;
+  }
+
+  public Map<String, BatchJobHandler<?>> getBatchHandlers() {
+    return batchHandlers;
+  }
+
+  public void setBatchHandlers(Map<String, BatchJobHandler<?>> batchHandlers) {
+    this.batchHandlers = batchHandlers;
+  }
+
+  public List<BatchJobHandler<?>> getCustomBatchJobHandlers() {
+    return customBatchJobHandlers;
+  }
+
+  public void setCustomBatchJobHandlers(List<BatchJobHandler<?>> customBatchJobHandlers) {
+    this.customBatchJobHandlers = customBatchJobHandlers;
+  }
+
+  public int getBatchJobsPerSeed() {
+    return batchJobsPerSeed;
+  }
+
+  public void setBatchJobsPerSeed(int batchJobsPerSeed) {
+    this.batchJobsPerSeed = batchJobsPerSeed;
+  }
+
+  public int getInvocationsPerBatchJob() {
+    return invocationsPerBatchJob;
+  }
+
+  public void setInvocationsPerBatchJob(int invocationsPerBatchJob) {
+    this.invocationsPerBatchJob = invocationsPerBatchJob;
+  }
+
+  public int getBatchPollTime() {
+    return batchPollTime;
+  }
+
+  public void setBatchPollTime(int batchPollTime) {
+    this.batchPollTime = batchPollTime;
   }
 
   public SessionFactory getIdentityProviderSessionFactory() {

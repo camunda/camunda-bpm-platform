@@ -1,0 +1,57 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.camunda.bpm.engine.impl.json;
+
+import java.util.List;
+
+import org.camunda.bpm.engine.impl.migration.MigrationInstructionImpl;
+import org.camunda.bpm.engine.impl.util.JsonUtil;
+import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import org.camunda.bpm.engine.migration.MigrationInstruction;
+
+public class MigrationInstructionJsonConverter extends JsonObjectConverter<MigrationInstruction> {
+
+  public static final MigrationInstructionJsonConverter INSTANCE = new MigrationInstructionJsonConverter();
+
+  public static final String SOURCE_ACTIVITY_IDS = "sourceActivityIds";
+  public static final String TARGET_ACTIVITY_IDS = "targetActivityIds";
+
+  public JSONObject toJsonObject(MigrationInstruction instruction) {
+    JSONObject json = new JSONObject();
+
+    JsonUtil.addArrayField(json, SOURCE_ACTIVITY_IDS, new String[]{instruction.getSourceActivityId()});
+    JsonUtil.addArrayField(json, TARGET_ACTIVITY_IDS, new String[]{instruction.getTargetActivityId()});
+
+    return json;
+  }
+
+  public MigrationInstruction toObject(JSONObject json) {
+    return new MigrationInstructionImpl(
+      readSourceActivityId(json),
+      readTargetActivityId(json)
+    );
+  }
+
+  protected String readSourceActivityId(JSONObject json) {
+    List<Object> sourceActivityIds = JsonUtil.jsonArrayAsList(json.getJSONArray(SOURCE_ACTIVITY_IDS));
+    return (String) sourceActivityIds.get(0);
+  }
+
+  protected String readTargetActivityId(JSONObject json) {
+    List<Object> targetActivityIds = JsonUtil.jsonArrayAsList(json.getJSONArray(TARGET_ACTIVITY_IDS));
+    return (String) targetActivityIds.get(0);
+  }
+
+
+}

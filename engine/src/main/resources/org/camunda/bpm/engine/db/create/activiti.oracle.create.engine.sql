@@ -90,9 +90,9 @@ create table ACT_RU_JOB (
 create table ACT_RU_JOBDEF (
     ID_ NVARCHAR2(64) NOT NULL,
     REV_ INTEGER,
-    PROC_DEF_ID_ NVARCHAR2(64) NOT NULL,
-    PROC_DEF_KEY_ NVARCHAR2(255) NOT NULL,
-    ACT_ID_ NVARCHAR2(255) NOT NULL,
+    PROC_DEF_ID_ NVARCHAR2(64),
+    PROC_DEF_KEY_ NVARCHAR2(255),
+    ACT_ID_ NVARCHAR2(255),
     JOB_TYPE_ NVARCHAR2(255) NOT NULL,
     JOB_CONFIGURATION_ NVARCHAR2(255),
     SUSPENSION_STATE_ INTEGER,
@@ -257,6 +257,21 @@ create table ACT_RU_EXT_TASK (
   primary key (ID_)
 );
 
+create table ACT_RU_BATCH (
+  ID_ NVARCHAR2(64) NOT NULL,
+  REV_ INTEGER NOT NULL,
+  TYPE_ NVARCHAR2(255),
+  SIZE_ INTEGER,
+  JOBS_PER_SEED_ INTEGER,
+  INVOCATIONS_PER_JOB_ INTEGER,
+  SEED_JOB_DEF_ID_ NVARCHAR2(64),
+  BATCH_JOB_DEF_ID_ NVARCHAR2(64),
+  MONITOR_JOB_DEF_ID_ NVARCHAR2(64),
+  CONFIGURATION_ NVARCHAR2(255),
+  TENANT_ID_ NVARCHAR2(64),
+  primary key (ID_)
+);
+
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_EXEC_TENANT_ID on ACT_RU_EXECUTION(TENANT_ID_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
@@ -277,6 +292,7 @@ create index ACT_IDX_METER_LOG on ACT_RU_METER_LOG(NAME_,TIMESTAMP_);
 create index ACT_IDX_EXT_TASK_TOPIC on ACT_RU_EXT_TASK(TOPIC_NAME_);
 create index ACT_IDX_EXT_TASK_TENANT_ID on ACT_RU_EXT_TASK(TENANT_ID_);
 create index ACT_IDX_AUTH_GROUP_ID on ACT_RU_AUTHORIZATION(GROUP_ID_);
+create index ACT_IDX_JOB_JOB_DEF_ID on ACT_RU_JOB(JOB_DEF_ID_);
 
 create index ACT_IDX_BYTEAR_DEPL on ACT_GE_BYTEARRAY(DEPLOYMENT_ID_);
 
@@ -393,7 +409,7 @@ alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_RCAUSE 
     foreign key (ROOT_CAUSE_INCIDENT_ID_) 
     references ACT_RU_INCIDENT (ID_); 
-    
+
 -- see http://stackoverflow.com/questions/675398/how-can-i-constrain-multiple-columns-to-prevent-duplicates-but-ignore-null-value
 create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION
    (case when USER_ID_ is null then null else TYPE_ end,
@@ -415,6 +431,24 @@ alter table ACT_RU_EXT_TASK
     add constraint ACT_FK_EXT_TASK_EXE 
     foreign key (EXECUTION_ID_) 
     references ACT_RU_EXECUTION (ID_);
+
+create index ACT_IDX_BATCH_SEED_JOB_DEF ON ACT_RU_BATCH(SEED_JOB_DEF_ID_);
+alter table ACT_RU_BATCH
+    add constraint ACT_FK_BATCH_SEED_JOB_DEF
+    foreign key (SEED_JOB_DEF_ID_)
+    references ACT_RU_JOBDEF (ID_);
+
+create index ACT_IDX_BATCH_MONITOR_JOB_DEF ON ACT_RU_BATCH(MONITOR_JOB_DEF_ID_);
+alter table ACT_RU_BATCH
+    add constraint ACT_FK_BATCH_MONITOR_JOB_DEF
+    foreign key (MONITOR_JOB_DEF_ID_)
+    references ACT_RU_JOBDEF (ID_);
+
+create index ACT_IDX_BATCH_JOB_DEF ON ACT_RU_BATCH(BATCH_JOB_DEF_ID_);
+alter table ACT_RU_BATCH
+    add constraint ACT_FK_BATCH_JOB_DEF
+    foreign key (BATCH_JOB_DEF_ID_)
+    references ACT_RU_JOBDEF (ID_);
 
 -- indexes for deadlock problems - https://app.camunda.com/jira/browse/CAM-2567 --
 create index ACT_IDX_INC_CAUSEINCID on ACT_RU_INCIDENT(CAUSE_INCIDENT_ID_);

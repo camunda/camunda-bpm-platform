@@ -57,6 +57,11 @@ drop index ACT_RU_EXECUTION.ACT_IDX_EXEC_TENANT_ID;
 drop index ACT_RE_PROCDEF.ACT_IDX_PROCDEF_TENANT_ID;
 drop index ACT_RE_DEPLOYMENT.ACT_IDX_DEPLOYMENT_TENANT_ID;
 
+drop index ACT_RU_JOB.ACT_IDX_JOB_JOB_DEF_ID;
+drop index ACT_RU_BATCH.ACT_IDX_BATCH_SEED_JOB_DEF;
+drop index ACT_RU_BATCH.ACT_IDX_BATCH_MONITOR_JOB_DEF;
+drop index ACT_RU_BATCH.ACT_IDX_BATCH_JOB_DEF;
+
 alter table ACT_GE_BYTEARRAY 
     drop constraint ACT_FK_BYTEARR_DEPL;
 
@@ -119,7 +124,16 @@ alter table ACT_RU_INCIDENT
     
 alter table ACT_RU_EXT_TASK
     drop constraint ACT_FK_EXT_TASK_EXE;
-    
+
+alter table ACT_RU_BATCH
+    drop constraint ACT_FK_BATCH_SEED_JOB_DEF;
+
+alter table ACT_RU_BATCH
+    drop constraint ACT_FK_BATCH_MONITOR_JOB_DEF;
+
+alter table ACT_RU_BATCH
+    drop constraint ACT_FK_BATCH_JOB_DEF;
+
 drop index ACT_RU_IDENTITYLINK.ACT_IDX_ATHRZ_PROCEDEF;
     
 if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'ACT_GE_PROPERTY') drop table ACT_GE_PROPERTY;
@@ -138,3 +152,4 @@ if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = '
 if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'ACT_RU_FILTER') drop table ACT_RU_FILTER;
 if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'ACT_RU_METER_LOG') drop table ACT_RU_METER_LOG;
 if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'ACT_RU_EXT_TASK') drop table ACT_RU_EXT_TASK;
+if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'ACT_RU_BATCH') drop table ACT_RU_BATCH;

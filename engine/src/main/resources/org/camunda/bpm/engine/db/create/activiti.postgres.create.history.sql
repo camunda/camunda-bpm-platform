@@ -219,6 +219,21 @@ create table ACT_HI_JOB_LOG (
     primary key (ID_)
 );
 
+create table ACT_HI_BATCH (
+    ID_ varchar(64) not null,
+    TYPE_ varchar(255),
+    SIZE_ integer,
+    JOBS_PER_SEED_ integer,
+    INVOCATIONS_PER_JOB_ integer,
+    SEED_JOB_DEF_ID_ varchar(64),
+    MONITOR_JOB_DEF_ID_ varchar(64),
+    BATCH_JOB_DEF_ID_ varchar(64),
+    TENANT_ID_  varchar(64),
+    START_TIME_ timestamp not null,
+    END_TIME_ timestamp,
+    primary key (ID_)
+);
+
 create index ACT_IDX_HI_PRO_INST_END on ACT_HI_PROCINST(END_TIME_);
 create index ACT_IDX_HI_PRO_I_BUSKEY on ACT_HI_PROCINST(BUSINESS_KEY_);
 create index ACT_IDX_HI_PRO_INST_TENANT_ID on ACT_HI_PROCINST(TENANT_ID_);
@@ -251,3 +266,4 @@ create index ACT_IDX_HI_INCIDENT_TENANT_ID on ACT_HI_INCIDENT(TENANT_ID_);
 create index ACT_IDX_HI_JOB_LOG_PROCINST on ACT_HI_JOB_LOG(PROCESS_INSTANCE_ID_);
 create index ACT_IDX_HI_JOB_LOG_PROCDEF on ACT_HI_JOB_LOG(PROCESS_DEF_ID_);
 create index ACT_IDX_HI_JOB_LOG_TENANT_ID on ACT_HI_JOB_LOG(TENANT_ID_);
+create index ACT_IDX_HI_JOB_LOG_JOB_DEF_ID on ACT_HI_JOB_LOG(JOB_DEF_ID_);

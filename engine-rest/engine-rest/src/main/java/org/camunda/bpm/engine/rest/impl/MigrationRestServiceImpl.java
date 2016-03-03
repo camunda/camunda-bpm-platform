@@ -60,7 +60,7 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
     try {
       MigrationPlan migrationPlan = MigrationPlanDto.toMigrationPlan(processEngine, migrationPlanDto);
       processEngine.getRuntimeService()
-        .executeMigrationPlan(migrationPlan, processInstanceIds);
+        .executeMigrationPlan(migrationPlan).processInstanceIds(processInstanceIds).execute();
     }
     catch (MigrationPlanValidationException e) {
       throw e;

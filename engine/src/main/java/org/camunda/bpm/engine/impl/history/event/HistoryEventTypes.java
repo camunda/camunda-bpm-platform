@@ -110,7 +110,21 @@ public enum HistoryEventTypes implements HistoryEventType {
    *
    * @since 7.4
    */
-  DMN_DECISION_EVALUATE("decision", "evaluate");
+  DMN_DECISION_EVALUATE("decision", "evaluate"),
+
+  /**
+   * fired when a batch was started.
+   *
+   * @since 7.5
+   */
+  BATCH_START("batch", "start"),
+
+  /**
+   * fired when a batch was completed.
+   *
+   * @since 7.5
+   */
+  BATCH_END("batch", "end");
 
   private HistoryEventTypes(String entityType, String eventName) {
     this.entityType = eventName;

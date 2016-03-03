@@ -16,7 +16,7 @@ package org.camunda.bpm.engine.rest.dto.migration;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.MigrationPlanBuilder;
+import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;

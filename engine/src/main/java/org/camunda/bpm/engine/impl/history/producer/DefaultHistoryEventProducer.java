@@ -19,11 +19,14 @@ import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.history.IncidentState;
 import org.camunda.bpm.engine.history.JobState;
+import org.camunda.bpm.engine.impl.batch.BatchEntity;
+import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
@@ -653,6 +656,43 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
 
     return evt;
+  }
+
+  // Batch
+
+  @Override
+  public HistoryEvent createBatchStartEvent(Batch batch) {
+    return createBatchEvent((BatchEntity) batch, HistoryEventTypes.BATCH_START);
+  }
+
+  @Override
+  public HistoryEvent createBatchEndEvent(Batch batch) {
+    return createBatchEvent((BatchEntity) batch, HistoryEventTypes.BATCH_END);
+  }
+
+  protected HistoryEvent createBatchEvent(BatchEntity batch, HistoryEventTypes eventType) {
+    HistoricBatchEntity event = new HistoricBatchEntity();
+
+    event.setId(batch.getId());
+    event.setType(batch.getType());
+    event.setSize(batch.getSize());
+    event.setBatchJobsPerSeed(batch.getBatchJobsPerSeed());
+    event.setInvocationsPerBatchJob(batch.getInvocationsPerBatchJob());
+    event.setSeedJobDefinitionId(batch.getSeedJobDefinitionId());
+    event.setMonitorJobDefinitionId(batch.getMonitorJobDefinitionId());
+    event.setBatchJobDefinitionId(batch.getBatchJobDefinitionId());
+    event.setTenantId(batch.getTenantId());
+    event.setEventType(eventType.getEventName());
+
+    if (HistoryEventTypes.BATCH_START.equals(eventType)) {
+      event.setStartTime(ClockUtil.getCurrentTime());
+    }
+
+    if (HistoryEventTypes.BATCH_END.equals(eventType)) {
+      event.setEndTime(ClockUtil.getCurrentTime());
+    }
+
+    return event;
   }
 
   // Job Log

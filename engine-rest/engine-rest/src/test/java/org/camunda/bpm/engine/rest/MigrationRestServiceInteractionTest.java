@@ -31,6 +31,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -44,7 +45,7 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.MigrationPlanBuilder;
+import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingActivityInstanceValidationReport;
@@ -53,6 +54,7 @@ import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationReport
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationInstructionValidationReport;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationReport;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
@@ -65,6 +67,7 @@ import org.camunda.bpm.engine.rest.util.migration.MigrationPlanDtoBuilder;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.InOrder;
 
 import com.jayway.restassured.response.Response;
 
@@ -79,6 +82,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
   protected RuntimeService runtimeServiceMock;
   protected MigrationPlanBuilder migrationPlanBuilderMock;
+  protected MigrationPlanExecutionBuilder migrationPlanExecutionBuilderMock;
 
   @Before
   public void setUpRuntimeData() {
@@ -94,6 +98,11 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
     when(runtimeServiceMock.createMigrationPlan(eq(EXAMPLE_PROCESS_DEFINITION_ID), eq(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)))
       .thenReturn(migrationPlanBuilderMock);
+
+    migrationPlanExecutionBuilderMock = mock(MigrationPlanExecutionBuilder.class);
+    when(migrationPlanExecutionBuilderMock.processInstanceIds(anyListOf(String.class))).thenReturn(migrationPlanExecutionBuilderMock);
+
+    when(runtimeServiceMock.executeMigrationPlan(any(MigrationPlan.class))).thenReturn(migrationPlanExecutionBuilderMock);
   }
 
   @Test
@@ -524,7 +533,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     when(processInstanceReport.getReports()).thenReturn(Arrays.asList(instanceReport1, instanceReport2));
 
     doThrow(new MigratingProcessInstanceValidationException("fooo", processInstanceReport))
-      .when(runtimeServiceMock).executeMigrationPlan(any(MigrationPlan.class), anyListOf(String.class));
+      .when(migrationPlanExecutionBuilderMock).execute();
 
     MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
@@ -608,7 +617,11 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   }
 
   protected void verifyMigrationPlanExecutionInteraction(MigrationExecutionDto migrationExecution) {
-    verify(runtimeServiceMock).executeMigrationPlan(any(MigrationPlan.class), eq(migrationExecution.getProcessInstanceIds()));
+    InOrder inOrder = inOrder(runtimeServiceMock, migrationPlanExecutionBuilderMock);
+    inOrder.verify(runtimeServiceMock).executeMigrationPlan(any(MigrationPlan.class));
+    inOrder.verify(migrationPlanExecutionBuilderMock).processInstanceIds(eq(migrationExecution.getProcessInstanceIds()));
+    inOrder.verify(migrationPlanExecutionBuilderMock).execute();
+    inOrder.verifyNoMoreInteractions();
   }
 
 }

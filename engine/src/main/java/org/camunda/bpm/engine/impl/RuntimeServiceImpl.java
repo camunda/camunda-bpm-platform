@@ -20,7 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.MigrationPlanBuilder;
+import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
+import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.impl.cmd.ActivateProcessInstanceCmd;
@@ -37,9 +38,9 @@ import org.camunda.bpm.engine.impl.cmd.RemoveExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SignalCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendProcessInstanceCmd;
-import org.camunda.bpm.engine.impl.migration.MigrateProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanBuilderImpl;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
@@ -481,9 +482,8 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     return new MigrationPlanBuilderImpl(commandExecutor, sourceProcessDefinitionId, targetProcessDefinitionId);
   }
 
-  public void executeMigrationPlan(MigrationPlan migrationPlan, List<String> processInstanceIds) {
-    commandExecutor.execute(new MigrateProcessInstanceCmd(migrationPlan, processInstanceIds));
-
+  public MigrationPlanExecutionBuilder executeMigrationPlan(MigrationPlan migrationPlan) {
+    return new MigrationPlanExecutionBuilderImpl(commandExecutor, migrationPlan);
   }
 
 }

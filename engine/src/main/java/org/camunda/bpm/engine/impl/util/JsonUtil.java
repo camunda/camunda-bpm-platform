@@ -15,12 +15,14 @@ package org.camunda.bpm.engine.impl.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.json.JSONArray;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
 
@@ -89,19 +91,37 @@ public final class JsonUtil {
     }
   }
 
+  public static <T> void addField(JSONObject json, String name, JsonObjectConverter<T> converter, T value) {
+    if (value != null) {
+      json.put(name, converter.toJsonObject(value));
+    }
+  }
+
   public static void addDefaultField(JSONObject json, String name, Object defaultValue, Object value) {
     if (value != null && !value.equals(defaultValue)) {
       json.put(name, value);
     }
   }
 
-  public static void addListField(JSONObject json, String name, List<String> list) {
+  public static void addListField(JSONObject json, String name, Collection list) {
     if (list != null) {
       json.put(name, new JSONArray(list));
     }
   }
 
-  public static void addArrayField(JSONObject json, String name, String[] array) {
+  public static <T> void addListField(JSONObject json, String name, JsonObjectConverter<T> converter, List<T> list) {
+    if (list != null) {
+      List<JSONObject> jsonList = new ArrayList<JSONObject>();
+
+      for (T item : list) {
+        jsonList.add(converter.toJsonObject(item));
+      }
+
+      addListField(json, name, jsonList);
+    }
+  }
+
+  public static void addArrayField(JSONObject json, String name, Object[] array) {
     if (array != null) {
       addListField(json, name, Arrays.asList(array));
     }
@@ -113,5 +133,18 @@ public final class JsonUtil {
     }
   }
 
+  public static <T> List<T> jsonArrayAsList(JSONArray jsonArray, JsonObjectConverter<T> converter) {
+    List<T> list = new ArrayList<T>();
+
+    for (int i = 0; i < jsonArray.length(); i++) {
+      list.add(converter.toObject(jsonArray.getJSONObject(i)));
+    }
+
+    return list;
+  }
+
+  public static <T> T jsonObject(JSONObject jsonObject, JsonObjectConverter<T> converter) {
+    return converter.toObject(jsonObject);
+  }
 
 }

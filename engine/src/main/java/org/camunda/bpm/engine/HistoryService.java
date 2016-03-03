@@ -16,6 +16,7 @@ package org.camunda.bpm.engine;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
@@ -204,5 +205,19 @@ public interface HistoryService {
    * @since 7.5
    */
   HistoricProcessInstanceReport createHistoricProcessInstanceReport();
+
+  /**
+   * Creates a query to search for {@link org.camunda.bpm.engine.batch.history.HistoricBatch} instances.
+   *
+   * @since 7.5
+   */
+  HistoricBatchQuery createHistoricBatchQuery();
+
+  /**
+   * Deletes a historic batch instance. All corresponding historic job logs are deleted as well;
+   *
+   * @since 7.5
+   */
+  void deleteHistoricBatch(String id);
 
 }
