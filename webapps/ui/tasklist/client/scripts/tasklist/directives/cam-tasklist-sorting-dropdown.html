@@ -1,7 +1,8 @@
 <ul class="dropdown-menu">
   <!-- single time selectable -->
   <li ng-repeat="(name, label) in options">
-    <a tabindex="-1"
+    <a href
+       tabindex="0"
        translate="{{ label }}"
        ng-click="handleClick($event, name)">
     </a>
@@ -14,8 +15,9 @@
   <li ng-repeat="(name, label) in sortableVariables"
       ng-click="showInputs($event, name)"
       ng-class="{'active': name === focusedOn}">
-    <a translate="{{ label }}"
-       tabindex="-1"></a>
+    <a href
+       translate="{{ label }}"
+       tabindex="0"></a>
 
     <div ng-show="name === focusedOn"
          cam-sorting-inputs
