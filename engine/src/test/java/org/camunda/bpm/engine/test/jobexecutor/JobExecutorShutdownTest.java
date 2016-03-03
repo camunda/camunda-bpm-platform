@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -37,15 +39,25 @@ public class JobExecutorShutdownTest {
   protected static final BpmnModelInstance TWO_ASYNC_TASKS = Bpmn.createExecutableProcess("process")
       .startEvent()
       .serviceTask("task1")
-        .camundaClass(SyncDelegate.class.getName())
-        .camundaAsyncBefore()
-        .camundaExclusive(true)
+      .camundaClass(SyncDelegate.class.getName())
+      .camundaAsyncBefore()
+      .camundaExclusive(true)
       .serviceTask("task2")
-        .camundaClass(SyncDelegate.class.getName())
-        .camundaAsyncBefore()
-        .camundaExclusive(true)
+      .camundaClass(SyncDelegate.class.getName())
+      .camundaAsyncBefore()
+      .camundaExclusive(true)
       .endEvent()
       .done();
+
+  protected static final BpmnModelInstance SINGLE_ASYNC_TASK = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .serviceTask("task1")
+      .camundaClass(SyncDelegate.class.getName())
+      .camundaAsyncBefore()
+      .camundaExclusive(true)
+      .endEvent()
+      .done();
+
 
   @Rule
   public ProcessEngineRule engineRule = new ProcessEngineRule(
@@ -61,7 +73,7 @@ public class JobExecutorShutdownTest {
 
   protected static ControllableJobExecutor buildControllableJobExecutor() {
     ControllableJobExecutor jobExecutor = new ControllableJobExecutor();
-    jobExecutor.setMaxJobsPerAcquisition(1);
+    jobExecutor.setMaxJobsPerAcquisition(2);
     jobExecutor.proceeedAndWaitOnShutdown(false);
     return jobExecutor;
   }
@@ -70,7 +82,7 @@ public class JobExecutorShutdownTest {
   public void setUp() throws Exception {
     jobExecutor = (ControllableJobExecutor)
         ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration()).getJobExecutor();
-    jobExecutor.setMaxJobsPerAcquisition(1);
+    jobExecutor.setMaxJobsPerAcquisition(2);
     acquisitionThread = jobExecutor.getAcquisitionThreadControl();
     executionThread = jobExecutor.getExecutionThreadControl();
   }
@@ -79,9 +91,9 @@ public class JobExecutorShutdownTest {
   public void testConcurrentShutdownAndExclusiveFollowUpJob() {
     // given
     Deployment deployment = engineRule.getRepositoryService()
-      .createDeployment()
-      .addModelInstance("foo.bpmn", TWO_ASYNC_TASKS)
-      .deploy();
+        .createDeployment()
+        .addModelInstance("foo.bpmn", TWO_ASYNC_TASKS)
+        .deploy();
     engineRule.manageDeployment(deployment);
 
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
@@ -117,6 +129,62 @@ public class JobExecutorShutdownTest {
 
   }
 
+  @Test
+  public void testShutdownAndMultipleLockedJobs() {
+    // given
+    Deployment deployment = engineRule.getRepositoryService()
+        .createDeployment()
+        .addModelInstance("foo.bpmn", SINGLE_ASYNC_TASK)
+        .deploy();
+    engineRule.manageDeployment(deployment);
+    
+    // add two jobs by starting two process instances
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+
+    // jobs must not be locked yet
+    List<Job> jobList = engineRule.getManagementService().createJobQuery().list();
+    Assert.assertEquals(2, jobList.size());
+    for(Job job : jobList) {
+      JobEntity jobEntity = (JobEntity)job;
+      Assert.assertNull(jobEntity.getLockOwner());
+    }
+
+    jobExecutor.start();
+
+    // wait before acquisition
+    acquisitionThread.waitForSync();
+    // wait for no more acquisition syncs
+    acquisitionThread.ignoreFutureSyncs();
+
+    acquisitionThread.makeContinue();
+
+    // when waiting during execution of first job
+    executionThread.waitForSync();
+
+    // jobs must now be locked
+    List<Job> lockedJobList = engineRule.getManagementService().createJobQuery().list();
+    Assert.assertEquals(2, lockedJobList.size());
+    for(Job job : lockedJobList) {
+      JobEntity jobEntity = (JobEntity)job;
+      Assert.assertNotNull(jobEntity.getLockOwner());
+    }
+
+    // shut down the job executor while first job is executing
+    jobExecutor.shutdown();
+
+    // then let first job continue
+    executionThread.waitUntilDone();
+
+    // check that only one job left, which is not executed nor locked
+    JobEntity jobEntity = (JobEntity) engineRule.getManagementService().createJobQuery().singleResult();
+    Assert.assertNotNull(jobEntity);
+    Assert.assertTrue(lockedJobList.get(1).getId().equals(jobEntity.getId()) || lockedJobList.get(0).getId().equals(jobEntity.getId()));
+    Assert.assertNull(jobEntity.getLockOwner());
+    Assert.assertNull(jobEntity.getLockExpirationTime());
+  }
+
+
   public static class SyncDelegate implements JavaDelegate {
 
     @Override
@@ -125,4 +193,6 @@ public class JobExecutorShutdownTest {
     }
 
   }
+
+
 }
