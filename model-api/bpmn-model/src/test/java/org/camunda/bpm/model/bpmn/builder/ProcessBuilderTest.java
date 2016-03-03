@@ -56,9 +56,11 @@ import org.camunda.bpm.model.bpmn.instance.Escalation;
 import org.camunda.bpm.model.bpmn.instance.EscalationEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.Event;
 import org.camunda.bpm.model.bpmn.instance.EventDefinition;
+import org.camunda.bpm.model.bpmn.instance.ExclusiveGateway;
 import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Gateway;
+import org.camunda.bpm.model.bpmn.instance.InclusiveGateway;
 import org.camunda.bpm.model.bpmn.instance.Message;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
@@ -298,6 +300,31 @@ public class ProcessBuilderTest {
     assertThat(modelInstance.getModelElementsByType(taskType))
       .hasSize(3);
     assertThat(modelInstance.getModelElementsByType(gatewayType))
+      .hasSize(1);
+  }
+
+  @Test
+  public void testCreateProcessWithInclusiveGateway() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask()
+      .inclusiveGateway()
+        .condition("approved", "${approved}")
+        .serviceTask()
+        .endEvent()
+      .moveToLastGateway()
+        .condition("not approved", "${!approved}")
+        .scriptTask()
+        .endEvent()
+      .done();
+
+    ModelElementType inclusiveGwType = modelInstance.getModel().getType(InclusiveGateway.class);
+
+    assertThat(modelInstance.getModelElementsByType(eventType))
+      .hasSize(3);
+    assertThat(modelInstance.getModelElementsByType(taskType))
+      .hasSize(3);
+    assertThat(modelInstance.getModelElementsByType(inclusiveGwType))
       .hasSize(1);
   }
 

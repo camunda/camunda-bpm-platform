@@ -23,6 +23,7 @@ import org.camunda.bpm.model.bpmn.instance.EndEvent;
 import org.camunda.bpm.model.bpmn.instance.ExclusiveGateway;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Gateway;
+import org.camunda.bpm.model.bpmn.instance.InclusiveGateway;
 import org.camunda.bpm.model.bpmn.instance.IntermediateCatchEvent;
 import org.camunda.bpm.model.bpmn.instance.IntermediateThrowEvent;
 import org.camunda.bpm.model.bpmn.instance.ManualTask;
@@ -166,12 +167,20 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     return createTarget(ExclusiveGateway.class).builder();
   }
 
+  public InclusiveGatewayBuilder inclusiveGateway() {
+    return createTarget(InclusiveGateway.class).builder();
+  }
+
   public EventBasedGatewayBuilder eventBasedGateway() {
     return createTarget(EventBasedGateway.class).builder();
   }
 
   public ExclusiveGatewayBuilder exclusiveGateway(String id) {
     return createTarget(ExclusiveGateway.class, id).builder();
+  }
+
+  public InclusiveGatewayBuilder inclusiveGateway(String id) {
+    return createTarget(InclusiveGateway.class, id).builder();
   }
 
   public IntermediateCatchEventBuilder intermediateCatchEvent() {
