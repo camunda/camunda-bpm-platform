@@ -56,63 +56,42 @@
                 ng-if="task.caseDefinitionId">
               {{ task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }}
             </h6>
+
+            <h5 class="assignee"
+                ng-if="task.assignee"
+                tooltip="task.assignee">
+              {{ assigneeDisplayedName(task); }}
+            </h5>
           </div>
 
-
-          <div class="row"
+          <div class="dates"
                ng-click="focus($event, task)">
-            <ul class="col-sm-12 col-md-6 dates list-inline">
-              <li class="creation-date">
-                <span tooltip-placement="top"
-                      tooltip="{{ 'CREATION_DATE' | translate }}"
-                      class="glyphicon glyphicon-bookmark"></span>
-                <span tooltip-placement="top"
-                      tooltip="{{ task.created | camDate:'long' }}"
-                      am-time-ago="task.created">{{ task.created }}</span>
-              </li>
-
-              <li class="followup-date"
-                  ng-if="!!task.followUp"
-                  ng-class="{overdue: task.followUp && (task.followUp < now) }">
-                <span tooltip-placement="top"
-                      tooltip="{{ 'FOLLOW_UP_DATE' | translate }}"
-                      class="glyphicon glyphicon-calendar"></span>
-                <span tooltip-placement="top"
-                      tooltip="{{ task.followUp | camDate:'long' }}"
-                      am-time-ago="task.followUp">{{ task.followUp }}</span>
-              </li>
-
-              <li class="due-date"
+            <span class="due-date"
                   ng-if="!!task.due"
                   ng-class="{overdue: task.due && (task.due < now) }">
-                <span tooltip-placement="top"
-                      tooltip="{{ 'DUE_DATE' | translate }}"
-                      class="glyphicon glyphicon-bell"></span>
-                <span tooltip-placement="top"
-                      tooltip="{{ task.due | camDate:'long' }}"
-                      am-time-ago="task.due">{{ task.due }}</span>
-              </li>
-            </ul>
+              {{ 'DUE' | translate }}
+              <span tooltip-placement="top"
+                    tooltip="{{ task.due | camDate:'long' }}"
+                    am-time-ago="task.due">{{ task.due }}</span>
+            </span>
 
-            <ul class="col-sm-12 col-md-6 actors list-inline"
-                ng-if="!!task.assignee">
-              <li class="assignee">
-                <span tooltip-placement="top"
-                      tooltip="{{ 'ASSIGNEE' | translate }}"
-                      class="glyphicon glyphicon-user"></span>
-                <span ng-if="assignees[task.assignee] && ( assignees[task.assignee].firstName || assignees[task.assignee].lastName )"
-                      tooltip-placement="top"
-                      tooltip="{{ assignees[task.assignee].firstName }} {{ assignees[task.assignee].lastName }} ({{ task.assignee }})">
-                  {{ assignees[task.assignee].firstName }} {{ assignees[task.assignee].lastName }}
-                </span>
-                <span ng-if="!(assignees[task.assignee] && ( assignees[task.assignee].firstName || assignees[task.assignee].lastName ))"
-                      tooltip-placement="top"
-                      tooltip="{{ task.assignee }}">
-                  {{ task.assignee }}
-                </span>
-              </li>
-            </ul>
+            <span class="followup-date"
+                  ng-if="!!task.followUp"
+                  ng-class="{overdue: task.followUp && (task.followUp < now) }">
+              {{ 'FOLLOW_UP' | translate }}
+              <span tooltip-placement="top"
+                    tooltip="{{ task.followUp | camDate:'long' }}"
+                    am-time-ago="task.followUp">{{ task.followUp }}</span>
+            </span>
+
+            <span class="creation-date">
+              {{ 'CREATION' | translate }}
+              <span tooltip-placement="top"
+                    tooltip="{{ task.created | camDate:'long' }}"
+                    am-time-ago="task.created">{{ task.created }}</span>
+            </span>
           </div>
+
 
           <div cam-tasklist-variables
                filter-properties="filterProperties"

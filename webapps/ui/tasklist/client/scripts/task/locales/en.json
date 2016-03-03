@@ -23,8 +23,12 @@
         "Search by task name, case sensitive.",
   "FOLLOW_UP_DATE":
         "Follow-up date",
+  "FOLLOW_UP":
+        "Follow-up",
   "DUE_DATE":
         "Due date",
+  "DUE":
+        "Due",
   "ASSIGNEE":
         "Assignee",
   "ACTION":

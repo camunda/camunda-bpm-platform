@@ -62,7 +62,7 @@ var moment = require('camunda-commons-ui/vendor/moment');
 
         $scope.query = {};
 
-        $scope.assignees = {};
+        var assignees = $scope.assignees = {};
         var parseAssignees = function(assigneeList) {
           for(var i = 0; i < assigneeList.length; i++) {
             $scope.assignees[assigneeList[i].id] = assigneeList[i];
@@ -90,6 +90,18 @@ var moment = require('camunda-commons-ui/vendor/moment');
             forceFocus = false;
           }
         });
+
+        $scope.assigneeDisplayedName = function (task) {
+          var _assignee = assignees[task.assignee] || {};
+          var hasFirstLastName = _assignee.firstName || _assignee.lastName;
+          if (hasFirstLastName) {
+            return ((_assignee.firstName || '') + ' ' + (_assignee.lastName || ''));
+          }
+          else if (!(assignees[task.assignee] && hasFirstLastName)) {
+            return task.assignee;
+          }
+          return '&lt;nobody&gt;';
+        };
 
         /**
          * observe the task list query

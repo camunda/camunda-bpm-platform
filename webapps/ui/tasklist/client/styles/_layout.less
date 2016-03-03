@@ -143,6 +143,60 @@ button {
     right: 0;
     bottom: 0;
   }
+
+  .names {
+    overflow: hidden;
+    margin-top: 7px;
+    h4,
+    h5,
+    h6 {
+      line-height: 18px;
+    }
+    h4 {
+      margin: 3px 0 0 0;
+      float: left;
+    }
+    h5,
+    h6 {
+      vertical-align: bottom;
+      margin-bottom: 5px;
+    }
+    h6 {
+      margin-top: 5px;
+      float: left;
+      clear: left;
+    }
+    h5 {
+      margin-top: 4px;
+      float: right;
+    }
+  }
+
+  .dates {
+    font-size: 12px;
+    > span {
+      > span {
+        text-transform: lowercase;
+        &:last-of-type:after {
+          content: ',';
+        }
+      }
+      &:last-of-type span:after {
+        display: none;
+      }
+    }
+    > span ~ span {
+      text-transform: lowercase;
+    }
+  }
+
+  .priority {
+    display: inline;
+    position: absolute;
+    top: 0;
+    right: 4px;
+    font-size: smaller;
+  }
 }
 
 
