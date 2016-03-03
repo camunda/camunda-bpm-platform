@@ -3,6 +3,8 @@
   <li>
 
     <span cam-widget-inline-field
+          tabindex="0"
+          ng-keydown="openDatepicker($event)"
           class="followup-date"
           ng-class="{overdue: task.followUp && (task.followUp < now) }"
           type="datetime"
@@ -18,8 +20,7 @@
             tooltip-placement="top"
             tooltip="{{ task.followUp | camDate:'long' }}"
             am-time-ago="task.followUp">{{ task.followUp }}</span>
-      <a href
-         ng-if="!task.followUp"
+      <a ng-if="!task.followUp"
          translate="SET_FOLLOW_UP_DATE">Set follow up</a>
     </span>
 
@@ -36,6 +37,8 @@
   <li>
 
     <span cam-widget-inline-field
+          tabindex="0"
+          ng-keydown="openDatepicker($event)"
           class="due-date"
           ng-class="{overdue: task.due && (task.due < now) }"
           type="datetime"
@@ -53,8 +56,7 @@
             tooltip="{{ task.due | camDate:'long' }}"
             am-time-ago="task.due">{{ task.due }}</span>
 
-      <a href
-         ng-if="!task.due"
+      <a ng-if="!task.due"
          translate="SET_DUE_DATE">Set due date</a>
     </span>
 
@@ -102,6 +104,8 @@
   <li class="assignee"
       ng-if="task.assignee">
     <span cam-widget-inline-field
+          tabindex="0"
+          ng-keydown="editAssignee($event)"
           class="set-value"
           type="text"
           validate="validateUser(this)"
