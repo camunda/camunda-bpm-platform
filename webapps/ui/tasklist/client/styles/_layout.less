@@ -152,6 +152,35 @@ button {
 
 
 
+
+.column.tasks-list {
+  .content {
+    padding-top: 0;
+  }
+  view {
+    display: block;
+    overflow: visible;
+    padding: (@grid-gutter-width * 0.5) 0;
+  }
+  [cam-widget-search] {
+    margin: 0 (@grid-gutter-width * 0.5);
+    padding-bottom: 0;
+  }
+
+  [cam-tasks] {
+    overflow-x: visible;
+    overflow-y: auto;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+
+
+
+
 // S+ (columns layout)
 @media (min-width: @screen-sm-min) {
   .filters-column-close {

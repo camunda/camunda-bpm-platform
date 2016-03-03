@@ -101,6 +101,8 @@ var angular = require('camunda-bpm-sdk-js/vendor/angular');
       });
 
       searchData.set('searchQuery', query);
+
+      $scope.$root.$broadcast('plugin:search:change');
     }, true);
 
     searchData.observe('currentFilter', function(filter) {
