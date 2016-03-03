@@ -12,15 +12,16 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
-import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CallingTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement.CallableElementBinding;
+import org.camunda.bpm.engine.impl.core.model.DefaultCallableElementTenantIdProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
+import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -32,6 +33,7 @@ import org.camunda.bpm.model.cmmn.instance.CmmnElement;
  */
 public abstract class CallingTaskItemHandler extends TaskItemHandler {
 
+  @Override
   protected void initializeActivity(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
     super.initializeActivity(element, activity, context);
 
@@ -60,6 +62,9 @@ public abstract class CallingTaskItemHandler extends TaskItemHandler {
 
     // version
     initializeVersion(element, activity, context, callableElement);
+
+    // tenant-id
+    initializeTenantId(element, activity, context, callableElement);
   }
 
   protected void initializeDefinitionKey(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, BaseCallableElement callableElement) {
@@ -86,6 +91,12 @@ public abstract class CallingTaskItemHandler extends TaskItemHandler {
     String version = getVersion(element, activity, context);
     ParameterValueProvider versionProvider = createParameterValueProvider(version, expressionManager);
     callableElement.setVersionValueProvider(versionProvider);
+  }
+
+  protected void initializeTenantId(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, BaseCallableElement callableElement) {
+    // TODO allow to use a custom tenant id provider - CAM-5415
+    DefaultCallableElementTenantIdProvider tenantIdProvider = new DefaultCallableElementTenantIdProvider();
+    callableElement.setTenantIdProvider(tenantIdProvider);
   }
 
   protected ParameterValueProvider createParameterValueProvider(String value, ExpressionManager expressionManager) {
