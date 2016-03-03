@@ -83,6 +83,7 @@ import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement.CallableElementBinding;
 import org.camunda.bpm.engine.impl.core.model.CallableElement;
 import org.camunda.bpm.engine.impl.core.model.CallableElementParameter;
+import org.camunda.bpm.engine.impl.core.model.DefaultCallableElementTenantIdProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
@@ -3406,12 +3407,16 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseTenantId(Element callingActivityElement, ActivityImpl activity, BaseCallableElement callableElement, String attrName) {
-    String tenantId = callingActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, attrName);
+    ParameterValueProvider tenantIdValueProvider;
 
-    if(tenantId != null && tenantId.length() > 0) {
-      ParameterValueProvider tenantIdValueProvider = createParameterValueProvider(tenantId, expressionManager);
-      callableElement.setTenantIdProvider(tenantIdValueProvider);
+    String tenantId = callingActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, attrName);
+    if (tenantId != null && tenantId.length() > 0) {
+      tenantIdValueProvider = createParameterValueProvider(tenantId, expressionManager);
+    } else {
+      tenantIdValueProvider = new DefaultCallableElementTenantIdProvider();
     }
+
+    callableElement.setTenantIdProvider(tenantIdValueProvider);
   }
 
   protected void parseVersion(Element callingActivityElement, ActivityImpl activity, BaseCallableElement callableElement, String bindingAttributeName, String versionAttributeName) {

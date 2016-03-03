@@ -15,12 +15,7 @@ package org.camunda.bpm.engine.impl.core.model;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
-import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
-import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
 public class BaseCallableElement {
 
@@ -123,25 +118,12 @@ public class BaseCallableElement {
     this.deploymentId = deploymentId;
   }
 
-  public String getDefinitionTenantId(CoreExecution execution) {
-    if(tenantIdProvider != null) {
-      return (String) tenantIdProvider.getValue(execution);
-    }
-    else {
-      if(execution instanceof ExecutionEntity) {
-        ExecutionEntity executionEntity = (ExecutionEntity) execution;
-        ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) executionEntity.getProcessDefinition();
-        return processDefinition.getTenantId();
-      }
-      else if(execution instanceof CaseExecutionEntity) {
-        CaseExecutionEntity caseExecution = (CaseExecutionEntity) execution;
-        CaseDefinitionEntity caseDefinition = (CaseDefinitionEntity) caseExecution.getCaseDefinition();
-        return caseDefinition.getTenantId();
-      }
-      else {
-        throw new IllegalArgumentException("Unexpected execution of type " + execution.getClass().getName());
-      }
-    }
+  public String getDefinitionTenantId(VariableScope variableScope) {
+    return (String) tenantIdProvider.getValue(variableScope);
+  }
+
+  public ParameterValueProvider getTenantIdProvider() {
+    return tenantIdProvider;
   }
 
 }
