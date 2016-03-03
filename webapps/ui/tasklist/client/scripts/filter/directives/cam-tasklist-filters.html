@@ -27,9 +27,6 @@
        ng-click="focus(filter)">
 
     <div class="task-filter">
-      <div ng-if="isFocused(filter)"
-           class="counter">{{ filterCount }}</div>
-
       <div class="actions">
         <a ng-click="openModal($event, filter)"
            tooltip="{{ 'FILTER_DETAILS' | translate }}"
@@ -44,6 +41,9 @@
         <span ng-style="{'background-color': filter.properties.color}"></span>
         <a href>{{ filter.name }}</a>
       </h4>
+
+      <div ng-show="isFocused(filter)"
+           class="counter">{{ filterCount }}</div>
     </div>
   </div>
 </div>

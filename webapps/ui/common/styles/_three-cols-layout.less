@@ -79,16 +79,23 @@
 }
 
 .first-column-list-item() {
+  padding-top: (@padding-base-vertical * 2);
+  padding-bottom: (@padding-base-vertical * 2);
+
   .actions {
     display: none;
     font-size: smaller;
     position: absolute;
-    bottom: 2px;
-    left: 12px;
+    top: 2px;
+    right: 6px;
     background-color: fade(@gray-lighter, 0.5);
     a {
-      margin-right: 0.5em;
+      margin-left: 0.5em;
     }
+  }
+
+  h4 {
+    font-size: 16px;
   }
 
   &:last-child {
@@ -134,15 +141,6 @@
     margin-right: 0;
     overflow: auto;
     overflow-x: visible;
-
-    // that ain't optimal, but... it ✓
-    // ¯\_(ツ)_/¯
-    &:focus,
-    .cell > *:focus,
-    .cell > * > *:focus,
-    .cell > * > * > *:focus {
-      // outline: none;
-    }
   }
 
   .column .cell.content {

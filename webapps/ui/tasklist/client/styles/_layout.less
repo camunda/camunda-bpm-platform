@@ -92,63 +92,31 @@ button {
       .second-column-list-item();
     }
   }
-
-  .column-left h4.name {
-    overflow: hidden;
-    > span {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border-radius: 14px;
-      // margin-left: -7px;
-      background-color: @gray-lighter;
-      // border: 2px solid fade(@gray, 50);
-    }
-  }
-
-  .column-center {
-    [cam-widget-search] {
-      margin: 0 (@grid-gutter-width * 0.5);
-    }
-
-    .dates,
-    .actors {
-      > li {
-        overflow: hidden;
-        white-space: nowrap;
-        max-width: 100%;
-        > span {
-          line-height: 20px;
-          vertical-align: text-top;
-          display: inline-block;
-          &:nth-child(1) {
-            margin-top: -3px;
-          }
-          &:nth-child(2) {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: ~"calc(100% - 16px)";
-          }
-        }
-      }
-    }
-  }
-
-
-  .counter,
-  .priority {
-    display: inline;
-    position: absolute;
-    top: 0;
-    right: 4px;
-    font-size: smaller;
-  }
 }
 
+.task-filter {
+  width: 100%;
+  margin: 6px 0;
+  overflow: hidden;
 
+  h4.name,
+  .counter {
+    margin: 0;
+    line-height: 20px;
+    min-height: 20px;
+    display: block;
+  }
 
+  h4.name {
+    float: left;
+  }
 
-
+  .counter {
+    float: right;
+    font-size: 14px;
+    text-align: right;
+  }
+}
 
 
 
