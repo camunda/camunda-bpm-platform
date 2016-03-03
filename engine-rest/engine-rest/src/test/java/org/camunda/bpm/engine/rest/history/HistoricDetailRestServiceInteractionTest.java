@@ -106,6 +106,7 @@ public class HistoricDetailRestServiceInteractionTest extends AbstractRestServic
       .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
       .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
       .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
+      .body("tenantId", equalTo(builder.getTenantId()))
     .when().get(HISTORIC_DETAIL_URL);
 
     verify(historicDetailQueryMock, times(1)).disableBinaryFetching();
@@ -148,6 +149,7 @@ public class HistoricDetailRestServiceInteractionTest extends AbstractRestServic
       .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
       .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
       .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
+      .body("tenantId", equalTo(builder.getTenantId()))
     .when().get(HISTORIC_DETAIL_URL);
 
     verify(historicDetailQueryMock, times(1)).disableBinaryFetching();
@@ -192,6 +194,7 @@ public class HistoricDetailRestServiceInteractionTest extends AbstractRestServic
       .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
       .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
       .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
+      .body("tenantId", equalTo(builder.getTenantId()))
     .when().get(HISTORIC_DETAIL_URL);
 
     verify(historicDetailQueryMock, times(1)).disableBinaryFetching();
@@ -232,6 +235,7 @@ public class HistoricDetailRestServiceInteractionTest extends AbstractRestServic
       .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
       .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
       .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
+      .body("tenantId", equalTo(builder.getTenantId()))
     .when().get(HISTORIC_DETAIL_URL);
 
     verify(historicDetailQueryMock, times(1)).disableBinaryFetching();

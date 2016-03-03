@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.history;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.nullValue;
@@ -240,6 +241,16 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     executeAndVerifySorting("occurrence", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderPartiallyByOccurrence();
     inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
+    inOrder.verify(mockedQuery).desc();
   }
 
   @Test
@@ -327,6 +338,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
           .body("[0].caseDefinitionId", equalTo(historicUpdateBuilder.getCaseDefinitionId()))
           .body("[0].caseInstanceId", equalTo(historicUpdateBuilder.getCaseInstanceId()))
           .body("[0].caseExecutionId", equalTo(historicUpdateBuilder.getCaseExecutionId()))
+          .body("[0].tenantId", equalTo(historicUpdateBuilder.getTenantId()))
         .when()
           .get(HISTORIC_DETAIL_RESOURCE_URL);
 
@@ -356,6 +368,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     String returnedCaseDefinitionId2 = from(content).getString("[1].caseDefinitionId");
     String returnedCaseInstanceId2 = from(content).getString("[1].caseInstanceId");
     String returnedCaseExecutionId2 = from(content).getString("[1].caseExecutionId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_ID, returnedId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_PROC_DEF_KEY, returnedProcessDefinitionKey2);
@@ -372,6 +385,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_CASE_DEF_KEY, returnedCaseDefinitionKey2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_CASE_INST_ID, returnedCaseInstanceId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_CASE_EXEC_ID, returnedCaseExecutionId2);
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId2);
 
   }
 
@@ -533,6 +547,46 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
       .get(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).caseExecutionId(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
+  }
+
+  @Test
+  public void testTenantIdListParameter() {
+    mockedQuery = setUpMockedDetailsQuery(createMockHistoricDetailsTwoTenants());
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+      .queryParam("variableUpdates", "true")
+      .queryParam("formFields", "true")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).variableUpdates();
+    verify(mockedQuery).formFields();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> historicDetails = from(content).getList("");
+    assertThat(historicDetails).hasSize(4);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+    String returnedTenantId3 = from(content).getString("[2].tenantId");
+    String returnedTenantId4 = from(content).getString("[3].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId3).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId4).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  private List<HistoricDetail> createMockHistoricDetailsTwoTenants() {
+    List<HistoricDetail> mockHistoricDetails = MockProvider.createMockHistoricDetails(MockProvider.EXAMPLE_TENANT_ID);
+    List<HistoricDetail> mockHistoricDetails2 = MockProvider.createMockHistoricDetails(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    mockHistoricDetails.addAll(mockHistoricDetails2);
+    return mockHistoricDetails;
   }
 
 }

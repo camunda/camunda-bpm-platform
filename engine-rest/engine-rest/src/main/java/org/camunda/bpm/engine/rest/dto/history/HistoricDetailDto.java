@@ -46,6 +46,7 @@ public abstract class HistoricDetailDto {
   protected String caseInstanceId;
   protected String caseExecutionId;
   protected String taskId;
+  protected String tenantId;
   protected Date time;
 
   public String getId() {
@@ -92,6 +93,10 @@ public abstract class HistoricDetailDto {
     return taskId;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
   public Date getTime() {
     return time;
   }
@@ -120,6 +125,7 @@ public abstract class HistoricDetailDto {
     dto.caseDefinitionId = historicDetail.getCaseDefinitionId();
     dto.caseInstanceId = historicDetail.getCaseInstanceId();
     dto.caseExecutionId = historicDetail.getCaseExecutionId();
+    dto.tenantId = historicDetail.getTenantId();
     dto.time = historicDetail.getTime();
 
     return dto;

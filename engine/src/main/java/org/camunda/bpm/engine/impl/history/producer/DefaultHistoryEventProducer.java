@@ -614,6 +614,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     historicFormPropertyEntity.setPropertyId(propertyId);
     historicFormPropertyEntity.setPropertyValue(propertyValue);
     historicFormPropertyEntity.setTaskId(taskId);
+    historicFormPropertyEntity.setTenantId(execution.getTenantId());
 
     ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
     if (definition != null) {

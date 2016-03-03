@@ -27,7 +27,6 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
   protected String variableName;
   protected String variableInstanceId;
   protected String scopeActivityInstanceId;
-  protected String tenantId;
 
   protected String serializerName;
 
@@ -106,14 +105,6 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
   }
   public void setScopeActivityInstanceId(String scopeActivityInstanceId) {
     this.scopeActivityInstanceId = scopeActivityInstanceId;
-  }
-
-  public String getTenantId() {
-    return tenantId;
-  }
-
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
   }
 
   @Override

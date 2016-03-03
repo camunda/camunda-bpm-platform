@@ -1894,10 +1894,14 @@ public abstract class MockProvider {
   // historic detail ////////////////////
 
   public static HistoricVariableUpdate createMockHistoricVariableUpdate() {
-    return mockHistoricVariableUpdate().build();
+    return mockHistoricVariableUpdate(EXAMPLE_TENANT_ID).build();
   }
 
   public static MockHistoricVariableUpdateBuilder mockHistoricVariableUpdate() {
+    return mockHistoricVariableUpdate(EXAMPLE_TENANT_ID);
+  }
+
+  public static MockHistoricVariableUpdateBuilder mockHistoricVariableUpdate(String tenantId) {
     return new MockHistoricVariableUpdateBuilder()
         .id(EXAMPLE_HISTORIC_VAR_UPDATE_ID)
         .processDefinitionKey(EXAMPLE_HISTORIC_VAR_UPDATE_PROC_DEF_KEY)
@@ -1915,11 +1919,15 @@ public abstract class MockProvider {
         .caseDefinitionKey(EXAMPLE_HISTORIC_VAR_UPDATE_CASE_DEF_KEY)
         .caseDefinitionId(EXAMPLE_HISTORIC_VAR_UPDATE_CASE_DEF_ID)
         .caseInstanceId(EXAMPLE_HISTORIC_VAR_UPDATE_CASE_INST_ID)
-        .caseExecutionId(EXAMPLE_HISTORIC_VAR_UPDATE_CASE_EXEC_ID);
+        .caseExecutionId(EXAMPLE_HISTORIC_VAR_UPDATE_CASE_EXEC_ID)
+        .tenantId(tenantId);
   }
 
-
   public static HistoricFormField createMockHistoricFormField() {
+    return createMockHistoricFormField(EXAMPLE_TENANT_ID);
+  }
+
+  public static HistoricFormField createMockHistoricFormField(String tenantId) {
     HistoricFormField historicFromField = mock(HistoricFormField.class);
 
     when(historicFromField.getId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_ID);
@@ -1936,6 +1944,7 @@ public abstract class MockProvider {
     when(historicFromField.getCaseDefinitionId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_CASE_DEF_ID);
     when(historicFromField.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_CASE_INST_ID);
     when(historicFromField.getCaseExecutionId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_CASE_EXEC_ID);
+    when(historicFromField.getTenantId()).thenReturn(tenantId);
 
     return historicFromField;
   }
@@ -1947,9 +1956,13 @@ public abstract class MockProvider {
   }
 
   public static List<HistoricDetail> createMockHistoricDetails() {
+    return createMockHistoricDetails(EXAMPLE_TENANT_ID);
+  }
+
+  public static List<HistoricDetail> createMockHistoricDetails(String tenantId) {
     List<HistoricDetail> entries = new ArrayList<HistoricDetail>();
-    entries.add(createMockHistoricVariableUpdate());
-    entries.add(createMockHistoricFormField());
+    entries.add(mockHistoricVariableUpdate(tenantId).build());
+    entries.add(createMockHistoricFormField(tenantId));
     return entries;
   }
 
