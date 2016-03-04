@@ -44,7 +44,7 @@ public class MigrationPlanCreationTest {
   public static final String ERROR_CODE = "Error";
   public static final String ESCALATION_CODE = "Escalation";
 
-  protected ProcessEngineRule rule = new ProcessEngineRule();
+  protected ProcessEngineRule rule = new ProcessEngineRule(true);
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule

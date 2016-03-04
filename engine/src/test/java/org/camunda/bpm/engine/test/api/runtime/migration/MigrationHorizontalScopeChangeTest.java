@@ -29,7 +29,7 @@ import org.junit.rules.RuleChain;
  */
 public class MigrationHorizontalScopeChangeTest {
 
-  protected ProcessEngineRule rule = new ProcessEngineRule();
+  protected ProcessEngineRule rule = new ProcessEngineRule(true);
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule

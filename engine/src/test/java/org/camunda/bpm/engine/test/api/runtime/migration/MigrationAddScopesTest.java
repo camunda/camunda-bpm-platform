@@ -44,7 +44,7 @@ import org.junit.rules.RuleChain;
  */
 public class MigrationAddScopesTest {
 
-  protected ProcessEngineRule rule = new ProcessEngineRule();
+  protected ProcessEngineRule rule = new ProcessEngineRule(true);
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule
