@@ -17,7 +17,8 @@
 
   <div class="form-group labels-left">
     <div class="col-xs-2 row-action">
-      <a ng-click="addVariable()"
+      <a href
+         ng-click="addVariable()"
          ng-disabled="options.disableAddVariableButton">
         <span class="hidden-xs hidden-sm"
               translate="ADD_VARIABLE">Add variable</span>
@@ -54,7 +55,8 @@
        ng-form="repeatForm">
 
     <div class="col-xs-2 row-action">
-      <a ng-click="removeVariable(delta)"
+      <a href
+         ng-click="removeVariable(delta)"
          ng-if="!variable.fixedName">
         <span class="hidden-sm hidden-xs"
               translate="REMOVE">Remove</span>
@@ -157,7 +159,8 @@
   <div class="form-group"
        ng-if="!options.hideLoadVariablesButton && !variablesLoaded">
     <div class="col-xs-2 row-action">
-      <a ng-click="loadVariables()">
+      <a href
+         ng-click="loadVariables()">
         <span class="hidden-sm hidden-xs"
               translate="LOAD_VARIABLES">Load Variables</span>
         <span class="glyphicon glyphicon-download"></span>

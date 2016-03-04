@@ -12,9 +12,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
   module.exports = [
     'camAPI',
     '$q',
+    '$timeout',
   function(
     camAPI,
-    $q
+    $q,
+    $timeout
   ) {
 
     return {
@@ -206,6 +208,14 @@ var angular = require('camunda-commons-ui/vendor/angular');
           // the first click only adds the fields
           if (!$scope.showNewPermissionFields) {
             $scope.showNewPermissionFields = true;
+
+            $timeout(function() {
+              var element = $element[0].querySelector('.new-permission button');
+              if(element) {
+                element.focus();
+              }
+            });
+
             return;
           }
 
@@ -244,6 +254,13 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
           control.$setValidity('authorization', true);
           control.$setPristine();
+
+          $timeout(function() {
+            var element = $element[0].querySelector('.new-permission button');
+            if(element) {
+              element.focus();
+            }
+          });
         };
 
         $scope.keyPressed = function ($event) {
@@ -267,6 +284,8 @@ var angular = require('camunda-commons-ui/vendor/angular');
         $scope.removeReadPermission = function (auth) {
           removeReadPermissionFromAuthorization(auth);
           validateNewPermission();
+
+          $element[0].querySelector('.global-access input').focus();
         };
 
         // submit authorizations //////////////////////////////////////////////////////////

@@ -88,6 +88,8 @@ var $ = require('jquery');
           form = camFormScope[formName];
           form.$setPristine();
           formController.notifyFormInitialized();
+
+          $scope.$root.$broadcast('embedded.form.rendered');
         };
 
         var complete = function (callback) {
