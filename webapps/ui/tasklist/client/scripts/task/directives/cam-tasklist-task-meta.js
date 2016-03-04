@@ -26,8 +26,10 @@ var angular = require('camunda-bpm-sdk-js/vendor/angular');
 
       controller: [
         '$scope',
+        '$timeout',
       function(
-        $scope
+        $scope,
+        $timeout
       ){
 
         var taskMetaData = $scope.taskData.newChild($scope);
@@ -147,16 +149,16 @@ var angular = require('camunda-bpm-sdk-js/vendor/angular');
         $scope.openDatepicker = function(evt) {
           if(evt.keyCode === 13 && evt.target === evt.currentTarget) {
             // we can not trigger events in an event handler, because 'apply is already in progress' ;)
-            window.setTimeout(function(){
+            $timeout(function(){
 
               // activate the inline edit field
               evt.target.firstChild.click();
 
               // wait for angular to open the date picker
-              window.setTimeout(function() {
+              $timeout(function() {
 
                 // wait for the update of the inline edit field, otherwise it will steal out focus
-                window.setTimeout(function() {
+                $timeout(function() {
 
                   // set the focus to the date picker
                   document.querySelector('.cam-widget-inline-field.field-control > .datepicker > table').focus();
@@ -169,7 +171,7 @@ var angular = require('camunda-bpm-sdk-js/vendor/angular');
         $scope.editAssignee = function(evt) {
           if(evt.keyCode === 13 && evt.target === evt.currentTarget) {
             // we can not trigger events in an event handler, because 'apply is already in progress' ;)
-            window.setTimeout(function(){
+            $timeout(function(){
               evt.target.firstChild.click();
             });
           }
