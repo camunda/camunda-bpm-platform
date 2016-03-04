@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 public class ProcessEngineRuleClassDeploymentTest {
 
   @Rule
-  public final ProcessEngineRule processEngineRule = new ProcessEngineRule();
+  public final ProcessEngineRule processEngineRule = new ProcessEngineRule(true);
 
   @Test
   public void testDeploymentOnClassLevel() {

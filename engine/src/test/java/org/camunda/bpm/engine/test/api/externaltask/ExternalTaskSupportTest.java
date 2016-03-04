@@ -38,7 +38,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class ExternalTaskSupportTest {
 
   @Rule
-  public ProcessEngineRule rule = new ProcessEngineRule();
+  public ProcessEngineRule rule = new ProcessEngineRule(true);
 
   @Parameters
   public static Collection<Object[]> processResources() {

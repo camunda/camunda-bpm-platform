@@ -32,7 +32,7 @@ public class MigrationEventSubProcessTest {
   public static final String SIGNAL_NAME = "Signal";
   public static final String TIMER_DATE = "2016-02-11T12:13:14Z";
 
-  protected ProcessEngineRule rule = new ProcessEngineRule();
+  protected ProcessEngineRule rule = new ProcessEngineRule(true);
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule

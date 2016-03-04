@@ -39,7 +39,7 @@ public class MigrationBoundaryEventsTest {
   public static final String TIMER_DATE = "2016-02-11T12:13:14Z";
   public static final String NEW_TIMER_DATE = "2018-02-11T12:13:14Z";
 
-  protected ProcessEngineRule rule = new ProcessEngineRule();
+  protected ProcessEngineRule rule = new ProcessEngineRule(true);
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule

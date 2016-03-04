@@ -33,14 +33,14 @@ import org.junit.rules.RuleChain;
  */
 public class MigrationPlanGenerationTest {
 
-  protected ProcessEngineRule rule = new ProcessEngineRule();
-  protected MigrationTestRule testHelper = new MigrationTestRule(rule);
-
   public static final String MESSAGE_NAME = "Message";
   public static final String SIGNAL_NAME = "Signal";
   public static final String TIMER_DATE = "2016-02-11T12:13:14Z";
   public static final String ERROR_CODE = "Error";
   public static final String ESCALATION_CODE = "Escalation";
+
+  protected ProcessEngineRule rule = new ProcessEngineRule(true);
+  protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
