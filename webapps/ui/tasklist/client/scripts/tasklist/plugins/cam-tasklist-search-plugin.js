@@ -52,12 +52,15 @@ var angular = require('camunda-bpm-sdk-js/vendor/angular');
   var Controller = [
    '$scope',
    '$translate',
+   '$timeout',
   function (
     $scope,
-    $translate
+    $translate,
+    $timeout
   ) {
 
     $scope.searches = [];
+    $scope.allSearches = [];
     $scope.translations = {};
 
     angular.forEach(searchConfig.tooltips, function(value, key) {
@@ -101,8 +104,13 @@ var angular = require('camunda-bpm-sdk-js/vendor/angular');
       });
 
       searchData.set('searchQuery', query);
+    }, true);
 
-      $scope.$root.$broadcast('plugin:search:change');
+    $scope.$watch('allSearches', function() {
+      // wait for angular to update the html
+      $timeout(function() {
+        $scope.$root.$broadcast('plugin:search:change');
+      });
     }, true);
 
     searchData.observe('currentFilter', function(filter) {
