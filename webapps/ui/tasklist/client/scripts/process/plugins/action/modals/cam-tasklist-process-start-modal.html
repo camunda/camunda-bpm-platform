@@ -7,7 +7,7 @@
     <div class="col-xs-6">
       <form>
         <div class="form-group has-feedback"
-             ng-show="!PROCESS_TO_START_SELECTED">
+             ng-if="!PROCESS_TO_START_SELECTED">
           <input type="text"
                  ng-model="page.searchValue"
                  placeholder="{{ 'SEARCH_PROCESS_BY_NAME' | translate }}"
@@ -23,9 +23,9 @@
 
   <div notifications-panel></div>
 
-  <div ng-show="!PROCESS_TO_START_SELECTED">
+  <div ng-if="!PROCESS_TO_START_SELECTED">
 
-    <div ng-show="!processDefinitionState.$loaded || lookupProcessDefinitionByName.$loading"
+    <div ng-if="!processDefinitionState.$loaded || lookupProcessDefinitionByName.$loading"
        class="loader">
       <span class="animate-spin glyphicon glyphicon-refresh"></span>
       {{ 'LOADING' | translate }}
@@ -39,7 +39,7 @@
         {{ 'NO_PROCESS_DEFINITION_AVAILABLE' | translate }}
       </div>
 
-      <div ng-show="page.total" class="available-processes">
+      <div ng-if="page.total" class="available-processes">
 
         <div class="text-help">
           <span class="glyphicon glyphicon-info-sign"></span>
@@ -56,7 +56,7 @@
 
       </div>
 
-      <pagination ng-show="page.total > page.size"
+      <pagination ng-if="page.total > page.size"
                   total-items="page.total"
                   items-per-page="page.size"
                   max-size="5"

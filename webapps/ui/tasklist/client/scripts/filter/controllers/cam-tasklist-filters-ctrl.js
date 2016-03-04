@@ -1,5 +1,6 @@
 'use strict';
 var fs = require('fs');
+var $ = require('jquery');
 
 var template = fs.readFileSync(__dirname + '/../modals/cam-tasklist-filter-modal.html', 'utf8');
 
@@ -8,11 +9,13 @@ var template = fs.readFileSync(__dirname + '/../modals/cam-tasklist-filter-modal
     '$modal',
     '$q',
     'camAPI',
+    '$timeout',
   function(
     $scope,
     $modal,
     $q,
-    camAPI
+    camAPI,
+    $timeout
   ) {
 
     var filtersData = $scope.filtersData = $scope.tasklistData.newChild($scope);
@@ -62,6 +65,20 @@ var template = fs.readFileSync(__dirname + '/../modals/cam-tasklist-filter-modal
 
     // open modal /////////////////////////////////////////////////////////////////////////////
 
+    var focusFilter = function(filter) {
+      // wait for modal to close
+      $timeout(function() {
+        // wait for filter list refresh
+        $timeout(function() {
+          if(filter) {
+            $('.task-filters .content h4 a:contains(\''+filter.name+'\')')[0].focus();
+          } else {
+            document.querySelector('.task-filters header button.btn-link').focus();
+          }
+        });
+      });
+    };
+
     $scope.openModal = function ($event, filter) {
       $event.stopPropagation();
 
@@ -77,8 +94,10 @@ var template = fs.readFileSync(__dirname + '/../modals/cam-tasklist-filter-modal
 
       }).result.then(function() {
         filtersData.changed('filters');
+        focusFilter(filter);
       }, function () {
         filtersData.changed('filters');
+        focusFilter(filter);
       });
 
     };

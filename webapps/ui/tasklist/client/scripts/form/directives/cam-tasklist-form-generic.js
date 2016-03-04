@@ -11,9 +11,11 @@ var $ = require('jquery');
   module.exports = [
     'CamForm',
     'camAPI',
+    '$timeout',
   function(
     CamForm,
-    camAPI
+    camAPI,
+    $timeout
   ){
 
     return {
@@ -91,6 +93,13 @@ var $ = require('jquery');
 
           form = camFormScope[formName];
           formController.notifyFormInitialized();
+
+          $timeout(function() {
+            var focusElement = _camForm.formElement[0].querySelectorAll('input')[0];
+            if(focusElement) {
+              focusElement.focus();
+            }
+          });
         };
 
         function clearVariableManager() {

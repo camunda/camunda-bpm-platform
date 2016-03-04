@@ -8,20 +8,37 @@ var createTaskModalTemplate = fs.readFileSync(__dirname + '/modals/cam-tasklist-
   var Controller = [
    '$scope',
    '$modal',
+   '$timeout',
   function (
     $scope,
-    $modal
+    $modal,
+    $timeout
   ) {
 
     $scope.open = function() {
-      $modal.open({
+      var modalInstance = $modal.open({
         size: 'lg',
         controller: 'camCreateTaskModalCtrl',
         template: createTaskModalTemplate
-      }).result.then(function(result) {
+      });
+
+      modalInstance.result.then(function(result) {
         if ($scope.tasklistApp && $scope.tasklistApp.refreshProvider) {
           $scope.tasklistApp.refreshProvider.refreshTaskList();
+          document.querySelector('.create-task-action a').focus();
         }
+      }, function() {
+        document.querySelector('.create-task-action a').focus();
+      });
+
+      // once we upgrade to a newer version of angular and angular-ui-bootstrap,
+      // we can use the {{rendered}} promise to get rid of the $timeouts
+      modalInstance.opened.then(function() {
+        $timeout(function() {
+          $timeout(function() {
+            document.querySelectorAll('div.modal-content input')[0].focus();
+          });
+        });
       });
     };
 

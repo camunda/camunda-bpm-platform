@@ -208,6 +208,14 @@ var $ = require('jquery');
           }
 
           scope.updateSortings();
+
+          // wait for the html to be updated
+          $timeout(function() {
+            var element = document.querySelector('[cam-sorting-choices] li:nth-child(0n+'+(idx+1)+') a.dropdown-toggle');
+            if(element) {
+              element.focus();
+            }
+          });
         };
 
         scope.resetFunctions = [];
@@ -258,6 +266,13 @@ var $ = require('jquery');
           scope.sortings.push(newSorting);
 
           scope.updateSortings();
+
+          $timeout(function() {
+            var element = document.querySelector('[cam-sorting-choices] li:last-child a.dropdown-toggle');
+            if(element) {
+              element.focus();
+            }
+          });
         };
 
         /**
@@ -266,6 +281,18 @@ var $ = require('jquery');
         scope.removeSorting = function (index) {
           scope.sortings.splice(index, 1);
           scope.updateSortings();
+
+          $timeout(function() {
+            var element;
+            if(scope.sortings.length !== index) {
+              element = document.querySelector('[cam-sorting-choices] li.sorting-choice:nth-child(0n+'+(index+1)+') a:first-child');
+            } else {
+              element = document.querySelector('[cam-sorting-choices] li.sorting-choice:nth-last-child(0n+2) a:first-child');
+            }
+            if(element) {
+              element.focus();
+            }
+          });
         };
 
         /**
@@ -275,6 +302,14 @@ var $ = require('jquery');
           scope.sortings[index].order = scope.sortings[index].order === 'asc' ? 'desc' : 'asc';
 
           scope.updateSortings();
+
+          // wait for the html to be updated
+          $timeout(function() {
+            var element = document.querySelector('[cam-sorting-choices] li:nth-child(0n+'+(index+1)+') a.sort-direction');
+            if(element) {
+              element.focus();
+            }
+          });
         };
       }
     };

@@ -71,17 +71,22 @@ var template = fs.readFileSync(__dirname + '/modals/cam-tasklist-process-start-m
 
     $scope.open = function() {
       processData.set('processDefinitionQuery', angular.copy(DEFAULT_PROCESS_DEFINITION_QUERY));
-      $modal.open({
+      var modalInstance = $modal.open({
         size: 'lg',
         controller: 'camProcessStartModalCtrl',
         template: template,
         resolve: {
           processData: function () { return processData; }
         }
-      }).result.then(function(result) {
+      });
+
+      modalInstance.result.then(function(result) {
         if ($scope.tasklistApp && $scope.tasklistApp.refreshProvider) {
           $scope.tasklistApp.refreshProvider.refreshTaskList();
+          document.querySelector('.start-process-action a').focus();
         }
+      }, function() {
+        document.querySelector('.start-process-action a').focus();
       });
     };
 

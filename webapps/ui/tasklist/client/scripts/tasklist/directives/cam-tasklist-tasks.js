@@ -38,8 +38,6 @@ var moment = require('camunda-commons-ui/vendor/moment');
           search.updateSilently(params);
         }
 
-        var forceFocus = false;
-
         $scope.pageNum = 1;
         $scope.pageSize = null;
         $scope.totalItems = 0;
@@ -72,23 +70,25 @@ var moment = require('camunda-commons-ui/vendor/moment');
         /**
          * observe the list of tasks
          */
+         var focusFirst = false;
         $scope.state = tasksData.observe('taskList', function (taskList) {
           $scope.totalItems = taskList.count;
           $scope.tasks = taskList._embedded.task;
           if(taskList._embedded.assignee) {
             parseAssignees(taskList._embedded.assignee);
           }
-          if(forceFocus) {
-            $scope.focus(null, $scope.tasks[forceFocus === 'first' ? 0 : $scope.pageSize - 1]);
-            $timeout(function(){
-              $element
-                .find('div[ng-keydown]')
-                .trigger('focus')
-                  .find('li.active')[0]
-                  .scrollIntoView(false);
-            }, 0);
-            forceFocus = false;
+
+          if(focusFirst) {
+            $timeout(function() {
+              // focus the first item on the new list of tasks
+              var el = document.querySelector('[cam-tasks] .tasks-list li:first-child a');
+              if(el) {
+                el.focus();
+              }
+            },0,false);
           }
+          focusFirst = false;
+
         });
 
         $scope.assigneeDisplayedName = function (task) {
@@ -113,6 +113,7 @@ var moment = require('camunda-commons-ui/vendor/moment');
             $scope.pageSize = $scope.query.maxResults;
             // Sachbearbeiter starts counting at '1'
             $scope.pageNum = ($scope.query.firstResult / $scope.pageSize) + 1;
+            focusFirst = true;
           }
         });
 
@@ -152,7 +153,6 @@ var moment = require('camunda-commons-ui/vendor/moment');
           }
           if($scope.pageNum < Math.ceil($scope.totalItems / $scope.pageSize)) {
             $scope.pageNum++;
-            forceFocus = 'first';
             $scope.pageChange();
           }
         };
@@ -165,7 +165,6 @@ var moment = require('camunda-commons-ui/vendor/moment');
           }
           if($scope.pageNum > 1) {
             $scope.pageNum--;
-            forceFocus = 'last';
             $scope.pageChange();
           }
         };

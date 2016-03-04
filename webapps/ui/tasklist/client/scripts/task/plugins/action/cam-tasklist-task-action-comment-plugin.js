@@ -32,6 +32,9 @@ var addCommentFormTemplate = fs.readFileSync(__dirname + '/modals/cam-tasklist-c
         }
       }).result.then(function() {
         commentData.changed('task');
+        document.querySelector('.createCommentLink').focus();
+      }, function() {
+        document.querySelector('.createCommentLink').focus();
       });
 
     };
