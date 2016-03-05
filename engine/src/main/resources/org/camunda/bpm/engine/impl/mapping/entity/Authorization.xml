@@ -99,6 +99,10 @@
     </where>
   </select>
 
+  <select id="selectAuthorizedGroupIds" resultType="string">
+    SELECT distinct(A.GROUP_ID_) FROM ${prefix}ACT_RU_AUTHORIZATION A
+  </select>
+
   <select id="selectAuthorization" resultMap="authorizationResultMap">
     select * FROM ${prefix}ACT_RU_AUTHORIZATION WHERE ID_ = #{id}
   </select>
@@ -277,63 +281,58 @@
               <if test="authGroupIds != null &amp;&amp; authGroupIds.size() > 0">
 
                 <!-- Group GRANTS -->
-                <foreach collection="authGroupIds" index="index" item="authGroupId">
-                  <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
-                    WHEN
-                      <if test="permCheck.resourceIdQueryParam != null">
-                      ${permCheck.resourceIdQueryParam} IN
-                      </if>
-                      <if test="permCheck.resourceId != null">
-                      EXISTS
-                      </if>
-                        (SELECT
-                                A.RESOURCE_ID_
-                         FROM
-                                ${prefix}ACT_RU_AUTHORIZATION A
-                         WHERE
-                                A.TYPE_ = 1
-                         AND
-                                A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR}
-                         AND
-                                ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} = #{permCheck.perms,  jdbcType=INTEGER}
-                         AND
-                                A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
-                         AND
-                                A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
-                    THEN 1
-                  </if>
-                </foreach>
+                <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
+                  WHEN
+                    <if test="permCheck.resourceIdQueryParam != null">
+                    ${permCheck.resourceIdQueryParam} IN
+                    </if>
+                    <if test="permCheck.resourceId != null">
+                    EXISTS
+                    </if>
+                      (SELECT
+                              A.RESOURCE_ID_
+                       FROM
+                              ${prefix}ACT_RU_AUTHORIZATION A
+                       WHERE
+                              A.TYPE_ = 1
+                       AND
+                              A.GROUP_ID_ IN <foreach item="item" index="index" collection="authGroupIds" open="(" separator="," close=")">#{item}</foreach>
+                       AND
+                              ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} = #{permCheck.perms,  jdbcType=INTEGER}
+                       AND
+                              A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
+                       AND
+                              A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
+                  THEN 1
+                </if>
 
                 <!-- Group REVOKES -->
-                <foreach collection="authGroupIds" index="index" item="authGroupId">
-                  <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
-                    WHEN
-                      <if test="permCheck.resourceIdQueryParam != null">
-                      ${permCheck.resourceIdQueryParam} IN
-                      </if>
-                      <if test="permCheck.resourceId != null">
-                      EXISTS
-                      </if>
-                        (SELECT
-                                A.RESOURCE_ID_
-                         FROM
-                                ${prefix}ACT_RU_AUTHORIZATION A
-                         WHERE
-                                A.TYPE_ = 2
-                         AND
-                                A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR}
-                         AND
-                                ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} != #{permCheck.perms,  jdbcType=INTEGER}
-                         AND
-                                A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
-                         AND
-                                A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
-                    THEN 0
-                  </if>
-                </foreach>
+                <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
+                  WHEN
+                    <if test="permCheck.resourceIdQueryParam != null">
+                    ${permCheck.resourceIdQueryParam} IN
+                    </if>
+                    <if test="permCheck.resourceId != null">
+                    EXISTS
+                    </if>
+                      (SELECT
+                              A.RESOURCE_ID_
+                       FROM
+                              ${prefix}ACT_RU_AUTHORIZATION A
+                       WHERE
+                              A.TYPE_ = 2
+                       AND
+                              A.GROUP_ID_ IN <foreach item="item" index="index" collection="authGroupIds" open="(" separator="," close=")">#{item}</foreach>
+                       AND
+                              ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} != #{permCheck.perms,  jdbcType=INTEGER}
+                       AND
+                              A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
+                       AND
+                              A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
+                  THEN 0
+                </if>
 
                 <!-- Group GRANTS -->
-                <foreach collection="authGroupIds" index="index" item="authGroupId">
                 WHEN
                   EXISTS
                     (SELECT
@@ -343,7 +342,7 @@
                      WHERE
                             A.TYPE_ = 1
                      AND
-                            A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR}
+                            A.GROUP_ID_ IN <foreach item="item" index="index" collection="authGroupIds" open="(" separator="," close=")">#{item}</foreach>
                      AND
                             ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} = #{permCheck.perms, jdbcType=INTEGER}
                      AND
@@ -351,10 +350,8 @@
                      AND
                             A.RESOURCE_ID_ = '*')
                   THEN 1
-                </foreach>
 
                 <!-- Group REVOKES -->
-                <foreach collection="authGroupIds" index="index" item="authGroupId">
                 WHEN
                   EXISTS
                     (SELECT
@@ -364,7 +361,7 @@
                      WHERE
                             A.TYPE_ = 2
                      AND
-                            A.GROUP_ID_ = #{authGroupId, jdbcType=VARCHAR}
+                            A.GROUP_ID_ IN <foreach item="item" index="index" collection="authGroupIds" open="(" separator="," close=")">#{item}</foreach>
                      AND
                             ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} != #{permCheck.perms, jdbcType=INTEGER}
                      AND
@@ -372,7 +369,7 @@
                      AND
                             A.RESOURCE_ID_ = '*')
                   THEN 0
-                </foreach>
+
                 ELSE (
                       SELECT
                         CASE

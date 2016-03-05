@@ -35,8 +35,9 @@ import org.camunda.bpm.engine.impl.tree.ActivityExecutionHierarchyWalker;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionMappingCollector;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionTuple;
 import org.camunda.bpm.engine.impl.tree.OutputVariablesPropagator;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker.WalkCondition;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
-import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 
 
 /**
@@ -182,7 +183,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
 
     try {
 
-      walker.walkUntil(new WalkCondition<ActivityExecutionTuple>() {
+      walker.walkUntil(new ReferenceWalker.WalkCondition<ActivityExecutionTuple>() {
 
         @Override
         public boolean isFulfilled(ActivityExecutionTuple element) {

@@ -82,6 +82,7 @@ public class HalTask extends HalResource<HalTask> {
   private String caseDefinitionId;
   private boolean suspended;
   private String formKey;
+  private String tenantId;
 
   public static HalTask generate(Task task, ProcessEngine engine) {
     return fromTask(task)
@@ -115,6 +116,7 @@ public class HalTask extends HalResource<HalTask> {
     dto.caseExecutionId = task.getCaseExecutionId();
     dto.caseInstanceId = task.getCaseInstanceId();
     dto.suspended = task.isSuspended();
+    dto.tenantId = task.getTenantId();
     try {
       dto.formKey = task.getFormKey();
     }
@@ -217,6 +219,10 @@ public class HalTask extends HalResource<HalTask> {
 
   public String getFormKey() {
     return formKey;
+  }
+
+  public String getTenantId() {
+    return tenantId;
   }
 
 }

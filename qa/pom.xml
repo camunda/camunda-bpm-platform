@@ -65,6 +65,11 @@
     <tomcat6.runtime.location>../tomcat-runtime/target/server/apache-tomcat-${version.tomcat}</tomcat6.runtime.location>
 
   </properties>
+
+  <modules>
+    <module>ensure-clean-db-plugin</module>
+  </modules>
+
   <profiles>
 
     <profile>

@@ -45,6 +45,7 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
   protected String activityId;
   protected SuspensionState suspensionState;
   protected Boolean retriesLeft;
+  protected String[] tenantIds;
 
   public ExternalTaskQueryImpl() {
   }
@@ -137,6 +138,12 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
     return this;
   }
 
+  public ExternalTaskQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   public ExternalTaskQuery orderById() {
     return orderBy(ExternalTaskQueryProperty.ID);
   }
@@ -157,6 +164,11 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
     return orderBy(ExternalTaskQueryProperty.PROCESS_DEFINITION_KEY);
   }
 
+  public ExternalTaskQuery orderByTenantId() {
+    return orderBy(ExternalTaskQueryProperty.TENANT_ID);
+  }
+
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext
@@ -164,6 +176,7 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
       .findExternalTaskCountByQueryCriteria(this);
   }
 
+  @Override
   public List<ExternalTask> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext

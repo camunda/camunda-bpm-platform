@@ -68,10 +68,10 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.api.runtime.util.SimpleSerializableBean;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
-import org.camunda.bpm.engine.test.api.runtime.util.SimpleSerializableBean;
 import org.camunda.bpm.engine.test.history.SerializableVariable;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -1676,7 +1676,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
 		 fail("exeception expected");
 	 } catch(ProcessEngineException e) {
-		 assertThat(e.getMessage(), containsString("no message start event with name 'newStartMessage' found"));
+		 assertThat(e.getMessage(), containsString("Cannot correlate message 'newStartMessage'"));
 	 }
 	 finally {
 		 // clean up

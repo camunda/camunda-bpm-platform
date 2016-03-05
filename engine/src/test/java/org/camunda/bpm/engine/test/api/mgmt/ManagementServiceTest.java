@@ -333,6 +333,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
   protected void createJob(final int retries, final String owner, final Date lockExpirationTime) {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Void>() {
+      @Override
       public Void execute(CommandContext commandContext) {
         JobManager jobManager = commandContext.getJobManager();
         MessageEntity job = new MessageEntity();
@@ -355,6 +356,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // and an inconsistent job that is never again picked up by a job executor
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Void>() {
+      @Override
       public Void execute(CommandContext commandContext) {
         JobManager jobManager = commandContext.getJobManager();
         MessageEntity job = new MessageEntity();
@@ -389,6 +391,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
 
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Void>() {
+      @Override
       public Void execute(CommandContext commandContext) {
         ((JobEntity) job).delete();
 
@@ -666,7 +669,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
 
     TableMetaData tableMetaData = managementService.getTableMetaData(tablePrefix+"ACT_RU_TASK");
     assertEquals(tableMetaData.getColumnNames().size(), tableMetaData.getColumnTypes().size());
-    assertEquals(20, tableMetaData.getColumnNames().size());
+    assertEquals(21, tableMetaData.getColumnNames().size());
 
     int assigneeIndex = tableMetaData.getColumnNames().indexOf("ASSIGNEE_");
     int createTimeIndex = tableMetaData.getColumnNames().indexOf("CREATE_TIME_");

@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.bpmn.job;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -290,5 +292,32 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     Job signalStartJob = managementService.createJobQuery().singleResult();
     assertNotNull(signalStartJob);
     assertEquals(4, signalStartJob.getPriority());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/miBodyAsyncProcess.bpmn20.xml")
+  public void FAILING_testMultiInstanceBodyActivityPriority() {
+    // given a process instance that executes an async mi body
+    runtimeService.startProcessInstanceByKey("miBodyAsyncPriorityProcess");
+
+    // then there is a job that has the priority as defined on the activity
+    assertEquals(1, managementService.createJobQuery().count());
+    Job miBodyJob = managementService.createJobQuery().singleResult();
+    assertNotNull(miBodyJob);
+    assertEquals(5, miBodyJob.getPriority());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/miInnerAsyncProcess.bpmn20.xml")
+  public void testMultiInstanceInnerActivityPriority() {
+    // given a process instance that executes an async mi inner activity
+    runtimeService.startProcessInstanceByKey("miBodyAsyncPriorityProcess");
+
+    // then there are three jobs that have the priority as defined on the activity (TODO: or should it be MI characteristics?)
+    List<Job> jobs = managementService.createJobQuery().list();
+
+    assertEquals(3, jobs.size());
+    for (Job job : jobs) {
+      assertNotNull(job);
+      assertEquals(5, job.getPriority());
+    }
   }
 }

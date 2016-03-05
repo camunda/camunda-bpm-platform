@@ -66,4 +66,16 @@ public abstract class TimerEventJobHandler implements JobHandler {
     return configParts;
   }
 
+  public static String updateKeyInConfiguration(String configuration, String key) {
+    String newConfiguration = key;
+    if (containsDelimiter(configuration)) {
+      String[] configParts = getConfigParts(configuration);
+      for (int i = 1; i < configParts.length; i++) {
+        newConfiguration += JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + configParts[i];
+      }
+    }
+
+    return newConfiguration;
+  }
+
 }

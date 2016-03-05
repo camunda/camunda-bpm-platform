@@ -9,10 +9,9 @@ create table ACT_RE_DECISION_DEF (
     DEPLOYMENT_ID_ varchar(64),
     RESOURCE_NAME_ varchar(4000),
     DGRM_RESOURCE_NAME_ varchar(4000),
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
--- create unique constraint on ACT_RE_DECISION_DEF --
-alter table ACT_RE_DECISION_DEF
-    add constraint ACT_UNIQ_DECISION_DEF
-    unique (KEY_,VERSION_);
+create index ACT_IDX_DEC_DEF_TENANT_ID on ACT_RE_DECISION_DEF(TENANT_ID_);
+    

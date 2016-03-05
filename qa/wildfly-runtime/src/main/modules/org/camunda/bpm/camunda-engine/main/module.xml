@@ -36,5 +36,7 @@
 
     <module name="org.camunda.bpm.dmn.camunda-engine-dmn" />
 
+    <module name="org.slf4j" />
+
   </dependencies>
 </module>

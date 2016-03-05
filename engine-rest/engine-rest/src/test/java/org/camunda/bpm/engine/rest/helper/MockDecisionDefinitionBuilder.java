@@ -27,6 +27,7 @@ public class MockDecisionDefinitionBuilder {
   private String resource = null;
   protected String diagramResource = null;
   private String deploymentId = null;
+  private String tenantId = null;
 
   public MockDecisionDefinitionBuilder id(String id) {
     this.id = id;
@@ -68,6 +69,11 @@ public class MockDecisionDefinitionBuilder {
     return this;
   }
 
+  public MockDecisionDefinitionBuilder tenantId(String tenantId) {
+    this.tenantId = tenantId;
+    return this;
+  }
+
   public DecisionDefinition build() {
     DecisionDefinition mockDefinition = mock(DecisionDefinition.class);
 
@@ -79,6 +85,7 @@ public class MockDecisionDefinitionBuilder {
     when(mockDefinition.getResourceName()).thenReturn(resource);
     when(mockDefinition.getDiagramResourceName()).thenReturn(diagramResource);
     when(mockDefinition.getDeploymentId()).thenReturn(deploymentId);
+    when(mockDefinition.getTenantId()).thenReturn(tenantId);
 
     return mockDefinition;
   }

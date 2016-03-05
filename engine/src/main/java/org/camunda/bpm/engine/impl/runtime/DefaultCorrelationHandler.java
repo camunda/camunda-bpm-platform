@@ -14,15 +14,18 @@
 package org.camunda.bpm.engine.impl.runtime;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
+
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
-import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -42,36 +45,39 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
     // first try to correlate to execution
     List<MessageCorrelationResult> correlations = correlateMessageToExecutions(commandContext, messageName, correlationSet);
 
-    if(correlations.size() > 1) {
-      throw new MismatchingMessageCorrelationException(messageName, correlationSet.getBusinessKey(), correlationSet.getCorrelationKeys(),
-          String.valueOf(correlations.size()) + " executions match the correlation keys. Should be one or zero.");
-    }
-    else if(!correlations.isEmpty()) {
+    if (correlations.size() > 1) {
+      throw LOG.exceptionCorrelateMessageToSingleExecution(messageName, correlations.size(), correlationSet);
+
+    } else if (correlations.size() == 1) {
       return correlations.get(0);
     }
 
-    // if unsuccessful, correlate to process definition
-    return tryCorrelateMessageToProcessDefinition(commandContext, messageName, correlationSet);
+    // then try to correlate to process definition
+    correlations = correlateStartMessages(commandContext, messageName, correlationSet);
+
+    if (correlations.size() > 1) {
+      throw LOG.exceptionCorrelateMessageToSingleProcessDefinition(messageName, correlations.size(), correlationSet);
+
+    } else if (correlations.size() == 1) {
+      return correlations.get(0);
+
+    } else {
+      return null;
+    }
   }
 
   public List<MessageCorrelationResult> correlateMessages(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
-
-    List<MessageCorrelationResult> result = new ArrayList<MessageCorrelationResult>();
+    List<MessageCorrelationResult> results = new ArrayList<MessageCorrelationResult>();
 
     // first collect correlations to executions
-    result.addAll(correlateMessageToExecutions(commandContext, messageName, correlationSet));
+    results.addAll(correlateMessageToExecutions(commandContext, messageName, correlationSet));
+    // now collect correlations to process definition
+    results.addAll(correlateStartMessages(commandContext, messageName, correlationSet));
 
-    // now collect a potential correlation to process definition
-    MessageCorrelationResult processDefinitionCorrelation = tryCorrelateMessageToProcessDefinition(commandContext, messageName, correlationSet);
-    if(processDefinitionCorrelation != null) {
-      result.add(processDefinitionCorrelation);
-    }
-
-    return result;
+    return results;
   }
 
-  protected List<MessageCorrelationResult> correlateMessageToExecutions(CommandContext commandContext, String messageName,
-      CorrelationSet correlationSet) {
+  protected List<MessageCorrelationResult> correlateMessageToExecutions(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
 
     ExecutionQueryImpl query = new ExecutionQueryImpl();
 
@@ -83,12 +89,12 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
     }
 
     String businessKey = correlationSet.getBusinessKey();
-    if(businessKey != null) {
+    if (businessKey != null) {
       query.processInstanceBusinessKey(businessKey);
     }
 
     String processInstanceId = correlationSet.getProcessInstanceId();
-    if(processInstanceId != null) {
+    if (processInstanceId != null) {
       query.processInstanceId(processInstanceId);
     }
 
@@ -98,6 +104,15 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
       query.messageEventSubscription();
     }
 
+    if (correlationSet.isTenantIdSet) {
+      String tenantId = correlationSet.getTenantId();
+      if (tenantId != null) {
+        query.tenantIdIn(tenantId);
+      } else {
+        query.withoutTenantId();
+      }
+    }
+
     // restrict to active executions
     query.active();
 
@@ -105,39 +120,100 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
 
     List<MessageCorrelationResult> result = new ArrayList<MessageCorrelationResult>(matchingExecutions.size());
 
-    for(Execution matchingExecution: matchingExecutions) {
-      result.add(MessageCorrelationResult.matchedExecution((ExecutionEntity) matchingExecution));
+    for (Execution matchingExecution : matchingExecutions) {
+      MessageCorrelationResult correlationResult = MessageCorrelationResult.matchedExecution((ExecutionEntity) matchingExecution);
+      result.add(correlationResult);
     }
 
     return result;
   }
 
-  protected MessageCorrelationResult tryCorrelateMessageToProcessDefinition(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
+  @Override
+  public List<MessageCorrelationResult> correlateStartMessages(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
     if (messageName == null) {
-      return null;
+      // ignore empty message name
+      return Collections.emptyList();
     }
 
-    MessageEventSubscriptionEntity messageEventSubscription = commandContext.getEventSubscriptionManager()
-      .findMessageStartEventSubscriptionByName(messageName);
-    if(messageEventSubscription == null || messageEventSubscription.getConfiguration() == null) {
-      return null;
+    if (correlationSet.getProcessDefinitionId() == null) {
+      return correlateStartMessageByEventSubscription(commandContext, messageName, correlationSet);
 
     } else {
-      DeploymentCache deploymentCache = Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache();
-
-      String processDefinitionId = messageEventSubscription.getConfiguration();
-      ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-      // only an active process definition will be returned
-      if (processDefinition == null || processDefinition.isSuspended()) {
-        LOG.couldNotFindProcessDefinitionForEventSubscription(messageEventSubscription, processDefinitionId);
-        return null;
-
+      MessageCorrelationResult correlationResult = correlateStartMessageByProcessDefinitionId(commandContext, messageName, correlationSet.getProcessDefinitionId());
+      if (correlationResult != null) {
+        return Collections.singletonList(correlationResult);
       } else {
-        return MessageCorrelationResult.matchedProcessDefinition(processDefinition, messageEventSubscription.getActivityId());
+        return Collections.emptyList();
       }
     }
+  }
+
+  protected List<MessageCorrelationResult> correlateStartMessageByEventSubscription(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
+    List<MessageCorrelationResult> results = new ArrayList<MessageCorrelationResult>();
+    DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentCache();
+
+    List<MessageEventSubscriptionEntity> messageEventSubscriptions = findMessageStartEventSubscriptions(commandContext, messageName, correlationSet);
+
+    for (MessageEventSubscriptionEntity messageEventSubscription : messageEventSubscriptions) {
+
+      if (messageEventSubscription.getConfiguration() != null) {
+        String processDefinitionId = messageEventSubscription.getConfiguration();
+        ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
+        // only an active process definition will be returned
+        if (processDefinition != null && !processDefinition.isSuspended()) {
+          MessageCorrelationResult result = MessageCorrelationResult.matchedProcessDefinition(processDefinition, messageEventSubscription.getActivityId());
+          results.add(result);
+
+        } else {
+          LOG.couldNotFindProcessDefinitionForEventSubscription(messageEventSubscription, processDefinitionId);
+        }
+      }
+    }
+    return results;
+  }
+
+  protected List<MessageEventSubscriptionEntity> findMessageStartEventSubscriptions(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
+    EventSubscriptionManager eventSubscriptionManager = commandContext.getEventSubscriptionManager();
+
+    if (correlationSet.isTenantIdSet) {
+      MessageEventSubscriptionEntity eventSubscription = eventSubscriptionManager.findMessageStartEventSubscriptionByNameAndTenantId(messageName, correlationSet.getTenantId());
+      if (eventSubscription != null) {
+        return Collections.singletonList(eventSubscription);
+      } else {
+        return Collections.emptyList();
+      }
+
+    } else {
+      return eventSubscriptionManager.findMessageStartEventSubscriptionByName(messageName);
+    }
+  }
+
+  protected MessageCorrelationResult correlateStartMessageByProcessDefinitionId(CommandContext commandContext, String messageName, String processDefinitionId) {
+    DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentCache();
+    ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
+    // only an active process definition will be returned
+    if (processDefinition != null && !processDefinition.isSuspended()) {
+
+      String startActivityId = findStartActivityIdByMessage(processDefinition, messageName);
+      if (startActivityId != null) {
+        return MessageCorrelationResult.matchedProcessDefinition(processDefinition, startActivityId);
+      }
+    }
+    return null;
+  }
+
+  protected String findStartActivityIdByMessage(ProcessDefinitionEntity processDefinition, String messageName) {
+    for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(processDefinition)) {
+      if (isMessageStartEventWithName(declaration, messageName)) {
+        return declaration.getActivityId();
+      }
+    }
+    return null;
+  }
+
+  protected boolean isMessageStartEventWithName(EventSubscriptionDeclaration declaration, String messageName) {
+    return MessageEventHandler.EVENT_HANDLER_TYPE.equals(declaration.getEventType()) && declaration.isStartEvent()
+        && messageName.equals(declaration.getEventName());
   }
 
 }

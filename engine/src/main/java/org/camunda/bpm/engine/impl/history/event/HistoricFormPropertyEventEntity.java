@@ -60,6 +60,7 @@ public class HistoricFormPropertyEventEntity extends HistoricDetailEventEntity {
            + ", processDefinitionId=" + processDefinitionId
            + ", processInstanceId=" + processInstanceId
            + ", taskId=" + taskId
+           + ", tenantId=" + tenantId
            + "]";
   }
 

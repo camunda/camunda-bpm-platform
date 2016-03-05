@@ -13,7 +13,7 @@
 package org.camunda.bpm.engine.impl.tree;
 
 /**
- * A visitor for {@link TreeWalker}.
+ * A visitor for {@link SingleReferenceWalker}.
  *
  * @author Thorben Lindhauer
  *

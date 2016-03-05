@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.repository;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +43,7 @@ public class CaseDefinitionQueryDto extends AbstractQueryDto<CaseDefinitionQuery
   private static final String SORT_BY_VERSION_VALUE = "version";
   private static final String SORT_BY_DEPLOYMENT_ID_VALUE = "deploymentId";
   private static final String SORT_BY_CATEGORY_VALUE = "category";
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
 
@@ -53,7 +56,7 @@ public class CaseDefinitionQueryDto extends AbstractQueryDto<CaseDefinitionQuery
     VALID_SORT_BY_VALUES.add(SORT_BY_NAME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_VERSION_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEPLOYMENT_ID_VALUE);
-
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   protected String caseDefinitionId;
@@ -69,6 +72,9 @@ public class CaseDefinitionQueryDto extends AbstractQueryDto<CaseDefinitionQuery
   protected String resourceNameLike;
   protected Integer version;
   protected Boolean latestVersion;
+  protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
+  protected Boolean includeDefinitionsWithoutTenantId;
 
   public CaseDefinitionQueryDto() {}
 
@@ -150,6 +156,21 @@ public class CaseDefinitionQueryDto extends AbstractQueryDto<CaseDefinitionQuery
     this.latestVersion = latestVersion;
   }
 
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
+  @CamundaQueryParam(value = "includeCaseDefinitionsWithoutTenantId", converter = BooleanConverter.class)
+  public void setIncludeCaseDefinitionsWithoutTenantId(Boolean includeDefinitionsWithoutTenantId) {
+    this.includeDefinitionsWithoutTenantId = includeDefinitionsWithoutTenantId;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -198,8 +219,17 @@ public class CaseDefinitionQueryDto extends AbstractQueryDto<CaseDefinitionQuery
     if (version != null) {
       query.caseDefinitionVersion(version);
     }
-    if (latestVersion != null && latestVersion) {
+    if (TRUE.equals(latestVersion)) {
       query.latestVersion();
+    }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
+    }
+    if (TRUE.equals(includeDefinitionsWithoutTenantId)) {
+      query.includeCaseDefinitionsWithoutTenantId();
     }
   }
 
@@ -217,6 +247,8 @@ public class CaseDefinitionQueryDto extends AbstractQueryDto<CaseDefinitionQuery
       query.orderByCaseDefinitionName();
     } else if (sortBy.equals(SORT_BY_DEPLOYMENT_ID_VALUE)) {
       query.orderByDeploymentId();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 

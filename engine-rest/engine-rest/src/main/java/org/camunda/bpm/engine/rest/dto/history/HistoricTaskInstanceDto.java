@@ -45,6 +45,7 @@ public class HistoricTaskInstanceDto {
   protected Date due;
   protected String parentTaskId;
   protected Date followUp;
+  private String tenantId;
 
   public String getId() {
     return id;
@@ -138,6 +139,10 @@ public class HistoricTaskInstanceDto {
     return followUp;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
   public static HistoricTaskInstanceDto fromHistoricTaskInstance(HistoricTaskInstance taskInstance) {
 
     HistoricTaskInstanceDto dto = new HistoricTaskInstanceDto();
@@ -165,6 +170,7 @@ public class HistoricTaskInstanceDto {
     dto.due = taskInstance.getDueDate();
     dto.parentTaskId = taskInstance.getParentTaskId();
     dto.followUp = taskInstance.getFollowUpDate();
+    dto.tenantId = taskInstance.getTenantId();
 
     return dto;
   }

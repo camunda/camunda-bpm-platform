@@ -70,6 +70,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   public static final String SORT_BY_NAME_VALUE = "name";
   public static final String SORT_BY_NAME_CASE_INSENSITIVE_VALUE = "nameCaseInsensitive";
   public static final String SORT_BY_PRIORITY_VALUE = "priority";
+  public static final String SORT_BY_TENANT_ID_VALUE = "tenantId";
 
   public static final String SORT_BY_PROCESS_VARIABLE = "processVariable";
   public static final String SORT_BY_EXECUTION_VARIABLE = "executionVariable";
@@ -93,6 +94,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_NAME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_NAME_CASE_INSENSITIVE_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_PRIORITY_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID_VALUE);
   }
 
   public static final String SORT_PARAMETERS_VARIABLE_NAME = "variable";
@@ -106,6 +108,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String processDefinitionId;
   private String executionId;
   private String[] activityInstanceIdIn;
+  private String[] tenantIdIn;
   private String processDefinitionName;
   private String processDefinitionNameLike;
   private String processInstanceId;
@@ -222,6 +225,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam(value="activityInstanceIdIn", converter = StringArrayConverter.class)
   public void setActivityInstanceIdIn(String[] activityInstanceIdIn) {
     this.activityInstanceIdIn = activityInstanceIdIn;
+  }
+
+  @CamundaQueryParam(value="tenantIdIn", converter = StringArrayConverter.class)
+  public void setTenantIdIn(String[] tenantIdIn) {
+    this.tenantIdIn = tenantIdIn;
   }
 
   @CamundaQueryParam("processDefinitionName")
@@ -604,6 +612,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return activityInstanceIdIn;
   }
 
+  public String[] getTenantIdIn() {
+    return tenantIdIn;
+  }
+
   public String getProcessDefinitionName() {
     return processDefinitionName;
   }
@@ -885,6 +897,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (activityInstanceIdIn != null && activityInstanceIdIn.length > 0) {
       query.activityInstanceIdIn(activityInstanceIdIn);
+    }
+    if (tenantIdIn != null && tenantIdIn.length > 0) {
+      query.tenantIdIn(tenantIdIn);
     }
     if (processDefinitionName != null) {
       query.processDefinitionName(processDefinitionName);
@@ -1178,6 +1193,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
       query.orderByTaskId();
     } else if (sortBy.equals(SORT_BY_NAME_VALUE)) {
       query.orderByTaskName();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID_VALUE)) {
+      query.orderByTenantId();
     } else if (sortBy.equals(SORT_BY_NAME_CASE_INSENSITIVE_VALUE)) {
       query.orderByTaskNameCaseInsensitive();
     } else if (sortBy.equals(SORT_BY_PRIORITY_VALUE)) {
@@ -1260,7 +1277,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.processDefinitionKeyIn = taskQuery.getProcessDefinitionKeys();
     dto.processDefinitionId = taskQuery.getProcessDefinitionId();
     dto.executionId = taskQuery.getExecutionId();
-    dto.activityInstanceIdIn = taskQuery.getActivityInstanceIdIn();
+    dto.tenantIdIn = taskQuery.getTenantIds();
     dto.processDefinitionName = taskQuery.getProcessDefinitionName();
     dto.processDefinitionNameLike = taskQuery.getProcessDefinitionNameLike();
     dto.processInstanceId = taskQuery.getProcessInstanceId();

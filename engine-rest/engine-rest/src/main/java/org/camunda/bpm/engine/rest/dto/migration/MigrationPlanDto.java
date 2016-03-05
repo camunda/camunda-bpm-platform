@@ -51,7 +51,7 @@ public class MigrationPlanDto {
     this.instructions = instructions;
   }
 
-  public static MigrationPlanDto fromMigrationPlan(MigrationPlan migrationPlan) {
+  public static MigrationPlanDto from(MigrationPlan migrationPlan) {
     MigrationPlanDto dto = new MigrationPlanDto();
 
     dto.setSourceProcessDefinitionId(migrationPlan.getSourceProcessDefinitionId());
@@ -59,7 +59,7 @@ public class MigrationPlanDto {
 
     ArrayList<MigrationInstructionDto> instructionDtos = new ArrayList<MigrationInstructionDto>();
     for (MigrationInstruction migrationInstruction : migrationPlan.getInstructions()) {
-      MigrationInstructionDto migrationInstructionDto = MigrationInstructionDto.fromMigrationInstruction(migrationInstruction);
+      MigrationInstructionDto migrationInstructionDto = MigrationInstructionDto.from(migrationInstruction);
       instructionDtos.add(migrationInstructionDto);
     }
     dto.setInstructions(instructionDtos);
@@ -71,7 +71,7 @@ public class MigrationPlanDto {
     MigrationPlanBuilder migrationPlanBuilder = processEngine.getRuntimeService().createMigrationPlan(migrationPlanDto.getSourceProcessDefinitionId(), migrationPlanDto.getTargetProcessDefinitionId());
 
     for (MigrationInstructionDto migrationInstructionDto : migrationPlanDto.getInstructions()) {
-      migrationPlanBuilder.mapActivities(migrationInstructionDto.getSourceActivityIds(), migrationInstructionDto.getTargetActivityIds());
+      migrationPlanBuilder.mapActivities(migrationInstructionDto.getSourceActivityIds().get(0), migrationInstructionDto.getTargetActivityIds().get(0));
     }
 
     return migrationPlanBuilder.build();

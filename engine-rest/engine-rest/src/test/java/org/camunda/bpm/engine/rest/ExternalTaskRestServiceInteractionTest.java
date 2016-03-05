@@ -139,6 +139,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
       .body("[0].activityInstanceId", equalTo(MockProvider.EXAMPLE_ACTIVITY_INSTANCE_ID))
       .body("[0].processDefinitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
       .body("[0].processDefinitionKey", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY))
+      .body("[0].tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
       .body("[0].retries", equalTo(MockProvider.EXTERNAL_TASK_RETRIES))
       .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
       .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME,
@@ -542,6 +543,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
       .body("suspended", equalTo(MockProvider.EXTERNAL_TASK_SUSPENDED))
       .body("topicName", equalTo(MockProvider.EXTERNAL_TASK_TOPIC_NAME))
       .body("workerId", equalTo(MockProvider.EXTERNAL_TASK_WORKER_ID))
+      .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
     .when()
       .get(SINGLE_EXTERNAL_TASK_URL);
   }

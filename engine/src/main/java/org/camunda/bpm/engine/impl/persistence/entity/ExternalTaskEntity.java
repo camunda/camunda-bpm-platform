@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -52,6 +53,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected String processDefinitionKey;
   protected String activityId;
   protected String activityInstanceId;
+  protected String tenantId;
 
   protected ExecutionEntity execution;
 
@@ -134,6 +136,12 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
   }
+  public String getTenantId() {
+    return tenantId;
+  }
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
   public Integer getRetries() {
     return retries;
   }
@@ -164,6 +172,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     persistentState.put("activityId", activityId);
     persistentState.put("activityInstanceId", activityInstanceId);
     persistentState.put("suspensionState", suspensionState);
+    persistentState.put("tenantId", tenantId);
 
     return persistentState;
   }
@@ -223,7 +232,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
         .getProcessEngineConfiguration()
         .getIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
 
-    incidentHandler.handleIncident(processDefinitionId, activityId, executionId, id, errorMessage);
+    incidentHandler.handleIncident(createIncidentContext(), errorMessage);
   }
 
   protected void removeIncident() {
@@ -231,7 +240,17 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
         .getProcessEngineConfiguration()
         .getIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
 
-    handler.resolveIncident(getProcessDefinitionId(), null, executionId, id);
+    handler.resolveIncident(createIncidentContext());
+  }
+
+  protected IncidentContext createIncidentContext() {
+    IncidentContext context = new IncidentContext();
+    context.setProcessDefinitionId(processDefinitionId);
+    context.setExecutionId(executionId);
+    context.setActivityId(activityId);
+    context.setTenantId(tenantId);
+    context.setConfiguration(id);
+    return context;
   }
 
   public void lock(String workerId, long lockDuration) {
@@ -264,6 +283,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     }
   }
 
+  @Override
   public String toString() {
     return "ExternalTaskEntity ["
         + "id=" + id
@@ -288,6 +308,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     externalTask.setProcessDefinitionId(execution.getProcessDefinitionId());
     externalTask.setActivityId(execution.getActivityId());
     externalTask.setActivityInstanceId(execution.getActivityInstanceId());
+    externalTask.setTenantId(execution.getTenantId());
 
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
     externalTask.setProcessDefinitionKey(processDefinition.getKey());

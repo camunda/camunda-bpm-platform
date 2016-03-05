@@ -300,16 +300,6 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     }
   }
 
-  @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
-  public void testStartProcessInstanceWithoutInstantiationInstruction() {
-    try {
-      runtimeService.createProcessInstanceByKey("exclusiveGateway").execute();
-      fail("exception expected; at least one modification instruction required");
-    } catch (ProcessEngineException e) {
-      assertTextPresent("At least one instantiation instruction required", e.getMessage());
-    }
-  }
-
   @Deployment(resources = LISTENERS_PROCESS)
   public void testListenerInvocation() {
     RecorderExecutionListener.clear();

@@ -135,5 +135,12 @@ public class ServiceNames {
     return BPM_PLATFORM_PLUGINS;
   }
 
+  /**
+   * @return the {@link ServiceName} of the {@link ProcessApplicationStopService}
+   */
+  public static ServiceName forProcessApplicationStopService(String moduleName) {
+    return PROCESS_APPLICATION_MODULE.append(moduleName).append("STOP");
+  }
+
 
 }

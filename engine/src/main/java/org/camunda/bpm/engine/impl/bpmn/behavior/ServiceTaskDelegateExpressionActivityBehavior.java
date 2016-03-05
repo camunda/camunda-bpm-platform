@@ -17,6 +17,7 @@ import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.applyFieldDecla
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -62,7 +63,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
           signal(execution, signalName, signalData);
           return null;
         }
-      }, targetProcessApplication);
+      }, targetProcessApplication, new InvocationContext(execution));
     }
     else {
       doSignal(execution, signalName, signalData);
@@ -92,7 +93,8 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
     });
   }
 
-	public void execute(final ActivityExecution execution) throws Exception {
+	@Override
+  public void execute(final ActivityExecution execution) throws Exception {
 	  Callable<Void> callable = new Callable<Void>() {
       @Override
       public Void call() throws Exception {

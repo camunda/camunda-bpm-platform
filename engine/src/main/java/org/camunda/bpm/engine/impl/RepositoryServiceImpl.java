@@ -32,8 +32,8 @@ import org.camunda.bpm.engine.impl.cmd.AddIdentityLinkForProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteIdentityLinkForProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeployCmd;
+import org.camunda.bpm.engine.impl.cmd.GetDeployedProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentBpmnModelInstanceCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDiagramCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDiagramLayoutCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessModelCmd;
@@ -143,11 +143,11 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   public ProcessDefinition getProcessDefinition(String processDefinitionId) {
-    return commandExecutor.execute(new GetDeploymentProcessDefinitionCmd(processDefinitionId));
+    return commandExecutor.execute(new GetDeployedProcessDefinitionCmd(processDefinitionId, true));
   }
 
   public ReadOnlyProcessDefinition getDeployedProcessDefinition(String processDefinitionId) {
-    return commandExecutor.execute(new GetDeploymentProcessDefinitionCmd(processDefinitionId));
+    return commandExecutor.execute(new GetDeployedProcessDefinitionCmd(processDefinitionId, true));
   }
 
   public void suspendProcessDefinitionById(String processDefinitionId) {

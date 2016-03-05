@@ -18,10 +18,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
@@ -345,32 +343,13 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     return result;
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   protected List<ExecutionEntity> loadFromDb(final String processInstanceId, final CommandContext commandContext) {
-    List<ExecutionEntity> executions = commandContext.runWithoutAuthorization(new Callable<List<ExecutionEntity>>() {
-      public List<ExecutionEntity> call() throws Exception {
-        return (List) new ExecutionQueryImpl()
-          .processInstanceId(processInstanceId)
-          .list();
-      }
-    });
+    List<ExecutionEntity> executions = commandContext.getExecutionManager().findExecutionsByProcessInstanceId(processInstanceId);
+    ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
 
     // initialize parent/child sets
-    Map<String, List<ExecutionEntity>> executionsByParent = new HashMap<String, List<ExecutionEntity>>();
-    for (ExecutionEntity execution : executions) {
-      putListElement(executionsByParent, execution.getParentId(), execution);
-    }
-
-    for (ExecutionEntity execution : executions) {
-      List<ExecutionEntity> children = executionsByParent.get(execution.getId());
-      if (children != null) {
-        for (ExecutionEntity child : children) {
-          child.setParent(execution);
-        }
-      }
-      else {
-        execution.setExecutions(new ArrayList<ExecutionEntity>());
-      }
+    if (processInstance != null) {
+      processInstance.restoreProcessInstance(executions, null, null, null, null, null);
     }
 
     return executions;

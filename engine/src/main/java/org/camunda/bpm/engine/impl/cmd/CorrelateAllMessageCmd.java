@@ -16,11 +16,11 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
@@ -31,12 +31,7 @@ import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
  * @author Daniel Meyer
  * @author Michael Scholz
  */
-public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd {
-
-  public CorrelateAllMessageCmd(String messageName, String businessKey,
-      Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
-    super(messageName, businessKey, correlationKeys, processVariables);
-  }
+public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd implements Command<Void> {
 
   /**
    * Initialize the command with a builder
@@ -48,11 +43,12 @@ public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd {
   }
 
   public Void execute(final CommandContext commandContext) {
-    ensureAtLeastOneNotNull("At least one of the following correlation criteria has to be present: "
-        + "messageName, businessKey, correlationKeys, processInstanceId", messageName, businessKey, correlationKeys, processInstanceId);
+    ensureAtLeastOneNotNull(
+        "At least one of the following correlation criteria has to be present: " + "messageName, businessKey, correlationKeys, processInstanceId", messageName,
+        builder.getBusinessKey(), builder.getCorrelationProcessInstanceVariables(), builder.getProcessInstanceId());
 
     final CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
-    final CorrelationSet correlationSet = new CorrelationSet(businessKey, processInstanceId, correlationKeys);
+    final CorrelationSet correlationSet = new CorrelationSet(builder);
     List<MessageCorrelationResult> correlationResults = commandContext.runWithoutAuthorization(new Callable<List<MessageCorrelationResult>>() {
       public List<MessageCorrelationResult> call() throws Exception {
         return correlationHandler.correlateMessages(commandContext, messageName, correlationSet);

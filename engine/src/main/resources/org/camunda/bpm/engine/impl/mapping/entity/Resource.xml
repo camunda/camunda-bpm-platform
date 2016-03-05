@@ -149,6 +149,9 @@
     <if test="parameter.tenantId != null">
       and D.TENANT_ID_ = #{ parameter.tenantId }
     </if>
+    <if test="parameter.tenantId == null">
+      and D.TENANT_ID_ is null
+    </if>
   </sql>
 
   <!-- postgresql specific -->

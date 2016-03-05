@@ -19,8 +19,8 @@ import org.camunda.bpm.engine.variable.Variables;
 
 public class InvoiceTestCase extends ProcessEngineTestCase {
 
-  @Deployment(resources= {"invoice.bpmn", "assign-approver-groups.dmn"})
-  public void testHappyPath() {
+  @Deployment(resources= {"invoice.v1.bpmn", "assign-approver-groups.dmn"})
+  public void testHappyPathV1() {
     InputStream invoiceInputStream = InvoiceProcessApplication.class.getClassLoader().getResourceAsStream("invoice.pdf");
     VariableMap variables = Variables.createVariables()
       .putValue("creditor", "Great Pizza for Everyone Inc.")
@@ -62,7 +62,50 @@ public class InvoiceTestCase extends ProcessEngineTestCase {
     assertProcessEnded(pi.getId());
   }
 
-  @Deployment(resources= {"invoice.bpmn", "assign-approver-groups.dmn"})
+  @Deployment(resources= {"invoice.v2.bpmn", "assign-approver-groups.dmn"})
+  public void testHappyPathV2() {
+    InputStream invoiceInputStream = InvoiceProcessApplication.class.getClassLoader().getResourceAsStream("invoice.pdf");
+    VariableMap variables = Variables.createVariables()
+      .putValue("creditor", "Great Pizza for Everyone Inc.")
+      .putValue("amount", 300.0d)
+      .putValue("invoiceCategory", "Travel Expenses")
+      .putValue("invoiceNumber", "GPFE-23232323")
+      .putValue("invoiceDocument", fileValue("invoice.pdf")
+        .file(invoiceInputStream)
+        .mimeType("application/pdf")
+        .create());
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("invoice", variables);
+
+    Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+    assertEquals("approveInvoice", task.getTaskDefinitionKey());
+
+    List<IdentityLink> links = taskService.getIdentityLinksForTask(task.getId());
+    Set<String> approverGroups = new HashSet<String>();
+    for (IdentityLink link : links) {
+      approverGroups.add(link.getGroupId());
+    }
+    assertEquals(2, approverGroups.size());
+    assertTrue(approverGroups.contains("accounting"));
+    assertTrue(approverGroups.contains("sales"));
+
+    variables.clear();
+    variables.put("approved", Boolean.TRUE);
+    taskService.complete(task.getId(), variables);
+
+    task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+
+    assertEquals("prepareBankTransfer", task.getTaskDefinitionKey());
+    taskService.complete(task.getId());
+
+    Job archiveInvoiceJob = managementService.createJobQuery().singleResult();
+    assertNotNull(archiveInvoiceJob);
+    managementService.executeJob(archiveInvoiceJob.getId());
+
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment(resources= {"invoice.v2.bpmn", "assign-approver-groups.dmn"})
   public void testApproveInvoiceAssignment() {
     InputStream invoiceInputStream = InvoiceProcessApplication.class.getClassLoader().getResourceAsStream("invoice.pdf");
 

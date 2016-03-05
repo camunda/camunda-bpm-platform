@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
@@ -60,6 +61,7 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   private static final String SORT_BY_DELETE_REASON = "deleteReason";
   private static final String SORT_BY_TASK_DEF_KEY = "taskDefinitionKey";
   private static final String SORT_BY_PRIORITY = "priority";
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -85,6 +87,7 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     VALID_SORT_BY_VALUES.add(SORT_BY_DELETE_REASON);
     VALID_SORT_BY_VALUES.add(SORT_BY_TASK_DEF_KEY);
     VALID_SORT_BY_VALUES.add(SORT_BY_PRIORITY);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   protected String taskId;
@@ -117,6 +120,7 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected Date taskFollowUpDate;
   protected Date taskFollowUpDateBefore;
   protected Date taskFollowUpDateAfter;
+  private List<String> tenantIds;
 
   protected String caseDefinitionId;
   protected String caseDefinitionKey;
@@ -318,6 +322,11 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     this.caseExecutionId = caseExecutionId;
   }
 
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -435,6 +444,9 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     if (caseExecutionId != null) {
       query.caseExecutionId(caseExecutionId);
     }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
 
     if (taskVariables != null) {
       for (VariableQueryParameterDto variableQueryParam : taskVariables) {
@@ -507,6 +519,8 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
       query.orderByCaseInstanceId();
     } else if (sortBy.equals(SORT_BY_CASE_EXEC_ID)) {
       query.orderByCaseExecutionId();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 

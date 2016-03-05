@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,12 +71,14 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
   protected static final String CASE_DEFINITION_URL = TEST_RESOURCE_ROOT_PATH + "/case-definition";
   protected static final String SINGLE_CASE_DEFINITION_URL = CASE_DEFINITION_URL + "/{id}";
   protected static final String SINGLE_CASE_DEFINITION_BY_KEY_URL = CASE_DEFINITION_URL + "/key/{key}";
+  protected static final String SINGLE_CASE_DEFINITION_BY_KEY_AND_TENANT_ID_URL = CASE_DEFINITION_URL + "/key/{key}/tenant-id/{tenant-id}";
 
   protected static final String XML_DEFINITION_URL = SINGLE_CASE_DEFINITION_URL + "/xml";
   protected static final String XML_DEFINITION_BY_KEY_URL = SINGLE_CASE_DEFINITION_BY_KEY_URL + "/xml";
 
   protected static final String CREATE_INSTANCE_URL = SINGLE_CASE_DEFINITION_URL + "/create";
   protected static final String CREATE_INSTANCE_BY_KEY_URL = SINGLE_CASE_DEFINITION_BY_KEY_URL + "/create";
+  protected static final String CREATE_INSTANCE_BY_KEY_AND_TENANT_ID_URL = SINGLE_CASE_DEFINITION_BY_KEY_AND_TENANT_ID_URL + "/create";
 
   protected static final String DIAGRAM_DEFINITION_URL = SINGLE_CASE_DEFINITION_URL + "/diagram";
 
@@ -91,17 +94,7 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
   public void setUpRuntime() {
     CaseDefinition mockCaseDefinition = MockProvider.createMockCaseDefinition();
 
-    repositoryServiceMock = mock(RepositoryService.class);
-
-    when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
-    when(repositoryServiceMock.getCaseDefinition(eq(MockProvider.EXAMPLE_CASE_DEFINITION_ID))).thenReturn(mockCaseDefinition);
-    when(repositoryServiceMock.getCaseModel(eq(MockProvider.EXAMPLE_CASE_DEFINITION_ID))).thenReturn(createMockCaseDefinitionCmmnXml());
-
-    caseDefinitionQueryMock = mock(CaseDefinitionQuery.class);
-    when(caseDefinitionQueryMock.caseDefinitionKey(MockProvider.EXAMPLE_CASE_DEFINITION_KEY)).thenReturn(caseDefinitionQueryMock);
-    when(caseDefinitionQueryMock.latestVersion()).thenReturn(caseDefinitionQueryMock);
-    when(caseDefinitionQueryMock.singleResult()).thenReturn(mockCaseDefinition);
-    when(repositoryServiceMock.createCaseDefinitionQuery()).thenReturn(caseDefinitionQueryMock);
+    setUpRuntimeData(mockCaseDefinition);
 
     caseServiceMock = mock(CaseService.class);
 
@@ -114,6 +107,23 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
     when(caseInstanceBuilder.businessKey(anyString())).thenReturn(caseInstanceBuilder);
     when(caseInstanceBuilder.setVariables(Matchers.<Map<String, Object>>any())).thenReturn(caseInstanceBuilder);
     when(caseInstanceBuilder.create()).thenReturn(mockCaseInstance);
+  }
+
+  private void setUpRuntimeData(CaseDefinition mockCaseDefinition) {
+    repositoryServiceMock = mock(RepositoryService.class);
+
+    when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
+    when(repositoryServiceMock.getCaseDefinition(eq(MockProvider.EXAMPLE_CASE_DEFINITION_ID))).thenReturn(mockCaseDefinition);
+    when(repositoryServiceMock.getCaseModel(eq(MockProvider.EXAMPLE_CASE_DEFINITION_ID))).thenReturn(createMockCaseDefinitionCmmnXml());
+
+    caseDefinitionQueryMock = mock(CaseDefinitionQuery.class);
+    when(caseDefinitionQueryMock.caseDefinitionKey(MockProvider.EXAMPLE_CASE_DEFINITION_KEY)).thenReturn(caseDefinitionQueryMock);
+    when(caseDefinitionQueryMock.tenantIdIn(anyString())).thenReturn(caseDefinitionQueryMock);
+    when(caseDefinitionQueryMock.withoutTenantId()).thenReturn(caseDefinitionQueryMock);
+    when(caseDefinitionQueryMock.latestVersion()).thenReturn(caseDefinitionQueryMock);
+    when(caseDefinitionQueryMock.singleResult()).thenReturn(mockCaseDefinition);
+    when(caseDefinitionQueryMock.list()).thenReturn(Collections.singletonList(mockCaseDefinition));
+    when(repositoryServiceMock.createCaseDefinitionQuery()).thenReturn(caseDefinitionQueryMock);
   }
 
   private InputStream createMockCaseDefinitionCmmnXml() {
@@ -152,6 +162,7 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
         .body("deploymentId", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_ID))
         .body("version", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_VERSION))
         .body("resource", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_RESOURCE_NAME))
+        .body("tenantId", equalTo(null))
     .when()
       .get(SINGLE_CASE_DEFINITION_URL);
 
@@ -180,7 +191,6 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
-        .statusCode(Status.OK.getStatusCode())
         .body("id", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_ID))
         .body("key", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_KEY))
         .body("category", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_CATEGORY))
@@ -188,9 +198,11 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
         .body("deploymentId", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_ID))
         .body("version", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_VERSION))
         .body("resource", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_RESOURCE_NAME))
+        .body("tenantId", equalTo(null))
     .when()
       .get(SINGLE_CASE_DEFINITION_BY_KEY_URL);
 
+    verify(caseDefinitionQueryMock).withoutTenantId();
     verify(repositoryServiceMock).getCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
   }
 
@@ -201,6 +213,7 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
     when(repositoryServiceMock.createCaseDefinitionQuery().caseDefinitionKey(nonExistingKey)).thenReturn(caseDefinitionQueryMock);
     when(caseDefinitionQueryMock.latestVersion()).thenReturn(caseDefinitionQueryMock);
     when(caseDefinitionQueryMock.singleResult()).thenReturn(null);
+    when(caseDefinitionQueryMock.list()).thenReturn(Collections.<CaseDefinition> emptyList());
 
     given()
       .pathParam("key", nonExistingKey)
@@ -211,6 +224,72 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
         .body("message", containsString("No matching case definition with key: " + nonExistingKey))
     .when()
       .get(SINGLE_CASE_DEFINITION_BY_KEY_URL);
+  }
+
+  @Test
+  public void testDefinitionRetrieval_ByKeyAndTenantId() {
+    CaseDefinition mockDefinition = MockProvider.mockCaseDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build();
+    setUpRuntimeData(mockDefinition);
+
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_CASE_DEFINITION_KEY)
+      .pathParam("tenant-id", MockProvider.EXAMPLE_TENANT_ID)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_ID))
+        .body("key", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_KEY))
+        .body("category", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_CATEGORY))
+        .body("name", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_NAME))
+        .body("deploymentId", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_ID))
+        .body("version", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_VERSION))
+        .body("resource", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_RESOURCE_NAME))
+        .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+    .when()
+      .get(SINGLE_CASE_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+
+    verify(caseDefinitionQueryMock).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID);
+    verify(repositoryServiceMock).getCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+  }
+
+  @Test
+  public void testNonExistingCaseDefinitionRetrieval_ByKeyAndTenantId() {
+    String nonExistingKey = "aNonExistingDefinitionKey";
+    String nonExistingTenantId = "aNonExistingTenantId";
+
+    when(repositoryServiceMock.createCaseDefinitionQuery().caseDefinitionKey(nonExistingKey)).thenReturn(caseDefinitionQueryMock);
+    when(caseDefinitionQueryMock.singleResult()).thenReturn(null);
+
+    given()
+      .pathParam("key", nonExistingKey)
+      .pathParam("tenant-id", nonExistingTenantId)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", is(RestException.class.getSimpleName()))
+      .body("message", containsString("No matching case definition with key: " + nonExistingKey + " and tenant-id: " + nonExistingTenantId))
+    .when().get(SINGLE_CASE_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+  }
+
+  @Test
+  public void testCreateCaseInstanceByCaseDefinitionKeyAndTenantId() {
+    CaseDefinition mockDefinition = MockProvider.mockCaseDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build();
+    setUpRuntimeData(mockDefinition);
+
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_CASE_DEFINITION_KEY)
+      .pathParam("tenant-id", MockProvider.EXAMPLE_TENANT_ID)
+    .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
+    .when()
+      .post(CREATE_INSTANCE_BY_KEY_AND_TENANT_ID_URL);
+
+    verify(caseDefinitionQueryMock).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID);
+    verify(caseServiceMock).withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    verify(caseInstanceBuilder).create();
   }
 
   @Test

@@ -13,17 +13,21 @@
 
 package org.camunda.bpm.engine.rest.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.rest.MigrationRestService;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
-import javax.ws.rs.core.Response.Status;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware implements MigrationRestService {
 
@@ -42,7 +46,7 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
         .mapEqualActivities()
         .build();
 
-      return MigrationPlanDto.fromMigrationPlan(migrationPlan);
+      return MigrationPlanDto.from(migrationPlan);
     }
     catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, e.getMessage());
@@ -57,6 +61,12 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
       MigrationPlan migrationPlan = MigrationPlanDto.toMigrationPlan(processEngine, migrationPlanDto);
       processEngine.getRuntimeService()
         .executeMigrationPlan(migrationPlan, processInstanceIds);
+    }
+    catch (MigrationPlanValidationException e) {
+      throw e;
+    }
+    catch (MigratingProcessInstanceValidationException e) {
+      throw e;
     }
     catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, e.getMessage());

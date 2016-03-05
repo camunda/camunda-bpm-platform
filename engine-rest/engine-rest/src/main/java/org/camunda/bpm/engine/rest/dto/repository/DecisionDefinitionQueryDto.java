@@ -12,9 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.dto.repository;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.camunda.bpm.engine.ProcessEngine;
@@ -35,6 +38,7 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
   private static final String SORT_BY_VERSION_VALUE = "version";
   private static final String SORT_BY_DEPLOYMENT_ID_VALUE = "deploymentId";
   private static final String SORT_BY_CATEGORY_VALUE = "category";
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
 
@@ -47,6 +51,7 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
     VALID_SORT_BY_VALUES.add(SORT_BY_NAME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_VERSION_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEPLOYMENT_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
 
   }
 
@@ -63,6 +68,9 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
   protected String resourceNameLike;
   protected Integer version;
   protected Boolean latestVersion;
+  protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
+  protected Boolean includeDefinitionsWithoutTenantId;
 
   public DecisionDefinitionQueryDto() {}
 
@@ -135,14 +143,32 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
     this.latestVersion = latestVersion;
   }
 
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
+  @CamundaQueryParam(value = "includeDecisionDefinitionsWithoutTenantId", converter = BooleanConverter.class)
+  public void setIncludeDecisionDefinitionsWithoutTenantId(Boolean includeDefinitionsWithoutTenantId) {
+    this.includeDefinitionsWithoutTenantId = includeDefinitionsWithoutTenantId;
+  }
+
+  @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
   }
 
+  @Override
   protected DecisionDefinitionQuery createNewQuery(ProcessEngine engine) {
     return engine.getRepositoryService().createDecisionDefinitionQuery();
   }
 
+  @Override
   protected void applyFilters(DecisionDefinitionQuery query) {
     if (decisionDefinitionId != null) {
       query.decisionDefinitionId(decisionDefinitionId);
@@ -180,11 +206,21 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
     if (version != null) {
       query.decisionDefinitionVersion(version);
     }
-    if (latestVersion != null && latestVersion) {
+    if (TRUE.equals(latestVersion)) {
       query.latestVersion();
+    }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
+    }
+    if (TRUE.equals(includeDefinitionsWithoutTenantId)) {
+      query.includeDecisionDefinitionsWithoutTenantId();
     }
   }
 
+  @Override
   protected void applySortBy(DecisionDefinitionQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
     if (sortBy.equals(SORT_BY_CATEGORY_VALUE)) {
       query.orderByDecisionDefinitionCategory();
@@ -198,6 +234,8 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
       query.orderByDecisionDefinitionName();
     } else if (sortBy.equals(SORT_BY_DEPLOYMENT_ID_VALUE)) {
       query.orderByDeploymentId();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 

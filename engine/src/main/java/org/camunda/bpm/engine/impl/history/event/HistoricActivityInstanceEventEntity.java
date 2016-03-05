@@ -54,6 +54,8 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
   protected String taskId;
   protected String taskAssignee;
 
+  /** id of the tenant which belongs to the activity instance  */
+  protected String tenantId;
 
   // getters and setters //////////////////////////////////////////////////////
 
@@ -149,6 +151,14 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
     return ActivityInstanceState.CANCELED.getStateCode() == activityInstanceState;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -169,6 +179,7 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
            + ", executionId=" + executionId
            + ", processDefinitionId=" + processDefinitionId
            + ", processInstanceId=" + processInstanceId
+           + ", tenantId=" + tenantId
            + "]";
   }
 }

@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
@@ -48,6 +47,7 @@ import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.task.delegate.TaskListenerInvocation;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -92,6 +92,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   protected Date dueDate;
   protected Date followUpDate;
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
+  protected String tenantId;
 
   protected boolean isIdentityLinksInitialized = false;
   protected transient List<IdentityLinkEntity> taskIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
@@ -159,9 +160,10 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     TaskEntity task = create();
 
     if (execution instanceof ExecutionEntity) {
-      task.setExecution((DelegateExecution) execution);
-      task.skipCustomListeners = ((ExecutionEntity) execution).isSkipCustomListeners();
-      task.insert((ExecutionEntity) execution);
+      ExecutionEntity executionEntity = (ExecutionEntity) execution;
+      task.setExecution(executionEntity);
+      task.skipCustomListeners = executionEntity.isSkipCustomListeners();
+      task.insert(executionEntity);
       return task;
 
     }
@@ -175,6 +177,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   public void insert(ExecutionEntity execution) {
     ensureParentTaskActive();
+    propagateExecutionTenantId(execution);
+    propagateParentTaskTenantId();
 
     CommandContext commandContext = Context.getCommandContext();
     TaskManager taskManager = commandContext.getTaskManager();
@@ -185,12 +189,62 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
+  protected void propagateExecutionTenantId(ExecutionEntity execution) {
+    if(execution != null) {
+      setTenantId(execution.getTenantId());
+    }
+  }
+
+  protected void propagateParentTaskTenantId() {
+    if (parentTaskId != null) {
+
+      final TaskEntity parentTask = Context
+          .getCommandContext()
+          .getTaskManager()
+          .findTaskById(parentTaskId);
+
+      if(tenantId != null && !tenantIdIsSame(parentTask)) {
+        throw LOG.cannotSetDifferentTenantIdOnSubtask(parentTaskId, parentTask.getTenantId(), tenantId);
+      }
+
+      setTenantId(parentTask.getTenantId());
+    }
+  }
+
   public void update() {
+    ensureTenantIdNotChanged();
+
     registerCommandContextCloseListener();
 
     CommandContext commandContext = Context.getCommandContext();
     DbEntityManager dbEntityManger = commandContext.getDbEntityManager();
+
     dbEntityManger.merge(this);
+  }
+
+  protected void ensureTenantIdNotChanged() {
+    final TaskEntity persistentTask = Context.getCommandContext().getTaskManager()
+      .findTaskById(id);
+
+    if(persistentTask != null) {
+
+      boolean changed = !tenantIdIsSame(persistentTask);
+
+      if(changed) {
+        throw LOG.cannotChangeTenantIdOfTask(id, persistentTask.tenantId, tenantId);
+      }
+    }
+  }
+
+  protected boolean tenantIdIsSame(final TaskEntity otherTask) {
+    final String otherTenantId = otherTask.getTenantId();
+
+    if(otherTenantId == null) {
+      return tenantId == null;
+    }
+    else {
+      return otherTenantId.equals(tenantId);
+    }
   }
 
   /** new task.  Embedded state and create time will be initialized.
@@ -277,6 +331,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     delete(deleteReason, cascade);
   }
 
+  @Override
   public void delegate(String userId) {
     setDelegationState(DelegationState.PENDING);
     if (getOwner() == null) {
@@ -290,6 +345,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     setAssignee(this.owner);
   }
 
+  @Override
   public Object getPersistentState() {
     Map<String, Object> persistentState = new  HashMap<String, Object>();
     persistentState.put("assignee", this.assignee);
@@ -329,12 +385,16 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     if (delegationState != null) {
       persistentState.put("delegationState", this.delegationState);
     }
+    if (tenantId != null) {
+      persistentState.put("tenantId", this.tenantId);
+    }
 
     persistentState.put("suspensionState", this.suspensionState);
 
     return persistentState;
   }
 
+  @Override
   public int getRevisionNext() {
     return revision+1;
   }
@@ -360,6 +420,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
+  @Override
   public UserTask getBpmnModelElementInstance() {
     BpmnModelInstance bpmnModelInstance = getBpmnModelInstance();
     if(bpmnModelInstance != null) {
@@ -376,6 +437,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
+  @Override
   public BpmnModelInstance getBpmnModelInstance() {
     if(processDefinitionId != null) {
       return Context.getProcessEngineConfiguration()
@@ -416,7 +478,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     variableInstance.setProcessInstanceId(processInstanceId);
     variableInstance.setCaseExecutionId(caseExecutionId);
     variableInstance.setCaseInstanceId(caseInstanceId);
-    // TODO set the tenant-id from the task when CAM-5195 is done
+    variableInstance.setTenantId(tenantId);
   }
 
   protected List<VariableInstanceEntity> loadVariableInstances() {
@@ -433,6 +495,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   // execution ////////////////////////////////////////////////////////////////
 
+  @Override
   public ExecutionEntity getExecution() {
     if ( (execution==null) && (executionId!=null) ) {
       this.execution = Context
@@ -443,7 +506,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return execution;
   }
 
-  public void setExecution(DelegateExecution execution) {
+  public void setExecution(PvmExecutionImpl execution) {
     if (execution!=null) {
 
       this.execution = (ExecutionEntity) execution;
@@ -469,6 +532,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   // case execution ////////////////////////////////////////////////////////////////
 
+  @Override
   public CaseExecutionEntity getCaseExecution() {
     ensureCaseExecutionInitialized();
     return caseExecution;
@@ -499,6 +563,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
+  @Override
   public String getCaseExecutionId() {
     return caseExecutionId;
   }
@@ -507,10 +572,12 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.caseExecutionId = caseExecutionId;
   }
 
+  @Override
   public String getCaseInstanceId() {
     return caseInstanceId;
   }
 
+  @Override
   public void setCaseInstanceId(String caseInstanceId) {
     registerCommandContextCloseListener();
     propertyChanged(CASE_INSTANCE_ID, this.caseInstanceId, caseInstanceId);
@@ -532,6 +599,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return null;
   }
 
+  @Override
   public String getCaseDefinitionId() {
     return caseDefinitionId;
   }
@@ -575,6 +643,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
+  @Override
   public Set<IdentityLink> getCandidates() {
     Set<IdentityLink> potentialOwners = new HashSet<IdentityLink>();
     for (IdentityLinkEntity identityLinkEntity : getIdentityLinks()) {
@@ -585,48 +654,58 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return potentialOwners;
   }
 
+  @Override
   public void addCandidateUser(String userId) {
     addIdentityLink(userId, null, IdentityLinkType.CANDIDATE);
   }
 
+  @Override
   public void addCandidateUsers(Collection<String> candidateUsers) {
     for (String candidateUser : candidateUsers) {
       addCandidateUser(candidateUser);
     }
   }
 
+  @Override
   public void addCandidateGroup(String groupId) {
     addIdentityLink(null, groupId, IdentityLinkType.CANDIDATE);
   }
 
+  @Override
   public void addCandidateGroups(Collection<String> candidateGroups) {
     for (String candidateGroup : candidateGroups) {
       addCandidateGroup(candidateGroup);
     }
   }
 
+  @Override
   public void addGroupIdentityLink(String groupId, String identityLinkType) {
     addIdentityLink(null, groupId, identityLinkType);
   }
 
+  @Override
   public void addUserIdentityLink(String userId, String identityLinkType) {
     addIdentityLink(userId, null, identityLinkType);
   }
 
+  @Override
   public void deleteCandidateGroup(String groupId) {
     deleteGroupIdentityLink(groupId, IdentityLinkType.CANDIDATE);
   }
 
+  @Override
   public void deleteCandidateUser(String userId) {
     deleteUserIdentityLink(userId, IdentityLinkType.CANDIDATE);
   }
 
+  @Override
   public void deleteGroupIdentityLink(String groupId, String identityLinkType) {
     if (groupId!=null) {
       deleteIdentityLink(null, groupId, identityLinkType);
     }
   }
 
+  @Override
   public void deleteUserIdentityLink(String userId, String identityLinkType) {
     if (userId!=null) {
       deleteIdentityLink(userId, null, identityLinkType);
@@ -667,6 +746,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   // special setters //////////////////////////////////////////////////////////
 
+  @Override
   public void setName(String taskName) {
     registerCommandContextCloseListener();
     propertyChanged(NAME, this.name, taskName);
@@ -678,6 +758,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.name = taskName;
   }
 
+  @Override
   public void setDescription(String description) {
     registerCommandContextCloseListener();
     propertyChanged(DESCRIPTION, this.description, description);
@@ -689,6 +770,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.description = description;
   }
 
+  @Override
   public void setAssignee(String assignee) {
     ensureTaskActive();
     registerCommandContextCloseListener();
@@ -717,6 +799,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.assignee = assignee;
   }
 
+  @Override
   public void setOwner(String owner) {
     ensureTaskActive();
     registerCommandContextCloseListener();
@@ -743,6 +826,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.owner = owner;
   }
 
+  @Override
   public void setDueDate(Date dueDate) {
     registerCommandContextCloseListener();
     propertyChanged(DUE_DATE, this.dueDate, dueDate);
@@ -753,6 +837,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.dueDate = dueDate;
   }
 
+  @Override
   public void setPriority(int priority) {
     registerCommandContextCloseListener();
     propertyChanged(PRIORITY, this.priority, priority);
@@ -763,6 +848,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.priority = priority;
   }
 
+  @Override
   public void setParentTaskId(String parentTaskId) {
     registerCommandContextCloseListener();
     propertyChanged(PARENT_TASK, this.parentTaskId, parentTaskId);
@@ -975,38 +1061,47 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   // getters and setters //////////////////////////////////////////////////////
 
+  @Override
   public String getId() {
     return id;
   }
 
+  @Override
   public void setId(String id) {
     this.id = id;
   }
 
+  @Override
   public int getRevision() {
     return revision;
   }
 
+  @Override
   public void setRevision(int revision) {
     this.revision = revision;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public String getDescription() {
     return description;
   }
 
+  @Override
   public Date getDueDate() {
     return dueDate;
   }
 
+  @Override
   public int getPriority() {
     return priority;
   }
 
+  @Override
   public Date getCreateTime() {
     return createTime;
   }
@@ -1015,10 +1110,12 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.createTime = createTime;
   }
 
+  @Override
   public String getExecutionId() {
     return executionId;
   }
 
+  @Override
   public String getProcessInstanceId() {
     return processInstanceId;
   }
@@ -1033,6 +1130,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return null;
   }
 
+  @Override
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
@@ -1050,6 +1148,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
+  @Override
   public String getFormKey() {
     if(!isFormKeyInitialized) {
       throw LOG.uninitializedFormKeyException();
@@ -1061,10 +1160,12 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.processDefinitionId = processDefinitionId;
   }
 
+  @Override
   public String getAssignee() {
     return assignee;
   }
 
+  @Override
   public String getTaskDefinitionKey() {
     return taskDefinitionKey;
   }
@@ -1073,6 +1174,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.taskDefinitionKey = taskDefinitionKey;
   }
 
+  @Override
   public String getEventName() {
     return eventName;
   }
@@ -1088,24 +1190,18 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public void setProcessInstance(ExecutionEntity processInstance) {
     this.processInstance = processInstance;
   }
-  public void setExecution(ExecutionEntity execution) {
-    this.execution = execution;
-    if (execution != null) {
-      this.executionId = execution.getId();
-    }
-    else {
-      this.executionId = null;
-    }
-  }
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
   }
+  @Override
   public String getOwner() {
     return owner;
   }
+  @Override
   public DelegationState getDelegationState() {
     return delegationState;
   }
+  @Override
   public void setDelegationState(DelegationState delegationState) {
     propertyChanged(DELEGATION, this.delegationState, delegationState);
     this.delegationState = delegationState;
@@ -1136,6 +1232,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return isDeleted;
   }
 
+  @Override
   public String getDeleteReason() {
     return deleteReason;
   }
@@ -1144,6 +1241,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     propertyChanged(DELETE, this.isDeleted, isDeleted);
     this.isDeleted = isDeleted;
   }
+  @Override
   public String getParentTaskId() {
     return parentTaskId;
   }
@@ -1154,14 +1252,27 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public void setSuspensionState(int suspensionState) {
     this.suspensionState = suspensionState;
   }
+  @Override
   public boolean isSuspended() {
     return suspensionState == SuspensionState.SUSPENDED.getStateCode();
   }
 
+  @Override
   public Date getFollowUpDate() {
     return followUpDate;
   }
 
+  @Override
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  @Override
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
+  @Override
   public void setFollowUpDate(Date followUpDate) {
     registerCommandContextCloseListener();
     propertyChanged(FOLLOW_UP_DATE, this.followUpDate, followUpDate);
@@ -1172,12 +1283,14 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.followUpDate = followUpDate;
   }
 
+  @Override
   public void onCommandContextClose(CommandContext commandContext) {
     if(commandContext.getDbEntityManager().isDirty(this)) {
       commandContext.getHistoricTaskInstanceManager().updateHistoricTaskInstance(this);
     }
   }
 
+  @Override
   public void onCommandFailed(CommandContext commandContext, Throwable t) {
     // ignore
   }
@@ -1202,6 +1315,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     propertyChanges.clear();
   }
 
+  @Override
   public ProcessEngineServices getProcessEngineServices() {
     return Context.getProcessEngineConfiguration()
           .getProcessEngine();

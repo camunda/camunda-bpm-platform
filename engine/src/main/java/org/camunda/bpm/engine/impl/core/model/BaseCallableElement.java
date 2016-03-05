@@ -22,6 +22,7 @@ public class BaseCallableElement {
   protected ParameterValueProvider definitionKeyValueProvider;
   protected CallableElementBinding binding;
   protected ParameterValueProvider versionValueProvider;
+  protected ParameterValueProvider tenantIdProvider;
   protected String deploymentId;
 
   public enum CallableElementBinding {
@@ -105,12 +106,24 @@ public class BaseCallableElement {
     this.versionValueProvider = version;
   }
 
+  public void setTenantIdProvider(ParameterValueProvider tenantIdProvider) {
+    this.tenantIdProvider = tenantIdProvider;
+  }
+
   public String getDeploymentId() {
     return deploymentId;
   }
 
   public void setDeploymentId(String deploymentId) {
     this.deploymentId = deploymentId;
+  }
+
+  public String getDefinitionTenantId(VariableScope variableScope) {
+    return (String) tenantIdProvider.getValue(variableScope);
+  }
+
+  public ParameterValueProvider getTenantIdProvider() {
+    return tenantIdProvider;
   }
 
 }

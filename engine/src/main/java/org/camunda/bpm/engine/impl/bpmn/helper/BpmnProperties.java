@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.impl.bpmn.parser.EscalationEventDefinition;
 import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.core.model.PropertyKey;
 import org.camunda.bpm.engine.impl.core.model.PropertyListKey;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 
 /**
  * Properties of bpmn elements.
@@ -35,4 +36,5 @@ public class BpmnProperties {
 
   public static final PropertyListKey<ErrorEventDefinition> ERROR_EVENT_DEFINITIONS = new PropertyListKey<ErrorEventDefinition>("errorEventDefinitions");
 
+  public static final PropertyListKey<TimerDeclarationImpl> TIMER_DECLARATIONS = new PropertyListKey<TimerDeclarationImpl>("timerDeclarations");
 }

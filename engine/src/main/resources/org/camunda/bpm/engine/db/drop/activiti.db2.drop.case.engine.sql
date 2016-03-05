@@ -37,6 +37,8 @@ drop index ACT_IDX_TASK_CASE_DEF_ID;
 drop index ACT_IDX_CASE_SENTRY_CASE_INST;
 drop index ACT_IDX_CASE_SENTRY_CASE_EXEC;
 
+drop index ACT_IDX_CASE_DEF_TENANT_ID;
+
 drop table ACT_RE_CASE_DEF;
 drop table ACT_RU_CASE_EXECUTION;
 drop table ACT_RU_CASE_SENTRY_PART;

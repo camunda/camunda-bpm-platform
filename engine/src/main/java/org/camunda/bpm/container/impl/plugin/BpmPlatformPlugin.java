@@ -20,4 +20,7 @@ import org.camunda.bpm.application.ProcessApplicationInterface;
 public interface BpmPlatformPlugin {
 
   public void postProcessApplicationDeploy(ProcessApplicationInterface processApplication);
+
+  public void postProcessApplicationUndeploy(ProcessApplicationInterface processApplication);
+
 }

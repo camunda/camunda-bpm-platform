@@ -208,10 +208,11 @@ public class JobManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<JobEntity> findJobsByConfiguration(String jobHandlerType, String jobHandlerConfiguration) {
+  public List<JobEntity> findJobsByConfiguration(String jobHandlerType, String jobHandlerConfiguration, String tenantId) {
     Map<String, String> params = new HashMap<String, String>();
     params.put("handlerType", jobHandlerType);
     params.put("handlerConfiguration", jobHandlerConfiguration);
+    params.put("tenantId", tenantId);
 
     if (TimerCatchIntermediateEventJobHandler.TYPE.equals(jobHandlerType)
       || TimerExecuteNestedActivityJobHandler.TYPE.equals(jobHandlerType)

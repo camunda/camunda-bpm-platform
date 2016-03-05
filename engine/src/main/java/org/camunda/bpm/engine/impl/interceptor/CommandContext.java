@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
+import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.IdentityService;
@@ -64,7 +65,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ReportManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricStatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceManager;
@@ -76,6 +76,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MeterLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ReportManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
@@ -152,7 +153,7 @@ public class CommandContext {
           return null;
         }
 
-      }, targetProcessApplication);
+      }, targetProcessApplication, new InvocationContext(nextInvocation.execution));
     }
     else {
       if(!nextInvocation.operation.isAsyncCapable()) {
@@ -192,14 +193,13 @@ public class CommandContext {
     ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(execution);
 
     if(requiresContextSwitch(targetProcessApplication)) {
-
       Context.executeWithinProcessApplication(new Callable<Void>() {
         public Void call() throws Exception {
           performOperation(executionOperation, execution);
           return null;
         }
 
-      }, targetProcessApplication);
+      }, targetProcessApplication, new InvocationContext(execution));
 
     } else {
       try {

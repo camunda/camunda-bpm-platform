@@ -43,6 +43,10 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   protected Integer version;
   protected boolean latest = false;
 
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
+  protected boolean includeDefinitionsWithoutTenantId = false;
+
   public DecisionDefinitionQueryImpl() {
   }
 
@@ -129,6 +133,24 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     return this;
   }
 
+  public DecisionDefinitionQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public DecisionDefinitionQuery withoutTenantId() {
+    isTenantIdSet = true;
+    this.tenantIds = null;
+    return this;
+  }
+
+  public DecisionDefinitionQuery includeDecisionDefinitionsWithoutTenantId() {
+    this.includeDefinitionsWithoutTenantId  = true;
+    return this;
+  }
+
   public DecisionDefinitionQuery orderByDecisionDefinitionCategory() {
     orderBy(DecisionDefinitionQueryProperty.DECISION_DEFINITION_CATEGORY);
     return this;
@@ -159,8 +181,13 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     return this;
   }
 
+  public DecisionDefinitionQuery orderByTenantId() {
+    return orderBy(DecisionDefinitionQueryProperty.TENANT_ID);
+  }
+
   //results ////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext
@@ -168,6 +195,7 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
       .findDecisionDefinitionCountByQueryCriteria(this);
   }
 
+  @Override
   public List<DecisionDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext
@@ -175,6 +203,7 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
       .findDecisionDefinitionsByQueryCriteria(this, page);
   }
 
+  @Override
   public void checkQueryOk() {
     super.checkQueryOk();
 

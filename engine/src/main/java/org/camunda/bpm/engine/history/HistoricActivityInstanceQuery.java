@@ -126,4 +126,13 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
    */
   HistoricActivityInstanceQuery orderPartiallyByOccurrence();
 
+  /** Only select historic activity instances with one of the given tenant ids. */
+  HistoricActivityInstanceQuery tenantIdIn(String... tenantIds);
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of historic activity instances without tenant id is database-specific.
+   */
+  HistoricActivityInstanceQuery orderByTenantId();
+
 }

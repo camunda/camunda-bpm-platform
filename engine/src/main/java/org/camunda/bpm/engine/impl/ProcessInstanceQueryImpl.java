@@ -53,6 +53,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   protected String caseInstanceId;
   protected String superCaseInstanceId;
   protected String subCaseInstanceId;
+
+  protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
 
   // Unused, see dynamic query
@@ -196,6 +198,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   public ProcessInstanceQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    isTenantIdSet = true;
     return this;
   }
 

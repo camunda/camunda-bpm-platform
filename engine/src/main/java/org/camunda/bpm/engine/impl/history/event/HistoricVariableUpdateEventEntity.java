@@ -128,6 +128,7 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
            + ", processInstanceId=" + processInstanceId
            + ", taskId=" + taskId
            + ", timestamp=" + timestamp
+           + ", tenantId=" + tenantId
            + "]";
   }
 

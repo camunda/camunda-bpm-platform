@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,7 +44,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
     lockConcurrentRoot(execution);
 
     PvmActivity activity = execution.getActivity();
-    if (!activeConcurrentExecutionsExist(execution)) {
+    if (activatesGateway(execution, activity)) {
 
       LOG.activityActivation(activity.getId());
 
@@ -84,46 +85,52 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
     }
   }
 
-  protected List< ? extends ActivityExecution> getLeaveExecutions(ActivityExecution parent) {
+  protected Collection<ActivityExecution> getLeafExecutions(ActivityExecution parent) {
     List<ActivityExecution> executionlist = new ArrayList<ActivityExecution>();
-    List< ? extends ActivityExecution> subExecutions = parent.getExecutions();
+    List<? extends ActivityExecution> subExecutions = parent.getNonEventScopeExecutions();
     if (subExecutions.size() == 0) {
       executionlist.add(parent);
     } else {
       for (ActivityExecution concurrentExecution : subExecutions) {
-        executionlist.addAll(getLeaveExecutions(concurrentExecution));
+        executionlist.addAll(getLeafExecutions(concurrentExecution));
       }
     }
 
     return executionlist;
   }
 
-  public boolean activeConcurrentExecutionsExist(ActivityExecution execution) {
-    PvmActivity activity = execution.getActivity();
-    if (execution.isConcurrent()) {
-      for (ActivityExecution concurrentExecution : getLeaveExecutions(execution.getParent())) {
-        if (concurrentExecution.isActive()) {
+  protected boolean activatesGateway(ActivityExecution execution, PvmActivity gatewayActivity) {
+    int numExecutionsGuaranteedToActivate = gatewayActivity.getIncomingTransitions().size();
+    ActivityExecution scopeExecution = execution.isScope() ? execution : execution.getParent();
 
-          boolean reachable = false;
-          PvmTransition pvmTransition = concurrentExecution.getTransition();
-          if (pvmTransition != null) {
-            reachable = isReachable(pvmTransition.getDestination(), activity, new HashSet<PvmActivity>());
-          } else {
-            reachable = isReachable(concurrentExecution.getActivity(), activity, new HashSet<PvmActivity>());
-          }
+    List<ActivityExecution> executionsAtGateway = execution.findInactiveConcurrentExecutions(gatewayActivity);
 
-          if (reachable) {
-            LOG.activeConcurrentExecutionFound(concurrentExecution.getActivity());
-            return true;
-          }
+    if (executionsAtGateway.size() >= numExecutionsGuaranteedToActivate) {
+      return true;
+    }
+    else {
+      Collection<ActivityExecution> executionsNotAtGateway = getLeafExecutions(scopeExecution);
+      executionsNotAtGateway.removeAll(executionsAtGateway);
+
+      for (ActivityExecution executionNotAtGateway : executionsNotAtGateway) {
+        if (canReachActivity(executionNotAtGateway, gatewayActivity)) {
+          return false;
         }
       }
-    } else if (execution.isActive()) { // is this ever true?
-      LOG.activeConcurrentExecutionFound(execution.getActivity());
+
+      // if no more token may arrive, then activate
       return true;
     }
 
-    return false;
+  }
+
+  protected boolean canReachActivity(ActivityExecution execution, PvmActivity activity) {
+    PvmTransition pvmTransition = execution.getTransition();
+    if (pvmTransition != null) {
+      return isReachable(pvmTransition.getDestination(), activity, new HashSet<PvmActivity>());
+    } else {
+      return isReachable(execution.getActivity(), activity, new HashSet<PvmActivity>());
+    }
   }
 
   protected boolean isReachable(PvmActivity srcActivity, PvmActivity targetActivity, Set<PvmActivity> visitedActivities) {

@@ -12,16 +12,14 @@
  */
 package org.camunda.bpm.engine.migration;
 
-import java.util.List;
-
 /**
  * @author Thorben Lindhauer
  *
  */
 public interface MigrationInstruction {
 
-  List<String> getSourceActivityIds();
+  String getSourceActivityId();
 
-  List<String> getTargetActivityIds();
+  String getTargetActivityId();
 
 }

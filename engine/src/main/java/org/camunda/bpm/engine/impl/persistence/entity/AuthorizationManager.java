@@ -34,9 +34,12 @@ import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.IdentityService;
@@ -96,6 +99,19 @@ public class AuthorizationManager extends AbstractManager {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
   public static final String DEFAULT_AUTHORIZATION_CHECK = "defaultAuthorizationCheck";
+
+  // Used instead of Collections.emptyList() as mybatis uses reflection to call methods
+  // like size() which can lead to problems as Collections.EmptyList is a private implementation
+  protected static final List<String> EMPTY_LIST = new ArrayList<String>();
+
+  /**
+   * Group ids for which authorizations exist in the database.
+   * This is initialized once per command by the {@link #filterAuthenticatedGroupIds(List)} method. (Manager
+   * instances are command scoped).
+   * It is used to only check authorizations for groups for which authorizations exist. In other words,
+   * if for a given group no authorization exists in the DB, then auth checks are not performed for this group.
+   */
+  protected Set<String> availableAuthorizedGroupIds = null;
 
   public Authorization createNewAuthorization(int type) {
     checkAuthorization(CREATE, AUTHORIZATION, null);
@@ -241,9 +257,11 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   public boolean isAuthorized(String userId, List<String> groupIds, List<PermissionCheck> permissionChecks) {
+    List<String> filteredGroupIds = filterAuthenticatedGroupIds(groupIds);
+
     AuthorizationCheck authCheck = new AuthorizationCheck();
     authCheck.setAuthUserId(userId);
-    authCheck.setAuthGroupIds(groupIds);
+    authCheck.setAuthGroupIds(filteredGroupIds);
     authCheck.setAtomicPermissionChecks(permissionChecks);
     return getDbEntityManager().selectBoolean("isUserAuthorizedForResource", authCheck);
   }
@@ -261,7 +279,7 @@ public class AuthorizationManager extends AbstractManager {
       query.setAuthorizationCheckEnabled(true);
 
       String currentUserId = currentAuthentication.getUserId();
-      List<String> currentGroupIds = currentAuthentication.getGroupIds();
+      List<String> currentGroupIds = filterAuthenticatedGroupIds(currentAuthentication.getGroupIds());
 
       query.setAuthUserId(currentUserId);
       query.setAuthGroupIds(currentGroupIds);
@@ -1071,6 +1089,20 @@ public class AuthorizationManager extends AbstractManager {
 
   public void checkReadDecisionDefinition(String decisionDefinitionKey) {
     checkAuthorization(READ, DECISION_DEFINITION, decisionDefinitionKey);
+  }
+
+  public List<String> filterAuthenticatedGroupIds(List<String> authenticatedGroupIds) {
+    if(authenticatedGroupIds == null || authenticatedGroupIds.isEmpty()) {
+      return EMPTY_LIST;
+    }
+    else {
+      if(availableAuthorizedGroupIds == null) {
+        availableAuthorizedGroupIds = new HashSet<String>(getDbEntityManager().selectList("selectAuthorizedGroupIds"));
+      }
+      Set<String> copy = new HashSet<String>(availableAuthorizedGroupIds);
+      copy.retainAll(authenticatedGroupIds);
+      return new ArrayList<String>(copy);
+    }
   }
 
 }

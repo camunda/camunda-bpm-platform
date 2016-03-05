@@ -21,13 +21,14 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
  *
  * @author Thorben Lindhauer
  */
-public class FlowScopeWalker extends TreeWalker<ScopeImpl> {
+public class FlowScopeWalker extends SingleReferenceWalker<ScopeImpl> {
 
   public FlowScopeWalker(ScopeImpl startActivity) {
     super(startActivity);
   }
 
   protected ScopeImpl nextElement() {
+    ScopeImpl currentElement = getCurrentElement();
     if (currentElement != null && ActivityImpl.class.isAssignableFrom(currentElement.getClass())) {
       return ((PvmActivity) currentElement).getFlowScope();
 

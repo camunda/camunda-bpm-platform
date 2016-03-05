@@ -82,6 +82,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
     assertThat(updatedTree).hasStructure(
       describeActivityInstanceTree(processInstance.getProcessDefinitionId())
         .activity("task1")
+        .transition("task2")
       .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);

@@ -61,6 +61,15 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
   /** Only select deployments with one of the given tenant ids. */
   DeploymentQuery tenantIdIn(String... tenantIds);
 
+  /** Only select deployments which have no tenant id. */
+  DeploymentQuery withoutTenantId();
+
+  /**
+   * Select deployments which have no tenant id. Can be used in
+   * combination with {@link #tenantIdIn(String...)}.
+   */
+  DeploymentQuery includeDeploymentsWithoutTenantId();
+
   //sorting ////////////////////////////////////////////////////////
 
   /** Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}). */

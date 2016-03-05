@@ -100,6 +100,15 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
    */
   HistoricDetailQuery excludeTaskDetails();
 
+  /** Only select historic details with one of the given tenant ids. */
+  HistoricDetailQuery tenantIdIn(String... tenantIds);
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of historic details without tenant id is database-specific.
+   */
+  HistoricDetailQuery orderByTenantId();
+
   HistoricDetailQuery orderByProcessInstanceId();
 
   HistoricDetailQuery orderByVariableName();

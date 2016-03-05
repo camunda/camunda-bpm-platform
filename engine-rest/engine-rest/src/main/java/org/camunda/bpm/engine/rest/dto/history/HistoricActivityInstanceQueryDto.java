@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -41,6 +42,7 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
   private static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_DURATION_VALUE = "duration";
   private static final String SORT_BY_PROCESS_DEFINITION_ID_VALUE = "definitionId";
   private static final String SORT_PARTIALLY_BY_OCCURRENCE = "occurrence";
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -56,6 +58,7 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
     VALID_SORT_BY_VALUES.add(SORT_BY_HISTORIC_ACTIVITY_INSTANCE_DURATION_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_PARTIALLY_BY_OCCURRENCE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   private String activityInstanceId;
@@ -74,6 +77,7 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
   private Date startedAfter;
   private Date finishedBefore;
   private Date finishedAfter;
+  private List<String> tenantIds;
 
   public HistoricActivityInstanceQueryDto() {
   }
@@ -162,6 +166,11 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
     this.finishedAfter = finishedAfter;
   }
 
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -222,6 +231,9 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
     if (finishedAfter != null) {
       query.finishedAfter(finishedAfter);
     }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
   }
 
   @Override
@@ -248,6 +260,8 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
       query.orderByHistoricActivityInstanceDuration();
     } else if (sortBy.equals(SORT_PARTIALLY_BY_OCCURRENCE)) {
       query.orderPartiallyByOccurrence();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 

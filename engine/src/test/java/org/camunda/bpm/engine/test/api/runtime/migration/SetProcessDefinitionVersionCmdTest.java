@@ -127,7 +127,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
       commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 23));
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("no processes deployed with key = 'receiveTask' and version = '23'", ae.getMessage());
+      assertTextPresent("no processes deployed with key = 'receiveTask', version = '23'", ae.getMessage());
     }
   }
 

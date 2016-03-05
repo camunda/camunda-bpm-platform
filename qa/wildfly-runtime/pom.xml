@@ -76,6 +76,14 @@
       <artifactId>jruby-complete</artifactId>
       <scope>runtime</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.qa</groupId>
+      <artifactId>camunda-qa-ensure-clean-db</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -204,7 +212,6 @@
                     <copy todir="${wildfly.runtime.location}/modules" overwrite="true">
                       <fileset dir="src/main/modules" />
                     </copy>
-
                   </target>
                 </configuration>
               </execution>

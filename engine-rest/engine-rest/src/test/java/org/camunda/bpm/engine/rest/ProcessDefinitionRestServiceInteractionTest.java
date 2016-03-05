@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -87,8 +88,12 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   protected static final String PROCESS_DEFINITION_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition";
   protected static final String SINGLE_PROCESS_DEFINITION_URL = PROCESS_DEFINITION_URL + "/{id}";
   protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_URL = PROCESS_DEFINITION_URL + "/key/{key}";
+  protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL = PROCESS_DEFINITION_URL + "/key/{key}/tenant-id/{tenant-id}";
+
   protected static final String START_PROCESS_INSTANCE_URL = SINGLE_PROCESS_DEFINITION_URL + "/start";
   protected static final String START_PROCESS_INSTANCE_BY_KEY_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/start";
+  protected static final String START_PROCESS_INSTANCE_BY_KEY_AND_TENANT_ID_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL + "/start";
+
   protected static final String XML_DEFINITION_URL = SINGLE_PROCESS_DEFINITION_URL + "/xml";
   protected static final String XML_DEFINITION_BY_KEY_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/xml";
   protected static final String DIAGRAM_DEFINITION_URL = SINGLE_PROCESS_DEFINITION_URL + "/diagram";
@@ -115,8 +120,26 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Before
   public void setUpRuntimeData() {
-    ProcessInstance mockInstance = MockProvider.createMockInstance();
     ProcessDefinition mockDefinition = MockProvider.createMockDefinition();
+    setUpRuntimeDataForDefinition(mockDefinition);
+
+    managementServiceMock = mock(ManagementService.class);
+    when(processEngine.getManagementService()).thenReturn(managementServiceMock);
+    when(managementServiceMock.getProcessApplicationForDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID)).thenReturn(MockProvider.EXAMPLE_PROCESS_APPLICATION_NAME);
+
+    // replace the runtime container delegate & process application service with a mock
+
+    ProcessApplicationService processApplicationService = mock(ProcessApplicationService.class);
+    ProcessApplicationInfo appMock = MockProvider.createMockProcessApplicationInfo();
+    when(processApplicationService.getProcessApplicationInfo(MockProvider.EXAMPLE_PROCESS_APPLICATION_NAME)).thenReturn(appMock);
+
+    RuntimeContainerDelegate delegate = mock(RuntimeContainerDelegate.class);
+    when(delegate.getProcessApplicationService()).thenReturn(processApplicationService);
+    RuntimeContainerDelegate.INSTANCE.set(delegate);
+  }
+
+  private void setUpRuntimeDataForDefinition(ProcessDefinition mockDefinition) {
+    ProcessInstance mockInstance = MockProvider.createMockInstance();
 
     // we replace this mock with every test in order to have a clean one (in terms of invocations) for verification
     runtimeServiceMock = mock(RuntimeService.class);
@@ -140,20 +163,6 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     VariableMap startFormVariablesMock = MockProvider.createMockFormVariables();
     when(formServiceMock.getStartFormVariables(eq(EXAMPLE_PROCESS_DEFINITION_ID), Matchers.<Collection<String>>any(), anyBoolean())).thenReturn(startFormVariablesMock);
-
-    managementServiceMock = mock(ManagementService.class);
-    when(processEngine.getManagementService()).thenReturn(managementServiceMock);
-    when(managementServiceMock.getProcessApplicationForDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID)).thenReturn(MockProvider.EXAMPLE_PROCESS_APPLICATION_NAME);
-
-    // replace the runtime container delegate & process application service with a mock
-
-    ProcessApplicationService processApplicationService = mock(ProcessApplicationService.class);
-    ProcessApplicationInfo appMock = MockProvider.createMockProcessApplicationInfo();
-    when(processApplicationService.getProcessApplicationInfo(MockProvider.EXAMPLE_PROCESS_APPLICATION_NAME)).thenReturn(appMock);
-
-    RuntimeContainerDelegate delegate = mock(RuntimeContainerDelegate.class);
-    when(delegate.getProcessApplicationService()).thenReturn(processApplicationService);
-    RuntimeContainerDelegate.INSTANCE.set(delegate);
   }
 
   private InputStream createMockProcessDefinionBpmn20Xml() {
@@ -167,6 +176,8 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   private void setUpMockDefinitionQuery(ProcessDefinition mockDefinition) {
     processDefinitionQueryMock = mock(ProcessDefinitionQuery.class);
     when(processDefinitionQueryMock.processDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)).thenReturn(processDefinitionQueryMock);
+    when(processDefinitionQueryMock.tenantIdIn(anyString())).thenReturn(processDefinitionQueryMock);
+    when(processDefinitionQueryMock.withoutTenantId()).thenReturn(processDefinitionQueryMock);
     when(processDefinitionQueryMock.latestVersion()).thenReturn(processDefinitionQueryMock);
     when(processDefinitionQueryMock.singleResult()).thenReturn(mockDefinition);
     when(processDefinitionQueryMock.count()).thenReturn(1L);
@@ -1231,6 +1242,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .body("resource", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME))
       .body("diagram", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME))
       .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED))
+      .body("tenantId", nullValue())
     .when().get(SINGLE_PROCESS_DEFINITION_URL);
 
     verify(repositoryServiceMock).getProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
@@ -2654,9 +2666,10 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .body("resource", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME))
       .body("diagram", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME))
       .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED))
-      .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+      .body("tenantId", nullValue())
     .when().get(SINGLE_PROCESS_DEFINITION_BY_KEY_URL);
 
+    verify(processDefinitionQueryMock).withoutTenantId();
     verify(repositoryServiceMock).getProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
   }
 
@@ -2674,27 +2687,70 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
       .body("type", is(RestException.class.getSimpleName()))
-      .body("message", containsString("No matching process definition with key: " + nonExistingKey))
+      .body("message", containsString("No matching process definition with key: " + nonExistingKey + " and no tenant-id"))
     .when().get(SINGLE_PROCESS_DEFINITION_BY_KEY_URL);
   }
 
   @Test
-  public void testProcessDefinitionRetrievalForMultipleTenants_ByKey() {
-    // process definition is deployed for two tenants
-    List<ProcessDefinition> processDefinitions = Arrays.asList(
-        MockProvider.createMockDefinition(MockProvider.EXAMPLE_TENANT_ID),
-        MockProvider.createMockDefinition(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
+  public void testDefinitionRetrieval_ByKeyAndTenantId() {
+    ProcessDefinition mockDefinition = MockProvider.mockDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build();
+    setUpRuntimeDataForDefinition(mockDefinition);
 
-    when(processDefinitionQueryMock.list()).thenReturn(processDefinitions);
-    when(processDefinitionQueryMock.count()).thenReturn(2L);
-    when(processDefinitionQueryMock.singleResult()).thenThrow(new ProcessEngineException("not a unique result"));
-
-    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .pathParam("tenant-id", MockProvider.EXAMPLE_TENANT_ID)
     .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .statusCode(Status.OK.getStatusCode())
+      .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+      .body("key", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY))
+      .body("category", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_CATEGORY))
+      .body("name", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME))
+      .body("description", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_DESCRIPTION))
+      .body("deploymentId", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_ID))
+      .body("version", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_VERSION))
+      .body("resource", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME))
+      .body("diagram", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME))
+      .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED))
+      .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+    .when().get(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+
+    verify(processDefinitionQueryMock).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID);
+    verify(repositoryServiceMock).getProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+  }
+
+  @Test
+  public void testNonExistingProcessDefinitionRetrieval_ByKeyAndTenantId() {
+    String nonExistingKey = "aNonExistingDefinitionKey";
+    String nonExistingTenantId = "aNonExistingTenantId";
+
+    when(repositoryServiceMock.createProcessDefinitionQuery().processDefinitionKey(nonExistingKey)).thenReturn(processDefinitionQueryMock);
+    when(processDefinitionQueryMock.singleResult()).thenReturn(null);
+
+    given()
+      .pathParam("key", nonExistingKey)
+      .pathParam("tenant-id", nonExistingTenantId)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
       .body("type", is(RestException.class.getSimpleName()))
-      .body("message", containsString("Found multiple process definition with key '"+MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY+"' for different tenants"))
-    .when().get(SINGLE_PROCESS_DEFINITION_BY_KEY_URL);
+      .body("message", containsString("No matching process definition with key: " + nonExistingKey + " and tenant-id: " + nonExistingTenantId))
+    .when().get(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+  }
+
+  @Test
+  public void testSimpleProcessInstantiation_ByKeyAndTenantId() {
+    ProcessDefinition mockDefinition = MockProvider.mockDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build();
+    setUpRuntimeDataForDefinition(mockDefinition);
+
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .pathParam("tenant-id", MockProvider.EXAMPLE_TENANT_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+    .when().post(START_PROCESS_INSTANCE_BY_KEY_AND_TENANT_ID_URL);
+
+    verify(processDefinitionQueryMock).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID);
   }
 
   @Test

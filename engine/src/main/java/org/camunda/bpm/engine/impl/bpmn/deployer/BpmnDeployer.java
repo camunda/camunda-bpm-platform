@@ -255,7 +255,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
 
   protected void removeObsoleteTimers(ProcessDefinitionEntity processDefinition) {
     List<JobEntity> jobsToDelete = getJobManager()
-      .findJobsByConfiguration(TimerStartEventJobHandler.TYPE, processDefinition.getKey());
+      .findJobsByConfiguration(TimerStartEventJobHandler.TYPE, processDefinition.getKey(), processDefinition.getTenantId());
 
     for (JobEntity job :jobsToDelete) {
         new DeleteJobsCmd(job.getId()).execute(Context.getCommandContext());

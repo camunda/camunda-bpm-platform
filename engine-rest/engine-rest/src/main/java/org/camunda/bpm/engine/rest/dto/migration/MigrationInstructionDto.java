@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.rest.dto.migration;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.migration.MigrationInstruction;
@@ -38,11 +39,11 @@ public class MigrationInstructionDto {
     this.targetActivityIds = targetActivityIds;
   }
 
-  public static MigrationInstructionDto fromMigrationInstruction(MigrationInstruction migrationInstruction) {
+  public static MigrationInstructionDto from(MigrationInstruction migrationInstruction) {
     MigrationInstructionDto dto = new MigrationInstructionDto();
 
-    dto.setSourceActivityIds(migrationInstruction.getSourceActivityIds());
-    dto.setTargetActivityIds(migrationInstruction.getTargetActivityIds());
+    dto.setSourceActivityIds(Collections.singletonList(migrationInstruction.getSourceActivityId()));
+    dto.setTargetActivityIds(Collections.singletonList(migrationInstruction.getTargetActivityId()));
 
     return dto;
   }

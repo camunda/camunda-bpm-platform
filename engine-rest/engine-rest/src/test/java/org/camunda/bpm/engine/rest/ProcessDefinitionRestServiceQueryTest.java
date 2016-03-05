@@ -318,7 +318,10 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
 
   @Test
   public void testProcessDefinitionTenantIdList() {
-    mockedQuery = setUpMockDefinitionQuery(createMockProcessDefinitionsTwoTenants());
+    List<ProcessDefinition> processDefinitions = Arrays.asList(
+        MockProvider.mockDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build(),
+        MockProvider.mockDefinition().id(MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).tenantId(MockProvider.ANOTHER_EXAMPLE_TENANT_ID).build());
+    mockedQuery = setUpMockDefinitionQuery(processDefinitions);
 
     Response response = given()
       .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
@@ -341,10 +344,54 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
   }
 
-  private List<ProcessDefinition> createMockProcessDefinitionsTwoTenants() {
-    return Arrays.asList(
-        MockProvider.createMockDefinition(MockProvider.EXAMPLE_TENANT_ID),
-        MockProvider.createMockDefinition(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
+  @Test
+  public void testProcessDefinitionWithoutTenantId() {
+    Response response = given()
+      .queryParam("withoutTenantId", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(PROCESS_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId1).isEqualTo(null);
+  }
+
+  @Test
+  public void testProcessDefinitionTenantIdIncludeDefinitionsWithoutTenantid() {
+    List<ProcessDefinition> processDefinitions = Arrays.asList(
+        MockProvider.mockDefinition().tenantId(null).build(),
+        MockProvider.mockDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build());
+    mockedQuery = setUpMockDefinitionQuery(processDefinitions);
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID)
+      .queryParam("includeProcessDefinitionsWithoutTenantId", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(PROCESS_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID);
+    verify(mockedQuery).includeProcessDefinitionsWithoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(null);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
   }
 
   @Test

@@ -267,7 +267,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
       previousProcessDefinitionId = Context
           .getCommandContext()
           .getProcessDefinitionManager()
-          .findPreviousProcessDefinitionIdByKeyAndVersion(key, version);
+          .findPreviousProcessDefinitionId(key, version, tenantId);
 
       if (previousProcessDefinitionId == null) {
         firstVersion = true;

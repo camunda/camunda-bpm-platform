@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.inOrder;
@@ -11,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -50,14 +52,20 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Before
   public void setUpRuntimeData() {
-    mockedQuery = mock(IncidentQuery.class);
-
     List<Incident> incidents = MockProvider.createMockIncidents();
 
-    when(mockedQuery.list()).thenReturn(incidents);
-    when(mockedQuery.count()).thenReturn((long) incidents.size());
+    mockedQuery = setupMockIncidentQuery(incidents);
+  }
 
-    when(processEngine.getRuntimeService().createIncidentQuery()).thenReturn(mockedQuery);
+  private IncidentQuery setupMockIncidentQuery(List<Incident> incidents) {
+    IncidentQuery sampleQuery = mock(IncidentQuery.class);
+
+    when(sampleQuery.list()).thenReturn(incidents);
+    when(sampleQuery.count()).thenReturn((long) incidents.size());
+
+    when(processEngine.getRuntimeService().createIncidentQuery()).thenReturn(sampleQuery);
+
+    return sampleQuery;
   }
 
   @Test
@@ -216,6 +224,16 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
     executeAndVerifySorting("configuration", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByConfiguration();
     inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByIncidentId();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByIncidentId();
+    inOrder.verify(mockedQuery).desc();
   }
 
   @Test
@@ -304,6 +322,7 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
     String returnedRootCauseIncidentId = from(content).getString("[0].rootCauseIncidentId");
     String returnedConfiguration = from(content).getString("[0].configuration");
     String returnedIncidentMessage = from(content).getString("[0].incidentMessage");
+    String returnedTenantId = from(content).getString("[0].tenantId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_PROC_INST_ID, returnedProcessInstanceId);
@@ -316,6 +335,7 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_ROOT_CAUSE_INCIDENT_ID, returnedRootCauseIncidentId);
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_CONFIGURATION, returnedConfiguration);
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_MESSAGE, returnedIncidentMessage);
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
   }
 
   @Test
@@ -436,6 +456,33 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
       .when().get(INCIDENT_QUERY_URL);
 
     verify(mockedQuery).configuration(configuration);
+  }
+
+  @Test
+  public void testQueryByTenantIds() {
+    mockedQuery = setupMockIncidentQuery(Arrays.asList(
+        MockProvider.createMockIncident(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockIncident(MockProvider.ANOTHER_EXAMPLE_TENANT_ID)));
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(INCIDENT_QUERY_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> executions = from(content).getList("");
+    assertThat(executions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
   }
 
 }

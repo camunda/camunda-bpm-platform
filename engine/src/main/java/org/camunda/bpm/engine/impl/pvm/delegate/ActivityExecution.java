@@ -128,6 +128,11 @@ public interface ActivityExecution extends DelegateExecution {
   List<? extends ActivityExecution> getExecutions();
 
   /**
+   * returns child executions that are not event scope executions.
+   */
+  List<? extends ActivityExecution> getNonEventScopeExecutions();
+
+  /**
    * @return true if this execution has child executions (event scope executions or not)
    */
   boolean hasChildren();

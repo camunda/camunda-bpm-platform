@@ -13,12 +13,15 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.application.impl.ProcessApplicationIdentifier;
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 
 /**
@@ -142,6 +145,57 @@ public class CommandLogger extends ProcessEngineLogger {
     logWarn(
         "022", "No exclusive lock is aquired while deploying because it is disabled. "
         + "This can lead to problems when multiple process engines use the same data source (i.e. in cluster mode).");
+  }
+
+  public BadUserRequestException exceptionStartProcessInstanceByIdAndTenantId() {
+    return new BadUserRequestException(exceptionMessage(
+        "023", "Cannot specify a tenant-id when start a process instance by process definition id."));
+  }
+
+  public BadUserRequestException exceptionStartProcessInstanceAtStartActivityAndSkipListenersOrMapping() {
+    return new BadUserRequestException(exceptionMessage(
+        "024", "Cannot skip custom listeners or input/output mappings when start a process instance at default start activity."));
+  }
+
+  public BadUserRequestException exceptionCorrelateMessageWithProcessDefinitionId() {
+    return new BadUserRequestException(exceptionMessage(
+        "025", "Cannot specify a process definition id when correlate a message, except for explicit correlation of a start message."));
+  }
+
+  public BadUserRequestException exceptionCorrelateStartMessageWithCorrelationVariables() {
+    return new BadUserRequestException(exceptionMessage(
+        "026", "Cannot specify correlation variables of a process instance when correlate a start message."));
+  }
+
+  public BadUserRequestException exceptionDeliverSignalToSingleExecutionWithTenantId() {
+    return new BadUserRequestException(exceptionMessage(
+        "027", "Cannot specify a tenant-id when deliver a signal to a single execution."));
+  }
+
+  public BadUserRequestException exceptionCorrelateMessageWithProcessInstanceAndTenantId() {
+    return new BadUserRequestException(exceptionMessage(
+        "028", "Cannot specify a tenant-id when correlate a message to a single process instance."));
+  }
+
+  public BadUserRequestException exceptionCorrelateMessageWithProcessDefinitionAndTenantId() {
+    return new BadUserRequestException(exceptionMessage(
+        "029", "Cannot specify a tenant-id when correlate a start message to a specific version of a process definition."));
+  }
+
+  public MismatchingMessageCorrelationException exceptionCorrelateMessageToSingleProcessDefinition(String messageName, long processDefinitionCound, CorrelationSet correlationSet) {
+    return new MismatchingMessageCorrelationException(exceptionMessage(
+        "030",
+        "Cannot correlate a message with name '{}' to a single process definition. {} process definitions match the correlations keys: {}",
+        messageName, processDefinitionCound, correlationSet
+        ));
+  }
+
+  public MismatchingMessageCorrelationException exceptionCorrelateMessageToSingleExecution(String messageName, long executionCound, CorrelationSet correlationSet) {
+    return new MismatchingMessageCorrelationException(exceptionMessage(
+        "031",
+        "Cannot correlate a message with name '{}' to a single execution. {} executions match the correlation keys: {}",
+        messageName, executionCound, correlationSet
+        ));
   }
 
 }

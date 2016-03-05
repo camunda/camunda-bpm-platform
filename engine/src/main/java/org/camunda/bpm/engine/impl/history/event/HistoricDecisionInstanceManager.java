@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.history.event;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -131,6 +133,7 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
 
   protected void appendHistoricDecisionInputInstances(Map<String, HistoricDecisionInstanceEntity> decisionInstancesById, HistoricDecisionInstanceQueryImpl query) {
     List<HistoricDecisionInputInstanceEntity> decisionInputInstances = findHistoricDecisionInputInstancesByDecisionInstanceIds(decisionInstancesById.keySet());
+    initializeInputInstances(decisionInstancesById.values());
 
     for (HistoricDecisionInputInstanceEntity decisionInputInstance : decisionInputInstances) {
 
@@ -141,6 +144,12 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
       if (!isBinaryValue(decisionInputInstance) || query.isByteArrayFetchingEnabled()) {
         fetchVariableValue(decisionInputInstance, query.isCustomObjectDeserializationEnabled());
       }
+    }
+  }
+
+  protected void initializeInputInstances(Collection<HistoricDecisionInstanceEntity> decisionInstances) {
+    for (HistoricDecisionInstanceEntity decisionInstance : decisionInstances) {
+      decisionInstance.setInputs(new ArrayList<HistoricDecisionInputInstance>());
     }
   }
 
@@ -162,10 +171,12 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     }
   }
 
-  protected void appendHistoricDecisionOutputInstances(Map<String, HistoricDecisionInstanceEntity> decisionInstancesById, HistoricDecisionInstanceQueryImpl query) {
-    List<HistoricDecisionOutputInstanceEntity> decisionInputInstances = findHistoricDecisionOutputInstancesByDecisionInstanceIds(decisionInstancesById.keySet());
 
-    for (HistoricDecisionOutputInstanceEntity decisionOutputInstance : decisionInputInstances) {
+  protected void appendHistoricDecisionOutputInstances(Map<String, HistoricDecisionInstanceEntity> decisionInstancesById, HistoricDecisionInstanceQueryImpl query) {
+    List<HistoricDecisionOutputInstanceEntity> decisionOutputInstances = findHistoricDecisionOutputInstancesByDecisionInstanceIds(decisionInstancesById.keySet());
+    initializeOutputInstances(decisionInstancesById.values());
+
+    for (HistoricDecisionOutputInstanceEntity decisionOutputInstance : decisionOutputInstances) {
 
       HistoricDecisionInstanceEntity historicDecisionInstance = decisionInstancesById.get(decisionOutputInstance.getDecisionInstanceId());
       historicDecisionInstance.addOutput(decisionOutputInstance);
@@ -174,6 +185,12 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
       if(!isBinaryValue(decisionOutputInstance) || query.isByteArrayFetchingEnabled()) {
         fetchVariableValue(decisionOutputInstance, query.isCustomObjectDeserializationEnabled());
       }
+    }
+  }
+
+  protected void initializeOutputInstances(Collection<HistoricDecisionInstanceEntity> decisionInstances) {
+    for (HistoricDecisionInstanceEntity decisionInstance : decisionInstances) {
+      decisionInstance.setOutputs(new ArrayList<HistoricDecisionOutputInstance>());
     }
   }
 

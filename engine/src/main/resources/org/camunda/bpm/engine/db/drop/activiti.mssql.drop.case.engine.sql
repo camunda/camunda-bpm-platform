@@ -1,4 +1,5 @@
 drop index ACT_RU_CASE_EXECUTION.ACT_IDX_CASE_EXEC_BUSKEY;
+drop index ACT_RE_CASE_DEF.ACT_IDX_CASE_DEF_TENANT_ID;
 
 -- indexes for concurrency problems - https://app.camunda.com/jira/browse/CAM-1646 --
 drop index ACT_RU_CASE_EXECUTION.ACT_IDX_CASE_EXEC_CASE;

@@ -12,15 +12,23 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import java.util.List;
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.migrate;
+import static org.camunda.bpm.engine.test.util.MigrationPlanValidationReportAssert.assertThat;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.migration.MigrationInstruction;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
 import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -31,216 +39,701 @@ import org.junit.rules.RuleChain;
  */
 public class MigrationPlanCreationTest {
 
-  protected ProcessEngineRule rule = new ProcessEngineRule();
+  public static final String MESSAGE_NAME = "Message";
+  public static final String SIGNAL_NAME = "Signal";
+  public static final String ERROR_CODE = "Error";
+  public static final String ESCALATION_CODE = "Escalation";
+
+  protected ProcessEngineRule rule = new ProcessEngineRule(true);
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
 
+  protected RuntimeService runtimeService;
+
+  @Before
+  public void initServices() {
+    runtimeService = rule.getRuntimeService();
+  }
+
   @Test
   public void testExplicitInstructionGeneration() {
 
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 
-    ProcessDefinition sourceProcessDefinition = testHelper.findProcessDefinition("UserTaskProcess", 1);
-    ProcessDefinition targetProcessDefinition = testHelper.findProcessDefinition("UserTaskProcess", 2);
-
-    MigrationPlan migrationPlan = rule.getRuntimeService()
+    MigrationPlan migrationPlan = runtimeService
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask", "userTask")
       .build();
 
-    Assert.assertNotNull(migrationPlan);
-    Assert.assertEquals(sourceProcessDefinition.getId(), migrationPlan.getSourceProcessDefinitionId());
-    Assert.assertEquals(targetProcessDefinition.getId(), migrationPlan.getTargetProcessDefinitionId());
-
-    List<MigrationInstruction> instructions = migrationPlan.getInstructions();
-    Assert.assertNotNull(instructions);
-    Assert.assertEquals(1, instructions.size());
-    Assert.assertEquals(1, instructions.get(0).getSourceActivityIds().size());
-    Assert.assertEquals("userTask", instructions.get(0).getSourceActivityIds().get(0));
-    Assert.assertEquals(1, instructions.get(0).getTargetActivityIds().size());
-    Assert.assertEquals("userTask", instructions.get(0).getTargetActivityIds().get(0));
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasInstructions(
+        migrate("userTask").to("userTask")
+      );
   }
 
   @Test
   public void testMigrateNonExistingSourceDefinition() {
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
-
-    ProcessDefinition processDefinition = testHelper.findProcessDefinition("UserTaskProcess", 1);
+    ProcessDefinition processDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 
     try {
-      rule.getRuntimeService()
+      runtimeService
         .createMigrationPlan("aNonExistingProcDefId", processDefinition.getId())
         .mapActivities("userTask", "userTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("source process definition with id aNonExistingProcDefId does not exist"));
+      assertExceptionMessage(e, "source process definition with id aNonExistingProcDefId does not exist");
     }
   }
 
   @Test
   public void testMigrateNullSourceDefinition() {
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
-
-    ProcessDefinition processDefinition = testHelper.findProcessDefinition("UserTaskProcess", 1);
+    ProcessDefinition processDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 
     try {
-      rule.getRuntimeService()
+      runtimeService
         .createMigrationPlan(null, processDefinition.getId())
         .mapActivities("userTask", "userTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("sourceProcessDefinitionId is null"));
+      assertExceptionMessage(e, "sourceProcessDefinitionId is null");
     }
   }
 
   @Test
   public void testMigrateNonExistingTargetDefinition() {
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
-
-    ProcessDefinition processDefinition = testHelper.findProcessDefinition("UserTaskProcess", 1);
+    ProcessDefinition processDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
     try {
-      rule.getRuntimeService()
+      runtimeService
         .createMigrationPlan(processDefinition.getId(), "aNonExistingProcDefId")
         .mapActivities("userTask", "userTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("target process definition with id aNonExistingProcDefId does not exist"));
+      assertExceptionMessage(e, "target process definition with id aNonExistingProcDefId does not exist");
     }
   }
 
   @Test
   public void testMigrateNullTargetDefinition() {
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
-
-    ProcessDefinition processDefinition = testHelper.findProcessDefinition("UserTaskProcess", 1);
+    ProcessDefinition processDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 
     try {
-      rule.getRuntimeService()
+      runtimeService
         .createMigrationPlan(processDefinition.getId(), null)
         .mapActivities("userTask", "userTask")
         .build();
-      Assert.fail("Should not succeed");
+      fail("Should not succeed");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("targetProcessDefinitionId is null"));
+      assertExceptionMessage(e, "targetProcessDefinitionId is null");
     }
   }
 
   @Test
   public void testMigrateNonExistingSourceActivityId() {
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 
-    ProcessDefinition sourceDefinition = testHelper.findProcessDefinition("UserTaskProcess", 1);
-    ProcessDefinition targetDefinition = testHelper.findProcessDefinition("UserTaskProcess", 2);
     try {
-      rule.getRuntimeService()
+      runtimeService
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
         .mapActivities("thisActivityDoesNotExist", "userTask")
         .build();
-      Assert.fail("Should not succeed");
-    } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("sourceActivity is null"));
+      fail("Should not succeed");
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("thisActivityDoesNotExist", "Source activity 'thisActivityDoesNotExist' does not exist");
     }
   }
 
   @Test
   public void testMigrateNullSourceActivityId() {
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 
-    ProcessDefinition sourceDefinition = testHelper.findProcessDefinition("UserTaskProcess", 1);
-    ProcessDefinition targetDefinition = testHelper.findProcessDefinition("UserTaskProcess", 2);
     try {
-      rule.getRuntimeService()
+      runtimeService
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
         .mapActivities(null, "userTask")
         .build();
-      Assert.fail("Should not succeed");
-    } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("sourceActivityId is null"));
+      fail("Should not succeed");
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures(null, "Source activity id is null");
     }
   }
 
   @Test
   public void testMigrateNonExistingTargetActivityId() {
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 
-    ProcessDefinition sourceDefinition = testHelper.findProcessDefinition("UserTaskProcess", 1);
-    ProcessDefinition targetDefinition = testHelper.findProcessDefinition("UserTaskProcess", 2);
     try {
-      rule.getRuntimeService()
+      runtimeService
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
         .mapActivities("userTask", "thisActivityDoesNotExist")
         .build();
-      Assert.fail("Should not succeed");
-    } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("targetActivity is null"));
+      fail("Should not succeed");
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("userTask", "Target activity 'thisActivityDoesNotExist' does not exist");
     }
   }
 
   @Test
   public void testMigrateNullTargetActivityId() {
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 
-    ProcessDefinition sourceDefinition = testHelper.findProcessDefinition("UserTaskProcess", 1);
-    ProcessDefinition targetDefinition = testHelper.findProcessDefinition("UserTaskProcess", 2);
     try {
-      rule.getRuntimeService()
+      runtimeService
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
         .mapActivities("userTask", null)
         .build();
-      Assert.fail("Should not succeed");
-    } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("targetActivityId is null"));
+      fail("Should not succeed");
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("userTask", "Target activity id is null");
     }
   }
 
   @Test
   public void testMigrateTaskToHigherScope() {
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
-    ProcessDefinition sourceDefinition = testHelper.findProcessDefinition("UserTaskProcess", 1);
-    ProcessDefinition targetDefinition = testHelper.findProcessDefinition("SubProcess", 1);
+    MigrationPlan migrationPlan = runtimeService
+      .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceDefinition)
+      .hasTargetProcessDefinition(targetDefinition)
+      .hasInstructions(
+        migrate("userTask").to("userTask")
+      );
+  }
+
+  @Test
+  public void testMigrateToUnsupportedActivityType() {
+
+    ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deploy(ProcessModels.ONE_RECEIVE_TASK_PROCESS);
 
     try {
-      rule.getRuntimeService()
+      runtimeService
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapActivities("userTask", "receiveTask")
+        .build();
+      fail("Should not succeed");
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("userTask",
+          "Type of the target activity 'receiveTask' is not supported by the migration",
+          "Activities are of different type which is not supported by the migration (userTask != receiveTask)"
+        );
+    }
+  }
+
+  @Test
+  public void testNotMigrateActivitiesOfDifferentType() {
+    ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .swapElementIds("userTask", "subProcess")
+    );
+
+    try {
+      runtimeService
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
         .mapActivities("userTask", "userTask")
         .build();
-      Assert.fail("Should not succeed");
-    } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Source activity userTask and"
-          + " target activity userTask are not contained in the same sub process"));
+      fail("Should not succeed");
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("userTask", "Activities are of different type which is not supported by the migration (userTask != subProcess)");
+    }
+  }
+
+  @Test
+  public void testNotMigrateBoundaryEventsOfDifferentType() {
+    ProcessDefinition sourceDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+      .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done()
+    );
+    ProcessDefinition targetDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+      .boundaryEvent("boundary").signal(SIGNAL_NAME)
+      .done()
+    );
+
+    try {
+      runtimeService
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .mapActivities("boundary", "boundary")
+        .build();
+      fail("Should not succeed");
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("boundary", "Activities are of different type which is not supported by the migration (boundaryMessage != boundarySignal)");
+    }
+  }
+
+  @Test
+  public void testMigrateSubProcessToProcessDefinition() {
+    ProcessDefinition sourceDefinition = testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
+
+    try {
+      runtimeService
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapActivities("subProcess", targetDefinition.getId())
+        .build();
+      fail("Should not succeed");
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("subProcess", "Target activity '" + targetDefinition.getId() + "' does not exist");
+    }
+  }
+
+  @Test
+  public void testMapEqualActivitiesWithParallelMultiInstance() {
+    // given
+    BpmnModelInstance testProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .getBuilderForElementById("userTask", UserTaskBuilder.class)
+      .multiInstance().parallel().cardinality("3").multiInstanceDone().done();
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+
+    // when
+    try {
+      runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .build();
+      fail("Should not succeed");
+    }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("userTask",
+          "Source activity 'userTask' is child of a multi instances",
+          "Target activity 'userTask' is child of a multi instances"
+        );
+    }
+  }
+
+  @Test
+  public void testMapEqualBoundaryEvents() {
+    BpmnModelInstance testProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+
+    MigrationPlan migrationPlan = runtimeService
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .mapActivities("boundary", "boundary")
+      .build();
+
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasInstructions(
+        migrate("userTask").to("userTask"),
+        migrate("boundary").to("boundary")
+      );
+  }
+
+  @Test
+  public void testMapBoundaryEventsWithDifferentId() {
+    BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
+    BpmnModelInstance targetProcess = modify(sourceProcess)
+      .changeElementId("boundary", "newBoundary");
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+
+    MigrationPlan migrationPlan = runtimeService
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .mapActivities("boundary", "newBoundary")
+      .build();
+
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasInstructions(
+        migrate("userTask").to("userTask"),
+        migrate("boundary").to("newBoundary")
+      );
+  }
+
+  @Test
+  public void testMapBoundaryToMigratedActivity() {
+    BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
+    BpmnModelInstance targetProcess = modify(sourceProcess)
+      .changeElementId("userTask", "newUserTask");
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+
+    MigrationPlan migrationPlan = runtimeService
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "newUserTask")
+      .mapActivities("boundary", "boundary")
+      .build();
+
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasInstructions(
+        migrate("userTask").to("newUserTask"),
+        migrate("boundary").to("boundary")
+      );
+  }
+
+  @Test
+  public void testNotMapBoundaryToParallelActivity() {
+    BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
+    BpmnModelInstance targetProcess = modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
+      .activityBuilder("userTask2")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+
+    try {
+      runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1")
+        .mapActivities("userTask2", "userTask2")
+        .mapActivities("boundary", "boundary")
+        .build();
+      fail("Should not succeed");
+    }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("boundary", "Event scope of the activity has changed and wasn't migrated");
+    }
+  }
+
+  @Test
+  public void testMapBoundaryToHigherScope() {
+    BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
+    BpmnModelInstance targetProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+
+    MigrationPlan migrationPlan = runtimeService
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .mapActivities("boundary", "boundary")
+      .build();
+
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasInstructions(
+        migrate("userTask").to("userTask"),
+        migrate("boundary").to("boundary")
+      );
+  }
+
+  @Test
+  public void testMapBoundaryToLowerScope() {
+    BpmnModelInstance sourceProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
+    BpmnModelInstance targetProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+
+    MigrationPlan migrationPlan = runtimeService
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .mapActivities("boundary", "boundary")
+      .build();
+
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasInstructions(
+        migrate("userTask").to("userTask"),
+        migrate("boundary").to("boundary")
+      );
+  }
+
+  @Test
+  public void testNotMapBoundaryToChildActivity() {
+    BpmnModelInstance sourceProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
+    BpmnModelInstance targetProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+
+    try {
+      runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess")
+        .mapActivities("userTask", "userTask")
+        .mapActivities("boundary", "boundary")
+        .build();
+      fail("Should not succeed");
+    }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("boundary", "Event scope of the activity has changed and wasn't migrated");
+    }
+  }
+
+  @Test
+  public void testNotMapBoundaryToParentActivity() {
+    BpmnModelInstance sourceProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
+    BpmnModelInstance targetProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+
+    try {
+      runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess")
+        .mapActivities("userTask", "userTask")
+        .mapActivities("boundary", "boundary")
+        .build();
+      fail("Should not succeed");
+    }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("boundary", "Event scope of the activity has changed and wasn't migrated");
+    }
+  }
+
+  @Test
+  public void testNotMapUnsupportedBoundaryEvents() {
+    BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+        .boundaryEvent("error").error(ERROR_CODE)
+      .moveToActivity("subProcess")
+        .boundaryEvent("escalation").escalation(ESCALATION_CODE)
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+
+    try {
+      runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess")
+        .mapActivities("error", "error")
+        .mapActivities("escalation", "escalation")
+        .mapActivities("userTask", "userTask")
+        .build();
+      fail("Should not succeed");
+    }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("error",
+          "Type of the source boundary event 'error' is not supported by migration",
+          "Type of the target boundary event 'error' is not supported by migration"
+        )
+        .hasInstructionFailures("escalation",
+          "Type of the source boundary event 'escalation' is not supported by migration",
+          "Type of the target boundary event 'escalation' is not supported by migration"
+        );
     }
 
   }
 
   @Test
-  public void testMigrateToDifferentActivityType() {
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_RECEIVE_TASK_PROCESS);
+  public void testNotMapProcessDefinitionWithEventSubProcess() {
+    BpmnModelInstance testProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .addSubProcessTo(ProcessModels.PROCESS_KEY)
+      .triggerByEvent()
+      .embeddedSubProcess()
+      .startEvent().message(MESSAGE_NAME)
+      .endEvent()
+      .subProcessDone()
+      .done();
 
-    ProcessDefinition sourceDefinition = testHelper.findProcessDefinition("UserTaskProcess", 1);
-    ProcessDefinition targetDefinition = testHelper.findProcessDefinition("ReceiveTaskProcess", 1);
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
 
     try {
-      rule.getRuntimeService()
-        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapActivities("userTask", "receiveTask")
+      runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask")
         .build();
-      Assert.fail("Should not succeed");
-    } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Invalid migration instruction"));
+      fail("Should not succeed");
     }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("userTask",
+          "Source activity 'userTask' has an event sub process child",
+          "Target activity 'userTask' has an event sub process child"
+        );
+    }
+  }
+
+  @Test
+  public void testNotMapSubProcessWithEventSubProcess() {
+    BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
+      .addSubProcessTo("subProcess")
+      .triggerByEvent()
+      .embeddedSubProcess()
+      .startEvent().message(MESSAGE_NAME)
+      .endEvent()
+      .subProcessDone()
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+
+    try {
+      runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess")
+        .mapActivities("userTask", "userTask")
+        .build();
+      fail("Should not succeed");
+    }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("subProcess",
+          "Source activity 'subProcess' has an event sub process child",
+          "Target activity 'subProcess' has an event sub process child"
+        );
+    }
+  }
+
+  @Test
+  public void testMapActivityWithUnmappedParentWhichHasAEventSubProcessChild() {
+    BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
+      .addSubProcessTo("subProcess")
+      .triggerByEvent()
+      .embeddedSubProcess()
+      .startEvent().message(MESSAGE_NAME)
+      .endEvent()
+      .subProcessDone()
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+
+    MigrationPlan migrationPlan = runtimeService
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasInstructions(
+        migrate("userTask").to("userTask")
+      );
+  }
+
+  @Test
+  public void testNotMapUserTaskInEventSubProcess() {
+    BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
+      .addSubProcessTo("subProcess")
+      .triggerByEvent()
+      .embeddedSubProcess()
+      .startEvent().message(MESSAGE_NAME)
+      .userTask("innerTask")
+      .endEvent()
+      .subProcessDone()
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+
+    try {
+      runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .mapActivities("innerTask", "innerTask")
+        .build();
+      fail("Should not succeed");
+    }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("innerTask",
+          "Source activity 'innerTask' is child of an event sub process",
+          "Target activity 'innerTask' is child of an event sub process"
+        );
+    }
+  }
+
+  @Test
+  public void testNotMapActivitiesMoreThanOnce() {
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+
+    try {
+      runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1")
+        .mapActivities("userTask1", "userTask2")
+        .build();
+      fail("Should not succeed");
+    }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("userTask1",
+          "There are multiple mappings for source activity id 'userTask1'",
+          "There are multiple mappings for source activity id 'userTask1'"
+        );
+    }
+  }
+
+  protected void assertExceptionMessage(Exception e, String message) {
+    assertThat(e.getMessage(), CoreMatchers.containsString(message));
   }
 
 }

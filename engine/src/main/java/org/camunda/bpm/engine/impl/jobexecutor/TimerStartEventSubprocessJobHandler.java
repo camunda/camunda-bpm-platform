@@ -34,7 +34,7 @@ public class TimerStartEventSubprocessJobHandler extends TimerEventJobHandler {
     return TYPE;
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
+  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     String activityId = getKey(configuration);
     ActivityImpl eventSubprocessActivity = execution.getProcessDefinition()
       .findActivity(activityId);

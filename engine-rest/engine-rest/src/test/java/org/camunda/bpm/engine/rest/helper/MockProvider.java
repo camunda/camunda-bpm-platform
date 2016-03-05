@@ -753,7 +753,8 @@ public abstract class MockProvider {
       .caseDefinitionId(EXAMPLE_CASE_DEFINITION_ID)
       .caseInstanceId(EXAMPLE_CASE_INSTANCE_ID)
       .caseExecutionId(EXAMPLE_CASE_EXECUTION_ID)
-      .formKey(EXAMPLE_FORM_KEY);
+      .formKey(EXAMPLE_FORM_KEY)
+      .tenantId(EXAMPLE_TENANT_ID);
   }
 
   public static List<Task> createMockTasks() {
@@ -1046,28 +1047,19 @@ public abstract class MockProvider {
     return mocks;
   }
 
-  public static ProcessDefinition createMockDefinition() {
-    return createMockDefinition(EXAMPLE_TENANT_ID);
-  }
-
-  public static ProcessDefinition createMockDefinition(String tenantId) {
-    MockDefinitionBuilder builder = new MockDefinitionBuilder();
-    ProcessDefinition mockDefinition = builder.id(EXAMPLE_PROCESS_DEFINITION_ID).category(EXAMPLE_PROCESS_DEFINITION_CATEGORY)
+  public static MockDefinitionBuilder mockDefinition() {
+    return new MockDefinitionBuilder().id(EXAMPLE_PROCESS_DEFINITION_ID).category(EXAMPLE_PROCESS_DEFINITION_CATEGORY)
         .name(EXAMPLE_PROCESS_DEFINITION_NAME).key(EXAMPLE_PROCESS_DEFINITION_KEY).description(EXAMPLE_PROCESS_DEFINITION_DESCRIPTION)
         .version(EXAMPLE_PROCESS_DEFINITION_VERSION).resource(EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME).deploymentId(EXAMPLE_DEPLOYMENT_ID)
-        .diagram(EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME).suspended(EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED).tenantId(tenantId).build();
+        .diagram(EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME).suspended(EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED);
+  }
 
-    return mockDefinition;
+  public static ProcessDefinition createMockDefinition() {
+    return mockDefinition().build();
   }
 
   public static ProcessDefinition createMockAnotherDefinition() {
-    MockDefinitionBuilder builder = new MockDefinitionBuilder();
-    ProcessDefinition mockDefinition = builder.id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).category(EXAMPLE_PROCESS_DEFINITION_CATEGORY)
-      .name(EXAMPLE_PROCESS_DEFINITION_NAME).key(EXAMPLE_PROCESS_DEFINITION_KEY).description(EXAMPLE_PROCESS_DEFINITION_DESCRIPTION)
-      .version(EXAMPLE_PROCESS_DEFINITION_VERSION).resource(EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME).deploymentId(EXAMPLE_DEPLOYMENT_ID)
-      .diagram(EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME).suspended(EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED).build();
-
-    return mockDefinition;
+    return mockDefinition().id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).build();
   }
 
   // deployments
@@ -1376,11 +1368,11 @@ public abstract class MockProvider {
 
   // jobs
   public static Job createMockJob() {
-    return createMockJob(EXAMPLE_TENANT_ID);
+    return mockJob().tenantId(EXAMPLE_TENANT_ID).build();
   }
 
-  public static Job createMockJob(String tenantId) {
-    Job mock = new MockJobBuilder()
+  public static MockJobBuilder mockJob() {
+    return new MockJobBuilder()
       .id(EXAMPLE_JOB_ID)
       .processInstanceId(EXAMPLE_PROCESS_INSTANCE_ID)
       .executionId(EXAMPLE_EXECUTION_ID)
@@ -1391,10 +1383,7 @@ public abstract class MockProvider {
       .dueDate(DateTimeUtil.parseDate(EXAMPLE_DUE_DATE))
       .suspended(EXAMPLE_JOB_IS_SUSPENDED)
       .priority(EXAMPLE_JOB_PRIORITY)
-      .jobDefinitionId(EXAMPLE_JOB_DEFINITION_ID)
-      .tenantId(tenantId)
-      .build();
-    return mock;
+      .jobDefinitionId(EXAMPLE_JOB_DEFINITION_ID);
   }
 
   public static List<Job> createMockJobs() {
@@ -1505,6 +1494,10 @@ public abstract class MockProvider {
   }
 
   public static HistoricActivityInstance createMockHistoricActivityInstance() {
+    return createMockHistoricActivityInstance(EXAMPLE_TENANT_ID);
+  }
+
+  public static HistoricActivityInstance createMockHistoricActivityInstance(String tenantId) {
     HistoricActivityInstance mock = mock(HistoricActivityInstance.class);
 
     when(mock.getId()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_ID);
@@ -1525,6 +1518,7 @@ public abstract class MockProvider {
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_DURATION);
     when(mock.isCanceled()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED);
     when(mock.isCompleteScope()).thenReturn(EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE);
+    when(mock.getTenantId()).thenReturn(tenantId);
 
     return mock;
   }
@@ -1643,6 +1637,10 @@ public abstract class MockProvider {
   }
 
   public static HistoricProcessInstance createMockHistoricProcessInstance() {
+    return createMockHistoricProcessInstance(EXAMPLE_TENANT_ID);
+  }
+
+  public static HistoricProcessInstance createMockHistoricProcessInstance(String tenantId) {
     HistoricProcessInstance mock = mock(HistoricProcessInstance.class);
 
     when(mock.getId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
@@ -1658,6 +1656,7 @@ public abstract class MockProvider {
     when(mock.getSuperProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID);
     when(mock.getSuperCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_CASE_INSTANCE_ID);
     when(mock.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID);
+    when(mock.getTenantId()).thenReturn(tenantId);
 
     return mock;
   }
@@ -1752,10 +1751,14 @@ public abstract class MockProvider {
   }
 
   public static HistoricVariableInstance createMockHistoricVariableInstance() {
-    return mockHistoricVariableInstance().build();
+    return mockHistoricVariableInstance(EXAMPLE_TENANT_ID).build();
   }
 
   public static MockHistoricVariableInstanceBuilder mockHistoricVariableInstance() {
+    return mockHistoricVariableInstance(EXAMPLE_TENANT_ID);
+  }
+
+  public static MockHistoricVariableInstanceBuilder mockHistoricVariableInstance(String tenantId) {
     return new MockHistoricVariableInstanceBuilder()
         .id(EXAMPLE_VARIABLE_INSTANCE_ID)
         .name(EXAMPLE_VARIABLE_INSTANCE_NAME)
@@ -1770,6 +1773,7 @@ public abstract class MockProvider {
         .caseInstanceId(EXAMPLE_VARIABLE_INSTANCE_CASE_INST_ID)
         .caseExecutionId(EXAMPLE_VARIABLE_INSTANCE_CASE_EXECUTION_ID)
         .taskId(EXAMPLE_VARIABLE_INSTANCE_TASK_ID)
+        .tenantId(tenantId)
         .errorMessage(null);
   }
 
@@ -1841,10 +1845,10 @@ public abstract class MockProvider {
   }
 
   public static JobDefinition createMockJobDefinition() {
-    return createMockJobDefinition(EXAMPLE_TENANT_ID);
+    return mockJobDefinition().build();
   }
 
-  public static JobDefinition createMockJobDefinition(String tenantId) {
+  public static MockJobDefinitionBuilder mockJobDefinition() {
     return new MockJobDefinitionBuilder()
       .id(EXAMPLE_JOB_DEFINITION_ID)
       .activityId(EXAMPLE_ACTIVITY_ID)
@@ -1853,9 +1857,7 @@ public abstract class MockProvider {
       .jobPriority(EXAMPLE_JOB_DEFINITION_PRIORITY)
       .suspended(EXAMPLE_JOB_DEFINITION_IS_SUSPENDED)
       .processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
-      .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY)
-      .tenantId(tenantId)
-      .build();
+      .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY);
   }
 
   public static List<UserOperationLogEntry> createUserOperationLogEntries() {
@@ -1892,10 +1894,14 @@ public abstract class MockProvider {
   // historic detail ////////////////////
 
   public static HistoricVariableUpdate createMockHistoricVariableUpdate() {
-    return mockHistoricVariableUpdate().build();
+    return mockHistoricVariableUpdate(EXAMPLE_TENANT_ID).build();
   }
 
   public static MockHistoricVariableUpdateBuilder mockHistoricVariableUpdate() {
+    return mockHistoricVariableUpdate(EXAMPLE_TENANT_ID);
+  }
+
+  public static MockHistoricVariableUpdateBuilder mockHistoricVariableUpdate(String tenantId) {
     return new MockHistoricVariableUpdateBuilder()
         .id(EXAMPLE_HISTORIC_VAR_UPDATE_ID)
         .processDefinitionKey(EXAMPLE_HISTORIC_VAR_UPDATE_PROC_DEF_KEY)
@@ -1913,11 +1919,15 @@ public abstract class MockProvider {
         .caseDefinitionKey(EXAMPLE_HISTORIC_VAR_UPDATE_CASE_DEF_KEY)
         .caseDefinitionId(EXAMPLE_HISTORIC_VAR_UPDATE_CASE_DEF_ID)
         .caseInstanceId(EXAMPLE_HISTORIC_VAR_UPDATE_CASE_INST_ID)
-        .caseExecutionId(EXAMPLE_HISTORIC_VAR_UPDATE_CASE_EXEC_ID);
+        .caseExecutionId(EXAMPLE_HISTORIC_VAR_UPDATE_CASE_EXEC_ID)
+        .tenantId(tenantId);
   }
 
-
   public static HistoricFormField createMockHistoricFormField() {
+    return createMockHistoricFormField(EXAMPLE_TENANT_ID);
+  }
+
+  public static HistoricFormField createMockHistoricFormField(String tenantId) {
     HistoricFormField historicFromField = mock(HistoricFormField.class);
 
     when(historicFromField.getId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_ID);
@@ -1934,6 +1944,7 @@ public abstract class MockProvider {
     when(historicFromField.getCaseDefinitionId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_CASE_DEF_ID);
     when(historicFromField.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_CASE_INST_ID);
     when(historicFromField.getCaseExecutionId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_CASE_EXEC_ID);
+    when(historicFromField.getTenantId()).thenReturn(tenantId);
 
     return historicFromField;
   }
@@ -1945,13 +1956,21 @@ public abstract class MockProvider {
   }
 
   public static List<HistoricDetail> createMockHistoricDetails() {
+    return createMockHistoricDetails(EXAMPLE_TENANT_ID);
+  }
+
+  public static List<HistoricDetail> createMockHistoricDetails(String tenantId) {
     List<HistoricDetail> entries = new ArrayList<HistoricDetail>();
-    entries.add(createMockHistoricVariableUpdate());
-    entries.add(createMockHistoricFormField());
+    entries.add(mockHistoricVariableUpdate(tenantId).build());
+    entries.add(createMockHistoricFormField(tenantId));
     return entries;
   }
 
   public static HistoricTaskInstance createMockHistoricTaskInstance() {
+    return createMockHistoricTaskInstance(EXAMPLE_TENANT_ID);
+  }
+
+  public static HistoricTaskInstance createMockHistoricTaskInstance(String tenantId) {
     HistoricTaskInstance taskInstance = mock(HistoricTaskInstance.class);
 
     when(taskInstance.getId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_ID);
@@ -1977,6 +1996,7 @@ public abstract class MockProvider {
     when(taskInstance.getCaseDefinitionId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_ID);
     when(taskInstance.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_INST_ID);
     when(taskInstance.getCaseExecutionId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_EXEC_ID);
+    when(taskInstance.getTenantId()).thenReturn(tenantId);
 
     return taskInstance;
   }
@@ -1990,6 +2010,10 @@ public abstract class MockProvider {
   // Incident ///////////////////////////////////////
 
   public static Incident createMockIncident() {
+    return createMockIncident(EXAMPLE_TENANT_ID);
+  }
+
+  public static Incident createMockIncident(String tenantId) {
     Incident incident = mock(Incident.class);
 
     when(incident.getId()).thenReturn(EXAMPLE_INCIDENT_ID);
@@ -2003,6 +2027,7 @@ public abstract class MockProvider {
     when(incident.getRootCauseIncidentId()).thenReturn(EXAMPLE_INCIDENT_ROOT_CAUSE_INCIDENT_ID);
     when(incident.getConfiguration()).thenReturn(EXAMPLE_INCIDENT_CONFIGURATION);
     when(incident.getIncidentMessage()).thenReturn(EXAMPLE_INCIDENT_MESSAGE);
+    when(incident.getTenantId()).thenReturn(tenantId);
 
     return incident;
   }
@@ -2058,10 +2083,8 @@ public abstract class MockProvider {
     return mocks;
   }
 
-  public static CaseDefinition createMockCaseDefinition() {
-    MockCaseDefinitionBuilder builder = new MockCaseDefinitionBuilder();
-
-    CaseDefinition mockDefinition = builder
+  public static MockCaseDefinitionBuilder mockCaseDefinition() {
+    return new MockCaseDefinitionBuilder()
         .id(EXAMPLE_CASE_DEFINITION_ID)
         .category(EXAMPLE_CASE_DEFINITION_CATEGORY)
         .name(EXAMPLE_CASE_DEFINITION_NAME)
@@ -2069,27 +2092,18 @@ public abstract class MockProvider {
         .version(EXAMPLE_CASE_DEFINITION_VERSION)
         .resource(EXAMPLE_CASE_DEFINITION_RESOURCE_NAME)
         .diagram(EXAMPLE_CASE_DEFINITION_DIAGRAM_RESOURCE_NAME)
-        .deploymentId(EXAMPLE_DEPLOYMENT_ID)
-        .build();
+        .deploymentId(EXAMPLE_DEPLOYMENT_ID);
+  }
 
-    return mockDefinition;
+  public static CaseDefinition createMockCaseDefinition() {
+    return mockCaseDefinition().build();
   }
 
   public static CaseDefinition createAnotherMockCaseDefinition() {
-    MockCaseDefinitionBuilder builder = new MockCaseDefinitionBuilder();
-
-    CaseDefinition mockDefinition = builder
-      .id(ANOTHER_EXAMPLE_CASE_DEFINITION_ID)
-      .category(EXAMPLE_CASE_DEFINITION_CATEGORY)
-      .name(EXAMPLE_CASE_DEFINITION_NAME)
-      .key(EXAMPLE_CASE_DEFINITION_KEY)
-      .version(EXAMPLE_CASE_DEFINITION_VERSION)
-      .resource(EXAMPLE_CASE_DEFINITION_RESOURCE_NAME)
-      .diagram(EXAMPLE_CASE_DEFINITION_DIAGRAM_RESOURCE_NAME)
-      .deploymentId(EXAMPLE_DEPLOYMENT_ID)
-      .build();
-
-    return mockDefinition;
+    return mockCaseDefinition()
+       .id(ANOTHER_EXAMPLE_CASE_DEFINITION_ID)
+       .tenantId(ANOTHER_EXAMPLE_TENANT_ID)
+       .build();
   }
 
   // case instance
@@ -2233,7 +2247,7 @@ public abstract class MockProvider {
     return mocks;
   }
 
-  public static DecisionDefinition createMockDecisionDefinition() {
+  public static MockDecisionDefinitionBuilder mockDecisionDefinition() {
     MockDecisionDefinitionBuilder builder = new MockDecisionDefinitionBuilder();
 
     return builder
@@ -2244,22 +2258,17 @@ public abstract class MockProvider {
       .version(EXAMPLE_DECISION_DEFINITION_VERSION)
       .resource(EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME)
       .diagram(EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME)
-      .deploymentId(EXAMPLE_DEPLOYMENT_ID)
-      .build();
+      .deploymentId(EXAMPLE_DEPLOYMENT_ID);
+  }
+
+  public static DecisionDefinition createMockDecisionDefinition() {
+    return mockDecisionDefinition().build();
   }
 
   public static DecisionDefinition createAnotherMockDecisionDefinition() {
-    MockDecisionDefinitionBuilder builder = new MockDecisionDefinitionBuilder();
-
-    return builder
+    return mockDecisionDefinition()
       .id(ANOTHER_EXAMPLE_DECISION_DEFINITION_ID)
-      .category(EXAMPLE_DECISION_DEFINITION_CATEGORY)
-      .name(EXAMPLE_DECISION_DEFINITION_NAME)
-      .key(EXAMPLE_DECISION_DEFINITION_KEY)
-      .version(EXAMPLE_DECISION_DEFINITION_VERSION)
-      .resource(EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME)
-      .diagram(EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME)
-      .deploymentId(EXAMPLE_DEPLOYMENT_ID)
+      .tenantId(ANOTHER_EXAMPLE_TENANT_ID)
       .build();
   }
 
@@ -2426,12 +2435,13 @@ public abstract class MockProvider {
   }
 
   public static ExternalTask createMockExternalTask() {
-    return mockExternalTask().buildExternalTask();
+    return mockExternalTask().tenantId(EXAMPLE_TENANT_ID).buildExternalTask();
   }
 
   public static LockedExternalTask createMockLockedExternalTask() {
     return mockExternalTask()
       .variable(EXAMPLE_VARIABLE_INSTANCE_NAME, EXAMPLE_PRIMITIVE_VARIABLE_VALUE)
+      .tenantId(EXAMPLE_TENANT_ID)
       .buildLockedExternalTask();
   }
 

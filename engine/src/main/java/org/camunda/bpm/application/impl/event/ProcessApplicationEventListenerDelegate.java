@@ -13,6 +13,8 @@
 package org.camunda.bpm.application.impl.event;
 
 import java.util.concurrent.Callable;
+
+import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
@@ -86,7 +88,7 @@ public class ProcessApplicationEventListenerDelegate implements ExecutionListene
     } else {
       if (ProcessApplicationContextUtil.requiresContextSwitch(processApp)) {
         // this should not be necessary since context switch is already performed by OperationContext and / or DelegateInterceptor
-        Context.executeWithinProcessApplication(notification, processApp);
+        Context.executeWithinProcessApplication(notification, processApp, new InvocationContext(execution));
 
       } else {
         // context switch already performed

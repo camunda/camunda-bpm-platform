@@ -48,8 +48,8 @@ public class MockMigrationInstructionBuilder {
 
   public MigrationInstruction build() {
     MigrationInstruction migrationInstructionMock = mock(MigrationInstruction.class);
-    when(migrationInstructionMock.getSourceActivityIds()).thenReturn(sourceActivityIds);
-    when(migrationInstructionMock.getTargetActivityIds()).thenReturn(targetActivityIds);
+    when(migrationInstructionMock.getSourceActivityId()).thenReturn(sourceActivityIds.get(0));
+    when(migrationInstructionMock.getTargetActivityId()).thenReturn(targetActivityIds.get(0));
     return migrationInstructionMock;
   }
 

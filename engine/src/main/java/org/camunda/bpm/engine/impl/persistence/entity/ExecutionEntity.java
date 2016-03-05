@@ -26,6 +26,8 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInstanceContext;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
@@ -62,10 +64,12 @@ import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDelet
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.FlowElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -265,6 +269,16 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
     ExecutionEntity subProcessInstance = (ExecutionEntity) super.createSubProcessInstance(processDefinition, businessKey, caseInstanceId);
 
+    // inherit the tenant-id from the process definition
+    String tenantId = ((ProcessDefinitionEntity) processDefinition).getTenantId();
+    if (tenantId != null) {
+      subProcessInstance.setTenantId(tenantId);
+    }
+    else {
+      // if process definition has no tenant id, inherit this process instance's tenant id
+      subProcessInstance.setTenantId(this.tenantId);
+    }
+
     fireHistoricActivityInstanceUpdate();
 
     return subProcessInstance;
@@ -352,11 +366,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void initializeTimerDeclarations() {
     LOG.initializeTimerDeclaration(this);
     ScopeImpl scope = getScopeActivity();
-    List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) scope.getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
+    List<TimerDeclarationImpl> timerDeclarations = TimerDeclarationImpl.getDeclarationsForScope(scope);
     if (timerDeclarations != null) {
       for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
         timerDeclaration.createTimerInstance(this);
@@ -377,6 +390,38 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     // Cached entity-state initialized to null, all bits are zero, indicating NO
     // entities present
     execution.cachedEntityState = 0;
+  }
+
+  @Override
+  public void start(Map<String, Object> variables) {
+    // determine tenant Id if null
+    if(tenantId == null) {
+      provideTenantId(variables);
+    }
+    super.start(variables);
+  }
+
+  protected void provideTenantId(Map<String, Object> variables) {
+    TenantIdProvider tenantIdProvider = Context.getProcessEngineConfiguration().getTenantIdProvider();
+
+    if(tenantIdProvider != null) {
+      VariableMap variableMap = Variables.fromMap(variables);
+      ProcessDefinition processDefinition = (ProcessDefinition) getProcessDefinition();
+
+      TenantIdProviderProcessInstanceContext ctx = null;
+
+      if(superExecutionId != null) {
+        ctx = new TenantIdProviderProcessInstanceContext(processDefinition, variableMap, getSuperExecution());
+      }
+      else if(superCaseExecutionId != null) {
+        ctx = new TenantIdProviderProcessInstanceContext(processDefinition, variableMap, getSuperCaseExecution());
+      }
+      else {
+        ctx = new TenantIdProviderProcessInstanceContext(processDefinition, variableMap);
+      }
+
+      tenantId = tenantIdProvider.provideTenantIdForProcessInstance(ctx);
+    }
   }
 
   public void startWithFormProperties(VariableMap properties) {
@@ -973,6 +1018,11 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   @Override
+  public ExecutionEntity resolveReplacedBy() {
+    return (ExecutionEntity) super.resolveReplacedBy();
+  }
+
+  @Override
   public void replace(PvmExecutionImpl execution) {
     ExecutionEntity replacedExecution = (ExecutionEntity) execution;
 
@@ -1116,7 +1166,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   protected void ensureExecutionTreeInitialized() {
     List<ExecutionEntity> executions = Context.getCommandContext()
       .getExecutionManager()
-      .findChildExecutionsByProcessInstanceId(processInstanceId);
+      .findExecutionsByProcessInstanceId(processInstanceId);
 
     ExecutionEntity processInstance = isProcessInstanceExecution() ? this : null;
 
@@ -1128,12 +1178,11 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       }
     }
 
-    processInstance.restoreProcessInstance(executions, null, null);
+    processInstance.restoreProcessInstance(executions, null, null, null, null, null);
   }
 
   /**
    * Restores a complete process instance tree including referenced entities.
-   * Note: currently only the restoring of variables and event subscriptions is supported.
    *
    * @param executions
    *   the list of all executions that are part of this process instance.
@@ -1144,10 +1193,16 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
    * @param variables
    *   the list of all variables that are linked to executions which are part of this process instance
    *   If null, variables are not initialized and are lazy loaded on demand
+   * @param jobs
+   * @param tasks
+   * @param incidents
    */
   public void restoreProcessInstance(Collection<ExecutionEntity> executions,
       Collection<EventSubscriptionEntity> eventSubscriptions,
-      Collection<VariableInstanceEntity> variables) {
+      Collection<VariableInstanceEntity> variables,
+      Collection<TaskEntity> tasks,
+      Collection<JobEntity> jobs,
+      Collection<IncidentEntity> incidents) {
 
     if(!isProcessInstanceExecution()) {
       throw LOG.restoreProcessInstanceException(this);
@@ -1201,6 +1256,28 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       for (VariableInstanceEntity variable : variables) {
         ExecutionEntity executionEntity = executionsMap.get(variable.getExecutionId());
         executionEntity.getVariableStore().getVariableInstances().put(variable.getName(), variable);
+      }
+    }
+
+    if (jobs != null) {
+      for (JobEntity job : jobs) {
+        ExecutionEntity execution = executionsMap.get(job.getExecutionId());
+        job.setExecution(execution);
+      }
+    }
+
+    if (tasks != null) {
+      for (TaskEntity task : tasks) {
+        ExecutionEntity execution = executionsMap.get(task.getExecutionId());
+        task.setExecution(execution);
+        execution.addTask(task);
+      }
+    }
+
+    if (incidents != null) {
+      for (IncidentEntity incident : incidents) {
+        ExecutionEntity execution = executionsMap.get(incident.getExecutionId());
+        incident.setExecution(execution);
       }
     }
   }

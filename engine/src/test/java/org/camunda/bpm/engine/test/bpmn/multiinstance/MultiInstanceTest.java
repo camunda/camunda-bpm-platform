@@ -397,6 +397,22 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  public void FAILING_testParallelUserTasksBasedOnCollectionExpression() {
+    DelegateEvent.clearEvents();
+
+    runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("myBean", new DelegateBean()));
+
+    List<DelegateEvent> recordedEvents = DelegateEvent.getEvents();
+    assertEquals(2, recordedEvents.size());
+
+    assertEquals("miTasks#multiInstanceBody", recordedEvents.get(0).getCurrentActivityId());
+    assertEquals("miTasks#multiInstanceBody", recordedEvents.get(1).getCurrentActivityId()); // or miTasks
+
+    DelegateEvent.clearEvents();
+  }
+
+  @Deployment
   public void testParallelUserTasksCustomExtensions() {
     Map<String, Object> vars = new HashMap<String, Object>();
     List<String> assigneeList = Arrays.asList("kermit", "gonzo", "fozzie");

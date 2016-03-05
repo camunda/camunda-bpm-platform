@@ -155,6 +155,15 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   /** Only select process definitions with one of the given tenant ids. */
   ProcessDefinitionQuery tenantIdIn(String... tenantIds);
 
+  /** Only select process definitions which have no tenant id. */
+  ProcessDefinitionQuery withoutTenantId();
+
+  /**
+   * Select process definitions which have no tenant id. Can be used in
+   * combination with {@link #tenantIdIn(String...)}.
+   */
+  ProcessDefinitionQuery includeProcessDefinitionsWithoutTenantId();
+
   // ordering ////////////////////////////////////////////////////////////
 
   /** Order by the category of the process definitions (needs to be followed by {@link #asc()} or {@link #desc()}). */

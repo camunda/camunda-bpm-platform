@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
+
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
@@ -43,6 +44,7 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected String activityInstanceId;
   protected String type;
   protected String variableInstanceId;
+  protected String[] tenantIds;
 
   protected boolean excludeTaskRelated = false;
   protected boolean isByteArrayFetchingEnabled = true;
@@ -116,6 +118,12 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public HistoricDetailQuery variableUpdates() {
     this.type = "VariableUpdate";
+    return this;
+  }
+
+  public HistoricDetailQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
     return this;
   }
 
@@ -207,6 +215,10 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   public HistoricDetailQuery orderPartiallyByOccurrence() {
     orderBy(HistoricDetailQueryProperty.SEQUENCE_COUNTER);
     return this;
+  }
+
+  public HistoricDetailQuery orderByTenantId() {
+    return orderBy(HistoricDetailQueryProperty.TENANT_ID);
   }
 
   // getters and setters //////////////////////////////////////////////////////

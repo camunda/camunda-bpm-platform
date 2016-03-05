@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
 
 /**
  *
@@ -824,5 +825,4 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
 
     assertEquals(key, job.getProcessDefinitionKey());
   }
-
 }

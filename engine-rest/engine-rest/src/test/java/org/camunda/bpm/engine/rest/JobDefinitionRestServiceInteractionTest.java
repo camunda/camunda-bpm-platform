@@ -104,7 +104,7 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
         .body("activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
         .body("suspended", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_IS_SUSPENDED))
         .body("overridingJobPriority", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY))
-        .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+        .body("tenantId", equalTo(null))
     .when()
       .get(SINGLE_JOB_DEFINITION_RESOURCE_URL);
 
@@ -1502,8 +1502,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
 
   private List<JobDefinition> createMockJobDefinitionsTwoTenants() {
     return Arrays.asList(
-        MockProvider.createMockJobDefinition(MockProvider.EXAMPLE_TENANT_ID),
-        MockProvider.createMockJobDefinition(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
+        MockProvider.mockJobDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build(),
+        MockProvider.mockJobDefinition().tenantId(MockProvider.ANOTHER_EXAMPLE_TENANT_ID).build());
   }
 
 }

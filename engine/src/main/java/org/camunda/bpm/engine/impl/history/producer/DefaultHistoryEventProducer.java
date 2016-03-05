@@ -70,6 +70,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     String parentActivityInstanceId = null;
     ExecutionEntity parentExecution = execution.getParent();
+    String tenantId = execution.getTenantId();
 
     if (parentExecution != null && CompensationBehavior.isCompensationThrowing(parentExecution)) {
       parentActivityInstanceId = CompensationBehavior.getParentActivityInstanceId(execution);
@@ -85,6 +86,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setProcessDefinitionId(execution.getProcessDefinitionId());
     evt.setProcessInstanceId(execution.getProcessInstanceId());
     evt.setExecutionId(execution.getId());
+    evt.setTenantId(tenantId);
 
     ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
     if (definition != null) {
@@ -111,6 +113,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String executionId = execution.getId();
     // the given execution is the process instance!
     String caseInstanceId = execution.getCaseInstanceId();
+    String tenantId = execution.getTenantId();
 
     ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
     String processDefinitionKey = null;
@@ -126,6 +129,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setExecutionId(executionId);
     evt.setBusinessKey(execution.getProcessBusinessKey());
     evt.setCaseInstanceId(caseInstanceId);
+    evt.setTenantId(tenantId);
 
     if (execution.getSuperCaseExecution() != null) {
       evt.setSuperCaseInstanceId(execution.getSuperCaseExecution().getCaseInstanceId());
@@ -156,6 +160,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String caseDefinitionId = taskEntity.getCaseDefinitionId();
     String caseExecutionId = taskEntity.getCaseExecutionId();
     String caseInstanceId = taskEntity.getCaseInstanceId();
+    String tenantId = taskEntity.getTenantId();
 
     evt.setId(taskEntity.getId());
     evt.setEventType(eventType.getEventName());
@@ -180,6 +185,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setParentTaskId(taskEntity.getParentTaskId());
     evt.setPriority(taskEntity.getPriority());
     evt.setTaskDefinitionKey(taskEntity.getTaskDefinitionKey());
+    evt.setTenantId(tenantId);
 
     ExecutionEntity execution = taskEntity.getExecution();
     if (execution != null) {
@@ -202,6 +208,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setRevision(variableInstance.getRevision());
     evt.setVariableName(variableInstance.getName());
     evt.setSerializerName(variableInstance.getSerializerName());
+    evt.setTenantId(variableInstance.getTenantId());
 
     ExecutionEntity execution = variableInstance.getExecution();
     if (execution != null) {
@@ -607,6 +614,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     historicFormPropertyEntity.setPropertyId(propertyId);
     historicFormPropertyEntity.setPropertyValue(propertyValue);
     historicFormPropertyEntity.setTaskId(taskId);
+    historicFormPropertyEntity.setTenantId(execution.getTenantId());
 
     ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
     if (definition != null) {

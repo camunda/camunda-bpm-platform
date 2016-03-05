@@ -49,7 +49,7 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
     return json.toString();
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
+  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     AbstractSetProcessDefinitionStateCmd cmd = getCommand(configuration);
     cmd.disableLogUserOperation();
     cmd.execute(commandContext);

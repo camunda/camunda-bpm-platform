@@ -72,7 +72,6 @@ public class MockMigrationPlanBuilder {
     MigrationPlanBuilder migrationPlanBuilderMock = mock(MigrationPlanBuilder.class);
     when(migrationPlanBuilderMock.mapEqualActivities()).thenReturn(migrationPlanBuilderMock);
     when(migrationPlanBuilderMock.mapActivities(anyString(), anyString())).thenReturn(migrationPlanBuilderMock);
-    when(migrationPlanBuilderMock.mapActivities(anyListOf(String.class), anyListOf(String.class))).thenReturn(migrationPlanBuilderMock);
     when(migrationPlanBuilderMock.build()).thenReturn(migrationPlanMock);
     return migrationPlanBuilderMock;
   }

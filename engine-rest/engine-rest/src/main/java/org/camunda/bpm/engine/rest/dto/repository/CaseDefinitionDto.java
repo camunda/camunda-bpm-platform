@@ -28,6 +28,7 @@ public class CaseDefinitionDto {
   protected int version;
   protected String resource;
   protected String deploymentId;
+  protected String tenantId;
 
   public String getId() {
     return id;
@@ -57,6 +58,10 @@ public class CaseDefinitionDto {
     return deploymentId;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
   public static CaseDefinitionDto fromCaseDefinition(CaseDefinition definition) {
     CaseDefinitionDto dto = new CaseDefinitionDto();
 
@@ -67,6 +72,7 @@ public class CaseDefinitionDto {
     dto.version = definition.getVersion();
     dto.resource = definition.getResourceName();
     dto.deploymentId = definition.getDeploymentId();
+    dto.tenantId = definition.getTenantId();
 
     return dto;
   }

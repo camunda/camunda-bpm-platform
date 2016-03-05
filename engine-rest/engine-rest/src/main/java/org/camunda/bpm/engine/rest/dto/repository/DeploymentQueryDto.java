@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.repository;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,6 +57,8 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
   private Date before;
   private Date after;
   private List<String> tenantIds;
+  private Boolean withoutTenantId;
+  private Boolean includeDeploymentsWithoutTenantId;
 
   public DeploymentQueryDto() {
   }
@@ -103,6 +107,16 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
+  @CamundaQueryParam(value = "includeDeploymentsWithoutTenantId", converter = BooleanConverter.class)
+  public void setIncludeDeploymentsWithoutTenantId(Boolean includeDeploymentsWithoutTenantId) {
+    this.includeDeploymentsWithoutTenantId = includeDeploymentsWithoutTenantId;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -128,7 +142,7 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
     if (nameLike != null) {
       query.deploymentNameLike(nameLike);
     }
-    if (withoutSource != null && withoutSource) {
+    if (TRUE.equals(withoutSource)) {
       query.deploymentSource(null);
     }
     if (source != null) {
@@ -142,6 +156,12 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
+    }
+    if (TRUE.equals(includeDeploymentsWithoutTenantId)) {
+      query.includeDeploymentsWithoutTenantId();
     }
   }
 

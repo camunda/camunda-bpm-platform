@@ -16,16 +16,14 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
-import org.camunda.bpm.engine.ProcessEngineException;
+
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.ProcessInstantiationBuilderImpl;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -49,23 +47,8 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
   }
 
   public ProcessInstance execute(CommandContext commandContext) {
-    String processDefinitionId = instantiationBuilder.getProcessDefinitionId();
-    String processDefinitionKey = instantiationBuilder.getProcessDefinitionKey();
 
-    DeploymentCache deploymentCache = Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache();
-    // Find the process definition
-    ProcessDefinitionEntity processDefinition = null;
-    if (processDefinitionId!=null) {
-      processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-      ensureNotNull("No process definition found for id = '" + processDefinitionId + "'", "processDefinition", processDefinition);
-    } else if(processDefinitionKey != null) {
-      processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
-      ensureNotNull("No process definition found for key '" + processDefinitionKey + "'", "processDefinition", processDefinition);
-    } else {
-      throw new ProcessEngineException("processDefinitionKey and processDefinitionId are null");
-    }
+    ProcessDefinitionEntity processDefinition = new GetDeployedProcessDefinitionCmd(instantiationBuilder, false).execute(commandContext);
 
     // check authorization
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();

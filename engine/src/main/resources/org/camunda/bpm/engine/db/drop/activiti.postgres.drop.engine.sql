@@ -2,6 +2,7 @@ drop index ACT_IDX_BYTEAR_DEPL ;
 drop index ACT_IDX_EXE_PROCINST ;
 drop index ACT_IDX_EXE_PARENT ;
 drop index ACT_IDX_EXE_SUPER;
+drop index ACT_IDX_EXE_PROCDEF;
 drop index ACT_IDX_TSKASS_TASK;
 drop index ACT_IDX_TASK_EXEC;
 drop index ACT_IDX_TASK_PROCINST;
@@ -12,6 +13,7 @@ drop index ACT_IDX_VAR_BYTEARRAY;
 drop index ACT_IDX_JOB_EXCEPTION;
 drop index ACT_IDX_JOB_PROCINST;
 drop index ACT_IDX_INC_CONFIGURATION;
+drop index ACT_IDX_AUTH_GROUP_ID;
 
 drop index ACT_IDX_EXEC_BUSKEY;
 drop index ACT_IDX_TASK_CREATE;
@@ -66,25 +68,25 @@ alter table ACT_RU_JOB
     drop constraint ACT_FK_JOB_EXCEPTION;
 
 alter table ACT_RU_EVENT_SUBSCR
-    drop constraint ACT_FK_EVENT_EXEC; 
+    drop constraint ACT_FK_EVENT_EXEC;
 
 alter table ACT_RU_INCIDENT
-    drop constraint ACT_FK_INC_EXE; 
+    drop constraint ACT_FK_INC_EXE;
 
 alter table ACT_RU_INCIDENT
-    drop constraint ACT_FK_INC_PROCINST; 
+    drop constraint ACT_FK_INC_PROCINST;
 
 alter table ACT_RU_INCIDENT
     drop constraint ACT_FK_INC_PROCDEF;
 
 alter table ACT_RU_INCIDENT
-    drop constraint ACT_FK_INC_CAUSE; 
+    drop constraint ACT_FK_INC_CAUSE;
 
 alter table ACT_RU_INCIDENT
-    drop constraint ACT_FK_INC_RCAUSE; 
+    drop constraint ACT_FK_INC_RCAUSE;
 
 alter table ACT_RU_AUTHORIZATION
-    drop constraint ACT_UNIQ_AUTH_GROUP; 
+    drop constraint ACT_UNIQ_AUTH_GROUP;
 
 alter table ACT_RU_AUTHORIZATION
     drop constraint ACT_UNIQ_AUTH_USER;
@@ -106,6 +108,7 @@ drop index ACT_IDX_INC_PROCDEFID;
 drop index ACT_IDX_INC_PROCINSTID;
 drop index ACT_IDX_INC_ROOTCAUSEINCID;
 drop index ACT_IDX_AUTH_RESOURCE_ID;
+drop index ACT_IDX_EXT_TASK_EXEC;
 
 drop index ACT_IDX_BYTEARRAY_NAME;
 drop index ACT_IDX_DEPLOYMENT_NAME;
@@ -114,10 +117,13 @@ drop index ACT_IDX_JOB_HANDLER_TYPE;
 drop index ACT_IDX_EVENT_SUBSCR_EVT_NAME;
 drop index ACT_IDX_PROCDEF_DEPLOYMENT_ID;
 
+drop index ACT_IDX_EXT_TASK_TENANT_ID;
+drop index ACT_IDX_INC_TENANT_ID;
 drop index ACT_IDX_JOBDEF_TENANT_ID;
 drop index ACT_IDX_JOB_TENANT_ID;
 drop index ACT_IDX_EVENT_SUBSCR_TENANT_ID;
 drop index ACT_IDX_VARIABLE_TENANT_ID;
+drop index ACT_IDX_TASK_TENANT_ID;
 drop index ACT_IDX_EXEC_TENANT_ID;
 drop index ACT_IDX_PROCDEF_TENANT_ID;
 drop index ACT_IDX_DEPLOYMENT_TENANT_ID;

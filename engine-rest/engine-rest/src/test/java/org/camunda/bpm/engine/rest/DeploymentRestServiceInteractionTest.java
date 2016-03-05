@@ -1487,6 +1487,46 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   }
 
   @Test
+  public void testRedeployDeploymentWithoutTenantId() {
+    when(mockDeployment.getTenantId()).thenReturn(null);
+
+    Response response = given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+    .when()
+      .post(REDEPLOY_DEPLOYMENT_URL);
+
+    verify(mockDeploymentBuilder).addDeploymentResources(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
+    verify(mockDeploymentBuilder, never()).tenantId(any(String.class));
+    verify(mockDeploymentBuilder).deploy();
+
+    verifyDeployment(mockDeployment, response);
+  }
+
+  @Test
+  public void testRedeployDeploymentWithTenantId() {
+    when(mockDeployment.getTenantId()).thenReturn(MockProvider.EXAMPLE_TENANT_ID);
+
+    Response response = given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+    .when()
+      .post(REDEPLOY_DEPLOYMENT_URL);
+
+    verify(mockDeploymentBuilder).addDeploymentResources(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
+    verify(mockDeploymentBuilder).tenantId(eq(MockProvider.EXAMPLE_TENANT_ID));
+    verify(mockDeploymentBuilder).deploy();
+
+    verifyDeployment(mockDeployment, response);
+  }
+
+  @Test
   public void testRedeployThrowsNotFoundException() {
     String message = "deployment not found";
     doThrow(new NotFoundException(message)).when(mockDeploymentBuilder).deploy();

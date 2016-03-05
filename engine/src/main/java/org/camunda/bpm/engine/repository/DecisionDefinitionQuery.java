@@ -118,6 +118,18 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
    */
   DecisionDefinitionQuery decisionDefinitionResourceNameLike(String resourceNameLike);
 
+  /** Only select decision definitions with one of the given tenant ids. */
+  DecisionDefinitionQuery tenantIdIn(String... tenantIds);
+
+  /** Only select decision definitions which have no tenant id. */
+  DecisionDefinitionQuery withoutTenantId();
+
+  /**
+   * Select decision definitions which have no tenant id. Can be used in
+   * combination with {@link #tenantIdIn(String...)}.
+   */
+  DecisionDefinitionQuery includeDecisionDefinitionsWithoutTenantId();
+
   // ordering ////////////////////////////////////////////////////////////
 
   /** Order by the category of the decision definitions (needs to be followed by
@@ -143,5 +155,9 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
   /** Order by deployment id (needs to be followed by {@link #asc()}
    * or {@link #desc()}). */
   DecisionDefinitionQuery orderByDeploymentId();
+
+  /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of decision instances without tenant id is database-specific. */
+  DecisionDefinitionQuery orderByTenantId();
 
 }

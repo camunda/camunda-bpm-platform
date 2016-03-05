@@ -6,9 +6,11 @@
 
   <process-archive>
     <process-engine>default</process-engine>
+    <resource>invoice.v2.bpmn</resource>
+    <resource>assign-approver-groups.dmn</resource>
     <properties>
       <property name="isDeleteUponUndeploy">false</property>
-      <property name="isScanForProcessDefinitions">true</property>
+      <property name="isScanForProcessDefinitions">false</property>
     </properties>
   </process-archive>
 

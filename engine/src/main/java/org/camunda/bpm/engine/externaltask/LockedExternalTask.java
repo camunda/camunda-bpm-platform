@@ -96,4 +96,10 @@ public interface LockedExternalTask {
    */
   VariableMap getVariables();
 
+  /**
+   * @return the id of the tenant the task belongs to. Can be <code>null</code>
+   * if the task belongs to no single tenant.
+   */
+  String getTenantId();
+
 }

@@ -219,7 +219,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
   }
 
   protected List filterLoadedObjects(List<Object> loadedObjects) {
-    if (loadedObjects.isEmpty()) {
+    if (loadedObjects.isEmpty() || loadedObjects.get(0) == null) {
       return loadedObjects;
     }
     if (! (DbEntity.class.isAssignableFrom(loadedObjects.get(0).getClass()))) {

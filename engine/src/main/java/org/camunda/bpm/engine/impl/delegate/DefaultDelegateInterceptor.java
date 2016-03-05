@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.delegate;
 
 import java.util.concurrent.Callable;
 
+import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -52,7 +53,7 @@ public class DefaultDelegateInterceptor implements DelegateInterceptor {
           handleInvocation(invocation);
           return null;
         }
-      }, processApplication);
+      }, processApplication, new InvocationContext(invocation.getContextExecution()));
     }
     else {
       handleInvocationInContext(invocation);

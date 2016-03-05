@@ -99,6 +99,9 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    */
   ExternalTaskQuery noRetriesLeft();
 
+  /** Only select external tasks that belong to one of the given tenant ids. */
+  ExternalTaskQuery tenantIdIn(String... tenantIds);
+
   /**
    * Order by external task id (needs to be followed by {@link #asc()} or {@link #desc()}).
    */
@@ -124,4 +127,11 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}).
    */
   ExternalTaskQuery orderByProcessDefinitionKey();
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of external tasks without tenant id is database-specific.
+   */
+  ExternalTaskQuery orderByTenantId();
+
 }

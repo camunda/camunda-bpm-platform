@@ -18,6 +18,7 @@ import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.api.delegate.AssertingJavaDelegate;
 import org.camunda.bpm.engine.test.api.delegate.AssertingJavaDelegate.DelegateExecutionAsserter;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -40,7 +41,7 @@ public class MultiTenancyDelegateExecutionTest extends PluggableProcessEngineTes
 
     AssertingJavaDelegate.addAsserts(hasTenantId("tenant1"));
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
   }
 
   public void testConcurrentExecution() {
@@ -60,7 +61,7 @@ public class MultiTenancyDelegateExecutionTest extends PluggableProcessEngineTes
 
     AssertingJavaDelegate.addAsserts(hasTenantId("tenant1"));
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
   }
 
   public void testEmbeddedSubprocess() {
@@ -78,7 +79,17 @@ public class MultiTenancyDelegateExecutionTest extends PluggableProcessEngineTes
 
     AssertingJavaDelegate.addAsserts(hasTenantId("tenant1"));
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+  }
+
+  protected void startProcessInstance(String processDefinitionKey) {
+    ProcessDefinition processDefinition = repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey(processDefinitionKey)
+        .latestVersion()
+        .singleResult();
+
+    runtimeService.startProcessInstanceById(processDefinition.getId());
   }
 
   @Override

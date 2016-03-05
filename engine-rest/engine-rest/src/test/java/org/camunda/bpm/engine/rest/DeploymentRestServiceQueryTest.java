@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -213,7 +214,10 @@ public class DeploymentRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testDeploymentTenantIdList() {
-    mockedQuery = setUpMockDeploymentQuery(createMockDeploymentsTwoTenants());
+    List<Deployment> deployments = Arrays.asList(
+        MockProvider.createMockDeployment(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockDeployment(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
+    mockedQuery = setUpMockDeploymentQuery(deployments);
 
     Response response = given()
       .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
@@ -236,10 +240,57 @@ public class DeploymentRestServiceQueryTest extends AbstractRestServiceTest {
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
   }
 
-  private List<Deployment> createMockDeploymentsTwoTenants() {
-    return Arrays.asList(
-        MockProvider.createMockDeployment(MockProvider.EXAMPLE_TENANT_ID),
-        MockProvider.createMockDeployment(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
+  @Test
+  public void testDeploymentWithoutTenantId() {
+    Deployment mockDeployment = MockProvider.createMockDeployment(null);
+    mockedQuery = setUpMockDeploymentQuery(Collections.singletonList(mockDeployment));
+
+    Response response = given()
+      .queryParam("withoutTenantId", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(DEPLOYMENT_QUERY_URL);
+
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId1).isEqualTo(null);
+  }
+
+  @Test
+  public void testDeploymentTenantIdIncludeDefinitionsWithoutTenantid() {
+    List<Deployment> mockDeployments = Arrays.asList(
+        MockProvider.createMockDeployment(null),
+        MockProvider.createMockDeployment(MockProvider.EXAMPLE_TENANT_ID));
+    mockedQuery = setUpMockDeploymentQuery(mockDeployments);
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID)
+      .queryParam("includeDeploymentsWithoutTenantId", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(DEPLOYMENT_QUERY_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID);
+    verify(mockedQuery).includeDeploymentsWithoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(null);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
   }
 
   private Map<String, String> getCompleteQueryParameters() {

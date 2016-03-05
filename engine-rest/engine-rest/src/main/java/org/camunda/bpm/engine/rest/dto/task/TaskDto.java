@@ -41,6 +41,7 @@ public class TaskDto {
   private String caseDefinitionId;
   private boolean suspended;
   private String formKey;
+  private String tenantId;
 
   public String getId() {
     return id;
@@ -166,6 +167,14 @@ public class TaskDto {
     return formKey;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   public static TaskDto fromEntity(Task task) {
     TaskDto dto = new TaskDto();
     dto.id = task.getId();
@@ -191,6 +200,7 @@ public class TaskDto {
     dto.caseExecutionId = task.getCaseExecutionId();
     dto.caseInstanceId = task.getCaseInstanceId();
     dto.suspended = task.isSuspended();
+    dto.tenantId = task.getTenantId();
 
     try {
       dto.formKey = task.getFormKey();
@@ -219,6 +229,7 @@ public class TaskDto {
     task.setFollowUpDate(getFollowUp());
     task.setParentTaskId(getParentTaskId());
     task.setCaseInstanceId(getCaseInstanceId());
+    task.setTenantId(getTenantId());
   }
 
 }

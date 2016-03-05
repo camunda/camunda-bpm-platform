@@ -400,19 +400,31 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     }
   }
 
-  protected void deployment(BpmnModelInstance... bpmnModelInstances) {
+  protected String deployment(BpmnModelInstance... bpmnModelInstances) {
     DeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
 
-    deployment(deploymentBuilder, bpmnModelInstances);
+    return deployment(deploymentBuilder, bpmnModelInstances);
   }
 
-  protected void deploymentForTenant(String tenantId, BpmnModelInstance... bpmnModelInstances) {
+  protected String deployment(String... resources) {
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
+
+    return deployment(deploymentBuilder, resources);
+  }
+
+  protected String deploymentForTenant(String tenantId, BpmnModelInstance... bpmnModelInstances) {
     DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().tenantId(tenantId);
 
-    deployment(deploymentBuilder, bpmnModelInstances);
+    return deployment(deploymentBuilder, bpmnModelInstances);
   }
 
-  protected void deployment(DeploymentBuilder deploymentBuilder, BpmnModelInstance... bpmnModelInstances) {
+  protected String deploymentForTenant(String tenantId, String... resources) {
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().tenantId(tenantId);
+
+    return deployment(deploymentBuilder, resources);
+  }
+
+  protected String deployment(DeploymentBuilder deploymentBuilder, BpmnModelInstance... bpmnModelInstances) {
     for (int i = 0; i < bpmnModelInstances.length; i++) {
       BpmnModelInstance bpmnModelInstance = bpmnModelInstances[i];
       deploymentBuilder.addModelInstance("testProcess-"+i+".bpmn", bpmnModelInstance);
@@ -420,6 +432,19 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
     deploymentId = deploymentBuilder.deploy().getId();
     deploymentIds.add(deploymentId);
+
+    return deploymentId;
+  }
+
+  protected String deployment(DeploymentBuilder deploymentBuilder, String... resources) {
+    for (int i = 0; i < resources.length; i++) {
+      deploymentBuilder.addClasspathResource(resources[i]);
+    }
+
+    deploymentId = deploymentBuilder.deploy().getId();
+    deploymentIds.add(deploymentId);
+
+    return deploymentId;
   }
 
 }

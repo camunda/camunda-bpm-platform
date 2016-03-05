@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.MigrationPlanBuilder;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.impl.cmd.ActivateProcessInstanceCmd;
-import org.camunda.bpm.engine.impl.cmd.CorrelateMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.FindActiveActivityIdsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
@@ -37,10 +36,6 @@ import org.camunda.bpm.engine.impl.cmd.PatchExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.RemoveExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SignalCmd;
-import org.camunda.bpm.engine.impl.cmd.SignalEventReceivedCmd;
-import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceByMessageAndProcessDefinitionIdCmd;
-import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceByMessageCmd;
-import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.migration.MigrateProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanBuilderImpl;
@@ -56,6 +51,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
+import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -67,51 +63,81 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, null, null, null));
+    return createProcessInstanceByKey(processDefinitionKey)
+        .execute();
   }
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, null, null));
+    return createProcessInstanceByKey(processDefinitionKey)
+        .businessKey(businessKey)
+        .execute();
   }
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, String caseInstanceId) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, caseInstanceId, null));
+    return createProcessInstanceByKey(processDefinitionKey)
+        .businessKey(businessKey)
+        .caseInstanceId(caseInstanceId)
+        .execute();
   }
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, null, null, variables));
+    return createProcessInstanceByKey(processDefinitionKey)
+        .setVariables(variables)
+        .execute();
   }
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, null, variables));
+    return createProcessInstanceByKey(processDefinitionKey)
+        .businessKey(businessKey)
+        .setVariables(variables)
+        .execute();
   }
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, String caseInstanceId, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, caseInstanceId, variables));
+    return createProcessInstanceByKey(processDefinitionKey)
+        .businessKey(businessKey)
+        .caseInstanceId(caseInstanceId)
+        .setVariables(variables)
+        .execute();
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, null, null, null));
+    return createProcessInstanceById(processDefinitionId)
+        .execute();
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, null, null));
+    return createProcessInstanceById(processDefinitionId)
+        .businessKey(businessKey)
+        .execute();
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, String caseInstanceId) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, caseInstanceId, null));
+    return createProcessInstanceById(processDefinitionId)
+        .businessKey(businessKey)
+        .caseInstanceId(caseInstanceId)
+        .execute();
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, null, null, variables));
+    return createProcessInstanceById(processDefinitionId)
+        .setVariables(variables)
+        .execute();
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, null, variables));
+    return createProcessInstanceById(processDefinitionId)
+        .businessKey(businessKey)
+        .setVariables(variables)
+        .execute();
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, String caseInstanceId, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, caseInstanceId, variables));
+    return createProcessInstanceById(processDefinitionId)
+        .businessKey(businessKey)
+        .caseInstanceId(caseInstanceId)
+        .setVariables(variables)
+        .execute();
   }
 
   public void deleteProcessInstance(String processInstanceId, String deleteReason) {
@@ -315,51 +341,74 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   public ProcessInstance startProcessInstanceByMessage(String messageName) {
-    return commandExecutor.execute(new StartProcessInstanceByMessageCmd(messageName,null, null));
+    return createMessageCorrelation(messageName).correlateStartMessage();
   }
 
   public ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey) {
-    return commandExecutor.execute(new StartProcessInstanceByMessageCmd(messageName, businessKey, null));
+    return createMessageCorrelation(messageName)
+        .processInstanceBusinessKey(businessKey)
+        .correlateStartMessage();
   }
 
   public ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> processVariables) {
-    return commandExecutor.execute(new StartProcessInstanceByMessageCmd(messageName, null, processVariables));
+    return createMessageCorrelation(messageName)
+        .setVariables(processVariables)
+        .correlateStartMessage();
   }
 
   public ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, Map<String, Object> processVariables) {
-    return commandExecutor.execute(new StartProcessInstanceByMessageCmd(messageName, businessKey, processVariables));
+    return createMessageCorrelation(messageName)
+        .processInstanceBusinessKey(businessKey)
+        .setVariables(processVariables)
+        .correlateStartMessage();
   }
 
   public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId) {
-	return commandExecutor.execute(new StartProcessInstanceByMessageAndProcessDefinitionIdCmd(messageName,processDefinitionId, null, null));
+    return createMessageCorrelation(messageName)
+        .processDefinitionId(processDefinitionId)
+        .correlateStartMessage();
   }
 
   public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, String businessKey) {
-	return commandExecutor.execute(new StartProcessInstanceByMessageAndProcessDefinitionIdCmd(messageName,processDefinitionId, businessKey, null));
+    return createMessageCorrelation(messageName)
+        .processDefinitionId(processDefinitionId)
+        .processInstanceBusinessKey(businessKey)
+        .correlateStartMessage();
   }
 
   public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, Map<String, Object> processVariables) {
-	return commandExecutor.execute(new StartProcessInstanceByMessageAndProcessDefinitionIdCmd(messageName,processDefinitionId, null, processVariables));
+    return createMessageCorrelation(messageName)
+        .processDefinitionId(processDefinitionId)
+        .setVariables(processVariables)
+        .correlateStartMessage();
   }
 
   public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, String businessKey, Map<String, Object> processVariables) {
-	return commandExecutor.execute(new StartProcessInstanceByMessageAndProcessDefinitionIdCmd(messageName,processDefinitionId, businessKey, processVariables));
+    return createMessageCorrelation(messageName)
+        .processDefinitionId(processDefinitionId)
+        .processInstanceBusinessKey(businessKey)
+        .setVariables(processVariables)
+        .correlateStartMessage();
   }
 
   public void signalEventReceived(String signalName) {
-    commandExecutor.execute(new SignalEventReceivedCmd(signalName, null, null));
+    createSignalEvent(signalName).send();
   }
 
   public void signalEventReceived(String signalName, Map<String, Object> processVariables) {
-    commandExecutor.execute(new SignalEventReceivedCmd(signalName, null, processVariables));
+    createSignalEvent(signalName).setVariables(processVariables).send();
   }
 
   public void signalEventReceived(String signalName, String executionId) {
-    commandExecutor.execute(new SignalEventReceivedCmd(signalName, executionId, null));
+    createSignalEvent(signalName).executionId(executionId).send();
   }
 
   public void signalEventReceived(String signalName, String executionId, Map<String, Object> processVariables) {
-    commandExecutor.execute(new SignalEventReceivedCmd(signalName, executionId, processVariables));
+    createSignalEvent(signalName).executionId(executionId).setVariables(processVariables).send();
+  }
+
+  public SignalEventReceivedBuilder createSignalEvent(String signalName) {
+    return new SignalEventReceivedBuilderImpl(commandExecutor, signalName);
   }
 
   public void messageEventReceived(String messageName, String executionId) {
@@ -377,30 +426,43 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   public void correlateMessage(String messageName, Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
-    commandExecutor.execute(new CorrelateMessageCmd(messageName, null, correlationKeys, processVariables));
+    createMessageCorrelation(messageName)
+      .processInstanceVariablesEqual(correlationKeys)
+      .setVariables(processVariables)
+      .correlate();
   }
 
   public void correlateMessage(String messageName, String businessKey,
       Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
-    commandExecutor.execute(new CorrelateMessageCmd(messageName, businessKey, correlationKeys, processVariables));
+
+    createMessageCorrelation(messageName)
+      .processInstanceVariablesEqual(correlationKeys)
+      .processInstanceBusinessKey(businessKey)
+      .setVariables(processVariables)
+      .correlate();
   }
 
   public void correlateMessage(String messageName) {
-    commandExecutor.execute(new CorrelateMessageCmd(messageName, null, null, null));
+    createMessageCorrelation(messageName).correlate();
   }
 
   public void correlateMessage(String messageName, String businessKey) {
-    commandExecutor.execute(new CorrelateMessageCmd(messageName, businessKey, null, null));
+    createMessageCorrelation(messageName)
+      .processInstanceBusinessKey(businessKey)
+      .correlate();
   }
 
-  public void correlateMessage(String messageName,
-      Map<String, Object> correlationKeys) {
-    commandExecutor.execute(new CorrelateMessageCmd(messageName, null, correlationKeys, null));
+  public void correlateMessage(String messageName, Map<String, Object> correlationKeys) {
+    createMessageCorrelation(messageName)
+      .processInstanceVariablesEqual(correlationKeys)
+      .correlate();
   }
 
-  public void correlateMessage(String messageName, String businessKey,
-      Map<String, Object> processVariables) {
-    commandExecutor.execute(new CorrelateMessageCmd(messageName, businessKey, null, processVariables));
+  public void correlateMessage(String messageName, String businessKey, Map<String, Object> processVariables) {
+    createMessageCorrelation(messageName)
+      .processInstanceBusinessKey(businessKey)
+      .setVariables(processVariables)
+      .correlate();
   }
 
   public ProcessInstanceModificationBuilder createProcessInstanceModification(String processInstanceId) {
@@ -408,11 +470,11 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   public ProcessInstantiationBuilder createProcessInstanceById(String processDefinitionId) {
-    return new ProcessInstantiationBuilderImpl(commandExecutor, processDefinitionId, null);
+    return ProcessInstantiationBuilderImpl.createProcessInstanceById(commandExecutor, processDefinitionId);
   }
 
   public ProcessInstantiationBuilder createProcessInstanceByKey(String processDefinitionKey) {
-    return new ProcessInstantiationBuilderImpl(commandExecutor, null, processDefinitionKey);
+    return ProcessInstantiationBuilderImpl.createProcessInstanceByKey(commandExecutor, processDefinitionKey);
   }
 
   public MigrationPlanBuilder createMigrationPlan(String sourceProcessDefinitionId, String targetProcessDefinitionId) {

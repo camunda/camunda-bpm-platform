@@ -109,7 +109,6 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
 
   public <T> T execute(Callable<T> callable) throws ProcessApplicationExecutionException {
     ClassLoader originalClassloader = ClassLoaderUtil.getContextClassloader();
-
     ClassLoader processApplicationClassloader = getProcessApplicationClassloader();
 
     try {
@@ -124,7 +123,11 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
     finally {
       ClassLoaderUtil.setContextClassloader(originalClassloader);
     }
+  }
 
+  public <T> T execute(Callable<T> callable, InvocationContext invocationContext) throws ProcessApplicationExecutionException {
+    // allows to hook into the invocation
+    return execute(callable);
   }
 
 

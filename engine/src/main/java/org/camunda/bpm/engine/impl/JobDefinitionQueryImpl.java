@@ -38,7 +38,10 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
   protected String jobConfiguration;
   protected SuspensionState suspensionState;
   protected Boolean withOverridingJobPriority;
+
+  protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
+  protected boolean includeJobDefinitionsWithoutTenantId = false;
 
   public JobDefinitionQueryImpl() {
   }
@@ -101,6 +104,18 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
   public JobDefinitionQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public JobDefinitionQuery withoutTenantId() {
+    isTenantIdSet = true;
+    this.tenantIds = null;
+    return this;
+  }
+
+  public JobDefinitionQuery includeJobDefinitionsWithoutTenantId() {
+    this.includeJobDefinitionsWithoutTenantId = true;
     return this;
   }
 

@@ -16,7 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 
@@ -25,6 +28,8 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
  *
  */
 public class CaseDefinitionManager extends AbstractManager {
+
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   public void insertCaseDefinition(CaseDefinitionEntity caseDefinition) {
     getDbEntityManager().insert(caseDefinition);
@@ -38,15 +43,51 @@ public class CaseDefinitionManager extends AbstractManager {
     return getDbEntityManager().selectById(CaseDefinitionEntity.class, caseDefinitionId);
   }
 
+  /**
+   * @return the latest version of the case definition with the given key (from any tenant)
+   *
+   * @throws ProcessEngineException if more than one tenant has a case definition with the given key
+   *
+   * @see #findLatestCaseDefinitionByKeyAndTenantId(String, String)
+   */
   public CaseDefinitionEntity findLatestCaseDefinitionByKey(String caseDefinitionKey) {
-    return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectLatestCaseDefinitionByKey", caseDefinitionKey);
+    @SuppressWarnings("unchecked")
+    List<CaseDefinitionEntity> caseDefinitions = getDbEntityManager().selectList("selectLatestCaseDefinitionByKey", caseDefinitionKey);
+
+    if (caseDefinitions.isEmpty()) {
+      return null;
+
+    } else if (caseDefinitions.size() == 1) {
+      return caseDefinitions.iterator().next();
+
+    } else {
+      throw LOG.multipleTenantsForCaseDefinitionKeyException(caseDefinitionKey);
+    }
   }
 
-  public CaseDefinitionEntity findCaseDefinitionByKeyAndVersion(String caseDefinitionKey, Integer caseDefinitionVersion) {
+  /**
+   * @return the latest version of the case definition with the given key and tenant id
+   *
+   * @see #findLatestCaseDefinitionByKeyAndTenantId(String, String)
+   */
+  public CaseDefinitionEntity findLatestCaseDefinitionByKeyAndTenantId(String caseDefinitionKey, String tenantId) {
+    Map<String, String> parameters = new HashMap<String, String>();
+    parameters.put("caseDefinitionKey", caseDefinitionKey);
+    parameters.put("tenantId", tenantId);
+
+    if (tenantId == null) {
+      return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectLatestCaseDefinitionByKeyWithoutTenantId", parameters);
+    } else {
+      return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectLatestCaseDefinitionByKeyAndTenantId", parameters);
+    }
+  }
+
+  public CaseDefinitionEntity findCaseDefinitionByKeyVersionAndTenantId(String caseDefinitionKey, Integer caseDefinitionVersion, String tenantId) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("caseDefinitionVersion", caseDefinitionVersion);
     parameters.put("caseDefinitionKey", caseDefinitionKey);
-    return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectCaseDefinitionByKeyAndVersion", parameters);
+    parameters.put("tenantId", tenantId);
+    return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectCaseDefinitionByKeyVersionAndTenantId", parameters);
   }
 
   public CaseDefinitionEntity findCaseDefinitionByDeploymentAndKey(String deploymentId, String caseDefinitionKey) {
@@ -56,11 +97,12 @@ public class CaseDefinitionManager extends AbstractManager {
     return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectCaseDefinitionByDeploymentAndKey", parameters);
   }
 
-  public String findPreviousCaseDefinitionIdByKeyAndVersion(String caseDefinitionKey, Integer version) {
+  public String findPreviousCaseDefinitionId(String caseDefinitionKey, Integer version, String tenantId) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("key", caseDefinitionKey);
     params.put("version", version);
-    return (String) getDbEntityManager().selectOne("selectPreviousCaseDefinitionIdByKeyAndVersion", params);
+    params.put("tenantId", tenantId);
+    return (String) getDbEntityManager().selectOne("selectPreviousCaseDefinitionId", params);
   }
 
   @SuppressWarnings("unchecked")

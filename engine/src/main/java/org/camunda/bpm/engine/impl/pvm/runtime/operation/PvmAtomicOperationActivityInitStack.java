@@ -26,6 +26,12 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  */
 public class PvmAtomicOperationActivityInitStack implements PvmAtomicOperation {
 
+  protected PvmAtomicOperation operationOnScopeInitialization;
+
+  public PvmAtomicOperationActivityInitStack(PvmAtomicOperation operationOnScopeInitialization) {
+    this.operationOnScopeInitialization = operationOnScopeInitialization;
+  }
+
   public String getCanonicalName() {
     return "activity-stack-init";
   }
@@ -48,9 +54,8 @@ public class PvmAtomicOperationActivityInitStack implements PvmAtomicOperation {
       propagatingExecution.setActivity(currentActivity);
     }
 
-
     // notify listeners for the instantiated activity
-    propagatingExecution.performOperation(ACTIVITY_INIT_STACK_NOTIFY_LISTENER_START);
+    propagatingExecution.performOperation(operationOnScopeInitialization);
   }
 
   public boolean isAsync(PvmExecutionImpl instance) {

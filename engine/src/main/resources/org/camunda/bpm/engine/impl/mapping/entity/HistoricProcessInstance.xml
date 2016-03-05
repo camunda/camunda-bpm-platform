@@ -36,7 +36,8 @@
         SUPER_PROCESS_INSTANCE_ID_,
         SUPER_CASE_INSTANCE_ID_,
         CASE_INST_ID_,
-        DELETE_REASON_
+        DELETE_REASON_,
+        TENANT_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
@@ -52,7 +53,8 @@
         #{superProcessInstanceId, jdbcType=VARCHAR},
         #{superCaseInstanceId, jdbcType=VARCHAR},
         #{caseInstanceId, jdbcType=VARCHAR},
-        #{deleteReason, jdbcType=VARCHAR}
+        #{deleteReason, jdbcType=VARCHAR},
+        #{tenantId, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -103,6 +105,7 @@
     <result property="superCaseInstanceId" column="SUPER_CASE_INSTANCE_ID_" jdbcType="VARCHAR" />
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- HISTORIC PROCESS INSTANCE SELECT -->
@@ -245,6 +248,13 @@
         </if>
         )
       </foreach>
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
+      </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
 

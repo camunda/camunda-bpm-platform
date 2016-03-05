@@ -43,6 +43,15 @@ public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, Ev
   /** Only select subscriptions that belong to one of the given tenant ids. */
   EventSubscriptionQuery tenantIdIn(String... tenantIds);
 
+  /** Only select subscriptions which have no tenant id. */
+  EventSubscriptionQuery withoutTenantId();
+
+  /**
+   * Select subscriptions which have no tenant id. Can be used in combination
+   * with {@link #tenantIdIn(String...)}.
+   */
+  EventSubscriptionQuery includeEventSubscriptionsWithoutTenantId();
+
   /** Order by event subscription creation date (needs to be followed by {@link #asc()} or {@link #desc()}). */
   EventSubscriptionQuery orderByCreated();
 

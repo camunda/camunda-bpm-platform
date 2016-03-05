@@ -16,14 +16,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.migration.DefaultMigrationPlanGenerator;
-import org.camunda.bpm.engine.impl.migration.DefaultMigrationPlanValidator;
+import org.camunda.bpm.engine.impl.migration.MigrationInstructionGenerator;
+import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanBuilderImpl;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanImpl;
-import org.camunda.bpm.engine.impl.migration.MigrationPlanValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationPlanValidationReportImpl;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidationReportImpl;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstruction;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstructionImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
+import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -34,6 +41,8 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
  */
 public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
 
+  public static final MigrationLogger LOG = EngineUtilLogger.MIGRATION_LOGGER;
+
   protected MigrationPlanBuilderImpl migrationBuilder;
 
   public CreateMigrationPlanCmd(MigrationPlanBuilderImpl migrationPlanBuilderImpl) {
@@ -42,48 +51,129 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
 
   @Override
   public MigrationPlan execute(CommandContext commandContext) {
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "sourceProcessDefinitionId", migrationBuilder.getSourceProcessDefinitionId());
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "targetProcessDefinitionId", migrationBuilder.getTargetProcessDefinitionId());
+    String sourceProcessDefinitionId = migrationBuilder.getSourceProcessDefinitionId();
+    String targetProcessDefinitionId = migrationBuilder.getTargetProcessDefinitionId();
+    MigrationPlanImpl migrationPlan = new MigrationPlanImpl(sourceProcessDefinitionId, targetProcessDefinitionId);
+
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "sourceProcessDefinitionId", sourceProcessDefinitionId);
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "targetProcessDefinitionId", targetProcessDefinitionId);
 
     ProcessDefinitionImpl sourceProcessDefinition = commandContext.getProcessEngineConfiguration()
-        .getDeploymentCache().findProcessDefinitionFromCache(migrationBuilder.getSourceProcessDefinitionId());
+        .getDeploymentCache().findProcessDefinitionFromCache(sourceProcessDefinitionId);
     ProcessDefinitionImpl targetProcessDefinition = commandContext.getProcessEngineConfiguration()
-        .getDeploymentCache().findProcessDefinitionFromCache(migrationBuilder.getTargetProcessDefinitionId());
+        .getDeploymentCache().findProcessDefinitionFromCache(targetProcessDefinitionId);
 
     EnsureUtil.ensureNotNull(BadUserRequestException.class,
-      "source process definition with id " + migrationBuilder.getSourceProcessDefinitionId() + " does not exist",
+      "source process definition with id " + sourceProcessDefinitionId + " does not exist",
       "sourceProcessDefinition",
       sourceProcessDefinition);
 
     EnsureUtil.ensureNotNull(BadUserRequestException.class,
-      "target process definition with id " + migrationBuilder.getTargetProcessDefinitionId() + " does not exist",
+      "target process definition with id " + targetProcessDefinitionId + " does not exist",
       "targetProcessDefinition",
       targetProcessDefinition);
-
-    MigrationPlanImpl migrationPlan = new MigrationPlanImpl(
-        migrationBuilder.getSourceProcessDefinitionId(),
-        migrationBuilder.getTargetProcessDefinitionId());
 
     List<MigrationInstruction> instructions = new ArrayList<MigrationInstruction>();
 
     if (migrationBuilder.isMapEqualActivities()) {
-
-      instructions.addAll(new DefaultMigrationPlanGenerator()
-        .generate(sourceProcessDefinition, targetProcessDefinition));
+      instructions.addAll(generateInstructions(commandContext, sourceProcessDefinition, targetProcessDefinition));
     }
 
     instructions.addAll(migrationBuilder.getExplicitMigrationInstructions());
-
-    MigrationPlanValidator validator = new DefaultMigrationPlanValidator();
-    for (MigrationInstruction instruction : instructions) {
-      validator.validateMigrationInstruction(sourceProcessDefinition, targetProcessDefinition, instruction);
-    }
-
     migrationPlan.setInstructions(instructions);
+
+    validateMigrationPlan(commandContext, migrationPlan, sourceProcessDefinition, targetProcessDefinition);
 
     return migrationPlan;
   }
 
+  protected List<MigrationInstruction> generateInstructions(CommandContext commandContext, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
 
+    // generate instructions
+    MigrationInstructionGenerator migrationInstructionGenerator = processEngineConfiguration.getMigrationInstructionGenerator();
+    List<ValidatingMigrationInstruction> generatedInstructions = migrationInstructionGenerator.generate(sourceProcessDefinition, targetProcessDefinition);
+
+    // filter only valid instructions
+    List<MigrationInstructionValidator> migrationInstructionValidators = new ArrayList<MigrationInstructionValidator>(processEngineConfiguration.getMigrationInstructionValidators());
+    List<MigrationInstruction> validInstructions = new ArrayList<MigrationInstruction>();
+    for (ValidatingMigrationInstruction generatedInstruction : generatedInstructions) {
+      if (isValidInstruction(generatedInstruction, generatedInstructions, migrationInstructionValidators)) {
+        validInstructions.add(generatedInstruction.toMigrationInstruction());
+      }
+    }
+
+    return validInstructions;
+  }
+
+  protected boolean isValidInstruction(ValidatingMigrationInstruction instruction, List<ValidatingMigrationInstruction> instructions, List<MigrationInstructionValidator> migrationInstructionValidators) {
+    return !validateInstruction(instruction, instructions, migrationInstructionValidators).hasFailures();
+  }
+
+  protected void validateMigrationPlan(CommandContext commandContext, MigrationPlanImpl migrationPlan, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
+    List<MigrationInstructionValidator> migrationInstructionValidators = commandContext.getProcessEngineConfiguration().getMigrationInstructionValidators();
+
+    MigrationPlanValidationReportImpl planReport = new MigrationPlanValidationReportImpl(migrationPlan);
+    List<ValidatingMigrationInstruction> validatingMigrationInstructions = wrapMigrationInstructions(migrationPlan, sourceProcessDefinition, targetProcessDefinition, planReport);
+
+    for (ValidatingMigrationInstruction validatingMigrationInstruction : validatingMigrationInstructions) {
+      MigrationInstructionValidationReportImpl instructionReport = validateInstruction(validatingMigrationInstruction, validatingMigrationInstructions, migrationInstructionValidators);
+      if (instructionReport.hasFailures()) {
+        planReport.addInstructionReport(instructionReport);
+      }
+    }
+
+    if (planReport.hasInstructionReports()) {
+      throw LOG.failingMigrationPlanValidation(planReport);
+    }
+
+  }
+
+  protected MigrationInstructionValidationReportImpl validateInstruction(ValidatingMigrationInstruction instruction, List<ValidatingMigrationInstruction> instructions, List<MigrationInstructionValidator> migrationInstructionValidators) {
+    MigrationInstructionValidationReportImpl validationReport = new MigrationInstructionValidationReportImpl(instruction.toMigrationInstruction());
+    for (MigrationInstructionValidator migrationInstructionValidator : migrationInstructionValidators) {
+      migrationInstructionValidator.validate(instruction, instructions, validationReport);
+    }
+    return validationReport;
+  }
+
+  protected List<ValidatingMigrationInstruction> wrapMigrationInstructions(MigrationPlan migrationPlan, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition, MigrationPlanValidationReportImpl planReport) {
+    List<ValidatingMigrationInstruction> validatingMigrationInstructions = new ArrayList<ValidatingMigrationInstruction>();
+    for (MigrationInstruction migrationInstruction : migrationPlan.getInstructions()) {
+      MigrationInstructionValidationReportImpl instructionReport = new MigrationInstructionValidationReportImpl(migrationInstruction);
+
+      String sourceActivityId = migrationInstruction.getSourceActivityId();
+      String targetActivityId = migrationInstruction.getTargetActivityId();
+      if (sourceActivityId != null && targetActivityId != null) {
+        ActivityImpl sourceActivity = sourceProcessDefinition.findActivity(sourceActivityId);
+        ActivityImpl targetActivity = targetProcessDefinition.findActivity(migrationInstruction.getTargetActivityId());
+
+        if (sourceActivity != null && targetActivity != null) {
+          validatingMigrationInstructions.add(new ValidatingMigrationInstructionImpl(sourceActivity, targetActivity));
+        }
+        else {
+          if (sourceActivity == null) {
+            instructionReport.addFailure("Source activity '" + sourceActivityId + "' does not exist");
+          }
+          if (targetActivity == null) {
+            instructionReport.addFailure("Target activity '" + targetActivityId + "' does not exist");
+          }
+        }
+      }
+      else {
+        if (sourceActivityId == null) {
+          instructionReport.addFailure("Source activity id is null");
+        }
+        if (targetActivityId == null) {
+          instructionReport.addFailure("Target activity id is null");
+        }
+      }
+
+      if (instructionReport.hasFailures()) {
+        planReport.addInstructionReport(instructionReport);
+      }
+    }
+    return validatingMigrationInstructions;
+  }
 
 }

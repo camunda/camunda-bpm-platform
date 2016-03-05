@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.deployer;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
@@ -22,8 +24,6 @@ import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
-
-import java.util.List;
 
 /**
  * {@link Deployer} responsible to parse CMMN 1.0 XML files and create the
@@ -40,26 +40,32 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
   protected ExpressionManager expressionManager;
   protected CmmnTransformer transformer;
 
+  @Override
   protected String[] getResourcesSuffixes() {
     return CMMN_RESOURCE_SUFFIXES;
   }
 
+  @Override
   protected List<CaseDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource, Properties properties) {
     return transformer.createTransform().deployment(deployment).resource(resource).transform();
   }
 
+  @Override
   protected CaseDefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey) {
     return getCaseDefinitionManager().findCaseDefinitionByDeploymentAndKey(deploymentId, definitionKey);
   }
 
+  @Override
   protected CaseDefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId) {
-    return getCaseDefinitionManager().findLatestCaseDefinitionByKey(definitionKey);
+    return getCaseDefinitionManager().findLatestCaseDefinitionByKeyAndTenantId(definitionKey, tenantId);
   }
 
+  @Override
   protected void persistDefinition(CaseDefinitionEntity definition) {
     getCaseDefinitionManager().insertCaseDefinition(definition);
   }
 
+  @Override
   protected void addDefinitionToDeploymentCache(DeploymentCache deploymentCache, CaseDefinitionEntity definition) {
     deploymentCache.addCaseDefinition(definition);
   }

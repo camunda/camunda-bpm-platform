@@ -36,7 +36,6 @@ public class ServiceNames {
 
   private final static ServiceName BPM_PLATFORM_PLUGINS = BPM_PLATFORM.append("bpm-platform-plugins");
 
-
   /**
    * Returns the service name for a {@link MscManagedProcessEngine}.
    *
@@ -134,6 +133,13 @@ public class ServiceNames {
    */
   public static ServiceName forBpmPlatformPlugins() {
     return BPM_PLATFORM_PLUGINS;
+  }
+
+  /**
+   * @return the {@link ServiceName} of the {@link ProcessApplicationStopService}
+   */
+  public static ServiceName forProcessApplicationStopService(String moduleName) {
+    return PROCESS_APPLICATION_MODULE.append(moduleName).append("STOP");
   }
 
 

@@ -16,6 +16,9 @@ import java.io.File;
 
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
  * @author Daniel Meyer
@@ -59,9 +62,14 @@ public class JsonUtil {
     }
   }
 
-  protected static ObjectMapper getMapper() {
+  public static ObjectMapper getMapper() {
     if(mapper == null) {
       mapper = new ObjectMapper();
+      SerializationConfig config = mapper
+          .getSerializationConfig()
+          .withSerializationInclusion(Inclusion.NON_EMPTY);
+      mapper.setSerializationConfig(config);
+
     }
     return mapper;
   }

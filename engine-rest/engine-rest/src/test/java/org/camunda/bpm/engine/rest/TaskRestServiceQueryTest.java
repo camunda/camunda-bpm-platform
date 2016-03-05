@@ -59,7 +59,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
-  
+
   protected static final String TASK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/task";
   protected static final String TASK_COUNT_QUERY_URL = TASK_QUERY_URL + "/count";
   private TaskQuery mockQuery;
@@ -157,6 +157,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     String returnedCaseExecutionId = from(content).getString("[0].caseExecutionId");
     boolean returnedSuspensionState = from(content).getBoolean("[0].suspended");
     String returnedFormKey = from(content).getString("[0].formKey");
+    String returnedTenantId = from(content).getString("[0].tenantId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_NAME, returnedTaskName);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_ID, returnedId);
@@ -178,6 +179,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_EXECUTION_ID, returnedCaseExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_SUSPENSION_STATE, returnedSuspensionState);
     Assert.assertEquals(MockProvider.EXAMPLE_FORM_KEY, returnedFormKey);
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
 
   }
 
@@ -261,6 +263,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     String returnedCaseExecutionId = (String) taskObject.get("caseExecutionId");
     boolean returnedSuspensionState = (Boolean) taskObject.get("suspended");
     String returnedFormKey = (String) taskObject.get("formKey");
+    String returnedTenantId = (String) taskObject.get("tenantId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_NAME, returnedTaskName);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_ID, returnedId);
@@ -281,7 +284,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_EXECUTION_ID, returnedCaseExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_TASK_SUSPENSION_STATE, returnedSuspensionState);
-    Assert.assertEquals(MockProvider.EXAMPLE_FORM_KEY, returnedFormKey);
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
 
     // validate the task count
     Assert.assertEquals(1l, from(content).getLong("count"));
@@ -369,6 +372,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .queryParam("taskDefinitionKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("taskDefinitionKeyIn")))
       .queryParam("processDefinitionKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("processDefinitionKeyIn")))
       .queryParam("processInstanceBusinessKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("processInstanceBusinessKeyIn")))
+      .queryParam("tenantIdIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("tenantIdIn")))
       .header("accept", MediaType.APPLICATION_JSON)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
@@ -409,11 +413,14 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     String[] taskDefinitionKeys = { "aTaskDefinitionKey", "anotherTaskDefinitionKey" };
     String[] processDefinitionKeys = { "aProcessDefinitionKey", "anotherProcessDefinitionKey" };
     String[] processInstanceBusinessKeys = { "aBusinessKey", "anotherBusinessKey" };
+    String[] tenantIds = { MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID };
+
 
     parameters.put("activityInstanceIdIn", activityInstanceIds);
     parameters.put("taskDefinitionKeyIn", taskDefinitionKeys);
     parameters.put("processDefinitionKeyIn", processDefinitionKeys);
     parameters.put("processInstanceBusinessKeyIn", processInstanceBusinessKeys);
+    parameters.put("tenantIdIn", tenantIds);
 
     return parameters;
   }
@@ -500,6 +507,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).taskDefinitionKeyIn(stringArrayParameters.get("taskDefinitionKeyIn"));
     verify(mockQuery).processDefinitionKeyIn(stringArrayParameters.get("processDefinitionKeyIn"));
     verify(mockQuery).processInstanceBusinessKeyIn(stringArrayParameters.get("processInstanceBusinessKeyIn"));
+    verify(mockQuery).tenantIdIn(stringArrayParameters.get("tenantIdIn"));
   }
 
   @Test
@@ -745,6 +753,16 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("caseInstanceId", "asc", Status.OK);
     inOrder.verify(mockQuery).orderByCaseInstanceId();
+    inOrder.verify(mockQuery).asc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByTenantId();
+    inOrder.verify(mockQuery).desc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByTenantId();
     inOrder.verify(mockQuery).asc();
 
   }

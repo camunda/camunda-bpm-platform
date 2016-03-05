@@ -17,7 +17,6 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -92,10 +91,6 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
 
   public void noActivityActivation(String activityId) {
     logDebug("012", "Element with id '{}' does not activate.", activityId);
-  }
-
-  public void activeConcurrentExecutionFound(PvmActivity activity) {
-    logDebug("013", "An active concurrent execution with id '{}' was found.", activity);
   }
 
   public void ignoringEventSubscription(SignalEventSubscriptionEntity eventSubscription, String processDefinitionId) {

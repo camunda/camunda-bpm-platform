@@ -279,6 +279,7 @@ public class TaskRestServiceInteractionTest extends
       .body("caseExecutionId", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_ID))
       .body("caseInstanceId", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
       .body("caseDefinitionId", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_ID))
+      .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
       .when().get(SINGLE_TASK_URL);
   }
 
@@ -348,6 +349,7 @@ public class TaskRestServiceInteractionTest extends
       .body("caseExecutionId", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_ID))
       .body("caseInstanceId", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
       .body("caseDefinitionId", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_ID))
+      .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
 
       // links
       .body("_links.assignee.href", endsWith(EXAMPLE_TASK_ASSIGNEE_NAME))
@@ -2655,6 +2657,7 @@ public class TaskRestServiceInteractionTest extends
     json.put("followUp", "2014-01-01T00:00:00");
     json.put("parentTaskId", "aParentTaskId");
     json.put("caseInstanceId", "aCaseInstanceId");
+    json.put("tenantId", MockProvider.EXAMPLE_TENANT_ID);
 
     Task newTask = mock(Task.class);
     when(taskServiceMock.newTask(anyString())).thenReturn(newTask);
@@ -2679,6 +2682,7 @@ public class TaskRestServiceInteractionTest extends
     verify(newTask).setFollowUpDate(any(Date.class));
     verify(newTask).setParentTaskId((String) json.get("parentTaskId"));
     verify(newTask).setCaseInstanceId((String) json.get("caseInstanceId"));
+    verify(newTask).setTenantId((String) json.get("tenantId"));
     verify(taskServiceMock).saveTask(newTask);
   }
 
@@ -2716,6 +2720,7 @@ public class TaskRestServiceInteractionTest extends
     verify(newTask).setFollowUpDate(null);
     verify(newTask).setParentTaskId((String) json.get("parentTaskId"));
     verify(newTask).setCaseInstanceId(null);
+    verify(newTask).setTenantId(null);
     verify(taskServiceMock).saveTask(newTask);
   }
 
@@ -2891,6 +2896,7 @@ public class TaskRestServiceInteractionTest extends
     json.put("followUp", "2014-01-01T00:00:00");
     json.put("parentTaskId", "aParentTaskId");
     json.put("caseInstanceId", "aCaseInstanceId");
+    json.put("tenantId", MockProvider.EXAMPLE_TENANT_ID);
 
     given()
         .pathParam("id", EXAMPLE_TASK_ID)
@@ -2912,6 +2918,7 @@ public class TaskRestServiceInteractionTest extends
     verify(mockTask).setFollowUpDate(any(Date.class));
     verify(mockTask).setParentTaskId((String) json.get("parentTaskId"));
     verify(mockTask).setCaseInstanceId((String) json.get("caseInstanceId"));
+    verify(mockTask).setTenantId((String) json.get("tenantId"));
     verify(taskServiceMock).saveTask(mockTask);
   }
 
@@ -2946,6 +2953,7 @@ public class TaskRestServiceInteractionTest extends
     verify(mockTask).setFollowUpDate(null);
     verify(mockTask).setParentTaskId((String) json.get("parentTaskId"));
     verify(mockTask).setCaseInstanceId(null);
+    verify(mockTask).setTenantId(null);
     verify(taskServiceMock).saveTask(mockTask);
   }
 

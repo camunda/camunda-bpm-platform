@@ -19,6 +19,8 @@
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <!-- note: if you add mappings here, make sure to select the columns in 'columnSelection' -->
   </resultMap>
 
   <insert id="insertExternalTask" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity">
@@ -36,6 +38,7 @@
       PROC_DEF_KEY_,
       ACT_ID_,
       ACT_INST_ID_,
+      TENANT_ID_,
       REV_
     ) values (
       #{id, jdbcType=VARCHAR},
@@ -51,6 +54,7 @@
       #{processDefinitionKey, jdbcType=VARCHAR},
       #{activityId, jdbcType=VARCHAR},
       #{activityInstanceId, jdbcType=VARCHAR},
+      #{tenantId, jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -196,6 +200,13 @@
             and RES.SUSPENSION_STATE_ = 2
         </if>
       </if>
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
+      </if>
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
     </where>
   </sql>
@@ -214,6 +225,7 @@
     RES.PROC_DEF_KEY_,
     RES.ACT_ID_,
     RES.ACT_INST_ID_,
-    RES.SUSPENSION_STATE_
+    RES.SUSPENSION_STATE_,
+    RES.TENANT_ID_
   </sql>
 </mapper>

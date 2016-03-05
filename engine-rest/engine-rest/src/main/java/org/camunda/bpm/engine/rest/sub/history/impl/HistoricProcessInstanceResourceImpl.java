@@ -12,17 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.sub.history.impl;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.history.HistoricProcessInstanceResource;
-
-import javax.ws.rs.core.Response.Status;
 
 public class HistoricProcessInstanceResourceImpl implements HistoricProcessInstanceResource {
 

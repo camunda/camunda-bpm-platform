@@ -59,4 +59,10 @@ public interface HistoricDetail {
 
   /** The time when this detail occurred */
   Date getTime();
+
+  /**
+   * The id of the tenant this historic detail belongs to. Can be <code>null</code>
+   * if the historic detail belongs to no single tenant.
+   */
+  String getTenantId();
 }

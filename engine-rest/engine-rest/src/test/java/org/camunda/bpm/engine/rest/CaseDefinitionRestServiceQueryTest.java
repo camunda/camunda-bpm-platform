@@ -22,6 +22,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -189,6 +190,11 @@ public class CaseDefinitionRestServiceQueryTest extends AbstractRestServiceTest 
     inOrder.verify(mockedQuery).orderByDeploymentId();
     inOrder.verify(mockedQuery).asc();
 
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
+    inOrder.verify(mockedQuery).asc();
+
     // desc
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("id", "desc", Status.OK);
@@ -218,6 +224,11 @@ public class CaseDefinitionRestServiceQueryTest extends AbstractRestServiceTest 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("deploymentId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByDeploymentId();
+    inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).desc();
   }
 
@@ -300,6 +311,7 @@ public class CaseDefinitionRestServiceQueryTest extends AbstractRestServiceTest 
     int returnedVersion = from(content).getInt("[0].version");
     String returnedResource = from(content).getString("[0].resource");
     String returnedDeploymentId = from(content).getString("[0].deploymentId");
+    String returnedTenantId = from(content).getString("[0].tenantId");
 
     assertThat(returnedId).isEqualTo(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
     assertThat(returnedKey).isEqualTo(MockProvider.EXAMPLE_CASE_DEFINITION_KEY);
@@ -308,6 +320,7 @@ public class CaseDefinitionRestServiceQueryTest extends AbstractRestServiceTest 
     assertThat(returnedVersion).isEqualTo(MockProvider.EXAMPLE_CASE_DEFINITION_VERSION);
     assertThat(returnedResource).isEqualTo(MockProvider.EXAMPLE_CASE_DEFINITION_RESOURCE_NAME);
     assertThat(returnedDeploymentId).isEqualTo(MockProvider.EXAMPLE_DEPLOYMENT_ID);
+    assertThat(returnedTenantId).isEqualTo(null);
   }
 
   @Test
@@ -377,6 +390,84 @@ public class CaseDefinitionRestServiceQueryTest extends AbstractRestServiceTest 
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     inOrder.verify(mockedQuery, never()).caseDefinitionIdIn(Matchers.<String[]>anyVararg());
     inOrder.verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testCaseDefinitionTenantIdList() {
+    List<CaseDefinition> caseDefinitions = Arrays.asList(
+        MockProvider.mockCaseDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build(),
+        MockProvider.mockCaseDefinition().id(MockProvider.ANOTHER_EXAMPLE_CASE_DEFINITION_ID).tenantId(MockProvider.ANOTHER_EXAMPLE_TENANT_ID).build());
+    mockedQuery = createMockCaseDefinitionQuery(caseDefinitions);
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(CASE_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void testCaseDefinitionWithoutTenantId() {
+    Response response = given()
+      .queryParam("withoutTenantId", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(CASE_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId1).isEqualTo(null);
+  }
+
+  @Test
+  public void testCaseDefinitionTenantIdIncludeDefinitionsWithoutTenantid() {
+    List<CaseDefinition> caseDefinitions = Arrays.asList(
+        MockProvider.mockCaseDefinition().tenantId(null).build(),
+        MockProvider.mockCaseDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build());
+    mockedQuery = createMockCaseDefinitionQuery(caseDefinitions);
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID)
+      .queryParam("includeCaseDefinitionsWithoutTenantId", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(CASE_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID);
+    verify(mockedQuery).includeCaseDefinitionsWithoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(null);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
   }
 
   @Test

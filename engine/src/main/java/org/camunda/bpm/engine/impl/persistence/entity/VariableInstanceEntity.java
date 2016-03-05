@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -483,7 +484,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
           return null;
         }
 
-      }, targetProcessApplication);
+      }, targetProcessApplication, new InvocationContext(getExecution()));
 
     }
     else {

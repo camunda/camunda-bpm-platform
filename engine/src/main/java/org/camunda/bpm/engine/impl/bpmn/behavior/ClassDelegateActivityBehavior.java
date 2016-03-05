@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDele
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -56,6 +57,7 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
   }
 
   // Activity Behavior
+  @Override
   public void execute(final ActivityExecution execution) throws Exception {
     this.executeWithErrorPropagation(execution, new Callable<Void>() {
       @Override
@@ -67,6 +69,7 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
   }
 
   // Signallable activity behavior
+  @Override
   public void signal(final ActivityExecution execution, final String signalName, final Object signalData) throws Exception {
     ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
     if(ProcessApplicationContextUtil.requiresContextSwitch(targetProcessApplication)) {
@@ -75,7 +78,7 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
           signal(execution, signalName, signalData);
           return null;
         }
-      }, targetProcessApplication);
+      }, targetProcessApplication, new InvocationContext(execution));
     }
     else {
       doSignal(execution, signalName, signalData);

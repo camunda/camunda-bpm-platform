@@ -200,6 +200,16 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
     inOrder.verify(mockedQuery).asc();
 
     inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("activityInstanceId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByActivityInstanceId();
+    inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("tenantId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).desc();

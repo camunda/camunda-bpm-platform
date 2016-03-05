@@ -32,26 +32,33 @@ public class ExecutionAssert {
     return assertion;
   }
 
-  public void matches(ExecutionTreeAssertion assertion) {
+  public ExecutionAssert matches(ExecutionTreeAssertion assertion) {
     assertion.assertExecution(tree);
+    return this;
+  }
+
+  public ExecutionAssert hasProcessDefinitionId(String expectedProcessDefinitionId) {
+    ExecutionTreeAssertion assertion = ExecutionTreeProcessDefinitionIdAssertion.processDefinitionId(expectedProcessDefinitionId);
+    matches(assertion);
+    return this;
   }
 
   public static class ExecutionTreeBuilder {
 
-    protected ExecutionTreeAssertion rootAssertion = null;
-    protected Stack<ExecutionTreeAssertion> activityInstanceStack = new Stack<ExecutionTreeAssertion>();
+    protected ExecutionTreeStructureAssertion rootAssertion = null;
+    protected Stack<ExecutionTreeStructureAssertion> activityInstanceStack = new Stack<ExecutionTreeStructureAssertion>();
 
     public ExecutionTreeBuilder(String rootActivityInstanceId) {
-      rootAssertion = new ExecutionTreeAssertion();
+      rootAssertion = new ExecutionTreeStructureAssertion();
       rootAssertion.setExpectedActivityId(rootActivityInstanceId);
       activityInstanceStack.push(rootAssertion);
     }
 
     public ExecutionTreeBuilder child(String activityId) {
-      ExecutionTreeAssertion newInstance = new ExecutionTreeAssertion();
+      ExecutionTreeStructureAssertion newInstance = new ExecutionTreeStructureAssertion();
       newInstance.setExpectedActivityId(activityId);
 
-      ExecutionTreeAssertion parentInstance = activityInstanceStack.peek();
+      ExecutionTreeStructureAssertion parentInstance = activityInstanceStack.peek();
       parentInstance.addChildAssertion(newInstance);
 
       activityInstanceStack.push(newInstance);
@@ -60,31 +67,31 @@ public class ExecutionAssert {
     }
 
     public ExecutionTreeBuilder scope() {
-      ExecutionTreeAssertion currentAssertion = activityInstanceStack.peek();
+      ExecutionTreeStructureAssertion currentAssertion = activityInstanceStack.peek();
       currentAssertion.setExpectedIsScope(true);
       return this;
     }
 
     public ExecutionTreeBuilder concurrent() {
-      ExecutionTreeAssertion currentAssertion = activityInstanceStack.peek();
+      ExecutionTreeStructureAssertion currentAssertion = activityInstanceStack.peek();
       currentAssertion.setExpectedIsConcurrent(true);
       return this;
     }
 
     public ExecutionTreeBuilder eventScope() {
-      ExecutionTreeAssertion currentAssertion = activityInstanceStack.peek();
+      ExecutionTreeStructureAssertion currentAssertion = activityInstanceStack.peek();
       currentAssertion.setExpectedIsEventScope(true);
       return this;
     }
 
     public ExecutionTreeBuilder noScope() {
-      ExecutionTreeAssertion currentAssertion = activityInstanceStack.peek();
+      ExecutionTreeStructureAssertion currentAssertion = activityInstanceStack.peek();
       currentAssertion.setExpectedIsScope(false);
       return this;
     }
 
     public ExecutionTreeBuilder id(String id) {
-      ExecutionTreeAssertion currentAssertion = activityInstanceStack.peek();
+      ExecutionTreeStructureAssertion currentAssertion = activityInstanceStack.peek();
       currentAssertion.setExpectedId(id);
       return this;
     }
@@ -94,7 +101,7 @@ public class ExecutionAssert {
       return this;
     }
 
-    public ExecutionTreeAssertion done() {
+    public ExecutionTreeStructureAssertion done() {
       return rootAssertion;
     }
   }

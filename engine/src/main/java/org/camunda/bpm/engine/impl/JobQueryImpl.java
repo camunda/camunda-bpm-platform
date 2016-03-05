@@ -59,7 +59,10 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   protected String exceptionMessage;
   protected boolean noRetriesLeft;
   protected SuspensionState suspensionState;
+
+  protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
+  protected boolean includeJobsWithoutTenantId = false;
 
   public JobQueryImpl() {
   }
@@ -238,6 +241,18 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   public JobQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public JobQuery withoutTenantId() {
+    isTenantIdSet = true;
+    this.tenantIds = null;
+    return this;
+  }
+
+  public JobQuery includeJobsWithoutTenantId() {
+    this.includeJobsWithoutTenantId = true;
     return this;
   }
 

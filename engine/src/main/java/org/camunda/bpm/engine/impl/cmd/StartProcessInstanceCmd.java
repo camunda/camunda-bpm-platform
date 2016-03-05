@@ -12,21 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
 import java.io.Serializable;
-import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.ProcessInstantiationBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-
 
 /**
  * @author Tom Baeyens
@@ -35,44 +29,26 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  protected String processDefinitionKey;
-  protected String processDefinitionId;
-  protected Map<String, Object> variables;
-  protected String businessKey;
-  protected String caseInstanceId;
 
-  public StartProcessInstanceCmd(String processDefinitionKey, String processDefinitionId, String businessKey, String caseInstanceId, Map<String, Object> variables) {
-    this.processDefinitionKey = processDefinitionKey;
-    this.processDefinitionId = processDefinitionId;
-    this.businessKey = businessKey;
-    this.caseInstanceId = caseInstanceId;
-    this.variables = variables;
+  protected final ProcessInstantiationBuilderImpl instantiationBuilder;
+
+  public StartProcessInstanceCmd(ProcessInstantiationBuilderImpl instantiationBuilder) {
+    this.instantiationBuilder = instantiationBuilder;
   }
 
   public ProcessInstance execute(CommandContext commandContext) {
 
-    DeploymentCache deploymentCache = Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache();
-    // Find the process definition
-    ProcessDefinitionEntity processDefinition = null;
-    if (processDefinitionId!=null) {
-      processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-      ensureNotNull("No process definition found for id = '" + processDefinitionId + "'", "processDefinition", processDefinition);
-    } else if(processDefinitionKey != null) {
-      processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
-      ensureNotNull("No process definition found for key '" + processDefinitionKey + "'", "processDefinition", processDefinition);
-    } else {
-      throw new ProcessEngineException("processDefinitionKey and processDefinitionId are null");
-    }
+    ProcessDefinitionEntity processDefinition = new GetDeployedProcessDefinitionCmd(instantiationBuilder, false).execute(commandContext);
 
     // check authorization
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkCreateProcessInstance(processDefinition);
 
     // Start the process instance
-    ExecutionEntity processInstance = processDefinition.createProcessInstance(businessKey, caseInstanceId);
-    processInstance.start(variables);
+    ExecutionEntity processInstance = processDefinition.createProcessInstance(instantiationBuilder.getBusinessKey(),
+        instantiationBuilder.getCaseInstanceId());
+    processInstance.start(instantiationBuilder.getVariables());
     return processInstance;
   }
+
 }

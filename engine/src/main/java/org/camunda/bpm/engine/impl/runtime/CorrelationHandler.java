@@ -25,25 +25,39 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 public interface CorrelationHandler {
 
   /**
-   * Correlate the given message and return the {@link MessageCorrelationResult} that matches it.
-   * Return null if the message could not be correlated.
+   * Correlate the given message to either a waiting execution or a process
+   * definition with a message start event.
    *
-   * @param commandContext
-   * @param messageName
-   * @param correlationSet any of its members may be <code>null</code>
-   * @return
+   * @param correlationSet
+   *          any of its members may be <code>null</code>
+   *
+   * @return the matched correlation target or <code>null</code> if the message
+   *         could not be correlated.
    */
   public MessageCorrelationResult correlateMessage(CommandContext commandContext, String messageName, CorrelationSet correlationSet);
 
   /**
-   * Correlate all given messages and return a {@link List} of {@link MessageCorrelationResult}s that matches them.
-   * Return any empty {@link List} if no message could not be correlated.
+   * Correlate the given message to all waiting executions and all process
+   * definitions which have a message start event.
    *
-   * @param commandContext
-   * @param messageName
-   * @param correlationSet any of its members may be <code>null</code>
-   * @return
+   * @param correlationSet
+   *          any of its members may be <code>null</code>
+   *
+   * @return all matched correlation targets or an empty List if the message
+   *         could not be correlated.
    */
   public List<MessageCorrelationResult> correlateMessages(CommandContext commandContext, String messageName, CorrelationSet correlationSet);
+
+  /**
+   * Correlate the given message to process definitions with a message start
+   * event.
+   *
+   * @param correlationSet
+   *          any of its members may be <code>null</code>
+   *
+   * @return the matched correlation targets or an empty list if the message
+   *         could not be correlated.
+   */
+  public List<MessageCorrelationResult> correlateStartMessages(CommandContext commandContext, String messageName, CorrelationSet correlationSet);
 
 }

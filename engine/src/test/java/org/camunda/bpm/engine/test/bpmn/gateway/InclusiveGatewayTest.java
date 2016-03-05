@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.test.bpmn.gateway;
 
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,12 +24,14 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
 
 /**
  * @author Joram Barrez
@@ -593,6 +598,70 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
 
     // then
     assertNull(query.taskDefinitionKey("taskAfterJoin").singleResult());
+  }
+
+  public void testTriggerGatewayWithEnoughArrivedTokens() {
+    deployment(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .userTask("beforeTask")
+      .inclusiveGateway("gw")
+      .userTask("afterTask")
+      .endEvent()
+      .done());
+
+    // given
+    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("process")
+      .startBeforeActivity("beforeTask")
+      .startBeforeActivity("beforeTask")
+      .execute();
+
+    Task task = taskService.createTaskQuery().list().get(0);
+
+    // when
+    taskService.complete(task.getId());
+
+    // then
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    assertThat(activityInstance).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("beforeTask")
+        .activity("afterTask")
+      .done());
+  }
+
+  public void testLoopingInclusiveGateways() {
+    deployment(Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .inclusiveGateway("fork1")
+        .inclusiveGateway("fork2")
+        .inclusiveGateway("join2")
+        .inclusiveGateway("join1")
+        .inclusiveGateway("fork3")
+        .endEvent()
+        .moveToNode("fork3")
+          .connectTo("fork1")
+        .moveToNode("fork1")
+          .userTask("task1")
+          .connectTo("join1")
+        .moveToNode("fork2")
+          .userTask("task2")
+          .connectTo("join2")
+        .done());
+
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // when
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    // then
+    assertThat(activityInstance).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("task1")
+        .activity("task2")
+        .activity("join2")
+      .done());
   }
 
 }

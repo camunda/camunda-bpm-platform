@@ -21,7 +21,13 @@ import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugin;
  */
 public class ExampleBpmPlatformPlugin implements BpmPlatformPlugin {
 
+  @Override
   public void postProcessApplicationDeploy(ProcessApplicationInterface processApplication) {
+  }
+
+  @Override
+  public void postProcessApplicationUndeploy(ProcessApplicationInterface processApplication) {
+
   }
 
 }

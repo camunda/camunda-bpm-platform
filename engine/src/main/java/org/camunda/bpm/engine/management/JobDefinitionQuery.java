@@ -55,6 +55,15 @@ public interface JobDefinitionQuery extends Query<JobDefinitionQuery, JobDefinit
   /** Only select job definitions that belong to one of the given tenant ids. */
   JobDefinitionQuery tenantIdIn(String... tenantIds);
 
+  /** Only select job definitions which have no tenant id. */
+  JobDefinitionQuery withoutTenantId();
+
+  /**
+   * Select job definitions which have no tenant id. Can be used in combination
+   * with {@link #tenantIdIn(String...)}.
+   */
+  JobDefinitionQuery includeJobDefinitionsWithoutTenantId();
+
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   JobDefinitionQuery orderByJobDefinitionId();
 

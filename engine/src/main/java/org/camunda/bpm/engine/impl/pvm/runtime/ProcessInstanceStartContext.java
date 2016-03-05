@@ -19,8 +19,9 @@ import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker.WalkCondition;
 import org.camunda.bpm.engine.impl.tree.ScopeCollector;
-import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 
 /**
  * Callback for being notified when a model instance has started.
@@ -55,7 +56,7 @@ public class ProcessInstanceStartContext extends ExecutionStartContext {
     if (instantiationStack == null) {
       FlowScopeWalker flowScopeWalker = new FlowScopeWalker(initial.getFlowScope());
       ScopeCollector scopeCollector = new ScopeCollector();
-      flowScopeWalker.addPreVisitor(scopeCollector).walkWhile(new WalkCondition<ScopeImpl>() {
+      flowScopeWalker.addPreVisitor(scopeCollector).walkWhile(new ReferenceWalker.WalkCondition<ScopeImpl>() {
         public boolean isFulfilled(ScopeImpl element) {
           return element == null || element == initial.getProcessDefinition();
         }
