@@ -17,7 +17,9 @@ public class TimerEventListenerJobHandler extends TimerEventJobHandler {
   }
 
   @Override
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
-    //TODO
+  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+
   }
+
+
 }
