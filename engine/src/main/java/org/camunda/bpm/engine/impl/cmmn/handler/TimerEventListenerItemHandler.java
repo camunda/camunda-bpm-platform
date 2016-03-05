@@ -50,19 +50,23 @@ public class TimerEventListenerItemHandler extends EventListenerItemHandler {
     TimerEventListener elemDef = (TimerEventListener) super.getDefinition(element);
 
     TimerExpression exp = elemDef.getTimerExpression();
-    String expText = exp.getText();
-    StartTrigger start = elemDef.getTimerStart();
+    if(exp!=null) {
+      String expText = exp.getText();
+      StartTrigger start = elemDef.getTimerStart();
 
-    Expression expression = context.getExpressionManager().createExpression(expText);
-    //TODO get the type from the camunda extensions in XML?
-    TimerDeclarationType type = determineTimeDeclrType(expText);
-    TimerEventListenerJobDeclaration timerDeclaration = null;
-    if (type != null) {
-      //TODO get the job type handler extending TimerEventJobHandler?
-      String jobHandlerType = TimerEventListenerJobHandler.TYPE;
-      timerDeclaration = new TimerEventListenerJobDeclaration(expression, type, jobHandlerType);
-    }// What to do if type not found?
-    return timerDeclaration;
+      Expression expression = context.getExpressionManager().createExpression(expText);
+      //TODO get the type from the camunda extensions in XML?
+      TimerDeclarationType type = determineTimeDeclrType(expText);
+      TimerEventListenerJobDeclaration timerDeclaration = null;
+      if (type != null) {
+        //TODO get the job type handler extending TimerEventJobHandler?
+        String jobHandlerType = TimerEventListenerJobHandler.TYPE;
+        timerDeclaration = new TimerEventListenerJobDeclaration(expression, type, jobHandlerType);
+      }// What to do if type not found?
+      return timerDeclaration;
+    }
+
+    return null;
   }
 
   private TimerDeclarationType determineTimeDeclrType(String expText) {
