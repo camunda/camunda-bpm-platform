@@ -82,6 +82,7 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
   public static final String PROPERTY_DISCRETIONARY = "discretionary";
   public static final String PROPERTY_ACTIVITY_TYPE = "activityType";
   public static final String PROPERTY_ACTIVITY_DESCRIPTION = "description";
+  public static final String PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION = "timerEventListenerJobDeclaration";
 
   public static List<String> TASK_OR_STAGE_CREATE_EVENTS = Arrays.asList(
       CaseExecutionListener.CREATE

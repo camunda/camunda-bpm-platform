@@ -30,105 +30,118 @@ import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTI
 import static org.junit.Assert.*;
 
 /**
- * @author subhro
+ *  @author Roman Smirnov
+ *  @author Subhro
  */
 public class TimerEventListenerHandlerTest extends CmmnElementHandlerTest {
 
-    protected TimerEventListener timerEventListener;
-    protected PlanItem planItem;
-    protected TimerEventListenerItemHandler timerEventListenerItemHandler=new TimerEventListenerItemHandler();
+  protected TimerEventListener timerEventListener;
+  protected PlanItem planItem;
+  protected TimerEventListenerItemHandler timerEventListenerItemHandler = new TimerEventListenerItemHandler();
 
-    @Before
-    public void setUp() {
-        timerEventListener = createElement(casePlanModel, "aTimerEventListener", TimerEventListener.class);
+  @Before
+  public void setUp() {
+    timerEventListener = createElement(casePlanModel, "aTimerEventListener", TimerEventListener.class);
 
-        planItem = createElement(casePlanModel, "PI_aTimerEventListener", PlanItem.class);
-        planItem.setDefinition(timerEventListener);
+    planItem = createElement(casePlanModel, "PI_aTimerEventListener", PlanItem.class);
+    planItem.setDefinition(timerEventListener);
 
-    }
+  }
 
-    @Test
-    public void testTimerEventListenerActivityName(){
-        String timerName="A TimerEventListener";
-        timerEventListener.setName(timerName);
+  @Test
+  public void testTimerEventListenerActivityName() {
+    String timerName = "A TimerEventListener";
+    timerEventListener.setName(timerName);
 
-        CmmnActivity activity = timerEventListenerItemHandler.handleElement(planItem, context);
-        assertEquals(timerName, activity.getName());
+    CmmnActivity activity = timerEventListenerItemHandler.handleElement(planItem, context);
+    assertEquals(timerName, activity.getName());
 
-    }
+  }
 
-    @Test
-    public void testPlanItemActivityName(){
-        String timerName = "A TimerEventListener";
-        timerEventListener.setName(timerName);
+  @Test
+  public void testPlanItemActivityName() {
+    String timerName = "A TimerEventListener";
+    timerEventListener.setName(timerName);
 
-        // the planItem has an own name "My LocalName"
-        String planItemName = "My Local TimerEventListener";
-        planItem.setName(planItemName);
+    // the planItem has an own name "My LocalName"
+    String planItemName = "My Local TimerEventListener";
+    planItem.setName(planItemName);
 
-        // when
-        CmmnActivity activity = timerEventListenerItemHandler.handleElement(planItem, context);
+    // when
+    CmmnActivity activity = timerEventListenerItemHandler.handleElement(planItem, context);
 
-        // then
-        assertNotEquals(timerName, activity.getName());
-        assertEquals(planItemName, activity.getName());
-    }
+    // then
+    assertNotEquals(timerName, activity.getName());
+    assertEquals(planItemName, activity.getName());
+  }
 
-    @Test
-    public void testTimerEventListenerActivityType(){
-        CmmnActivity activity = timerEventListenerItemHandler.handleElement(planItem, context);
+  @Test
+  public void testTimerEventListenerActivityType() {
+    CmmnActivity activity = timerEventListenerItemHandler.handleElement(planItem, context);
 
-        // then
-        String activityType = (String) activity.getProperty(PROPERTY_ACTIVITY_TYPE);
-        assertEquals("timerEventListener", activityType);
-    }
+    // then
+    String activityType = (String) activity.getProperty(PROPERTY_ACTIVITY_TYPE);
+    assertEquals("timerEventListener", activityType);
+  }
 
 
-    @Test
-    public void testTimerEventListenerDescription(){
-        String description = "This is a timer event listener";
-        timerEventListener.setDescription(description);
+  @Test
+  public void testTimerEventListenerDescription() {
+    String description = "This is a timer event listener";
+    timerEventListener.setDescription(description);
 
-        // when
-        CmmnActivity activity = timerEventListenerItemHandler.handleElement(planItem, context);
+    // when
+    CmmnActivity activity = timerEventListenerItemHandler.handleElement(planItem, context);
 
-        // then
-        assertEquals(description, activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
-    }
+    // then
+    assertEquals(description, activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
+  }
 
-    @Test
-    public void testActivityBehavior(){
-        CmmnActivity activity = timerEventListenerItemHandler.handleElement(planItem, context);
+  @Test
+  public void testActivityBehavior() {
+    CmmnActivity activity = timerEventListenerItemHandler.handleElement(planItem, context);
 
-        // then
-        CmmnActivityBehavior behavior = activity.getActivityBehavior();
-        assertTrue(behavior instanceof TimerEventListenerActivityBehavior);
+    // then
+    CmmnActivityBehavior behavior = activity.getActivityBehavior();
+    assertTrue(behavior instanceof TimerEventListenerActivityBehavior);
 
-    }
+  }
 
-    @Test
-    public void testWithoutParent() {
-        // given: a planItem
+  @Test
+  public void testWithoutParent() {
+    // given: a planItem
 
-        // when
-        CmmnActivity activity = timerEventListenerItemHandler.handleElement(planItem, context);
+    // when
+    CmmnActivity activity = timerEventListenerItemHandler.handleElement(planItem, context);
 
-        // then
-        assertNull(activity.getParent());
-    }
+    // then
+    assertNull(activity.getParent());
+  }
 
-    @Test
-    public void testWithParent() {
-        // given:
-        // a new activity as parent
-        CmmnCaseDefinition parent = new CmmnCaseDefinition("aParentActivity");
-        context.setParent(parent);
+  @Test
+  public void testWithParent() {
+    // given:
+    // a new activity as parent
+    CmmnCaseDefinition parent = new CmmnCaseDefinition("aParentActivity");
+    context.setParent(parent);
 
-        // when
-        CmmnActivity activity = timerEventListenerItemHandler.handleElement(planItem, context);
+    // when
+    CmmnActivity activity = timerEventListenerItemHandler.handleElement(planItem, context);
 
-        // then
-        assertEquals(parent, activity.getParent());
-        assertTrue(parent.getActivities().contains(activity));
-    }
+    // then
+    assertEquals(parent, activity.getParent());
+    assertTrue(parent.getActivities().contains(activity));
+  }
+
+  @Test
+  public void testTimerExpression(){
+    //create a timer expression;
+    TimerExpression timerExprElement = createElement(timerEventListener, TimerExpression.class);
+    timerExprElement.setText("${aTest}");
+    Cmmn.validateModel(modelInstance);
+
+    CmmnActivity newActivity = timerEventListenerItemHandler.handleElement(planItem, context);
+   assertNotNull(newActivity.getProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION));
+
+  }
 }

@@ -18,54 +18,64 @@ import org.camunda.bpm.engine.impl.cmmn.behavior.TimerEventListenerActivityBehav
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
-import org.camunda.bpm.model.cmmn.instance.CmmnElement;
-import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
-import org.camunda.bpm.model.cmmn.instance.TimerEventListener;
+import org.camunda.bpm.engine.impl.jobexecutor.*;
+import org.camunda.bpm.model.cmmn.instance.*;
 
 import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * @author subhro
+ *  @author Roman Smirnov
+ *  @author Subhro
  */
-public class TimerEventListenerItemHandler extends ItemHandler{
+public class TimerEventListenerItemHandler extends EventListenerItemHandler {
 
-    private static Logger logger=Logger.getLogger(TimerEventListenerItemHandler.class.getSimpleName());
+  @Override
+  protected CmmnActivityBehavior getActivityBehavior() {
+    return new TimerEventListenerActivityBehavior();
+  }
 
-    @Override
-    protected List<String> getStandardEvents(CmmnElement element) {
-        return EVENT_LISTENER_OR_MILESTONE_EVENTS;
-    }
+  @Override
+  protected void initializeActivity(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    super.initializeActivity(element, activity, context);
+    initializeTimerEventListenerJobDeclaration(element, activity, context);
+  }
 
-    @Override
-    protected CmmnActivityBehavior getActivityBehavior() {
-        logger.info("Getting CMMN activity behavior for TimeEventListnerItemHandler");
-        return new TimerEventListenerActivityBehavior();
-    }
+  private void initializeTimerEventListenerJobDeclaration(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    JobDeclaration timerEventListenerJobDeclaration=parseTimerExpression(element,context);
+    activity.setProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION,timerEventListenerJobDeclaration);
+  }
 
-    @Override
-    protected void initializeActivity(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
-        super.initializeActivity(element, activity, context);
-    }
+  private JobDeclaration parseTimerExpression(CmmnElement element, CmmnHandlerContext context) {
+    TimerEventListener elemDef = (TimerEventListener) super.getDefinition(element);
 
-    @Override
-    protected void initializeEntryCriterias(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
-        // entry criteria is not applicable on event listeners
+    TimerExpression exp = elemDef.getTimerExpression();
+    String expText = exp.getText();
+    StartTrigger start = elemDef.getTimerStart();
+
+    Expression expression = context.getExpressionManager().createExpression(expText);
+    //TODO get the type from the camunda extensions in XML?
+    TimerDeclarationType type = determineTimeDeclrType(expText);
+    TimerEventListenerJobDeclaration timerDeclaration = null;
+    if (type != null) {
+      //TODO get the job type handler extending TimerEventJobHandler?
+      String jobHandlerType = TimerEventListenerJobHandler.TYPE;
+      timerDeclaration = new TimerEventListenerJobDeclaration(expression, type, jobHandlerType);
+    }// What to do if type not found?
+    return timerDeclaration;
+  }
+
+  private TimerDeclarationType determineTimeDeclrType(String expText) {
+    if(expText!=null && expText.startsWith("R")){
+      //TODO more validations, for format and values?
+      return TimerDeclarationType.CYCLE;
+    }else if(expText!=null && expText.startsWith("P")){
+      //TODO more validations.
+      return TimerDeclarationType.DURATION;
+    }else if(expText!=null){
+      //TODO ISO date format validation?
+      return TimerDeclarationType.DATE;
     }
-    @Override
-    protected void initializeExitCriterias(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
-        // exit criteria is not applicable on milestones
-    }
-    @Override
-    protected void initializeRepetitionRule(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
-        // repetition rule is not applicable on event listeners
-    }
-    @Override
-    protected void initializeRequiredRule(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
-        // required rule is not applicable on event listeners
-    }
-    @Override
-    protected void initializeManualActivationRule(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
-        // manual activation rule is not applicable on event listeners
-    }
+    return null;
+  }
 }
