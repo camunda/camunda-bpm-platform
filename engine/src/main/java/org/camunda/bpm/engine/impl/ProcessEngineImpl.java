@@ -98,7 +98,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     executeSchemaOperations();
 
     if (name == null) {
-      LOG.processEngineCreated("default");
+      LOG.processEngineCreated(ProcessEngines.NAME_DEFAULT);
     } else {
       LOG.processEngineCreated(name);
     }
@@ -142,6 +142,8 @@ public class ProcessEngineImpl implements ProcessEngine {
     commandExecutorSchemaOperations.execute(new SchemaOperationProcessEngineClose());
 
     processEngineConfiguration.close();
+
+    LOG.processEngineClosed(name);
   }
 
   // getters and setters //////////////////////////////////////////////////////
