@@ -24,6 +24,8 @@ public class CorrelationMessageDto {
   private Map<String, VariableValueDto> processVariables;
   private String tenantId;
   private boolean withoutTenantId;
+  private String processInstanceId;
+
   private boolean all = false;
 
   public String getMessageName() {
@@ -73,7 +75,7 @@ public class CorrelationMessageDto {
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
   }
-
+  
   public boolean isWithoutTenantId() {
     return withoutTenantId;
   }
@@ -82,4 +84,11 @@ public class CorrelationMessageDto {
     this.withoutTenantId = withoutTenantId;
   }
 
+  public String getProcessInstanceId() {
+    return processInstanceId;
+  }
+
+  public void setProcessInstanceId(String processInstanceId) {
+    this.processInstanceId = processInstanceId;
+  }
 }
