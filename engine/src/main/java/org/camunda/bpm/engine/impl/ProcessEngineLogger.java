@@ -144,5 +144,9 @@ public class ProcessEngineLogger extends BaseLogger {
     logError("006", "Exception while closing process engine {}", string, e);
   }
 
+  public void processEngineClosed(String name) {
+    logInfo("007", "Process Engine {} closed", name);
+  }
+
 }
 
