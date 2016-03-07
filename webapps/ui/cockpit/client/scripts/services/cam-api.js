@@ -1,6 +1,6 @@
 'use strict';
 
-var CamSDK = require('camunda-bpm-sdk-js/lib/angularjs/index');
+var CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular');
 
   module.exports = ['Uri', 'camAPIHttpClient', function(Uri, camAPIHttpClient) {
 

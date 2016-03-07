@@ -21,7 +21,6 @@
     "angular-moment": "0.9.0",
     "angular-route": "1.2.29",
     "bpmn-js": "0.12.1",
-    "camunda-bpm-sdk-js": "git://github.com/camunda/camunda-bpm-sdk-js#master",
     "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master",
     "events": "1.1.0",
     "jquery": "2.1.1",
