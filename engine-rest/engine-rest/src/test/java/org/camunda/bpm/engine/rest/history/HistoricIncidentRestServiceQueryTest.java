@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest.history;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.inOrder;
@@ -11,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -50,14 +52,18 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
 
   @Before
   public void setUpRuntimeData() {
-    mockedQuery = mock(HistoricIncidentQuery.class);
+    mockedQuery = setUpMockHistoricIncidentQuery(MockProvider.createMockHistoricIncidents());
+  }
 
-    List<HistoricIncident> incidents = MockProvider.createMockHistoricIncidents();
+  private HistoricIncidentQuery setUpMockHistoricIncidentQuery(List<HistoricIncident> mockedHistoricIncidents) {
+    HistoricIncidentQuery mockedHistoricIncidentQuery = mock(HistoricIncidentQuery.class);
 
-    when(mockedQuery.list()).thenReturn(incidents);
-    when(mockedQuery.count()).thenReturn((long) incidents.size());
+    when(mockedHistoricIncidentQuery.list()).thenReturn(mockedHistoricIncidents);
+    when(mockedHistoricIncidentQuery.count()).thenReturn((long) mockedHistoricIncidents.size());
 
-    when(processEngine.getHistoryService().createHistoricIncidentQuery()).thenReturn(mockedQuery);
+    when(processEngine.getHistoryService().createHistoricIncidentQuery()).thenReturn(mockedHistoricIncidentQuery);
+
+    return mockedHistoricIncidentQuery;
   }
 
   @Test
@@ -226,6 +232,12 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     executeAndVerifySorting("configuration", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByConfiguration();
     inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByIncidentId();
+    inOrder.verify(mockedQuery).desc();
+
   }
 
   @Test
@@ -319,6 +331,7 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     Boolean returnedIncidentOpen = from(content).getBoolean("[0].open");
     Boolean returnedIncidentDeleted = from(content).getBoolean("[0].deleted");
     Boolean returnedIncidentResolved = from(content).getBoolean("[0].resolved");
+    String returnedTenantId = from(content).getString("[0].tenantId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_PROC_INST_ID, returnedProcessInstanceId);
@@ -336,6 +349,7 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_STATE_OPEN, returnedIncidentOpen);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_STATE_DELETED, returnedIncidentDeleted);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_STATE_RESOLVED, returnedIncidentResolved);
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
   }
 
   @Test
@@ -486,6 +500,33 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
       .when().get(HISTORY_INCIDENT_QUERY_URL);
 
     verify(mockedQuery).deleted();
+  }
+
+  @Test
+  public void testQueryByTenantIds() {
+    mockedQuery = setUpMockHistoricIncidentQuery(Arrays.asList(
+        MockProvider.createMockHistoricIncident(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockHistoricIncident(MockProvider.ANOTHER_EXAMPLE_TENANT_ID)));
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORY_INCIDENT_QUERY_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> incidents = from(content).getList("");
+    assertThat(incidents).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
   }
 
 }

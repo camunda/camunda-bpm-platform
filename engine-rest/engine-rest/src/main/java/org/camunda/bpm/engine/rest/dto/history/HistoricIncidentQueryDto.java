@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -43,6 +44,7 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
   private static final String SORT_BY_CAUSE_INCIDENT_ID = "causeIncidentId";
   private static final String SORT_BY_ROOT_CAUSE_INCIDENT_ID = "rootCauseIncidentId";
   private static final String SORT_BY_CONFIGURATION = "configuration";
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -58,6 +60,7 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     VALID_SORT_BY_VALUES.add(SORT_BY_CAUSE_INCIDENT_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_ROOT_CAUSE_INCIDENT_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_CONFIGURATION);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   protected String incidentId;
@@ -73,6 +76,7 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
   protected Boolean open;
   protected Boolean resolved;
   protected Boolean deleted;
+  protected List<String> tenantIds;
 
   public HistoricIncidentQueryDto() {}
 
@@ -145,6 +149,11 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     this.deleted = deleted;
   }
 
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -196,6 +205,9 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     if (deleted != null && deleted) {
       query.deleted();
     }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
   }
 
   @Override
@@ -222,6 +234,8 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
       query.orderByRootCauseIncidentId();
     } else if (sortBy.equals(SORT_BY_CONFIGURATION)) {
       query.orderByConfiguration();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 

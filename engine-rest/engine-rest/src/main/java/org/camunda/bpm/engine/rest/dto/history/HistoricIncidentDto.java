@@ -35,6 +35,7 @@ public class HistoricIncidentDto {
   protected String rootCauseIncidentId;
   protected String configuration;
   protected String incidentMessage;
+  protected String tenantId;
   protected Boolean open;
   protected Boolean deleted;
   protected Boolean resolved;
@@ -91,6 +92,10 @@ public class HistoricIncidentDto {
     return incidentMessage;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
   public Boolean isOpen() {
     return open;
   }
@@ -122,6 +127,7 @@ public class HistoricIncidentDto {
     dto.open = historicIncident.isOpen();
     dto.deleted = historicIncident.isDeleted();
     dto.resolved = historicIncident.isResolved();
+    dto.tenantId = historicIncident.getTenantId();
 
     return dto;
   }

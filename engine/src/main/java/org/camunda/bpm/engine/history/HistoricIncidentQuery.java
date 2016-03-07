@@ -47,6 +47,9 @@ public interface HistoricIncidentQuery extends Query<HistoricIncidentQuery, Hist
   /** Only select historic incidents which contain the id of the root cause incident. **/
   HistoricIncidentQuery rootCauseIncidentId(String rootCauseIncidentId);
 
+  /** Only select historic incidents that belong to one of the given tenant ids. */
+  HistoricIncidentQuery tenantIdIn(String... tenantIds);
+
   /** Only select incidents which contain the configuration. **/
   HistoricIncidentQuery configuration(String configuration);
 
@@ -91,5 +94,11 @@ public interface HistoricIncidentQuery extends Query<HistoricIncidentQuery, Hist
 
   /** Order by configuration (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricIncidentQuery orderByConfiguration();
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of incidents without tenant id is database-specific.
+   */
+  HistoricIncidentQuery orderByTenantId();
 
 }

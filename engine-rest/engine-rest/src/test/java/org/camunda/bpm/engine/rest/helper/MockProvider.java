@@ -2039,8 +2039,11 @@ public abstract class MockProvider {
   }
 
   // Historic Incident ///////////////////////////////////////
-
   public static HistoricIncident createMockHistoricIncident() {
+    return createMockHistoricIncident(EXAMPLE_TENANT_ID);
+  }
+
+  public static HistoricIncident createMockHistoricIncident(String tenantId) {
     HistoricIncident incident = mock(HistoricIncident.class);
 
     when(incident.getId()).thenReturn(EXAMPLE_HIST_INCIDENT_ID);
@@ -2059,6 +2062,7 @@ public abstract class MockProvider {
     when(incident.isOpen()).thenReturn(EXAMPLE_HIST_INCIDENT_STATE_OPEN);
     when(incident.isDeleted()).thenReturn(EXAMPLE_HIST_INCIDENT_STATE_DELETED);
     when(incident.isResolved()).thenReturn(EXAMPLE_HIST_INCIDENT_STATE_RESOLVED);
+    when(incident.getTenantId()).thenReturn(tenantId);
 
     return incident;
   }

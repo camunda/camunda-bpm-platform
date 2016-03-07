@@ -21,7 +21,8 @@
         CAUSE_INCIDENT_ID_,
         ROOT_CAUSE_INCIDENT_ID_,
         CONFIGURATION_,
-        INCIDENT_STATE_
+        INCIDENT_STATE_,
+        TENANT_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{processDefinitionKey, jdbcType=VARCHAR},
@@ -36,7 +37,8 @@
         #{causeIncidentId ,jdbcType=VARCHAR},
         #{rootCauseIncidentId ,jdbcType=VARCHAR},
         #{configuration, jdbcType=VARCHAR},
-        #{incidentState, jdbcType=INTEGER}
+        #{incidentState, jdbcType=INTEGER},
+        #{tenantId, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -83,6 +85,7 @@
     <result property="rootCauseIncidentId" column="ROOT_CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
     <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
     <result property="incidentState" column="INCIDENT_STATE_" jdbcType="INTEGER" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- HISTORIC INCIDENT SELECT -->
@@ -137,6 +140,13 @@
       </if>
       <if test="incidentState != null">
         and RES.INCIDENT_STATE_ = #{incidentState.stateCode}
+      </if>
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
       </if>
 
       <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">

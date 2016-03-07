@@ -121,4 +121,10 @@ public interface HistoricIncident {
   */
   public boolean isResolved();
 
+  /**
+   * Returns the id of the tenant this incident belongs to. Can be <code>null</code>
+   * if the incident belongs to no single tenant.
+   */
+  public String getTenantId();
+
 }

@@ -277,6 +277,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setRootCauseIncidentId(incident.getRootCauseIncidentId());
     evt.setConfiguration(incident.getConfiguration());
     evt.setIncidentMessage(incident.getIncidentMessage());
+    evt.setTenantId(incident.getTenantId());
 
     IncidentEntity incidentEntity = (IncidentEntity) incident;
     ProcessDefinitionEntity definition = incidentEntity.getProcessDefinition();
