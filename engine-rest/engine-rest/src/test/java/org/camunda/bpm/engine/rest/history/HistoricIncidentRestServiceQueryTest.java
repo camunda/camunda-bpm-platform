@@ -235,7 +235,7 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("tenantId", "desc", Status.OK);
-    inOrder.verify(mockedQuery).orderByIncidentId();
+    inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).desc();
 
   }
