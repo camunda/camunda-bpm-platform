@@ -246,10 +246,12 @@
   }
 
   .columns {
+    position: absolute;
     > .column {
       position: absolute;
       width: auto;
       min-height: auto;
+      border-width: 0 1px 0 0;
     }
 
     .column-left {
@@ -269,10 +271,6 @@
       left: (@left-width + @center-width);
       margin-left: 0;
     }
-  }
-
-  .column {
-    border-width: 0 1px 0 0;
   }
 }
 
@@ -352,7 +350,8 @@
   }
 
   .column {
-    border: 1px solid mix(@gray-light, @gray-lighter);
+    border-style: solid;
+    border-color: mix(@gray-light, @gray-lighter);
     background-color: @body-bg;
 
     .cell.top {
