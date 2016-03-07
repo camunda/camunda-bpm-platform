@@ -30,10 +30,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
-import org.camunda.bpm.model.bpmn.instance.UserTask;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormData;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormField;
 
 public class MultiTenancyHistoricDetailFormPropertyQueryTest extends PluggableProcessEngineTestCase {
 
@@ -45,19 +41,12 @@ public class MultiTenancyHistoricDetailFormPropertyQueryTest extends PluggablePr
     BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
       .startEvent()
       .userTask("userTask")
+        .camundaFormField()
+          .camundaId("myFormField")
+          .camundaType("string")
+          .camundaFormFieldDone()
       .endEvent()
     .done();
-
-    ExtensionElements extensionElements = oneTaskProcess.newInstance(ExtensionElements.class);
-    UserTask userTask = (UserTask) oneTaskProcess.getModelElementById("userTask");
-    userTask.setExtensionElements(extensionElements);
-
-    CamundaFormData camundaFormData = oneTaskProcess.newInstance(CamundaFormData.class);
-    CamundaFormField camundaFormField = oneTaskProcess.newInstance(CamundaFormField.class);
-    camundaFormField.setCamundaId("myFormField");
-    camundaFormField.setCamundaType("string");
-    camundaFormData.addChildElement(camundaFormField);
-    userTask.getExtensionElements().addChildElement(camundaFormData);
 
     deploymentForTenant(TENANT_ONE, oneTaskProcess);
     deploymentForTenant(TENANT_TWO, oneTaskProcess);
