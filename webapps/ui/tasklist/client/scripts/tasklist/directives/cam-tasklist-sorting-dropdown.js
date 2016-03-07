@@ -3,7 +3,7 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-tasklist-sorting-dropdown.html', 'utf8');
 
-var angular = require('camunda-bpm-sdk-js/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
   module.exports = ['$translate',
   function ($translate){

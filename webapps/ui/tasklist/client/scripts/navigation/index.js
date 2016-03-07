@@ -1,6 +1,6 @@
 'use strict';
 
-var angular = require('camunda-bpm-sdk-js/vendor/angular'),
+var angular = require('camunda-commons-ui/vendor/angular'),
     camLayoutCtrl = require('./controllers/cam-layout-ctrl'),
     camHeaderViewsCtrl = require('./controllers/cam-header-views-ctrl');
 

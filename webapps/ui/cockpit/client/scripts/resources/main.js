@@ -1,6 +1,6 @@
 'use strict';
 
-var angular = require('camunda-bpm-sdk-js/vendor/angular'),
+var angular = require('camunda-commons-ui/vendor/angular'),
 
   commonsUi = require('camunda-commons-ui/lib/util/index'),
   processDefinitionResource = require('./processDefinitionResource'),

@@ -5,7 +5,7 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/cam-cockpit-deployments-search-plugin.html', 'utf8');
 var searchConfigJSON = fs.readFileSync(__dirname + '/cam-cockpit-deployments-search-plugin-config.json', 'utf8');
 
-var angular = require('camunda-bpm-sdk-js/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
   var searchConfig = JSON.parse(searchConfigJSON);
 
