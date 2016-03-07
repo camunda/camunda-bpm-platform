@@ -2,7 +2,7 @@
 
 var resetUrl = 'http://localhost:8080/camunda/ensureCleanDb/default';
 var request = require('request');
-var CamSDK = require('camunda-bpm-sdk-js');
+var CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk');
 var camClient = new CamSDK.Client({
   mock: false,
   apiUri: 'http://localhost:8080/engine-rest'

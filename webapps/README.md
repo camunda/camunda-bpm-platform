@@ -36,7 +36,7 @@ See [plugin development guide](http://docs.camunda.org/latest/real-life/how-to/#
 
 ### [camunda-bpm-sdk-js](https://github.com/camunda/camunda-bpm-sdk-js)
 
-Has tools to work with the REST API and forms.
+Has tools to work with the REST API and forms (included transitively via camunda-commons-ui).
 
 ### [camunda-commons-ui](https://github.com/camunda/camunda-commons-ui)
 
@@ -78,7 +78,7 @@ The webapps are then available pointing a browser at [http://localhost:8080](htt
 You can now start developing using the `grunt auto-build` command in the webapp directory. To shorten compile times, you can specify the project you are going to make changes to by calling `grunt auto-build:cockpit`
 
 
-If you want to make changes in the camunda-commons-ui project or the camunda-bpm-sdk-js, you have to link the projects to the camunda-bpm-webapp:
+If you want to make changes in the camunda-commons-ui project or the camunda-bpm-sdk-js, you have to link the projects via npm:
 
 ```sh
 # cd <path to your workspace>
