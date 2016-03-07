@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
 import org.hamcrest.CoreMatchers;
@@ -324,8 +325,8 @@ public class MigrationPlanCreationTest {
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasInstructionFailures("userTask",
-          "Source activity 'userTask' is child of a multi instances",
-          "Target activity 'userTask' is child of a multi instances"
+          "Target activity 'userTask' is a descendant of multi-instance body 'userTask#multiInstanceBody' "
+        + "that is not migrated from the source process definition."
         );
     }
   }

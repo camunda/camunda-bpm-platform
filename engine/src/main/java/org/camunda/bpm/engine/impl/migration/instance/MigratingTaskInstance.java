@@ -40,9 +40,10 @@ public class MigratingTaskInstance implements MigratingInstance {
   }
 
   @Override
-  public void attachState(ExecutionEntity execution) {
-    execution.addTask(userTask);
-    userTask.setExecution(execution);
+  public void attachState(MigratingActivityInstance owningInstance) {
+    ExecutionEntity representativeExecution = owningInstance.resolveRepresentativeExecution();
+    representativeExecution.addTask(userTask);
+    userTask.setExecution(representativeExecution);
   }
 
   @Override

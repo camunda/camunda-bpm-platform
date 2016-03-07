@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.migration;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingProcessInstanceValidationReportImpl;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationPlanValidationReportImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -60,6 +61,24 @@ public class MigrationLogger extends ProcessEngineLogger {
       "{}",
       sb.toString()),
       validationReport);
+  }
+
+  public ProcessEngineException cannotBecomeSubordinateInNonScope(MigratingActivityInstance activityInstance) {
+    return new ProcessEngineException(exceptionMessage(
+      "005",
+      "{}",
+      "Cannot attach a subordinate to activity instance '{}'. Activity '{}' is not a scope",
+      activityInstance.getActivityInstance().getId(),
+      activityInstance.getActivityInstance().getActivityId()));
+  }
+
+  public ProcessEngineException cannotDestroySubordinateInNonScope(MigratingActivityInstance activityInstance) {
+    return new ProcessEngineException(exceptionMessage(
+        "006",
+        "{}",
+        "Cannot destroy a subordinate of activity instance '{}'. Activity '{}' is not a scope",
+        activityInstance.getActivityInstance().getId(),
+        activityInstance.getActivityInstance().getActivityId()));
   }
 
 }

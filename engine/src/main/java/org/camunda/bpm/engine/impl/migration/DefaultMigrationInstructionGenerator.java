@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.migration.validation.activity.MigrationActivityValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstruction;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstructionImpl;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstructions;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -39,17 +39,21 @@ public class DefaultMigrationInstructionGenerator implements MigrationInstructio
     return this;
   }
 
-  public List<ValidatingMigrationInstruction> generate(ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
-    List<ValidatingMigrationInstruction> migrationInstructions = new ArrayList<ValidatingMigrationInstruction>();
+  public ValidatingMigrationInstructions generate(ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
+    ValidatingMigrationInstructions migrationInstructions = new ValidatingMigrationInstructions();
     generate(sourceProcessDefinition, targetProcessDefinition, sourceProcessDefinition, targetProcessDefinition, migrationInstructions);
     return migrationInstructions;
   }
 
-  public void generate(ScopeImpl sourceScope, ScopeImpl targetScope, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition, List<ValidatingMigrationInstruction> migrationInstructions) {
+  public void generate(ScopeImpl sourceScope,
+      ScopeImpl targetScope,
+      ProcessDefinitionImpl sourceProcessDefinition,
+      ProcessDefinitionImpl targetProcessDefinition,
+      ValidatingMigrationInstructions migrationInstructions) {
     for (ActivityImpl sourceActivity : sourceScope.getActivities()) {
       for (ActivityImpl targetActivity : targetScope.getActivities()) {
         if (isValidActivity(sourceActivity) && isValidActivity(targetActivity) && migrationActivityMatcher.matchActivities(sourceActivity, targetActivity)) {
-          migrationInstructions.add(new ValidatingMigrationInstructionImpl(sourceActivity, targetActivity));
+          migrationInstructions.addInstruction(new ValidatingMigrationInstructionImpl(sourceActivity, targetActivity));
           generate(sourceActivity, targetActivity, sourceProcessDefinition, targetProcessDefinition, migrationInstructions);
         }
       }

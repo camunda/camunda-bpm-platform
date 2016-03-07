@@ -174,15 +174,15 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
    *          of multi instance activity
    * @return inner activity
    */
-  protected ActivityImpl getInnerActivity(ActivityExecution execution) {
-    for (PvmActivity activity : execution.getActivity().getActivities()) {
+  public ActivityImpl getInnerActivity(PvmActivity miBodyActivity) {
+    for (PvmActivity activity : miBodyActivity.getActivities()) {
       ActivityImpl innerActivity = (ActivityImpl) activity;
       // note that miBody can contains also a compensation handler
       if (!innerActivity.isCompensationHandler()) {
         return innerActivity;
       }
     }
-    throw new ProcessEngineException("inner activity of multi instance execution '" + execution.getId() + "' not found");
+    throw new ProcessEngineException("inner activity of multi instance body activity '" + miBodyActivity.getId() + "' not found");
   }
 
   protected void setLoopVariable(ActivityExecution execution, String variableName, Object value) {
@@ -195,8 +195,17 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
     return value.getValue();
   }
 
+
   protected Integer getLocalLoopVariable(ActivityExecution execution, String variableName) {
     return (Integer) execution.getVariableLocal(variableName);
+  }
+
+  public boolean hasLoopVariable(ActivityExecution execution, String variableName) {
+    return execution.hasVariableLocal(variableName);
+  }
+
+  public void removeLoopVariable(ActivityExecution execution, String variableName) {
+    execution.removeVariableLocal(variableName);
   }
 
   // Getters and Setters ///////////////////////////////////////////////////////////

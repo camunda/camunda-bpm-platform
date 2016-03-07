@@ -12,8 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -60,7 +63,8 @@ public class PvmAtomicOperationActivityInitStackNotifyListenerStart extends PvmA
     ActivityImpl activity = execution.getActivity();
     if (activity.getActivityBehavior() instanceof ModificationObserverBehavior) {
       ModificationObserverBehavior behavior = (ModificationObserverBehavior) activity.getActivityBehavior();
-      propagatingExecution = (PvmExecutionImpl) behavior.initializeScope(propagatingExecution);
+      List<ActivityExecution> concurrentExecutions = behavior.initializeScope(propagatingExecution, 1);
+      propagatingExecution = (PvmExecutionImpl) concurrentExecutions.get(0);
     }
 
     // if the stack has been instantiated

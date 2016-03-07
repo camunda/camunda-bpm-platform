@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationIns
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstruction;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstructionImpl;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstructions;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
@@ -92,12 +93,12 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
 
     // generate instructions
     MigrationInstructionGenerator migrationInstructionGenerator = processEngineConfiguration.getMigrationInstructionGenerator();
-    List<ValidatingMigrationInstruction> generatedInstructions = migrationInstructionGenerator.generate(sourceProcessDefinition, targetProcessDefinition);
+    ValidatingMigrationInstructions generatedInstructions = migrationInstructionGenerator.generate(sourceProcessDefinition, targetProcessDefinition);
 
     // filter only valid instructions
     List<MigrationInstructionValidator> migrationInstructionValidators = new ArrayList<MigrationInstructionValidator>(processEngineConfiguration.getMigrationInstructionValidators());
     List<MigrationInstruction> validInstructions = new ArrayList<MigrationInstruction>();
-    for (ValidatingMigrationInstruction generatedInstruction : generatedInstructions) {
+    for (ValidatingMigrationInstruction generatedInstruction : generatedInstructions.getInstructions()) {
       if (isValidInstruction(generatedInstruction, generatedInstructions, migrationInstructionValidators)) {
         validInstructions.add(generatedInstruction.toMigrationInstruction());
       }
@@ -106,7 +107,7 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
     return validInstructions;
   }
 
-  protected boolean isValidInstruction(ValidatingMigrationInstruction instruction, List<ValidatingMigrationInstruction> instructions, List<MigrationInstructionValidator> migrationInstructionValidators) {
+  protected boolean isValidInstruction(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, List<MigrationInstructionValidator> migrationInstructionValidators) {
     return !validateInstruction(instruction, instructions, migrationInstructionValidators).hasFailures();
   }
 
@@ -114,9 +115,9 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
     List<MigrationInstructionValidator> migrationInstructionValidators = commandContext.getProcessEngineConfiguration().getMigrationInstructionValidators();
 
     MigrationPlanValidationReportImpl planReport = new MigrationPlanValidationReportImpl(migrationPlan);
-    List<ValidatingMigrationInstruction> validatingMigrationInstructions = wrapMigrationInstructions(migrationPlan, sourceProcessDefinition, targetProcessDefinition, planReport);
+    ValidatingMigrationInstructions validatingMigrationInstructions = wrapMigrationInstructions(migrationPlan, sourceProcessDefinition, targetProcessDefinition, planReport);
 
-    for (ValidatingMigrationInstruction validatingMigrationInstruction : validatingMigrationInstructions) {
+    for (ValidatingMigrationInstruction validatingMigrationInstruction : validatingMigrationInstructions.getInstructions()) {
       MigrationInstructionValidationReportImpl instructionReport = validateInstruction(validatingMigrationInstruction, validatingMigrationInstructions, migrationInstructionValidators);
       if (instructionReport.hasFailures()) {
         planReport.addInstructionReport(instructionReport);
@@ -129,7 +130,7 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
 
   }
 
-  protected MigrationInstructionValidationReportImpl validateInstruction(ValidatingMigrationInstruction instruction, List<ValidatingMigrationInstruction> instructions, List<MigrationInstructionValidator> migrationInstructionValidators) {
+  protected MigrationInstructionValidationReportImpl validateInstruction(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, List<MigrationInstructionValidator> migrationInstructionValidators) {
     MigrationInstructionValidationReportImpl validationReport = new MigrationInstructionValidationReportImpl(instruction.toMigrationInstruction());
     for (MigrationInstructionValidator migrationInstructionValidator : migrationInstructionValidators) {
       migrationInstructionValidator.validate(instruction, instructions, validationReport);
@@ -137,8 +138,8 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
     return validationReport;
   }
 
-  protected List<ValidatingMigrationInstruction> wrapMigrationInstructions(MigrationPlan migrationPlan, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition, MigrationPlanValidationReportImpl planReport) {
-    List<ValidatingMigrationInstruction> validatingMigrationInstructions = new ArrayList<ValidatingMigrationInstruction>();
+  protected ValidatingMigrationInstructions wrapMigrationInstructions(MigrationPlan migrationPlan, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition, MigrationPlanValidationReportImpl planReport) {
+    ValidatingMigrationInstructions validatingMigrationInstructions = new ValidatingMigrationInstructions();
     for (MigrationInstruction migrationInstruction : migrationPlan.getInstructions()) {
       MigrationInstructionValidationReportImpl instructionReport = new MigrationInstructionValidationReportImpl(migrationInstruction);
 
@@ -149,7 +150,7 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
         ActivityImpl targetActivity = targetProcessDefinition.findActivity(migrationInstruction.getTargetActivityId());
 
         if (sourceActivity != null && targetActivity != null) {
-          validatingMigrationInstructions.add(new ValidatingMigrationInstructionImpl(sourceActivity, targetActivity));
+          validatingMigrationInstructions.addInstruction(new ValidatingMigrationInstructionImpl(sourceActivity, targetActivity));
         }
         else {
           if (sourceActivity == null) {

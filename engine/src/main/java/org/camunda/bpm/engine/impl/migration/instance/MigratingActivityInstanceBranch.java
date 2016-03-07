@@ -19,41 +19,37 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 /**
- * Keeps track of executions created in a branch of the execution tree from the process instance downwards
+ * Keeps track of activity instances created in a branch of the activity instance tree from the process instance downwards
  *
  * @author Thorben Lindhauer
  */
-public class MigratingExecutionBranch {
-  protected Map<ScopeImpl, ExecutionEntity> scopeExecutions;
+public class MigratingActivityInstanceBranch {
+  protected Map<ScopeImpl, MigratingActivityInstance> scopeInstances;
 
-  public MigratingExecutionBranch() {
-    this(new HashMap<ScopeImpl, ExecutionEntity>());
+  public MigratingActivityInstanceBranch() {
+    this(new HashMap<ScopeImpl, MigratingActivityInstance>());
   }
 
-  protected MigratingExecutionBranch(Map<ScopeImpl, ExecutionEntity> createdScopeExecutions) {
-    this.scopeExecutions = createdScopeExecutions;
+  protected MigratingActivityInstanceBranch(Map<ScopeImpl, MigratingActivityInstance> scopeInstances) {
+    this.scopeInstances = scopeInstances;
   }
 
-  public MigratingExecutionBranch copy() {
-    return new MigratingExecutionBranch(new HashMap<ScopeImpl, ExecutionEntity>(scopeExecutions));
+  public MigratingActivityInstanceBranch copy() {
+    return new MigratingActivityInstanceBranch(new HashMap<ScopeImpl, MigratingActivityInstance>(scopeInstances));
   }
 
-  public ExecutionEntity getExecution(ScopeImpl scope) {
-    return scopeExecutions.get(scope);
+  public MigratingActivityInstance getInstance(ScopeImpl scope) {
+    return scopeInstances.get(scope);
   }
 
-  public boolean hasExecution(ScopeImpl scope) {
-    return scopeExecutions.containsKey(scope);
-  }
-
-  public void registerExecution(ScopeImpl scope, ExecutionEntity execution) {
-    this.scopeExecutions.put(scope, execution);
+  public boolean hasInstance(ScopeImpl scope) {
+    return scopeInstances.containsKey(scope);
   }
 
   public void visited(MigratingActivityInstance activityInstance) {
     ScopeImpl targetScope = activityInstance.getTargetScope();
     if (targetScope.isScope()) {
-      scopeExecutions.put(targetScope, activityInstance.resolveRepresentativeExecution());
+      scopeInstances.put(targetScope, activityInstance);
     }
   }
 }

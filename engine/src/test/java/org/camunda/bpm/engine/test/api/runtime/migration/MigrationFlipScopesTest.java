@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationExcept
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;

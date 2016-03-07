@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.migration;
 
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
+import org.camunda.bpm.engine.impl.bpmn.parser.ActivityTypes;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 public class DefaultMigrationActivityMatcher implements MigrationActivityMatcher {
@@ -31,7 +32,20 @@ public class DefaultMigrationActivityMatcher implements MigrationActivityMatcher
     String sourceType = source.getProperties().get(BpmnProperties.TYPE);
     String targetType = target.getProperties().get(BpmnProperties.TYPE);
 
-    return sourceType.equals(targetType);
+
+    if (sourceType.equals(targetType)) {
+      if (ActivityTypes.MULTI_INSTANCE_BODY.equals(sourceType)) {
+        // Multi-instance requires a stricter condition since sequential and parallel multi
+        // instance have the same type
+        return source.getActivityBehavior().getClass().equals(target.getActivityBehavior().getClass());
+      }
+      else {
+        return true;
+      }
+    }
+    else {
+      return false;
+    }
   }
 
 

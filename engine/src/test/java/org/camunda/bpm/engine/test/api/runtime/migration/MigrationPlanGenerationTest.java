@@ -19,7 +19,8 @@ import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.migrate;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.standalone.deploy.BPMNParseListenerTest;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.MigrationPlanAssert;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
@@ -155,7 +156,9 @@ public class MigrationPlanGenerationTest {
         .multiInstance().parallel().cardinality("3").multiInstanceDone().done();
 
     assertGeneratedMigrationPlan(testProcess, testProcess)
-      .hasEmptyInstructions();
+      .hasInstructions(
+        migrate("userTask").to("userTask"),
+        migrate("userTask#multiInstanceBody").to("userTask#multiInstanceBody"));
   }
 
   @Test
@@ -472,6 +475,34 @@ public class MigrationPlanGenerationTest {
         migrate("userTask").to("userTask")
       );
   }
+
+  @Test
+  public void testNotMigrateMultiInstanceOfDifferentType() {
+    BpmnModelInstance sourceProcess = MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS;
+    BpmnModelInstance targetProcess = MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS;
+
+    assertGeneratedMigrationPlan(sourceProcess, targetProcess)
+      .hasEmptyInstructions();
+  }
+
+  @Test
+  public void testNotMigrateBoundaryEventsWithInvalidEventScopeInstruction() {
+    BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+        .activityBuilder("userTask")
+        .boundaryEvent("boundary")
+        .message("foo")
+        .done();
+    BpmnModelInstance targetProcess = modify(ProcessModels.ONE_RECEIVE_TASK_PROCESS)
+        .changeElementId("receiveTask", "userTask")
+        .activityBuilder("userTask")
+        .boundaryEvent("boundary")
+        .message("foo")
+        .done();
+
+    assertGeneratedMigrationPlan(sourceProcess, targetProcess)
+      .hasEmptyInstructions();
+  }
+
 
   // helper
 

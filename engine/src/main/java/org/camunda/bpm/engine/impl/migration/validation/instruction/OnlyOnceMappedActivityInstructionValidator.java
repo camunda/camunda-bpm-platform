@@ -13,25 +13,19 @@
 
 package org.camunda.bpm.engine.impl.migration.validation.instruction;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 
 public class OnlyOnceMappedActivityInstructionValidator implements MigrationInstructionValidator {
 
-  public void validate(ValidatingMigrationInstruction instruction, List<ValidatingMigrationInstruction> instructions, MigrationInstructionValidationReportImpl report) {
-    String sourceActivityId = instruction.getSourceActivity().getId();
-    List<ValidatingMigrationInstruction> migrationInstructions = new ArrayList<ValidatingMigrationInstruction>();
+  public void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, MigrationInstructionValidationReportImpl report) {
+    ActivityImpl sourceActivity = instruction.getSourceActivity();
+    List<ValidatingMigrationInstruction> instructionsForSourceActivity = instructions.getInstructionsBySourceScope(sourceActivity);
 
-    for (ValidatingMigrationInstruction migrationInstruction : instructions) {
-      if (migrationInstruction.getSourceActivity().getId().equals(sourceActivityId)) {
-        migrationInstructions.add(migrationInstruction);
-      }
-    }
-
-    if (migrationInstructions.size() > 1) {
-      addFailure(sourceActivityId, migrationInstructions, report);
+    if (instructionsForSourceActivity.size() > 1) {
+      addFailure(sourceActivity.getId(), instructionsForSourceActivity, report);
     }
   }
 

@@ -15,18 +15,42 @@ package org.camunda.bpm.engine.impl.migration.validation.instance;
 
 import java.util.Arrays;
 
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.StringUtil;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 public class NoActiveTransitionsActivityInstanceValidator implements MigratingActivityInstanceValidator {
 
   public void validate(MigratingActivityInstance migratingInstance, MigratingProcessInstance migratingProcessInstance, MigratingActivityInstanceValidationReportImpl instanceReport) {
     TransitionInstance[] childTransitionInstances = migratingInstance.getActivityInstance().getChildTransitionInstances();
-    if (childTransitionInstances.length > 0) {
+
+    if (hasAsyncTransitionInstances(migratingInstance.getActivityInstance())) {
       instanceReport.addFailure("Has active asynchronous child transitions: ["+ StringUtil.joinProcessElementInstanceIds(Arrays.asList(childTransitionInstances)) + "]");
     }
+  }
+
+  /**
+   * Workaround for CAM-5609: In general, only async continuations should be represented as TransitionInstances, but
+   * due to this bug, completed multi-instances are represented like that as well. We tolerate the second case.
+   */
+  protected boolean hasAsyncTransitionInstances(ActivityInstance activityInstance) {
+    for (TransitionInstance childTransitionInstance : activityInstance.getChildTransitionInstances()) {
+      String executionId = childTransitionInstance.getExecutionId();
+      ExecutionEntity execution = Context.getCommandContext().getExecutionManager().findExecutionById(executionId);
+      for (JobEntity job : execution.getJobs()) {
+        if (AsyncContinuationJobHandler.TYPE.equals(job.getJobHandlerType())) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
 }

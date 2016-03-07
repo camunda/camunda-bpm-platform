@@ -13,13 +13,11 @@
 
 package org.camunda.bpm.engine.impl.migration.validation.instruction;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 
 public class SameTypeInstructionValidator implements MigrationInstructionValidator {
 
-  public void validate(ValidatingMigrationInstruction instruction, List<ValidatingMigrationInstruction> instructions, MigrationInstructionValidationReportImpl report) {
+  public void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, MigrationInstructionValidationReportImpl report) {
     String sourceType = instruction.getSourceActivity().getProperties().get(BpmnProperties.TYPE);
     String targetType = instruction.getTargetActivity().getProperties().get(BpmnProperties.TYPE);
 

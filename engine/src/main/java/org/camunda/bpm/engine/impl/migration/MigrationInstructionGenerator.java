@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.migration.validation.activity.MigrationActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstruction;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstructions;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 
 /**
@@ -45,7 +46,7 @@ public interface MigrationInstructionGenerator {
    * @param targetProcessDefinition the target process definiton
    * @return the list of generated instructions
    */
-  List<ValidatingMigrationInstruction> generate(ProcessDefinitionImpl sourceProcessDefinition,
-                                                ProcessDefinitionImpl targetProcessDefinition);
+  ValidatingMigrationInstructions generate(ProcessDefinitionImpl sourceProcessDefinition,
+                                           ProcessDefinitionImpl targetProcessDefinition);
 
 }

@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.impl.migration.instance;
 
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
@@ -31,8 +30,8 @@ public class MigratingIncident implements MigratingInstance {
     incident.setExecution(null);
   }
 
-  public void attachState(ExecutionEntity newScopeExecution) {
-    incident.setExecution(newScopeExecution);
+  public void attachState(MigratingActivityInstance newOwningInstance) {
+    incident.setExecution(newOwningInstance.resolveRepresentativeExecution());
   }
 
   public void migrateState() {

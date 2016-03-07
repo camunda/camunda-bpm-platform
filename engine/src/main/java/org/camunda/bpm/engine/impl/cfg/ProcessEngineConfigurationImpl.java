@@ -193,14 +193,17 @@ import org.camunda.bpm.engine.impl.migration.MigrationInstructionGenerator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.HasNoEventSubProcessChildActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.HasNoEventSubProcessParentActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.MigrationActivityValidator;
-import org.camunda.bpm.engine.impl.migration.validation.activity.NotMultiInstanceChildActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedBoundaryEventActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.AdditionalFlowScopeActivityInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingActivityInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.NoActiveTransitionsActivityInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.NoUnmappedLeafActivityInstanceValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotRemoveMultiInstanceInnerActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMultiInstanceBodyValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMultiInstanceInnerActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.MultiInstanceTypeValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.OnlyOnceMappedActivityInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.SameEventScopeInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.SameTypeInstructionValidator;
@@ -3104,7 +3107,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     List<MigrationActivityValidator> migrationActivityValidators = new ArrayList<MigrationActivityValidator>();
     migrationActivityValidators.add(SupportedActivityValidator.INSTANCE);
     migrationActivityValidators.add(SupportedBoundaryEventActivityValidator.INSTANCE);
-    migrationActivityValidators.add(NotMultiInstanceChildActivityValidator.INSTANCE);
     migrationActivityValidators.add(HasNoEventSubProcessParentActivityValidator.INSTANCE);
     migrationActivityValidators.add(HasNoEventSubProcessChildActivityValidator.INSTANCE);
     return migrationActivityValidators;
@@ -3149,6 +3151,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     migrationInstructionValidators.add(new SameTypeInstructionValidator());
     migrationInstructionValidators.add(new SameEventScopeInstructionValidator());
     migrationInstructionValidators.add(new OnlyOnceMappedActivityInstructionValidator());
+    migrationInstructionValidators.add(new CannotAddMultiInstanceBodyValidator());
+    migrationInstructionValidators.add(new CannotAddMultiInstanceInnerActivityValidator());
+    migrationInstructionValidators.add(new CannotRemoveMultiInstanceInnerActivityValidator());
+    migrationInstructionValidators.add(new MultiInstanceTypeValidator());
     return migrationInstructionValidators;
   }
 

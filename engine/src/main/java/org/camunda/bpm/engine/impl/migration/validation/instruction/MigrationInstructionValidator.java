@@ -13,10 +13,6 @@
 
 package org.camunda.bpm.engine.impl.migration.validation.instruction;
 
-import java.util.List;
-
-import org.camunda.bpm.engine.migration.MigrationInstructionValidationReport;
-
 /**
  * Checks that a migration instruction is valid for the
  * migration plan. For example if the instruction migrates
@@ -32,6 +28,6 @@ public interface MigrationInstructionValidator {
    * @param instructions the complete migration plan to validate
    * @param report the validation report
    */
-  void validate(ValidatingMigrationInstruction instruction, List<ValidatingMigrationInstruction> instructions, MigrationInstructionValidationReportImpl report);
+  void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, MigrationInstructionValidationReportImpl report);
 
 }

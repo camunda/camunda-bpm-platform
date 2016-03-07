@@ -206,8 +206,8 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     executionIds.add(scopeExecution.getId());
 
     for (PvmExecutionImpl childExecution : scopeExecution.getNonEventScopeExecutions()) {
-      // add all concurrent children that are not in an activity or inactive
-      if (childExecution.isConcurrent() && (childExecution.getActivityId() == null || !childExecution.isActive())) {
+      // add all concurrent children that are not in an activity
+      if (childExecution.isConcurrent() && (childExecution.getActivityId() == null)) {
         executionIds.add(childExecution.getId());
       }
     }

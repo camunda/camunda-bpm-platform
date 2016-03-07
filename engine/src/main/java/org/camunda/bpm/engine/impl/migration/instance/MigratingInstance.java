@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.migration.instance;
 
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-
 /**
  * @author Thorben Lindhauer
  *
@@ -21,17 +19,17 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 public interface MigratingInstance {
 
   /**
-   * Detach this instance's state from the execution tree
+   * Detach this instance's state from its owning instance and the execution tree
    */
   void detachState();
 
   /**
-   * Restore this instance's state to the execution tree.
+   * Restore this instance's state as a subordinate to the given activity instance
+   * (e.g. in the execution tree).
    * Restoration should restore the state that was detached
    * before (i.e. the source process definition state)
-   * @param newScopeExecution
    */
-  void attachState(ExecutionEntity newScopeExecution);
+  void attachState(MigratingActivityInstance targetActivityInstance);
 
   /**
    * Migrate state from the source process definition

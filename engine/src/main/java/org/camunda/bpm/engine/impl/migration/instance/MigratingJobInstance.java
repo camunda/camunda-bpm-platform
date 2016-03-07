@@ -57,11 +57,12 @@ public class MigratingJobInstance implements MigratingInstance, RemovingInstance
     }
   }
 
-  public void attachState(ExecutionEntity newScopeExecution) {
+  public void attachState(MigratingActivityInstance newOwningInstance) {
+    ExecutionEntity newScopeExecution = newOwningInstance.resolveRepresentativeExecution();
     jobEntity.setExecution(newScopeExecution);
 
     for (MigratingInstance dependentInstance : migratingDependentInstances) {
-      dependentInstance.attachState(newScopeExecution);
+      dependentInstance.attachState(newOwningInstance);
     }
   }
 

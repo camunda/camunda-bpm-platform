@@ -13,18 +13,15 @@
 
 package org.camunda.bpm.engine.impl.migration.validation.instruction;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.migration.validation.activity.HasNoEventSubProcessChildActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.HasNoEventSubProcessParentActivityValidator;
-import org.camunda.bpm.engine.impl.migration.validation.activity.NotMultiInstanceChildActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedBoundaryEventActivityValidator;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 public class SupportedActivitiesInstructionValidator implements MigrationInstructionValidator {
 
-  public void validate(ValidatingMigrationInstruction instruction, List<ValidatingMigrationInstruction> instructions, MigrationInstructionValidationReportImpl report) {
+  public void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, MigrationInstructionValidationReportImpl report) {
     ActivityImpl sourceActivity = instruction.getSourceActivity();
     validateSourceActivity(instruction, sourceActivity, report);
 
@@ -39,10 +36,6 @@ public class SupportedActivitiesInstructionValidator implements MigrationInstruc
 
     if (!SupportedBoundaryEventActivityValidator.INSTANCE.valid(activity)) {
       report.addFailure("Type of the source boundary event '" + activity.getId() + "' is not supported by migration");
-    }
-
-    if (!NotMultiInstanceChildActivityValidator.INSTANCE.valid(activity)) {
-      report.addFailure("Source activity '" + activity.getId() + "' is child of a multi instances");
     }
 
     if (!HasNoEventSubProcessParentActivityValidator.INSTANCE.valid(activity)) {
@@ -61,10 +54,6 @@ public class SupportedActivitiesInstructionValidator implements MigrationInstruc
 
     if (!SupportedBoundaryEventActivityValidator.INSTANCE.valid(activity)) {
       report.addFailure("Type of the target boundary event '" + activity.getId() + "' is not supported by migration");
-    }
-
-    if (!NotMultiInstanceChildActivityValidator.INSTANCE.valid(activity)) {
-      report.addFailure("Target activity '" + activity.getId() + "' is child of a multi instances");
     }
 
     if (!HasNoEventSubProcessParentActivityValidator.INSTANCE.valid(activity)) {

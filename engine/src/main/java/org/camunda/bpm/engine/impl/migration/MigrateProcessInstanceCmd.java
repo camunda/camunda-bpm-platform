@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstanceWalker;
-import org.camunda.bpm.engine.impl.migration.instance.MigratingExecutionBranch;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstanceBranch;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
 import org.camunda.bpm.engine.impl.migration.instance.parser.MigratingInstanceParser;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingActivityInstanceValidationReportImpl;
@@ -131,7 +131,7 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
 
           visitedActivityInstances.add(currentInstance);
           if (!currentInstance.migrates()) {
-            Set<MigratingActivityInstance> children = currentInstance.getChildren();
+            Set<MigratingActivityInstance> children = new HashSet<MigratingActivityInstance>(currentInstance.getChildren());
             MigratingActivityInstance parent = currentInstance.getParent();
 
             // 1. detach children
@@ -144,9 +144,7 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
 
             // 3. reconnect parent and children
             for (MigratingActivityInstance child : children) {
-              child.attachState(parent.resolveRepresentativeExecution());
-              parent.getChildren().add(child);
-              child.setParent(parent);
+              child.attachState(parent);
             }
           }
           else {
@@ -207,14 +205,14 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
     MigratingActivityInstance rootActivityInstance =
         migratingProcessInstance.getMigratingInstance(migratingProcessInstance.getProcessInstanceId());
 
-    MigratingExecutionBranch scopeExecutionContext = new MigratingExecutionBranch();
+    MigratingActivityInstanceBranch scopeExecutionContext = new MigratingActivityInstanceBranch();
     scopeExecutionContext.visited(rootActivityInstance);
 
     migrateActivityInstance(scopeExecutionContext, rootActivityInstance);
   }
 
   protected void migrateActivityInstance(
-    MigratingExecutionBranch migratingExecutionBranch,
+    MigratingActivityInstanceBranch migratingInstanceBranch,
     MigratingActivityInstance migratingActivityInstance) {
 
     ActivityInstance activityInstance = migratingActivityInstance.getActivityInstance();
@@ -236,23 +234,23 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
 
         // determine the list of ancestor scopes (parent, grandparent, etc.) for which
         //     no executions exist yet
-        List<ScopeImpl> nonExistingScopes = collectNonExistingFlowScopes(targetFlowScope, migratingExecutionBranch);
+        List<ScopeImpl> nonExistingScopes = collectNonExistingFlowScopes(targetFlowScope, migratingInstanceBranch);
 
         // get the closest ancestor scope that is instantiated already
         ScopeImpl existingScope = nonExistingScopes.isEmpty() ?
             targetFlowScope :
             nonExistingScopes.get(0).getFlowScope();
 
-        // and its scope execution
-        ExecutionEntity ancestorScopeExecution = migratingExecutionBranch.getExecution(existingScope);
+        // and its scope instance
+        MigratingActivityInstance ancestorScopeInstance = migratingInstanceBranch.getInstance(existingScope);
 
         // Instantiate the scopes as children of the scope execution
-        instantiateScopes(ancestorScopeExecution, migratingExecutionBranch, nonExistingScopes);
+        instantiateScopes(ancestorScopeInstance, migratingInstanceBranch, nonExistingScopes);
 
-        ExecutionEntity targetFlowScopeExecution = migratingExecutionBranch.getExecution(targetFlowScope);
+        MigratingActivityInstance targetFlowScopeInstance = migratingInstanceBranch.getInstance(targetFlowScope);
 
         // 3. attach to newly created execution
-        migratingActivityInstance.attachState(targetFlowScopeExecution);
+        migratingActivityInstance.attachState(targetFlowScopeInstance);
       }
     }
 
@@ -268,21 +266,23 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
     // * are reused to attach activity instances to when the activity instances share a
     //   common ancestor path to the process instance
     // * are not reused when activity instances are in unrelated branches of the execution tree
-    migratingExecutionBranch = migratingExecutionBranch.copy();
-    migratingExecutionBranch.visited(migratingActivityInstance);
+    migratingInstanceBranch = migratingInstanceBranch.copy();
+    migratingInstanceBranch.visited(migratingActivityInstance);
 
-    for (MigratingActivityInstance childInstance : migratingActivityInstance.getChildren()) {
-      migrateActivityInstance(migratingExecutionBranch, childInstance);
+    Set<MigratingActivityInstance> children = new HashSet<MigratingActivityInstance>(migratingActivityInstance.getChildren());
+
+    for (MigratingActivityInstance childInstance : children) {
+      migrateActivityInstance(migratingInstanceBranch, childInstance);
     }
 
 }
 
   /**
    * Returns a list of flow scopes from the given scope until a scope is reached that is already present in the given
-   * {@link MigratingExecutionBranch} (exclusive). The order of the returned list is top-down, i.e. the highest scope
+   * {@link MigratingActivityInstanceBranch} (exclusive). The order of the returned list is top-down, i.e. the highest scope
    * is the first element of the list.
    */
-  protected List<ScopeImpl> collectNonExistingFlowScopes(ScopeImpl scope, final MigratingExecutionBranch migratingExecutionBranch) {
+  protected List<ScopeImpl> collectNonExistingFlowScopes(ScopeImpl scope, final MigratingActivityInstanceBranch migratingExecutionBranch) {
     FlowScopeWalker walker = new FlowScopeWalker(scope);
     final List<ScopeImpl> result = new LinkedList<ScopeImpl>();
     walker.addPreVisitor(new TreeVisitor<ScopeImpl>() {
@@ -297,7 +297,7 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
 
       @Override
       public boolean isFulfilled(ScopeImpl element) {
-        return migratingExecutionBranch.hasExecution(element);
+        return migratingExecutionBranch.hasInstance(element);
       }
     });
 
@@ -308,22 +308,19 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
    * Creates scope executions for the given list of scopes;
    * Registers these executions with the migrating execution branch;
    *
-   * @param ancestorScopeExecution the execution for the scope that the scopes to instantiate
+   * @param ancestorScopeInstance the instance for the scope that the scopes to instantiate
    *   are subordinates to
    * @param executionBranch the migrating execution branch that manages scopes and their executions
    * @param scopesToInstantiate a list of hierarchical scopes to instantiate, ordered top-down
    */
-  protected void instantiateScopes(ExecutionEntity ancestorScopeExecution,
-      MigratingExecutionBranch executionBranch, List<ScopeImpl> scopesToInstantiate) {
+  protected void instantiateScopes(MigratingActivityInstance ancestorScopeInstance,
+      MigratingActivityInstanceBranch executionBranch, List<ScopeImpl> scopesToInstantiate) {
 
     if (scopesToInstantiate.isEmpty()) {
       return;
     }
 
-    ExecutionEntity newParentExecution = ancestorScopeExecution;
-    if (!ancestorScopeExecution.getNonEventScopeExecutions().isEmpty() || ancestorScopeExecution.getActivity() != null) {
-      newParentExecution = (ExecutionEntity) ancestorScopeExecution.createConcurrentExecution();
-    }
+    ExecutionEntity newParentExecution = ancestorScopeInstance.createAttachableExecution();
 
     Map<PvmActivity, PvmExecutionImpl> createdExecutions =
         newParentExecution.instantiateScopes((List) scopesToInstantiate);
@@ -331,8 +328,7 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
     for (ScopeImpl scope : scopesToInstantiate) {
       ExecutionEntity createdExecution = (ExecutionEntity) createdExecutions.get(scope);
       createdExecution.setActivity(null);
-      executionBranch.registerExecution(scope, createdExecution);
-
+      executionBranch.visited(new MigratingActivityInstance(scope, createdExecution));
     }
   }
 

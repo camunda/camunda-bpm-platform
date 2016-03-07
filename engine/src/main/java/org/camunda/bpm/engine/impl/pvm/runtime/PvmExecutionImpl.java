@@ -776,7 +776,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       boolean skipCustomListeners, boolean skipIoMappings) {
 
 
-    PvmExecutionImpl propagatingExecution = createConcurrentExecution();
 
     ScopeImpl flowScope = null;
     if (!activityStack.isEmpty()) {
@@ -787,9 +786,13 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       flowScope = targetTransition.getSource().getFlowScope();
     }
 
+    PvmExecutionImpl propagatingExecution = null;
     if (flowScope.getActivityBehavior() instanceof ModificationObserverBehavior) {
       ModificationObserverBehavior flowScopeBehavior = (ModificationObserverBehavior) flowScope.getActivityBehavior();
-      flowScopeBehavior.concurrentExecutionCreated(propagatingExecution.getParent(), propagatingExecution);
+      propagatingExecution = (PvmExecutionImpl) flowScopeBehavior.createInnerInstance(this);
+    }
+    else {
+      propagatingExecution = createConcurrentExecution();
     }
 
     propagatingExecution.executeActivities(activityStack, targetActivity, targetTransition, variables, localVariables,

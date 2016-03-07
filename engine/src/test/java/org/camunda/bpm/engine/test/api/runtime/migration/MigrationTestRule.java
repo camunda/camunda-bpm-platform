@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Collections;
@@ -172,6 +173,13 @@ public class MigrationTestRule extends TestWatcher {
     Task task = taskService.createTaskQuery().taskDefinitionKey(taskKey).singleResult();
     assertNotNull(task);
     taskService.complete(task.getId());
+  }
+
+  public void completeAnyTask(String taskKey) {
+    TaskService taskService = processEngine.getTaskService();
+    List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey(taskKey).list();
+    assertTrue(!tasks.isEmpty());
+    taskService.complete(tasks.get(0).getId());
   }
 
   public void correlateMessage(String messageName) {

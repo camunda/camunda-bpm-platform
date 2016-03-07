@@ -15,12 +15,11 @@ package org.camunda.bpm.engine.impl.migration.validation.instruction;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 public class SameEventScopeInstructionValidator implements MigrationInstructionValidator {
 
-  public void validate(ValidatingMigrationInstruction instruction, List<ValidatingMigrationInstruction> instructions, MigrationInstructionValidationReportImpl report) {
+  public void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, MigrationInstructionValidationReportImpl report) {
     ScopeImpl sourceEventScope = instruction.getSourceActivity().getEventScope();
     ScopeImpl targetEventScope = instruction.getTargetActivity().getEventScope();
 
@@ -39,13 +38,11 @@ public class SameEventScopeInstructionValidator implements MigrationInstructionV
     }
   }
 
-  protected ScopeImpl findMappedEventScope(ScopeImpl sourceEventScope, List<ValidatingMigrationInstruction> instructions) {
+  protected ScopeImpl findMappedEventScope(ScopeImpl sourceEventScope, ValidatingMigrationInstructions instructions) {
     if (sourceEventScope != null) {
-      for (ValidatingMigrationInstruction instruction : instructions) {
-        ActivityImpl sourceActivity = instruction.getSourceActivity();
-        if (sourceEventScope.getId().equals(sourceActivity.getId())) {
-          return instruction.getTargetActivity();
-        }
+      List<ValidatingMigrationInstruction> eventScopeInstructions = instructions.getInstructionsBySourceScope(sourceEventScope);
+      if (eventScopeInstructions.size() > 0) {
+        return eventScopeInstructions.get(0).getTargetActivity();
       }
     }
     return null;
