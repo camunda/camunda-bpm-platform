@@ -719,6 +719,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setProcessDefinitionId(jobEntity.getProcessDefinitionId());
     evt.setProcessDefinitionKey(jobEntity.getProcessDefinitionKey());
     evt.setDeploymentId(jobEntity.getDeploymentId());
+    evt.setTenantId(jobEntity.getTenantId());
 
     // initialize sequence counter
     initSequenceCounter(jobEntity, evt);

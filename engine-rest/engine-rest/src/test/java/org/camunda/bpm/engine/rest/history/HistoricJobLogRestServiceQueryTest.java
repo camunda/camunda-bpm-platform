@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.history;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.inOrder;
@@ -295,6 +296,16 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("jobPriority", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByJobPriority();
+    inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).desc();
   }
 
@@ -734,4 +745,63 @@ public class HistoricJobLogRestServiceQueryTest extends AbstractRestServiceTest 
     verifyNoMoreInteractions(mockedQuery);
   }
 
+  @Test
+  public void testTenantIdListParameter() {
+    mockedQuery = setUpMockHistoricJobLogQuery(createMockHistoricJobLogsTwoTenants());
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_JOB_LOG_RESOURCE_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> jobLogs = from(content).getList("");
+    assertThat(jobLogs).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void testTenantIdListPostParameter() {
+    mockedQuery = setUpMockHistoricJobLogQuery(createMockHistoricJobLogsTwoTenants());
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST.split(","));
+
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_JOB_LOG_RESOURCE_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> jobLogs = from(content).getList("");
+    assertThat(jobLogs).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  private List<HistoricJobLog> createMockHistoricJobLogsTwoTenants() {
+    return Arrays.asList(
+        MockProvider.createMockHistoricJobLog(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockHistoricJobLog(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
+  }
 }

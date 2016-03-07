@@ -41,6 +41,7 @@ public class HistoricJobLogDto {
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String deploymentId;
+  protected String tenantId;
 
   protected boolean creationLog;
   protected boolean failureLog;
@@ -111,6 +112,10 @@ public class HistoricJobLogDto {
     return deploymentId;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
   public boolean isCreationLog() {
     return creationLog;
   }
@@ -149,6 +154,7 @@ public class HistoricJobLogDto {
     result.processDefinitionId = historicJobLog.getProcessDefinitionId();
     result.processDefinitionKey = historicJobLog.getProcessDefinitionKey();
     result.deploymentId = historicJobLog.getDeploymentId();
+    result.tenantId = historicJobLog.getTenantId();
 
     result.creationLog = historicJobLog.isCreationLog();
     result.failureLog = historicJobLog.isFailureLog();

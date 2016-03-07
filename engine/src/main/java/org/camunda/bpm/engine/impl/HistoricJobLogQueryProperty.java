@@ -33,5 +33,6 @@ public interface HistoricJobLogQueryProperty {
   public static final QueryProperty RETRIES = new QueryPropertyImpl("JOB_RETRIES_");
   public static final QueryProperty PRIORITY = new QueryPropertyImpl("JOB_PRIORITY_");
   public static final QueryProperty SEQUENCE_COUNTER = new QueryPropertyImpl("SEQUENCE_COUNTER_");
+  public static final QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
 
 }

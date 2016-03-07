@@ -2285,6 +2285,10 @@ public abstract class MockProvider {
   }
 
   public static HistoricJobLog createMockHistoricJobLog() {
+    return createMockHistoricJobLog(EXAMPLE_TENANT_ID);
+  }
+
+  public static HistoricJobLog createMockHistoricJobLog(String tenantId) {
     HistoricJobLog mock = mock(HistoricJobLog.class);
 
     when(mock.getId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_ID);
@@ -2306,6 +2310,7 @@ public abstract class MockProvider {
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_ID);
     when(mock.getProcessDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_PROC_DEF_KEY);
     when(mock.getDeploymentId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_DEPLOYMENT_ID);
+    when(mock.getTenantId()).thenReturn(tenantId);
     when(mock.isCreationLog()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_IS_CREATION_LOG);
     when(mock.isFailureLog()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_IS_FAILURE_LOG);
     when(mock.isSuccessLog()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_IS_SUCCESS_LOG);

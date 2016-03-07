@@ -55,6 +55,8 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   protected int state;
 
+  protected String tenantId;
+
   public Date getTimestamp() {
     return timestamp;
   }
@@ -181,6 +183,14 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   public void setState(int state) {
     this.state = state;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 
   public boolean isCreationLog() {

@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.history;
 
 import org.camunda.bpm.engine.query.Query;
-import org.camunda.bpm.engine.runtime.JobQuery;
 
 /**
  * @author Roman Smirnov
@@ -56,6 +55,9 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
 
   /** Only select historic job log entries with the deployment id. */
   HistoricJobLogQuery deploymentId(String deploymentId);
+
+  /** Only select historic job log entries that belong to one of the given tenant ids. */
+  HistoricJobLogQuery tenantIdIn(String... tenantIds);
 
   /**
    * Only select log entries where the job had a priority higher than or
@@ -143,5 +145,11 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
    * @since 7.3
    */
   HistoricJobLogQuery orderPartiallyByOccurrence();
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of job log entries without tenant id is database-specific.
+   */
+  HistoricJobLogQuery orderByTenantId();
 
 }

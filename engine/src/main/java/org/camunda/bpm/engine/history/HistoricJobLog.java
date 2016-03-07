@@ -124,6 +124,12 @@ public interface HistoricJobLog {
   String getDeploymentId();
 
   /**
+   * Returns the id of the tenant this job log entry belongs to. Can be <code>null</code>
+   * if the job log entry belongs to no single tenant.
+   */
+  public String getTenantId();
+
+  /**
    * Returns <code>true</code> when <code>this</code> log represents
    * the creation of the associated job.
    */

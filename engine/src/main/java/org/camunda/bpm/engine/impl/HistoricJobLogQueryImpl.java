@@ -50,6 +50,7 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   protected JobState state;
   protected Long jobPriorityHigherThanOrEqual;
   protected Long jobPriorityLowerThanOrEqual;
+  protected String[] tenantIds;
 
   public HistoricJobLogQueryImpl() {
   }
@@ -146,6 +147,12 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return this;
   }
 
+  public HistoricJobLogQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   public HistoricJobLogQuery creationLog() {
     setState(JobState.CREATED);
     return this;
@@ -239,6 +246,10 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return this;
   }
 
+  public HistoricJobLogQuery orderByTenantId() {
+    return orderBy(HistoricJobLogQueryProperty.TENANT_ID);
+  }
+
   // results //////////////////////////////////////////////////////////////
 
   public long executeCount(CommandContext commandContext) {
@@ -303,6 +314,10 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
 
   public JobState getState() {
     return state;
+  }
+
+  public String[] getTenantIds() {
+    return tenantIds;
   }
 
   // setter //////////////////////////////////
