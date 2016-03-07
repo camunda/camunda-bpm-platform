@@ -202,6 +202,12 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
+  public ProcessInstanceQuery withoutTenantId() {
+    tenantIds = null;
+    isTenantIdSet = true;
+    return this;
+  }
+
   //results /////////////////////////////////////////////////////////////////
 
   @Override

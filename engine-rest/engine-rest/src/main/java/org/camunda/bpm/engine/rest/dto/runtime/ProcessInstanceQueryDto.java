@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +68,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private String incidentMessage;
   private String incidentMessageLike;
   private List<String> tenantIds;
+  private Boolean withoutTenantId;
 
   private List<VariableQueryParameterDto> variables;
 
@@ -171,6 +174,11 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -214,10 +222,10 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     if (subCaseInstance != null) {
       query.subCaseInstanceId(subCaseInstance);
     }
-    if (active != null && active == true) {
+    if (TRUE.equals(active)) {
       query.active();
     }
-    if (suspended != null && suspended == true) {
+    if (TRUE.equals(suspended)) {
       query.suspended();
     }
     if (incidentId != null) {
@@ -234,6 +242,9 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
     }
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {

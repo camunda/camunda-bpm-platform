@@ -444,6 +444,28 @@ public class ProcessInstanceRestServiceQueryTest extends
   }
 
   @Test
+  public void testWithoutTenantIdParameter() {
+    mockedQuery = setUpMockInstanceQuery(Arrays.asList(MockProvider.createMockInstance(null)));
+
+    Response response = given()
+      .queryParam("withoutTenantId", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(PROCESS_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId1).isEqualTo(null);
+  }
+
+  @Test
   public void testTenantIdListPostParameter() {
     mockedQuery = setUpMockInstanceQuery(createMockProcessInstancesTwoTenants());
 
@@ -470,6 +492,32 @@ public class ProcessInstanceRestServiceQueryTest extends
 
     assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void testWithoutTenantIdPostParameter() {
+    mockedQuery = setUpMockInstanceQuery(Arrays.asList(MockProvider.createMockInstance(null)));
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("withoutTenantId", true);
+
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(PROCESS_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId1).isEqualTo(null);
   }
 
   private List<ProcessInstance> createMockProcessInstancesTwoTenants() {

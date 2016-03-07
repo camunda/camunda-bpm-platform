@@ -195,6 +195,9 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   /** Only select process instances with one of the given tenant ids. */
   ProcessInstanceQuery tenantIdIn(String... tenantIds);
 
+  /** Only selects process instances which have no tenant id. */
+  ProcessInstanceQuery withoutTenantId();
+
   //ordering /////////////////////////////////////////////////////////////////
 
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
