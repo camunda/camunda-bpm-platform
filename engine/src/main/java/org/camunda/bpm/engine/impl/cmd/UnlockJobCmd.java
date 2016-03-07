@@ -46,16 +46,16 @@ public class UnlockJobCmd implements Command<Void> {
   public Void execute(CommandContext commandContext) {
     JobEntity job = getJob();
 
-    if (Context.getJobExecutorContext() != null) {
+    if (Context.getJobExecutorContext() == null) {
+      EnsureUtil.ensureNotNull("Job with id " + jobId + " does not exist", "job", job);
+    }
+    else if (Context.getJobExecutorContext() != null && job == null) {
       // CAM-1842
       // Job was acquired but does not exist anymore. This is not a problem.
       // It usually means that the job has been deleted after it was acquired which can happen if the
       // the activity instance corresponding to the job is cancelled.
       LOG.debugAcquiredJobNotFound(jobId);
       return null;
-
-    } else {
-      EnsureUtil.ensureNotNull("Job with id " + jobId + " does not exist", "job", job);
     }
 
     job.unlock();
