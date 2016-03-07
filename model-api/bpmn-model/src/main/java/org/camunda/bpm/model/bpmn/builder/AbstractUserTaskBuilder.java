@@ -17,6 +17,8 @@ import java.util.List;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormData;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormField;
 
 /**
  * @author Sebastian Menski
@@ -150,4 +152,14 @@ public abstract class AbstractUserTaskBuilder<B extends AbstractUserTaskBuilder<
     return myself;
   }
 
+  /**
+   * Creates a new camunda form field extension element.
+   *
+   * @return the builder object
+   */
+  public CamundaUserTaskFormFieldBuilder camundaFormField() {
+    CamundaFormData camundaFormData = getCreateSingleExtensionElement(CamundaFormData.class);
+    CamundaFormField camundaFormField = createChild(camundaFormData, CamundaFormField.class);
+    return new CamundaUserTaskFormFieldBuilder(modelInstance, element, camundaFormField);
+  }
 }

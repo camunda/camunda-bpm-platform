@@ -56,7 +56,6 @@ import org.camunda.bpm.model.bpmn.instance.Escalation;
 import org.camunda.bpm.model.bpmn.instance.EscalationEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.Event;
 import org.camunda.bpm.model.bpmn.instance.EventDefinition;
-import org.camunda.bpm.model.bpmn.instance.ExclusiveGateway;
 import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Gateway;
@@ -81,6 +80,8 @@ import org.camunda.bpm.model.bpmn.instance.TimeDuration;
 import org.camunda.bpm.model.bpmn.instance.TimerEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormData;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormField;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIn;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputOutput;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputParameter;
@@ -1652,6 +1653,80 @@ public class ProcessBuilderTest {
 
   }
 
+  @Test
+  public void testUserTaskCamundaFormField() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask(TASK_ID)
+        .camundaFormField()
+          .camundaId("myFormField_1")
+          .camundaLabel("Form Field One")
+          .camundaType("string")
+          .camundaDefaultValue("myDefaultVal_1")
+         .camundaFormFieldDone()
+        .camundaFormField()
+          .camundaId("myFormField_2")
+          .camundaLabel("Form Field Two")
+          .camundaType("integer")
+          .camundaDefaultValue("myDefaultVal_2")
+         .camundaFormFieldDone()
+      .endEvent()
+      .done();
+
+    UserTask userTask = modelInstance.getModelElementById(TASK_ID);
+    assertCamundaFormField(userTask);
+  }
+
+  @Test
+  public void testUserTaskCamundaFormFieldWithExistingCamundaFormData() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask(TASK_ID)
+        .camundaFormField()
+          .camundaId("myFormField_1")
+          .camundaLabel("Form Field One")
+          .camundaType("string")
+          .camundaDefaultValue("myDefaultVal_1")
+         .camundaFormFieldDone()
+      .endEvent()
+      .done();
+
+    UserTask userTask = modelInstance.getModelElementById(TASK_ID);
+
+    userTask.builder()
+      .camundaFormField()
+        .camundaId("myFormField_2")
+        .camundaLabel("Form Field Two")
+        .camundaType("integer")
+        .camundaDefaultValue("myDefaultVal_2")
+       .camundaFormFieldDone();
+
+    assertCamundaFormField(userTask);
+  }
+
+  @Test
+  public void testStartEventCamundaFormField() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent(START_EVENT_ID)
+        .camundaFormField()
+          .camundaId("myFormField_1")
+          .camundaLabel("Form Field One")
+          .camundaType("string")
+          .camundaDefaultValue("myDefaultVal_1")
+         .camundaFormFieldDone()
+         .camundaFormField()
+         .camundaId("myFormField_2")
+          .camundaLabel("Form Field Two")
+          .camundaType("integer")
+          .camundaDefaultValue("myDefaultVal_2")
+         .camundaFormFieldDone()
+      .endEvent()
+      .done();
+
+    StartEvent startEvent = modelInstance.getModelElementById(START_EVENT_ID);
+    assertCamundaFormField(startEvent);
+  }
+
   protected Message assertMessageEventDefinition(String elementId, String messageName) {
     MessageEventDefinition messageEventDefinition = assertAndGetSingleEventDefinition(elementId, MessageEventDefinition.class);
     Message message = messageEventDefinition.getMessage();
@@ -1765,6 +1840,29 @@ public class ProcessBuilderTest {
     EventDefinition eventDefinition = eventDefinitions.iterator().next();
     assertThat(eventDefinition).isInstanceOf(eventDefinitionType);
     return (T) eventDefinition;
+  }
+
+  protected void assertCamundaFormField(BaseElement element) {
+    assertThat(element.getExtensionElements()).isNotNull();
+
+    CamundaFormData camundaFormData = element.getExtensionElements().getElementsQuery().filterByType(CamundaFormData.class).singleResult();
+    assertThat(camundaFormData).isNotNull();
+
+    List<CamundaFormField> camundaFormFields = new ArrayList<CamundaFormField>(camundaFormData.getCamundaFormFields());
+    assertThat(camundaFormFields).hasSize(2);
+
+    CamundaFormField camundaFormField = camundaFormFields.get(0);
+    assertThat(camundaFormField.getCamundaId()).isEqualTo("myFormField_1");
+    assertThat(camundaFormField.getCamundaLabel()).isEqualTo("Form Field One");
+    assertThat(camundaFormField.getCamundaType()).isEqualTo("string");
+    assertThat(camundaFormField.getCamundaDefaultValue()).isEqualTo("myDefaultVal_1");
+
+    camundaFormField = camundaFormFields.get(1);
+    assertThat(camundaFormField.getCamundaId()).isEqualTo("myFormField_2");
+    assertThat(camundaFormField.getCamundaLabel()).isEqualTo("Form Field Two");
+    assertThat(camundaFormField.getCamundaType()).isEqualTo("integer");
+    assertThat(camundaFormField.getCamundaDefaultValue()).isEqualTo("myDefaultVal_2");
+
   }
 
 }
