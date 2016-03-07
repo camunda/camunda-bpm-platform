@@ -91,6 +91,25 @@ public class StatisticsRestTest extends AbstractRestServiceTest {
   }
 
   @Test
+  public void testProcessDefinitionStatisticsRetrieval() {
+    given()
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("$.size()", is(2))
+      .body("[0].definition.id", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+      .body("[0].definition.key", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY))
+      .body("[0].definition.category", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_CATEGORY))
+      .body("[0].definition.name", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME))
+      .body("[0].definition.description", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_DESCRIPTION))
+      .body("[0].definition.deploymentId", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_ID))
+      .body("[0].definition.version", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_VERSION))
+      .body("[0].definition.resource", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME))
+      .body("[0].definition.diagram", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME))
+      .body("[0].definition.tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+    .when().get(PROCESS_DEFINITION_STATISTICS_URL);
+  }
+
+  @Test
   public void testActivityStatisticsRetrieval() {
     given().pathParam("id", "aDefinitionId")
     .then().expect()
