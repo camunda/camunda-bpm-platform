@@ -1,6 +1,6 @@
 'use strict';
 
-var angular = require('camunda-bpm-sdk-js/vendor/angular'),
+var angular = require('camunda-commons-ui/vendor/angular'),
     camCockpitResources = require('./directives/cam-cockpit-resources');
 
   var resourcesModule = angular.module('cam.cockpit.repository.resources', []);

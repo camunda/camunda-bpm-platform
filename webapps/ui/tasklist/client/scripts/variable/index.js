@@ -7,7 +7,7 @@
 
 'use strict';
 
-var angular = require('camunda-bpm-sdk-js/vendor/angular'),
+var angular = require('camunda-commons-ui/vendor/angular'),
     camTasklistVariables = require('./directives/cam-tasklist-variables'),
     camTasklistVariablesDetailsModalCtrl = require('./modals/cam-tasklist-variables-detail-modal');
 
