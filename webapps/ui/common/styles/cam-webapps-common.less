@@ -116,39 +116,31 @@
 .nav-tabs {
   .nav-justified();
   .nav-tabs-justified();
-
+  padding-bottom: 1px;
   padding-left: (@grid-gutter-width * 0.5);
   padding-right: (@grid-gutter-width * 0.5);
   margin-top: 5px;
   border-top: 1px solid @gray-lighter;
-  border-bottom: 1px solid @gray-light;
+  border-bottom: 1px solid mix(@gray-lighter, @gray-light);
 
   > li {
     text-align: center;
+    border: none;
 
     > a {
       border: none;
       background: none;
       overflow: hidden;
-      margin: 0 auto -5px auto;
-      display: inline-block;
+      margin: 0 2px;
+      display: block;
       position: relative;
+      padding-bottom: 7px;
+      border-bottom: 2px solid @gray-lighter;
 
       &:hover,
       &:focus {
         background: none;
-      }
-
-      &:after {
-        position: absolute;
-        content: '';
-        display: block;
-        height: 2px;
-        bottom: 1px;
-        width: 100%;
-        left: 0;
-        border: none;
-        background-color: @gray-lighter;
+        border-bottom: 2px solid @link-hover-color;
       }
     }
 
@@ -156,9 +148,6 @@
     &:focus {
       border: none;
       background: none;
-      > a:after {
-        background-color: @link-hover-color;
-      }
     }
 
     &.active {
@@ -172,10 +161,7 @@
           background: none;
           border: none;
           cursor: default;
-
-          &:after {
-            background-color: @nav-tabs-active-link-hover-border-color;
-          }
+          border-bottom: 2px solid @nav-tabs-active-link-hover-border-color;
         }
       }
     }
@@ -184,12 +170,16 @@
   > .active > a,
   > .active > a:hover,
   > .active > a:focus {
-    border: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
   }
 
   @media (min-width: @screen-sm-min) {
     > li > a {
-      border: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
     }
   }
 }
