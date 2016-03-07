@@ -48,7 +48,7 @@ describe('Task Dates Spec', function() {
     it('should display relative follow up date in the list of tasks', function() {
 
       // then
-      expect(taskListPage.taskFollowUpDate('Task 1')).to.eventually.match('a few seconds ago');
+      expect(taskListPage.taskFollowUpDate('Task 1')).to.eventually.include('a few seconds ago');
     });
 
 
@@ -138,7 +138,7 @@ describe('Task Dates Spec', function() {
     it('should display relative due date in the list of tasks', function() {
 
       // then
-      expect(taskListPage.taskDueDate('Task 1')).to.eventually.match('a few seconds ago');
+      expect(taskListPage.taskDueDate('Task 1')).to.eventually.include('a few seconds ago');
     });
 
 
