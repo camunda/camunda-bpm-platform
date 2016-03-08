@@ -21,29 +21,33 @@
 
   <div ng-show="totalItems"
        ng-repeat="(delta, filter) in filters | orderBy:'properties.priority'"
-       class="item task-filter-wrapper"
+       class="item task-filter"
        ng-class="{active: isFocused(filter)}"
        ng-style="filter.style"
        ng-click="focus(filter)">
 
-    <div class="task-filter">
-      <div class="actions">
-        <a ng-click="openModal($event, filter)"
-           tooltip="{{ 'FILTER_DETAILS' | translate }}"
-           tooltip-placement="top">
-          <span class="glyphicon glyphicon-pencil"></span>
-        </a>
-      </div>
+    <h4 class="name"
+        tooltip="{{ filter.properties.description }}"
+        tooltip-placement="top">
+      <a href>
+        <span class="color-pill"
+              ng-style="{'background-color': filter.properties.color}"></span>
 
-      <h4 class="name"
-          tooltip="{{ filter.properties.description }}"
-          tooltip-placement="top">
-        <span ng-style="{'background-color': filter.properties.color}"></span>
-        <a href>{{ filter.name }}</a>
-      </h4>
+        {{ filter.name }}
 
-      <div ng-show="isFocused(filter)"
-           class="counter">{{ filterCount }}</div>
+        <span ng-style="{visibility: isFocused(filter) ? 'visible' : 'hidden'}"
+              class="counter">{{ filterCount }}</span>
+      </a>
+    </h4>
+
+    <div class="actions"
+         ng-style="{visibility: isFocused(filter) ? 'visible' : 'hidden'}">
+      <a ng-click="openModal($event, filter)"
+         tooltip="{{ 'FILTER_DETAILS' | translate }}"
+         tooltip-placement="top"
+         href>
+        <span class="glyphicon glyphicon-pencil"></span>
+      </a>
     </div>
   </div>
 </div>
