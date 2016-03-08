@@ -1,0 +1,5 @@
+<module xmlns="urn:jboss:module:1.0" name="org.camunda.bpm.dmn.camunda-engine-feel-api">
+  <resources>
+    <resource-root path="camunda-engine-feel-api-@project.version@.jar" />
+  </resources>
+</module>
