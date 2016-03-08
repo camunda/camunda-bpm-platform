@@ -13,20 +13,19 @@
 
 package org.camunda.bpm.engine.test.api.multitenancy.query;
 
-import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.DeploymentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 
 public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestCase {
 
@@ -49,9 +48,9 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
         .list();
 
     assertThat(deploymentStatistics.size(), is(3));
-    assertThat(deploymentStatistics, hasItem(deploymentWithTenantId(null)));
-    assertThat(deploymentStatistics, hasItem(deploymentWithTenantId(TENANT_ONE)));
-    assertThat(deploymentStatistics, hasItem(deploymentWithTenantId(TENANT_TWO)));
+
+    Set<String> tenantIds = collectDeploymentTenantIds(deploymentStatistics);
+    assertThat(tenantIds, hasItems(null, TENANT_ONE, TENANT_TWO));
   }
 
   public void testProcessDefinitionStatistics() {
@@ -60,47 +59,27 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
       .list();
 
     assertThat(processDefinitionStatistics.size(), is(3));
-    assertThat(processDefinitionStatistics, hasItem(processDefinitionWithTenantId(null)));
-    assertThat(processDefinitionStatistics, hasItem(processDefinitionWithTenantId(TENANT_ONE)));
-    assertThat(processDefinitionStatistics, hasItem(processDefinitionWithTenantId(TENANT_TWO)));
+
+    Set<String> tenantIds = collectDefinitionTenantIds(processDefinitionStatistics);
+    assertThat(tenantIds, hasItems(null, TENANT_ONE, TENANT_TWO));
   }
 
-  protected Matcher<DeploymentStatistics> deploymentWithTenantId(final String tenantId) {
-    return new TypeSafeMatcher<DeploymentStatistics>() {
+  protected Set<String> collectDeploymentTenantIds(List<DeploymentStatistics> deploymentStatistics) {
+    Set<String> tenantIds = new HashSet<String>();
 
-      @Override
-      public void describeTo(Description description) {
-        description.appendText("a deployment with tenant-id ").appendValue(tenantId);
-      }
-
-      @Override
-      protected boolean matchesSafely(DeploymentStatistics item) {
-        if(tenantId == null) {
-          return item.getTenantId() == null;
-        } else {
-          return tenantId.equals(item.getTenantId());
-        }
-      }
-    };
+    for (DeploymentStatistics statistics : deploymentStatistics) {
+      tenantIds.add(statistics.getTenantId());
+    }
+    return tenantIds;
   }
 
-  protected Matcher<ProcessDefinitionStatistics> processDefinitionWithTenantId(final String tenantId) {
-    return new TypeSafeMatcher<ProcessDefinitionStatistics>() {
+  protected Set<String> collectDefinitionTenantIds(List<ProcessDefinitionStatistics> processDefinitionStatistics) {
+    Set<String> tenantIds = new HashSet<String>();
 
-      @Override
-      public void describeTo(Description description) {
-        description.appendText("a process definition with tenant-id ").appendValue(tenantId);
-      }
-
-      @Override
-      protected boolean matchesSafely(ProcessDefinitionStatistics item) {
-        if(tenantId == null) {
-          return item.getTenantId() == null;
-        } else {
-          return tenantId.equals(item.getTenantId());
-        }
-      }
-    };
+    for (ProcessDefinitionStatistics statistics : processDefinitionStatistics) {
+      tenantIds.add(statistics.getTenantId());
+    }
+    return tenantIds;
   }
 
 }
