@@ -48,7 +48,7 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
   protected static final String SORT_BY_PROCESS_DEFINITION_KEY = "processDefinitionKey";
   protected static final String SORT_BY_DEPLOYMENT_ID = "deploymentId";
   protected static final String SORT_PARTIALLY_BY_OCCURRENCE = "occurrence";
-  private static final String SORT_BY_TENANT_ID = "tenantId";
+  protected static final String SORT_BY_TENANT_ID = "tenantId";
 
   protected static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -191,14 +191,17 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
     this.tenantIds = tenantIds;
   }
 
+  @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
   }
 
+  @Override
   protected HistoricJobLogQuery createNewQuery(ProcessEngine engine) {
     return engine.getHistoryService().createHistoricJobLogQuery();
   }
 
+  @Override
   protected void applyFilters(HistoricJobLogQuery query) {
     if (id != null) {
       query.logId(id);
@@ -276,6 +279,7 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
     }
   }
 
+  @Override
   protected void applySortBy(HistoricJobLogQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
     if (sortBy.equals(SORT_BY_TIMESTAMP)) {
       query.orderByTimestamp();
