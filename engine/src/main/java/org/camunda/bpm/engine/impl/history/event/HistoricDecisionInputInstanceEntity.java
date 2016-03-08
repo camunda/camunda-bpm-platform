@@ -37,6 +37,8 @@ public class HistoricDecisionInputInstanceEntity extends HistoryEvent implements
   protected String textValue;
   protected String textValue2;
 
+  protected String tenantId;
+
   protected ByteArrayField byteArrayField = new ByteArrayField(this);
   protected TypedValueField typedValueField = new TypedValueField(this, false);
 
@@ -169,6 +171,14 @@ public class HistoricDecisionInputInstanceEntity extends HistoryEvent implements
 
   public void setSerializerName(String serializerName) {
     typedValueField.setSerializerName(serializerName);
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 
   public void delete() {

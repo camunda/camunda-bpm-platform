@@ -31,6 +31,7 @@ public class ByteArrayEntity implements Serializable, DbEntity, HasDbRevision {
   protected String name;
   protected byte[] bytes;
   protected String deploymentId;
+  protected String tenantId;
 
   public ByteArrayEntity() {
   }
@@ -94,6 +95,14 @@ public class ByteArrayEntity implements Serializable, DbEntity, HasDbRevision {
     this.revision = revision;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -101,6 +110,7 @@ public class ByteArrayEntity implements Serializable, DbEntity, HasDbRevision {
            + ", revision=" + revision
            + ", name=" + name
            + ", deploymentId=" + deploymentId
+           + ", tenantId=" + tenantId
            + "]";
   }
 

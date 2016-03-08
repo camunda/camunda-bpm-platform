@@ -56,4 +56,10 @@ public interface HistoricDecisionInputInstance {
    */
   String getErrorMessage();
 
+  /**
+   * The id of the tenant this historic decision input instance belongs to. Can be <code>null</code>
+   * if the historic decision input instance belongs to no single tenant.
+   */
+  String getTenantId();
+
 }

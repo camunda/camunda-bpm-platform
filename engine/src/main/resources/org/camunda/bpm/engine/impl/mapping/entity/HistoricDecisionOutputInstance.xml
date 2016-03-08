@@ -20,7 +20,8 @@
           DOUBLE_,
           LONG_,
           TEXT_,
-          TEXT2_
+          TEXT2_,
+          TENANT_ID_
      ) values (
           #{id, jdbcType=VARCHAR},
           #{decisionInstanceId, jdbcType=VARCHAR},
@@ -34,7 +35,8 @@
           #{doubleValue, jdbcType=DOUBLE},
           #{longValue, jdbcType=BIGINT},
           #{textValue, jdbcType=VARCHAR},
-          #{textValue2, jdbcType=VARCHAR}
+          #{textValue2, jdbcType=VARCHAR},
+          #{tenantId, jdbcType=VARCHAR}
      )
   </insert>
   
@@ -60,6 +62,7 @@
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
     <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
     <result property="longValue" column="LONG_" jdbcType="BIGINT" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
   
   <!-- select -->

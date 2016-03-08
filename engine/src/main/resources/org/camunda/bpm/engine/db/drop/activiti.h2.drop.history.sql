@@ -31,6 +31,10 @@ drop index ACT_IDX_HI_JOB_LOG_PROCINST;
 drop index ACT_IDX_HI_JOB_LOG_PROCDEF;
 drop index ACT_IDX_HI_JOB_LOG_TENANT_ID;
 
+drop index ACT_IDX_HI_COMMENT_TENANT_ID;
+drop index ACT_IDX_HI_ATTACHMENT_TENANT_ID;
+drop index ACT_IDX_HI_OP_LOG_TENANT_ID;
+
 drop table ACT_HI_PROCINST if exists;
 drop table ACT_HI_ACTINST if exists;
 drop table ACT_HI_VARINST if exists;

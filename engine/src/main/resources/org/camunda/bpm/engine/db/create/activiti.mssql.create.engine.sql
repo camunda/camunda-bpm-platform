@@ -24,6 +24,7 @@ create table ACT_GE_BYTEARRAY (
     DEPLOYMENT_ID_ nvarchar(64),
     BYTES_ image,
     GENERATED_ tinyint,
+    TENANT_ID_ nvarchar(64),
     primary key (ID_)
 );
 
@@ -413,6 +414,7 @@ create index ACT_IDX_EXT_TASK_EXEC on ACT_RU_EXT_TASK(EXECUTION_ID_);
 
 -- indexes to improve deployment
 create index ACT_IDX_BYTEARRAY_NAME on ACT_GE_BYTEARRAY(NAME_);
+create index ACT_IDX_BYTEARRAY_TENANT_ID on ACT_GE_BYTEARRAY(TENANT_ID_);
 create index ACT_IDX_DEPLOYMENT_NAME on ACT_RE_DEPLOYMENT(NAME_);
 create index ACT_IDX_DEPLOYMENT_TENANT_ID on ACT_RE_DEPLOYMENT(TENANT_ID_);
 create index ACT_IDX_JOBDEF_PROC_DEF_ID ON ACT_RU_JOBDEF(PROC_DEF_ID_);

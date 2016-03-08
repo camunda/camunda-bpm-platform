@@ -132,6 +132,7 @@ create table ACT_HI_COMMENT (
     ACTION_ nvarchar(255),
     MESSAGE_ nvarchar(4000),
     FULL_MSG_ image,
+    TENANT_ID_ nvarchar(64),
     primary key (ID_)
 );
 
@@ -146,6 +147,7 @@ create table ACT_HI_ATTACHMENT (
     PROC_INST_ID_ nvarchar(64),
     URL_ nvarchar(4000),
     CONTENT_ID_ nvarchar(64),
+    TENANT_ID_ nvarchar(64),
     primary key (ID_)
 );
 
@@ -170,6 +172,7 @@ create table ACT_HI_OP_LOG (
     PROPERTY_ nvarchar(64),
     ORG_VALUE_ nvarchar(4000),
     NEW_VALUE_ nvarchar(4000),
+    TENANT_ID_ nvarchar(64),
     primary key (ID_)
 );
 
@@ -248,3 +251,7 @@ create index ACT_IDX_HI_INCIDENT_TENANT_ID on ACT_HI_INCIDENT(TENANT_ID_);
 create index ACT_IDX_HI_JOB_LOG_PROCINST on ACT_HI_JOB_LOG(PROCESS_INSTANCE_ID_);
 create index ACT_IDX_HI_JOB_LOG_PROCDEF on ACT_HI_JOB_LOG(PROCESS_DEF_ID_);
 create index ACT_IDX_HI_JOB_LOG_TENANT_ID on ACT_HI_JOB_LOG(TENANT_ID_);
+
+create index ACT_IDX_HI_COMMENT_TENANT_ID on ACT_HI_COMMENT(TENANT_ID_);
+create index ACT_IDX_HI_ATTACHMENT_TENANT_ID on ACT_HI_ATTACHMENT(TENANT_ID_);
+create index ACT_IDX_HI_OP_LOG_TENANT_ID on ACT_HI_OP_LOG(TENANT_ID_);
