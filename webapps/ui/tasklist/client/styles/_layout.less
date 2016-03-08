@@ -143,24 +143,33 @@ button {
 
 .task-filter {
   width: 100%;
-  margin: 6px 0;
   overflow: hidden;
+  display: table !important;
+  vertical-align: bottom;
+  padding-top: 2px;
+  padding-bottom: 5px;
 
   h4.name,
-  .counter {
-    margin: 0;
-    line-height: 20px;
-    min-height: 20px;
-    display: block;
+  .actions {
+    display: table-cell;
   }
 
   h4.name {
-    float: left;
+    margin: 0;
+    line-height: 24px;
+    min-height: 24px;
+  }
+
+  .actions,
+  .counter {
+    font-size: smaller;
   }
 
   .counter {
-    float: right;
-    font-size: 14px;
+    vertical-align: super;
+  }
+
+  .actions {
     text-align: right;
   }
 }
