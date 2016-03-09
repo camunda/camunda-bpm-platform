@@ -65,6 +65,25 @@
         "value": "Source Undefined"
       },
       "basic": true
+    },
+    {
+      "id": {
+        "key": "tenantIdIn",
+        "value": "Tenant ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "withoutTenantId",
+        "value": "without Tenant ID"
+      },
+      "basic": true
     }
   ],
   "operators": {

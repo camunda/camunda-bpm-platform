@@ -72,5 +72,17 @@
       <property name="resourceRootPath">pa:pa3</property>
     </properties>
   </process-archive>
+  
+  <process-archive name="tenant1-processes" tenantId="tenant1">
+    <properties>
+      <property name="resourceRootPath">pa:pa3/invoice</property>
+    </properties>
+  </process-archive>
+  
+  <process-archive name="tenant2-processes" tenantId="tenant2">
+    <properties>
+      <property name="resourceRootPath">pa:pa3/invoice</property>
+    </properties>
+  </process-archive>
 
 </process-application>

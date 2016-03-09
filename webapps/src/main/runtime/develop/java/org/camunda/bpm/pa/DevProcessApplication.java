@@ -267,8 +267,12 @@ public class DevProcessApplication extends ServletProcessApplication {
     taskService.setVariable(standaloneTaskId, "anotherVariable", 123456l);
 
     startInvoiceInstances(engine);
+    startInvoiceInstancesForTenant(engine, "tenant1");
+    startInvoiceInstancesForTenant(engine, "tenant1");
+    startInvoiceInstancesForTenant(engine, "tenant2");
 
     new Thread(){
+      @Override
       public void run() {
         ((ProcessEngineImpl) engine).getProcessEngineConfiguration().getJobExecutor().start();
       }
@@ -311,7 +315,9 @@ public class DevProcessApplication extends ServletProcessApplication {
     InputStream invoiceInputStream = getClass().getClassLoader().getResourceAsStream("invoice.pdf");
 
     // process instance 1
-    processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
+    processEngine.getRuntimeService().createProcessInstanceByKey("invoice")
+      .processDefinitionWithoutTenantId()
+      .setVariables(createVariables()
         .putValue("creditor", "Great Pizza for Everyone Inc.")
         .putValue("amount", 30.00d)
         .putValue("invoiceCategory", "Travel Expenses")
@@ -319,13 +325,16 @@ public class DevProcessApplication extends ServletProcessApplication {
         .putValue("invoiceDocument", fileValue("invoice.pdf")
             .file(invoiceInputStream)
             .mimeType("application/pdf")
-            .create()));
+            .create()))
+      .execute();
 
     IoUtil.closeSilently(invoiceInputStream);
     invoiceInputStream = getClass().getClassLoader().getResourceAsStream("invoice.pdf");
 
     // process instance 2
-    ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
+    ProcessInstance pi = processEngine.getRuntimeService().createProcessInstanceByKey("invoice")
+      .processDefinitionWithoutTenantId()
+      .setVariables(createVariables()
         .putValue("creditor", "Bobby's Office Supplies")
         .putValue("amount", 900.00d)
         .putValue("invoiceCategory", "Misc")
@@ -333,7 +342,9 @@ public class DevProcessApplication extends ServletProcessApplication {
         .putValue("invoiceDocument", fileValue("invoice.pdf")
             .file(invoiceInputStream)
             .mimeType("application/pdf")
-            .create()));
+            .create()))
+      .execute();
+
     try {
       Calendar calendar = Calendar.getInstance();
       calendar.add(Calendar.DAY_OF_MONTH, -14);
@@ -352,7 +363,9 @@ public class DevProcessApplication extends ServletProcessApplication {
     invoiceInputStream = getClass().getClassLoader().getResourceAsStream("invoice.pdf");
 
     // process instance 3
-    pi = processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
+    pi = processEngine.getRuntimeService().createProcessInstanceByKey("invoice")
+      .processDefinitionWithoutTenantId()
+      .setVariables(createVariables()
         .putValue("creditor", "Papa Steve's all you can eat")
         .putValue("amount", 10.99d)
         .putValue("invoiceCategory", "Travel Expenses")
@@ -360,8 +373,28 @@ public class DevProcessApplication extends ServletProcessApplication {
         .putValue("invoiceDocument", fileValue("invoice.pdf")
             .file(invoiceInputStream)
             .mimeType("application/pdf")
-            .create()));
+            .create()))
+      .execute();
 
+  }
+
+  private void startInvoiceInstancesForTenant(ProcessEngine processEngine, String tenantId) {
+    InputStream invoiceInputStream = getClass().getClassLoader().getResourceAsStream("invoice.pdf");
+
+    processEngine.getRuntimeService().createProcessInstanceByKey("invoice")
+      .processDefinitionTenantId(tenantId)
+      .setVariables(createVariables()
+        .putValue("creditor", "Fruits Inc.")
+        .putValue("amount", 20.50d)
+        .putValue("invoiceCategory", "Travel Expenses")
+        .putValue("invoiceNumber", "GREEN-14492")
+        .putValue("invoiceDocument", fileValue("invoice.pdf")
+            .file(invoiceInputStream)
+            .mimeType("application/pdf")
+            .create()))
+      .execute();
+
+    IoUtil.closeSilently(invoiceInputStream);
   }
 
   protected void createReportDemoData(ProcessEngine engine) {

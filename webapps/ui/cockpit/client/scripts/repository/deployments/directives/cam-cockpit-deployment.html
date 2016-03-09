@@ -14,4 +14,11 @@
   <dd ng-class="{ undefined: !deployment.source}" class="source">
     {{ deployment.source ? deployment.source : '&lt;undefined&gt;' }}
   </dd>
+  
+  <dt>Tenant ID:</dt>
+  <dd class="tenant-id"
+      ng-if="deployment.tenantId">{{ deployment.tenantId }}</dd>
+  <dd class="tenant-id"
+      ng-if="!deployment.tenantId"><span class="null-value">null</span></dd>
+      
 </dl>

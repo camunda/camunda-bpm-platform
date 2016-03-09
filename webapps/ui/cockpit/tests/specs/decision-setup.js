@@ -12,10 +12,8 @@ operation('deployment', 'create', [{
   files: [{
     name: 'assign-approver-groups.dmn',
     content: readResource('assign-approver-groups.dmn')
-  }]
-},{
-  deploymentName: 'invoice',
-  files: [{
+  },
+  {
     name: 'invoice.bpmn',
     content: readResource('invoice.bpmn')
   }]
@@ -48,10 +46,8 @@ operation('deployment', 'create', [{
   files: [{
     name: 'assign-approver-groups-clauses-without-name.dmn',
     content: readResource('assign-approver-groups-clauses-without-name.dmn')
-  }]
-},{
-  deploymentName: 'invoice',
-  files: [{
+  },
+  {
     name: 'invoice.bpmn',
     content: readResource('invoice.bpmn')
   }]
@@ -89,11 +85,79 @@ operation('decision-definition', 'evaluate', [{
 
 );
 
+var multiTenancyDeployment = combine(
+		
+    operation('deployment', 'create', [{
+      deploymentName:  'processTenantOne',
+      tenantId: 'tenant1', 
+      files: [{
+        name: 'invoice.bpmn',
+        filename: 'invoice.bpmn',
+        content: readResource('invoice.bpmn')
+      },
+      {
+        name: 'assign-approver-groups.dmn',
+        content: readResource('assign-approver-groups.dmn')
+      }]
+    }]),
+      
+    operation('deployment', 'create', [{
+      deploymentName:  'processNoTenant',
+      files: [{
+        name: 'invoice.bpmn',
+        filename: 'invoice.bpmn',
+        content: readResource('invoice.bpmn')
+      },
+      {
+        name: 'assign-approver-groups.dmn',
+        content: readResource('assign-approver-groups.dmn')
+      }]
+    }]),
+    
+    operation('process-definition', 'start', [{
+      key: 'invoice',
+      tenantId: 'tenant1',
+      variables: {
+        creditor: {
+          value: 'test',
+          type: 'String'
+        },
+        amount : {
+          value: 20.5,
+          type: 'Double'
+        },
+        invoiceCategory : {
+          value: 'Travel Expenses',
+          type: 'String'
+        }
+      }
+    }]),
+    
+    operation('process-definition', 'start', [{
+      key: 'invoice',
+      variables: {
+        creditor: {
+          value: 'test',
+          type: 'String'
+        },
+        amount : {
+          value: 15.0,
+          type: 'Double'
+        },
+        invoiceCategory : {
+          value: 'Travel Expenses',
+          type: 'String'
+        }
+      }
+    }])
+);
+
 module.exports = {
 
   setup1: deployFirst,
   setup2: combine(deployFirst, deploySecond),
   setup3: deployThird,
-  setup4: deploy4
-
+  setup4: deploy4,
+  multiTenancySetup: multiTenancyDeployment
+  
 };

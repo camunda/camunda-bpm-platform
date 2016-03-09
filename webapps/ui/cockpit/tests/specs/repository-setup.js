@@ -102,5 +102,26 @@ module.exports = {
         key: 'loanApplicationCase'
       }])
 
-    )
+    ),
+    
+  multiTenancySetup: combine(
+  		
+      operation('deployment', 'create', [{
+        deploymentName:  'processTenantOne',
+        tenantId: 'tenant1', 
+        files: [{
+          name: 'user-tasks.bpmn',
+          content: readResource('user-tasks.bpmn')
+        }]
+      }]),
+        
+      operation('deployment', 'create', [{
+        deploymentName:  'processNoTenant',
+        files: [{
+          name: 'user-tasks.bpmn',
+          content: readResource('user-tasks.bpmn')
+        }]
+      }])
+  )
+  
 };

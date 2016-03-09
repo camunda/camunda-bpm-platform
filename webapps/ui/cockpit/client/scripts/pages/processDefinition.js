@@ -192,7 +192,16 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     }]);
 
     processData.provide('instances.all', [ 'processDefinition', function(definition) {
-      return ProcessInstanceResource.count({ processDefinitionKey : definition.key }).$promise;
+    
+	  var queryParams = { processDefinitionKey : definition.key }
+    	
+	  if(definition.tenantId) {
+    	queryParams.tenantIdIn = [ definition.tenantId ];
+      } else {
+    	queryParams.withoutTenantId = true;
+      }
+    	
+      return ProcessInstanceResource.count(queryParams).$promise;
     }]);
 
     processData.provide('instances.current', [ 'processDefinition', function(definition) {
@@ -216,7 +225,19 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     }]);
 
     processData.provide('allProcessDefinitions', [ 'processDefinition', function(definition) {
-      return ProcessDefinitionResource.query({ 'key' : definition.key, 'sortBy': 'version', 'sortOrder': 'desc' }).$promise;
+      
+      var queryParams = { 
+        'key' : definition.key, 
+        'sortBy': 'version', 
+        'sortOrder': 'desc' }
+     	
+   	  if(definition.tenantId) {
+       	queryParams.tenantIdIn = [ definition.tenantId ];
+      }	else {
+    	queryParams.withoutTenantId = true;
+      }
+    	
+      return ProcessDefinitionResource.query(queryParams).$promise;
     }]);
 
     // processDiagram /////////////////////

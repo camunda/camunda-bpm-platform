@@ -123,5 +123,63 @@ module.exports = {
       {
         key: 'sevenFailingServiceTasks'
       }])
-    )
+    ),
+    
+    multiTenancySetup:
+
+        combine(
+        		operation('deployment', 'create', [{
+              deploymentName:  'user-tasks',
+              tenantId: 'tenant1',
+              files: [{
+                name: 'user-tasks.bpmn',
+                content: readResource('user-tasks.bpmn')
+              }]
+            }]),
+            
+            operation('deployment', 'create', [{
+              deploymentName:  'user-tasks',
+              files: [{
+                name: 'user-tasks.bpmn',
+                content: readResource('user-tasks.bpmn')
+              }]
+            }]),
+
+            operation('process-definition', 'start', [{
+              key: 'user-tasks',
+              tenantId: 'tenant1',
+              variables: {
+                test: {
+                  value: 1.5,
+                  type: 'Double'
+                },
+                myString : {
+                  value: '123 dfg',
+                  type: 'String'
+                },
+                extraLong : {
+                  value: '1234567890987654321',
+                  type: 'Long'
+                }
+              }
+            }]),	
+            
+            operation('process-definition', 'start', [{
+              key: 'user-tasks',
+              variables: {
+                test: {
+                  value: 3.0,
+                  type: 'Double'
+                },
+                myString : {
+                  value: '50 dfg',
+                  type: 'String'
+                },
+                extraLong : {
+                  value: '42',
+                  type: 'Long'
+                }
+              }
+            }])
+        )
 };

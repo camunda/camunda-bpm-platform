@@ -62,6 +62,12 @@
         <dt>Definition Version:</dt>
         <dd class="definition-version">{{decisionDefinition.version}}</dd>
 
+        <dt>Tenant ID:</dt>
+        <dd class="tenant-id"
+            ng-if="decisionDefinition.tenantId">{{ decisionDefinition.tenantId }}</dd>
+        <dd class="tenant-id"
+            ng-if="!decisionDefinition.tenantId"><span class="null-value">null</span></dd>
+
         <dt>Deployment ID:</dt>
         <dd class="deployment-id"
             ng-if="decisionDefinition"><a ng-href="{{ getDeploymentUrl() }}">{{ decisionDefinition.deploymentId }}</a></dd>

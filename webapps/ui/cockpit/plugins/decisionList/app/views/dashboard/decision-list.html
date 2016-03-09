@@ -8,6 +8,7 @@
     <thead>
       <tr>
         <th class="name">Name</th>
+        <th class="tenant-id">Tenant ID</th>
       </tr>
     </thead>
 
@@ -17,6 +18,9 @@
           <a href="#/decision-definition/{{ decision.id }}">
             {{ decision.name || decision.key }}
           </a>
+        </td>
+        <td class="tenantId">
+          {{ decision.tenantId }}
         </td>
       </tr>
     </tbody>
