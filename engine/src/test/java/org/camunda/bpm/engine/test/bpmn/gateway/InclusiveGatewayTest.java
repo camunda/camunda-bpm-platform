@@ -630,25 +630,8 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
       .done());
   }
 
+  @Deployment
   public void testLoopingInclusiveGateways() {
-    deployment(Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .inclusiveGateway("fork1")
-        .inclusiveGateway("fork2")
-        .inclusiveGateway("join2")
-        .inclusiveGateway("join1")
-        .inclusiveGateway("fork3")
-        .endEvent()
-        .moveToNode("fork3")
-          .connectTo("fork1")
-        .moveToNode("fork1")
-          .userTask("task1")
-          .connectTo("join1")
-        .moveToNode("fork2")
-          .userTask("task2")
-          .connectTo("join2")
-        .done());
-
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
@@ -660,7 +643,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
       describeActivityInstanceTree(processInstance.getProcessDefinitionId())
         .activity("task1")
         .activity("task2")
-        .activity("join2")
+        .activity("inclusiveGw3")
       .done());
   }
 
