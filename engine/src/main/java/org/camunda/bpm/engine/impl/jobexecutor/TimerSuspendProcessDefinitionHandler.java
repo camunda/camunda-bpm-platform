@@ -39,12 +39,12 @@ public class TimerSuspendProcessDefinitionHandler extends TimerChangeProcessDefi
 
     if (by.equals(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID)) {
       String processDefinitionId = getProcessDefinitionId(config);
-      cmd = new SuspendProcessDefinitionCmd(processDefinitionId, null, activateProcessInstances, null);
+      cmd = new SuspendProcessDefinitionCmd(processDefinitionId, null, null, activateProcessInstances, null);
     } else
 
     if (by.equals(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY)) {
       String processDefinitionKey = getProcessDefinitionKey(config);
-      cmd = new SuspendProcessDefinitionCmd(null, processDefinitionKey, activateProcessInstances, null);
+      cmd = new SuspendProcessDefinitionCmd(null, processDefinitionKey, null, activateProcessInstances, null);
     }
 
     return cmd;

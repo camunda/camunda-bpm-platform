@@ -44,6 +44,9 @@
       <if test="processDefinitionKey != null">
         and KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
       </if>
+      <if test="processDefinitionTenantId != null">
+        and TENANT_ID_ = #{processDefinitionTenantId, jdbcType=VARCHAR}
+      </if>
     </where>
   </update>
 
@@ -139,6 +142,12 @@
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
+  </select>
+
+  <select id="selectProcessDefinitionCountDistinctTenantByKey" parameterType="string" resultType="long">
+    select count( distinct RES.TENANT_ID_ )
+    from ${prefix}ACT_RE_PROCDEF RES
+    where RES.KEY_ = #{parameter}
   </select>
 
   <select id="selectProcessDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultType="long">

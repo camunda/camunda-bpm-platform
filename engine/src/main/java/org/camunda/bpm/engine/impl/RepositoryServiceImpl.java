@@ -151,35 +151,55 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   public void suspendProcessDefinitionById(String processDefinitionId) {
-    commandExecutor.execute(new SuspendProcessDefinitionCmd(processDefinitionId, null, false, null));
+    commandExecutor.execute(new SuspendProcessDefinitionCmd(processDefinitionId, null, null, false, null));
   }
 
   public void suspendProcessDefinitionById(String processDefinitionId, boolean suspendProcessInstances, Date suspensionDate) {
-    commandExecutor.execute(new SuspendProcessDefinitionCmd(processDefinitionId, null, suspendProcessInstances, suspensionDate));
+    commandExecutor.execute(new SuspendProcessDefinitionCmd(processDefinitionId, null, null, suspendProcessInstances, suspensionDate));
   }
 
   public void suspendProcessDefinitionByKey(String processDefinitionKey) {
-    commandExecutor.execute(new SuspendProcessDefinitionCmd(null, processDefinitionKey, false, null));
+    commandExecutor.execute(new SuspendProcessDefinitionCmd(null, processDefinitionKey, null, false, null));
   }
 
   public void suspendProcessDefinitionByKey(String processDefinitionKey, boolean suspendProcessInstances, Date suspensionDate) {
-    commandExecutor.execute(new SuspendProcessDefinitionCmd(null, processDefinitionKey, suspendProcessInstances, suspensionDate));
+    commandExecutor.execute(new SuspendProcessDefinitionCmd(null, processDefinitionKey, null, suspendProcessInstances, suspensionDate));
+  }
+
+  public void suspendProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId) {
+    commandExecutor.execute(new SuspendProcessDefinitionCmd(null, processDefinitionKey, processDefinitionTenantId, false, null));
+  }
+
+  public void suspendProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId,
+          boolean suspendProcessInstances, Date suspensionDate) {
+    commandExecutor.execute(new SuspendProcessDefinitionCmd(null, processDefinitionKey, processDefinitionTenantId,
+            suspendProcessInstances, suspensionDate));
   }
 
   public void activateProcessDefinitionById(String processDefinitionId) {
-    commandExecutor.execute(new ActivateProcessDefinitionCmd(processDefinitionId, null, false, null));
+    commandExecutor.execute(new ActivateProcessDefinitionCmd(processDefinitionId, null, null, false, null));
   }
 
   public void activateProcessDefinitionById(String processDefinitionId, boolean activateProcessInstances, Date activationDate) {
-    commandExecutor.execute(new ActivateProcessDefinitionCmd(processDefinitionId, null, activateProcessInstances, activationDate));
+    commandExecutor.execute(new ActivateProcessDefinitionCmd(processDefinitionId, null, null, activateProcessInstances, activationDate));
   }
 
   public void activateProcessDefinitionByKey(String processDefinitionKey) {
-    commandExecutor.execute(new ActivateProcessDefinitionCmd(null, processDefinitionKey, false, null));
+    commandExecutor.execute(new ActivateProcessDefinitionCmd(null, processDefinitionKey, null, false, null));
   }
 
   public void activateProcessDefinitionByKey(String processDefinitionKey, boolean activateProcessInstances, Date activationDate) {
-    commandExecutor.execute(new ActivateProcessDefinitionCmd(null, processDefinitionKey, activateProcessInstances, activationDate));
+    commandExecutor.execute(new ActivateProcessDefinitionCmd(null, processDefinitionKey, null, activateProcessInstances, activationDate));
+  }
+
+  public void activateProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId) {
+    commandExecutor.execute(new ActivateProcessDefinitionCmd(null, processDefinitionKey, processDefinitionTenantId, false, null));
+  }
+
+  public void activateProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId,
+          boolean suspendProcessInstances, Date suspensionDate) {
+    commandExecutor.execute(new ActivateProcessDefinitionCmd(null, processDefinitionKey, processDefinitionTenantId,
+            suspendProcessInstances, suspensionDate));
   }
 
   public InputStream getProcessModel(String processDefinitionId) {

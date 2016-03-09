@@ -150,6 +150,10 @@ public class ProcessDefinitionManager extends AbstractManager {
     return getDbEntityManager().selectList("selectProcessDefinitionByKeyIn", keys);
   }
 
+  public long findProcessDefinitionCountDistinctTenantByKey(String processDefinitionKey) {
+    return (Long) getDbEntityManager().selectOne("selectProcessDefinitionCountDistinctTenantByKey", processDefinitionKey);
+  }
+
   // update ///////////////////////////////////////////////////////////
 
   public void updateProcessDefinitionSuspensionStateById(String processDefinitionId, SuspensionState suspensionState) {
@@ -162,6 +166,15 @@ public class ProcessDefinitionManager extends AbstractManager {
   public void updateProcessDefinitionSuspensionStateByKey(String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbEntityManager().update(ProcessDefinitionEntity.class, "updateProcessDefinitionSuspensionStateByParameters", parameters);
+  }
+
+  public void updateProcessDefinitionSuspensionStateByKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId,
+      SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("processDefinitionTenantId", processDefinitionTenantId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbEntityManager().update(ProcessDefinitionEntity.class, "updateProcessDefinitionSuspensionStateByParameters", parameters);
   }

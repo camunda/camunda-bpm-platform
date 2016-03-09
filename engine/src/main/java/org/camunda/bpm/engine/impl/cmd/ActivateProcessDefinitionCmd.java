@@ -32,8 +32,8 @@ public class ActivateProcessDefinitionCmd extends AbstractSetProcessDefinitionSt
   }
 
   public ActivateProcessDefinitionCmd(String processDefinitionId, String processDefinitionKey,
-          boolean includeProcessInstances, Date executionDate) {
-    super(processDefinitionId, processDefinitionKey, includeProcessInstances, executionDate);
+          String processDefinitionTenantId, boolean includeProcessInstances, Date executionDate) {
+    super(processDefinitionId, processDefinitionKey, processDefinitionTenantId, includeProcessInstances, executionDate);
   }
 
   protected SuspensionState getNewSuspensionState() {
