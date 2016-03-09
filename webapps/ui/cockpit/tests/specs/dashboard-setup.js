@@ -71,11 +71,80 @@ var dmnFragment2 = operation('deployment', 'create', [{
   }]
 }]);
 
+var multiTenancyDeployment = combine(
+		
+    operation('deployment', 'create', [{
+      deploymentName:  'processTenantOne',
+      tenantId: 'tenant1', 
+      files: [{
+        name: 'invoice.bpmn',
+        filename: 'invoice.bpmn',
+        content: readResource('invoice.bpmn')
+      },
+      {
+        name: 'assign-approver-groups.dmn',
+        content: readResource('assign-approver-groups.dmn')
+      }]
+    }]),
+      
+    operation('deployment', 'create', [{
+      deploymentName:  'processNoTenant',
+      files: [{
+        name: 'invoice.bpmn',
+        filename: 'invoice.bpmn',
+        content: readResource('invoice.bpmn')
+      },
+      {
+        name: 'assign-approver-groups.dmn',
+        content: readResource('assign-approver-groups.dmn')
+      }]
+    }]),
+    
+    operation('process-definition', 'start', [{
+      key: 'invoice',
+      tenantId: 'tenant1',
+      variables: {
+        creditor: {
+          value: 'test',
+          type: 'String'
+        },
+        amount : {
+          value: 20.5,
+          type: 'Double'
+        },
+        invoiceCategory : {
+          value: 'Travel Expenses',
+          type: 'String'
+        }
+      }
+    }]),
+    
+    operation('process-definition', 'start', [{
+      key: 'invoice',
+      variables: {
+        creditor: {
+          value: 'test',
+          type: 'String'
+        },
+        amount : {
+          value: 15.0,
+          type: 'Double'
+        },
+        invoiceCategory : {
+          value: 'Travel Expenses',
+          type: 'String'
+        }
+      }
+    }])
+);
+
 module.exports = {
 
   setup1: fragment1,
   setup2: fragment2,
   setup3: fragment3,
   setup4: dmnFragment1,
-  setup5: dmnFragment2
+  setup5: dmnFragment2,
+  multiTenancySetup: multiTenancyDeployment
+  
 };

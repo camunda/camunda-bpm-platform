@@ -18,6 +18,10 @@ module.exports = Base.extend({
 
   decisionName: function(item) {
     return this.decisionsList().get(item).element(by.binding('{{ decision.name || decision.key }}')).getText();
+  },
+  
+  tenantId: function(item) {
+    return this.decisionsList().get(item).element(by.css('.tenantId')).getText();
   }
 
 });

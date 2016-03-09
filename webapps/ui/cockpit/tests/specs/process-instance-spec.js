@@ -431,4 +431,44 @@ describe('Cockpit Process Instance Spec', function() {
       });
     });
   });
+  
+  describe('multi tenancy', function() {
+    
+  	before(function() { 
+      return testHelper(setupFile.multiTenancySetup, function() {
+
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+      });
+    });
+  	
+	  it('should display tenant id of instance', function() {
+	  	
+	  	// first process definition is deployed for tenant with id 'tenant1'
+	  	dashboardPage.deployedProcessesList.selectProcess(0);
+	  	definitionPage.processInstancesTab.selectInstanceId(0);
+	    	
+	  	// when
+	  	instancePage.sidebarTabClick('Information');
+
+	  	// then
+	  	expect(instancePage.information.tenantId()).to.eventually.contain('tenant1');
+	  });
+	 	
+	  it('should not display tenant id of instance if not exists', function() {
+	  	
+	  	dashboardPage.navigateToWebapp('Cockpit');
+      // second process definition is deployed without tenant id
+      dashboardPage.deployedProcessesList.selectProcess(1);
+      definitionPage.processInstancesTab.selectInstanceId(0);
+	    
+      // when
+	  	instancePage.sidebarTabClick('Information');
+	
+	  	// then
+	    expect(instancePage.information.tenantId()).to.eventually.contain('null');
+	  });
+		  
+  });
+  
 });

@@ -57,5 +57,10 @@ module.exports = Base.extend({
 
   deploymentId: function () {
     return this.listElement().element(by.css('.deployment-id')).getText();
+  },
+  
+  tenantId: function () {
+    return this.listElement().element(by.css('.tenant-id')).getText();
   }
+  
 });

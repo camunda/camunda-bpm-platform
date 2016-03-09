@@ -26,6 +26,10 @@ module.exports = Page.extend({
   deploymentSource: function(idx) {
     return this.deploymentList().get(idx).element(by.css('.source')).getText();
   },
+  
+  deploymentTenantId: function(idx) {
+    return this.deploymentList().get(idx).element(by.css('.tenant-id')).getText();
+  },
 
   selectDeployment: function(idxOrName) {
     var that = this;

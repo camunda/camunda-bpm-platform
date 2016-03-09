@@ -226,5 +226,36 @@ describe('Cockpit Decision Instance Spec', function() {
     });
 
   });
+  
+  describe('multi tenancy', function() {
+    
+  	before(function() { 
+      return testHelper(setupFile.multiTenancySetup, function() {
+
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+      });
+    });
+  	
+  	it('should not display tenant id of instance if not exists', function() {
+	  	
+	  	// first decision definition is deployed without tenant id
+	  	dashboardPage.deployedDecisionsList.selectDecision(0);
+      definitionPage.decisionInstancesTab.selectInstanceId(0);
+	    
+      expect(instancePage.information.tenantId()).to.eventually.contain('null');
+	  });
+  	
+	  it('should display tenant id of instance', function() {
+	  	
+	  	dashboardPage.navigateToWebapp('Cockpit');
+	  	// second decision definition is deployed for tenant with id 'tenant1'
+    	dashboardPage.deployedDecisionsList.selectDecision(1);
+	  	definitionPage.decisionInstancesTab.selectInstanceId(0);
+	    	
+	  	expect(instancePage.information.tenantId()).to.eventually.contain('tenant1');
+	  });
+	 	  
+  });
 
 });

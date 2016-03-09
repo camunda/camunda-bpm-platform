@@ -48,7 +48,19 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     decisionData.provide('allDefinitions', [ 'decisionDefinition', function(decisionDefinition) {
       var deferred = $q.defer();
 
-      decisionDefinitionService.list({ key: decisionDefinition.key, sortBy: 'version', sortOrder: 'desc' }, function(err, data) {
+      var queryParams = {
+        key: decisionDefinition.key,
+        sortBy: 'version',
+        sortOrder: 'desc'
+      }
+      
+      if(decisionDefinition.tenantId) {
+    	queryParams.tenantIdIn = decisionDefinition.tenantId;
+      } else {
+    	queryParams.withoutTenantId = true;
+      }
+        
+      decisionDefinitionService.list(queryParams, function(err, data) {
         if(!err) {
           deferred.resolve(data);
         } else {

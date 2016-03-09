@@ -566,5 +566,47 @@ describe('Repository Spec', function() {
     });
 
   });
+  
+  describe('multi tenancy', function() {
+    
+  	before(function() { 
+      return testHelper(setupFile.multiTenancySetup, function() {
+
+      	repositoryPage.navigateToWebapp('Cockpit');
+        repositoryPage.authentication.userLogin('admin', 'admin');
+        repositoryPage.navigateTo();
+      });
+    });
+  	
+  	it('should search by invalid tenant id', function() {
+
+      // when
+      deploymentsPage.createSearch('Tenant ID', '=', 'nonExisting');
+
+      //then
+      expect(deploymentsPage.deploymentList().count()).to.eventually.eql(0);
+    });
+
+    it('should search by tenant id', function() {
+
+      // when
+      deploymentsPage.changeValue(0, 'tenant1');
+
+      // then
+      expect(deploymentsPage.deploymentList().count()).to.eventually.eql(1);
+      expect(deploymentsPage.deploymentTenantId(0)).to.eventually.eql('tenant1');
+    });
+
+    it('should search for deployment without tenant id', function() {
+
+      // when
+      deploymentsPage.changeType(0, 'without Tenant ID');
+
+      // then
+      expect(deploymentsPage.deploymentList().count()).to.eventually.eql(1);
+      expect(deploymentsPage.deploymentTenantId(0)).to.eventually.eql('null');
+    });
+  	
+  });
 
 });

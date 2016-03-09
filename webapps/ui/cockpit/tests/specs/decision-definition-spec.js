@@ -115,5 +115,58 @@ describe('Cockpit Decision Definition Spec', function() {
     });
 
   });
+  
+  describe('multi tenancy', function() {
+    
+  	before(function() { 
+      return testHelper(setupFile.multiTenancySetup, function() {
+
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+      });
+    });
+  	
+		describe('decision definition with tenant id', function() {
+		
+		    before(function() { 
+		    	// second decision definition is deployed for tenant with id 'tenant1'
+		    	dashboardPage.deployedDecisionsList.selectDecision(1);
+		    });
+		
+		    it('should display definition tenant id', function() {
+		        
+		    	expect(definitionPage.information.tenantId()).to.eventually.contain('tenant1');
+		    });
+		    
+		    it('should display definition version for tenant only', function() {
+
+		    	expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
+		      expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
+		    });
+		
+		  });
+		
+		describe('decision definition without tenant id', function() {
+		
+		  before(function() { 
+		  	dashboardPage.navigateToWebapp('Cockpit');
+	      // first decision definition is deployed without tenant id
+		  	dashboardPage.deployedDecisionsList.selectDecision(0);
+		  });
+		
+		  it('should not display definition tenant id', function() {
+		      
+		  	expect(definitionPage.information.tenantId()).to.eventually.contain('null');
+		  });
+		  
+		  it('should display definition version for non-tenant only', function() {
+		    
+		  	expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
+		    expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
+		  });
+		
+		});
+		
+  });
 
 });

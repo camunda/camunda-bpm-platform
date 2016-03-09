@@ -148,5 +148,88 @@ describe('Cockpit Process Definition Spec', function() {
     });
 
   });
+  
+  describe('multi tenancy', function() {
+  
+  	before(function() { 
+      return testHelper(setupFile.multiTenancySetup, function() {
+
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+      });
+    });
+  	
+		describe('process definition with tenant id', function() {
+		
+		    before(function() { 
+		    	// first process definition is deployed for tenant with id 'tenant1'
+	        dashboardPage.deployedProcessesList.selectProcess(0);
+		    });
+		
+		    it('should display definition tenant id', function() {
+		        // when
+		        definitionPage.sidebarTabClick('Information');
+		
+		        // then
+		        expect(definitionPage.information.tenantId()).to.eventually.contain('tenant1');
+		      });
+		    
+		    it('should display definition version for tenant only', function() {
+		      // when
+		      definitionPage.sidebarTabClick('Information');
+		
+		      // then
+		      expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
+		      expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
+		    });
+		    
+		    it('should display running instances for tenant only', function() {
+		      // when
+		      definitionPage.sidebarTabClick('Information');
+		
+		      // then
+		      expect(definitionPage.information.definitionInstancesCurrent()).to.eventually.contain('1');
+		      expect(definitionPage.information.definitionInstancesAll()).to.eventually.contain('1');
+		    });
+		
+		  });
+		
+		describe('process definition without tenant id', function() {
+		
+		  before(function() { 
+		  	dashboardPage.navigateToWebapp('Cockpit');
+	      // second process definition is deployed without tenant id
+	      dashboardPage.deployedProcessesList.selectProcess(1);
+		  });
+		
+		  it('should not display definition tenant id', function() {
+		      // when
+		      definitionPage.sidebarTabClick('Information');
+		
+		      // then
+		      expect(definitionPage.information.tenantId()).to.eventually.contain('null');
+		    });
+		  
+		  it('should display definition version for non-tenant only', function() {
+		    // when
+		    definitionPage.sidebarTabClick('Information');
+		
+		    // then
+		    expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
+		    expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
+		  });
+		  
+		  it('should display running instances for non-tenant only', function() {
+		    // when
+		    definitionPage.sidebarTabClick('Information');
+		
+		    // then
+		    expect(definitionPage.information.definitionInstancesCurrent()).to.eventually.contain('1');
+		    expect(definitionPage.information.definitionInstancesAll()).to.eventually.contain('1');
+		  });
+		
+		});
+		
+  });
 
 });

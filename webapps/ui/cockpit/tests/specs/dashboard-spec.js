@@ -144,5 +144,41 @@ describe('Cockpit Dashboard Spec', function() {
     });
 
   });
+  
+  describe('multi tenancy', function() {
+    
+  	before(function() { 
+      return testHelper(setupFile.multiTenancySetup, function() {
+
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+      });
+    });
+  	
+  	it('should show tenant ids of process definitions', function() {
+	  	
+	  	expect(dashboardPage.deployedProcessesList.processesList().count()).to.eventually.eql(2);
+	  	
+	  	expect(dashboardPage.deployedProcessesList.tenantId(0)).to.eventually.eql('tenant1');
+      expect(dashboardPage.deployedProcessesList.tenantId(1)).to.eventually.eql('');
+	  });
+  	
+	  it('should aggregate process instance count by tenant id', function() {
+	  	
+	  	expect(dashboardPage.deployedProcessesList.processesList().count()).to.eventually.eql(2);
+	  	
+	  	expect(dashboardPage.deployedProcessesList.runningInstances(0)).to.eventually.eql('1');
+      expect(dashboardPage.deployedProcessesList.runningInstances(1)).to.eventually.eql('1');
+	  });
+	  
+	  it('should show tenant ids of decision definitions', function() {
+	  	
+	  	expect(dashboardPage.deployedDecisionsList.decisionsList().count()).to.eventually.eql(2);
+	  	
+	  	expect(dashboardPage.deployedDecisionsList.tenantId(0)).to.eventually.eql('');
+	  	expect(dashboardPage.deployedDecisionsList.tenantId(1)).to.eventually.eql('tenant1');
+    });
+		  
+  });
 
 });

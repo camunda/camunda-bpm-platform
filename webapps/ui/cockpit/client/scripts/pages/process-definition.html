@@ -100,6 +100,12 @@
                   </span>
                 </dd>
 
+                <dt>Tenant ID:</dt>
+                <dd class="tenant-id"
+                    ng-if="processDefinition.tenantId">{{ processDefinition.tenantId }}</dd>
+                <dd class="tenant-id"
+                    ng-if="!processDefinition.tenantId"><span class="null-value">null</span></dd>
+
                 <dt>Deployment ID:</dt>
                 <dd class="deployment-id">
                   <a ng-href="{{ getDeploymentUrl() }}">{{ processDefinition.deploymentId }}</a>

@@ -349,10 +349,6 @@
           <version>${project.version}</version>
         </dependency>
         <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-jdk14</artifactId>
-        </dependency>
-        <dependency>
           <groupId>com.h2database</groupId>
           <artifactId>h2</artifactId>
         </dependency>
@@ -372,6 +368,12 @@
           <artifactId>tomcat-juli</artifactId>
           <version>7.0.33</version>
         </dependency>
+        
+        <dependency>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+        </dependency>
+        
       </dependencies>
       <build>
         <plugins>
