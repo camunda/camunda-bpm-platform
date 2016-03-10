@@ -80,7 +80,7 @@ If data is missing, provide it.]]></documentation>
       <conditionExpression xsi:type="tFormalExpression">${clarified}</conditionExpression>
     </sequenceFlow>
     <dataStoreReference id="DataStoreReference_1" name="Financial Accounting System" dataStoreRef="FinancialAccountingSystem" />
-    <businessRuleTask id="assignApprover" name="Assign Approver Group" camunda:resultVariable="approverGroups" camunda:decisionRef="invoice-assign-approver" camunda:mapDecisionResult="collectEntries">
+    <businessRuleTask id="assignApprover" name="Assign Approver Group" camunda:resultVariable="approverGroups" camunda:decisionRef="invoice-assign-approver" camunda:decisionRefBinding="deployment" camunda:mapDecisionResult="collectEntries">
       <incoming>SequenceFlow_1</incoming>
       <outgoing>sequenceFlow_178</outgoing>
     </businessRuleTask>
