@@ -368,7 +368,7 @@
   <!-- BYTE ARRAY INSERT -->
 
   <insert id="insertByteArray" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">
-    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, NAME_, BYTES_, DEPLOYMENT_ID_, REV_)
+    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, NAME_, BYTES_, DEPLOYMENT_ID_, TENANT_ID_, REV_)
     values (
       #{id, jdbcType=VARCHAR},
       #{name, jdbcType=VARCHAR}, 
@@ -447,12 +447,13 @@
   </update>
 
     <insert id="insertByteArray_postgres" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">
-    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, NAME_, BYTES_, DEPLOYMENT_ID_, REV_)
+    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, NAME_, BYTES_, DEPLOYMENT_ID_, TENANT_ID_, REV_)
     values (
       #{id, jdbcType=VARCHAR},
       #{name, jdbcType=VARCHAR},
       #{bytes, jdbcType=BINARY},
       #{deploymentId, jdbcType=VARCHAR},
+      #{tenantId, jdbcType=VARCHAR},
       1
     )
   </insert>
