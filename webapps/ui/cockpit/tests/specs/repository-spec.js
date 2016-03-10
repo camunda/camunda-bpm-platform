@@ -230,7 +230,7 @@ describe('Repository Spec', function() {
         // then
         expect(deploymentsPage.deploymentList().count()).to.eventually.eql(1);
         expect(deploymentsPage.deploymentName(0)).to.eventually.eql('second-deployment');
-        expect(deploymentsPage.deploymentSource(0)).to.eventually.eql('<undefined>');
+        expect(deploymentsPage.deploymentSource(0)).to.eventually.eql('null');
       });
 
     });
@@ -566,10 +566,10 @@ describe('Repository Spec', function() {
     });
 
   });
-  
+
   describe('multi tenancy', function() {
-    
-  	before(function() { 
+
+  	before(function() {
       return testHelper(setupFile.multiTenancySetup, function() {
 
       	repositoryPage.navigateToWebapp('Cockpit');
@@ -577,7 +577,7 @@ describe('Repository Spec', function() {
         repositoryPage.navigateTo();
       });
     });
-  	
+
   	it('should search by invalid tenant id', function() {
 
       // when
@@ -606,7 +606,7 @@ describe('Repository Spec', function() {
       expect(deploymentsPage.deploymentList().count()).to.eventually.eql(1);
       expect(deploymentsPage.deploymentTenantId(0)).to.eventually.eql('null');
     });
-  	
+
   });
 
 });
