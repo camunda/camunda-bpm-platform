@@ -121,6 +121,22 @@
 
   <sql id="selectHistoricDecisionInstancesByQueryCriteriaSql">
     from ${prefix}ACT_HI_DECINST RES
+
+    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+      INNER JOIN (
+        SELECT
+            DISTINCT SELF.DEC_DEF_KEY_ AS KEY_
+        FROM
+            ${prefix}ACT_HI_DECINST SELF
+        WHERE
+            1 = (
+                <bind name="permCheck" value="permissionChecks.atomicChecks[0]" />
+                <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck" />
+            )
+      ) AUTH
+      ON AUTH.KEY_ = RES.DEC_DEF_KEY_
+    </if>
+
     <where>
       <if test="decisionInstanceId != null">
         RES.ID_ = #{decisionInstanceId}
@@ -180,8 +196,6 @@
         and RES.EVAL_TIME_ &gt;= #{evaluatedAfter}
       </if>
 
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
-      
     </where>
   </sql>
 

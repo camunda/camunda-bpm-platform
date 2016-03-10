@@ -120,6 +120,22 @@
 
   <sql id="selectUserOperationLogEntriesByQueryCriteriaSql">
     from ${prefix}ACT_HI_OP_LOG RES
+
+    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+      LEFT JOIN (
+        SELECT
+            DISTINCT SELF.PROC_DEF_KEY_ AS KEY_
+        FROM
+            ${prefix}ACT_HI_OP_LOG SELF
+        WHERE
+            1 = (
+                <bind name="permCheck" value="permissionChecks.atomicChecks[0]" />
+                <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck" />
+            )
+      ) AUTH
+      ON AUTH.KEY_ = RES.PROC_DEF_KEY_
+    </if>
+
     <where>
       <if test="deploymentId != null">
         RES.DEPLOYMENT_ID_ = #{deploymentId}
@@ -177,17 +193,8 @@
       </if>
 
       <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
-        AND
-          ( CASE
-
-            WHEN
-              RES.PROC_DEF_KEY_ is not null
-            THEN
-              (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
-
-            ELSE
-              1
-          END ) = 1
+        <!-- may not exist in the context of a process definition -->
+        and ((RES.PROC_DEF_KEY_ is not null and AUTH.KEY_ is not null) or RES.PROC_DEF_KEY_ is null)
       </if>
 
     </where>

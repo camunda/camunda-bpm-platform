@@ -137,6 +137,22 @@
 
   <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
     from ${prefix}ACT_HI_PROCINST RES
+
+    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+      INNER JOIN (
+        SELECT
+            DISTINCT SELF.PROC_DEF_KEY_ AS KEY_
+        FROM
+            ${prefix}ACT_HI_PROCINST SELF
+        WHERE
+            1 = (
+                <bind name="permCheck" value="permissionChecks.atomicChecks[0]" />
+                <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck" />
+            )
+      ) AUTH
+      ON AUTH.KEY_ = RES.PROC_DEF_KEY_
+    </if>
+
     <if test="processKeyNotIn != null || processDefinitionKey != null || processDefinitionName != null || processDefinitionNameLike != null">
       inner join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
     </if>
@@ -255,8 +271,6 @@
           #{tenantId}
         </foreach>
       </if>
-
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
 
     </where>
   </sql>

@@ -107,6 +107,22 @@
 
   <sql id="selectHistoricIncidentByQueryCriteriaSql">
     from ${prefix}ACT_HI_INCIDENT RES
+
+    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+      LEFT JOIN (
+        SELECT
+            DISTINCT SELF.PROC_DEF_KEY_ AS KEY_
+        FROM
+            ${prefix}ACT_HI_INCIDENT SELF
+        WHERE
+            1 = (
+                <bind name="permCheck" value="permissionChecks.atomicChecks[0]" />
+                <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck" />
+            )
+      ) AUTH
+      ON AUTH.KEY_ = RES.PROC_DEF_KEY_
+    </if>
+
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
@@ -150,18 +166,8 @@
       </if>
 
       <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
-        AND
-          ( CASE
-
-            WHEN
-              <!-- incident exists in context of a process instance -->
-              RES.PROC_DEF_ID_ is not null
-            THEN
-              (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
-
-            ELSE
-              1
-          END ) = 1
+        <!-- incident exists in context of a process definition -->
+        and ((RES.PROC_DEF_ID_ is not null and AUTH.KEY_ is not null) or RES.PROC_DEF_ID_ is null)
       </if>
 
     </where>

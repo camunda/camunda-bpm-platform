@@ -174,6 +174,22 @@
 
   <sql id="selectHistoricJobLogByQueryCriteriaSql">
     from ${prefix}ACT_HI_JOB_LOG RES
+
+    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+      LEFT JOIN (
+        SELECT
+            DISTINCT SELF.PROCESS_DEF_KEY_ AS KEY_
+        FROM
+            ${prefix}ACT_HI_JOB_LOG SELF
+        WHERE
+            1 = (
+                <bind name="permCheck" value="permissionChecks.atomicChecks[0]" />
+                <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck" />
+            )
+      ) AUTH
+      ON AUTH.KEY_ = RES.PROCESS_DEF_KEY_
+    </if>
+
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
@@ -235,20 +251,12 @@
           #{tenantId}
         </foreach>
       </if>
+
       <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
-        AND
-          ( CASE
-
-            WHEN
-              RES.PROCESS_DEF_KEY_ is not null
-            THEN
-              (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
-
-            ELSE
-              <!-- "standalone" job (e.g. job to activate/suspend a process definition etc.) -->
-              1
-          END ) = 1
+        <!-- incident exists in context of a process definition -->
+        and ((RES.PROCESS_DEF_KEY_ is not null and AUTH.KEY_ is not null) or RES.PROCESS_DEF_KEY_ is null)
       </if>
+
     </where>
   </sql>
 
