@@ -46,6 +46,7 @@ public class CommentEntity implements Comment, Event, DbEntity, Serializable {
   protected String action;
   protected String message;
   protected String fullMessage;
+  protected String tenantId;
   
   public Object getPersistentState() {
     return CommentEntity.class;
@@ -169,6 +170,14 @@ public class CommentEntity implements Comment, Event, DbEntity, Serializable {
     this.action = action;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -181,6 +190,7 @@ public class CommentEntity implements Comment, Event, DbEntity, Serializable {
            + ", action=" + action
            + ", message=" + message
            + ", fullMessage=" + fullMessage
+           + ", tenantId=" + tenantId
            + "]";
   }
 }

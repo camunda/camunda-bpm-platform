@@ -41,7 +41,8 @@
         ENTITY_TYPE_,
         PROPERTY_,
         ORG_VALUE_,
-        NEW_VALUE_
+        NEW_VALUE_,
+        TENANT_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{deploymentId, jdbcType=VARCHAR},
@@ -62,7 +63,8 @@
         #{entityType ,jdbcType=VARCHAR},
         #{property, jdbcType=VARCHAR},
         #{orgValue, jdbcType=VARCHAR},
-        #{newValue ,jdbcType=VARCHAR}
+        #{newValue ,jdbcType=VARCHAR},
+        #{tenantId ,jdbcType=VARCHAR}
       )
   </insert>
 
@@ -95,6 +97,7 @@
     <result property="property" column="PROPERTY_" jdbcType="VARCHAR" />
     <result property="orgValue" column="ORG_VALUE_" jdbcType="VARCHAR" />
     <result property="newValue" column="NEW_VALUE_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- OPERATION LOG ENTRY SELECT -->

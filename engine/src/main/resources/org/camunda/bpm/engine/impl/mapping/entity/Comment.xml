@@ -31,7 +31,8 @@
       #{processInstanceId ,jdbcType=VARCHAR},
       #{action ,jdbcType=VARCHAR},
       #{message ,jdbcType=VARCHAR},
-      #{fullMessageBytes ,jdbcType=BLOB}
+      #{fullMessageBytes ,jdbcType=BLOB},
+      #{tenantId ,jdbcType=VARCHAR}
     )
   </insert>
 
@@ -46,7 +47,8 @@
       #{processInstanceId ,jdbcType=VARCHAR},
       #{action ,jdbcType=VARCHAR},
       #{message ,jdbcType=VARCHAR},
-      #{fullMessageBytes ,jdbcType=BINARY}
+      #{fullMessageBytes ,jdbcType=BINARY},
+      #{tenantId ,jdbcType=VARCHAR}
     )
   </insert>
 
@@ -68,6 +70,7 @@
     <result property="action" column="ACTION_" jdbcType="VARCHAR" />
     <result property="message" column="MESSAGE_" jdbcType="VARCHAR" />
     <result property="fullMessageBytes" column="FULL_MSG_" jdbcType="BLOB" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <resultMap id="commentResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
@@ -80,6 +83,7 @@
     <result property="action" column="ACTION_" jdbcType="VARCHAR" />
     <result property="message" column="MESSAGE_" jdbcType="VARCHAR" />
     <result property="fullMessageBytes" column="FULL_MSG_" jdbcType="BINARY" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
   
   <!-- COMMENT SELECT -->

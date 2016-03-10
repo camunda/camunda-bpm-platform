@@ -374,6 +374,7 @@
       #{name, jdbcType=VARCHAR}, 
       #{bytes, jdbcType=BLOB}, 
       #{deploymentId, jdbcType=VARCHAR},
+      #{tenantId, jdbcType=VARCHAR},
       1 
     )  
   </insert>
@@ -414,6 +415,7 @@
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR"/>
     <result property="bytes" column="BYTES_" jdbcType="BLOB"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!-- BYTE ARRAY SELECT -->
@@ -428,6 +430,7 @@
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR"/>
     <result property="bytes" column="BYTES_" jdbcType="BINARY"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
 
   <select id="selectByteArray_postgres" parameterType="string" resultMap="byteArrayResultMap_postgres">

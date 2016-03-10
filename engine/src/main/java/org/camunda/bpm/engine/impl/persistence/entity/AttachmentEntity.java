@@ -39,6 +39,7 @@ public class AttachmentEntity implements Attachment, DbEntity, HasDbRevision, Se
   protected String url;
   protected String contentId;
   protected ByteArrayEntity content;
+  protected String tenantId;
 
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
@@ -148,6 +149,14 @@ public class AttachmentEntity implements Attachment, DbEntity, HasDbRevision, Se
     this.content = content;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -161,6 +170,7 @@ public class AttachmentEntity implements Attachment, DbEntity, HasDbRevision, Se
            + ", url=" + url
            + ", contentId=" + contentId
            + ", content=" + content
+           + ", tenantId=" + tenantId
            + "]";
   }
 }

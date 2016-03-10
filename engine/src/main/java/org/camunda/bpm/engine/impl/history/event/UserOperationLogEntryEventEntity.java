@@ -35,6 +35,7 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
   protected String newValue;
   protected String entityType;
   protected String deploymentId;
+  protected String tenantId;
 
   public String getOperationId() {
     return operationId;
@@ -132,6 +133,14 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
     this.deploymentId = deploymentId;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -152,6 +161,7 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
         + ", executionId=" + executionId
         + ", processDefinitionId=" + processDefinitionId
         + ", processInstanceId=" + processInstanceId
+        + ", tenantId=" + tenantId
         + ", entityType=" + entityType
         + "]";
   }
