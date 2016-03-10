@@ -40,6 +40,7 @@ public class HistoricDecisionInstanceDto {
   protected String caseInstanceId;
   protected String activityId;
   protected String activityInstanceId;
+  protected String userId;
   protected List<HistoricDecisionInputInstanceDto> inputs;
   protected List<HistoricDecisionOutputInstanceDto> outputs;
   protected Double collectResultValue;
@@ -95,6 +96,10 @@ public class HistoricDecisionInstanceDto {
   public String getActivityInstanceId() {
     return activityInstanceId;
   }
+  
+  public String getUserId() {
+    return userId;
+  }
 
   @JsonInclude(Include.NON_NULL)
   public List<HistoricDecisionInputInstanceDto> getInputs() {
@@ -126,6 +131,7 @@ public class HistoricDecisionInstanceDto {
     dto.caseInstanceId = historicDecisionInstance.getCaseInstanceId();
     dto.activityId = historicDecisionInstance.getActivityId();
     dto.activityInstanceId = historicDecisionInstance.getActivityInstanceId();
+    dto.userId = historicDecisionInstance.getUserId();
     dto.collectResultValue = historicDecisionInstance.getCollectResultValue();
 
     try {
