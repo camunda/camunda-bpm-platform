@@ -179,6 +179,10 @@
       <if test="evaluatedAfter != null">
         and RES.EVAL_TIME_ &gt;= #{evaluatedAfter}
       </if>
+      
+      <if test="userId != null">
+        and RES.USER_ID_ = #{userId} 
+      </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
       
