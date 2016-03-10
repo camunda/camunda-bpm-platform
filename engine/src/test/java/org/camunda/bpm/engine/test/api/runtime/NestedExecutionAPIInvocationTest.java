@@ -32,6 +32,7 @@ import org.junit.Test;
  * @author Thorben Lindhauer
  *
  */
+@Ignore("CAM-5618")
 public class NestedExecutionAPIInvocationTest {
 
   @Rule
