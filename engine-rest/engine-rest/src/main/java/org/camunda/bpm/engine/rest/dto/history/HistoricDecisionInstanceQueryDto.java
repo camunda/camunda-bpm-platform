@@ -55,6 +55,7 @@ public class HistoricDecisionInstanceQueryDto extends AbstractQueryDto<HistoricD
   protected String[] activityInstanceIdIn;
   protected Date evaluatedBefore;
   protected Date evaluatedAfter;
+  protected String userId;
   protected Boolean includeInputs;
   protected Boolean includeOutputs;
   protected Boolean disableBinaryFetching;
@@ -141,6 +142,11 @@ public class HistoricDecisionInstanceQueryDto extends AbstractQueryDto<HistoricD
   public void setEvaluatedAfter(Date evaluatedAfter) {
     this.evaluatedAfter = evaluatedAfter;
   }
+  
+  @CamundaQueryParam(value = "userId")
+  public void setUserId(String userId) {
+    this.userId = userId;
+  }
 
   @CamundaQueryParam(value = "includeInputs", converter = BooleanConverter.class)
   public void setIncludeInputs(Boolean includeInputs) {
@@ -215,6 +221,9 @@ public class HistoricDecisionInstanceQueryDto extends AbstractQueryDto<HistoricD
     }
     if (evaluatedAfter != null) {
       query.evaluatedAfter(evaluatedAfter);
+    }
+    if (userId != null) {
+      query.userId(userId);
     }
     if (includeInputs != null && includeInputs) {
       query.includeInputs();
