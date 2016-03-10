@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
@@ -56,8 +57,8 @@ public class AsyncContinuationJobHandler implements JobHandler {
   }
 
   @Override
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-
+  public void execute(String configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
+    ExecutionEntity execution = (ExecutionEntity) context;
     LegacyBehavior.repairMultiInstanceAsyncJob(execution);
 
     String operationName = null;

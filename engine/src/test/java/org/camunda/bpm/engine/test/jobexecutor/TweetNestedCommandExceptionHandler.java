@@ -13,10 +13,10 @@
 package org.camunda.bpm.engine.test.jobexecutor;
 
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 
 /**
@@ -32,7 +32,7 @@ public class TweetNestedCommandExceptionHandler implements JobHandler {
     return TYPE;
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(String configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
     Context.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Void>() {
 
       public Void execute(CommandContext commandContext) {

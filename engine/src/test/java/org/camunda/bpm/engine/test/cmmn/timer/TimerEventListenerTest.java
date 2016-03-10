@@ -10,19 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.jobexecutor;
+package org.camunda.bpm.engine.test.cmmn.timer;
 
-import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
+import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
+import org.camunda.bpm.engine.test.Deployment;
 
 /**
- * @author Tom Baeyens
+ * @author smirnov
+ *
  */
-public interface JobHandler {
+public class TimerEventListenerTest extends CmmnProcessEngineTestCase {
 
-  String getType();
+  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/timer/TimerEventListenerTest.testSimple.cmmn"})
+  public void testSimple() {
+    createCaseInstanceByKey("case");
 
-  void execute(String configuration, CoreExecution context, CommandContext commandContext, String tenantId);
+    assertEquals(1, managementService.createJobQuery().count());
+  }
 
 }

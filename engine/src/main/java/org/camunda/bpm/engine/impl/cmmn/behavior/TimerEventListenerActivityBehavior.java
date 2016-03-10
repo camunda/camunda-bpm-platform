@@ -12,7 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
+import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventListenerJobDeclaration;
 
 /**
  *  @author Roman Smirnov
@@ -22,6 +25,8 @@ public class TimerEventListenerActivityBehavior extends EventListenerActivityBeh
 
   @Override
   public void created(CmmnActivityExecution execution) {
+    TimerEventListenerJobDeclaration declaration = (TimerEventListenerJobDeclaration) execution.getActivity().getProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION);
+    declaration.createTimerInstance((CaseExecutionEntity) execution);
     // TODO: implement this:
     // (2) in case of TimerEventListener we have to check
     // whether the timer must be triggered, when a transition

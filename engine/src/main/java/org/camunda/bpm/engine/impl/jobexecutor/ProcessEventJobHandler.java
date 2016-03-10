@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,32 +13,32 @@
 
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 
 /**
  * @author Daniel Meyer
  */
 public class ProcessEventJobHandler implements JobHandler {
-  
-  public final static String TYPE = "event"; 
+
+  public final static String TYPE = "event";
 
   public String getType() {
     return TYPE;
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    // lookup subscription:    
+  public void execute(String configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
+    // lookup subscription:
     EventSubscriptionEntity eventSubscription = commandContext.getEventSubscriptionManager()
       .findEventSubscriptionById(configuration);
-    
-    // if event subscription is null, ignore 
-    if(eventSubscription != null) {      
-      eventSubscription.eventReceived(null, false);      
+
+    // if event subscription is null, ignore
+    if(eventSubscription != null) {
+      eventSubscription.eventReceived(null, false);
     }
-    
+
   }
 
 }

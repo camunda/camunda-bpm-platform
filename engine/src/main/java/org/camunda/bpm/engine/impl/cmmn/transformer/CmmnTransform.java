@@ -52,6 +52,7 @@ import org.camunda.bpm.model.cmmn.instance.ProcessTask;
 import org.camunda.bpm.model.cmmn.instance.Sentry;
 import org.camunda.bpm.model.cmmn.instance.Stage;
 import org.camunda.bpm.model.cmmn.instance.Task;
+import org.camunda.bpm.model.cmmn.instance.TimerEventListener;
 
 /**
  * @author Roman Smirnov
@@ -271,6 +272,8 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
       planItemTransformer = getPlanItemHandler(Stage.class);
     } else if (definition instanceof Milestone) {
       planItemTransformer = getPlanItemHandler(Milestone.class);
+    } else if (definition instanceof TimerEventListener) {
+      planItemTransformer = getPlanItemHandler(TimerEventListener.class);
     } else if (definition instanceof EventListener) {
       planItemTransformer = getPlanItemHandler(EventListener.class);
     }

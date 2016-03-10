@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -34,8 +35,9 @@ public class TimerStartEventSubprocessJobHandler extends TimerEventJobHandler {
     return TYPE;
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(String configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
     String activityId = getKey(configuration);
+    ExecutionEntity execution = (ExecutionEntity) context;
     ActivityImpl eventSubprocessActivity = execution.getProcessDefinition()
       .findActivity(activityId);
 

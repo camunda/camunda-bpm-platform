@@ -25,7 +25,10 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
@@ -78,6 +81,12 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   protected String processDefinitionId = null;
   protected String processDefinitionKey = null;
 
+  protected String caseExecutionId = null;
+  protected String caseInstanceId = null;
+
+  protected String caseDefinitionId = null;
+  protected String caseDefinitionKey = null;
+
   protected boolean isExclusive = DEFAULT_EXCLUSIVE;
 
   protected int retries = DEFAULT_RETRIES;
@@ -106,14 +115,20 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   protected String activityId;
   protected JobDefinition jobDefinition;
   protected ExecutionEntity execution;
+  protected CaseExecutionEntity caseExecution;
 
   // sequence counter //////////////////////////
   protected long sequenceCounter = 1;
 
   public void execute(CommandContext commandContext) {
+    CoreExecution context = null;
     if (executionId != null) {
-      ExecutionEntity execution = getExecution();
+      context = getExecution();
       ensureNotNull("Cannot find execution with id '" + executionId + "' referenced from job '" + this + "'", "execution", execution);
+    }
+    else if (caseExecutionId != null) {
+      context = getCaseExecution();
+      ensureNotNull("Cannot find case execution with id '" + caseExecutionId + "' referenced from job '" + id + "'", caseExecution);
     }
 
     // initialize activity id
@@ -125,7 +140,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     preExecute(commandContext);
     JobHandler jobHandler = getJobHandler();
     ensureNotNull("Cannot find job handler '" + jobHandlerType + "' from job '" + this + "'", "jobHandler", jobHandler);
-    jobHandler.execute(jobHandlerConfiguration, execution, commandContext, tenantId);
+    jobHandler.execute(jobHandlerConfiguration, context, commandContext, tenantId);
     postExecute(commandContext);
   }
 
@@ -149,6 +164,15 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
       ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
       this.deploymentId = processDefinition.getDeploymentId();
+    }
+    else {
+      CaseExecutionEntity caseExecution = getCaseExecution();
+      if (caseExecution != null) {
+        caseExecution.addJob(this);
+
+        CaseDefinitionEntity caseDefinition = (CaseDefinitionEntity) caseExecution.getCaseDefinition();
+        this.deploymentId = caseDefinition.getDeploymentId();
+      }
     }
 
     commandContext
@@ -175,6 +199,11 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     ExecutionEntity execution = getExecution();
     if (execution != null) {
       execution.removeJob(this);
+    }
+
+    CaseExecutionEntity caseExecution = getCaseExecution();
+    if (caseExecution != null) {
+      caseExecution.removeJob(this);
     }
 
     removeFailedJobIncident(incidentResolved);
@@ -218,6 +247,20 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     }
   }
 
+
+  public void setCaseExecution(CaseExecutionEntity caseExecution) {
+    if (caseExecution != null) {
+      caseExecutionId = caseExecution.getId();
+      caseInstanceId = caseExecution.getCaseInstanceId();
+      caseExecution.addJob(this);
+    }
+    else {
+      this.caseExecution.removeJob(this);
+      caseInstanceId = null;
+      caseExecutionId = null;
+    }
+  }
+
   // sequence counter /////////////////////////////////////////////////////////
 
   public long getSequenceCounter() {
@@ -253,6 +296,20 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
           .getCommandContext()
           .getExecutionManager()
           .findExecutionById(executionId);
+    }
+  }
+
+  protected CaseExecutionEntity getCaseExecution() {
+    ensureCaseExecutionInitialized();
+    return caseExecution;
+  }
+
+  protected void ensureCaseExecutionInitialized() {
+    if (caseExecution == null && caseExecutionId != null) {
+      caseExecution = Context
+          .getCommandContext()
+          .getCaseExecutionManager()
+          .findCaseExecutionById(caseExecutionId);
     }
   }
 
@@ -588,6 +645,38 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.tenantId = tenantId;
   }
 
+  public String getCasExecutionId() {
+    return caseExecutionId;
+  }
+
+  public void setCasExecutionId(String caseExecutionId) {
+    this.caseExecutionId = caseExecutionId;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
+  public void setCaseInstanceId(String caseInstanceId) {
+    this.caseInstanceId = caseInstanceId;
+  }
+
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
+  }
+
+  public void setCaseDefinitionId(String caseDefinitionId) {
+    this.caseDefinitionId = caseDefinitionId;
+  }
+
+  public String getCaseDefinitionKey() {
+    return caseDefinitionKey;
+  }
+
+  public void setCaseDefinitionKey(String caseDefinitionKey) {
+    this.caseDefinitionKey = caseDefinitionKey;
+  }
+
   protected void ensureActivityIdInitialized() {
     if (activityId == null) {
       JobDefinition jobDefinition = getJobDefinition();
@@ -598,6 +687,12 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
         ExecutionEntity execution = getExecution();
         if (execution != null) {
           activityId = execution.getActivityId();
+        }
+        else {
+          CaseExecutionEntity caseExecution = getCaseExecution();
+          if (caseExecution != null) {
+            activityId = caseExecution.getActivityId();
+          }
         }
       }
     }

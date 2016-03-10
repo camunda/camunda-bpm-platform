@@ -16,9 +16,9 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 
@@ -32,7 +32,7 @@ public class TimerStartEventJobHandler extends TimerEventJobHandler {
     return TYPE;
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(String configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
     DeploymentCache deploymentCache = Context
             .getProcessEngineConfiguration()
             .getDeploymentCache();

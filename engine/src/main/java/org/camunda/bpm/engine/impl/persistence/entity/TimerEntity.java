@@ -22,8 +22,8 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.RepeatingFailedJobListener;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerJobDeclaration;
 
 
 /**
@@ -40,7 +40,7 @@ public class TimerEntity extends JobEntity {
   public TimerEntity() {
   }
 
-  public TimerEntity(TimerDeclarationImpl timerDeclaration) {
+  public TimerEntity(TimerJobDeclaration<?> timerDeclaration) {
     repeat = timerDeclaration.getRepeat();
   }
 

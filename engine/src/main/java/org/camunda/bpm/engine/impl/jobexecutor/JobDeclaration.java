@@ -128,6 +128,10 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
 
   protected abstract T newJobInstance(S context);
 
+  protected boolean isJobPrioritySupported() {
+    return true;
+  }
+
   // Getter / Setters //////////////////////////////////////////
 
   public String getJobDefinitionId() {

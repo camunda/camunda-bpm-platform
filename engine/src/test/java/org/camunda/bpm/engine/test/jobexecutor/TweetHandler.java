@@ -15,9 +15,9 @@ package org.camunda.bpm.engine.test.jobexecutor;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.junit.Assert;
 
 public class TweetHandler implements JobHandler {
@@ -28,7 +28,7 @@ public class TweetHandler implements JobHandler {
     return "tweet";
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(String configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
     messages.add(configuration);
     Assert.assertNotNull(commandContext);
   }

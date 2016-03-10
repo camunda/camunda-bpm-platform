@@ -15,9 +15,9 @@ package org.camunda.bpm.engine.impl.batch;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
  * Job handler for batch monitor jobs. The batch monitor job
@@ -31,7 +31,7 @@ public class BatchMonitorJobHandler implements JobHandler {
     return TYPE;
   }
 
-  public void execute(String batchId, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(String batchId, CoreExecution execution, CommandContext commandContext, String tenantId) {
     BatchEntity batch = commandContext.getBatchManager().findBatchById(batchId);
     ensureNotNull("Batch with id '" + batchId + "' cannot be found", "batch", batch);
 

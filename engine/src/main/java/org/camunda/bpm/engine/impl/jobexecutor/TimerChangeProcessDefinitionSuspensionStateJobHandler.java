@@ -14,8 +14,8 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmd.AbstractSetProcessDefinitionStateCmd;
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
 
@@ -68,7 +68,7 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
     return json.toString();
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(String configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
     AbstractSetProcessDefinitionStateCmd cmd = getCommand(configuration);
     cmd.disableLogUserOperation();
     cmd.execute(commandContext);
