@@ -21,7 +21,7 @@
   <!-- COMMENT INSERT -->
   
   <insert id="insertComment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
-    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_)
+    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_, TENANT_ID_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{type ,jdbcType=VARCHAR},
@@ -37,7 +37,7 @@
   </insert>
 
   <insert id="insertComment_postgres" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
-    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_)
+    insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_, TENANT_ID_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{type ,jdbcType=VARCHAR},

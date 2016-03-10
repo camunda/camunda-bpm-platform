@@ -21,7 +21,7 @@
   <!-- ATTACHMENT INSERT -->
 
   <insert id="insertAttachment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity">
-    insert into ${prefix}ACT_HI_ATTACHMENT (ID_, NAME_, DESCRIPTION_, TYPE_, TASK_ID_, PROC_INST_ID_, URL_, CONTENT_ID_, REV_)
+    insert into ${prefix}ACT_HI_ATTACHMENT (ID_, NAME_, DESCRIPTION_, TYPE_, TASK_ID_, PROC_INST_ID_, URL_, CONTENT_ID_, TENANT_ID_, REV_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{name ,jdbcType=VARCHAR},
