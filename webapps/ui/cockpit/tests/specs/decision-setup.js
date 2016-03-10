@@ -92,8 +92,8 @@ var multiTenancyDeployment = combine(
       tenantId: 'tenant1', 
       files: [{
         name: 'invoice.bpmn',
-        filename: 'invoice.bpmn',
-        content: readResource('invoice.bpmn')
+        filename: 'invoice-deployment-binding.bpmn',
+        content: readResource('invoice-deployment-binding.bpmn')
       },
       {
         name: 'assign-approver-groups.dmn',
@@ -105,8 +105,8 @@ var multiTenancyDeployment = combine(
       deploymentName:  'processNoTenant',
       files: [{
         name: 'invoice.bpmn',
-        filename: 'invoice.bpmn',
-        content: readResource('invoice.bpmn')
+        filename: 'invoice-deployment-binding.bpmn',
+        content: readResource('invoice-deployment-binding.bpmn')
       },
       {
         name: 'assign-approver-groups.dmn',
