@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest.history;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -141,6 +143,16 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     executeAndVerifySorting("evaluationTime", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByEvaluationTime();
     inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByEvaluationTime();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByEvaluationTime();
+    inOrder.verify(mockedQuery).desc();
   }
 
   @Test
@@ -234,6 +246,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     List<HistoricDecisionInputInstanceDto> returnedInputs = from(content).getList("[0].inputs");
     List<HistoricDecisionOutputInstanceDto> returnedOutputs = from(content).getList("[0].outputs");
     Double returnedCollectResultValue = from(content).getDouble("[0].collectResultValue");
+    String returnedTenantId = from(content).getString("[0].tenantId");
 
     assertThat(returnedHistoricDecisionInstanceId, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID));
     assertThat(returnedDecisionDefinitionId, is(MockProvider.EXAMPLE_DECISION_DEFINITION_ID));
@@ -251,6 +264,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     assertThat(returnedInputs, is(nullValue()));
     assertThat(returnedOutputs, is(nullValue()));
     assertThat(returnedCollectResultValue, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_COLLECT_RESULT_VALUE));
+    assertThat(returnedTenantId, is(MockProvider.EXAMPLE_TENANT_ID));
   }
 
   @Test
@@ -439,6 +453,37 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     inOrder.verify(mockedQuery).decisionDefinitionId(decisionDefinitionId);
     inOrder.verify(mockedQuery).disableCustomObjectDeserialization();
     inOrder.verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testTenantIdListParameter() {
+    mockedQuery = setUpMockHistoricDecisionInstanceQuery(createMockHistoricDecisionInstancesTwoTenants());
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DECISION_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> historicDecisionInstances = from(content).getList("");
+    assertThat(historicDecisionInstances).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  private List<HistoricDecisionInstance> createMockHistoricDecisionInstancesTwoTenants() {
+    return Arrays.asList(
+        MockProvider.createMockHistoricDecisionInstanceBase(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockHistoricDecisionInstanceBase(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
   }
 
   protected Map<String, String> getCompleteStringQueryParameters() {

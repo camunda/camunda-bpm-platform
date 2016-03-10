@@ -49,6 +49,7 @@ public class HistoricDecisionInstanceEntity extends HistoryEvent implements Hist
   protected Double collectResultValue;
 
   protected String userId;
+  protected String tenantId;
 
   protected List<HistoricDecisionInputInstance> inputs;
   protected List<HistoricDecisionOutputInstance> outputs;
@@ -107,6 +108,14 @@ public class HistoricDecisionInstanceEntity extends HistoryEvent implements Hist
 
   public void setUserId(String userId) {
     this.userId = userId;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 
   @Override

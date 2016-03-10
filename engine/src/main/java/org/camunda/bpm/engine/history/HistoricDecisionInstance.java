@@ -92,4 +92,10 @@ public interface HistoricDecisionInstance {
 
   /** The result of the collect operation if the hit policy 'collect' was used for the decision. */
   Double getCollectResultValue();
+
+  /**
+   * The id of the tenant this historic decision instance belongs to. Can be <code>null</code>
+   * if the historic decision instance belongs to no single tenant.
+   */
+  String getTenantId();
 }

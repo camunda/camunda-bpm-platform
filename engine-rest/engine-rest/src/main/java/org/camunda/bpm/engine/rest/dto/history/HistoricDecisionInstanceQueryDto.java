@@ -26,18 +26,21 @@ import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class HistoricDecisionInstanceQueryDto extends AbstractQueryDto<HistoricDecisionInstanceQuery> {
 
   public static final String SORT_BY_EVALUATION_TIME_VALUE = "evaluationTime";
+  public static final String SORT_BY_TENANT_ID = "tenantId";
 
   public static final List<String> VALID_SORT_BY_VALUES;
 
   static {
     VALID_SORT_BY_VALUES = new ArrayList<String>();
     VALID_SORT_BY_VALUES.add(SORT_BY_EVALUATION_TIME_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   protected String decisionInstanceId;
@@ -59,6 +62,7 @@ public class HistoricDecisionInstanceQueryDto extends AbstractQueryDto<HistoricD
   protected Boolean includeOutputs;
   protected Boolean disableBinaryFetching;
   protected Boolean disableCustomObjectDeserialization;
+  protected List<String> tenantIds;
 
   public HistoricDecisionInstanceQueryDto() {
   }
@@ -162,6 +166,11 @@ public class HistoricDecisionInstanceQueryDto extends AbstractQueryDto<HistoricD
     this.disableCustomObjectDeserialization = disableCustomObjectDeserialization;
   }
 
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
   }
@@ -228,11 +237,16 @@ public class HistoricDecisionInstanceQueryDto extends AbstractQueryDto<HistoricD
     if (disableCustomObjectDeserialization != null && disableCustomObjectDeserialization) {
       query.disableCustomObjectDeserialization();
     }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
   }
 
   protected void applySortBy(HistoricDecisionInstanceQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
     if (sortBy.equals(SORT_BY_EVALUATION_TIME_VALUE)) {
       query.orderByEvaluationTime();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 

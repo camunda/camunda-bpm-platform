@@ -2336,6 +2336,10 @@ public abstract class MockProvider {
   }
 
   public static HistoricDecisionInstance createMockHistoricDecisionInstanceBase() {
+    return createMockHistoricDecisionInstanceBase(EXAMPLE_TENANT_ID);
+  }
+
+  public static HistoricDecisionInstance createMockHistoricDecisionInstanceBase(String tenantId) {
     HistoricDecisionInstance mock = mock(HistoricDecisionInstance.class);
 
     when(mock.getId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_ID);
@@ -2352,6 +2356,7 @@ public abstract class MockProvider {
     when(mock.getActivityInstanceId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID);
     when(mock.getEvaluationTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATION_TIME));
     when(mock.getCollectResultValue()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_COLLECT_RESULT_VALUE);
+    when(mock.getTenantId()).thenReturn(tenantId);
 
     return mock;
   }

@@ -436,6 +436,7 @@
                 <exclude>**/MultiTenancyHistoricDetailVariableUpdateQueryTest.java</exclude>
                 <exclude>**/MultiTenancyHistoricIncidentQueryTest.java</exclude>
                 <exclude>**/MultiTenancyHistoricJobLogQueryTest.java</exclude>
+                <exclude>**/MultiTenancyHistoricDecisionInstanceQueryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -482,6 +483,7 @@
                 <exclude>**/MultiTenancyHistoricDetail*QueryTest.java</exclude>
                 <exclude>**/MultiTenancyHistoricIncidentQueryTest.java</exclude>
                 <exclude>**/MultiTenancyHistoricJobLogQueryTest.java</exclude>
+                <exclude>**/MultiTenancyHistoricDecisionInstanceQueryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>

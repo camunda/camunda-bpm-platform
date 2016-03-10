@@ -8,21 +8,22 @@
       </input>
       <output id="output1" label="result" name="result" typeRef="string" />
       <rule id="row-928575414-1">
-        <inputEntry id="UnaryTests_0yaqbiy">        <text>gold</text>
+        <description></description>
+        <inputEntry id="UnaryTests_0yaqbiy">        <text><![CDATA["gold"]]></text>
 </inputEntry>
-        <outputEntry id="LiteralExpression_00jmzea">        <text>A</text>
+        <outputEntry id="LiteralExpression_00jmzea">        <text><![CDATA["A"]]></text>
 </outputEntry>
       </rule>
       <rule id="row-928575414-2">
-        <inputEntry id="UnaryTests_0v7sw35">        <text>silber</text>
+        <inputEntry id="UnaryTests_0v7sw35">        <text><![CDATA["silber"]]></text>
 </inputEntry>
-        <outputEntry id="LiteralExpression_0p0k6xd">        <text>B</text>
+        <outputEntry id="LiteralExpression_0p0k6xd">        <text><![CDATA["B"]]></text>
 </outputEntry>
       </rule>
       <rule id="row-928575414-3">
-        <inputEntry id="UnaryTests_17w26sl">        <text>bronze</text>
+        <inputEntry id="UnaryTests_17w26sl">        <text><![CDATA["bronze"]]></text>
 </inputEntry>
-        <outputEntry id="LiteralExpression_1yupghb">        <text>C</text>
+        <outputEntry id="LiteralExpression_1yupghb">        <text><![CDATA["C"]]></text>
 </outputEntry>
       </rule>
     </decisionTable>

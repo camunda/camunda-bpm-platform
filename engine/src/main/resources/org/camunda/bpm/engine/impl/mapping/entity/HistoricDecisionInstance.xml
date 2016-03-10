@@ -22,7 +22,8 @@
       ACT_ID_,
       EVAL_TIME_,
       COLLECT_VALUE_,
-      USER_ID_)
+      USER_ID_,
+      TENANT_ID_)
     values (#{id, jdbcType=VARCHAR},
             #{decisionDefinitionId, jdbcType=VARCHAR},
             #{decisionDefinitionKey, jdbcType=VARCHAR},
@@ -37,7 +38,8 @@
             #{activityId, jdbcType=VARCHAR},
             #{evaluationTime, jdbcType=TIMESTAMP},
             #{collectResultValue, jdbcType=DOUBLE},
-            #{userId, jdbcType=VARCHAR}
+            #{userId, jdbcType=VARCHAR},
+            #{tenantId, jdbcType=VARCHAR}
            )
   </insert>
   
@@ -65,6 +67,7 @@
     <result property="evaluationTime" column="EVAL_TIME_" jdbcType="TIMESTAMP"/>
     <result property="collectResultValue" column="COLLECT_VALUE_" jdbcType="DOUBLE"/>
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!-- select -->
@@ -194,6 +197,14 @@
       </if>
       <if test="evaluatedAfter != null">
         and RES.EVAL_TIME_ &gt;= #{evaluatedAfter}
+      </if>
+
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
       </if>
 
     </where>

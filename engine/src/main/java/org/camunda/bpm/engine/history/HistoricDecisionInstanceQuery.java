@@ -97,4 +97,13 @@ public interface HistoricDecisionInstanceQuery extends Query<HistoricDecisionIns
    * Independent of this setting, variable serialized values are accessible. */
   HistoricDecisionInstanceQuery disableCustomObjectDeserialization();
 
+  /** Only select historic decision instances with one of the given tenant ids. */
+  HistoricDecisionInstanceQuery tenantIdIn(String... tenantIds);
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of historic decision instances without tenant id is database-specific.
+   */
+  HistoricDecisionInstanceQuery orderByTenantId();
+
 }

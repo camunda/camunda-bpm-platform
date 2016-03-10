@@ -64,6 +64,7 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     setReferenceToProcessInstance(event, executionEntity);
     // set current time as evaluation time
     event.setEvaluationTime(ClockUtil.getCurrentTime());
+    event.setTenantId(execution.getTenantId());
 
     return event;
   }
@@ -78,6 +79,8 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     setReferenceToCaseInstance(event, executionEntity);
     // set current time as evaluation time
     event.setEvaluationTime(ClockUtil.getCurrentTime());
+    // TODO: set tenant id (using next line) when delegate case execution is extended with it
+    // event.setTenantId(execution.getTenantId();)
 
     return event;
   }
@@ -92,6 +95,9 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     event.setEvaluationTime(ClockUtil.getCurrentTime());
     // set the user id if there is an authenticated user and no process instance
     setUserId(event);
+
+    DmnDecision decisionTable = evaluationEvent.getDecisionTable();
+    event.setTenantId(((DecisionDefinition) decisionTable).getTenantId());
 
     return event;
   }
