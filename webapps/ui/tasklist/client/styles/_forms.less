@@ -54,9 +54,11 @@
   margin-bottom: 0;
   padding-top: 7px;
 
+
   > a[ng-click],
   .btn-link {
     white-space: nowrap;
+    display: inline-block;
 
     > span {
       max-width: 100%;
@@ -64,17 +66,17 @@
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
-      position: relative;
-      padding-right: 24px;
-      margin-right: -24px;
-      vertical-align: middle;
       z-index: 1;
+
+      padding-right: 1.4em;
+      margin-right: -1.4em;
     }
 
-    .glyphicon {
+    > .glyphicon {
       padding: 0;
       margin: 0;
       z-index: 2;
+      top: -3px;
     }
   }
 }

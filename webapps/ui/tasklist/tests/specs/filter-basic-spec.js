@@ -42,8 +42,8 @@ describe('Tasklist Filter Basic Spec', function() {
     it('should validate existing filter', function() {
 
       // then
-      expect(dashboardPage.taskFilters.filterName(0)).to.eventually.eql('My Tasks');
-      expect(dashboardPage.taskFilters.filterName(1)).to.eventually.eql('All');
+      expect(dashboardPage.taskFilters.filterName(0)).to.eventually.include('My Tasks');
+      expect(dashboardPage.taskFilters.filterName(1)).to.eventually.include('All');
       expect(dashboardPage.taskFilters.isFilterSelected(0)).to.eventually.be.true;
       expect(dashboardPage.taskFilters.isFilterSelected(1)).to.eventually.be.false;
     });
@@ -99,7 +99,7 @@ describe('Tasklist Filter Basic Spec', function() {
       dashboardPage.taskFilters.selectFilter(0);
 
       // then
-      expect(dashboardPage.taskFilters.filterName(0)).to.eventually.eql('öäü-Filter');
+      expect(dashboardPage.taskFilters.filterName(0)).to.eventually.include('öäü-Filter');
       expect(dashboardPage.taskList.taskList().count()).to.eventually.eql(3);
     });
 
@@ -164,7 +164,7 @@ describe('Tasklist Filter Basic Spec', function() {
 
       // then
       expect(dashboardPage.taskFilters.filterList().count()).to.eventually.eql(2);
-      expect(dashboardPage.taskFilters.filterName(1)).to.eventually.eql('Test Filter');
+      expect(dashboardPage.taskFilters.filterName(1)).to.eventually.include('Test Filter');
       expect(dashboardPage.taskFilters.isFilterSelected(1)).to.eventually.be.true;
     });
 
@@ -205,7 +205,7 @@ describe('Tasklist Filter Basic Spec', function() {
       editModalPage.saveFilter();
 
       // then
-      expect(dashboardPage.taskFilters.filterName(2)).to.eventually.eql('My Tasks are shown here');
+      expect(dashboardPage.taskFilters.filterName(2)).to.eventually.include('My Tasks are shown here');
       expect(dashboardPage.taskFilters.filterDescription(2)).to.eventually.eql('Show all my Tasks');
       expect(dashboardPage.taskFilters.isFilterSelected(2)).to.eventually.be.true;
     });

@@ -37,7 +37,7 @@ describe('Tasklist Filter Variables Spec', function() {
       expect(editModalPage.addVariableButton().isDisplayed()).to.eventually.be.true;
 
       // when
-      editModalPage.showUndefinedVariablesCheckBox().click()
+      editModalPage.showUndefinedVariablesCheckBox().click();
 
       // then
       expect(editModalPage.showUndefinedVariablesCheckBox().isSelected()).to.eventually.be.true;
@@ -149,7 +149,7 @@ describe('Tasklist Filter Variables Spec', function() {
       it('should save filter and validate results in the list of tasks', function() {
 
         // when
-        editModalPage.saveFilter()
+        editModalPage.saveFilter();
 
         // then
         expect(dashboardPage.taskList.taskVariableLabel(0,1).getText()).to.eventually.eql('String Variable:');
@@ -163,7 +163,7 @@ describe('Tasklist Filter Variables Spec', function() {
     describe('display undefined variables', function() {
 
       before(function() {
-        dashboardPage.taskFilters.selectFilter(0);
+        // dashboardPage.taskFilters.selectFilter(0);
         dashboardPage.taskFilters.editFilter(0);
       });
 
@@ -175,7 +175,7 @@ describe('Tasklist Filter Variables Spec', function() {
 
         // when
         editModalPage.addVariable('MyUndefined', 'undefined Variable');
-        editModalPage.showUndefinedVariablesCheckBox().click()
+        editModalPage.showUndefinedVariablesCheckBox().click();
 
         // then
         expect(editModalPage.variableList().count()).to.eventually.eql(1);
@@ -185,7 +185,9 @@ describe('Tasklist Filter Variables Spec', function() {
       it('should save filter and see the undefined variable in the list of tasks', function() {
 
         // when
-        editModalPage.saveFilter()
+        editModalPage.saveFilter();
+
+        browser.sleep(10000);
 
         // then
         expect(dashboardPage.taskList.taskVariableLabel(0,0).getText()).to.eventually.eql('undefined Variable:');

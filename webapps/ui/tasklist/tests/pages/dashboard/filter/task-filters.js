@@ -33,7 +33,7 @@ module.exports = Page.extend({
   },
 
   selectFilter: function(item) {
-    this.filterList().get(item).element(by.css('[class="task-filter"]')).click();
+    return this.filterList().get(item).click();
   },
 
   filterStatus: function(item) {
@@ -81,10 +81,10 @@ module.exports = Page.extend({
 
   editFilter: function(item) {
     var self = this;
-
-    browser.actions().mouseMove(this.filterNameElement(item)).perform().then(function() {
-      self.filterList().get(item).element(by.css('[ng-click="openModal($event, filter)"]')).click();
-    });
+    this.selectFilter(item).element(by.css('[ng-click="openModal($event, filter)"]')).click();
+    // browser.actions().mouseMove(this.filterNameElement(item)).perform().then(function() {
+    //   self.filterList().get(item).element(by.css('[ng-click="openModal($event, filter)"]')).click();
+    // });
   }
 
 });

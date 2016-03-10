@@ -41,6 +41,11 @@
   }
 
   .groups {
+    color: @link-color;
+    &:hover {
+      color: @link-hover-color;
+    }
+
     > span {
       position: relative;
       top: 2px;
@@ -48,10 +53,6 @@
       > .glyphicon,
       > a {
         vertical-align: top;
-      }
-
-      .glyphicon {
-        top: 2px;
       }
 
       a {
@@ -65,11 +66,6 @@
       }
     }
   }
-
-
-  // .glyphicon-remove {
-  //   top: 3px;
-  // }
 }
 
 // S+
