@@ -504,6 +504,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     parameters.put("activityInstanceIdIn", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID_IN);
     parameters.put("evaluatedBefore", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATED_BEFORE);
     parameters.put("evaluatedAfter", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATED_AFTER);
+    parameters.put("userId", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_USER_ID);
 
     return parameters;
   }
@@ -527,6 +528,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     verify(mockedQuery).activityInstanceIdIn(stringArrayConverter.convertQueryParameterToType(stringQueryParameters.get("activityInstanceIdIn")));
     verify(mockedQuery).evaluatedBefore(DateTimeUtil.parseDate(stringQueryParameters.get("evaluatedBefore")));
     verify(mockedQuery).evaluatedAfter(DateTimeUtil.parseDate(stringQueryParameters.get("evaluatedAfter")));
+    verify(mockedQuery).userId(stringQueryParameters.get("userId"));
 
     verify(mockedQuery).list();
   }
