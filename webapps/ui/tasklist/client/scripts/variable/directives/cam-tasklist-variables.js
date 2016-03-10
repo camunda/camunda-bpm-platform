@@ -71,7 +71,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
           angular.forEach(scope.variables, function(variable) {
             scope.variablesByName[variable.name] = variable;
           });
-          console.info('filterProperties.showUndefinedVariable', scope.filterProperties.showUndefinedVariable);
+
           scope.shownVariablesCount = Object.keys(scope.filterProperties.showUndefinedVariable ? scope.variableDefinitions : scope.variablesByName).length;
         }
       }

@@ -187,8 +187,6 @@ describe('Tasklist Filter Variables Spec', function() {
         // when
         editModalPage.saveFilter();
 
-        browser.sleep(10000);
-
         // then
         expect(dashboardPage.taskList.taskVariableLabel(0,0).getText()).to.eventually.eql('undefined Variable:');
         expect(dashboardPage.taskList.taskVariableValue(0,0).getText()).to.eventually.eql('<Undefined>');
