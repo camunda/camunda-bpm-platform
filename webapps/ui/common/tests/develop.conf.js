@@ -5,9 +5,13 @@ var promised = require('chai-as-promised');
 chai.use(promised);
 global.expect   = chai.expect;
 
+var bail = typeof process.env.TEST_BAIL !== undefined;
 var tested = process.env.TESTED || '*';
 var testedApp = process.env.TESTED_APP || 'admin,tasklist,cockpit';
 testedApp = testedApp.indexOf(',') > -1 ? ('{' + testedApp + '}') : testedApp;
+
+var specsPath = '../../'+ testedApp +'/tests/specs/' + tested + '-spec.js';
+console.info('Will run tests found in %s', specsPath, bail);
 
 exports.config = {
 
@@ -38,7 +42,7 @@ exports.config = {
   // Spec patterns are relative to the location of the spec file. They may
   // include glob patterns.
   specs: [
-    '../../'+ testedApp +'/tests/specs/' + tested + '-spec.js'
+    specsPath
   ],
 
   // A base URL for your application under test. Calls to protractor.get()
@@ -65,6 +69,7 @@ exports.config = {
   */
 
   mochaOpts: {
+    bail: bail,
     timeout: 15000,
     colors: true,
     reporter: 'spec',

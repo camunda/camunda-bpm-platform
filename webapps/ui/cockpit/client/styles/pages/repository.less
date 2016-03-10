@@ -27,6 +27,18 @@
 
 .three-cols-layout {
   position: relative;
+
+  .column-left,
+  .column-center {
+    .cell.content {
+      position: absolute;
+    }
+    .alert,
+    .well {
+      margin: 0 (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5);
+    }
+  }
+
   .column-left .deployments > li,
   .column-center .list-unstyled > li {
     .column-list-item();
@@ -39,46 +51,68 @@
     [cam-widget-search] {
       margin: 0 (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5);
     }
+  }
 
-    .deployments {
-      .first-column-list();
-      > li {
-        .first-column-list-item();
+  .deployments {
+    .first-column-list();
+
+    > li {
+      .first-column-list-item();
+      padding-top: 10px;
+      padding-bottom: 10px;
+      &:hover .actions {
+        display: block;
+        visibility: visible;
       }
+    }
 
-      dl {
-        overflow: hidden;
-        font-size: small;
+    .actions {
+      float: right;
+      font-size: smaller;
+      visibility: hidden;
+      a {
+        margin-left: 0.5em;
       }
+    }
 
-      dt,
-      dd {
-        margin-bottom: @padding-base-vertical;
-        &:last-of-type {
-          margin-bottom: 0;
-        }
+    dl {
+      overflow: hidden;
+      font-size: small;
+      margin-bottom: 0;
+    }
+
+    dt,
+    dd {
+      margin-bottom: @padding-base-vertical;
+      &:last-of-type {
+        margin-bottom: 0;
       }
+    }
 
-      dt {
-        float: left;
-        clear: left;
-      }
+    dt {
+      float: left;
+      clear: left;
+    }
 
-      dd {
-        float: right;
-        clear: right;
-        text-align: right;
-        .undefined {
-          color: @gray-light;
-        }
+    dd {
+      float: right;
+      clear: right;
+      text-align: right;
+      .undefined {
+        color: @gray-light;
       }
     }
   }
 
-  .column-center .list-unstyled {
-    .second-column-list();
-    > li {
-      .second-column-list-item();
+  .column-center {
+    .list-unstyled {
+      .second-column-list();
+      > li {
+        .second-column-list-item();
+        > h4 {
+          margin: 0;
+        }
+      }
     }
   }
 
@@ -88,7 +122,6 @@
     display: block;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: @gray-light;
 
     &:after {
       content: '/';
@@ -98,6 +131,11 @@
     &:empty {
       display: none;
     }
+  }
+
+  .cell.top .resource-actions {
+    float: right;
+    margin-left: 1em;
   }
 }
 

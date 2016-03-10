@@ -155,7 +155,7 @@ describe('Tasklist Filter Permissions Spec', function() {
         dashboardPage.authentication.userLogin('test', 'test');
 
         // then
-        expect(dashboardPage.taskFilters.filterName(0)).to.eventually.eql('Empty Filter');
+        expect(dashboardPage.taskFilters.filterName(0)).to.eventually.include('Empty Filter');
       });
 
     });
@@ -197,7 +197,7 @@ describe('Tasklist Filter Permissions Spec', function() {
         dashboardPage.authentication.userLogin('juri', 'juri');
 
         // then
-        expect(dashboardPage.taskFilters.filterName(0)).to.eventually.eql('Empty Filter');
+        expect(dashboardPage.taskFilters.filterName(0)).to.eventually.include('Empty Filter');
       });
 
     });
@@ -239,7 +239,7 @@ describe('Tasklist Filter Permissions Spec', function() {
         dashboardPage.authentication.userLogin('test', 'test');
 
         // then
-        expect(dashboardPage.taskFilters.filterName(0)).to.eventually.eql('Empty Filter');
+        expect(dashboardPage.taskFilters.filterName(0)).to.eventually.include('Empty Filter');
       });
 
     });

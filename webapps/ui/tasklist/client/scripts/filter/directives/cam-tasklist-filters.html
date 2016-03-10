@@ -21,7 +21,7 @@
 
   <div ng-show="totalItems"
        ng-repeat="(delta, filter) in filters | orderBy:'properties.priority'"
-       class="item task-filter"
+       class="item task-filter cells-wrapper"
        ng-class="{active: isFocused(filter)}"
        ng-style="filter.style"
        ng-click="focus(filter)">

@@ -33,12 +33,6 @@
           ng-repeat="(delta, task) in tasks"
           ng-class="{active: currentTaskId === task.id}">
 
-        <div class="priority"
-             tooltip-placement="right"
-             tooltip="{{ 'PRIORITY' | translate }}">
-          {{ task.priority }}
-        </div>
-
         <div class="clickable"
              ng-click="focus($event, task)">
           <div class="names">
@@ -66,32 +60,40 @@
             </h5>
           </div>
 
-          <div class="dates"
-               ng-click="focus($event, task)">
-            <span class="due-date"
-                  ng-if="!!task.due"
-                  ng-class="{overdue: task.due && (task.due < now) }">
-              {{ 'DUE' | translate }}
-              <span tooltip-placement="top"
-                    tooltip="{{ task.due | camDate:'long' }}"
-                    am-time-ago="task.due">{{ task.due }}</span>
-            </span>
+          <div class="cells-wrapper">
+            <div class="dates"
+                 ng-click="focus($event, task)">
+              <span class="due-date"
+                    ng-if="!!task.due"
+                    ng-class="{overdue: task.due && (task.due < now) }">
+                {{ 'DUE' | translate }}
+                <span tooltip-placement="top"
+                      tooltip="{{ task.due | camDate:'long' }}"
+                      am-time-ago="task.due">{{ task.due }}</span>
+              </span>
 
-            <span class="followup-date"
-                  ng-if="!!task.followUp"
-                  ng-class="{overdue: task.followUp && (task.followUp < now) }">
-              {{ 'FOLLOW_UP' | translate }}
-              <span tooltip-placement="top"
-                    tooltip="{{ task.followUp | camDate:'long' }}"
-                    am-time-ago="task.followUp">{{ task.followUp }}</span>
-            </span>
+              <span class="followup-date"
+                    ng-if="!!task.followUp"
+                    ng-class="{overdue: task.followUp && (task.followUp < now) }">
+                {{ 'FOLLOW_UP' | translate }}
+                <span tooltip-placement="top"
+                      tooltip="{{ task.followUp | camDate:'long' }}"
+                      am-time-ago="task.followUp">{{ task.followUp }}</span>
+              </span>
 
-            <span class="creation-date">
-              {{ 'CREATION' | translate }}
-              <span tooltip-placement="top"
-                    tooltip="{{ task.created | camDate:'long' }}"
-                    am-time-ago="task.created">{{ task.created }}</span>
-            </span>
+              <span class="creation-date">
+                {{ 'CREATION' | translate }}
+                <span tooltip-placement="top"
+                      tooltip="{{ task.created | camDate:'long' }}"
+                      am-time-ago="task.created">{{ task.created }}</span>
+              </span>
+            </div>
+
+            <div class="priority"
+                 tooltip-placement="right"
+                 tooltip="{{ 'PRIORITY' | translate }}">
+              {{ task.priority }}
+            </div>
           </div>
 
 

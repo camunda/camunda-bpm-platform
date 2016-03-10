@@ -1,23 +1,5 @@
 @import "_three-cols-layout";
 
-.size-helper(@color: red; @txt: '') {
-  /*
-  &:before {
-    color: #fff;
-    content: @txt;
-    display: block;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    padding: 0 0.2em;
-    min-width: 40px;
-    min-height: 20px;
-    z-index: 99999;
-    background-color: @color;
-  }
-  */
-}
-
 .three-cols-layout-base();
 
 button {
@@ -45,9 +27,6 @@ button {
 
 @media (max-width: @screen-xs-max) {
   .three-cols-layout-handheld();
-  body {
-    .size-helper(blue, "max @{screen-xs-max}");
-  }
 
   .columns {
     > .column {
@@ -95,6 +74,7 @@ button {
       display: none;
     }
   }
+
   .cell.content {
     display: none;
   }
@@ -105,8 +85,17 @@ button {
 .three-cols-layout {
   .column-left,
   .column-center {
+    .alert,
     .well {
       margin: 0 (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5);
+    }
+
+    .cells-wrapper {
+      display: table;
+      width: 100%;
+      > * {
+        display: table-cell;
+      }
     }
   }
 
@@ -129,30 +118,29 @@ button {
     }
   }
 
-  .cell.top {
-    button.maximize,
-    button.region-toggle {
-      display: inline-block;
+  [cam-tasklist-form-generic] .row-action {
+    > a[ng-click],
+    .btn-link {
+      display: block;
     }
+  }
 
-    button.reset-regions {
-      display: none;
-    }
+  button.maximize,
+  button.region-toggle {
+    display: inline-block;
+  }
+
+  button.reset-regions {
+    display: none;
   }
 }
 
 .task-filter {
   width: 100%;
   overflow: hidden;
-  display: table !important;
   vertical-align: bottom;
-  padding-top: 2px;
+  padding-top: 5px;
   padding-bottom: 5px;
-
-  h4.name,
-  .actions {
-    display: table-cell;
-  }
 
   h4.name {
     margin: 0;
@@ -160,20 +148,29 @@ button {
     min-height: 24px;
   }
 
-  .actions,
-  .counter {
-    font-size: smaller;
-  }
-
-  .counter {
-    vertical-align: super;
-  }
-
   .actions {
     text-align: right;
   }
+
+  .counter {
+    color: @gray;
+    &:before {
+      content: '(';
+    }
+    &:after {
+      content: ')';
+    }
+  }
 }
 
+.task-card {
+  .nav-tabs {
+    padding-left: (@grid-gutter-width * 0.5);
+    padding-right: (@grid-gutter-width * 0.5);
+    margin-left: 0 - (@grid-gutter-width * 0.5);
+    margin-right: 0 - (@grid-gutter-width * 0.5);
+  }
+}
 
 
 
@@ -202,34 +199,38 @@ button {
 
   .names {
     overflow: hidden;
-    margin-top: 7px;
+
     h4,
     h5,
     h6 {
-      line-height: 18px;
-    }
-    h4 {
-      margin: 3px 0 0 0;
-      float: left;
-    }
-    h5,
-    h6 {
-      vertical-align: bottom;
+      line-height: 20px;
       margin-bottom: 5px;
     }
+    h4 {
+      margin-top: 4px;
+      float: left;
+    }
+
+    h5,
     h6 {
       margin-top: 5px;
+      font-size: @font-size-base;
+    }
+    h6 {
       float: left;
       clear: left;
     }
     h5 {
-      margin-top: 4px;
       float: right;
     }
   }
 
+  .priority,
   .dates {
-    font-size: 12px;
+    font-size: smaller;
+  }
+
+  .dates {
     > span {
       > span {
         text-transform: lowercase;
@@ -247,11 +248,7 @@ button {
   }
 
   .priority {
-    display: inline;
-    position: absolute;
-    top: 0;
-    right: 4px;
-    font-size: smaller;
+    text-align: right;
   }
 }
 
@@ -261,10 +258,6 @@ button {
 
 // S+ (columns layout)
 @media (min-width: @screen-sm-min) {
-  body {
-    .size-helper(green, "min @{screen-sm-min}");
-  }
-
   .filters-column-close {
     .task-filters {
       .cell.content {
@@ -292,12 +285,12 @@ button {
 
 
 
-  .task-column-close,
+  .task-column-close *,
   .filters-column-close.list-column-close {
-    .maximize {
+    button.maximize {
       display: none;
     }
-    .reset-regions {
+    button.reset-regions {
       display: block;
     }
   }
@@ -374,10 +367,6 @@ button {
 
 // S
 @media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
-  body {
-    .size-helper(purple, "min: @{screen-sm-min}, max: @{screen-sm-max}");
-  }
-
   .three-cols-layout(180px, 300px);
   .three-cols-layout-states(180px, 300px);
 }
@@ -385,10 +374,6 @@ button {
 
 // M
 @media (min-width: @screen-md-min) and (max-width: @screen-md-max) {
-  body {
-    .size-helper(orange, "min: @{screen-md-min}, max: @{screen-md-max}");
-  }
-
   .three-cols-layout(200px, 320px);
   .three-cols-layout-states(200px, 320px);
 
@@ -400,10 +385,6 @@ button {
 
 // L
 @media (min-width: @screen-lg-min) {
-  body {
-    .size-helper(violet, "min: @{screen-lg-min}");
-  }
-
   .three-cols-layout(220px, 360px);
   .three-cols-layout-states(220px, 360px);
 

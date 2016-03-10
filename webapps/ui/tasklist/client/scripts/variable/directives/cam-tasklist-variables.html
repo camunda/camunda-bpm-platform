@@ -1,16 +1,11 @@
 <div class="variables-list"
      ng-class="{expanded: (expanded && shownVariablesCount > 2)}">
 
-  <!-- <h6 class="col-xs-12"
-      translate="TASK_VARIABLES">Variables</h6> -->
-
   <div ng-repeat="(delta, info) in variableDefinitions"
        ng-if="variablesByName[info.name] || filterProperties.showUndefinedVariable">
     <div class="col-xs-12 col-lg-6">
 
       <div class="row variable-item">
-        <!-- <span class="col-xs-4 col-lg-12"
-              ng-click="selectValue($event)"> -->
         <span class="col-xs-4 col-lg-12">
           <strong class="variable-label"
                   ng-class="{'undefined' : !variablesByName[info.name] && filterProperties.showUndefinedVariable}"

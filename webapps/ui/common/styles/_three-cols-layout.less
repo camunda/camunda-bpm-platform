@@ -1,14 +1,13 @@
 .side-stroke(
-  @hover-color: @link-hover-color;
-  @active-color: @navbar-default-link-active-bg;
-  @inactive-color: @gray-lighter;
+  @hover-color: @link-color;
+  @active-color: @brand-primary;
   @padding: @grid-gutter-width * 0.5;
 ) {
   padding-left: (@padding - 5px);
   padding-right: (@padding - 5px);
   margin-left: 2px;
   margin-right: 5px;
-  border: 3px solid @inactive-color;
+  border: 3px solid transparent;
   border-width: 0 0 0 3px;
   transition: border-color 0.218s linear;
 
@@ -23,14 +22,14 @@
 }
 
 .column-list-item-colors(
-  @base-color: lighten(@gray-light, 5%);
-  @active-color: @text-color;
+  @base-color: @text-color;
+  @active-color: @gray-base;
   @active-link-color: @link-color;
   @active-link-hover-color: @link-hover-color;
 ) {
   color: @base-color;
   transition: color 0.218s ease;
-  a {
+  h4 a {
     color: @base-color;
     transition: color 0.218s ease;
   }
@@ -39,7 +38,7 @@
   &:hover,
   &:focus {
     color: @active-color;
-    a {
+    h4 a {
       color: @active-link-color;
       &:hover,
       &:focus {
@@ -50,11 +49,7 @@
 }
 
 .column-list-item() {
-  display: block;
-  padding-top: @padding-base-vertical;
-  padding-bottom: @padding-base-vertical;
   margin-bottom: @padding-base-vertical;
-  position: relative;
 
   h4 {
     word-wrap: break-word;
@@ -62,7 +57,7 @@
 
   .side-stroke();
 
-  .column-list-item-colors();
+  .column-list-item-colors(@gray, @gray-base, @gray-base, @gray-base);
 }
 
 
@@ -79,11 +74,9 @@
 }
 
 .first-column-list-item() {
-  padding-top: (@padding-base-vertical * 2);
-  padding-bottom: (@padding-base-vertical * 2);
-
   h4 {
     font-size: 16px;
+    margin-top: 0;
   }
 
   &:last-child {
@@ -102,6 +95,8 @@
 }
 
 .second-column-list-item() {
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 
@@ -321,14 +316,20 @@
 
 
 .three-cols-layout-colors(@left, @center, @right) {
-  .columns {
-    color: @gray;
+  .columns,
+  .column-right {
+    color: @gray-dark;
   }
+  // .variables-list a {
+  //   &,
+  //   &:hover,
+  //   &:focus {
+  //     color: @gray-dark;
+  //   }
+  // }
 
-  .active,
-  .clickable:hover,
-  .clickable:focus {
-    color: @gray-darker;
+  .active {
+    color: @gray-base;
   }
 
   .column {
@@ -343,7 +344,6 @@
   }
 
   .column-right {
-    color: @gray-darker;
     border-right: none;
   }
 
