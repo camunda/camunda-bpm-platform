@@ -61,6 +61,7 @@ var dataDepend = require('angular-data-depend');
       require('./form/index').name,
       require('./filter/index').name,
       require('./api/index').name,
+      require('./shortcuts/plugins/index').name,
     ].concat(pluginDependencies.map(function(el){
       return el.ngModuleName;
     }));

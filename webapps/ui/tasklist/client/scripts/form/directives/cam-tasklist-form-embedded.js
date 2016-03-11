@@ -92,6 +92,15 @@ var $ = require('jquery');
           $scope.$root.$broadcast('embedded.form.rendered');
         };
 
+        $scope.$on('shortcut:focusForm', function() {
+          if(camForm) {
+            var focusElement = camForm.formElement[0].querySelectorAll('input')[0];
+            if(focusElement) {
+              focusElement.focus();
+            }
+          }
+        });
+
         var complete = function (callback) {
           camForm.submit(callback);
         };

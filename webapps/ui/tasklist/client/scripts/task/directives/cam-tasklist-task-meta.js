@@ -236,6 +236,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
             el.focus();
           }
         };
+        $scope.$on('shortcut:claimTask', claim);
 
         var unclaim = $scope.unclaim = function() {
           Task.unclaim($scope.task.id, notify('unclaimed'));

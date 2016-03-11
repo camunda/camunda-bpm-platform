@@ -91,6 +91,13 @@ var moment = require('camunda-commons-ui/vendor/moment');
 
         });
 
+        $scope.$on('shortcut:focusList', function() {
+          var el = document.querySelector('[cam-tasks] .tasks-list li:first-child a');
+          if(el) {
+            el.focus();
+          }
+        });
+
         $scope.assigneeDisplayedName = function (task) {
           var _assignee = assignees[task.assignee] || {};
           var hasFirstLastName = _assignee.firstName || _assignee.lastName;

@@ -90,6 +90,8 @@ var template = fs.readFileSync(__dirname + '/modals/cam-tasklist-process-start-m
       });
     };
 
+    $scope.$on('shortcut:startProcess', $scope.open);
+
   }];
 
   var Configuration = function PluginConfiguration(ViewsProvider) {

@@ -78,6 +78,9 @@ var template = fs.readFileSync(__dirname + '/../modals/cam-tasklist-filter-modal
         });
       });
     };
+    $scope.$on('shortcut:focusFilter', function() {
+      $('.task-filters .content h4 a')[0].focus();
+    });
 
     $scope.openModal = function ($event, filter) {
       $event.stopPropagation();
