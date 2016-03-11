@@ -710,12 +710,12 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery followUpAfterExpression(String followUpDateExpression);
 
   /**
-   * Only selects tasks which are suspended, because its process instance was suspended.
+   * Only select tasks which are suspended, because its process instance was suspended.
    */
   TaskQuery suspended();
 
   /**
-   * Only selects tasks which are active (ie. not suspended)
+   * Only select tasks which are active (ie. not suspended)
    */
   TaskQuery active();
 
@@ -730,7 +730,7 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks with one of the given tenant ids. */
   TaskQuery tenantIdIn(String... tenantIds);
 
-  /** Only selects tasks which have no tenant id. */
+  /** Only select tasks which have no tenant id. */
   TaskQuery withoutTenantId();
 
   // ordering ////////////////////////////////////////////////////////////
@@ -810,6 +810,6 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery orderByCaseInstanceVariable(String variableName, ValueType valueType);
 
   /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of process instances without tenant id is database-specific. */
+   * Note that the ordering of tasks without tenant id is database-specific. */
   TaskQuery orderByTenantId();
 }
