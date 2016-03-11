@@ -139,3 +139,62 @@ ALTER TABLE ACT_HI_DECINST
   ADD TENANT_ID_ nvarchar(64);
 
 create index ACT_IDX_HI_DEC_INST_TENANT_ID on ACT_HI_DECINST(TENANT_ID_);
+
+--- BATCH ---
+
+-- remove not null from job definition table --
+alter table ACT_RU_JOBDEF
+	modify PROC_DEF_ID_ nvarchar(64),
+	modify PROC_DEF_KEY_ nvarchar(255),
+	modify ACT_ID_ nvarchar(255);
+
+create table ACT_RU_BATCH (
+    ID_ nvarchar(64) not null,
+    REV_ int not null,
+    TYPE_ nvarchar(255),
+    SIZE_ int,
+    JOBS_PER_SEED_ int,
+    INVOCATIONS_PER_JOB_ int,
+    SEED_JOB_DEF_ID_ nvarchar(64),
+    BATCH_JOB_DEF_ID_ nvarchar(64),
+    MONITOR_JOB_DEF_ID_ nvarchar(64),
+    CONFIGURATION_ nvarchar(255),
+    TENANT_ID_ nvarchar(64),
+    primary key (ID_)
+);
+
+create table ACT_HI_BATCH (
+    ID_ nvarchar(64) not null,
+    TYPE_ nvarchar(255),
+    SIZE_ int,
+    JOBS_PER_SEED_ int,
+    INVOCATIONS_PER_JOB_ int,
+    SEED_JOB_DEF_ID_ nvarchar(64),
+    MONITOR_JOB_DEF_ID_ nvarchar(64),
+    BATCH_JOB_DEF_ID_ nvarchar(64),
+    TENANT_ID_  nvarchar(64),
+    START_TIME_ datetime2 not null,
+    END_TIME_ datetime2,
+    primary key (ID_)
+);
+
+create index ACT_IDX_JOB_JOB_DEF_ID on ACT_RU_JOB(JOB_DEF_ID_);
+create index ACT_IDX_HI_JOB_LOG_JOB_DEF_ID on ACT_HI_JOB_LOG(JOB_DEF_ID_);
+
+create index ACT_IDX_BATCH_SEED_JOB_DEF ON ACT_RU_BATCH(SEED_JOB_DEF_ID_);
+alter table ACT_RU_BATCH
+    add constraint ACT_FK_BATCH_SEED_JOB_DEF
+    foreign key (SEED_JOB_DEF_ID_)
+    references ACT_RU_JOBDEF (ID_);
+
+create index ACT_IDX_BATCH_MONITOR_JOB_DEF ON ACT_RU_BATCH(MONITOR_JOB_DEF_ID_);
+alter table ACT_RU_BATCH
+    add constraint ACT_FK_BATCH_MONITOR_JOB_DEF
+    foreign key (MONITOR_JOB_DEF_ID_)
+    references ACT_RU_JOBDEF (ID_);
+
+create index ACT_IDX_BATCH_JOB_DEF ON ACT_RU_BATCH(BATCH_JOB_DEF_ID_);
+alter table ACT_RU_BATCH
+    add constraint ACT_FK_BATCH_JOB_DEF
+    foreign key (BATCH_JOB_DEF_ID_)
+    references ACT_RU_JOBDEF (ID_);
