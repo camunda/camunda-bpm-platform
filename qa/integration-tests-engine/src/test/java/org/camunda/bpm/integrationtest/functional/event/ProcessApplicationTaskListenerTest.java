@@ -45,7 +45,6 @@ public class ProcessApplicationTaskListenerTest extends AbstractFoxPlatformInteg
         .addAsLibraries(DeploymentHelper.getEngineCdi())
         .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestContainer.class)
         .addClass(TaskListenerProcessApplication.class)
         .addAsResource("org/camunda/bpm/integrationtest/functional/event/ProcessApplicationEventSupportTest.testTaskListener.bpmn20.xml");
 

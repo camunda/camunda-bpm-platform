@@ -14,13 +14,47 @@
     <redirect.test.output>true</redirect.test.output>
   </properties>
 
+  <!-- import shrinkwrap and arquillian bom for artifact versions,
+  	DO NOT CHANGE ordering, because we want shrinkwrap versions to be newer -->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.shrinkwrap.resolver</groupId>
+        <artifactId>shrinkwrap-resolver-bom</artifactId>
+        <version>${version.shrinkwrap.resolvers}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-bom</artifactId>
+        <version>${version.arquillian}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
+  	<!-- set shrinkwrap artifacts -->
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
       <artifactId>shrinkwrap-resolver-depchain</artifactId>
       <version>${version.shrinkwrap.resolvers}</version>
       <scope>test</scope>
       <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.arquillian.junit</groupId>
+      <artifactId>arquillian-junit-container</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.arquillian.protocol</groupId>
+      <artifactId>arquillian-protocol-servlet</artifactId>
+      <scope>test</scope>
     </dependency>
     
     <dependency>
@@ -43,13 +77,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.arquillian.junit</groupId>
-      <artifactId>arquillian-junit-container</artifactId>
-      <version>${version.arquillian}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.camunda.bpm.javaee</groupId>
       <artifactId>camunda-ejb-client</artifactId>
       <scope>provided</scope>
@@ -67,6 +94,7 @@
       </exclusions>
     </dependency>
 
+    <!-- camunda -->
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
@@ -137,6 +165,7 @@
       <groupId>org.jboss.weld.servlet</groupId>
       <artifactId>weld-servlet</artifactId>
       <version>1.1.10.Final</version>
+      <scope>test</scope>
     </dependency>
 
     <!-- required for TestWarDeploymentWithProcessEnginePlugin -->
@@ -215,12 +244,6 @@
           <version>${version.jboss.as}</version>
           <scope>test</scope>
         </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
-          <scope>test</scope>
-        </dependency>
       </dependencies>
       <build>
         <testResources>
@@ -296,12 +319,6 @@
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-arquillian-container-domain-managed</artifactId>
           <version>${version.jboss.as}</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -403,29 +420,7 @@
 
     <profile>
       <id>wildfly</id>
-      <dependencyManagement>
-        <dependencies>
-          <dependency>
-            <groupId>org.jboss.arquillian</groupId>
-            <artifactId>arquillian-bom</artifactId>
-            <version>1.1.5.Final</version>
-            <scope>import</scope>
-            <type>pom</type>
-          </dependency>
-        </dependencies>
-      </dependencyManagement>
       <dependencies>
-        <!-- redefine the dependencies so we get the correct version specified above -->
-        <dependency>
-          <groupId>org.jboss.arquillian.junit</groupId>
-          <artifactId>arquillian-junit-container</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <scope>test</scope>
-        </dependency>
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
           <groupId>org.camunda.bpm.qa</groupId>
@@ -506,31 +501,7 @@
 
     <profile>
       <id>wildfly-domain</id>
-      <dependencyManagement>
-        <dependencies>
-          <dependency>
-            <groupId>org.jboss.arquillian</groupId>
-            <artifactId>arquillian-bom</artifactId>
-            <version>1.1.5.Final</version>
-            <scope>import</scope>
-            <type>pom</type>
-          </dependency>
-        </dependencies>
-      </dependencyManagement>
       <dependencies>
-        <!-- redefine the dependencies so we get the correct version specified above -->
-        <dependency>
-          <groupId>org.jboss.arquillian.junit</groupId>
-          <artifactId>arquillian-junit-container</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <scope>test</scope>
-        </dependency>
-
-
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
           <groupId>org.camunda.bpm.qa</groupId>
@@ -657,12 +628,6 @@
           <groupId>org.jboss.arquillian.container</groupId>
           <artifactId>arquillian-glassfish-managed-3.1</artifactId>
           <version>1.0.0.CR4</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -874,14 +839,6 @@
       <dependencyManagement>
         <dependencies>
           <dependency>
-            <groupId>org.jboss.shrinkwrap.resolver</groupId>
-            <artifactId>shrinkwrap-resolver-bom</artifactId>
-            <version>${version.shrinkwrap.resolvers}</version>
-            <scope>import</scope>
-            <type>pom</type>
-          </dependency>
-
-          <dependency>
             <groupId>org.jboss.bom</groupId>
             <artifactId>jboss-javaee-6.0-with-tools</artifactId>
             <version>1.0.4.Final</version>
@@ -901,24 +858,11 @@
         </dependency>
 
         <dependency>
-          <groupId>org.jboss.arquillian.junit</groupId>
-          <artifactId>arquillian-junit-container</artifactId>
-          <scope>test</scope>
-        </dependency>
-
-        <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
           <artifactId>arquillian-tomcat-managed-7</artifactId>
           <version>1.0.0.CR5</version>
           <scope>test</scope>
         </dependency>
-
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <scope>test</scope>
-        </dependency>
-
       </dependencies>
       <build>
         <testResources>
@@ -988,12 +932,6 @@
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-arquillian-container-managed</artifactId>
           <version>${version.jboss.as}</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>

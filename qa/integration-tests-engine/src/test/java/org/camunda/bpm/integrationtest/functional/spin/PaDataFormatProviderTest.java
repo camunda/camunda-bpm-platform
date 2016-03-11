@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.integrationtest.functional.spin;
 
-import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
-
 import org.camunda.bpm.application.ProcessApplicationContext;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.Variables;
@@ -23,7 +21,6 @@ import org.camunda.bpm.integrationtest.functional.spin.dataformat.FooDataFormat;
 import org.camunda.bpm.integrationtest.functional.spin.dataformat.FooDataFormatProvider;
 import org.camunda.bpm.integrationtest.functional.spin.dataformat.FooSpin;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
-import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.camunda.spin.spi.DataFormatProvider;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -32,6 +29,8 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
 
 /**
  * @author Thorben Lindhauer
@@ -45,7 +44,6 @@ public class PaDataFormatProviderTest extends AbstractFoxPlatformIntegrationTest
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "PaDataFormatTest.war")
         .addAsResource("META-INF/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestContainer.class)
         .addAsResource("org/camunda/bpm/integrationtest/oneTaskProcess.bpmn")
         .addClass(Foo.class)
         .addClass(FooDataFormat.class)

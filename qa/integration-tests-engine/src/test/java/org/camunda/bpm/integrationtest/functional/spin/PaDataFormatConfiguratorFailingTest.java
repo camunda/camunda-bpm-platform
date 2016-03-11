@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.integrationtest.functional.spin;
 
-import java.util.Set;
-
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.integrationtest.functional.spin.dataformat.FailingJsonDataFormatConfigurator;
 import org.camunda.bpm.integrationtest.functional.spin.dataformat.JsonSerializable;
@@ -32,6 +30,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Set;
+
 /**
  * @author Thorben Lindhauer
  *
@@ -47,7 +47,6 @@ public class PaDataFormatConfiguratorFailingTest {
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "PaDataFormatConfiguratorFailingTest.war")
         .addAsResource("META-INF/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestContainer.class)
         .addClass(ReferenceStoringProcessApplication.class)
         .addAsResource("org/camunda/bpm/integrationtest/oneTaskProcess.bpmn")
         .addClass(JsonSerializable.class)

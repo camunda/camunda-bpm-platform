@@ -13,9 +13,6 @@
 
 package org.camunda.bpm.integrationtest.functional.slf4j;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -28,6 +25,9 @@ import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.NOPLoggerFactory;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 @RunWith(Arquillian.class)
 public class Slf4jClassloadingTest extends AbstractFoxPlatformIntegrationTest {
 
@@ -39,13 +39,10 @@ public class Slf4jClassloadingTest extends AbstractFoxPlatformIntegrationTest {
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "test.war")
         .addAsResource("META-INF/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestLogger.class)
-        .addClass(TestContainer.class);
+        .addClass(TestLogger.class);
 
     TestContainer.addContainerSpecificResourcesWithoutWeld(webArchive);
-
-    // for jboss/wildfly add commons-logging dependency (file is ignored by other application servers)
-    webArchive.addAsManifestResource("jboss-deployment-structure-with-commons-logging.xml", "jboss-deployment-structure.xml");
+    TestContainer.addCommonLoggingDependency(webArchive);
 
     return webArchive;
   }

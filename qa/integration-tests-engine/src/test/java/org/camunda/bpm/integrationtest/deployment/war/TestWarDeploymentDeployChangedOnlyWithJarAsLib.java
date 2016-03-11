@@ -68,7 +68,6 @@ public class TestWarDeploymentDeployChangedOnlyWithJarAsLib extends AbstractFoxP
         .addAsLibraries(processArchiveJar)
 
         .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestContainer.class)
         .addClass(TestWarDeploymentDeployChangedOnlyWithJarAsLib.class);
 
     TestContainer.addContainerSpecificResources(archive);
@@ -100,7 +99,6 @@ public class TestWarDeploymentDeployChangedOnlyWithJarAsLib extends AbstractFoxP
         .addAsLibraries(processArchiveJar)
 
         .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestContainer.class)
         .addClass(TestWarDeploymentDeployChangedOnlyWithJarAsLib.class);
 
     TestContainer.addContainerSpecificResources(archive);

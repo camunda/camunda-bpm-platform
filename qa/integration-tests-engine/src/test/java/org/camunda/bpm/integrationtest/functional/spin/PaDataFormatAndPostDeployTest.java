@@ -18,7 +18,6 @@ import org.camunda.bpm.integrationtest.functional.spin.dataformat.FooDataFormat;
 import org.camunda.bpm.integrationtest.functional.spin.dataformat.FooDataFormatProvider;
 import org.camunda.bpm.integrationtest.functional.spin.dataformat.FooSpin;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
-import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.camunda.spin.spi.DataFormatProvider;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -42,7 +41,6 @@ public class PaDataFormatAndPostDeployTest extends AbstractFoxPlatformIntegratio
         .addClass(PaDataformatAndPostDeployApp.class)
         .addAsResource("META-INF/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestContainer.class)
         .addAsResource("org/camunda/bpm/integrationtest/oneTaskProcess.bpmn")
         .addClass(Foo.class)
         .addClass(FooDataFormat.class)

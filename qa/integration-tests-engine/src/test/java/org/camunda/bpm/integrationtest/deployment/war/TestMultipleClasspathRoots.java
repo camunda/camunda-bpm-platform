@@ -89,7 +89,6 @@ public class TestMultipleClasspathRoots extends AbstractFoxPlatformIntegrationTe
         .addAsResource(processAssets[1], "directory/processes/process.bpmn")
 
         .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestContainer.class)
         .addClass(TestResourceName.class);
 
     TestContainer.addContainerSpecificResources(archive);

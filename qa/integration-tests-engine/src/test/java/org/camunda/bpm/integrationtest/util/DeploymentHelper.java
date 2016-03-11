@@ -15,26 +15,11 @@
  */
 package org.camunda.bpm.integrationtest.util;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.resolver.api.CoordinateParseException;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenStrategyStage;
 import org.jboss.shrinkwrap.resolver.api.maven.ScopeType;
-import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenCoordinate;
-import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenCoordinates;
 import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenDependencies;
-import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenDependency;
-import org.jboss.shrinkwrap.resolver.api.maven.filter.MavenResolutionFilter;
-import org.jboss.shrinkwrap.resolver.api.maven.filter.RejectDependenciesFilter;
-import org.jboss.shrinkwrap.resolver.api.maven.strategy.DefaultTransitiveExclusionPolicy;
-import org.jboss.shrinkwrap.resolver.api.maven.strategy.MavenResolutionStrategy;
 import org.jboss.shrinkwrap.resolver.api.maven.strategy.RejectDependenciesStrategy;
-import org.jboss.shrinkwrap.resolver.api.maven.strategy.TransitiveExclusionPolicy;
 
 
 public class DeploymentHelper {
@@ -53,8 +38,8 @@ public class DeploymentHelper {
       return CACHED_CLIENT_ASSET;
     } else {
 
-      JavaArchive[] resolvedArchives = Maven.resolver()
-          .offline()
+      JavaArchive[] resolvedArchives = Maven.configureResolver()
+          .workOffline()
           .loadPomFromFile("pom.xml")
           .resolve(CAMUNDA_EJB_CLIENT)
           .withTransitivity()
@@ -75,8 +60,8 @@ public class DeploymentHelper {
       return CACHED_ENGINE_CDI_ASSET;
     } else {
 
-      JavaArchive[] resolvedArchives = Maven.resolver()
-          .offline()
+      JavaArchive[] resolvedArchives = Maven.configureResolver()
+          .workOffline()
           .loadPomFromFile("pom.xml")
           .resolve(CAMUNDA_ENGINE_CDI)
           .withTransitivity()
@@ -96,8 +81,8 @@ public class DeploymentHelper {
       return CACHED_WELD_ASSETS;
     } else {
 
-      JavaArchive[] resolvedArchives = Maven.resolver()
-          .offline()
+      JavaArchive[] resolvedArchives = Maven.configureResolver()
+          .workOffline()
           .loadPomFromFile("pom.xml")
           .resolve(CAMUNDA_ENGINE_CDI, "org.jboss.weld.servlet:weld-servlet")
           .withTransitivity()
@@ -118,8 +103,8 @@ public class DeploymentHelper {
       return CACHED_SPRING_ASSETS;
     } else {
 
-      JavaArchive[] resolvedArchives = Maven.resolver()
-          .offline()
+      JavaArchive[] resolvedArchives = Maven.configureResolver()
+          .workOffline()
           .loadPomFromFile("pom.xml")
           .addDependencies(
               MavenDependencies.createDependency("org.camunda.bpm:camunda-engine-spring", ScopeType.COMPILE, false,
@@ -139,4 +124,49 @@ public class DeploymentHelper {
 
   }
 
+  public static JavaArchive[] getJodaTimeModuleForServer(String server) {
+    if (server.equals("tomcat") ||
+        server.equals("websphere") ||
+        server.equals("weblogic") ||
+        server.equals("glassfish")) {
+      return Maven.configureResolver()
+          .workOffline()
+          .loadPomFromFile("pom.xml")
+          .resolve("com.fasterxml.jackson.datatype:jackson-datatype-joda")
+          .using(new RejectDependenciesStrategy(false,
+              "joda-time:joda-time"))
+          .as(JavaArchive.class);
+    } else if (server.equals("jboss")) {
+      return Maven.configureResolver()
+          .workOffline()
+          .loadPomFromFile("pom.xml")
+          .resolve("com.fasterxml.jackson.datatype:jackson-datatype-joda")
+          .using(new RejectDependenciesStrategy(false,
+              "com.fasterxml.jackson.core:jackson-annotations",
+              "com.fasterxml.jackson.core:jackson-core",
+              "com.fasterxml.jackson.core:jackson-databind"))
+          .as(JavaArchive.class);
+    } else {
+      throw new RuntimeException("Unable to determine dependencies for jodaTimeModule: " + server);
+    }
+  }
+
+  public static JavaArchive[] getSpinJacksonJsonDataFormatForServer(String server) {
+    if (server.equals("tomcat") ||
+        server.equals("websphere") ||
+        server.equals("weblogic") ||
+        server.equals("glassfish")) {
+      return Maven.configureResolver()
+          .workOffline()
+          .loadPomFromFile("pom.xml")
+          .resolve("org.camunda.spin:camunda-spin-dataformat-json-jackson")
+          .using(new RejectDependenciesStrategy(false,
+              "org.camunda.spin:camunda-spin-core",
+              "org.camunda.commons:camunda-commons-logging",
+              "org.camunda.commons:camunda-commons-utils"))
+          .as(JavaArchive.class);
+    } else {
+      throw new RuntimeException("Unable to determine dependencies for spinJacksonJsonDataFormat: " + server);
+    }
+  }
 }

@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.integrationtest.functional.spin;
 
-import java.io.IOException;
-import java.util.Date;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.application.ProcessApplicationContext;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.Variables;
@@ -34,9 +34,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.Date;
 
 /**
  * @author Thorben Lindhauer
@@ -50,7 +49,6 @@ public class PaDataFormatConfiguratorJodaTest extends AbstractFoxPlatformIntegra
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "PaDataFormatTest.war")
         .addAsResource("META-INF/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestContainer.class)
         .addClass(ReferenceStoringProcessApplication.class)
         .addAsResource("org/camunda/bpm/integrationtest/oneTaskProcess.bpmn")
         .addClass(JodaJsonSerializable.class)

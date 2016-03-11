@@ -12,10 +12,7 @@
  */
 package org.camunda.bpm.integrationtest.util;
 
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-import org.jboss.shrinkwrap.resolver.api.maven.strategy.RejectDependenciesStrategy;
 
 /**
  * @author roman.smirnov
@@ -43,33 +40,15 @@ public class TestContainer {
   }
 
   public static void addSpinJacksonJsonDataFormat(WebArchive webArchive) {
-    webArchive.addAsLibraries(getSpinJacksonJsonDataFormat());
+    webArchive.addAsLibraries(DeploymentHelper.getSpinJacksonJsonDataFormatForServer("glassfish-servlet"));
   }
 
   public static void addJodaTimeJacksonModule(WebArchive webArchive) {
-    webArchive.addAsLibraries(getJodaTimeModule());
+    webArchive.addAsLibraries(DeploymentHelper.getJodaTimeModuleForServer("glassfish-servlet"));
   }
 
-  protected static JavaArchive[] getSpinJacksonJsonDataFormat() {
-    return Maven.resolver()
-      .offline()
-      .loadPomFromFile("pom.xml")
-      .resolve("org.camunda.spin:camunda-spin-dataformat-json-jackson")
-      .using(new RejectDependenciesStrategy(false,
-          "org.camunda.spin:camunda-spin-core",
-          "org.camunda.commons:camunda-commons-logging",
-          "org.camunda.commons:camunda-commons-utils"))
-      .as(JavaArchive.class);
-  }
-
-  protected static JavaArchive[] getJodaTimeModule() {
-    return Maven.resolver()
-        .offline()
-        .loadPomFromFile("pom.xml")
-        .resolve("com.fasterxml.jackson.datatype:jackson-datatype-joda")
-        .using(new RejectDependenciesStrategy(false,
-            "joda-time:joda-time"))
-        .as(JavaArchive.class);
+  public static void addCommonLoggingDependency(WebArchive webArchive) {
+    // nothing to do
   }
 
 }

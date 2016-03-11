@@ -27,8 +27,7 @@ public class TestProcessEnginesXmlInProcessApplication extends AbstractFoxPlatfo
         .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
         .addAsLibraries(DeploymentHelper.getEngineCdi())
         .addAsResource("singleEngine.xml", "META-INF/processes.xml")
-        .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestContainer.class);
+        .addClass(AbstractFoxPlatformIntegrationTest.class);
 
       TestContainer.addContainerSpecificResources(archive);
       

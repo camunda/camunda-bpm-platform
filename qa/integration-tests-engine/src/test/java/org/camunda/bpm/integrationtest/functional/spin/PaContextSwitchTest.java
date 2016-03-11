@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.integrationtest.functional.spin;
 
-import java.util.concurrent.Callable;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.application.ProcessApplicationContext;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
@@ -33,10 +33,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.concurrent.Callable;
 
-import static org.camunda.bpm.application.ProcessApplicationContext.*;
+import static org.camunda.bpm.application.ProcessApplicationContext.withProcessApplicationContext;
 
 /**
  * @author Thorben Lindhauer
@@ -50,7 +49,6 @@ public class PaContextSwitchTest extends AbstractFoxPlatformIntegrationTest {
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "pa1.war")
         .addAsResource("META-INF/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestContainer.class)
         .addClass(ProcessApplication1.class)
         .addClass(JsonSerializable.class)
         .addClass(RuntimeServiceDelegate.class)
@@ -70,7 +68,6 @@ public class PaContextSwitchTest extends AbstractFoxPlatformIntegrationTest {
         .addAsLibraries(DeploymentHelper.getEngineCdi())
         .addAsResource("META-INF/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestContainer.class)
         .addClass(ProcessApplication2.class);
 
     return webArchive;

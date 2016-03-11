@@ -36,9 +36,8 @@
     <version.glassfish>3.1.2</version.glassfish>
     <version.tomcat>8.0.24</version.tomcat>
 
-    <version.arquillian>1.0.0.Final</version.arquillian>
-    <version.arquillian.drone>1.0.0.Final</version.arquillian.drone>
-    <version.shrinkwrap.resolvers>2.0.0</version.shrinkwrap.resolvers>
+    <version.arquillian>1.1.10.Final</version.arquillian>
+    <version.shrinkwrap.resolvers>2.2.2</version.shrinkwrap.resolvers>
     <version.selenium>2.45.0</version.selenium>
 
     <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>

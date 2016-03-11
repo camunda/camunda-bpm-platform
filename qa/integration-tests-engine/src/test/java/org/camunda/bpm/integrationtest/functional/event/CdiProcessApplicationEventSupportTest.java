@@ -43,7 +43,6 @@ public class CdiProcessApplicationEventSupportTest extends AbstractFoxPlatformIn
         .addAsLibraries(DeploymentHelper.getEngineCdi())
         .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestContainer.class)
         .addClass(CdiEventSupportProcessApplication.class)
         .addClass(EventObserverCdiBean.class)
         .addAsResource("org/camunda/bpm/integrationtest/functional/event/ProcessApplicationEventSupportTest.testExecutionListener.bpmn20.xml");

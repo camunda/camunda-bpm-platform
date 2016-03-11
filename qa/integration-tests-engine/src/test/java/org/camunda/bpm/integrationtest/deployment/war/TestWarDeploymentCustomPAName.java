@@ -12,12 +12,9 @@
  */
 package org.camunda.bpm.integrationtest.deployment.war;
 
-import java.util.Set;
-
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.integrationtest.deployment.war.apps.CustomNameServletPA;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
-import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -25,6 +22,8 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.Set;
 
 /**
  * @author Thorben Lindhauer
@@ -38,7 +37,6 @@ public class TestWarDeploymentCustomPAName extends AbstractFoxPlatformIntegratio
     return ShrinkWrap.create(WebArchive.class, "pa1.war")
         .addAsResource("META-INF/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addClass(TestContainer.class)
         .addClass(CustomNameServletPA.class)
         .addAsResource("org/camunda/bpm/integrationtest/testDeployProcessArchive.bpmn20.xml");
   }
