@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.test.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +23,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingActivityInstanceValidationReport;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationReport;
-import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -51,7 +49,7 @@ public class MigratingProcessInstanceValidationReportAssert {
   public MigratingProcessInstanceValidationReportAssert hasProcessInstanceId(String processInstanceId) {
     isNotNull();
 
-    assertEquals("Expected report to be for process instance", processInstanceId, actual.getMigratingProcessInstance().getProcessInstanceId());
+    assertEquals("Expected report to be for process instance", processInstanceId, actual.getProcessInstanceId());
 
     return this;
   }

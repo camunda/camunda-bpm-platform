@@ -91,6 +91,10 @@ public class MigratingJobInstance implements MigratingInstance, RemovingInstance
     jobEntity.delete();
   }
 
+  public boolean migrates() {
+    return targetScope != null;
+  }
+
   public ScopeImpl getTargetScope() {
     return targetScope;
   }

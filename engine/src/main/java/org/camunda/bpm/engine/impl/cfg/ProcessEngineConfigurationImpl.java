@@ -630,7 +630,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initDeploymentRegistration();
     initResourceAuthorizationProvider();
     initMetrics();
-    initMigrationActivityComparator();
+    initMigrationActivityMatcher();
     initMigrationInstructionGenerator();
     initMigrationInstructionValidators();
     initMigratingActivityInstanceValidators();
@@ -1078,7 +1078,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     addSessionFactory(new DbSqlPersistenceProviderFactory());
   }
 
-  protected void initMigrationActivityComparator() {
+  protected void initMigrationActivityMatcher() {
     if (migrationActivityMatcher == null) {
       migrationActivityMatcher = new DefaultMigrationActivityMatcher();
     }

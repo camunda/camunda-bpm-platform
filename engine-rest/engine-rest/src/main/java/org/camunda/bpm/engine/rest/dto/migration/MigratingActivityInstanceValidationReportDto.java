@@ -22,6 +22,7 @@ public class MigratingActivityInstanceValidationReportDto {
 
   protected MigrationInstructionDto migrationInstruction;
   protected String activityInstanceId;
+  protected String sourceScopeId;
   protected List<String> failures;
 
   public MigrationInstructionDto getMigrationInstruction() {
@@ -48,6 +49,14 @@ public class MigratingActivityInstanceValidationReportDto {
     this.failures = failures;
   }
 
+  public String getSourceScopeId() {
+    return sourceScopeId;
+  }
+
+  public void setSourceScopeId(String sourceScopeId) {
+    this.sourceScopeId = sourceScopeId;
+  }
+
   public static List<MigratingActivityInstanceValidationReportDto> from(List<MigratingActivityInstanceValidationReport> reports) {
     ArrayList<MigratingActivityInstanceValidationReportDto> dtos = new ArrayList<MigratingActivityInstanceValidationReportDto>();
     for (MigratingActivityInstanceValidationReport report : reports) {
@@ -59,8 +68,9 @@ public class MigratingActivityInstanceValidationReportDto {
   public static MigratingActivityInstanceValidationReportDto from(MigratingActivityInstanceValidationReport report) {
     MigratingActivityInstanceValidationReportDto dto = new MigratingActivityInstanceValidationReportDto();
     dto.setMigrationInstruction(MigrationInstructionDto.from(report.getMigrationInstruction()));
-    dto.setActivityInstanceId(report.getMigratingActivityInstanceId());
+    dto.setActivityInstanceId(report.getActivityInstanceId());
     dto.setFailures(report.getFailures());
+    dto.setSourceScopeId(report.getSourceScopeId());
     return dto;
   }
 

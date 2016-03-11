@@ -47,7 +47,6 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingActivityInstanceValidationReport;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationReport;
@@ -516,19 +515,19 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     when(migrationInstruction.getTargetActivityId()).thenReturn(ANOTHER_EXAMPLE_ACTIVITY_ID);
 
     MigratingActivityInstanceValidationReport instanceReport1 = mock(MigratingActivityInstanceValidationReport.class);
-    when(instanceReport1.getMigratingActivityInstanceId()).thenReturn(EXAMPLE_ACTIVITY_INSTANCE_ID);
+    when(instanceReport1.getActivityInstanceId()).thenReturn(EXAMPLE_ACTIVITY_INSTANCE_ID);
     when(instanceReport1.getMigrationInstruction()).thenReturn(migrationInstruction);
+    when(instanceReport1.getSourceScopeId()).thenReturn(EXAMPLE_ACTIVITY_ID);
     when(instanceReport1.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
 
     MigratingActivityInstanceValidationReport instanceReport2 = mock(MigratingActivityInstanceValidationReport.class);
-    when(instanceReport2.getMigratingActivityInstanceId()).thenReturn(EXAMPLE_ACTIVITY_INSTANCE_ID);
+    when(instanceReport2.getActivityInstanceId()).thenReturn(EXAMPLE_ACTIVITY_INSTANCE_ID);
     when(instanceReport2.getMigrationInstruction()).thenReturn(migrationInstruction);
+    when(instanceReport2.getSourceScopeId()).thenReturn(EXAMPLE_ACTIVITY_ID);
     when(instanceReport2.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
 
     MigratingProcessInstanceValidationReport processInstanceReport = mock(MigratingProcessInstanceValidationReport.class);
-    MigratingProcessInstance migratingProcessInstance = mock(MigratingProcessInstance.class);
-    when(migratingProcessInstance.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
-    when(processInstanceReport.getMigratingProcessInstance()).thenReturn(migratingProcessInstance);
+    when(processInstanceReport.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(processInstanceReport.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
     when(processInstanceReport.getReports()).thenReturn(Arrays.asList(instanceReport1, instanceReport2));
 
@@ -559,6 +558,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .body("validationReport.instanceValidationReports[0].migrationInstruction.targetActivityIds", hasSize(1))
       .body("validationReport.instanceValidationReports[0].migrationInstruction.targetActivityIds[0]", is(ANOTHER_EXAMPLE_ACTIVITY_ID))
       .body("validationReport.instanceValidationReports[0].activityInstanceId", is(EXAMPLE_ACTIVITY_INSTANCE_ID))
+      .body("validationReport.instanceValidationReports[0].sourceScopeId", is(EXAMPLE_ACTIVITY_ID))
       .body("validationReport.instanceValidationReports[0].failures", hasSize(2))
       .body("validationReport.instanceValidationReports[0].failures[0]", is("failure1"))
       .body("validationReport.instanceValidationReports[0].failures[1]", is("failure2"))
@@ -567,6 +567,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .body("validationReport.instanceValidationReports[1].migrationInstruction.targetActivityIds", hasSize(1))
       .body("validationReport.instanceValidationReports[1].migrationInstruction.targetActivityIds[0]", is(ANOTHER_EXAMPLE_ACTIVITY_ID))
       .body("validationReport.instanceValidationReports[1].activityInstanceId", is(EXAMPLE_ACTIVITY_INSTANCE_ID))
+      .body("validationReport.instanceValidationReports[1].sourceScopeId", is(EXAMPLE_ACTIVITY_ID))
       .body("validationReport.instanceValidationReports[1].failures", hasSize(2))
       .body("validationReport.instanceValidationReports[1].failures[0]", is("failure1"))
       .body("validationReport.instanceValidationReports[1].failures[1]", is("failure2"))

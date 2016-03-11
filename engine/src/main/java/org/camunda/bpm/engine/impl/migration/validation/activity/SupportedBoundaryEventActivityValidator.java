@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
+import org.camunda.bpm.engine.impl.bpmn.parser.ActivityTypes;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 public class SupportedBoundaryEventActivityValidator implements MigrationActivityValidator {
@@ -25,9 +26,9 @@ public class SupportedBoundaryEventActivityValidator implements MigrationActivit
   public static SupportedBoundaryEventActivityValidator INSTANCE = new SupportedBoundaryEventActivityValidator();
 
   public static final List<String> supportedTypes = Arrays.asList(
-    "boundaryMessage",
-    "boundarySignal",
-    "boundaryTimer"
+    ActivityTypes.BOUNDARY_MESSAGE,
+    ActivityTypes.BOUNDARY_SIGNAL,
+    ActivityTypes.BOUNDARY_TIMER
   );
 
   public boolean valid(ActivityImpl activity) {

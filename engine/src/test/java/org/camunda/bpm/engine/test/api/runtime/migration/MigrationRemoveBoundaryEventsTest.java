@@ -832,7 +832,7 @@ public class MigrationRemoveBoundaryEventsTest {
   }
 
   @Test
-  public void testMigrateIncidentForJob() {
+  public void testRemoveIncidentForJob() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
       .userTaskBuilder("userTask")

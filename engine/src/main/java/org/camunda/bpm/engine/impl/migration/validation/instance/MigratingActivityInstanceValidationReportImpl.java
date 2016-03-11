@@ -21,23 +21,27 @@ import org.camunda.bpm.engine.migration.MigrationInstruction;
 
 public class MigratingActivityInstanceValidationReportImpl implements MigratingActivityInstanceValidationReport {
 
-  protected MigratingActivityInstance migratingActivityInstance;
+  protected String activityInstanceId;
+  protected String sourceScopeId;
+  protected MigrationInstruction migrationInstruction;
   protected List<String> failures = new ArrayList<String>();
 
   public MigratingActivityInstanceValidationReportImpl(MigratingActivityInstance migratingActivityInstance) {
-    this.migratingActivityInstance = migratingActivityInstance;
+    this.activityInstanceId = migratingActivityInstance.getActivityInstance().getId();
+    this.sourceScopeId = migratingActivityInstance.getSourceScope().getId();
+    this.migrationInstruction = migratingActivityInstance.getMigrationInstruction();
   }
 
   public String getSourceScopeId() {
-    return migratingActivityInstance.getSourceScope().getId();
+    return sourceScopeId;
   }
 
-  public String getMigratingActivityInstanceId() {
-    return migratingActivityInstance.getActivityInstance().getId();
+  public String getActivityInstanceId() {
+    return activityInstanceId;
   }
 
   public MigrationInstruction getMigrationInstruction() {
-    return migratingActivityInstance.getMigrationInstruction();
+    return migrationInstruction;
   }
 
   public void addFailure(String failure) {

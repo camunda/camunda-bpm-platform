@@ -16,21 +16,20 @@ package org.camunda.bpm.engine.impl.migration.validation.instance;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationReport;
 
 public class MigratingProcessInstanceValidationReportImpl implements MigratingProcessInstanceValidationReport {
 
-  protected MigratingProcessInstance migratingProcessInstance;
+  protected String processInstanceId;
   protected List<MigratingActivityInstanceValidationReport> reports = new ArrayList<MigratingActivityInstanceValidationReport>();
   protected List<String> failures = new ArrayList<String>();
 
-  public MigratingProcessInstance getMigratingProcessInstance() {
-    return migratingProcessInstance;
+  public String getProcessInstanceId() {
+    return processInstanceId;
   }
 
-  public void setMigratingProcessInstance(MigratingProcessInstance migratingProcessInstance) {
-    this.migratingProcessInstance = migratingProcessInstance;
+  public void setProcessInstanceId(String processInstanceId) {
+    this.processInstanceId = processInstanceId;
   }
 
   public void addInstanceReport(MigratingActivityInstanceValidationReport instanceReport) {
@@ -55,7 +54,7 @@ public class MigratingProcessInstanceValidationReportImpl implements MigratingPr
 
   public void writeTo(StringBuilder sb) {
     sb.append("Cannot migrate process instance '")
-      .append(migratingProcessInstance.getProcessInstanceId())
+      .append(processInstanceId)
       .append("':\n");
 
     for (String failure : failures) {
@@ -64,7 +63,7 @@ public class MigratingProcessInstanceValidationReportImpl implements MigratingPr
 
     for (MigratingActivityInstanceValidationReport report : reports) {
       sb.append("\tCannot migrate activity instance '")
-        .append(report.getMigratingActivityInstanceId())
+        .append(report.getActivityInstanceId())
         .append("':\n");
 
       for (String failure : report.getFailures()) {

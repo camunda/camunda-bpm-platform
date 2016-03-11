@@ -19,4 +19,9 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 public class ActivityTypes {
 
   public static final String MULTI_INSTANCE_BODY = "multiInstanceBody";
+
+
+  public static final String BOUNDARY_TIMER = "boundaryTimer";
+  public static final String BOUNDARY_MESSAGE = "boundaryMessage";
+  public static final String BOUNDARY_SIGNAL = "boundarySignal";
 }

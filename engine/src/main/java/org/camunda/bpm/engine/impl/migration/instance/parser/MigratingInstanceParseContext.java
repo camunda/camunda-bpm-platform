@@ -213,7 +213,7 @@ public class MigratingInstanceParseContext {
   }
 
   public void validateNoEntitiesLeft(MigratingProcessInstanceValidationReportImpl processInstanceReport) {
-    processInstanceReport.setMigratingProcessInstance(migratingProcessInstance);
+    processInstanceReport.setProcessInstanceId(migratingProcessInstance.getProcessInstanceId());
 
     ensureNoEntitiesAreLeft("tasks", tasks, processInstanceReport);
     ensureNoEntitiesAreLeft("incidents", incidents, processInstanceReport);

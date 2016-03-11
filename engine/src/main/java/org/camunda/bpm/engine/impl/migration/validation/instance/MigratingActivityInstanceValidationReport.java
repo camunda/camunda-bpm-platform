@@ -30,7 +30,7 @@ public interface MigratingActivityInstanceValidationReport {
   /**
    * @return the activity instance id of this report
    */
-  String getMigratingActivityInstanceId();
+  String getActivityInstanceId();
 
   /**
    * @return the migration instruction that cannot be applied

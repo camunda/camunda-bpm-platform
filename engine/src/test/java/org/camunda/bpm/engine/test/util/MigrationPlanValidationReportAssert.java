@@ -13,15 +13,12 @@
 
 package org.camunda.bpm.engine.test.util;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationPlanValidationReportImpl;
 import org.camunda.bpm.engine.migration.MigrationInstructionValidationReport;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationReport;
 import org.hamcrest.Matcher;

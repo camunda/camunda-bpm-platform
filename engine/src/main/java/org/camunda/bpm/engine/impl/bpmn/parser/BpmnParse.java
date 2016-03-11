@@ -2929,7 +2929,7 @@ public class BpmnParse extends Parse {
    *          inside this activity, specifically created for this event.
    */
   public void parseBoundaryTimerEventDefinition(Element timerEventDefinition, boolean interrupting, ActivityImpl boundaryActivity) {
-    boundaryActivity.getProperties().set(BpmnProperties.TYPE, "boundaryTimer");
+    boundaryActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.BOUNDARY_TIMER);
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, boundaryActivity, TimerExecuteNestedActivityJobHandler.TYPE);
 
     // ACT-1427
@@ -2950,7 +2950,7 @@ public class BpmnParse extends Parse {
   }
 
   public void parseBoundarySignalEventDefinition(Element element, boolean interrupting, ActivityImpl signalActivity) {
-    signalActivity.getProperties().set(BpmnProperties.TYPE, "boundarySignal");
+    signalActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.BOUNDARY_SIGNAL);
 
     EventSubscriptionDeclaration signalDefinition = parseSignalEventDefinition(element);
     if (signalActivity.getId() == null) {
@@ -2966,7 +2966,7 @@ public class BpmnParse extends Parse {
   }
 
   public void parseBoundaryMessageEventDefinition(Element element, boolean interrupting, ActivityImpl messageActivity) {
-    messageActivity.getProperties().set(BpmnProperties.TYPE, "boundaryMessage");
+    messageActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.BOUNDARY_MESSAGE);
 
     EventSubscriptionDeclaration messageEventDefinition = parseMessageEventDefinition(element);
     if (messageActivity.getId() == null) {

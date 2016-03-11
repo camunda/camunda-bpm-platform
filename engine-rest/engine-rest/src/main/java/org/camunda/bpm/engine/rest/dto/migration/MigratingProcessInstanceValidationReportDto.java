@@ -49,7 +49,7 @@ public class MigratingProcessInstanceValidationReportDto {
 
   public static MigratingProcessInstanceValidationReportDto from(MigratingProcessInstanceValidationReport validationReport) {
     MigratingProcessInstanceValidationReportDto dto = new MigratingProcessInstanceValidationReportDto();
-    dto.setProcessInstanceId(validationReport.getMigratingProcessInstance().getProcessInstanceId());
+    dto.setProcessInstanceId(validationReport.getProcessInstanceId());
     dto.setFailures(validationReport.getFailures());
     dto.setInstanceValidationReports(MigratingActivityInstanceValidationReportDto.from(validationReport.getReports()));
     return dto;
