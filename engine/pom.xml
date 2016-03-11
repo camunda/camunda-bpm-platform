@@ -437,6 +437,7 @@
                 <exclude>**/MultiTenancyHistoricIncidentQueryTest.java</exclude>
                 <exclude>**/MultiTenancyHistoricJobLogQueryTest.java</exclude>
                 <exclude>**/MultiTenancyHistoricDecisionInstanceQueryTest.java</exclude>
+                <exclude>**/BatchMigrationHistoryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -484,6 +485,7 @@
                 <exclude>**/MultiTenancyHistoricIncidentQueryTest.java</exclude>
                 <exclude>**/MultiTenancyHistoricJobLogQueryTest.java</exclude>
                 <exclude>**/MultiTenancyHistoricDecisionInstanceQueryTest.java</exclude>
+                <exclude>**/BatchMigrationHistoryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -526,6 +528,7 @@
                 <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompensateEventHistoryTest.java</exclude>
                 <exclude>**/MultiTenancyHistoric*QueryTest.java</exclude>
+                <exclude>**/BatchMigrationHistoryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
