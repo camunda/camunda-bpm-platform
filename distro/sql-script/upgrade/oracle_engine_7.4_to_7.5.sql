@@ -138,9 +138,11 @@ create index ACT_IDX_HI_DEC_INST_TENANT_ID on ACT_HI_DECINST(TENANT_ID_);
 
 -- remove not null from job definition table --
 alter table ACT_RU_JOBDEF
-	modify PROC_DEF_ID_ NVARCHAR2(64),
-	modify PROC_DEF_KEY_ NVARCHAR2(255),
-	modify ACT_ID_ NVARCHAR2(255);
+    modify (
+        PROC_DEF_ID_ null,
+	    PROC_DEF_KEY_ null,
+	    ACT_ID_ null
+    );
 
 create table ACT_RU_BATCH (
   ID_ NVARCHAR2(64) NOT NULL,

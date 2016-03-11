@@ -37,27 +37,27 @@ create index ACT_IDX_VARIABLE_TENANT_ID on ACT_RU_VARIABLE(TENANT_ID_);
 ALTER TABLE ACT_RU_EVENT_SUBSCR
   ADD TENANT_ID_ nvarchar(64);
 
-create index ACT_IDX_EVENT_SUBSCR_TENANT_ID on ACT_RU_EVENT_SUBSCR(TENANT_ID_);  
+create index ACT_IDX_EVENT_SUBSCR_TENANT_ID on ACT_RU_EVENT_SUBSCR(TENANT_ID_);
 
 ALTER TABLE ACT_RU_JOB
   ADD TENANT_ID_ nvarchar(64);
 
-create index ACT_IDX_JOB_TENANT_ID on ACT_RU_JOB(TENANT_ID_); 
+create index ACT_IDX_JOB_TENANT_ID on ACT_RU_JOB(TENANT_ID_);
 
 ALTER TABLE ACT_RU_JOBDEF
   ADD TENANT_ID_ nvarchar(64);
 
-create index ACT_IDX_JOBDEF_TENANT_ID on ACT_RU_JOBDEF(TENANT_ID_); 
+create index ACT_IDX_JOBDEF_TENANT_ID on ACT_RU_JOBDEF(TENANT_ID_);
 
 ALTER TABLE ACT_RU_INCIDENT
   ADD TENANT_ID_ nvarchar(64);
 
-create index ACT_IDX_INC_TENANT_ID on ACT_RU_INCIDENT(TENANT_ID_); 
+create index ACT_IDX_INC_TENANT_ID on ACT_RU_INCIDENT(TENANT_ID_);
 
 ALTER TABLE ACT_RU_EXT_TASK
   ADD TENANT_ID_ nvarchar(64);
 
-create index ACT_IDX_EXT_TASK_TENANT_ID on ACT_RU_EXT_TASK(TENANT_ID_); 
+create index ACT_IDX_EXT_TASK_TENANT_ID on ACT_RU_EXT_TASK(TENANT_ID_);
 
 ALTER TABLE ACT_RE_DECISION_DEF
        DROP CONSTRAINT ACT_UNIQ_DECISION_DEF;
@@ -144,9 +144,11 @@ create index ACT_IDX_HI_DEC_INST_TENANT_ID on ACT_HI_DECINST(TENANT_ID_);
 
 -- remove not null from job definition table --
 alter table ACT_RU_JOBDEF
-	modify PROC_DEF_ID_ nvarchar(64),
-	modify PROC_DEF_KEY_ nvarchar(255),
-	modify ACT_ID_ nvarchar(255);
+	alter column PROC_DEF_ID_ nvarchar(64) null;
+alter table ACT_RU_JOBDEF
+	alter column PROC_DEF_KEY_ nvarchar(255) null;
+alter table ACT_RU_JOBDEF
+	alter column ACT_ID_ nvarchar(255) null;
 
 create table ACT_RU_BATCH (
     ID_ nvarchar(64) not null,
