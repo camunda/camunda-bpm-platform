@@ -31,6 +31,7 @@ public class ResourceEntity implements Serializable, DbEntity, Resource {
   protected byte[] bytes;
   protected String deploymentId;
   protected boolean generated = false;
+  protected String tenantId;
 
   public String getId() {
     return id;
@@ -80,6 +81,14 @@ public class ResourceEntity implements Serializable, DbEntity, Resource {
     return generated;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -87,6 +96,7 @@ public class ResourceEntity implements Serializable, DbEntity, Resource {
            + ", name=" + name
            + ", deploymentId=" + deploymentId
            + ", generated=" + generated
+           + ", tenantId=" + tenantId
            + "]";
   }
 }

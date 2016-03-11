@@ -7,8 +7,22 @@
   <!-- RESOURCE INSERT -->
 
   <insert id="insertResource" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity">
-    insert into ${prefix}ACT_GE_BYTEARRAY(ID_, NAME_, BYTES_, DEPLOYMENT_ID_, GENERATED_, REV_)
-    values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=BLOB}, #{deploymentId, jdbcType=VARCHAR}, #{generated, jdbcType=BOOLEAN}, 1)  
+    insert into ${prefix}ACT_GE_BYTEARRAY(
+        ID_,
+        NAME_,
+        BYTES_,
+        DEPLOYMENT_ID_,
+        GENERATED_,
+        TENANT_ID_,
+        REV_)
+    values (
+        #{id, jdbcType=VARCHAR},
+        #{name, jdbcType=VARCHAR},
+        #{bytes, jdbcType=BLOB},
+        #{deploymentId, jdbcType=VARCHAR},
+        #{generated, jdbcType=BOOLEAN},
+        #{tenantId, jdbcType=VARCHAR},
+        1)
   </insert>
   
   <!-- RESOURCE UPDATE -->
@@ -27,6 +41,7 @@
     <result property="bytes" column="BYTES_" jdbcType="BLOB"/>
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="generated" column="GENERATED_" jdbcType="BOOLEAN"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
   
   <!-- RESOURCE SELECT -->
@@ -161,6 +176,7 @@
     <result property="bytes" column="BYTES_" jdbcType="BINARY"/>
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="generated" column="GENERATED_" jdbcType="BOOLEAN"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
     
   <!-- postgresql specific -->
