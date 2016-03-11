@@ -12,11 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.dto.task;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
@@ -108,7 +111,6 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String processDefinitionId;
   private String executionId;
   private String[] activityInstanceIdIn;
-  private String[] tenantIdIn;
   private String processDefinitionName;
   private String processDefinitionNameLike;
   private String processInstanceId;
@@ -172,6 +174,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   private String delegationState;
 
+  private String[] tenantIdIn;
+  private Boolean withoutTenantId;
+
   private List<String> candidateGroups;
   private String candidateGroupsExpression;
 
@@ -230,6 +235,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam(value="tenantIdIn", converter = StringArrayConverter.class)
   public void setTenantIdIn(String[] tenantIdIn) {
     this.tenantIdIn = tenantIdIn;
+  }
+
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
   }
 
   @CamundaQueryParam("processDefinitionName")
@@ -900,6 +910,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (tenantIdIn != null && tenantIdIn.length > 0) {
       query.tenantIdIn(tenantIdIn);
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
     }
     if (processDefinitionName != null) {
       query.processDefinitionName(processDefinitionName);

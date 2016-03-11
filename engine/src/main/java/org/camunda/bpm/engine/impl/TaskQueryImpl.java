@@ -25,8 +25,8 @@ import java.util.Set;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
+import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
@@ -68,7 +68,6 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String processInstanceId;
   protected String executionId;
   protected String[] activityInstanceIdIn;
-  protected String[] tenantIds;
   protected Date createTime;
   protected Date createTimeBefore;
   protected Date createTimeAfter;
@@ -96,6 +95,9 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected boolean initializeFormKeys = false;
   protected boolean taskNameCaseInsensitive = false;
   protected String parentTaskId;
+
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
 
   // case management /////////////////////////////
   protected String caseDefinitionKey;
@@ -403,6 +405,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public TaskQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public TaskQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
     return this;
   }
 

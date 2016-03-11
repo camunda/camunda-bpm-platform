@@ -20,8 +20,6 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.query.Query;
-import org.camunda.bpm.engine.repository.DeploymentQuery;
-import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
@@ -729,8 +727,11 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    */
   TaskQuery initializeFormKeys();
 
-  /** Only select tasks definitions with one of the given tenant ids. */
+  /** Only select tasks with one of the given tenant ids. */
   TaskQuery tenantIdIn(String... tenantIds);
+
+  /** Only selects tasks which have no tenant id. */
+  TaskQuery withoutTenantId();
 
   // ordering ////////////////////////////////////////////////////////////
 

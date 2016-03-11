@@ -362,12 +362,14 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   public void testAdditionalParametersExcludingVariables() {
     Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
     Map<String, Integer> intQueryParameters = getCompleteIntQueryParameters();
+    Map<String, Boolean> booleanQueryParameters = getCompleteBooleanQueryParameters();
 
     Map<String, String[]> arrayQueryParameters = getCompleteStringArrayQueryParameters();
 
     given()
       .queryParams(stringQueryParameters)
       .queryParams(intQueryParameters)
+      .queryParams(booleanQueryParameters)
       .queryParam("activityInstanceIdIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("activityInstanceIdIn")))
       .queryParam("taskDefinitionKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("taskDefinitionKeyIn")))
       .queryParam("processDefinitionKeyIn", arrayAsCommaSeperatedList(arrayQueryParameters.get("processDefinitionKeyIn")))
@@ -379,11 +381,8 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verifyIntegerParameterQueryInvocations();
     verifyStringParameterQueryInvocations();
+    verifyBooleanParameterQueryInvocation();
     verifyStringArrayParametersInvocations();
-
-    verify(mockQuery).taskUnassigned();
-    verify(mockQuery).active();
-    verify(mockQuery).suspended();
 
     verify(mockQuery).list();
   }
@@ -449,9 +448,6 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("name", "aName");
     parameters.put("nameLike", "aNameLike");
     parameters.put("owner", "anOwner");
-    parameters.put("unassigned", "true");
-    parameters.put("active", "true");
-    parameters.put("suspended", "true");
     parameters.put("caseDefinitionKey", "aCaseDefKey");
     parameters.put("caseDefinitionId", "aCaseDefId");
     parameters.put("caseDefinitionName", "aCaseDefName");
@@ -461,6 +457,17 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("caseInstanceBusinessKeyLike", "aCaseInstanceBusinessKeyLike");
     parameters.put("caseExecutionId", "aCaseExecutionId");
     parameters.put("parentTaskId", "aParentTaskId");
+
+    return parameters;
+  }
+
+  private Map<String, Boolean> getCompleteBooleanQueryParameters() {
+    Map<String, Boolean> parameters = new HashMap<String, Boolean>();
+
+    parameters.put("unassigned", true);
+    parameters.put("active", true);
+    parameters.put("suspended", true);
+    parameters.put("withoutTenantId", true);
 
     return parameters;
   }
@@ -508,6 +515,13 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).processDefinitionKeyIn(stringArrayParameters.get("processDefinitionKeyIn"));
     verify(mockQuery).processInstanceBusinessKeyIn(stringArrayParameters.get("processInstanceBusinessKeyIn"));
     verify(mockQuery).tenantIdIn(stringArrayParameters.get("tenantIdIn"));
+  }
+
+  private void verifyBooleanParameterQueryInvocation() {
+    verify(mockQuery).taskUnassigned();
+    verify(mockQuery).active();
+    verify(mockQuery).suspended();
+    verify(mockQuery).withoutTenantId();
   }
 
   @Test
@@ -1333,10 +1347,12 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     Map<String, Object> queryParameters = new HashMap<String, Object>();
     Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
     Map<String, Integer> intQueryParameters = getCompleteIntQueryParameters();
+    Map<String, Boolean> booleanQueryParameters = getCompleteBooleanQueryParameters();
     Map<String, String[]> stringArrayQueryParameters = getCompleteStringArrayQueryParameters();
 
     queryParameters.putAll(stringQueryParameters);
     queryParameters.putAll(intQueryParameters);
+    queryParameters.putAll(booleanQueryParameters);
     queryParameters.putAll(stringArrayQueryParameters);
 
     List<String> candidateGroups = new ArrayList<String>();
@@ -1355,12 +1371,9 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verifyStringParameterQueryInvocations();
     verifyIntegerParameterQueryInvocations();
     verifyStringArrayParametersInvocations();
+    verifyBooleanParameterQueryInvocation();
 
-    verify(mockQuery).taskUnassigned();
-    verify(mockQuery).active();
-    verify(mockQuery).suspended();
     verify(mockQuery).includeAssignedTasks();
-
     verify(mockQuery).taskCandidateGroupIn(argThat(new EqualsList(candidateGroups)));
   }
 
