@@ -146,12 +146,12 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("tenantId", "asc", Status.OK);
-    inOrder.verify(mockedQuery).orderByEvaluationTime();
+    inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).asc();
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("tenantId", "desc", Status.OK);
-    inOrder.verify(mockedQuery).orderByEvaluationTime();
+    inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).desc();
   }
 
