@@ -97,29 +97,35 @@ describe('Tasklist Search', function() {
     });
 
 
-    it('should keep search pills after page refresh', function() {
+    it('should keep search pills after page refresh', function(done) {
 
       // when
       browser.getCurrentUrl().then(function(url) {
         browser.get(url).then(function() {
           browser.sleep(500);
+
+          // then
+          expect(page.taskList.taskList().count()).to.eventually.eql(1);
+          expect(page.taskList.taskName(0)).to.eventually.eql('Task 2');
+
+          done();
         });
       });
 
-      // then
-      expect(page.taskList.taskList().count()).to.eventually.eql(1);
-      expect(page.taskList.taskName(0)).to.eventually.eql('Task 2');
     });
 
 
-    it('should change String search value and find Task 1', function() {
+    it('should change String search value and find Task 1', function(done) {
 
       // when
-      page.taskList.taskSearch.changeValue(2, '\'4711\'');
+      page.taskList.taskSearch.changeValue(2, '\'4711\'').then(function() {
 
-      // then
-      expect(page.taskList.taskList().count()).to.eventually.eql(1);
-      expect(page.taskList.taskName(0)).to.eventually.eql('Task 1');
+        // then
+        expect(page.taskList.taskList().count()).to.eventually.eql(1);
+        expect(page.taskList.taskName(0)).to.eventually.eql('Task 1');
+
+        done();
+      });
     });
   });
 
