@@ -40,6 +40,7 @@ import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_PRIORITY
 import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_PROCESS_INSTANCE_ID_VALUE;
 import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_PROCESS_VARIABLE;
 import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_TASK_VARIABLE;
+import static org.camunda.bpm.engine.rest.dto.task.TaskQueryDto.SORT_BY_TENANT_ID_VALUE;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_FILTER_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.mockFilter;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.mockVariableInstance;
@@ -287,6 +288,8 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     when(query.getNameLike()).thenReturn(MockProvider.EXAMPLE_TASK_NAME);
     when(query.getOwner()).thenReturn(MockProvider.EXAMPLE_TASK_OWNER);
     when(query.getParentTaskId()).thenReturn(MockProvider.EXAMPLE_TASK_PARENT_TASK_ID);
+    when(query.getTenantIds()).thenReturn(MockProvider.EXAMPLE_TENANT_ID_LIST.split(","));
+    when(query.isTenantIdSet()).thenReturn(true);
 
     filterMock = MockProvider.createMockFilter(EXAMPLE_FILTER_ID, query);
     when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filterMock);
@@ -329,6 +332,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("query.nameLike", equalTo(MockProvider.EXAMPLE_TASK_NAME))
       .body("query.owner", equalTo(MockProvider.EXAMPLE_TASK_OWNER))
       .body("query.parentTaskId", equalTo(MockProvider.EXAMPLE_TASK_PARENT_TASK_ID))
+      .body("query.tenantIdIn", hasItems(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID))
     .when()
       .get(SINGLE_FILTER_URL);
 
@@ -384,6 +388,22 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("query.candidateUser", equalTo("abc"))
       .body("query.containsKey('candidateGroups')", is(false))
       .body("query.includeAssignedTasks", is(true))
+    .when()
+      .get(SINGLE_FILTER_URL);
+  }
+
+  @Test
+  public void testGetFilterWithoutTenantIdQuery() {
+    TaskQueryImpl query = new TaskQueryImpl();
+    query.withoutTenantId();
+    Filter filter = new FilterEntity("Task").setName("test").setQuery(query);
+    when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filter);
+
+    given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("query.withoutTenantId", is(true))
     .when()
       .get(SINGLE_FILTER_URL);
   }
@@ -464,7 +484,8 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .orderByTaskId().asc()
       .orderByTaskName().asc()
       .orderByTaskNameCaseInsensitive().asc()
-      .orderByTaskPriority().asc();
+      .orderByTaskPriority().asc()
+      .orderByTenantId().asc();
 
     Filter filter = new FilterEntity("Task").setName("test").setQuery(query);
     when(filterServiceMock.getFilter(EXAMPLE_FILTER_ID)).thenReturn(filter);
@@ -479,7 +500,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     // validate sorting content
     String content = response.asString();
     List<Map<String, Object>> sortings = from(content).getJsonObject("query.sorting");
-    assertThat(sortings).hasSize(13);
+    assertThat(sortings).hasSize(14);
     assertSorting(sortings.get(0), SORT_BY_PROCESS_INSTANCE_ID_VALUE, SORT_ORDER_ASC_VALUE);
     assertSorting(sortings.get(1), SORT_BY_CASE_INSTANCE_ID_VALUE, SORT_ORDER_ASC_VALUE);
     assertSorting(sortings.get(2), SORT_BY_DUE_DATE_VALUE, SORT_ORDER_ASC_VALUE);
@@ -493,6 +514,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     assertSorting(sortings.get(10), SORT_BY_NAME_VALUE, SORT_ORDER_ASC_VALUE);
     assertSorting(sortings.get(11), SORT_BY_NAME_CASE_INSENSITIVE_VALUE, SORT_ORDER_ASC_VALUE);
     assertSorting(sortings.get(12), SORT_BY_PRIORITY_VALUE, SORT_ORDER_ASC_VALUE);
+    assertSorting(sortings.get(13), SORT_BY_TENANT_ID_VALUE, SORT_ORDER_ASC_VALUE);
   }
 
   @Test

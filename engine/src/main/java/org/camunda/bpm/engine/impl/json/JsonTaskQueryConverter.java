@@ -101,6 +101,8 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String PROCESS_VARIABLES = "processVariables";
   public static final String TASK_VARIABLES = "taskVariables";
   public static final String CASE_INSTANCE_VARIABLES = "caseInstanceVariables";
+  public static final String TENANT_IDS = "tenantIds";
+  public static final String WITHOUT_TENANT_ID = "withoutTenantId";
   public static final String ORDERING_PROPERTIES = "orderingProperties";
 
   /**
@@ -111,6 +113,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
 
   protected static JsonTaskQueryVariableValueConverter variableValueConverter = new JsonTaskQueryVariableValueConverter();
 
+  @Override
   public JSONObject toJsonObject(TaskQuery taskQuery) {
     JSONObject json = new JSONObject();
     TaskQueryImpl query = (TaskQueryImpl) taskQuery;
@@ -160,7 +163,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     addDefaultField(json, FOLLOW_UP_NULL_ACCEPTED, false, query.isFollowUpNullAccepted());
     addDateField(json, FOLLOW_UP_AFTER, query.getFollowUpAfter());
     addDefaultField(json, EXCLUDE_SUBTASKS, false, query.isExcludeSubtasks());
-    addSuspensionState(json, query.getSuspensionState());
+    addSuspensionStateField(json, query.getSuspensionState());
     addField(json, CASE_DEFINITION_KEY, query.getCaseDefinitionKey());
     addField(json, CASE_DEFINITION_ID, query.getCaseDefinitionId());
     addField(json, CASE_DEFINITION_NAME, query.getCaseDefinitionName());
@@ -169,6 +172,8 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     addField(json, CASE_INSTANCE_BUSINESS_KEY, query.getCaseInstanceBusinessKey());
     addField(json, CASE_INSTANCE_BUSINESS_KEY_LIKE, query.getCaseInstanceBusinessKeyLike());
     addField(json, CASE_EXECUTION_ID, query.getCaseExecutionId());
+    addTenantIdFields(json, query);
+
     if (query.getOrderingProperties() != null && !query.getOrderingProperties().isEmpty()) {
       addField(json, ORDERING_PROPERTIES,
           JsonQueryOrderingPropertyConverter.ARRAY_CONVERTER.toJsonArray(query.getOrderingProperties()));
@@ -183,13 +188,23 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     return json;
   }
 
-  private void addSuspensionState(JSONObject json, SuspensionState suspensionState) {
+  protected void addSuspensionStateField(JSONObject json, SuspensionState suspensionState) {
     if (suspensionState != null) {
       if (suspensionState.equals(SuspensionState.ACTIVE)) {
         json.put(ACTIVE, true);
       }
       else if (suspensionState.equals(SuspensionState.SUSPENDED)) {
         json.put(SUSPENDED, true);
+      }
+    }
+  }
+
+  protected void addTenantIdFields(JSONObject json, TaskQueryImpl query) {
+    if (query.isTenantIdSet()) {
+      if (query.getTenantIds() != null) {
+        addArrayField(json, TENANT_IDS, query.getTenantIds());
+      } else {
+        addField(json, WITHOUT_TENANT_ID, true);
       }
     }
   }
@@ -221,6 +236,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     array.put(variableValueConverter.toJsonObject(variable));
   }
 
+  @Override
   public TaskQuery toObject(JSONObject json) {
     TaskQueryImpl query = new TaskQueryImpl();
 
@@ -394,6 +410,12 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     }
     if (json.has(CASE_EXECUTION_ID)) {
       query.caseExecutionId(json.getString(CASE_EXECUTION_ID));
+    }
+    if (json.has(TENANT_IDS)) {
+      query.tenantIdIn(getArray(json.getJSONArray(TENANT_IDS)));
+    }
+    if (json.has(WITHOUT_TENANT_ID)) {
+      query.withoutTenantId();
     }
     if (json.has(ORDER_BY)) {
       List<QueryOrderingProperty> orderingProperties =

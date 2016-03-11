@@ -626,6 +626,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return tenantIdIn;
   }
 
+  public Boolean getWithoutTenantId() {
+    return withoutTenantId;
+  }
+
   public String getProcessDefinitionName() {
     return processDefinitionName;
   }
@@ -1290,7 +1294,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.processDefinitionKeyIn = taskQuery.getProcessDefinitionKeys();
     dto.processDefinitionId = taskQuery.getProcessDefinitionId();
     dto.executionId = taskQuery.getExecutionId();
-    dto.tenantIdIn = taskQuery.getTenantIds();
+
     dto.processDefinitionName = taskQuery.getProcessDefinitionName();
     dto.processDefinitionNameLike = taskQuery.getProcessDefinitionNameLike();
     dto.processInstanceId = taskQuery.getProcessInstanceId();
@@ -1328,6 +1332,14 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
     if (taskQuery.getDelegationState() != null) {
       dto.delegationState = taskQuery.getDelegationState().toString();
+    }
+
+    if (taskQuery.isTenantIdSet()) {
+      if (taskQuery.getTenantIds() != null) {
+        dto.tenantIdIn = taskQuery.getTenantIds();
+      } else {
+        dto.withoutTenantId = true;
+      }
     }
 
     dto.processVariables = new ArrayList<VariableQueryParameterDto>();
@@ -1484,6 +1496,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     else if (TaskQueryProperty.TASK_ID.equals(queryProperty)) {
       return SORT_BY_ID_VALUE;
+    }
+    else if (TaskQueryProperty.TENANT_ID.equals(queryProperty)) {
+      return SORT_BY_TENANT_ID_VALUE;
     }
     else {
       throw new RestException("Unknown query property for task query " + queryProperty);

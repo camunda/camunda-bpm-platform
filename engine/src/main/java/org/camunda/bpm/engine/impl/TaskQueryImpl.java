@@ -1293,6 +1293,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return taskNameCaseInsensitive;
   }
 
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
+
   @Override
   public TaskQuery extend(TaskQuery extending) {
     TaskQueryImpl extendingQuery = (TaskQueryImpl) extending;
@@ -1760,4 +1764,5 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public void addTaskPermissionCheck(PermissionCheck permissionCheck) {
     taskPermissionChecks.addAtomicCheck(permissionCheck);
   }
+
 }
