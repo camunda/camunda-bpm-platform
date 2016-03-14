@@ -19,6 +19,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -101,6 +102,21 @@ public class IoUtil {
     try {
       if(closeable != null) {
         closeable.close();
+      }
+    }
+    catch(IOException ignore) {
+      LOG.debugCloseException(ignore);
+    }
+  }
+
+  /**
+   * Flushes the given object. The same as calling {@link Flushable#flush()}, but
+   * errors while flushing are silently ignored.
+   */
+  public static void flushSilently(Flushable flushable) {
+    try {
+      if(flushable != null) {
+        flushable.flush();
       }
     }
     catch(IOException ignore) {

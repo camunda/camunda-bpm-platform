@@ -12,14 +12,16 @@
  */
 package org.camunda.bpm.engine.impl.migration.batch;
 
+import java.io.ByteArrayOutputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.JobQueryImpl;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.json.MigrationBatchConfigurationJsonConverter;
@@ -30,8 +32,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import org.camunda.bpm.engine.impl.util.json.JSONTokener;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 
 /**
@@ -40,12 +44,10 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
  */
 public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchConfiguration> {
 
-  public static final String TYPE = "instance-migration";
-
   public static final MigrationBatchJobDeclaration JOB_DECLARATION = new MigrationBatchJobDeclaration();
 
   public String getType() {
-    return TYPE;
+    return Batch.TYPE_PROCESS_INSTANCE_MIGRATION;
   }
 
   public JobDeclaration<?, MessageEntity> getJobDeclaration() {
@@ -54,12 +56,19 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
 
   public byte[] writeConfiguration(MigrationBatchConfiguration configuration) {
     JSONObject jsonObject = MigrationBatchConfigurationJsonConverter.INSTANCE.toJsonObject(configuration);
-    return StringUtil.toByteArray(jsonObject.toString());
+
+    ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+    Writer writer = StringUtil.writerForStream(outStream);
+
+    jsonObject.write(writer);
+    IoUtil.flushSilently(writer);
+
+    return outStream.toByteArray();
   }
 
   public MigrationBatchConfiguration readConfiguration(byte[] serializedConfiguration) {
-    String jsonString = StringUtil.fromBytes(serializedConfiguration);
-    return MigrationBatchConfigurationJsonConverter.INSTANCE.toObject(new JSONObject(jsonString));
+    Reader jsonReader = StringUtil.readerFromBytes(serializedConfiguration);
+    return MigrationBatchConfigurationJsonConverter.INSTANCE.toObject(new JSONObject(new JSONTokener(jsonReader)));
   }
 
   public boolean createJobs(BatchEntity batch) {
@@ -120,14 +129,6 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
     return jobInstance;
   }
 
-  public boolean isCompleted(BatchEntity batch) {
-    return Context.getCommandContext().getProcessEngineConfiguration()
-      .getManagementService()
-      .createJobQuery()
-      .jobDefinitionId(batch.getBatchJobDefinitionId())
-      .count() == 0;
-  }
-
   @Override
   public void deleteJobs(BatchEntity batch) {
     CommandContext commandContext = Context.getCommandContext();
@@ -151,7 +152,7 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
 
     commandContext.getProcessEngineConfiguration()
       .getRuntimeService()
-      .executeMigrationPlan(batchConfiguration.getMigrationPlan())
+      .newMigration(batchConfiguration.getMigrationPlan())
         .processInstanceIds(batchConfiguration.getProcessInstanceIds())
         .execute();
 

@@ -214,7 +214,7 @@ public class BatchMigrationHistoryTest {
     assertNotNull(jobLog);
     assertTrue(jobLog.isCreationLog());
     assertEquals(batch.getBatchJobDefinitionId(), jobLog.getJobDefinitionId());
-    assertEquals(MigrationBatchJobHandler.TYPE, jobLog.getJobDefinitionType());
+    assertEquals(Batch.TYPE_PROCESS_INSTANCE_MIGRATION, jobLog.getJobDefinitionType());
     assertEquals(batch.getId(), jobLog.getJobDefinitionConfiguration());
     assertEquals(START_DATE, jobLog.getTimestamp());
     assertNull(jobLog.getDeploymentId());
@@ -226,7 +226,7 @@ public class BatchMigrationHistoryTest {
     assertNotNull(jobLog);
     assertTrue(jobLog.isSuccessLog());
     assertEquals(batch.getBatchJobDefinitionId(), jobLog.getJobDefinitionId());
-    assertEquals(MigrationBatchJobHandler.TYPE, jobLog.getJobDefinitionType());
+    assertEquals(Batch.TYPE_PROCESS_INSTANCE_MIGRATION, jobLog.getJobDefinitionType());
     assertEquals(batch.getId(), jobLog.getJobDefinitionConfiguration());
     assertEquals(executionDate, jobLog.getTimestamp());
     assertNull(jobLog.getDeploymentId());

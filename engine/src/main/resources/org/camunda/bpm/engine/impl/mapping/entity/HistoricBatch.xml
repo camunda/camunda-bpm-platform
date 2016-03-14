@@ -67,8 +67,6 @@
   <update id="updateHistoricBatch" parameterType="org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity">
     update ${prefix}ACT_HI_BATCH
     <set>
-      TYPE_ = #{type, jdbcType=VARCHAR},
-      SIZE_ = #{size, jdbcType=INTEGER},
       END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
     </set>
     where ID_= #{id, jdbcType=VARCHAR}

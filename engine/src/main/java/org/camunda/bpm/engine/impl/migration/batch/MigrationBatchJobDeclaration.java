@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.migration.batch;
 
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -26,7 +27,7 @@ public class MigrationBatchJobDeclaration extends JobDeclaration<ByteArrayEntity
   private static final long serialVersionUID = 1L;
 
   public MigrationBatchJobDeclaration() {
-    super(MigrationBatchJobHandler.TYPE);
+    super(Batch.TYPE_PROCESS_INSTANCE_MIGRATION);
   }
 
   protected ExecutionEntity resolveExecution(ByteArrayEntity configuration) {

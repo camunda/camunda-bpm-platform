@@ -66,7 +66,7 @@ public class BatchMigrationHelper {
       .mapEqualActivities()
       .build();
 
-    return runtimeService.executeMigrationPlan(migrationPlan).processInstanceIds(processInstanceIds).executeAsync();
+    return runtimeService.newMigration(migrationPlan).processInstanceIds(processInstanceIds).executeAsync();
   }
 
   public Job getJobForDefinition(JobDefinition jobDefinition) {
@@ -122,7 +122,7 @@ public class BatchMigrationHelper {
 
   public JobDefinition getMigrationJobDefinition(Batch batch) {
     return engineRule.getManagementService()
-      .createJobDefinitionQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).jobType(MigrationBatchJobHandler.TYPE).singleResult();
+      .createJobDefinitionQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).jobType(Batch.TYPE_PROCESS_INSTANCE_MIGRATION).singleResult();
   }
 
   public List<Job> getMigrationJobs(Batch batch) {
@@ -144,17 +144,29 @@ public class BatchMigrationHelper {
 
   public List<HistoricJobLog> getHistoricSeedJobLog(Batch batch) {
     return engineRule.getHistoryService()
-      .createHistoricJobLogQuery().jobDefinitionId(batch.getSeedJobDefinitionId()).list();
+      .createHistoricJobLogQuery()
+      .jobDefinitionId(batch.getSeedJobDefinitionId())
+      .orderPartiallyByOccurrence()
+      .asc()
+      .list();
   }
 
   public List<HistoricJobLog> getHistoricMonitorJobLog(Batch batch) {
     return engineRule.getHistoryService()
-      .createHistoricJobLogQuery().jobDefinitionId(batch.getMonitorJobDefinitionId()).list();
+      .createHistoricJobLogQuery()
+      .jobDefinitionId(batch.getMonitorJobDefinitionId())
+      .orderPartiallyByOccurrence()
+      .asc()
+      .list();
   }
 
   public List<HistoricJobLog> getHistoricBatchJobLog(Batch batch) {
     return engineRule.getHistoryService()
-      .createHistoricJobLogQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list();
+      .createHistoricJobLogQuery()
+      .jobDefinitionId(batch.getBatchJobDefinitionId())
+      .orderPartiallyByOccurrence()
+      .asc()
+      .list();
   }
 
   public long countSourceProcessInstances() {

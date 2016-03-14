@@ -41,7 +41,6 @@ public class MigrateProcessInstanceBatchCmd implements Command<Batch> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public Batch execute(CommandContext commandContext) {
     BatchEntity batch = createBatch(commandContext);
 
@@ -88,7 +87,7 @@ public class MigrateProcessInstanceBatchCmd implements Command<Batch> {
 
   @SuppressWarnings("unchecked")
   protected BatchJobHandler<MigrationBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    return (BatchJobHandler<MigrationBatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(MigrationBatchJobHandler.TYPE);
+    return (BatchJobHandler<MigrationBatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_PROCESS_INSTANCE_MIGRATION);
   }
 
 }

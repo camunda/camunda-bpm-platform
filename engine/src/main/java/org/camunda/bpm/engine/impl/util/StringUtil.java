@@ -13,10 +13,15 @@
 
 package org.camunda.bpm.engine.impl.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
@@ -24,7 +29,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.runtime.ProcessElementInstance;
-import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 /**
  * @author Sebastian Menski
@@ -94,6 +98,22 @@ public final class StringUtil {
     Charset charset = processEngineConfiguration.getDefaultCharset();
     return new String(bytes, charset);
   }
+
+  public static Reader readerFromBytes(byte[] bytes) {
+    EnsureUtil.ensureActiveCommandContext("StringUtil.readerFromBytes");
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
+
+    return new InputStreamReader(inputStream, processEngineConfiguration.getDefaultCharset());
+  }
+
+  public static Writer writerForStream(OutputStream outStream) {
+    EnsureUtil.ensureActiveCommandContext("StringUtil.readerFromBytes");
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+
+    return new OutputStreamWriter(outStream, processEngineConfiguration.getDefaultCharset());
+  }
+
 
   /**
    * Gets the bytes from a string using the current process engine's default charset

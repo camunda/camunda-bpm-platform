@@ -60,12 +60,4 @@ public interface BatchJobHandler<T> extends JobHandler {
    */
   void deleteJobs(BatchEntity batch);
 
-  /**
-   * Check if a batch was completed.
-   *
-   * @param batch the batch to check for completion
-   * @return true if the batch was completed, false otherwise
-   */
-  boolean isCompleted(BatchEntity batch);
-
 }

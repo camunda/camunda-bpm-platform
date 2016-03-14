@@ -1709,6 +1709,6 @@ public interface RuntimeService {
    * @param migrationPlan the migration plan to executed
    * @return a fluent builder
    */
-  MigrationPlanExecutionBuilder executeMigrationPlan(MigrationPlan migrationPlan);
+  MigrationPlanExecutionBuilder newMigration(MigrationPlan migrationPlan);
 
 }

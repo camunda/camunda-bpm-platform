@@ -29,10 +29,10 @@ public class ByteArrayField {
   protected ByteArrayEntity byteArrayValue;
   protected String byteArrayId;
 
-  protected final Nameable valueFields;
+  protected final Nameable nameProvider;
 
-  public ByteArrayField(Nameable valueFields) {
-    this.valueFields = valueFields;
+  public ByteArrayField(Nameable nameProvider) {
+    this.nameProvider = nameProvider;
   }
 
   public String getByteArrayId() {
@@ -82,7 +82,7 @@ public class ByteArrayField {
       else {
         deleteByteArrayValue();
 
-        byteArrayValue = new ByteArrayEntity(valueFields.getName(), bytes);
+        byteArrayValue = new ByteArrayEntity(nameProvider.getName(), bytes);
         Context.
           getCommandContext()
           .getDbEntityManager()

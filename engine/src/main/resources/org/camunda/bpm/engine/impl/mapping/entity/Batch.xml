@@ -85,6 +85,9 @@
       <if test="batchId != null">
         RES.ID_ = #{batchId}
       </if>
+      <if test="type != null">
+        and RES.TYPE_ = #{type}
+      </if>
     </where>
   </sql>
 

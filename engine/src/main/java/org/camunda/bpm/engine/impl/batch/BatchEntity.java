@@ -319,6 +319,14 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
       .completeHistoricBatch(this);
   }
 
+  public boolean isCompleted() {
+    return Context.getCommandContext().getProcessEngineConfiguration()
+      .getManagementService()
+      .createJobQuery()
+      .jobDefinitionId(batchJobDefinitionId)
+      .count() == 0;
+  }
+
   public String toString() {
     return "BatchEntity{" +
       "batchHandler=" + batchJobHandler +

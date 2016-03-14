@@ -482,7 +482,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     return new MigrationPlanBuilderImpl(commandExecutor, sourceProcessDefinitionId, targetProcessDefinitionId);
   }
 
-  public MigrationPlanExecutionBuilder executeMigrationPlan(MigrationPlan migrationPlan) {
+  public MigrationPlanExecutionBuilder newMigration(MigrationPlan migrationPlan) {
     return new MigrationPlanExecutionBuilderImpl(commandExecutor, migrationPlan);
   }
 

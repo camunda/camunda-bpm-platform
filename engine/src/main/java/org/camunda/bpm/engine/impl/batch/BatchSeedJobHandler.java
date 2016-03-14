@@ -22,8 +22,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
  * The batch seed job handler is responsible to
  * create all jobs to be executed by the batch.
  *
- * If all jobs a created a seed monitor job is
- * created oversee the completion of the batch
+ * If all jobs are created a seed monitor job is
+ * created to oversee the completion of the batch
  * (see {@link BatchMonitorJobHandler}).
  */
 public class BatchSeedJobHandler implements JobHandler {

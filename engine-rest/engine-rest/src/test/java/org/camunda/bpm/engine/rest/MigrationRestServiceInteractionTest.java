@@ -101,7 +101,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     migrationPlanExecutionBuilderMock = mock(MigrationPlanExecutionBuilder.class);
     when(migrationPlanExecutionBuilderMock.processInstanceIds(anyListOf(String.class))).thenReturn(migrationPlanExecutionBuilderMock);
 
-    when(runtimeServiceMock.executeMigrationPlan(any(MigrationPlan.class))).thenReturn(migrationPlanExecutionBuilderMock);
+    when(runtimeServiceMock.newMigration(any(MigrationPlan.class))).thenReturn(migrationPlanExecutionBuilderMock);
   }
 
   @Test
@@ -619,7 +619,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
   protected void verifyMigrationPlanExecutionInteraction(MigrationExecutionDto migrationExecution) {
     InOrder inOrder = inOrder(runtimeServiceMock, migrationPlanExecutionBuilderMock);
-    inOrder.verify(runtimeServiceMock).executeMigrationPlan(any(MigrationPlan.class));
+    inOrder.verify(runtimeServiceMock).newMigration(any(MigrationPlan.class));
     inOrder.verify(migrationPlanExecutionBuilderMock).processInstanceIds(eq(migrationExecution.getProcessInstanceIds()));
     inOrder.verify(migrationPlanExecutionBuilderMock).execute();
     inOrder.verifyNoMoreInteractions();

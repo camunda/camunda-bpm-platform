@@ -23,4 +23,14 @@ public interface BatchQuery extends Query<BatchQuery, Batch> {
   /** Only select batch instances for the given batch id. */
   BatchQuery batchId(String batchId);
 
+  /**
+   * Only select batches of the given type.
+   */
+  BatchQuery type(String type);
+
+  /**
+   * Returns batches sorted by id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   */
+  BatchQuery orderById();
+
 }

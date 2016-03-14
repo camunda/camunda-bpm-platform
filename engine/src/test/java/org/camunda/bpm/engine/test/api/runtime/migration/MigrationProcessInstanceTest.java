@@ -54,7 +54,7 @@ public class MigrationProcessInstanceTest {
   @Test
   public void testNullMigrationPlan() {
     try {
-      runtimeService.executeMigrationPlan(null).processInstanceIds(Collections.<String>emptyList()).execute();
+      runtimeService.newMigration(null).processInstanceIds(Collections.<String>emptyList()).execute();
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
@@ -70,7 +70,7 @@ public class MigrationProcessInstanceTest {
       .build();
 
     try {
-      runtimeService.executeMigrationPlan(migrationPlan).processInstanceIds(null).execute();
+      runtimeService.newMigration(migrationPlan).processInstanceIds(null).execute();
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
@@ -91,7 +91,7 @@ public class MigrationProcessInstanceTest {
       .build();
 
     try {
-      runtimeService.executeMigrationPlan(migrationPlan).processInstanceIds(Collections.singletonList(processInstance.getId())).execute();
+      runtimeService.newMigration(migrationPlan).processInstanceIds(Collections.singletonList(processInstance.getId())).execute();
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
@@ -109,7 +109,7 @@ public class MigrationProcessInstanceTest {
       .build();
 
     try {
-      runtimeService.executeMigrationPlan(migrationPlan).processInstanceIds(Collections.singletonList("unknown")).execute();
+      runtimeService.newMigration(migrationPlan).processInstanceIds(Collections.singletonList("unknown")).execute();
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
@@ -127,7 +127,7 @@ public class MigrationProcessInstanceTest {
       .build();
 
     try {
-      runtimeService.executeMigrationPlan(migrationPlan).processInstanceIds(Collections.<String>singletonList(null)).execute();
+      runtimeService.newMigration(migrationPlan).processInstanceIds(Collections.<String>singletonList(null)).execute();
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {

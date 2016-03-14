@@ -13,10 +13,23 @@
 package org.camunda.bpm.engine.batch;
 
 /**
- * A batch represents a number of jobs which
+ * <p>A batch represents a number of jobs which
  * execute a number of commands asynchronously.
+ *
+ * <p>Batches have three types of jobs:
+ * <ul>
+ *   <li>Seed jobs: Create execution jobs
+ *   <li>Execution jobs: Execute the actual action
+ *   <li>Monitor jobs: Manage the batch once all execution jobs have been created
+ *     (e.g. responsible for deletion of the Batch after completion).
+ * </ul>
+ *
+ * <p>All three job types have independent job definitions. They can be controlled individually
+ * (e.g. suspension) and are independently represented in the historic job log.
  */
 public interface Batch {
+
+  public static final String TYPE_PROCESS_INSTANCE_MIGRATION = "instance-migration";
 
   /**
    * @return the id of the batch

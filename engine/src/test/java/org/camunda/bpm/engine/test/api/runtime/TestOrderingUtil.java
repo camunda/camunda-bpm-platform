@@ -16,11 +16,10 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
@@ -32,6 +31,8 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+
+import junit.framework.TestCase;
 
 /**
  * This class provides utils to verify the sorting of queries of engine entities.
@@ -552,6 +553,20 @@ public class TestOrderingUtil {
         return object.getLockExpirationTime() == null;
       }
 
+    };
+  }
+
+  // batch
+
+  public static NullTolerantComparator<Batch> batchById() {
+    return new NullTolerantComparator<Batch>() {
+      public int compare(Batch o1, Batch o2) {
+        return o1.getId().compareTo(o2.getId());
+      }
+
+      public boolean hasNullProperty(Batch object) {
+        return false;
+      }
     };
   }
 

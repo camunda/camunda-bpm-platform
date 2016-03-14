@@ -35,12 +35,7 @@ public class BatchMonitorJobHandler implements JobHandler {
     BatchEntity batch = commandContext.getBatchManager().findBatchById(batchId);
     ensureNotNull("Batch with id '" + batchId + "' cannot be found", "batch", batch);
 
-    BatchJobHandler<?> batchJobHandler = commandContext
-      .getProcessEngineConfiguration()
-      .getBatchHandlers()
-      .get(batch.getType());
-
-    boolean completed = batchJobHandler.isCompleted(batch);
+    boolean completed = batch.isCompleted();
 
     if (!completed) {
       batch.createMonitorJob();
