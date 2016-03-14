@@ -141,6 +141,7 @@ alter table ACT_RU_JOBDEF
 	alter column PROC_DEF_ID_ drop not null
 	alter column PROC_DEF_KEY_ drop not null
 	alter column ACT_ID_ drop not null;
+CALL SYSPROC.ADMIN_CMD('REORG TABLE ACT_RU_JOBDEF');
 
 create table ACT_RU_BATCH (
   ID_ varchar(64) not null,
