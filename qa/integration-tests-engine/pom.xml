@@ -419,6 +419,22 @@
     </profile>
 
     <profile>
+      <id>wildfly8</id>
+      <properties>
+        <container.adapter.groupId>org.wildfly</container.adapter.groupId>
+        <container.adapter.version>${version.wildfly}</container.adapter.version>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>wildfly10</id>
+      <properties>
+        <container.adapter.groupId>org.wildfly.arquillian</container.adapter.groupId>
+        <container.adapter.version>1.1.0.Beta1</container.adapter.version>
+      </properties>
+    </profile>
+
+    <profile>
       <id>wildfly</id>
       <dependencies>
         <dependency>
@@ -430,9 +446,9 @@
           <type>pom</type>
         </dependency>
         <dependency>
-          <groupId>org.wildfly</groupId>
+          <groupId>${container.adapter.groupId}</groupId>
           <artifactId>wildfly-arquillian-container-managed</artifactId>
-          <version>${version.wildfly}</version>
+          <version>${container.adapter.version}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -511,9 +527,9 @@
           <type>pom</type>
         </dependency>
         <dependency>
-          <groupId>org.wildfly</groupId>
+          <groupId>${container.adapter.groupId}</groupId>
           <artifactId>wildfly-arquillian-container-domain-managed</artifactId>
-          <version>${version.wildfly}</version>
+          <version>${container.adapter.version}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>

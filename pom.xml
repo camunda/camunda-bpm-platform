@@ -141,20 +141,9 @@
       <modules>
         <module>javaee/ejb-client</module>
         <module>distro/wildfly</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>distro-wildfly10</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>javaee/ejb-client</module>
         <module>distro/wildfly10</module>
       </modules>
     </profile>
-
 
     <profile>
       <!-- profile for running process-engine unit tests in QA -->

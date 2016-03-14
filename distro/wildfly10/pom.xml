@@ -8,7 +8,7 @@
     <version>7.5.0-SNAPSHOT</version>
   </parent>
   
-  <groupId>org.camunda.bpm.wildfly10</groupId>
+  <groupId>org.camunda.bpm.wildfly</groupId>
   <artifactId>camunda-wildfly10</artifactId>
   <packaging>pom</packaging>
 
@@ -33,7 +33,7 @@
                   <message>
                     *****************************************************************************************************
                     *                                                                                                   *
-                    *            You must use at least JDK 1.7 to compile Camunda Bpm Wildfly 10!!!                     *
+                    *            You must use at least use JDK 1.7 to compile Camunda Bpm Wildfly 10!!!                 *
                     * Continue by excluding Wildfly from reactor by using '-P-distro-wildfly10' to disable the profile. *
                     *                                                                                                   *
                     *****************************************************************************************************
@@ -49,8 +49,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>${version.java.wildfly10}</source>
-          <target>${version.java.wildfly10}</target>
+          <source>${version.java.wildfly}</source>
+          <target>${version.java.wildfly}</target>
         </configuration>
       </plugin>
     </plugins>
@@ -64,7 +64,6 @@
       </activation>
       <modules>
         <module>assembly</module>
-        <module>modules</module>
       </modules>
     </profile>
     <profile>

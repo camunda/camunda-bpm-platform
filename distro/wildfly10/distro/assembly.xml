@@ -16,7 +16,7 @@
     <dependencySet>
       <unpack>true</unpack>
       <includes>
-        <include>org.camunda.bpm.wildfly10:camunda-wildfly10-assembly</include>
+        <include>org.camunda.bpm.wildfly:camunda-wildfly10-assembly</include>
       </includes>
       <outputDirectory />
     </dependencySet>

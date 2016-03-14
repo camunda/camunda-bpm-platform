@@ -116,7 +116,6 @@
     </dependency>
   </dependencies>
 
-
   <profiles>
     <profile>
       <id>jboss</id>
@@ -227,6 +226,7 @@
         </plugins>
       </build>
     </profile>
+
     <profile>
       <id>wildfly</id>
       <properties>
@@ -251,12 +251,11 @@
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine-rest</artifactId>
+          <version>${project.version}</version>
           <scope>test</scope>
           <type>war</type>
-          <version>${project.version}</version>
         </dependency>
       </dependencies>
-
       <build>
         <plugins>
           <plugin>
@@ -336,6 +335,7 @@
         </plugins>
       </build>
     </profile>
+
     <profile>
       <id>glassfish</id>
       <properties>

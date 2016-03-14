@@ -42,11 +42,11 @@
   </dependencySets>
   <fileSets>
     <fileSet>
-      <directory>../modules/target/modules</directory>
+      <directory>${project.build.directory}/modules</directory>
       <outputDirectory>modules</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>../modules/target/modules</directory>
+      <directory>${project.build.directory}/modules</directory>
       <outputDirectory>server/wildfly-${version.wildfly10}/modules</outputDirectory>
     </fileSet>
   </fileSets>
