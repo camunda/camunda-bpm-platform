@@ -139,7 +139,7 @@
     from ${prefix}ACT_HI_PROCINST RES
 
     <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
-      INNER JOIN (
+      LEFT JOIN (
         SELECT
             DISTINCT SELF.PROC_DEF_KEY_ AS KEY_
         FROM
@@ -270,6 +270,10 @@
                  open="(" separator="," close=")">
           #{tenantId}
         </foreach>
+      </if>
+
+      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+        and ((RES.PROC_DEF_KEY_ is not null and AUTH.KEY_ is not null) or RES.PROC_DEF_KEY_ is null)
       </if>
 
     </where>
