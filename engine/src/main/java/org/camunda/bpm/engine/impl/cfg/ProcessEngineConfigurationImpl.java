@@ -934,37 +934,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         // update the jdbc parameters to the configured ones...
         Environment environment = new Environment("default", transactionFactory, dataSource);
         Reader reader = new InputStreamReader(inputStream);
+
         Properties properties = new Properties();
-        properties.put("prefix", databaseTablePrefix);
-        if(databaseType != null) {
-          properties.put("limitBefore" , DbSqlSessionFactory.databaseSpecificLimitBeforeStatements.get(databaseType));
-          properties.put("limitAfter" , DbSqlSessionFactory.databaseSpecificLimitAfterStatements.get(databaseType));
-          properties.put("innerLimitAfter" , DbSqlSessionFactory.databaseSpecificInnerLimitAfterStatements.get(databaseType));
-          properties.put("limitBetween" , DbSqlSessionFactory.databaseSpecificLimitBetweenStatements.get(databaseType));
-          properties.put("limitBetweenClob" , DbSqlSessionFactory.databaseSpecificLimitBetweenClobStatements.get(databaseType));
-          properties.put("orderBy" , DbSqlSessionFactory.databaseSpecificOrderByStatements.get(databaseType));
-          properties.put("limitBeforeNativeQuery" , DbSqlSessionFactory.databaseSpecificLimitBeforeNativeQueryStatements.get(databaseType));
+        initSqlSessionFactoryProperties(properties, databaseTablePrefix, databaseType);
 
-          properties.put("bitand1" , DbSqlSessionFactory.databaseSpecificBitAnd1.get(databaseType));
-          properties.put("bitand2" , DbSqlSessionFactory.databaseSpecificBitAnd2.get(databaseType));
-          properties.put("bitand3" , DbSqlSessionFactory.databaseSpecificBitAnd3.get(databaseType));
-
-          properties.put("datepart1" , DbSqlSessionFactory.databaseSpecificDatepart1.get(databaseType));
-          properties.put("datepart2" , DbSqlSessionFactory.databaseSpecificDatepart2.get(databaseType));
-          properties.put("datepart3" , DbSqlSessionFactory.databaseSpecificDatepart3.get(databaseType));
-
-          properties.put("trueConstant", DbSqlSessionFactory.databaseSpecificTrueConstant.get(databaseType));
-          properties.put("falseConstant", DbSqlSessionFactory.databaseSpecificFalseConstant.get(databaseType));
-
-          properties.put("dbSpecificDummyTable" , DbSqlSessionFactory.databaseSpecificDummyTable.get(databaseType));
-          properties.put("dbSpecificIfNullFunction", DbSqlSessionFactory.databaseSpecificIfNull.get(databaseType));
-
-          Map<String, String> constants = DbSqlSessionFactory.dbSpecificConstants.get(databaseType);
-          for (Entry<String, String> entry : constants.entrySet()) {
-            properties.put(entry.getKey(), entry.getValue());
-          }
-
-        }
         XMLConfigBuilder parser = new XMLConfigBuilder(reader,"", properties);
         Configuration configuration = parser.getConfiguration();
         configuration.setEnvironment(environment);
@@ -978,6 +951,40 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         throw new ProcessEngineException("Error while building ibatis SqlSessionFactory: " + e.getMessage(), e);
       } finally {
         IoUtil.closeSilently(inputStream);
+      }
+    }
+  }
+
+  public static void initSqlSessionFactoryProperties(Properties properties, String databaseTablePrefix, String databaseType) {
+
+    properties.put("prefix", databaseTablePrefix);
+
+    if(databaseType != null) {
+      properties.put("limitBefore" , DbSqlSessionFactory.databaseSpecificLimitBeforeStatements.get(databaseType));
+      properties.put("limitAfter" , DbSqlSessionFactory.databaseSpecificLimitAfterStatements.get(databaseType));
+      properties.put("innerLimitAfter" , DbSqlSessionFactory.databaseSpecificInnerLimitAfterStatements.get(databaseType));
+      properties.put("limitBetween" , DbSqlSessionFactory.databaseSpecificLimitBetweenStatements.get(databaseType));
+      properties.put("limitBetweenClob" , DbSqlSessionFactory.databaseSpecificLimitBetweenClobStatements.get(databaseType));
+      properties.put("orderBy" , DbSqlSessionFactory.databaseSpecificOrderByStatements.get(databaseType));
+      properties.put("limitBeforeNativeQuery" , DbSqlSessionFactory.databaseSpecificLimitBeforeNativeQueryStatements.get(databaseType));
+
+      properties.put("bitand1" , DbSqlSessionFactory.databaseSpecificBitAnd1.get(databaseType));
+      properties.put("bitand2" , DbSqlSessionFactory.databaseSpecificBitAnd2.get(databaseType));
+      properties.put("bitand3" , DbSqlSessionFactory.databaseSpecificBitAnd3.get(databaseType));
+
+      properties.put("datepart1" , DbSqlSessionFactory.databaseSpecificDatepart1.get(databaseType));
+      properties.put("datepart2" , DbSqlSessionFactory.databaseSpecificDatepart2.get(databaseType));
+      properties.put("datepart3" , DbSqlSessionFactory.databaseSpecificDatepart3.get(databaseType));
+
+      properties.put("trueConstant", DbSqlSessionFactory.databaseSpecificTrueConstant.get(databaseType));
+      properties.put("falseConstant", DbSqlSessionFactory.databaseSpecificFalseConstant.get(databaseType));
+
+      properties.put("dbSpecificDummyTable" , DbSqlSessionFactory.databaseSpecificDummyTable.get(databaseType));
+      properties.put("dbSpecificIfNullFunction", DbSqlSessionFactory.databaseSpecificIfNull.get(databaseType));
+
+      Map<String, String> constants = DbSqlSessionFactory.dbSpecificConstants.get(databaseType);
+      for (Entry<String, String> entry : constants.entrySet()) {
+        properties.put(entry.getKey(), entry.getValue());
       }
     }
   }
