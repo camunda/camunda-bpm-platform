@@ -53,9 +53,23 @@ var fragment4 = combine(
   }])
 )
 
+var multiTenancyFragment = combine(
+    operation('task', 'create', [{
+      id: '1',
+      name: 'Task 1',
+      tenantId: 'tenant1'
+    },
+    {
+      id: '2',
+      name: 'Task 2'
+    }])
+)
+
 module.exports = {
 
   setup1: combine(fragment1, fragment2),
   setup2: combine(fragment3),
-  setup3: combine(fragment1, fragment4)
+  setup3: combine(fragment1, fragment4),
+  multiTenancySetup: combine(fragment1, multiTenancyFragment)
+  
 };

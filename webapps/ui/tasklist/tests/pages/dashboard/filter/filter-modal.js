@@ -246,7 +246,7 @@ module.exports = Base.extend({
   includeAssignedTasksCheckbox: function () {
     return this.criteriaPageElement().element(by.css('[ng-model="filter.includeAssignedTasks"]'));
   },
-
+  
   addCriterion: function(group, key, value) {
     var self = this;
 
@@ -254,7 +254,10 @@ module.exports = Base.extend({
       self.criterionList().count().then(function(items) {
         items = items -1;
         self.selectCriterionKey(items, group, key);
-        self.criterionValueInput(items, value);
+        
+        if(value) {
+          self.criterionValueInput(items, value);
+        }
       });
     });
   },

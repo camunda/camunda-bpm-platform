@@ -308,5 +308,53 @@ describe('Tasklist Filter Criteria Spec', function() {
     });
 
   });
+  
+  describe('multi tenacy', function() {
+   
+      before(function() {
+        return testHelper(setupFile.multiTenancySetup, function() {
+          dashboardPage.navigateToWebapp('Tasklist');
+          dashboardPage.authentication.userLogin('admin', 'admin');
+        });
+      });
+
+      beforeEach(function() {
+        dashboardPage.taskFilters.selectFilter(0);
+        dashboardPage.taskFilters.editFilter(0);
+        editModalPage.selectPanelByKey('criteria');        
+      });
+      
+      it('should add tenant id criterion and validate result', function() {
+        
+        // when
+        editModalPage.addCriterion('Task', 'Tenant ID In', 'tenant1');
+        editModalPage.saveFilter();
+
+        // then
+        expect(dashboardPage.taskList.taskList().count()).to.eventually.eql(1);
+      });
+
+      it('should add tenant ids criterion and validate result', function() {
+
+        // when
+        editModalPage.editCriterion(0, 'Task', 'Tenant ID In', 'tenant1,tenant2');
+        editModalPage.saveFilter();
+
+        // then
+        expect(dashboardPage.taskList.taskList().count()).to.eventually.eql(2);
+      });
+      
+      it('should add without tenant id criterion and validate result', function() {
+
+        // when
+        editModalPage.removeCriterionButton(0).click();
+        editModalPage.addCriterion('Task', 'Without Tenant ID');
+        editModalPage.saveFilter();
+
+        // then
+        expect(dashboardPage.taskList.taskList().count()).to.eventually.eql(1);
+      });
+
+    });
 
 });

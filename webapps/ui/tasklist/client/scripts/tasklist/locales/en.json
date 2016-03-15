@@ -82,5 +82,9 @@
   "DELEGATION_STATE":
                   "Delegation State",
   "LIKE":
-                  "like"
+                  "like",
+  "TENANT_ID":
+                  "Tenant ID",
+  "WITHOUT_TENANT_ID":
+                  "Without Tenant ID"
 }

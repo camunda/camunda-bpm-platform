@@ -25,6 +25,10 @@
               ng-if="task.caseDefinitionId">
             {{ task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }}
           </h4>
+          <h4 class="tenant-id"
+              ng-if="task.tenantId">
+            {{ task.tenantId }}
+          </h4>
         </div>
 
         <div cam-tasklist-task-meta

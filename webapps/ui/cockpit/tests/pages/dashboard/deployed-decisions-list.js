@@ -21,7 +21,7 @@ module.exports = Base.extend({
   },
   
   tenantId: function(item) {
-    return this.decisionsList().get(item).element(by.css('.tenantId')).getText();
+    return this.decisionsList().get(item).element(by.css('.tenant-id')).getText();
   }
 
 });
