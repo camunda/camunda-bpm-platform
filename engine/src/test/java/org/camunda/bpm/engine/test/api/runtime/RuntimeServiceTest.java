@@ -1327,11 +1327,8 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(asyncExecutionId, asyncBeforeTransitionInstance.getExecutionId());
   }
 
-  /**
-   * requires fix for CAM-3662
-   */
   @Deployment
-  public void FAILING_testActivityInstanceTreeForNestedAsyncBeforeStartEvent() {
+  public void testActivityInstanceTreeForNestedAsyncBeforeStartEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
@@ -1340,9 +1337,6 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
           .beginScope("subProcess")
             .transition("theSubProcessStart")
         .done());
-
-    TransitionInstance asyncBeforeTransitionInstance = tree.getChildTransitionInstances()[0];
-    assertEquals(processInstance.getId(), asyncBeforeTransitionInstance.getExecutionId());
   }
 
   @Deployment
