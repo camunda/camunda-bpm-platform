@@ -90,6 +90,10 @@ module.exports = Page.extend({
   processListInfoText: function() {
     return this.startProcessDialog()
       .element(by.css('.glyphicon-info-sign'));
+  },
+  
+  processTenantIdField: function(idx) {
+    return this.processList().get(idx).element(by.css('.tenant-id'));
   }
 
 });
