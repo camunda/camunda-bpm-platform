@@ -2051,7 +2051,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
-  public void FAILING_testGetValueOfSerializableVar() {
+  public void testGetValueOfSerializableVar() {
     // given
     List<String> serializable = new ArrayList<String>();
     serializable.add("one");
@@ -2075,7 +2075,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("serializableVar", instance.getName());
     assertNotNull(instance.getValue());
     assertEquals(serializable, instance.getValue());
-    assertEquals("Serializable", instance.getTypeName());
+    assertEquals(ValueType.OBJECT.getName(), instance.getTypeName());
 
   }
 
