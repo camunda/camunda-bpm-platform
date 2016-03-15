@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.db.entitymanager.operation;
 
+import java.util.Set;
+
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 
@@ -27,6 +29,8 @@ public class DbEntityOperation extends DbOperation {
    * The entity the operation is performed on.
    */
   protected DbEntity entity;
+
+  protected Set<String> flushRelevantEntityReferences;
 
   /**
    * Indicates whether the operation failed to execute due to OptimisticLocking
@@ -53,6 +57,14 @@ public class DbEntityOperation extends DbOperation {
 
   public boolean isFailed() {
     return failed;
+  }
+
+  public void setFlushRelevantEntityReferences(Set<String> flushRelevantEntityReferences) {
+    this.flushRelevantEntityReferences = flushRelevantEntityReferences;
+  }
+
+  public Set<String> getFlushRelevantEntityReferences() {
+    return flushRelevantEntityReferences;
   }
 
   public String toString() {

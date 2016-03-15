@@ -16,8 +16,10 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.camunda.bpm.engine.ProcessEngineServices;
@@ -1607,24 +1609,18 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     this.superExecutionId = superExecutionId;
   }
 
-  public boolean hasReferenceTo(DbEntity entity) {
-    if (entity instanceof ExecutionEntity) {
-      ExecutionEntity executionEntity = (ExecutionEntity) entity;
-      String otherId = executionEntity.getId();
+  @Override
+  public Set<String> getReferencedEntityIds() {
+    Set<String> referenceIds = new HashSet<String>();
 
-      // parentId
-      if (parentId != null && parentId.equals(otherId)) {
-        return true;
-      }
-
-      // superExecutionId
-      if (superExecutionId != null && superExecutionId.equals(otherId)) {
-        return true;
-      }
-
+    if (superExecutionId != null) {
+      referenceIds.add(superExecutionId);
+    }
+    if (parentId != null) {
+      referenceIds.add(parentId);
     }
 
-    return false;
+    return referenceIds;
   }
 
   public int getSuspensionState() {

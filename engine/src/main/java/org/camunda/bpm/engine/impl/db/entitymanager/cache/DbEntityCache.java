@@ -159,6 +159,7 @@ public class DbEntityCache {
     CachedDbEntity cachedDbEntity = new CachedDbEntity();
     cachedDbEntity.setEntity(e);
     cachedDbEntity.setEntityState(PERSISTENT);
+    cachedDbEntity.determineEntityReferences();
     cachedDbEntity.makeCopy();
 
     putInternal(cachedDbEntity);
@@ -173,6 +174,7 @@ public class DbEntityCache {
     CachedDbEntity cachedDbEntity = new CachedDbEntity();
     cachedDbEntity.setEntity(e);
     cachedDbEntity.setEntityState(MERGED);
+    cachedDbEntity.determineEntityReferences();
     // no copy required
 
     putInternal(cachedDbEntity);

@@ -1522,11 +1522,8 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertProcessEnded(processInstance.getId());
   }
 
-  /**
-   * disabled until CAM-3604 is fixed
-   */
   @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
-  public void FAILING_testStartAfterActivityDuringCompensation() {
+  public void testStartAfterActivityDuringCompensation() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
     completeTasksInOrder("userTask");

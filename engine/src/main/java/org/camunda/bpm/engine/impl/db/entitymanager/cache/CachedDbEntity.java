@@ -12,7 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.db.entitymanager.cache;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.entitymanager.Recyclable;
 
 /**
@@ -28,6 +32,11 @@ public class CachedDbEntity implements Recyclable {
   protected Object copy;
 
   protected DbEntityState entityState;
+
+  /**
+   * Ids of referenced entities of the same entity type
+   */
+  protected Set<String> flushRelevantEntityReferences = null;
 
   public void recycle() {
     // clean out state
@@ -57,6 +66,23 @@ public class CachedDbEntity implements Recyclable {
     return entityState + " " + dbEntity.getClass().getSimpleName() + "["+dbEntity.getId()+"]";
   }
 
+  public void determineEntityReferences() {
+    if (dbEntity instanceof HasDbReferences) {
+      flushRelevantEntityReferences = ((HasDbReferences) dbEntity).getReferencedEntityIds();
+    }
+    else {
+      flushRelevantEntityReferences = Collections.emptySet();
+    }
+  }
+
+  public boolean areFlushRelevantReferencesDetermined() {
+    return flushRelevantEntityReferences != null;
+  }
+
+  public Set<String> getFlushRelevantEntityReferences() {
+    return flushRelevantEntityReferences;
+  }
+
   // getters / setters ////////////////////////////
 
   public DbEntity getEntity() {
@@ -73,6 +99,10 @@ public class CachedDbEntity implements Recyclable {
 
   public void setEntityState(DbEntityState entityState) {
     this.entityState = entityState;
+  }
+
+  public Class<? extends DbEntity> getEntityType() {
+    return dbEntity.getClass();
   }
 
 }

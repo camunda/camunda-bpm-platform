@@ -173,11 +173,56 @@ public class DbOperationsOrderingTest {
 
   }
 
+  @Test
+  public void testDeleteReferenceOrdering() {
+    // given
+    execution1.setParentExecution(execution2);
+    entityManager.getDbEntityCache().putPersistent(execution1);
+    entityManager.getDbEntityCache().putPersistent(execution2);
+
+    // when deleting the entities
+    entityManager.delete(execution1);
+    entityManager.delete(execution2);
+
+    entityManager.flushEntityCache();
+
+    // then the flush is based on the persistent relationships
+    List<DbOperation> deleteOperations = entityManager.getDbOperationManager().calculateFlush();
+    assertHappensBefore(execution1, execution2, deleteOperations);
+  }
+
+  @Test
+  public void testDeleteReferenceOrderingAfterTransientUpdate() {
+    // given
+    execution1.setParentExecution(execution2);
+    entityManager.getDbEntityCache().putPersistent(execution1);
+    entityManager.getDbEntityCache().putPersistent(execution2);
+
+    // when reverting the relation in memory
+    execution1.setParentExecution(null);
+    execution2.setParentExecution(execution1);
+
+    // and deleting the entities
+    entityManager.delete(execution1);
+    entityManager.delete(execution2);
+
+    entityManager.flushEntityCache();
+
+    // then the flush is based on the persistent relationships
+    List<DbOperation> deleteOperations = entityManager.getDbOperationManager().calculateFlush();
+    assertHappensBefore(execution1, execution2, deleteOperations);
+  }
 
   protected void assertHappensAfter(DbEntity entity1, DbEntity entity2, List<DbOperation> operations) {
     int idx1 = indexOfEntity(entity1, operations);
     int idx2 = indexOfEntity(entity2, operations);
-    assertTrue(entity1 + " should be inserted after " + entity2, idx1 > idx2);
+    assertTrue("operation for " + entity1 + " should be executed after operation for " + entity2, idx1 > idx2);
+  }
+
+  protected void assertHappensBefore(DbEntity entity1, DbEntity entity2, List<DbOperation> operations) {
+    int idx1 = indexOfEntity(entity1, operations);
+    int idx2 = indexOfEntity(entity2, operations);
+    assertTrue("operation for " + entity1 + " should be executed before operation for " + entity2, idx1 < idx2);
   }
 
   protected int indexOfEntity(DbEntity entity, List<DbOperation> operations) {

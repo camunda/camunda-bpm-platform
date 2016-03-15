@@ -17,8 +17,10 @@ import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTI
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
@@ -682,25 +684,18 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
       .forceUpdate(this);
   }
 
-  public boolean hasReferenceTo(DbEntity entity) {
+  @Override
+  public Set<String> getReferencedEntityIds() {
+    Set<String> referenceIds = new HashSet<String>();
 
-    if (entity instanceof CaseExecutionEntity) {
-      CaseExecutionEntity otherEntity = (CaseExecutionEntity) entity;
-      String otherId = otherEntity.getId();
-
-      // parentId
-      if(parentId != null && parentId.equals(otherId)) {
-        return true;
-      }
-
-      // superExecutionId
-      if(superCaseExecutionId != null && superCaseExecutionId.equals(otherId)) {
-        return true;
-      }
-
+    if (parentId != null) {
+      referenceIds.add(parentId);
     }
-    return false;
+    if (superCaseExecutionId != null) {
+      referenceIds.add(superCaseExecutionId);
+    }
 
+    return referenceIds;
   }
 
   public Object getPersistentState() {

@@ -12,12 +12,18 @@
  */
 package org.camunda.bpm.engine.impl.db;
 
+import java.util.Set;
+
 /**
  * @author Daniel Meyer
  *
  */
 public interface HasDbReferences {
 
-  boolean hasReferenceTo(DbEntity entity);
+  /**
+   * @return the ids of the entities that this entity references. Should
+   *   only return ids for entities of the same type
+   */
+  Set<String> getReferencedEntityIds();
 
 }

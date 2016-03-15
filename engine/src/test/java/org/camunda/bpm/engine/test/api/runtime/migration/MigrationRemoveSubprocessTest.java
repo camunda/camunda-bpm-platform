@@ -211,7 +211,6 @@ public class MigrationRemoveSubprocessTest {
   }
 
 
-  @Ignore("Suffers of CAM-3604")
   @Test
   public void testRemoveConcurrentScope() {
 
@@ -233,8 +232,8 @@ public class MigrationRemoveSubprocessTest {
       .hasProcessDefinitionId(targetProcessDefinition.getId())
       .matches(
         describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child("userTask1").concurrent().noScope().up()
-          .child("userTask2").concurrent().noScope()
+          .child("userTask").concurrent().noScope().up()
+          .child("userTask").concurrent().noScope()
           .done());
 
     testHelper.assertActivityTreeAfterMigration().hasStructure(

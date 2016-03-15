@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -188,16 +189,20 @@ public class DbOperationManager {
 
       DbEntityOperation currentOperation = opList.get(i);
       DbEntity currentEntity = currentOperation.getEntity();
+      Set<String> currentReferences = currentOperation.getFlushRelevantEntityReferences();
 
       // check whether this operation must be placed after another operation
       int moveTo = i;
       for(int k = i+1; k < opList.size(); k++) {
         DbEntityOperation otherOperation = opList.get(k);
         DbEntity otherEntity = otherOperation.getEntity();
+        Set<String> otherReferences = otherOperation.getFlushRelevantEntityReferences();
 
         if(currentOperation.getOperationType() == INSERT) {
+
+
           // if we reference the other entity, we need to be inserted after that entity
-          if(((HasDbReferences) currentEntity).hasReferenceTo(otherEntity)) {
+          if(currentReferences != null && currentReferences.contains(otherEntity.getId())) {
             moveTo = k;
             break; // we can only reference a single entity
           }
@@ -205,7 +210,7 @@ public class DbOperationManager {
         } else { // UPDATE or DELETE
 
           // if the other entity has a reference to us, we must be placed after the other entity
-          if(((HasDbReferences) otherEntity).hasReferenceTo(currentEntity)) {
+          if(otherReferences != null && otherReferences.contains(currentEntity.getId())) {
             moveTo = k;
             // cannot break, there may be another entity further to the right which also references us
           }

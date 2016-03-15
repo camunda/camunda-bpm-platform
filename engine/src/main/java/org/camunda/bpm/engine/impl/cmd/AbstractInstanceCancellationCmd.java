@@ -64,7 +64,7 @@ public abstract class AbstractInstanceCancellationCmd extends AbstractProcessIns
 
   protected void handleChildRemovalInScope(ExecutionEntity removedExecution) {
     // TODO: the following should be closer to PvmAtomicOperationDeleteCascadeFireActivityEnd
-    // once CAM-3604 is fixed (note though that e.g. boundary events expect concurrent executions to be preserved)
+    // (note though that e.g. boundary events expect concurrent executions to be preserved)
     //
     // Idea: attempting to prune and synchronize on the parent is the default behavior when
     // a concurrent child is removed, but scope activities implementing ModificationObserverBehavior

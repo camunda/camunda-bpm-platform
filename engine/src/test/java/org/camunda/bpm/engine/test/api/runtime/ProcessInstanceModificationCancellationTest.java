@@ -194,9 +194,8 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     assertProcessEnded(processInstanceId);
   }
 
-  // TODO: fix CAM-3604 first
   @Deployment(resources = ONE_SCOPE_TASK_PROCESS)
-  public void FAILING_testCancelAllInOneScopeTaskProcess() {
+  public void testCancelAllInOneScopeTaskProcess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();

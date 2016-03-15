@@ -15,8 +15,10 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -238,17 +240,14 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
   }
 
   @Override
-  public boolean hasReferenceTo(DbEntity entity) {
-    if (entity instanceof IncidentEntity) {
-      IncidentEntity incident = (IncidentEntity) entity;
-      String otherId = incident.getId();
+  public Set<String> getReferencedEntityIds() {
+    Set<String> referenceIds = new HashSet<String>();
 
-      if(causeIncidentId != null && causeIncidentId.equals(otherId)) {
-        return true;
-      }
-
+    if (causeIncidentId != null) {
+      referenceIds.add(causeIncidentId);
     }
-    return false;
+
+    return referenceIds;
   }
 
   @Override
@@ -466,6 +465,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
       return false;
     return true;
   }
+
 
 
 }
