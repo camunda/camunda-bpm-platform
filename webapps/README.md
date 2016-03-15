@@ -90,6 +90,29 @@ cd ../camunda-bpm-webapp
 npm link camunda-commons-ui
 ```
 
+#### Testing
+
+Install the webapps with grunt and start the server in test mode:
+
+```sh
+mvn jetty:run -Pdev-e2e
+```
+
+Make sure that you terminate the server for development or use another port.
+
+To run the tests, call
+
+```sh
+grunt test-e2e --protractorConfig=ui/common/tests/develop.conf.js
+```
+
+Now, it opens a new browser at [http://localhost:8080](http://localhost:8080) and do the tests steps. If you want to tests only one spec or a part of it then you can annotate the description of the spec with the keyword `only`:
+
+```javascript
+describe.only('Cockpit Dashboard Spec', function() {
+  // ...
+}
+```
 
 ## Browsers support
 
@@ -123,13 +146,6 @@ In place of a guide, just follow the formatting of existing code (and / or use t
 * [Documentation](http://docs.camunda.org/latest/)
 * [Stackoverflow](stackoverflow.com/questions/tagged/camunda)
 * Google groups for [users](https://groups.google.com/forum/#!forum/camunda-bpm-users) and [developers](https://groups.google.com/forum/#!forum/camunda-bpm-dev)
-
-## Authors
-
-- [Daniel _meyerdan_ Meyer](https://github.com/meyerdan) - [@meyerdan](http://twitter.com/meyerdan)
-- [Valentin _zeropaper_ Vago](https://github.com/zeropaper) - [@zeropaper](http://twitter.com/zeropaper)
-- [Nico _Nikku_ Rehwaldt](https://github.com/nikku) - [@nrehwaldt](http://twitter.com/nrehwaldt)
-- [Sebastian Stamm](https://github.com/SebastianStamm) - [@seb_stamm](https://twitter.com/seb_stamm)
 
 ## License
 
