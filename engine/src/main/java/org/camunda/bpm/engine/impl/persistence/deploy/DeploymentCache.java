@@ -431,7 +431,7 @@ public class DeploymentCache {
   }
 
   public DecisionDefinition findDeployedLatestDecisionDefinitionByKey(String decisionDefinitionKey) {
-    ensureNotNull("Invalid decision definition key", "caseDefinitionKey", decisionDefinitionKey);
+    ensureNotNull("Invalid decision definition key", "decisionDefinitionKey", decisionDefinitionKey);
 
     DecisionDefinitionEntity decisionDefinition = Context
       .getCommandContext()
@@ -439,6 +439,21 @@ public class DeploymentCache {
       .findLatestDecisionDefinitionByKey(decisionDefinitionKey);
 
     ensureNotNull(DecisionDefinitionNotFoundException.class, "no decision definition deployed with key '" + decisionDefinitionKey + "'", "decisionDefinition", decisionDefinition);
+
+    decisionDefinition = resolveDecisionDefinition(decisionDefinition);
+
+    return decisionDefinition;
+  }
+
+  public DecisionDefinition findDeployedLatestDecisionDefinitionByKeyAndTenantId(String decisionDefinitionKey, String tenantId) {
+    ensureNotNull("Invalid decision definition key", "decisionDefinitionKey", decisionDefinitionKey);
+
+    DecisionDefinitionEntity decisionDefinition = Context
+      .getCommandContext()
+      .getDecisionDefinitionManager()
+      .findLatestDecisionDefinitionByKeyAndTenantId(decisionDefinitionKey, tenantId);
+
+    ensureNotNull(DecisionDefinitionNotFoundException.class, "no decision definition deployed with key '" + decisionDefinitionKey + "' and tenant-id '" + tenantId + "'", "decisionDefinition", decisionDefinition);
 
     decisionDefinition = resolveDecisionDefinition(decisionDefinition);
 
@@ -464,6 +479,18 @@ public class DeploymentCache {
       .findDecisionDefinitionByKeyAndVersion(decisionDefinitionKey, decisionDefinitionVersion);
 
     ensureNotNull(DecisionDefinitionNotFoundException.class, "no decision definition deployed with key = '" + decisionDefinitionKey + "' and version = '" + decisionDefinitionVersion + "'", "decisionDefinition", decisionDefinition);
+    decisionDefinition = resolveDecisionDefinition(decisionDefinition);
+
+    return decisionDefinition;
+  }
+
+  public DecisionDefinition findDeployedDecisionDefinitionByKeyVersionAndTenantId(String decisionDefinitionKey, Integer decisionDefinitionVersion, String tenantId) {
+    DecisionDefinitionEntity decisionDefinition = Context
+      .getCommandContext()
+      .getDecisionDefinitionManager()
+      .findDecisionDefinitionByKeyVersionAndTenantId(decisionDefinitionKey, decisionDefinitionVersion, tenantId);
+
+    ensureNotNull(DecisionDefinitionNotFoundException.class, "no decision definition deployed with key = '" + decisionDefinitionKey + "', version = '" + decisionDefinitionVersion + "' and tenant-id '" + tenantId + "'", "decisionDefinition", decisionDefinition);
     decisionDefinition = resolveDecisionDefinition(decisionDefinition);
 
     return decisionDefinition;

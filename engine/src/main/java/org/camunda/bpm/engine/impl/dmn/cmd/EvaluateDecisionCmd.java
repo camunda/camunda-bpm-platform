@@ -14,12 +14,11 @@
 package org.camunda.bpm.engine.impl.dmn.cmd;
 
 import static org.camunda.bpm.engine.impl.util.DecisionTableUtil.evaluateDecisionTable;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.util.Map;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.dmn.DecisionEvaluationBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
@@ -29,30 +28,34 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
 /**
- * Evaluates the decision with the given key and version. If no version is
- * provided then the latest version is taken.
- *
- * @author Philipp Ossler
+ * Evaluates the decision with the given key or id.
+ * 
+ * If the decision definition key given then specify the version and tenant-id.
+ * If no version is provided then the latest version is taken.
+ * 
+ * @author Kristin Polenz
  */
-public class EvaluateDecisionByKeyCmd implements Command<DmnDecisionTableResult> {
+public class EvaluateDecisionCmd implements Command<DmnDecisionTableResult> {
 
   protected String decisionDefinitionKey;
+  protected String decisionDefinitionId;
   protected Integer version;
   protected VariableMap variables;
+  protected String decisionDefinitionTenantId;
+  protected boolean isTenandIdSet;
 
-  public EvaluateDecisionByKeyCmd(String decisionDefinitionKey, Integer version, Map<String, Object> variables) {
-    this.decisionDefinitionKey = decisionDefinitionKey;
-    this.version = version;
-    this.variables = Variables.fromMap(variables);
-  }
-
-  public EvaluateDecisionByKeyCmd(String decisionDefinitionKey, Map<String, Object> variables) {
-    this(decisionDefinitionKey, null, variables);
+  public EvaluateDecisionCmd(DecisionEvaluationBuilderImpl builder) {
+    this.decisionDefinitionKey = builder.getDecisionDefinitionKey();
+    this.decisionDefinitionId = builder.getDecisionDefinitionId();
+    this.version = builder.getVersion();
+    this.variables = Variables.fromMap(builder.getVariables());
+    this.decisionDefinitionTenantId = builder.getDecisionDefinitionTenantId();
+    this.isTenandIdSet = builder.isTenantIdSet();
   }
 
   @Override
   public DmnDecisionTableResult execute(CommandContext commandContext) {
-    ensureNotNull("decision definition key is null", "processDefinitionKey", decisionDefinitionKey);
+    ensureOnlyOneNotNull("either decision definition id or key must be set", decisionDefinitionId, decisionDefinitionKey);
 
     DecisionDefinition decisionDefinition = getDecisionDefinition(commandContext);
 
@@ -75,12 +78,35 @@ public class EvaluateDecisionByKeyCmd implements Command<DmnDecisionTableResult>
 
   protected DecisionDefinition getDecisionDefinition(CommandContext commandContext) {
     DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentCache();
-
-    if (version == null) {
-      return deploymentCache.findDeployedLatestDecisionDefinitionByKey(decisionDefinitionKey);
+    
+    if (decisionDefinitionId != null) {
+      return findById(deploymentCache);
     } else {
-      return deploymentCache.findDeployedDecisionDefinitionByKeyAndVersion(decisionDefinitionKey, version);
+      return findByKey(deploymentCache);
     }
+  }
+
+  protected DecisionDefinition findById(DeploymentCache deploymentCache) {
+    return deploymentCache.findDeployedDecisionDefinitionById(decisionDefinitionId);
+  }
+
+  protected DecisionDefinition findByKey(DeploymentCache deploymentCache) {
+    DecisionDefinition decisionDefinition = null;
+
+    if (version == null && !isTenandIdSet) {
+      decisionDefinition = deploymentCache.findDeployedLatestDecisionDefinitionByKey(decisionDefinitionKey);
+    }
+    else if (version == null && isTenandIdSet) {
+      decisionDefinition = deploymentCache.findDeployedLatestDecisionDefinitionByKeyAndTenantId(decisionDefinitionKey, decisionDefinitionTenantId);
+    }
+    else if (version != null && !isTenandIdSet) {
+      decisionDefinition = deploymentCache.findDeployedDecisionDefinitionByKeyAndVersion(decisionDefinitionKey, version);
+    }
+    else if (version != null && isTenandIdSet) {
+      decisionDefinition = deploymentCache.findDeployedDecisionDefinitionByKeyVersionAndTenantId(decisionDefinitionKey, version, decisionDefinitionTenantId);
+    }
+
+    return decisionDefinition;
   }
 
 }

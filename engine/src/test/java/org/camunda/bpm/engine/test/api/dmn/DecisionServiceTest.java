@@ -19,7 +19,7 @@ import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.test.Deployment;
@@ -100,9 +100,9 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
   public void testEvaluateDecisionByNullId() {
     try {
       decisionService.evaluateDecisionTableById(null, null);
-      fail("expect exception");
-    } catch (NotValidException e) {
-      assertTextPresent("decision definition id is null", e.getMessage());
+      fail("NullValueException exception");
+    } catch (NullValueException e) {
+      // Expected exception
     }
   }
 
@@ -118,9 +118,9 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
   public void testEvaluateDecisionByNullKey() {
     try {
       decisionService.evaluateDecisionTableByKey(null, null);
-      fail("expect exception");
-    } catch (NotValidException e) {
-      assertTextPresent("decision definition key is null", e.getMessage());
+      fail("NullValueException expected");
+    } catch (NullValueException e) {
+      // Expected exception
     }
   }
 

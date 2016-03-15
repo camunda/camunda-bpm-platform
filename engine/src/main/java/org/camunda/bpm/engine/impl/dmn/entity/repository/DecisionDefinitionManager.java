@@ -88,6 +88,18 @@ public class DecisionDefinitionManager extends AbstractManager {
     return (DecisionDefinitionEntity) getDbEntityManager().selectOne("selectDecisionDefinitionByKeyAndVersion", parameters);
   }
 
+  public DecisionDefinitionEntity findDecisionDefinitionByKeyVersionAndTenantId(String decisionDefinitionKey, Integer decisionDefinitionVersion, String tenantId) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("decisionDefinitionVersion", decisionDefinitionVersion);
+    parameters.put("decisionDefinitionKey", decisionDefinitionKey);
+    parameters.put("tenantId", tenantId);
+    if (tenantId == null) {
+      return (DecisionDefinitionEntity) getDbEntityManager().selectOne("selectDecisionDefinitionByKeyVersionWithoutTenantId", parameters);
+    } else {
+      return (DecisionDefinitionEntity) getDbEntityManager().selectOne("selectDecisionDefinitionByKeyVersionAndTenantId", parameters);
+    }
+  }
+
   public DecisionDefinitionEntity findDecisionDefinitionByDeploymentAndKey(String deploymentId, String decisionDefinitionKey) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("deploymentId", deploymentId);

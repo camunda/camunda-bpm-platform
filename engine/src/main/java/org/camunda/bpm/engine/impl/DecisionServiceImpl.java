@@ -17,13 +17,8 @@ import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.DecisionService;
-import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.exception.dmn.DecisionDefinitionNotFoundException;
-import org.camunda.bpm.engine.impl.dmn.cmd.EvaluateDecisionByIdCmd;
-import org.camunda.bpm.engine.impl.dmn.cmd.EvaluateDecisionByKeyCmd;
-import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.dmn.DecisionEvaluationBuilder;
+import org.camunda.bpm.engine.impl.dmn.DecisionEvaluationBuilderImpl;
 
 /**
  * @author Philipp Ossler
@@ -31,27 +26,30 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 public class DecisionServiceImpl extends ServiceImpl implements DecisionService {
 
   public DmnDecisionTableResult evaluateDecisionTableById(String decisionDefinitionId, Map<String, Object> variables) {
-    return evaluateDecisionTable(new EvaluateDecisionByIdCmd(decisionDefinitionId, variables));
+    return evaluateDecisionTableById(decisionDefinitionId)
+        .variables(variables)
+        .evaluate();
   }
 
   public DmnDecisionTableResult evaluateDecisionTableByKey(String decisionDefinitionKey, Map<String, Object> variables) {
-    return evaluateDecisionTable(new EvaluateDecisionByKeyCmd(decisionDefinitionKey, variables));
+    return evaluateDecisionTableByKey(decisionDefinitionKey)
+        .variables(variables)
+        .evaluate();
   }
 
   public DmnDecisionTableResult evaluateDecisionTableByKeyAndVersion(String decisionDefinitionKey, Integer version, Map<String, Object> variables) {
-    return evaluateDecisionTable(new EvaluateDecisionByKeyCmd(decisionDefinitionKey, version, variables));
+    return evaluateDecisionTableByKey(decisionDefinitionKey)
+        .version(version)
+        .variables(variables)
+        .evaluate();
   }
 
-  protected DmnDecisionTableResult evaluateDecisionTable(Command<DmnDecisionTableResult> cmd) {
-    try {
-      return commandExecutor.execute(cmd);
-    }
-    catch (NullValueException e) {
-      throw new NotValidException(e.getMessage(), e);
-    }
-    catch (DecisionDefinitionNotFoundException e) {
-      throw new NotFoundException(e.getMessage(), e);
-    }
+  public DecisionEvaluationBuilder evaluateDecisionTableByKey(String decisionDefinitionKey) {
+    return DecisionEvaluationBuilderImpl.evaluateDecisionTableByKey(commandExecutor, decisionDefinitionKey);
+  }
+
+  public DecisionEvaluationBuilder evaluateDecisionTableById(String decisionDefinitionId) {
+    return DecisionEvaluationBuilderImpl.evaluateDecisionTableById(commandExecutor, decisionDefinitionId);
   }
 
 }

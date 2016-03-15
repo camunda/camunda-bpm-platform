@@ -120,6 +120,23 @@
       and VERSION_ = #{decisionDefinitionVersion}
   </select>
 
+  <select id="selectDecisionDefinitionByKeyVersionWithoutTenantId" parameterType="map" resultMap="decisionDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_DECISION_DEF
+    where KEY_ = #{decisionDefinitionKey}
+          and VERSION_ = #{decisionDefinitionVersion}
+          and TENANT_ID_ is null
+  </select>
+
+  <select id="selectDecisionDefinitionByKeyVersionAndTenantId" parameterType="map" resultMap="decisionDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_DECISION_DEF
+    where KEY_ = #{decisionDefinitionKey}
+          and VERSION_ = #{decisionDefinitionVersion}
+          and TENANT_ID_ = #{tenantId}
+  </select>
+
+
   <select id="selectPreviousDecisionDefinitionId" parameterType="map" resultType="string">
     select RES.ID_
       from ${prefix}ACT_RE_DECISION_DEF RES

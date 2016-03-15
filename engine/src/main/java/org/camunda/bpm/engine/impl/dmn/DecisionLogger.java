@@ -16,6 +16,7 @@ import java.util.Collection;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.dmn.result.DecisionTableResultMapper;
@@ -43,6 +44,11 @@ public class DecisionLogger extends ProcessEngineLogger {
         decisionResult,
         outputNames
       ));
+  }
+
+  public BadUserRequestException exceptionEvaluateDecisionDefinitionByIdAndTenantId() {
+    return new BadUserRequestException(exceptionMessage(
+        "003", "Cannot specify a tenant-id when evaluate a decision definition by decision definition id."));
   }
 
 }
