@@ -12,18 +12,15 @@ var startDialogPage = dashboardPage.startProcess;
 
 describe('Tasklist Start Spec', function () {
 
-  before(function() {
-    return testHelper(setupFile.setup1, function() {
-
-      dashboardPage.navigateToWebapp('Tasklist');
-      dashboardPage.authentication.userLogin('admin', 'admin');
-    });
-  });
-
   describe('start process dialog', function() {
 
     before(function() {
-      dashboardPage.navigateTo();
+      return testHelper(setupFile.setup1, function() {
+
+        dashboardPage.navigateToWebapp('Tasklist');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.navigateTo();
+      });
     });
 
     afterEach(function() {
@@ -95,7 +92,12 @@ describe('Tasklist Start Spec', function () {
   describe('generic start form', function() {
 
     before(function() {
-      dashboardPage.navigateTo();
+      return testHelper(setupFile.setup1, function() {
+
+        dashboardPage.navigateToWebapp('Tasklist');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.navigateTo();
+      });
     });
 
     beforeEach(function() {
@@ -237,8 +239,13 @@ describe('Tasklist Start Spec', function () {
   describe('start process', function() {
 
     before(function() {
-      dashboardPage.navigateTo();
-      dashboardPage.startProcess.openStartDialogAndSelectProcess('User Tasks');
+      return testHelper(setupFile.setup1, function() {
+
+        dashboardPage.navigateToWebapp('Tasklist');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.navigateTo();
+        dashboardPage.startProcess.openStartDialogAndSelectProcess('User Tasks');
+      });
     });
 
     it('should enter variables and business key', function() {
@@ -292,6 +299,68 @@ describe('Tasklist Start Spec', function () {
       expect(dashboardPage.taskList.taskVariableValue(0,6).getText()).to.eventually.eql('true');
     });
 
+  });
+  
+  describe('multi tenancy', function(){
+  
+    // TODO avoid multiple setups
+    before(function() {
+      return testHelper(setupFile.multiTenancySetup, function() {
+
+        dashboardPage.navigateToWebapp('Tasklist');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+      });
+    });
+
+    it('should display the tenand id of process definitions', function() {
+
+      // when
+      dashboardPage.startProcess.openStartDialog();      
+      
+      // then
+      expect(startDialogPage.processList().count()).to.eventually.eql(2);
+      
+      expect(startDialogPage.processTenantIdField(0).isPresent()).to.eventually.be.false;
+      expect(startDialogPage.processTenantIdField(1).isPresent()).to.eventually.be.true;
+      expect(startDialogPage.processTenantIdField(1).getText()).to.eventually.eql('tenant1');
+    });
+    
+    it('should start an instance of a process definition with tenant id', function() {
+
+      // when
+      dashboardPage.startProcess.selectProcessByIndex(1);
+      startDialogPage.startProcess();
+      
+      // then
+      expect(startDialogPage.startProcessDialog().isPresent()).to.eventually.be.false;
+      expect(dashboardPage.taskList.taskList().count()).to.eventually.eql(1);
+      
+      dashboardPage.taskList.selectTask(0);
+      dashboardPage.waitForElementToBeVisible(dashboardPage.currentTask.taskName());
+      
+      // then
+      expect(dashboardPage.currentTask.taskTenantIdField().isPresent()).to.eventually.be.true;
+      expect(dashboardPage.currentTask.taskTenantIdField().getText()).to.eventually.eql('tenant1');
+    });
+    
+    it('should start an instance of a process definition which belong to no tenant', function() {
+
+      // when
+      dashboardPage.startProcess.openStartDialog();
+      dashboardPage.startProcess.selectProcessByIndex(0);
+      startDialogPage.startProcess();
+      
+      // then
+      expect(startDialogPage.startProcessDialog().isPresent()).to.eventually.be.false;
+      expect(dashboardPage.taskList.taskList().count()).to.eventually.eql(2);
+      
+      dashboardPage.taskList.selectTask(0);
+      dashboardPage.waitForElementToBeVisible(dashboardPage.currentTask.taskName());
+      
+      // then
+      expect(dashboardPage.currentTask.taskTenantIdField().isPresent()).to.eventually.be.false;
+    });
+    
   });
 
 });

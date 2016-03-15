@@ -51,6 +51,9 @@
             <a href ng-click="selectProcessDefinition(processDefinition)">
               {{ processDefinition.name || processDefinition.key }}
             </a>
+            <div ng-if="processDefinition.tenantId" class="tenant-id">
+              {{ processDefinition.tenantId }}
+            </div>
           </li>
         </ul>
 

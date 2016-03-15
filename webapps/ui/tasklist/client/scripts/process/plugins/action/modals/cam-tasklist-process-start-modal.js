@@ -88,13 +88,23 @@ var angular = require('camunda-commons-ui/vendor/angular');
       page.total = processDefinitions.count;
 
       $scope.processDefinitions = processDefinitions.items.sort(function(a, b) {
+        // order by process definition name / key and secondary by tenant id
         var aName = (a.name || a.key).toLowerCase();
         var bName = (b.name || b.key).toLowerCase();
+        
+        var aTenantId = a.tenantId ? a.tenantId.toLowerCase() : '';
+        var bTenantId = b.tenantId ? b.tenantId.toLowerCase() : '';
+        
         if (aName < bName)
            return -1;
-        if (aName > bName)
+        else if (aName > bName)
           return 1;
-        return 0;
+        else if (aTenantId < bTenantId)
+          return -1;
+        else if (aTenantId > bTenantId)
+          return 1;
+        else 
+          return 0;
       });
 
       if(page.total > 0) {

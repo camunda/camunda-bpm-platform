@@ -62,5 +62,37 @@ module.exports = {
         },
         resourceType: 'Task'
       }])
+    ),
+    
+    multiTenancySetup:
 
-)};
+      combine(
+        operation('deployment', 'create', [{
+          deploymentName:  'user-tasks',
+          tenantId: 'tenant1',
+          files:           [{
+            name: 'user-tasks.bpmn',
+            content: readResource('user-tasks.bpmn')
+          }]
+        }]),
+        
+        operation('deployment', 'create', [{
+          deploymentName:  'user-tasks',
+          files:           [{
+            name: 'user-tasks.bpmn',
+            content: readResource('user-tasks.bpmn')
+          }]
+        }]),
+
+        operation('filter', 'create', [{
+          name:         'All',
+          query: {},
+          properties: {
+            priority: 10,
+            description:  'Show all Tasks'
+          },
+          resourceType: 'Task'
+        }])
+  )
+    
+};
