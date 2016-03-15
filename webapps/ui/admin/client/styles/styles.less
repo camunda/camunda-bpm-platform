@@ -1,7 +1,5 @@
 @import "cam-variables.less";
 @import "app-variables.less";
-// @import "cam-bootstrap.less";
-// @import "cam-common.less";
 @import "cam-webapps-common.less";
 
 /* ---------------------------------------------------------------- */
@@ -9,5 +7,34 @@
 .page-header{
   margin: (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5) 0 (@grid-gutter-width * 0.5);
 }
+
+
+.sidebar-nav {
+  ul {
+    .menu-ul(16px, 24px);
+  }
+
+  li {
+    > a {
+      margin-left: 2px;
+      border-left: 3px solid transparent;
+      color: @text-color;
+    }
+    &:hover > a {
+      border-left-color: @link-color;
+      color: @gray-base;
+    }
+    &.active-trail > a {
+      color: @gray-dark;
+    }
+    &.active > a {
+      border-left-color: @brand-primary;
+      color: @gray-base;
+    }
+  }
+}
+
+
+/* ---------------------------------------------------------------- */
 
 @import "pages/authorizations.less";

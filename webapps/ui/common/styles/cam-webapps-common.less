@@ -22,36 +22,31 @@
 
 .dropdown-menu {
   .shadow;
-  > li > a {
-    padding-left: 9px;
-    padding-right: 9px;
+  > li {
+    padding: 0;
+    margin: 2px 0;
+
+    > a {
+      padding: 2px 9px;
+    }
   }
 
   > .active,
   > li:hover {
-    background-color: transparent;
-
     > a {
-      background-color: transparent;
-      padding-left: 6px;
-      border-width: 0 0 0 2px;
-      margin-left: 1px;
+      padding-left: 4px;
+      border-width: 0 0 0 3px;
+      margin-left: 2px;
       border-style: solid;
-      color: @dropdown-link-color;
-      border-color: @dropdown-link-color;
-
-      &:hover {
-        background-color: transparent;
-        color: @dropdown-link-hover-color;
-        border-color: @dropdown-link-hover-color;
-      }
+      color: @gray-base;
+      border-color: @brand-primary;
     }
   }
 
   > li:hover {
     > a {
-      color: @dropdown-link-hover-color;
-      border-color: @dropdown-link-hover-color;
+      color: @gray-base;
+      border-color: @link-color;
     }
   }
 }
