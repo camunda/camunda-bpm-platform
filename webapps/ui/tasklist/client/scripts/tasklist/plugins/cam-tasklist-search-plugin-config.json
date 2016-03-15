@@ -356,6 +356,23 @@
           "value": "="
         }
       ]
+    },    {
+      "id": {
+        "key": "tenantIdIn",
+        "value": "TENANT_ID"
+      },
+      "operators": [
+        {
+          "key": "in",
+          "value": "="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "withoutTenantId",
+        "value": "WITHOUT_TENANT_ID"
+      },
+      "basic": true
     }
   ],
   "operators": {

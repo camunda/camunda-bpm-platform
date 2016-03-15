@@ -33,8 +33,17 @@ var angular = require('camunda-commons-ui/vendor/angular');
   var sanitizeValue = function(value, operator) {
     if(operator === 'Like' || operator === 'like') {
       return '%'+value+'%';
+    } else if(operator == 'in') {
+    	return value.split(',');
     }
     return value;
+  };
+  
+  var getQueryValueBySearch = function(search) {
+    if (search.basic) {
+      return true;
+    }
+    return sanitizeValue(parseValue(search.value.value), search.operator.value.key);
   };
 
   var sanitizeProperty = function(search, type, operator, value) {
@@ -96,10 +105,10 @@ var angular = require('camunda-commons-ui/vendor/angular');
           query[search.type.value.key].push({
             name: typeof search.name.value === 'object' ? search.name.value.key : search.name.value,
             operator: search.operator.value.key,
-            value: sanitizeValue(parseValue(search.value.value), search.operator.value.key)
+            value: getQueryValueBySearch(search)
           });
         } else {
-          query[sanitizeProperty(search, search.type.value.key, search.operator.value.key, search.value.value)] = sanitizeValue(parseValue(search.value.value), search.operator.value.key);
+          query[sanitizeProperty(search, search.type.value.key, search.operator.value.key, search.value.value)] = getQueryValueBySearch(search);
         }
       });
 

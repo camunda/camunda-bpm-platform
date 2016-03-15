@@ -108,4 +108,38 @@ module.exports = {
         type: 'candidate'
       }])
 
-)};
+    ),
+    
+    multiTenancySetup:
+
+      combine(
+        operation('filter', 'create', [{
+          name: 'Empty Filter',
+          query: {},
+          properties: {
+            priority: 5,
+            description: 'Filter',
+          },
+          resourceType: 'Task'
+        }]),
+
+        operation('task', 'create', [{
+          id: '1',
+          name: 'Task 1',
+          tenantId: 'tenant1',
+          owner: 'test'
+        },
+        {
+          id: '2',
+          name: 'Task 2',
+          tenantId: 'tenant2',
+          owner: 'test'
+        },
+        {
+          id: '3',
+          name: 'Task 3',
+          owner: 'test'
+        }])
+    )
+    
+};

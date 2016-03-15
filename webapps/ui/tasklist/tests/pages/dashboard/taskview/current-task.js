@@ -166,6 +166,10 @@ module.exports = Page.extend({
     var tooltipWidget = element(by.css('body > [tooltip-popup]'));
     this.waitForElementToBeVisible(tooltipWidget);
     return tooltipWidget.getText();
+  },
+  
+  taskTenantIdField: function() {
+    return this.formElement().element(by.css('.tenant-id'));
   }
 
 });
