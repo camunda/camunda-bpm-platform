@@ -18,9 +18,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -104,7 +102,7 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
 
     deploymentForTenant(TENANT_ONE, DMN_FILE, process);
 
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO, process);
+    deploymentForTenant(TENANT_TWO, DMN_FILE, process);
     deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
 
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
@@ -117,17 +115,6 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
 
     assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is("A"));
     assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is("C"));
-
-    // check whether DMN_FILE_VERSION_TWO version 2 is really used
-    DecisionDefinition latestDecisionDefinitionTenantTwo = repositoryService.createDecisionDefinitionQuery()
-        .tenantIdIn(TENANT_TWO).decisionDefinitionKey("decision").latestVersion().singleResult();
-
-    HistoricDecisionInstanceQuery decisionInstanceQuery = historyService.createHistoricDecisionInstanceQuery()
-        .tenantIdIn(TENANT_TWO).decisionDefinitionId(latestDecisionDefinitionTenantTwo.getId()).includeOutputs();
-
-    assertThat(decisionInstanceQuery.singleResult().getOutputs().size(), is(1));
-    assertThat((String)decisionInstanceQuery.singleResult().getOutputs().iterator().next().getValue(), is("C"));
-
   }
 
   public void testEvaluateDecisionTaskWithVersionBinding() {
