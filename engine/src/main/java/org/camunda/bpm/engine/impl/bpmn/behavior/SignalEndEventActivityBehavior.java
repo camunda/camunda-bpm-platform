@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
@@ -35,17 +35,26 @@ public class SignalEndEventActivityBehavior extends FlowNodeActivityBehavior {
   @Override
   public void execute(ActivityExecution execution) throws Exception {
 
-    CommandContext commandContext = Context.getCommandContext();
+    List<SignalEventSubscriptionEntity> signalEventSubscriptions = findSignalEventSubscriptions(signalDefinition.getEventName(), execution.getTenantId());
 
-    List<SignalEventSubscriptionEntity> signalEventSubscriptions = commandContext
-        .getEventSubscriptionManager()
-        .findSignalEventSubscriptionsByEventNameAndTenantIdIncludeWithoutTenantId(signalDefinition.getEventName(), execution.getTenantId());
-
-      for (SignalEventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
-        signalEventSubscription.eventReceived(null, signalDefinition.isAsync());
-      }
+    for (SignalEventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
+      signalEventSubscription.eventReceived(null, signalDefinition.isAsync());
+    }
 
     leave(execution);
+  }
+
+  protected List<SignalEventSubscriptionEntity> findSignalEventSubscriptions(String signalName, String tenantId) {
+    EventSubscriptionManager eventSubscriptionManager = Context.getCommandContext().getEventSubscriptionManager();
+
+    if(tenantId != null) {
+      return eventSubscriptionManager
+          .findSignalEventSubscriptionsByEventNameAndTenantIdIncludeWithoutTenantId(signalName, tenantId);
+
+    } else {
+      // find event subscriptions without tenant id
+      return eventSubscriptionManager.findSignalEventSubscriptionsByEventNameAndTenantId(signalName, null);
+    }
   }
 
   public EventSubscriptionDeclaration getSignalDefinition() {

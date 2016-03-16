@@ -39,11 +39,9 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
 
   @Override
   public void execute(ActivityExecution execution) throws Exception {
-    final EventSubscriptionManager eventSubscriptionManager = Context.getCommandContext().getEventSubscriptionManager();
 
     // trigger all event subscriptions for the signal (start and intermediate)
-    List<SignalEventSubscriptionEntity> signalEventSubscriptions = eventSubscriptionManager
-        .findSignalEventSubscriptionsByEventNameAndTenantIdIncludeWithoutTenantId(signalDefinition.getEventName(), execution.getTenantId());
+    List<SignalEventSubscriptionEntity> signalEventSubscriptions = findSignalEventSubscriptions(signalDefinition.getEventName(), execution.getTenantId());
 
     for (SignalEventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
       if(isActiveEventSubscription(signalEventSubscription)){
@@ -52,6 +50,19 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
     }
 
     leave(execution);
+  }
+
+  protected List<SignalEventSubscriptionEntity> findSignalEventSubscriptions(String signalName, String tenantId) {
+    EventSubscriptionManager eventSubscriptionManager = Context.getCommandContext().getEventSubscriptionManager();
+
+    if(tenantId != null) {
+      return eventSubscriptionManager
+          .findSignalEventSubscriptionsByEventNameAndTenantIdIncludeWithoutTenantId(signalName, tenantId);
+
+    } else {
+      // find event subscriptions without tenant id
+      return eventSubscriptionManager.findSignalEventSubscriptionsByEventNameAndTenantId(signalName, null);
+    }
   }
 
   protected boolean isActiveEventSubscription(SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
