@@ -38,6 +38,18 @@
       <param-name>javax.ws.rs.Application</param-name>
       <param-value>org.camunda.bpm.engine.rest.impl.application.DefaultApplication</param-value>
     </init-param>
+    <!-- disable Moxy as Jersey default JSON processor in case running on WLS 12R2 and above -->
+    <init-param>
+      <param-name>jersey.config.server.disableMoxyJson</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <!-- Enable to debug Jersey requests -->
+    <!--
+    <init-param>
+      <param-name>jersey.config.server.tracing.type</param-name>
+      <param-value>ALL</param-value>
+    </init-param>
+    -->
   </servlet>
 
   <servlet-mapping>
