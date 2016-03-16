@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.dmn.deployer.DmnDeployer;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.useroperation.UserOperationLogLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -504,7 +505,7 @@ public abstract class TestHelper {
   }
 
   public static void clearUserOperationLog(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
+    if(processEngineConfiguration.getUserOperationLogLevel().equals(UserOperationLogLevel.USER_OPERATION_LOG_LEVEL_FULL)) {
       HistoryService historyService = processEngineConfiguration.getHistoryService();
       List<UserOperationLogEntry> logs = historyService.createUserOperationLogQuery().list();
       for (UserOperationLogEntry log : logs) {

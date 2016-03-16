@@ -133,6 +133,16 @@ public abstract class ProcessEngineConfiguration {
   public static final String HISTORY_AUTO = "auto";
 
   /**
+   * Value for {@link #setUserOperationLog(String)}. 
+   */
+  public static final String USER_OPERATION_LOG_NONE = "none";
+  
+  /**
+   * Value for {@link #setUserOperationLog(String)}. 
+   */
+  public static final String USER_OPERATION_LOG_FULL = "full";
+  
+  /**
    * The default history level that is used when no history level is configured
    */
   public static final String HISTORY_DEFAULT = HISTORY_AUDIT;
@@ -140,6 +150,7 @@ public abstract class ProcessEngineConfiguration {
   protected String processEngineName = ProcessEngines.NAME_DEFAULT;
   protected int idBlockSize = 100;
   protected String history = HISTORY_DEFAULT;
+  protected String userOperationLog = null; // default determined via history
   protected boolean jobExecutorActivate;
   protected boolean jobExecutorDeploymentAware = false;
   protected boolean jobExecutorPreferTimerJobs = false;
@@ -645,4 +656,13 @@ public abstract class ProcessEngineConfiguration {
     this.jobExecutorAcquireByPriority = jobExecutorAcquireByPriority;
   }
 
+  public String getUserOperationLog() {
+    return userOperationLog;
+  }
+  
+  public ProcessEngineConfiguration setUserOperationLog(String level) {
+    this.userOperationLog = level;
+    return this;
+  }
+  
 }

@@ -150,6 +150,7 @@ import org.camunda.bpm.engine.impl.history.producer.DefaultDmnHistoryEventProduc
 import org.camunda.bpm.engine.impl.history.producer.DmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.history.transformer.CmmnHistoryTransformListener;
+import org.camunda.bpm.engine.impl.history.useroperation.UserOperationLogLevel;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.db.DbIdentityServiceProvider;
@@ -301,6 +302,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public static final int HISTORYLEVEL_AUDIT = HistoryLevel.HISTORY_LEVEL_AUDIT.getId();
   public static final int HISTORYLEVEL_FULL = HistoryLevel.HISTORY_LEVEL_FULL.getId();
 
+  public static final int USER_OPERATION_LOG_LEVEL_NONE = UserOperationLogLevel.USER_OPERATION_LOG_LEVEL_NONE.getId();
+  public static final int USER_OPERATION_LOG_LEVEL_FULL = UserOperationLogLevel.USER_OPERATION_LOG_LEVEL_FULL.getId();
+
   public static final String DEFAULT_WS_SYNC_FACTORY = "org.camunda.bpm.engine.impl.webservice.CxfWebServiceClientFactory";
 
   public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/camunda/bpm/engine/impl/mapping/mappings.xml";
@@ -451,6 +455,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   /** a list of supported custom history levels */
   protected List<HistoryLevel> customHistoryLevels;
 
+  protected UserOperationLogLevel userOperationLogLevel;
+
   protected List<BpmnParseListener> preParseListeners;
   protected List<BpmnParseListener> postParseListeners;
 
@@ -573,7 +579,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<MigratingActivityInstanceValidator> customPostMigratingActivityInstanceValidators;
   protected List<MigratingActivityInstanceValidator> migratingActivityInstanceValidators;
 
-
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   @Override
@@ -591,6 +596,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initDefaultCharset();
     initHistoryLevel();
     initHistoryEventProducer();
+    initUserOperationLevelLevel();
     initCmmnHistoryEventProducer();
     initDmnHistoryEventProducer();
     initHistoryEventHandler();
@@ -1403,6 +1409,29 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
+  // user operation log //////////////////////////////////////////////////////////////////
+  
+  public void initUserOperationLevelLevel() {
+    if(userOperationLog == null) {
+      // default to full on FULL history, otherwise none
+      if(historyLevel != null && historyLevel.equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
+        userOperationLogLevel = UserOperationLogLevel.USER_OPERATION_LOG_LEVEL_FULL;
+      } else {
+        userOperationLogLevel = UserOperationLogLevel.USER_OPERATION_LOG_LEVEL_NONE;
+      }
+    } else {
+      if(userOperationLog.equals(UserOperationLogLevel.USER_OPERATION_LOG_LEVEL_FULL.getName())) {
+        userOperationLogLevel = UserOperationLogLevel.USER_OPERATION_LOG_LEVEL_FULL;
+      } else if(userOperationLog.equals(UserOperationLogLevel.USER_OPERATION_LOG_LEVEL_NONE.getName())) {
+        userOperationLogLevel = UserOperationLogLevel.USER_OPERATION_LOG_LEVEL_NONE;
+      } else {
+        throw new ProcessEngineException("invalid user-operation level " + userOperationLog);
+      }
+    }
+  }
+
+  
+  
   // id generator /////////////////////////////////////////////////////////////
 
   protected void initIdGenerator() {
@@ -3199,4 +3228,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return migratingActivityInstanceValidators;
   }
 
+  public UserOperationLogLevel getUserOperationLogLevel() {
+    return userOperationLogLevel;
+  }
+
+  public void setUserOperationLogLevel(UserOperationLogLevel userOperationLogLevel) {
+    this.userOperationLogLevel = userOperationLogLevel;
+  }
 }
