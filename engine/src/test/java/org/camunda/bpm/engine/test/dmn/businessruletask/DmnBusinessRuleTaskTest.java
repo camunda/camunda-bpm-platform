@@ -54,7 +54,7 @@ public class DmnBusinessRuleTaskTest extends PluggableProcessEngineTestCase {
       fail("Exception expected");
     }
     catch (DecisionDefinitionNotFoundException e) {
-      assertTextPresent("no decision definition deployed with key = 'testDecision' and version = '1'", e.getMessage());
+      assertTextPresent("no decision definition deployed with key = 'testDecision', version = '1' and tenant-id 'null", e.getMessage());
     }
   }
 
