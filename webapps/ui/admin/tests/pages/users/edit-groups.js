@@ -9,7 +9,7 @@ module.exports = Page.extend({
   url: '/camunda/app/admin/default/#/users/:user?tab=groups',
 
   subHeader: function() {
-    return formElement.element(by.css('legend')).getText();
+    return formElement.element(by.css('.h4')).getText();
   },
 
   groupList: function() {

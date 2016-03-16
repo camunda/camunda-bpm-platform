@@ -11,6 +11,6 @@ module.exports = Page.extend({
   },
 
   boxHeader: function() {
-    return groupsSection.element(by.css('h2, legend')).getText();
+    return groupsSection.element(by.css('div.h4')).getText();
   }
 });

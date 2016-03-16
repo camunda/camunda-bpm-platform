@@ -9,7 +9,7 @@ module.exports = Page.extend({
   url: '/camunda/app/admin/default/#/users/:user?tab=profile',
 
   subHeader: function() {
-    return formElement.element(by.css('legend')).getText();
+    return formElement.element(by.css('.h4')).getText();
   },
 
 	firstNameInput: function(inputValue) {
@@ -39,7 +39,7 @@ module.exports = Page.extend({
     return inputField;
   },
 
-  updateProfileButton: function() { 
+  updateProfileButton: function() {
   	return formElement.element(by.css('[ng-click="updateProfile()"]'));
   },
 
