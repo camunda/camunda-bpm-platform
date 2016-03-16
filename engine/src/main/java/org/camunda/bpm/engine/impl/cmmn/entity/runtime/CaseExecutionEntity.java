@@ -617,11 +617,6 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     return variableStore;
   }
 
-  protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
-    variableInstance.setCaseInstanceId(caseInstanceId);
-    variableInstance.setCaseExecutionId(id);
-  }
-
   protected List<VariableInstanceEntity> loadVariableInstances() {
     return Context
         .getCommandContext()

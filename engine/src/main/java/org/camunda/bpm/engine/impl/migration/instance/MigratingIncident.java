@@ -26,6 +26,11 @@ public class MigratingIncident implements MigratingInstance {
     this.targetScope = targetScope;
   }
 
+  @Override
+  public boolean isDetached() {
+    return incident.getExecutionId() == null;
+  }
+
   public void detachState() {
     incident.setExecution(null);
   }

@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.impl.migration.instance;
  */
 public interface MigratingInstance {
 
+  boolean isDetached();
+
   /**
    * Detach this instance's state from its owning instance and the execution tree
    */

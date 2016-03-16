@@ -13,8 +13,8 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.List;
-import java.util.Map;
 
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
 
 /**
@@ -24,8 +24,6 @@ import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
  *
  */
 public class ExecutionEntityVariableStore extends AbstractPersistentVariableStore {
-
-  private static final long serialVersionUID = 1L;
 
   protected ExecutionEntity executionEntity;
 
@@ -37,16 +35,23 @@ public class ExecutionEntityVariableStore extends AbstractPersistentVariableStor
     return executionEntity.loadVariableInstances();
   }
 
-  protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
-    executionEntity.initializeVariableInstanceBackPointer(variableInstance);
+  protected void referenceOwningEntity(VariableInstanceEntity variableInstance) {
+    variableInstance.setExecution(executionEntity);
+  }
+
+  @Override
+  protected void initializeEntitySpecificContext(VariableInstanceEntity variableInstance) {
+    variableInstance.setConcurrentLocal(!executionEntity.isScope() || executionEntity.isExecutingScopeLeafActivity());
   }
 
   protected boolean isAutoFireHistoryEvents() {
     return executionEntity.isAutoFireHistoryEvents();
   }
 
-  public Map<String, VariableInstanceEntity> getVariableInstancesWithoutInitialization() {
-    return variableInstances;
+  @Override
+  protected AbstractVariableScope getThisScope() {
+    return executionEntity;
   }
+
 
 }

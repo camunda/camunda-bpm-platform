@@ -12,8 +12,14 @@
  */
 package org.camunda.bpm.engine.impl.migration.instance.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.pvm.delegate.MigrationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -61,6 +67,11 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
       migratingInstance.setParent(parentInstance);
     }
 
+    CoreActivityBehavior<?> sourceActivityBehavior = sourceScope.getActivityBehavior();
+    if (sourceActivityBehavior instanceof MigrationObserverBehavior) {
+      ((MigrationObserverBehavior) sourceActivityBehavior).onParseMigratingInstance(parseContext, migratingInstance);
+    }
+
     parseContext.submit(migratingInstance);
 
     parseDependentInstances(parseContext, migratingInstance);
@@ -70,6 +81,51 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
     parseContext.handleDependentJobs(migratingInstance, migratingInstance.resolveRepresentativeExecution().getJobs());
     parseContext.handleDependentEventSubscriptions(migratingInstance, migratingInstance.resolveRepresentativeExecution().getEventSubscriptions());
     parseContext.handleDependentTasks(migratingInstance, migratingInstance.resolveRepresentativeExecution().getTasks());
+    parseContext.handleDependentVariables(migratingInstance, collectActivityInstanceVariables(migratingInstance));
+  }
+
+  protected List<VariableInstanceEntity> collectActivityInstanceVariables(MigratingActivityInstance instance) {
+    List<VariableInstanceEntity> variables = new ArrayList<VariableInstanceEntity>();
+    ExecutionEntity representativeExecution = instance.resolveRepresentativeExecution();
+    ExecutionEntity parentExecution = representativeExecution.getParent();
+
+    // decide for representative execution and parent execution whether to none/all/concurrentLocal variables
+    // belong to this activity instance
+    boolean addAllRepresentativeExecutionVariables = instance.getSourceScope().isScope()
+        || representativeExecution.isConcurrent();
+
+    if (addAllRepresentativeExecutionVariables) {
+      variables.addAll(representativeExecution.getVariablesInternal());
+    }
+    else {
+      variables.addAll(getConcurrentLocalVariables(representativeExecution));
+    }
+
+    boolean addAnyParentExecutionVariables = parentExecution != null && instance.getSourceScope().isScope();
+    if (addAnyParentExecutionVariables) {
+      boolean addAllParentExecutionVariables = parentExecution.isConcurrent();
+
+      if (addAllParentExecutionVariables) {
+        variables.addAll(parentExecution.getVariablesInternal());
+      }
+      else {
+        variables.addAll(getConcurrentLocalVariables(parentExecution));
+      }
+    }
+
+    return variables;
+  }
+
+  protected List<VariableInstanceEntity> getConcurrentLocalVariables(ExecutionEntity execution) {
+    List<VariableInstanceEntity> variables = new ArrayList<VariableInstanceEntity>();
+
+    for (VariableInstanceEntity variable : execution.getVariablesInternal()) {
+      if (variable.isConcurrentLocal()) {
+        variables.add(variable);
+      }
+    }
+
+    return variables;
   }
 
 

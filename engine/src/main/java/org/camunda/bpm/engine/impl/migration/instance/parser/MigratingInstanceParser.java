@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -49,6 +50,8 @@ public class MigratingInstanceParser {
       new EventSubscriptionInstanceHandler();
   protected MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<TaskEntity>> dependentTaskHandler =
       new TaskInstanceHandler();
+  protected MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<VariableInstanceEntity>> dependentVariableHandler =
+      new VariableInstanceHandler();
   protected MigratingInstanceParseHandler<IncidentEntity> incidentHandler =
       new IncidentInstanceHandler();
 
@@ -64,9 +67,10 @@ public class MigratingInstanceParser {
     List<TaskEntity> tasks = fetchTasks(commandContext, processInstanceId);
     List<JobEntity> jobs = fetchJobs(commandContext, processInstanceId);
     List<IncidentEntity> incidents = fetchIncidents(commandContext, processInstanceId);
+    List<VariableInstanceEntity> variables = fetchVariables(commandContext, processInstanceId);
 
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
-    processInstance.restoreProcessInstance(executions, eventSubscriptions, null, tasks, jobs, incidents);
+    processInstance.restoreProcessInstance(executions, eventSubscriptions, variables, tasks, jobs, incidents);
 
     ProcessDefinitionEntity targetProcessDefinition = Context
       .getProcessEngineConfiguration()
@@ -79,7 +83,8 @@ public class MigratingInstanceParser {
       .eventSubscriptions(eventSubscriptions)
       .incidents(incidents)
       .tasks(tasks)
-      .targetJobDefinitions(targetJobDefinitions);
+      .targetJobDefinitions(targetJobDefinitions)
+      .variables(variables);
 
     ActivityInstance activityInstance = engine.getRuntimeService().getActivityInstance(processInstanceId);
 
@@ -123,6 +128,10 @@ public class MigratingInstanceParser {
     return incidentHandler;
   }
 
+  public MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<VariableInstanceEntity>> getDependentVariablesHandler() {
+    return dependentVariableHandler;
+  }
+
   protected List<ExecutionEntity> fetchExecutions(CommandContext commandContext, final String processInstanceId) {
     return commandContext.getExecutionManager().findExecutionsByProcessInstanceId(processInstanceId);
   }
@@ -145,5 +154,9 @@ public class MigratingInstanceParser {
 
   protected List<JobDefinitionEntity> fetchJobDefinitions(CommandContext commandContext, String processDefinitionId) {
     return commandContext.getJobDefinitionManager().findByProcessDefinitionId(processDefinitionId);
+  }
+
+  protected List<VariableInstanceEntity> fetchVariables(CommandContext commandContext, String processInstanceId) {
+    return commandContext.getVariableInstanceManager().findVariableInstancesByProcessInstanceId(processInstanceId);
   }
 }

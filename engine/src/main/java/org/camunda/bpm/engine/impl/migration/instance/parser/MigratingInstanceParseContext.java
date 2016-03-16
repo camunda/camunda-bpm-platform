@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
@@ -48,10 +49,11 @@ public class MigratingInstanceParseContext {
   protected Map<String, MigratingActivityInstance> activityInstances = new HashMap<String, MigratingActivityInstance>();
   protected Map<String, MigratingJobInstance> migratingJobs = new HashMap<String, MigratingJobInstance>();
 
-  protected Collection<TaskEntity> tasks;
+  protected Collection<EventSubscriptionEntity> eventSubscriptions;
   protected Collection<IncidentEntity> incidents;
   protected Collection<JobEntity> jobs;
-  protected Collection<EventSubscriptionEntity> eventSubscriptions;
+  protected Collection<TaskEntity> tasks;
+  protected Collection<VariableInstanceEntity> variables;
 
   protected ProcessDefinitionImpl sourceProcessDefinition;
   protected ProcessDefinitionImpl targetProcessDefinition;
@@ -103,6 +105,11 @@ public class MigratingInstanceParseContext {
     return this;
   }
 
+  public MigratingInstanceParseContext variables(Collection<VariableInstanceEntity> variables) {
+    this.variables = new HashSet<VariableInstanceEntity>(variables);
+    return this;
+  }
+
   public void submit(MigratingActivityInstance activityInstance) {
     activityInstances.put(activityInstance.getActivityInstance().getId(), activityInstance);
   }
@@ -125,6 +132,10 @@ public class MigratingInstanceParseContext {
 
   public void consume(EventSubscriptionEntity eventSubscription) {
     eventSubscriptions.remove(eventSubscription);
+  }
+
+  public void consume(VariableInstanceEntity variableInstance) {
+    variables.remove(variableInstance);
   }
 
   public MigratingProcessInstance getMigratingProcessInstance() {
@@ -212,6 +223,10 @@ public class MigratingInstanceParseContext {
     parser.getDependentTaskHandler().handle(this, migratingInstance, tasks);
   }
 
+  public void handleDependentVariables(MigratingActivityInstance migratingInstance, List<VariableInstanceEntity> variables) {
+    parser.getDependentVariablesHandler().handle(this, migratingInstance, variables);
+  }
+
   public void validateNoEntitiesLeft(MigratingProcessInstanceValidationReportImpl processInstanceReport) {
     processInstanceReport.setProcessInstanceId(migratingProcessInstance.getProcessInstanceId());
 
@@ -219,6 +234,7 @@ public class MigratingInstanceParseContext {
     ensureNoEntitiesAreLeft("incidents", incidents, processInstanceReport);
     ensureNoEntitiesAreLeft("jobs", jobs, processInstanceReport);
     ensureNoEntitiesAreLeft("event subscriptions", eventSubscriptions, processInstanceReport);
+    ensureNoEntitiesAreLeft("variables", variables, processInstanceReport);
   }
 
   public void ensureNoEntitiesAreLeft(String entityName, Collection<? extends DbEntity> dbEntities, MigratingProcessInstanceValidationReportImpl processInstanceReport) {

@@ -101,8 +101,16 @@ public class MigrationRemoveMultiInstanceTest {
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
-    // then all MI variables are gone
-    Assert.assertEquals(0, rule.getRuntimeService().createVariableInstanceQuery().count());
+    // then
+    Assert.assertEquals(0, rule.getRuntimeService().createVariableInstanceQuery().variableName("nrOfInstances").count());
+
+    // the MI body variables are gone
+    Assert.assertEquals(0, rule.getRuntimeService().createVariableInstanceQuery().variableName("nrOfInstances").count());
+    Assert.assertEquals(0, rule.getRuntimeService().createVariableInstanceQuery().variableName("nrOfActiveInstances").count());
+    Assert.assertEquals(0, rule.getRuntimeService().createVariableInstanceQuery().variableName("nrOfCompletedInstances").count());
+
+    // and the loop counters are still there (because they logically belong to the inner activity instances)
+    Assert.assertEquals(3, rule.getRuntimeService().createVariableInstanceQuery().variableName("loopCounter").count());
   }
 
   @Test

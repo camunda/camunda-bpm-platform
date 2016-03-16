@@ -472,15 +472,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return null;
   }
 
-  protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
-    variableInstance.setTaskId(id);
-    variableInstance.setExecutionId(executionId);
-    variableInstance.setProcessInstanceId(processInstanceId);
-    variableInstance.setCaseExecutionId(caseExecutionId);
-    variableInstance.setCaseInstanceId(caseInstanceId);
-    variableInstance.setTenantId(tenantId);
-  }
-
   protected List<VariableInstanceEntity> loadVariableInstances() {
     return Context
       .getCommandContext()
@@ -1281,6 +1272,17 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   public void setFollowUpDateWithoutCascade(Date followUpDate) {
     this.followUpDate = followUpDate;
+  }
+
+  public Collection<VariableInstanceEntity> getVariablesInternal() {
+    Map<String, VariableInstanceEntity> rawVariables = variableStore.getVariableInstancesWithoutInitialization();
+
+    if (rawVariables != null) {
+      return rawVariables.values();
+    }
+    else {
+      return null;
+    }
   }
 
   @Override

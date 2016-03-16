@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.pvm.delegate;
 
+import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.impl.migration.instance.parser.MigratingInstanceParseContext;
+
 /**
  * @author Thorben Lindhauer
  *
@@ -24,4 +27,9 @@ public interface MigrationObserverBehavior {
    * have been migrated to their target activities and process definition.
    */
   void migrateScope(ActivityExecution scopeExecution);
+
+  /**
+   * Callback to implement behavior specific parsing (e.g. adding additional dependent entities).
+   */
+  void onParseMigratingInstance(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance);
 }

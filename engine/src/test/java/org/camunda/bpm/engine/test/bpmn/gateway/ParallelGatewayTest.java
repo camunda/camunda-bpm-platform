@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.test.bpmn.gateway;
 
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -29,6 +31,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.hamcrest.CoreMatchers;
 
 /**
@@ -283,5 +286,34 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
     taskService.complete(task4.getId());
 
     assertProcessEnded(pi.getId());
+  }
+
+  public void testRemoveConcurrentExecutionLocalVariablesOnJoin() {
+    deployment(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .parallelGateway("fork")
+      .userTask("task1")
+      .parallelGateway("join")
+      .userTask("afterTask")
+      .endEvent()
+      .moveToNode("fork")
+      .userTask("task2")
+      .connectTo("join")
+      .done());
+
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    for (Task task : tasks) {
+      runtimeService.setVariableLocal(task.getExecutionId(), "var", "value");
+    }
+
+    // when
+    taskService.complete(tasks.get(0).getId());
+    taskService.complete(tasks.get(1).getId());
+
+    // then
+    assertEquals(0, runtimeService.createVariableInstanceQuery().count());
   }
 }

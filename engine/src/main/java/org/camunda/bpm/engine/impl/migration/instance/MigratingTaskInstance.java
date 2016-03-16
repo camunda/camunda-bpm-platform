@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.migration.instance;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Thorben Lindhauer
@@ -34,6 +35,11 @@ public class MigratingTaskInstance implements MigratingInstance {
   }
 
   @Override
+  public boolean isDetached() {
+    return userTask.getExecutionId() == null;
+  }
+
+  @Override
   public void detachState() {
     userTask.getExecution().removeTask(userTask);
     userTask.setExecution(null);
@@ -43,6 +49,11 @@ public class MigratingTaskInstance implements MigratingInstance {
   public void attachState(MigratingActivityInstance owningInstance) {
     ExecutionEntity representativeExecution = owningInstance.resolveRepresentativeExecution();
     representativeExecution.addTask(userTask);
+
+    for (VariableInstanceEntity variable : userTask.getVariablesInternal()) {
+      variable.setExecution(representativeExecution);
+    }
+
     userTask.setExecution(representativeExecution);
   }
 

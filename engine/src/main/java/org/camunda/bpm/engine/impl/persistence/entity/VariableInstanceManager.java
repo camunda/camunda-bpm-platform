@@ -39,6 +39,11 @@ public class VariableInstanceManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
+  public List<VariableInstanceEntity> findVariableInstancesByProcessInstanceId(String processInstanceId) {
+    return getDbEntityManager().selectList("selectVariablesByProcessInstanceId", processInstanceId);
+  }
+
+  @SuppressWarnings("unchecked")
   public List<VariableInstanceEntity> findVariableInstancesByCaseExecutionId(String caseExecutionId) {
     return getDbEntityManager().selectList("selectVariablesByCaseExecutionId", caseExecutionId);
   }

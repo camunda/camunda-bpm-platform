@@ -96,7 +96,36 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
     }
   }
 
+  public void detachChildren() {
+    Set<MigratingActivityInstance> childrenCopy = new HashSet<MigratingActivityInstance>(childInstances);
+    // First detach all dependent entities, only then detach the activity instances.
+    // This is because detaching activity instances may trigger execution tree compaction which in turn
+    // may overwrite certain dependent entities (e.g. variables)
+    for (MigratingActivityInstance child : childrenCopy) {
+      child.detachDependentInstances();
+    }
+
+    for (MigratingActivityInstance child : childrenCopy) {
+      child.detachState();
+    }
+  }
+
+  public void detachDependentInstances() {
+    for (MigratingInstance dependentInstance : migratingDependentInstances) {
+      if (!dependentInstance.isDetached()) {
+        dependentInstance.detachState();
+      }
+    }
+  }
+
+  @Override
+  public boolean isDetached() {
+    return instanceBehavior.isDetached();
+  }
+
   public void detachState() {
+
+    detachDependentInstances();
 
     instanceBehavior.detachState();
 
@@ -111,6 +140,10 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
     activityInstance.getChildren().add(this);
     this.setParent(activityInstance);
     instanceBehavior.attachState(activityInstance);
+
+    for (MigratingInstance dependentInstance : migratingDependentInstances) {
+      dependentInstance.attachState(this);
+    }
   }
 
   public void migrateDependentEntities() {
@@ -133,6 +166,10 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
     migratingDependentInstances.add(migratingInstance);
   }
 
+  public List<MigratingInstance> getMigratingDependentInstances() {
+    return migratingDependentInstances;
+  }
+
   public void addRemovingDependentInstance(RemovingInstance removingInstance) {
     removingDependentInstances.add(removingInstance);
   }
@@ -151,6 +188,10 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
 
   public ScopeImpl getTargetScope() {
     return targetScope;
+  }
+
+  public ScopeImpl getCurrentScope() {
+    return currentScope;
   }
 
   public Set<MigratingActivityInstance> getChildren() {
@@ -187,7 +228,6 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
   @Override
   public void migrateState() {
     instanceBehavior.migrateState();
-    currentScope = targetScope;
   }
 
   public ExecutionEntity createAttachableExecution() {
@@ -201,6 +241,8 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
 
 
   protected interface MigratingActivityInstanceBehavior {
+
+    boolean isDetached();
 
     void detachState();
 
@@ -220,18 +262,18 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
   protected class MigratingNonScopeActivityInstanceBehavior implements MigratingActivityInstanceBehavior {
 
     @Override
+    public boolean isDetached() {
+      return resolveRepresentativeExecution().getActivity() == null;
+    }
+
+    @Override
     public void detachState() {
       ExecutionEntity currentExecution = resolveRepresentativeExecution();
 
       currentExecution.setActivity(null);
       currentExecution.leaveActivityInstance();
 
-      for (MigratingInstance dependentInstance : migratingDependentInstances) {
-        dependentInstance.detachState();
-      }
-
       parentInstance.destroyAttachableExecution(currentExecution);
-
     }
 
     @Override
@@ -242,10 +284,6 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
       representativeExecution.setActivity((PvmActivity) sourceScope);
       representativeExecution.setActivityInstanceId(activityInstance.getId());
 
-      for (MigratingInstance dependentInstance : migratingDependentInstances) {
-        dependentInstance.attachState(MigratingActivityInstance.this);
-      }
-
     }
 
     @Override
@@ -253,6 +291,8 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
       ExecutionEntity currentExecution = resolveRepresentativeExecution();
       currentExecution.setProcessDefinition(targetScope.getProcessDefinition());
       currentExecution.setActivity((PvmActivity) targetScope);
+
+      currentScope = targetScope;
 
       if (targetScope.isScope()) {
         becomeScope();
@@ -311,6 +351,13 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
   protected class MigratingScopeActivityInstanceBehavior implements MigratingActivityInstanceBehavior {
 
     @Override
+    public boolean isDetached() {
+      ExecutionEntity representativeExecution = resolveRepresentativeExecution();
+      return representativeExecution != representativeExecution.getProcessInstance()
+        && representativeExecution.getParent() == null;
+    }
+
+    @Override
     public void detachState() {
       ExecutionEntity currentScopeExecution = resolveRepresentativeExecution();
 
@@ -346,6 +393,8 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
       if (parentExecution != null && parentExecution.isConcurrent()) {
         parentExecution.setProcessDefinition(targetScope.getProcessDefinition());
       }
+
+      currentScope = targetScope;
 
       if (!targetScope.isScope()) {
         becomeNonScope();

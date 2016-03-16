@@ -49,6 +49,11 @@ public class MigratingJobInstance implements MigratingInstance, RemovingInstance
     migratingDependentInstances.add(migratingInstance);
   }
 
+  @Override
+  public boolean isDetached() {
+    return jobEntity.getExecutionId() == null;
+  }
+
   public void detachState() {
     jobEntity.setExecution(null);
 

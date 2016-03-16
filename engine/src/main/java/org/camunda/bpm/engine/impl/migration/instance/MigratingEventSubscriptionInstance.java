@@ -39,6 +39,11 @@ public class MigratingEventSubscriptionInstance implements MigratingInstance, Re
     this.eventSubscriptionDeclaration = eventSubscriptionDeclaration;
   }
 
+  @Override
+  public boolean isDetached() {
+    return eventSubscriptionEntity.getExecutionId() == null;
+  }
+
   public void detachState() {
     eventSubscriptionEntity.setExecution(null);
   }

@@ -135,9 +135,7 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
             MigratingActivityInstance parent = currentInstance.getParent();
 
             // 1. detach children
-            for (MigratingActivityInstance child : children) {
-              child.detachState();
-            }
+            currentInstance.detachChildren();
 
             // 2. manipulate execution tree (i.e. remove this instance)
             currentInstance.remove();
@@ -227,10 +225,7 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
       if (targetFlowScope != parentActivityInstanceTargetScope) {
         // create intermediate scopes
 
-        // 1. detach activity instance
-        migratingActivityInstance.detachState();
-
-        // 2. manipulate execution tree
+        // 1. manipulate execution tree
 
         // determine the list of ancestor scopes (parent, grandparent, etc.) for which
         //     no executions exist yet
@@ -248,6 +243,11 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
         instantiateScopes(ancestorScopeInstance, migratingInstanceBranch, nonExistingScopes);
 
         MigratingActivityInstance targetFlowScopeInstance = migratingInstanceBranch.getInstance(targetFlowScope);
+
+        // 2. detach activity instance
+        // The order of steps 1 and 2 avoids intermediate execution tree compaction
+        // which in turn could overwrite some dependent instances (e.g. variables)
+        migratingActivityInstance.detachState();
 
         // 3. attach to newly created execution
         migratingActivityInstance.attachState(targetFlowScopeInstance);

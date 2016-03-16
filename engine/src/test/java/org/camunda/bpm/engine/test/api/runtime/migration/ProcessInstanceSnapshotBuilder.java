@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 
@@ -76,6 +77,13 @@ public class ProcessInstanceSnapshotBuilder {
     return this;
   }
 
+  public ProcessInstanceSnapshotBuilder variables() {
+    List<VariableInstance> variables = processEngine.getRuntimeService().createVariableInstanceQuery().processInstanceIdIn(processInstanceId).list();
+    snapshot.setVariables(variables);
+
+    return this;
+  }
+
   public ProcessInstanceSnapshot build() {
     return snapshot;
   }
@@ -86,6 +94,7 @@ public class ProcessInstanceSnapshotBuilder {
     tasks();
     eventSubscriptions();
     jobs();
+    variables();
 
     return build();
   }

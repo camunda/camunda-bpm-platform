@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ActivityInstanceAssert.ActivityInstanceAssertThatClause;
@@ -140,6 +141,10 @@ public class MigrationTestRule extends TestWatcher {
 
   public ActivityInstance getSingleActivityInstanceBeforeMigration(String activityId) {
     return getSingleActivityInstance(snapshotBeforeMigration.getActivityTree(), activityId);
+  }
+
+  public ActivityInstance getSingleActivityInstanceAfterMigration(String activityId) {
+    return getSingleActivityInstance(snapshotAfterMigration.getActivityTree(), activityId);
   }
 
   public ProcessInstanceSnapshot takeFullProcessInstanceSnapshot(ProcessInstance processInstance) {
@@ -317,5 +322,29 @@ public class MigrationTestRule extends TestWatcher {
   public void assertEventSubProcessTimerJobRemoved(String activityId) {
     assertJobRemoved(activityId, TimerStartEventSubprocessJobHandler.TYPE);
   }
+
+  public void assertVariableMigratedToExecution(VariableInstance variableBefore, String executionId) {
+    assertVariableMigratedToExecution(variableBefore, executionId, variableBefore.getActivityInstanceId());
+  }
+
+  public void assertVariableMigratedToExecution(VariableInstance variableBefore, String executionId, String activityInstanceId) {
+    VariableInstance variableAfter = snapshotAfterMigration.getVariable(variableBefore.getId());
+
+    Assert.assertNotNull("Variable with id " + variableBefore.getId() + " does not exist", variableAfter);
+
+    Assert.assertEquals(activityInstanceId, variableAfter.getActivityInstanceId());
+    Assert.assertEquals(variableBefore.getCaseExecutionId(), variableAfter.getCaseExecutionId());
+    Assert.assertEquals(variableBefore.getCaseInstanceId(), variableAfter.getCaseInstanceId());
+    Assert.assertEquals(variableBefore.getErrorMessage(), variableAfter.getErrorMessage());
+    Assert.assertEquals(executionId, variableAfter.getExecutionId());
+    Assert.assertEquals(variableBefore.getId(), variableAfter.getId());
+    Assert.assertEquals(variableBefore.getName(), variableAfter.getName());
+    Assert.assertEquals(variableBefore.getProcessInstanceId(), variableAfter.getProcessInstanceId());
+    Assert.assertEquals(variableBefore.getTaskId(), variableAfter.getTaskId());
+    Assert.assertEquals(variableBefore.getTenantId(), variableAfter.getTenantId());
+    Assert.assertEquals(variableBefore.getTypeName(), variableAfter.getTypeName());
+    Assert.assertEquals(variableBefore.getValue(), variableAfter.getValue());
+  }
+
 
 }

@@ -190,6 +190,7 @@ import org.camunda.bpm.engine.impl.migration.DefaultMigrationActivityMatcher;
 import org.camunda.bpm.engine.impl.migration.DefaultMigrationInstructionGenerator;
 import org.camunda.bpm.engine.impl.migration.MigrationActivityMatcher;
 import org.camunda.bpm.engine.impl.migration.MigrationInstructionGenerator;
+import org.camunda.bpm.engine.impl.migration.batch.MigrationBatchJobHandler;
 import org.camunda.bpm.engine.impl.migration.validation.activity.HasNoEventSubProcessChildActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.HasNoEventSubProcessParentActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.MigrationActivityValidator;
@@ -199,16 +200,16 @@ import org.camunda.bpm.engine.impl.migration.validation.instance.AdditionalFlowS
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingActivityInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.NoActiveTransitionsActivityInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.NoUnmappedLeafActivityInstanceValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotRemoveMultiInstanceInnerActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instance.VariableConflictActivityInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMultiInstanceBodyValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMultiInstanceInnerActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotRemoveMultiInstanceInnerActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MultiInstanceTypeValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.OnlyOnceMappedActivityInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.SameEventScopeInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.SameTypeInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.SupportedActivitiesInstructionValidator;
-import org.camunda.bpm.engine.impl.migration.batch.MigrationBatchJobHandler;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
@@ -3195,6 +3196,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     migratingActivityInstanceValidators.add(new AdditionalFlowScopeActivityInstanceValidator());
     migratingActivityInstanceValidators.add(new NoUnmappedLeafActivityInstanceValidator());
     migratingActivityInstanceValidators.add(new NoActiveTransitionsActivityInstanceValidator());
+    migratingActivityInstanceValidators.add(new VariableConflictActivityInstanceValidator());
 
     return migratingActivityInstanceValidators;
   }

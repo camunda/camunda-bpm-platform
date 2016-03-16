@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
@@ -37,7 +37,6 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
-import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
@@ -65,6 +64,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -1037,11 +1037,15 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     // current activity
     replacedExecution.moveActivityLocalJobsTo(this);
 
-    // only move variables when compacting the tree, but not when expanding
-    // this behavior should be changed when fixing CAM-3941
-    if (replacedExecution.getParent() == this) {
-      // update the related process variables
-      replacedExecution.moveVariablesTo(this);
+    if (!replacedExecution.isEnded()) {
+      // on compaction, move all variables
+      if (replacedExecution.getParent() == this) {
+        replacedExecution.moveVariablesTo(this);
+      }
+      else {
+        // on expansion, only move concurrent local variables
+        replacedExecution.moveConcurrentLocalVariablesTo(this);
+      }
     }
 
     // note: this method not move any event subscriptions since concurrent
@@ -1051,6 +1055,13 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     // operation is concurrent)
 
     super.replace(replacedExecution);
+  }
+
+  @Override
+  public void onConcurrentExpand(PvmExecutionImpl scopeExecution) {
+    ExecutionEntity scopeExecutionEntity = (ExecutionEntity) scopeExecution;
+    scopeExecutionEntity.moveConcurrentLocalVariablesTo(this);
+    super.onConcurrentExpand(scopeExecutionEntity);
   }
 
   protected void moveTasksTo(ExecutionEntity other) {
@@ -1096,21 +1107,14 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   protected void moveVariablesTo(ExecutionEntity other) {
-    variableStore.ensureVariableInstancesInitialized();
-    for (CoreVariableInstance variable : variableStore.getVariableInstances().values()) {
-      ((VariableInstanceEntity) variable).setExecutionId(other.getId());
-    }
+    variableStore.moveVariablesTo(other.variableStore);
+  }
+
+  protected void moveConcurrentLocalVariablesTo(ExecutionEntity other) {
+    variableStore.moveConcurrentLocalVariablesTo(other.variableStore);
   }
 
   // variables ////////////////////////////////////////////////////////////////
-
-  protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
-    variableInstance.setProcessInstanceId(processInstanceId);
-    variableInstance.setExecutionId(id);
-    variableInstance.setTenantId(tenantId);
-
-    variableInstance.setConcurrentLocal(!isScope || isExecutingScopeLeafActivity());
-  }
 
   protected boolean isExecutingScopeLeafActivity() {
     return isActive && getActivity() != null && getActivity().isScope() && activityInstanceId != null
@@ -1216,6 +1220,13 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       executionsMap.put(execution.getId(), execution);
     }
 
+    Map<String, List<VariableInstanceEntity>> variablesByScope = new HashMap<String, List<VariableInstanceEntity>>();
+    if(variables != null) {
+      for (VariableInstanceEntity variable : variables) {
+        CollectionUtil.addToMapOfLists(variablesByScope, variable.getVariableScopeId(), variable);
+      }
+    }
+
     // restore execution tree
     for (ExecutionEntity execution : executions) {
       if (execution.executions == null) {
@@ -1224,8 +1235,13 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       if(execution.eventSubscriptions == null && eventSubscriptions != null) {
         execution.eventSubscriptions = new ArrayList<EventSubscriptionEntity>();
       }
-      if(variableStore.getVariableInstancesDirect() == null && variables != null) {
-        variableStore.setVariableInstances(new HashMap<String, VariableInstanceEntity>());
+      if(variables != null && execution.variableStore.getVariableInstancesDirect() == null) {
+        if (variablesByScope.containsKey(execution.id)) {
+          execution.variableStore.initializeVariablesFrom(variablesByScope.get(execution.id));
+        }
+        else {
+          execution.variableStore.setVariableInstances(new HashMap<String, VariableInstanceEntity>());
+        }
       }
       String parentId = execution.getParentId();
       ExecutionEntity parent = executionsMap.get(parentId);
@@ -1254,13 +1270,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       }
     }
 
-    if(variables != null) {
-      for (VariableInstanceEntity variable : variables) {
-        ExecutionEntity executionEntity = executionsMap.get(variable.getExecutionId());
-        executionEntity.getVariableStore().getVariableInstances().put(variable.getName(), variable);
-      }
-    }
-
     if (jobs != null) {
       for (JobEntity job : jobs) {
         ExecutionEntity execution = executionsMap.get(job.getExecutionId());
@@ -1273,8 +1282,18 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
         ExecutionEntity execution = executionsMap.get(task.getExecutionId());
         task.setExecution(execution);
         execution.addTask(task);
+
+        if(variables != null && task.variableStore.getVariableInstancesDirect() == null) {
+          if (variablesByScope.containsKey(task.getId())) {
+            task.variableStore.initializeVariablesFrom(variablesByScope.get(task.id));
+          }
+          else {
+            task.variableStore.setVariableInstances(new HashMap<String, VariableInstanceEntity>());
+          }
+        }
       }
     }
+
 
     if (incidents != null) {
       for (IncidentEntity incident : incidents) {
@@ -1519,8 +1538,27 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   // variables /////////////////////////////////////////////////////////
 
   @Override
-  protected CoreVariableStore getVariableStore() {
+  protected ExecutionEntityVariableStore getVariableStore() {
     return variableStore;
+  }
+
+  public Collection<VariableInstanceEntity> getVariablesInternal() {
+    Map<String, VariableInstanceEntity> rawVariables = variableStore.getVariableInstancesWithoutInitialization();
+
+    if (rawVariables != null) {
+      return rawVariables.values();
+    }
+    else {
+      return null;
+    }
+  }
+
+  public void removeVariableInternal(VariableInstanceEntity variable) {
+    variableStore.detachVariable(variable);
+  }
+
+  public void addVariableInternal(VariableInstanceEntity variable) {
+    variableStore.attachVariable(variable);
   }
 
   // getters and setters //////////////////////////////////////////////////////

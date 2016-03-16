@@ -103,6 +103,9 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
    */
   protected boolean isTransient = false;
 
+  // transient properties
+  protected ExecutionEntity execution;
+
   // Default constructor for SQL mapping
   public VariableInstanceEntity() {
     typedValueField.addImplicitUpdateListener(this);
@@ -160,12 +163,15 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     if (byteArrayField.getByteArrayId() != null) {
       persistentState.put("byteArrayValueId", byteArrayField.getByteArrayId());
     }
-    if (forcedUpdate) {
-      persistentState.put("forcedUpdate", Boolean.TRUE);
-    }
 
     persistentState.put("sequenceCounter", getSequenceCounter());
     persistentState.put("concurrentLocal", isConcurrentLocal);
+    persistentState.put("executionId", executionId);
+    persistentState.put("taskId", taskId);
+    persistentState.put("caseExecutionId", caseExecutionId);
+    persistentState.put("caseInstanceId", caseInstanceId);
+    persistentState.put("tenantId", tenantId);
+    persistentState.put("processInstanceId", processInstanceId);
 
     return persistentState;
   }
@@ -190,6 +196,11 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   public void setCaseExecutionId(String caseExecutionId) {
     this.caseExecutionId = caseExecutionId;
+  }
+
+  public void setCaseExecution(CaseExecutionEntity caseExecution) {
+    this.caseInstanceId = caseExecution.getCaseInstanceId();
+    this.caseExecutionId = caseExecution.getId();
   }
 
   // byte array value /////////////////////////////////////////////////////////
@@ -269,21 +280,34 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   // execution ////////////////////////////////////////////////////////////////
 
-  public ExecutionEntity getExecution() {
-    if (executionId != null) {
-      return Context
-        .getCommandContext()
-        .getExecutionManager()
-        .findExecutionById(executionId);
+  protected void ensureExecutionInitialized() {
+    if (execution == null && executionId != null) {
+      execution = Context
+          .getCommandContext()
+          .getExecutionManager()
+          .findExecutionById(executionId);
     }
-    return null;
+  }
+
+  public ExecutionEntity getExecution() {
+    ensureExecutionInitialized();
+    return execution;
   }
 
   public void setExecution(ExecutionEntity execution) {
-    this.executionId = execution.getId();
-    this.processInstanceId = execution.getProcessInstanceId();
-    this.tenantId = execution.getTenantId();
-    forcedUpdate = true;
+    this.execution = execution;
+
+    if (execution == null) {
+      this.executionId = null;
+      this.processInstanceId = null;
+      this.tenantId = null;
+    }
+    else {
+      setExecutionId(execution.getId());
+      this.processInstanceId = execution.getProcessInstanceId();
+      this.tenantId = execution.getTenantId();
+    }
+
   }
 
   // case execution ///////////////////////////////////////////////////////////
@@ -390,6 +414,18 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   public void setTaskId(String taskId) {
     this.taskId = taskId;
+  }
+
+  public void setTask(TaskEntity task) {
+    this.taskId = task.getId();
+    this.tenantId = task.getTenantId();
+
+    if (task.getExecution() != null) {
+      setExecution(task.getExecution());
+    }
+    if (task.getCaseExecution() != null) {
+      setCaseExecution(task.getCaseExecution());
+    }
   }
 
   public String getActivityInstanceId() {
@@ -525,7 +561,6 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
       + ", textValue=" + textValue
       + ", textValue2=" + textValue2
       + ", byteArrayValueId=" + getByteArrayValueId()
-      + ", forcedUpdate=" + forcedUpdate
       + ", configuration=" + configuration
       + ", isConcurrentLocal=" + isConcurrentLocal
       + "]";

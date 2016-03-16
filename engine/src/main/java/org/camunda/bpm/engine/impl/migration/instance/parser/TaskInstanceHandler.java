@@ -12,11 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.migration.instance.parser;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingTaskInstance;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Thorben Lindhauer
@@ -30,6 +32,16 @@ public class TaskInstanceHandler implements MigratingDependentInstanceParseHandl
     for (TaskEntity task : tasks) {
       owningInstance.addMigratingDependentInstance(new MigratingTaskInstance(task, owningInstance));
       parseContext.consume(task);
+
+      Collection<VariableInstanceEntity> variables = task.getVariablesInternal();
+
+      if (variables != null) {
+        for (VariableInstanceEntity variable : variables) {
+          // we don't need to represent task variables in the migrating instance structure because
+          // they are migrated by the MigratingTaskInstance as well
+          parseContext.consume(variable);
+        }
+      }
     }
 
   }

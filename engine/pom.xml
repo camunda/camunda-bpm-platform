@@ -439,6 +439,7 @@
                 <exclude>**/MultiTenancyHistoricDecisionInstanceQueryTest.java</exclude>
                 <exclude>**/BatchMigrationHistoryTest.java</exclude>
                 <exclude>**/TenantIdProviderTest.java</exclude>
+                <exclude>**/MigrationHistoryVariablesTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -488,6 +489,7 @@
                 <exclude>**/MultiTenancyHistoricDecisionInstanceQueryTest.java</exclude>
                 <exclude>**/BatchMigrationHistoryTest.java</exclude>
                 <exclude>**/TenantIdProviderTest.java</exclude>
+                <exclude>**/MigrationHistoryVariablesTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -532,6 +534,7 @@
                 <exclude>**/MultiTenancyHistoric*QueryTest.java</exclude>
                 <exclude>**/BatchMigrationHistoryTest.java</exclude>
                 <exclude>**/TenantIdProviderTest.java</exclude>
+                <exclude>**/MigrationHistoryVariablesTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>

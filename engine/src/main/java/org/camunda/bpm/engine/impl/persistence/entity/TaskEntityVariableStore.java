@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
 
 /**
@@ -23,8 +24,6 @@ import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
  *
  */
 public class TaskEntityVariableStore extends AbstractPersistentVariableStore {
-
-  private static final long serialVersionUID = 1L;
 
   protected TaskEntity taskEntity;
 
@@ -36,7 +35,18 @@ public class TaskEntityVariableStore extends AbstractPersistentVariableStore {
     return taskEntity.loadVariableInstances();
   }
 
-  protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
-    taskEntity.initializeVariableInstanceBackPointer(variableInstance);
+  @Override
+  protected void referenceOwningEntity(VariableInstanceEntity variableInstance) {
+    variableInstance.setTask(taskEntity);
+  }
+
+  @Override
+  protected void initializeEntitySpecificContext(VariableInstanceEntity variableInstance) {
+
+  }
+
+  @Override
+  protected AbstractVariableScope getThisScope() {
+    return taskEntity;
   }
 }

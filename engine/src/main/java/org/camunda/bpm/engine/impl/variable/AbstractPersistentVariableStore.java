@@ -17,10 +17,12 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableListener;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -49,17 +51,26 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
   protected Map<String, VariableInstanceEntity> variableInstances = null;
 
   protected abstract List<VariableInstanceEntity> loadVariableInstances();
-  protected abstract void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance);
+  protected abstract void referenceOwningEntity(VariableInstanceEntity variableInstance);
+  protected abstract void initializeEntitySpecificContext(VariableInstanceEntity variableInstance);
 
   public void ensureVariableInstancesInitialized() {
     if (variableInstances==null) {
-      variableInstances = new HashMap<String, VariableInstanceEntity>();
       CommandContext commandContext = Context.getCommandContext();
       ensureNotNull("lazy loading outside command context", "commandContext", commandContext);
       List<VariableInstanceEntity> variableInstancesList = loadVariableInstances();
-      for (VariableInstanceEntity variableInstance : variableInstancesList) {
-        variableInstances.put(variableInstance.getName(), variableInstance);
-      }
+      initializeVariablesFrom(variableInstancesList);
+    }
+  }
+
+  public void initializeVariablesFrom(Collection<VariableInstanceEntity> variables) {
+    if (variableInstances != null) {
+      throw new ProcessEngineException("Variable instances already initialized");
+    }
+
+    variableInstances = new HashMap<String, VariableInstanceEntity>();
+    for (VariableInstanceEntity variableInstance : variables) {
+      variableInstances.put(variableInstance.getName(), variableInstance);
     }
   }
 
@@ -145,7 +156,8 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
 
     // create variable instance
     VariableInstanceEntity variableInstance = VariableInstanceEntity.createAndInsert(variableName, value);
-    initializeVariableInstanceBackPointer(variableInstance);
+    referenceOwningEntity(variableInstance);
+    initializeEntitySpecificContext(variableInstance);
     variableInstances.put(variableName, variableInstance);
 
     // fire CREATE event
@@ -167,6 +179,52 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
       variable.delete();
     }
     variableInstances.clear();
+  }
+
+  public void detachVariable(VariableInstanceEntity variableInstance) {
+    ensureVariableInstancesInitialized();
+    VariableInstanceEntity variableInstanceEntity = variableInstances.get(variableInstance.getName());
+    if (variableInstanceEntity != null && variableInstanceEntity.getId().equals(variableInstance.getId())) {
+      variableInstances.remove(variableInstance.getName());
+    }
+  }
+
+  public void attachVariable(VariableInstanceEntity variableInstance) {
+    ensureVariableInstancesInitialized();
+
+    if (variableInstances.containsKey(variableInstance.getName())) {
+      setVariableValue(variableInstances.get(variableInstance.getName()),
+          variableInstance.getTypedValue(), getThisScope());
+      variableInstance.delete();
+    }
+    else {
+      referenceOwningEntity(variableInstance);
+
+      variableInstances.put(variableInstance.getName(), variableInstance);
+    }
+
+  }
+
+  public void moveVariablesTo(AbstractPersistentVariableStore other) {
+
+    ensureVariableInstancesInitialized();
+
+    for (VariableInstanceEntity variable : new HashSet<VariableInstanceEntity>(variableInstances.values())) {
+      this.detachVariable(variable);
+      other.attachVariable(variable);
+    }
+  }
+
+  public void moveConcurrentLocalVariablesTo(AbstractPersistentVariableStore other) {
+
+    ensureVariableInstancesInitialized();
+
+    for (VariableInstanceEntity variable : new HashSet<VariableInstanceEntity>(variableInstances.values())) {
+      if (variable.isConcurrentLocal()) {
+        this.detachVariable(variable);
+        other.attachVariable(variable);
+      }
+    }
   }
 
   public static void fireHistoricVariableInstanceDelete(VariableInstanceEntity variableInstance, AbstractVariableScope sourceActivityExecution) {
@@ -223,10 +281,17 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
     // only create the variable instance but do not insert it into the data base
     VariableInstanceEntity variableInstance = VariableInstanceEntity.create(variableName, value);
     variableInstance.setTransient(true);
-    initializeVariableInstanceBackPointer(variableInstance);
+    referenceOwningEntity(variableInstance);
+    initializeEntitySpecificContext(variableInstance);
 
     ensureVariableInstancesInitialized();
     variableInstances.put(variableName, variableInstance);
   }
+
+  public Map<String, VariableInstanceEntity> getVariableInstancesWithoutInitialization() {
+    return variableInstances;
+  }
+
+  protected abstract AbstractVariableScope getThisScope();
 
 }

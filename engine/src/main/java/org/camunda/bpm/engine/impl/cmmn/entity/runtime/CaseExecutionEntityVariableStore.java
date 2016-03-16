@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
 
@@ -33,8 +34,19 @@ public class CaseExecutionEntityVariableStore extends AbstractPersistentVariable
     return caseExecutionEntity.loadVariableInstances();
   }
 
-  protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
-    caseExecutionEntity.initializeVariableInstanceBackPointer(variableInstance);
+  @Override
+  protected void referenceOwningEntity(VariableInstanceEntity variableInstance) {
+    variableInstance.setCaseExecution(caseExecutionEntity);
+  }
+
+  @Override
+  protected void initializeEntitySpecificContext(VariableInstanceEntity variableInstance) {
+    // nothing to do
+  }
+
+  @Override
+  protected AbstractVariableScope getThisScope() {
+    return caseExecutionEntity;
   }
 
 }
