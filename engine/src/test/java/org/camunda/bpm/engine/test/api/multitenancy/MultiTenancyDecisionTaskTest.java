@@ -30,8 +30,8 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
-  protected static final String DMN_FILE = "org/camunda/bpm/engine/test/api/multiTenancy/simpleDecisionTable.dmn";
-  protected static final String DMN_FILE_VERSION_TWO = "org/camunda/bpm/engine/test/api/multiTenancy/simpleDecisionTable_v2.dmn";
+  protected static final String DMN_FILE = "org/camunda/bpm/engine/test/api/multitenancy/simpleDecisionTable.dmn";
+  protected static final String DMN_FILE_VERSION_TWO = "org/camunda/bpm/engine/test/api/multitenancy/simpleDecisionTable_v2.dmn";
 
   public void testEvaluateDecisionTaskWithDeploymentBinding() {
 
@@ -118,7 +118,7 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is("A"));
     assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is("C"));
 
-    // check whether DMN_FILE_VERSION_TWO version 2 is really used 
+    // check whether DMN_FILE_VERSION_TWO version 2 is really used
     DecisionDefinition latestDecisionDefinitionTenantTwo = repositoryService.createDecisionDefinitionQuery()
         .tenantIdIn(TENANT_TWO).decisionDefinitionKey("decision").latestVersion().singleResult();
 
