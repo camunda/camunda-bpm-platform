@@ -39,7 +39,7 @@ public class TestContainer {
   }
 
   public static void addCommonLoggingDependency(WebArchive webArchive) {
-    // nothing to do
+    webArchive.addAsManifestResource("jboss-deployment-structure-with-commons-logging.xml", "jboss-deployment-structure.xml");
   }
 
 }

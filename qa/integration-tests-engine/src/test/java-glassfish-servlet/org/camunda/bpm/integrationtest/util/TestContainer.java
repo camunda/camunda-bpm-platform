@@ -40,11 +40,11 @@ public class TestContainer {
   }
 
   public static void addSpinJacksonJsonDataFormat(WebArchive webArchive) {
-    webArchive.addAsLibraries(DeploymentHelper.getSpinJacksonJsonDataFormatForServer("glassfish-servlet"));
+    webArchive.addAsLibraries(DeploymentHelper.getSpinJacksonJsonDataFormatForServer("glassfish"));
   }
 
   public static void addJodaTimeJacksonModule(WebArchive webArchive) {
-    webArchive.addAsLibraries(DeploymentHelper.getJodaTimeModuleForServer("glassfish-servlet"));
+    webArchive.addAsLibraries(DeploymentHelper.getJodaTimeModuleForServer("glassfish"));
   }
 
   public static void addCommonLoggingDependency(WebArchive webArchive) {
