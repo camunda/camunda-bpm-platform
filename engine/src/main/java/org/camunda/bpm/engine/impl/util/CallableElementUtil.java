@@ -80,12 +80,13 @@ public class CallableElementUtil {
 
   public static DecisionDefinition getDecisionDefinitionToCall(VariableScope execution, BaseCallableElement callableElement) {
     String decisionDefinitionKey = callableElement.getDefinitionKey(execution);
+    String tenantId = callableElement.getDefinitionTenantId((CoreExecution) execution);
 
     DeploymentCache deploymentCache = getDeploymentCache();
 
     DecisionDefinition decisionDefinition = null;
     if (callableElement.isLatestBinding()) {
-      decisionDefinition = deploymentCache.findDeployedLatestDecisionDefinitionByKey(decisionDefinitionKey);
+      decisionDefinition = deploymentCache.findDeployedLatestDecisionDefinitionByKeyAndTenantId(decisionDefinitionKey, tenantId);
 
     } else if (callableElement.isDeploymentBinding()) {
       String deploymentId = callableElement.getDeploymentId();
@@ -93,7 +94,7 @@ public class CallableElementUtil {
 
     } else if (callableElement.isVersionBinding()) {
       Integer version = callableElement.getVersion(execution);
-      decisionDefinition = deploymentCache.findDeployedDecisionDefinitionByKeyAndVersion(decisionDefinitionKey, version);
+      decisionDefinition = deploymentCache.findDeployedDecisionDefinitionByKeyVersionAndTenantId(decisionDefinitionKey, version, tenantId);
     }
 
     return decisionDefinition;
