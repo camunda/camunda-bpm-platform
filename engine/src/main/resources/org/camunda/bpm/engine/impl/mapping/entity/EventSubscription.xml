@@ -138,6 +138,16 @@
         and EVT.TENANT_ID_ is null
       </if>
   </select>
+  
+  <select id="selectSignalEventSubscriptionsByEventNameAndTenantIdIncludeWithoutTenantId" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    select EVT.*
+    from ${prefix}ACT_RU_EVENT_SUBSCR EVT
+    left join ${prefix}ACT_RU_EXECUTION EXC on EVT.EXECUTION_ID_ = EXC.ID_
+    where (EVENT_TYPE_ = 'signal')
+      and (EVENT_NAME_ = #{parameter.eventName})
+      and (EVT.EXECUTION_ID_ is null or EXC.SUSPENSION_STATE_ = 1)
+      and (EVT.TENANT_ID_ = #{parameter.tenantId} or EVT.TENANT_ID_ is null)
+  </select>
 
   <select id="selectSignalEventSubscriptionsByExecution" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select *

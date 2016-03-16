@@ -48,6 +48,19 @@ public class MultiTenancySignalReceiveTest extends PluggableProcessEngineTestCas
       .endEvent()
       .done();
 
+  protected static final BpmnModelInstance SIGNAL_INTERMEDIATE_THROW_PROCESS = Bpmn.createExecutableProcess("signalThrow")
+      .startEvent()
+      .intermediateThrowEvent()
+        .signal("signal")
+      .endEvent()
+      .done();
+
+  protected static final BpmnModelInstance SIGNAL_END_THROW_PROCESS = Bpmn.createExecutableProcess("signalThrow")
+      .startEvent()
+      .endEvent()
+        .signal("signal")
+      .done();
+
   public void testSendSignalToStartEventForNonTenant() {
     deployment(SIGNAL_START_PROCESS);
     deploymentForTenant(TENANT_ONE, SIGNAL_START_PROCESS);
@@ -217,6 +230,68 @@ public class MultiTenancySignalReceiveTest extends PluggableProcessEngineTestCas
     } catch (BadUserRequestException e) {
       assertThat(e.getMessage(), containsString("Cannot specify a tenant-id when deliver a signal to a single execution."));
     }
+  }
+
+  public void testThrowIntermediateSignalForTenant() {
+    deploymentForTenant(TENANT_ONE, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS, SIGNAL_INTERMEDIATE_THROW_PROCESS);
+    deploymentForTenant(TENANT_TWO, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
+    deployment(SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
+
+    runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionWithoutTenantId().execute();
+    runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_TWO).execute();
+
+    runtimeService.startProcessInstanceByKey("signalThrow");
+
+    TaskQuery query = taskService.createTaskQuery();
+    assertThat(query.withoutTenantId().count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+  }
+
+  public void testThrowIntermediateSignalForNonTenant() {
+    deployment(SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS, SIGNAL_INTERMEDIATE_THROW_PROCESS);
+    deploymentForTenant(TENANT_ONE, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
+
+    runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionWithoutTenantId().execute();
+    runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
+
+    runtimeService.startProcessInstanceByKey("signalThrow");
+
+    TaskQuery query = taskService.createTaskQuery();
+    assertThat(query.withoutTenantId().count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
+  }
+
+  public void testThrowEndSignalForTenant() {
+    deploymentForTenant(TENANT_ONE, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS, SIGNAL_END_THROW_PROCESS);
+    deploymentForTenant(TENANT_TWO, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
+    deployment(SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
+
+    runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionWithoutTenantId().execute();
+    runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_TWO).execute();
+
+    runtimeService.startProcessInstanceByKey("signalThrow");
+
+    TaskQuery query = taskService.createTaskQuery();
+    assertThat(query.withoutTenantId().count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+  }
+
+  public void testThrowEndSignalForNonTenant() {
+    deployment(SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS, SIGNAL_END_THROW_PROCESS);
+    deploymentForTenant(TENANT_ONE, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
+
+    runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionWithoutTenantId().execute();
+    runtimeService.createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
+
+    runtimeService.startProcessInstanceByKey("signalThrow");
+
+    TaskQuery query = taskService.createTaskQuery();
+    assertThat(query.withoutTenantId().count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
   }
 
 }

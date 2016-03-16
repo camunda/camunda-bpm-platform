@@ -120,6 +120,27 @@ public class EventSubscriptionManager extends AbstractManager {
     return new ArrayList<SignalEventSubscriptionEntity>(eventSubscriptions);
   }
 
+  /**
+   * Find all signal event subscriptions with the given event name which belongs to the given tenant or no tenant.
+   */
+  @SuppressWarnings("unchecked")
+  public List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByEventNameAndTenantIdIncludeWithoutTenantId(String eventName, String tenantId) {
+    final String query = "selectSignalEventSubscriptionsByEventNameAndTenantIdIncludeWithoutTenantId";
+
+    Map<String, Object> parameter = new HashMap<String, Object>();
+    parameter.put("eventName", eventName);
+    parameter.put("tenantId", tenantId);
+    Set<SignalEventSubscriptionEntity> eventSubscriptions = new HashSet<SignalEventSubscriptionEntity>( getDbEntityManager().selectList(query, parameter));
+
+    // add events created in this command (not visible yet in query)
+    for (SignalEventSubscriptionEntity entity : createdSignalSubscriptions) {
+      if(eventName.equals(entity.getEventName()) && (entity.getTenantId() == null || hasTenantId(entity, tenantId))) {
+        eventSubscriptions.add(entity);
+      }
+    }
+    return new ArrayList<SignalEventSubscriptionEntity>(eventSubscriptions);
+  }
+
   protected boolean hasTenantId(SignalEventSubscriptionEntity entity, String tenantId) {
     if (tenantId == null) {
       return entity.getTenantId() == null;

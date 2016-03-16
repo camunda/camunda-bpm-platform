@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,32 +25,33 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
  * @author Kristin Polenz
  */
 public class SignalEndEventActivityBehavior extends FlowNodeActivityBehavior {
-  
+
   protected EventSubscriptionDeclaration signalDefinition;
-  
+
   public SignalEndEventActivityBehavior(EventSubscriptionDeclaration signalDefinition) {
     this.signalDefinition = signalDefinition;
   }
-  
+
+  @Override
   public void execute(ActivityExecution execution) throws Exception {
-    
+
     CommandContext commandContext = Context.getCommandContext();
-    
-    List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByEventName = commandContext
+
+    List<SignalEventSubscriptionEntity> signalEventSubscriptions = commandContext
         .getEventSubscriptionManager()
-        .findSignalEventSubscriptionsByEventName(signalDefinition.getEventName());
-      
-      for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : findSignalEventSubscriptionsByEventName) {
-        signalEventSubscriptionEntity.eventReceived(null, signalDefinition.isAsync());
+        .findSignalEventSubscriptionsByEventNameAndTenantIdIncludeWithoutTenantId(signalDefinition.getEventName(), execution.getTenantId());
+
+      for (SignalEventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
+        signalEventSubscription.eventReceived(null, signalDefinition.isAsync());
       }
 
     leave(execution);
   }
-  
+
   public EventSubscriptionDeclaration getSignalDefinition() {
     return signalDefinition;
   }
-  
+
   public void setSignalDefinition(EventSubscriptionDeclaration signalDefinition) {
     this.signalDefinition = signalDefinition;
   }
