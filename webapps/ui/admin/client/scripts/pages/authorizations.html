@@ -5,16 +5,15 @@
     <div class="page-header">
       <h1 ng-controller="AuthorizationCreateController">
         Authorizations
-        <a ng-click="addNewAuthorization()"
+        <!-- <a ng-click="addNewAuthorization()"
            tooltip-placement="right"
            tooltip="Create a new authorization">
           <span class="glyphicon glyphicon-plus-sign"></span>
-        </a>
+        </a> -->
       </h1>
     </div>
 
     <div class="col-sm-3 col-lg-2 sidebar-nav">
-      <h2>Resources</h2>
       <ul>
         <li ng-class="activeClass('resource='+res.id)"
             ng-repeat="res in resourceList | orderBy:'name':false">
@@ -27,7 +26,13 @@
           name="createAuthForm"
           ng-controller="AuthorizationCreateController">
 
-      <h2>{{title}} Authorizations</h2>
+      <div class="h4">
+        {{title}} Authorizations
+        <a tooltip="Create new {{title}} authorization"
+           ng-click="addNewAuthorization()"
+           class="glyphicon glyphicon-plus-sign">
+        </a>
+      </div>
 
       <table class="cam-table">
         <thead>
@@ -98,7 +103,6 @@
                   {{ formatPermissions(authorization.permissions) }}
                 </div>
 
-                <!-- using "ng-if" rather than "ng-show" to prevent style glitches -->
                 <div ng-if="authorization.permissions != 'ALL'"
                      class="input-group-btn">
                   <a ng-click="addAllPermissionsTo(authorization)"
@@ -165,7 +169,8 @@
             </td>
           </tr>
           <tr>
-            <td colspan="5">
+            <td colspan="4"><!-- good ol' tables --></td>
+            <td>
               <a ng-click="addNewAuthorization()">
                 Create New
                 <span class="glyphicon glyphicon-plus-sign"></span>

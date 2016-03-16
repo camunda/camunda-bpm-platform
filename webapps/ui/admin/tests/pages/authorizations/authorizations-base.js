@@ -11,7 +11,7 @@ module.exports = Page.extend({
   },
 
   boxHeader: function() {
-    return groupsSection.element(by.css('[ng-controller="AuthorizationCreateController"] h2')).getText();
+    return groupsSection.element(by.css('[ng-controller="AuthorizationCreateController"] .h4')).getText();
   },
 
   newAuthorizationButton: function() {

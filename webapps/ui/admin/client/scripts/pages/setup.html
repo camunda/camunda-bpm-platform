@@ -4,10 +4,7 @@
            ng-switch on="created">
     <div class="row">
       <div class="page-header">
-        <h1>
-          <!-- <span class="glyphicon glyphicon-user"></span> -->
-          Setup
-        </h1>
+        <h1>Setup</h1>
       </div>
     </div>
 
@@ -33,7 +30,7 @@
 
         <form class="form-horizontal"
               name="createUserForm">
-          <legend>User Account</legend>
+          <div class="h4">User Account</div>
 
           <div class="form-group">
             <label class="control-label col-sm-4"
@@ -97,7 +94,7 @@
             </div>
           </div>
 
-          <legend>User Profile</legend>
+          <div class="h4">User Profile</div>
 
           <div class="form-group">
             <label class="control-label col-sm-4"
@@ -170,7 +167,7 @@
       </div>
 
       <div class="col-md-4 well">
-        <legend>Why is this page shown?</legend>
+        <div class="h4">Why is this page shown?</div>
         <p>You are trying to access the process engine &quot;<strong>{{ engineName }}</strong>&quot;.
         This process engine is configured to use the built-in identity service (database) but has no administrative users configured.
         This page allows you to create a user for accessing the process engine.</p>

@@ -24,13 +24,13 @@
             name="editGroupForm"
             cam-widget-loader
             loading-state="{{ groupLoadingState }}">
-        <legend>Group</legend>
+        <div class="h4">Group</div>
 
         <div class="form-group">
-          <label class="control-label col-sm-4"
+          <label class="control-label col-sm-4 col-md-2"
                  for="inputName">Group Name*</label>
 
-          <div class="col-sm-8">
+          <div class="col-sm-8 col-md-10">
             <input id="inputName"
                    name="groupName"
                    class="form-control"
@@ -48,10 +48,10 @@
         </div>
 
         <div class="form-group">
-          <label class="control-label col-sm-4"
+          <label class="control-label col-sm-4 col-md-2"
                  for="inputType">Group Type</label>
 
-          <div class="col-sm-8">
+          <div class="col-sm-8 col-md-10">
             <input id="inputType"
                    name="groupType"
                    class="form-control"
@@ -63,9 +63,9 @@
 
         <div class="form-group"
              ng-show="availableOperations.update">
-          <div class="col-sm-8 col-sm-offset-4">
+          <div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 text-right">
             <button type="submit"
-                    class="btn btn-default"
+                    class="btn btn-primary"
                     ng-disabled="!canSubmit(editGroupForm, 'group')"
                     ng-click="updateGroup()">Update Group</button>
           </div>
@@ -74,21 +74,23 @@
 
       <form class="form-horizontal"
             ng-show="show('group') && availableOperations.delete">
-        <legend>Delete Group</legend>
+        <div class="h4">Delete Group</div>
 
         <div class="alert alert-danger">
           <strong>Warning:</strong> deleting a group cannot be undone.
         </div>
 
-        <button type="submit"
-                class="btn btn-danger"
-                ng-click="deleteGroup()">
-          Delete Group
-        </button>
+        <div class="text-right">
+          <button type="submit"
+                  class="btn btn-danger"
+                  ng-click="deleteGroup()">
+            Delete Group
+          </button>
+        </div>
       </form>
 
       <div ng-show="show('users')">
-        <legend>Users</legend>
+        <div class="h4">Users</div>
 
         <div cam-widget-loader
              loading-state="{{ userLoadingState }}"

@@ -71,7 +71,7 @@ describe('Admin Authorizations Spec', function() {
       authorizationsPage.application.isActive();
       expect(authorizationsPage.application.createNewButton().isEnabled()).to.eventually.be.true;
       expect(authorizationsPage.application.newAuthorizationButton().isEnabled()).to.eventually.be.true;
-      expect(authorizationsPage.application.boxHeader()).to.eventually.eql('Application Authorizations');
+      expect(authorizationsPage.application.boxHeader()).to.eventually.include('Application Authorizations');
     });
 
 

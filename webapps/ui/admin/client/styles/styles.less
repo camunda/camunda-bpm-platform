@@ -5,13 +5,17 @@
 /* ---------------------------------------------------------------- */
 
 .page-header{
-  margin: (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5) 0 (@grid-gutter-width * 0.5);
+  margin: 0 (@grid-gutter-width * 0.5);
+  border: none;
 }
 
 
 .sidebar-nav {
+  border-right: 1px solid mix(@gray-light, @gray-lighter);
+
   ul {
     .menu-ul(16px, 24px);
+    margin-top: 8px;
   }
 
   li {
@@ -29,7 +33,6 @@
     }
     &.active > a {
       border-left-color: @brand-primary;
-      color: @gray-base;
     }
   }
 }

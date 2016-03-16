@@ -184,7 +184,7 @@ describe('Admin Users Spec', function() {
         usersPage.editUserProfile.selectUserNavbarItem('Profile');
 
         // then
-        expect(usersPage.editUserProfile.subHeader()).to.eventually.eql('Profile');
+        expect(usersPage.editUserProfile.subHeader()).to.eventually.include('Profile');
         expect(usersPage.editUserProfile.updateProfileButton().isEnabled()).to.eventually.eql(false);
       });
 

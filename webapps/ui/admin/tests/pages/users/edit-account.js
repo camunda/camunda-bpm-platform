@@ -3,18 +3,18 @@
 var Page = require('./edit-base');
 
 var changePasswordFormElement = element(by.css('form[name="updateCredentialsForm"]'));
-var deleteUserFormElement = element(by.css('[ng-show="availableOperations.delete"]'));
+var deleteUserFormElement = element(by.css('[ng-if="availableOperations.delete"]'));
 
 module.exports = Page.extend({
 
   url: '/camunda/app/admin/default/#/users/:user?tab=account',
 
   subHeaderChangePassword: function() {
-    return changePasswordFormElement.element(by.css('legend')).getText();
+    return changePasswordFormElement.element(by.css('.h4')).getText();
   },
 
   subHeaderDeleteUser: function() {
-    return deleteUserFormElement.element(by.css('legend')).getText();
+    return deleteUserFormElement.element(by.css('.h4')).getText();
   },
 
   myPasswordInput: function(inputValue) {
