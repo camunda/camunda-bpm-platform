@@ -42,7 +42,7 @@ public interface DecisionService {
    *           when no decision definition is deployed with the given id.
    *
    * @throws NotValidException
-   *           when the given case definition id is null.
+   *           when the given decision definition id is null.
    *
    * @throws AuthorizationException
    *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
@@ -63,7 +63,7 @@ public interface DecisionService {
    *           when no decision definition is deployed with the given key.
    *
    * @throws NotValidException
-   *           when the given case definition key is null.
+   *           when the given decision definition key is null.
    *
    * @throws AuthorizationException
    *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
@@ -90,7 +90,7 @@ public interface DecisionService {
    *           version.
    *
    * @throws NotValidException
-   *           when the given case definition key is null.
+   *           when the given decision definition key is null.
    *
    * @throws AuthorizationException
    *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
@@ -99,8 +99,7 @@ public interface DecisionService {
   DmnDecisionTableResult evaluateDecisionTableByKeyAndVersion(String decisionDefinitionKey, Integer version, Map<String, Object> variables);
 
   /**
-   * Returns a fluent builder to evaluate the decision with the given key
-   * in the latest version.
+   * Returns a fluent builder to evaluate the decision with the given key.
    * The builder can be used to set further properties and specify evaluation
    * instructions.
    *

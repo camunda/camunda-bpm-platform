@@ -72,7 +72,7 @@ public class DecisionEvaluationBuilderImpl implements DecisionEvaluationBuilder 
   }
 
   public DmnDecisionTableResult evaluate() {
-     ensureOnlyOneNotNull("either decision definition id or key must be set", decisionDefinitionId, decisionDefinitionKey);
+     ensureOnlyOneNotNull(NotValidException.class, "either decision definition id or key must be set", decisionDefinitionId, decisionDefinitionKey);
 
      if (isTenantIdSet && decisionDefinitionId != null) {
        throw LOG.exceptionEvaluateDecisionDefinitionByIdAndTenantId();

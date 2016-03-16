@@ -15,8 +15,15 @@ package org.camunda.bpm.engine.dmn;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 
 /**
+ * Fluent builder to evaluate a decision.
+ *
  * @author Kristin Polenz
  *
  */
@@ -45,6 +52,21 @@ public interface DecisionEvaluationBuilder {
    */
   DecisionEvaluationBuilder variables(Map<String, Object> variables);
 
+  /**
+   * Evaluates the decision.
+   *
+   * @return the result of the evaluation.
+   *
+   * @throws NotFoundException
+   *           when no decision definition is deployed with the given id / key.
+   *
+   * @throws NotValidException
+   *           when the given decision definition id / key is null.
+   *
+   * @throws AuthorizationException
+   *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
+   *           on {@link Resources#DECISION_DEFINITION}.
+   */
   DmnDecisionTableResult evaluate();
 
 }
