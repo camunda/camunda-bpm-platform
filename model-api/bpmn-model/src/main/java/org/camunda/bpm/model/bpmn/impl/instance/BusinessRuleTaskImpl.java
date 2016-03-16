@@ -229,11 +229,11 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
   }
 
   public String getCamundaDecisionRefTenantId() {
-    return camundaDecisionRefAttribute.getValue(this);
+    return camundaDecisionRefTenantIdAttribute.getValue(this);
   }
 
   public void setCamundaDecisionRefTenantId(String tenantId) {
-    camundaDecisionRefAttribute.setValue(this, tenantId);
+    camundaDecisionRefTenantIdAttribute.setValue(this, tenantId);
   }
 
 

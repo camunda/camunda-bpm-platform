@@ -563,14 +563,14 @@ public class ProcessBuilderTest {
         .camundaClass(TEST_CLASS_API)
         .camundaDelegateExpression(TEST_DELEGATE_EXPRESSION_API)
         .camundaExpression(TEST_EXPRESSION_API)
-        .camundaResultVariable(TEST_STRING_API)
-        .camundaTopic(TEST_STRING_API)
-        .camundaType(TEST_STRING_API)
-        .camundaDecisionRef(TEST_STRING_API)
-        .camundaDecisionRefBinding(TEST_STRING_API)
-        .camundaDecisionRefVersion(TEST_STRING_API)
-        .camundaDecisionRefTenantId(TEST_STRING_API)
-        .camundaMapDecisionResult(TEST_STRING_API)
+        .camundaResultVariable("resultVar")
+        .camundaTopic("topic")
+        .camundaType("type")
+        .camundaDecisionRef("decisionRef")
+        .camundaDecisionRefBinding("latest")
+        .camundaDecisionRefVersion("7")
+        .camundaDecisionRefTenantId("tenantId")
+        .camundaMapDecisionResult("singleEntry")
       .endEvent()
       .done();
 
@@ -578,14 +578,14 @@ public class ProcessBuilderTest {
     assertThat(businessRuleTask.getCamundaClass()).isEqualTo(TEST_CLASS_API);
     assertThat(businessRuleTask.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
     assertThat(businessRuleTask.getCamundaExpression()).isEqualTo(TEST_EXPRESSION_API);
-    assertThat(businessRuleTask.getCamundaResultVariable()).isEqualTo(TEST_STRING_API);
-    assertThat(businessRuleTask.getCamundaTopic()).isEqualTo(TEST_STRING_API);
-    assertThat(businessRuleTask.getCamundaType()).isEqualTo(TEST_STRING_API);
-    assertThat(businessRuleTask.getCamundaDecisionRef()).isEqualTo(TEST_STRING_API);
-    assertThat(businessRuleTask.getCamundaDecisionRefBinding()).isEqualTo(TEST_STRING_API);
-    assertThat(businessRuleTask.getCamundaDecisionRefVersion()).isEqualTo(TEST_STRING_API);
-    assertThat(businessRuleTask.getCamundaDecisionRefTenantId()).isEqualTo(TEST_STRING_API);
-    assertThat(businessRuleTask.getCamundaMapDecisionResult()).isEqualTo(TEST_STRING_API);
+    assertThat(businessRuleTask.getCamundaResultVariable()).isEqualTo("resultVar");
+    assertThat(businessRuleTask.getCamundaTopic()).isEqualTo("topic");
+    assertThat(businessRuleTask.getCamundaType()).isEqualTo("type");
+    assertThat(businessRuleTask.getCamundaDecisionRef()).isEqualTo("decisionRef");
+    assertThat(businessRuleTask.getCamundaDecisionRefBinding()).isEqualTo("latest");
+    assertThat(businessRuleTask.getCamundaDecisionRefVersion()).isEqualTo("7");
+    assertThat(businessRuleTask.getCamundaDecisionRefTenantId()).isEqualTo("tenantId");
+    assertThat(businessRuleTask.getCamundaMapDecisionResult()).isEqualTo("singleEntry");
   }
 
   @Test
