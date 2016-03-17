@@ -1,6 +1,5 @@
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular');
 
   var config = window.camTasklistConf;
   var defaultConfig = {
@@ -41,6 +40,13 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
     this.getDateLocales = function() {
       return config.camDateLocales;
+    };
+
+    this.getAppVendor = function () {
+      return config.app && config.app.vendor ? config.app.vendor : 'Camunda';
+    };
+    this.getAppName = function () {
+      return config.app && config.app.name ? config.app.name : 'Tasklist';
     };
 
 
