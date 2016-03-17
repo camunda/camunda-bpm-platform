@@ -14,16 +14,20 @@
 
   module.exports = [
     'camAPI',
+    'configuration',
     '$window',
     '$scope',
   function(
     camAPI,
+    configuration,
     $window,
     $scope
   ) {
 
     // create a new tasklistApp
     $scope.tasklistApp = new TasklistApp();
+    $scope.appVendor = configuration.getAppVendor();
+    $scope.appName = configuration.getAppName();
 
     function getUserProfile(auth) {
       if (!auth || !auth.name) {
