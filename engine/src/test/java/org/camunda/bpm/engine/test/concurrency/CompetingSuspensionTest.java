@@ -50,7 +50,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
       try {
         processEngineConfiguration
           .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new SuspendProcessDefinitionCmd(processDefinitionId, null, true, null)));
+          .execute(new ControlledCommand(activeThread, new SuspendProcessDefinitionCmd(processDefinitionId, null, null, true, null)));
 
       }
       catch (OptimisticLockingException e) {

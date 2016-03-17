@@ -35,6 +35,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
 
   protected String processDefinitionId;
   protected String processDefinitionKey;
+  protected String processDefinitionTenantId;
   protected ProcessDefinitionEntity processDefinitionEntity;
   protected Date executionDate;
 
@@ -45,19 +46,38 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
     this.processDefinitionEntity = processDefinitionEntity;
     this.processDefinitionId = processDefinitionEntity.getId();
     this.executionDate = executionDate;
+    this.processDefinitionTenantId = processDefinitionEntity.getTenantId();
   }
 
-  public AbstractSetProcessDefinitionStateCmd(String processDefinitionId, String processDefinitionKey, boolean includeProcessInstances, Date executionDate) {
+  public AbstractSetProcessDefinitionStateCmd(String processDefinitionId, String processDefinitionKey, String processDefinitionTenantId, boolean includeProcessInstances, Date executionDate) {
     super(includeProcessInstances, executionDate);
     this.processDefinitionId = processDefinitionId;
     this.processDefinitionKey = processDefinitionKey;
     this.executionDate = executionDate;
+    this.processDefinitionTenantId = processDefinitionTenantId;
+  }
+
+  public Void execute(final CommandContext commandContext) {
+    checkTenants(commandContext);
+
+    return super.execute(commandContext);
   }
 
   protected void checkParameters(CommandContext commandContext) {
     // Validation of input parameters
     if(processDefinitionId == null && processDefinitionKey == null) {
       throw new ProcessEngineException("Process definition id / key cannot be null");
+    }
+  }
+
+  protected void checkTenants(CommandContext commandContext) {
+    ProcessDefinitionManager processDefinitionManager = commandContext.getProcessDefinitionManager();
+
+    if (processDefinitionKey != null) {
+      long count = processDefinitionManager.findProcessDefinitionCountDistinctTenantByKey(processDefinitionKey);
+      if (count > 1) {
+        throw new ProcessEngineException("Multiple tenant-ids for same process definition key");
+      }
     }
   }
 
@@ -87,8 +107,12 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
       processDefinitionManager.updateProcessDefinitionSuspensionStateById(processDefinitionId, suspensionState);
     } else
 
-    if (processDefinitionKey != null) {
+    if (processDefinitionKey != null && processDefinitionTenantId == null) {
       processDefinitionManager.updateProcessDefinitionSuspensionStateByKey(processDefinitionKey, suspensionState);
+    } else
+
+    if (processDefinitionKey != null && processDefinitionTenantId != null) {
+        processDefinitionManager.updateProcessDefinitionSuspensionStateByKeyAndTenantId(processDefinitionKey, processDefinitionTenantId, suspensionState);
     }
 
     commandContext.runWithoutAuthorization(new Callable<Void>() {

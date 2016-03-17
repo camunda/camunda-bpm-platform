@@ -39,12 +39,12 @@ public class TimerActivateProcessDefinitionHandler extends TimerChangeProcessDef
 
     if (by.equals(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID)) {
       String processDefinitionId = getProcessDefinitionId(config);
-      cmd = new ActivateProcessDefinitionCmd(processDefinitionId, null, activateProcessInstances, null);
+      cmd = new ActivateProcessDefinitionCmd(processDefinitionId, null, null, activateProcessInstances, null);
     } else
 
     if (by.equals(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY)) {
       String processDefinitionKey = getProcessDefinitionKey(config);
-      cmd = new ActivateProcessDefinitionCmd(null, processDefinitionKey, activateProcessInstances, null);
+      cmd = new ActivateProcessDefinitionCmd(null, processDefinitionKey, null, activateProcessInstances, null);
     }
 
     return cmd;

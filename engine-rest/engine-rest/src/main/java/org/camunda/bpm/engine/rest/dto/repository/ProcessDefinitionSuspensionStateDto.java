@@ -30,6 +30,7 @@ public class ProcessDefinitionSuspensionStateDto extends SuspensionStateDto {
   private boolean includeProcessInstances;
   private String processDefinitionId;
   private String processDefinitionKey;
+  private String processDefinitionTenantId;
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
@@ -49,6 +50,10 @@ public class ProcessDefinitionSuspensionStateDto extends SuspensionStateDto {
 
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
+  }
+
+  public void setProcessDefinitionTenantId(String processDefinitionTenantId) {
+    this.processDefinitionTenantId = processDefinitionTenantId;
   }
 
   public void updateSuspensionState(ProcessEngine engine) {
@@ -73,15 +78,27 @@ public class ProcessDefinitionSuspensionStateDto extends SuspensionStateDto {
       }
     } else
 
-    if (processDefinitionKey != null) {
+    if (processDefinitionKey != null && processDefinitionTenantId == null) {
       // activate/suspend process definition by key
       if (getSuspended()) {
         repositoryService.suspendProcessDefinitionByKey(processDefinitionKey, includeProcessInstances, delayedExecutionDate);
       } else {
         repositoryService.activateProcessDefinitionByKey(processDefinitionKey, includeProcessInstances, delayedExecutionDate);
       }
-    } else {
-      String message = "Either processDefinitionId or processDefinitionKey should be set to update the suspension state.";
+    } else
+
+    if (processDefinitionKey != null && processDefinitionTenantId != null) {
+      // activate/suspend process definition by key and tenant-id
+      if (getSuspended()) {
+        repositoryService.suspendProcessDefinitionByKeyAndTenantId(processDefinitionKey, processDefinitionTenantId,
+            includeProcessInstances, delayedExecutionDate);
+      } else {
+        repositoryService.activateProcessDefinitionByKeyAndTenantId(processDefinitionKey, processDefinitionTenantId,
+            includeProcessInstances, delayedExecutionDate);
+      }
+    }else {
+      String message = "Either processDefinitionId or processDefinitionKey or processDefinitionKey and processDefinitionTenantId"
+          + " should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
   }

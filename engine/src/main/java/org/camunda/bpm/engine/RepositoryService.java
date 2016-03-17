@@ -264,6 +264,49 @@ public interface RepositoryService {
   void suspendProcessDefinitionByKey(String processDefinitionKey, boolean suspendProcessInstances, Date suspensionDate);
 
   /**
+   * Suspends the <strong>all</strong> process definitions with the given key (= id in the bpmn20.xml file)
+   * and tenant-id.
+   *
+   * If a process definition is in state suspended, it will not be possible to start new process instances
+   * based on the process definition.
+   *
+   * <strong>Note: all the process instances of the process definition will still be active
+   * (ie. not suspended)!</strong>
+   *
+   * @throws ProcessEngineException
+   *          If no such processDefinition can be found.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void suspendProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId);
+
+  /**
+   * Suspends the <strong>all</strong> process definitions with the given key (= id in the bpmn20.xml file)
+   * and tenant-id.
+   *
+   * If a process definition is in state suspended, it will not be possible to start new process instances
+   * based on the process definition.
+   *
+   * @param suspendProcessInstances If true, all the process instances of the provided process definition
+   *                                will be suspended too.
+   * @param suspensionDate The date on which the process definition will be suspended. If null, the
+   *                       process definition is suspended immediately.
+   *                       Note: The job executor needs to be active to use this!
+   *
+   * @throws ProcessEngineException
+   *          If no such processDefinition can be found.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}
+   *          and if <code>suspendProcessInstances</code> is set to <code>true</code> and the user have no
+   *          {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE} or no
+   *          {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *
+   * @see RuntimeService#suspendProcessInstanceById(String)
+   */
+  void suspendProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId,
+      boolean suspendProcessInstances, Date suspensionDate);
+
+  /**
    * Activates the process definition with the given id.
    *
    * @throws ProcessEngineException
@@ -324,6 +367,38 @@ public interface RepositoryService {
    * @see RuntimeService#activateProcessInstanceById(String)
    */
   void activateProcessDefinitionByKey(String processDefinitionKey, boolean activateProcessInstances,  Date activationDate);
+
+  /**
+   * Activates the process definition with the given key (=id in the bpmn20.xml file) and tenant-id.
+   *
+   * @throws ProcessEngineException
+   *          If no such processDefinition can be found.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void activateProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId);
+
+  /**
+   * Activates the process definition with the given key (=id in the bpmn20.xml file) and tenant-id.
+   *
+   * @param activateProcessInstances If true, all the process instances of the provided process definition
+   *                                will be activated too.
+   * @param activationDate The date on which the process definition will be activated. If null, the
+   *                       process definition is suspended immediately.
+   *                       Note: The job executor needs to be active to use this!
+   *
+   * @throws ProcessEngineException
+   *          If no such processDefinition can be found.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}
+   *          and if <code>activateProcessInstances</code> is set to <code>true</code> and the user have no
+   *          {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE} or no
+   *          {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *
+   * @see RuntimeService#activateProcessInstanceById(String)
+   */
+  void activateProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId,
+      boolean activateProcessInstances,  Date activationDate);
 
   /**
    * Gives access to a deployed process model, e.g., a BPMN 2.0 XML file,

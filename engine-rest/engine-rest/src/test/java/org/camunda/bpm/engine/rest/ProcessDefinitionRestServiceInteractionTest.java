@@ -2040,6 +2040,310 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   }
 
   @Test
+  public void testActivateProcessDefinitionByKeyAndTenantId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_DEFINITION_SUSPENDED_URL);
+
+    verify(repositoryServiceMock).activateProcessDefinitionByKeyAndTenantId(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.EXAMPLE_TENANT_ID, false, null);
+  }
+
+  @Test
+  public void testActivateProcessDefinitionByKeyAndTenantIdIncludingInstaces() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("includeProcessInstances", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_DEFINITION_SUSPENDED_URL);
+
+    verify(repositoryServiceMock).activateProcessDefinitionByKeyAndTenantId(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.EXAMPLE_TENANT_ID, true, null);
+  }
+
+  @Test
+  public void testDelayedActivateProcessDefinitionByKeyAndTenantId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_DEFINITION_SUSPENDED_URL);
+
+    verify(repositoryServiceMock).activateProcessDefinitionByKeyAndTenantId(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.EXAMPLE_TENANT_ID, false, executionDate);
+  }
+
+  @Test
+  public void testDelayedActivateProcessDefinitionByKeyAndTenantIdIncludingInstaces() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("includeProcessInstances", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_DEFINITION_SUSPENDED_URL);
+
+    verify(repositoryServiceMock).activateProcessDefinitionByKeyAndTenantId(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.EXAMPLE_TENANT_ID, true, executionDate);
+  }
+
+  @Test
+  public void testActivateProcessDefinitionByKeyAndTenantIdWithUnparseableDate() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("executionDate", "a");
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    String message = "Could not update the suspension state of Process Definitions due to: Invalid format: \"a\"";
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", is(InvalidRequestException.class.getSimpleName()))
+        .body("message", is(message))
+      .when()
+        .put(PROCESS_DEFINITION_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testActivateProcessDefinitionByKeyAndTenantIdWithException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    String expectedException = "expectedException";
+    doThrow(new ProcessEngineException(expectedException))
+      .when(repositoryServiceMock)
+      .activateProcessDefinitionByKeyAndTenantId(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.EXAMPLE_TENANT_ID, false, null);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", is(ProcessEngineException.class.getSimpleName()))
+        .body("message", is(expectedException))
+      .when()
+        .put(PROCESS_DEFINITION_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testActivateProcessDefinitionByKeyAndTenantIdThrowsAuthorizationException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(repositoryServiceMock).activateProcessDefinitionByKeyAndTenantId(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.EXAMPLE_TENANT_ID, false, null);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", is(AuthorizationException.class.getSimpleName()))
+        .body("message", is(message))
+      .when()
+        .put(PROCESS_DEFINITION_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testSuspendProcessDefinitionByKeyAndTenantId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_DEFINITION_SUSPENDED_URL);
+
+    verify(repositoryServiceMock).suspendProcessDefinitionByKeyAndTenantId(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.EXAMPLE_TENANT_ID, false, null);
+  }
+
+  @Test
+  public void testSuspendProcessDefinitionByKeyAndTenantIdIncludingInstaces() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("includeProcessInstances", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_DEFINITION_SUSPENDED_URL);
+
+    verify(repositoryServiceMock).suspendProcessDefinitionByKeyAndTenantId(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.EXAMPLE_TENANT_ID, true, null);
+  }
+
+  @Test
+  public void testDelayedSuspendProcessDefinitionByKeyAndTenantId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_DEFINITION_SUSPENDED_URL);
+
+    verify(repositoryServiceMock).suspendProcessDefinitionByKeyAndTenantId(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.EXAMPLE_TENANT_ID, false, executionDate);
+  }
+
+  @Test
+  public void testDelayedSuspendProcessDefinitionByKeyAndTenantIdIncludingInstaces() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("includeProcessInstances", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    Date executionDate = DateTimeUtil.parseDate(MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_DEFINITION_SUSPENDED_URL);
+
+    verify(repositoryServiceMock).suspendProcessDefinitionByKeyAndTenantId(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.EXAMPLE_TENANT_ID, true, executionDate);
+  }
+
+  @Test
+  public void testSuspendProcessDefinitionByKeyAndTenantIdWithUnparseableDate() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("executionDate", "a");
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    String message = "Could not update the suspension state of Process Definitions due to: Invalid format: \"a\"";
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", is(InvalidRequestException.class.getSimpleName()))
+        .body("message", is(message))
+      .when()
+        .put(PROCESS_DEFINITION_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testSuspendProcessDefinitionByKeyAndTenantIdWithException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    String expectedException = "expectedException";
+    doThrow(new ProcessEngineException(expectedException))
+      .when(repositoryServiceMock)
+      .suspendProcessDefinitionByKeyAndTenantId(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.EXAMPLE_TENANT_ID, false, null);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", is(ProcessEngineException.class.getSimpleName()))
+        .body("message", is(expectedException))
+      .when()
+        .put(PROCESS_DEFINITION_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testSuspendProcessDefinitionByKeyAndTenantIdThrowsAuthorizationException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(repositoryServiceMock).suspendProcessDefinitionByKeyAndTenantId(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.EXAMPLE_TENANT_ID, false, null);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", is(AuthorizationException.class.getSimpleName()))
+        .body("message", is(message))
+      .when()
+        .put(PROCESS_DEFINITION_SUSPENDED_URL);
+  }
+
+  @Test
   public void testActivateProcessDefinitionByIdShouldThrowException() {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("suspended", false);
@@ -2064,7 +2368,8 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("suspended", false);
 
-    String message = "Either processDefinitionId or processDefinitionKey should be set to update the suspension state.";
+    String message = "Either processDefinitionId or processDefinitionKey or processDefinitionKey and processDefinitionTenantId"
+            + " should be set to update the suspension state.";
 
     given()
       .contentType(ContentType.JSON)
@@ -2103,7 +2408,8 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("suspended", true);
 
-    String message = "Either processDefinitionId or processDefinitionKey should be set to update the suspension state.";
+    String message = "Either processDefinitionId or processDefinitionKey or processDefinitionKey and processDefinitionTenantId"
+            + " should be set to update the suspension state.";
 
     given()
       .contentType(ContentType.JSON)
@@ -2122,7 +2428,8 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("suspended", true);
 
-    String message = "Either processDefinitionId or processDefinitionKey should be set to update the suspension state.";
+    String message = "Either processDefinitionId or processDefinitionKey or processDefinitionKey and processDefinitionTenantId"
+            + " should be set to update the suspension state.";
 
     given()
       .contentType(ContentType.JSON)
