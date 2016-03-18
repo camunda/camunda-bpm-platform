@@ -9,6 +9,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
@@ -42,6 +43,12 @@ public class RestIT extends AbstractWebappIntegrationTest {
 
   protected String getApplicationContextPath() {
     return "engine-rest/";
+  }
+
+  @BeforeClass
+  public static void setup() throws InterruptedException {
+    // just wait some seconds before starting because of Wildfly / Cargo race conditions
+    Thread.sleep(5 * 1000);
   }
 
   @Test
