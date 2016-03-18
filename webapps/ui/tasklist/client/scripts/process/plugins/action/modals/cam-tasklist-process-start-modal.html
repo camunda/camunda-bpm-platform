@@ -48,12 +48,14 @@
 
         <ul class="processes">
           <li ng-repeat="processDefinition in processDefinitions">
-            <a href ng-click="selectProcessDefinition(processDefinition)">
+            <a href
+               ng-click="selectProcessDefinition(processDefinition)">
               {{ processDefinition.name || processDefinition.key }}
             </a>
-            <div ng-if="processDefinition.tenantId" class="tenant-id">
+            <span ng-if="processDefinition.tenantId"
+                  class="tenant-id">
               {{ processDefinition.tenantId }}
-            </div>
+            </span>
           </li>
         </ul>
 
@@ -100,7 +102,7 @@
        class="row row-action">
 
     <div class="col-xs-12">
-      <button class="btn btn-xs btn-link"
+      <button class="btn btn-link"
               type="button"
               ng-click="$dismiss()">
         {{ 'CLOSE' | translate }}
@@ -112,7 +114,7 @@
        class="row">
 
     <div class="col-xs-4 align-left">
-      <button class="btn btn-xs btn-link"
+      <button class="btn btn-link"
               type="button"
               ng-click="back()">
         {{ 'BACK' | translate }}
@@ -120,7 +122,7 @@
     </div>
 
     <div class="col-xs-8">
-      <button class="btn btn-xs btn-link"
+      <button class="btn btn-link"
               type="button"
               ng-click="$dismiss()">
         {{ 'CLOSE' | translate }}
