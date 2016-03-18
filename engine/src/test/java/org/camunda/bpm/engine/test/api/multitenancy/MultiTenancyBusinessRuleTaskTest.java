@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
-public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTestCase {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
@@ -31,7 +31,10 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
   protected static final String DMN_FILE = "org/camunda/bpm/engine/test/api/multitenancy/simpleDecisionTable.dmn";
   protected static final String DMN_FILE_VERSION_TWO = "org/camunda/bpm/engine/test/api/multitenancy/simpleDecisionTable_v2.dmn";
 
-  public void testEvaluateDecisionTaskWithDeploymentBinding() {
+  protected static final String RESULT_OF_VERSION_ONE = "A";
+  protected static final String RESULT_OF_VERSION_TWO = "C";
+
+  public void testEvaluateDecisionWithDeploymentBinding() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -55,11 +58,11 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
       .setVariable("status", "gold")
       .processDefinitionTenantId(TENANT_TWO).execute();
 
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is("A"));
-    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is("C"));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
   }
 
-  public void testEvaluateDecisionTaskWithLatestBindingSameVersion() {
+  public void testEvaluateDecisionWithLatestBindingSameVersion() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -83,11 +86,11 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
       .setVariable("status", "gold")
       .processDefinitionTenantId(TENANT_TWO).execute();
 
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is("A"));
-    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is("C"));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
   }
 
-  public void testEvaluateDecisionTaskWithLatestBindingDifferentVersion() {
+  public void testEvaluateDecisionWithLatestBindingDifferentVersions() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -113,11 +116,11 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
       .setVariable("status", "gold")
       .processDefinitionTenantId(TENANT_TWO).execute();
 
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is("A"));
-    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is("C"));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
   }
 
-  public void testEvaluateDecisionTaskWithVersionBinding() {
+  public void testEvaluateDecisionWithVersionBinding() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -132,10 +135,10 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
         .done();
 
     deploymentForTenant(TENANT_ONE, DMN_FILE, process);
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO, process);
+    deploymentForTenant(TENANT_ONE, DMN_FILE_VERSION_TWO);
 
-    deploymentForTenant(TENANT_ONE, DMN_FILE);
-    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
+    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO, process);
+    deploymentForTenant(TENANT_TWO, DMN_FILE);
 
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold")
@@ -145,11 +148,11 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
       .setVariable("status", "gold")
       .processDefinitionTenantId(TENANT_TWO).execute();
 
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is("A"));
-    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is("C"));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
   }
 
-  public void testFailEvaluateDecisionTaskFromOtherTenantWithDeploymentBinding() {
+  public void testFailEvaluateDecisionFromOtherTenantWithDeploymentBinding() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -174,7 +177,7 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     }
   }
 
-  public void testFailEvaluateDecisionTaskFromOtherTenantWithLatestBinding() {
+  public void testFailEvaluateDecisionFromOtherTenantWithLatestBinding() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -199,7 +202,7 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     }
   }
 
-  public void testFailEvaluateDecisionTaskFromOtherTenantWithVersionBinding() {
+  public void testFailEvaluateDecisionFromOtherTenantWithVersionBinding() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -227,7 +230,7 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     }
   }
 
-  public void testEvaluateDecisionTaskTenantIdConstant() {
+  public void testEvaluateDecisionTenantIdConstant() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -248,10 +251,10 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold").execute();
 
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is("A"));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
   }
 
-  public void testEvaluateDecisionTaskWithoutTenantIdConstant() {
+  public void testEvaluateDecisionWithoutTenantIdConstant() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -272,10 +275,10 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold").execute();
 
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is("A"));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
   }
 
-  public void testEvaluateDecisionTaskTenantIdExpression() {
+  public void testEvaluateDecisionTenantIdExpression() {
 
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
         .startEvent()
@@ -296,7 +299,7 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold").execute();
 
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is("A"));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
   }
 
   protected String deploymentForTenant(String tenantId, String classpathResource, BpmnModelInstance modelInstance) {
