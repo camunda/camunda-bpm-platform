@@ -38,7 +38,7 @@ public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
     ResourceConfig rc = ResourceConfig.forApplication(application);
 
     Map<String, Object> properties = new HashMap<String, Object>();
-    properties.put(ServerProperties.TRACING, Boolean.TRUE);
+    properties.put(ServerProperties.TRACING, "ALL");
     rc.addProperties(properties);
 
     Properties serverProperties = readProperties();
