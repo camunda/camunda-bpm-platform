@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.exception.cmmn.CmmnModelInstanceNotFoundException;
 import org.camunda.bpm.engine.exception.dmn.DecisionDefinitionNotFoundException;
 import org.camunda.bpm.engine.exception.dmn.DmnModelInstanceNotFoundException;
-import org.camunda.bpm.engine.impl.cmd.ActivateProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.AddIdentityLinkForProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteIdentityLinkForProcessDefinitionCmd;
@@ -42,7 +41,6 @@ import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceForIdCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceNamesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourcesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetIdentityLinksForProcessDefinitionCmd;
-import org.camunda.bpm.engine.impl.cmd.SuspendProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDiagramCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseModelCmd;
@@ -56,6 +54,7 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQuery
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilderImpl;
+import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -68,6 +67,7 @@ import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.repository.Resource;
+import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateBuilder;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
@@ -151,35 +151,59 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   public void suspendProcessDefinitionById(String processDefinitionId) {
-    commandExecutor.execute(new SuspendProcessDefinitionCmd(processDefinitionId, null, false, null));
+    updateProcessDefinitionSuspensionStateById(processDefinitionId)
+      .suspend();
   }
 
   public void suspendProcessDefinitionById(String processDefinitionId, boolean suspendProcessInstances, Date suspensionDate) {
-    commandExecutor.execute(new SuspendProcessDefinitionCmd(processDefinitionId, null, suspendProcessInstances, suspensionDate));
+    updateProcessDefinitionSuspensionStateById(processDefinitionId)
+      .includeProcessInstances(suspendProcessInstances)
+      .executionDate(suspensionDate)
+      .suspend();
   }
 
   public void suspendProcessDefinitionByKey(String processDefinitionKey) {
-    commandExecutor.execute(new SuspendProcessDefinitionCmd(null, processDefinitionKey, false, null));
+    updateProcessDefinitionSuspensionStateByKey(processDefinitionKey)
+      .suspend();
   }
 
   public void suspendProcessDefinitionByKey(String processDefinitionKey, boolean suspendProcessInstances, Date suspensionDate) {
-    commandExecutor.execute(new SuspendProcessDefinitionCmd(null, processDefinitionKey, suspendProcessInstances, suspensionDate));
+    updateProcessDefinitionSuspensionStateByKey(processDefinitionKey)
+      .includeProcessInstances(suspendProcessInstances)
+      .executionDate(suspensionDate)
+      .suspend();
   }
 
   public void activateProcessDefinitionById(String processDefinitionId) {
-    commandExecutor.execute(new ActivateProcessDefinitionCmd(processDefinitionId, null, false, null));
+    updateProcessDefinitionSuspensionStateById(processDefinitionId)
+      .activate();
   }
 
   public void activateProcessDefinitionById(String processDefinitionId, boolean activateProcessInstances, Date activationDate) {
-    commandExecutor.execute(new ActivateProcessDefinitionCmd(processDefinitionId, null, activateProcessInstances, activationDate));
+    updateProcessDefinitionSuspensionStateById(processDefinitionId)
+      .includeProcessInstances(activateProcessInstances)
+      .executionDate(activationDate)
+      .activate();
   }
 
   public void activateProcessDefinitionByKey(String processDefinitionKey) {
-    commandExecutor.execute(new ActivateProcessDefinitionCmd(null, processDefinitionKey, false, null));
+    updateProcessDefinitionSuspensionStateByKey(processDefinitionKey)
+      .activate();
   }
 
   public void activateProcessDefinitionByKey(String processDefinitionKey, boolean activateProcessInstances, Date activationDate) {
-    commandExecutor.execute(new ActivateProcessDefinitionCmd(null, processDefinitionKey, activateProcessInstances, activationDate));
+    updateProcessDefinitionSuspensionStateByKey(processDefinitionKey)
+      .includeProcessInstances(activateProcessInstances)
+      .executionDate(activationDate)
+      .activate();
+  }
+
+  public UpdateProcessDefinitionSuspensionStateBuilder updateProcessDefinitionSuspensionStateByKey(String processDefinitionKey) {
+    return UpdateProcessDefinitionSuspensionStateBuilderImpl.byKey(commandExecutor, processDefinitionKey);
+  }
+
+  public UpdateProcessDefinitionSuspensionStateBuilder updateProcessDefinitionSuspensionStateById(String processDefinitionId) {
+    return UpdateProcessDefinitionSuspensionStateBuilderImpl.byId(commandExecutor, processDefinitionId);
   }
 
   public InputStream getProcessModel(String processDefinitionId) {

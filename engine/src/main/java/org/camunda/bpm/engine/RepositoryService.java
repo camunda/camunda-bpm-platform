@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.repository.Resource;
+import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateBuilder;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
@@ -324,6 +325,30 @@ public interface RepositoryService {
    * @see RuntimeService#activateProcessInstanceById(String)
    */
   void activateProcessDefinitionByKey(String processDefinitionKey, boolean activateProcessInstances,  Date activationDate);
+
+  /**
+   * Activate or suspend all process definitions with the given key using a
+   * fluent builder. To update the suspension state call
+   * {@link UpdateProcessDefinitionSuspensionStateBuilder#activate()} or
+   * {@link UpdateProcessDefinitionSuspensionStateBuilder#suspend()}.
+   *
+   * @param processDefinitionKey
+   *          the key of the process definition
+   * @return the builder to update the suspension state
+   */
+  UpdateProcessDefinitionSuspensionStateBuilder updateProcessDefinitionSuspensionStateByKey(String processDefinitionKey);
+
+  /**
+   * Activate or suspend the process definitions with the given id using a
+   * fluent builder. To update the suspension state call
+   * {@link UpdateProcessDefinitionSuspensionStateBuilder#activate()} or
+   * {@link UpdateProcessDefinitionSuspensionStateBuilder#suspend()}.
+   *
+   * @param processDefinitionId
+   *          the id of the process definition
+   * @return the builder to update the suspension state
+   */
+  UpdateProcessDefinitionSuspensionStateBuilder updateProcessDefinitionSuspensionStateById(String processDefinitionId);
 
   /**
    * Gives access to a deployed process model, e.g., a BPMN 2.0 XML file,

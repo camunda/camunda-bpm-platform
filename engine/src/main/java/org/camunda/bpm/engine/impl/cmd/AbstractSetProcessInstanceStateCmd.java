@@ -32,19 +32,28 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
   protected String processDefinitionId;
   protected String processDefinitionKey;
 
-  public AbstractSetProcessInstanceStateCmd(String processInstanceId, String processDefinitionId, String processDefinitionKey) {
+  protected String tenantId;
+  protected boolean isTenantIdSet = false;
+
+  public AbstractSetProcessInstanceStateCmd(String processInstanceId, String processDefinitionId, String processDefinitionKey, boolean isTenantIdSet,
+      String tenantId) {
     super(true, null);
+
     this.processInstanceId = processInstanceId;
     this.processDefinitionId = processDefinitionId;
     this.processDefinitionKey = processDefinitionKey;
+    this.isTenantIdSet = isTenantIdSet;
+    this.tenantId = tenantId;
   }
 
+  @Override
   protected void checkParameters(CommandContext commandContext) {
     if(processInstanceId == null && processDefinitionId == null && processDefinitionKey == null) {
       throw new ProcessEngineException("ProcessInstanceId, ProcessDefinitionId nor ProcessDefinitionKey cannot be null.");
     }
   }
 
+  @Override
   protected void checkAuthorization(CommandContext commandContext) {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     if (processInstanceId != null) {
@@ -60,6 +69,7 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
     }
   }
 
+  @Override
   protected void updateSuspensionState(CommandContext commandContext, SuspensionState suspensionState) {
     ExecutionManager executionManager = commandContext.getExecutionManager();
     TaskManager taskManager = commandContext.getTaskManager();
@@ -69,22 +79,26 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
       executionManager.updateExecutionSuspensionStateByProcessInstanceId(processInstanceId, suspensionState);
       taskManager.updateTaskSuspensionStateByProcessInstanceId(processInstanceId, suspensionState);
       externalTaskManager.updateExternalTaskSuspensionStateByProcessInstanceId(processInstanceId, suspensionState);
-    } else
 
-    if (processDefinitionId != null) {
+    } else if (processDefinitionId != null) {
       executionManager.updateExecutionSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
       taskManager.updateTaskSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
       externalTaskManager.updateExternalTaskSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
-    } else
 
-    if (processDefinitionKey != null) {
-      executionManager.updateExecutionSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
+    } else if (isTenantIdSet) {
+      executionManager.updateExecutionSuspensionStateByProcessDefinitionKeyAndTenantId(processDefinitionKey, tenantId, suspensionState);
+      // TODO update suspension state depending on the given tenant id - CAM-5650
       taskManager.updateTaskSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
       externalTaskManager.updateExternalTaskSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
 
+    } else {
+      executionManager.updateExecutionSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
+      taskManager.updateTaskSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
+      externalTaskManager.updateExternalTaskSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
     }
   }
 
+  @Override
   protected void logUserOperation(CommandContext commandContext) {
     PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, getNewSuspensionState().getName());
     commandContext.getOperationLogManager()
@@ -92,6 +106,7 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
         processDefinitionKey, propertyChange);
   }
 
+  @Override
   protected abstract AbstractSetJobStateCmd getNextCommand();
 
 }

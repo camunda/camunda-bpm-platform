@@ -198,4 +198,9 @@ public class CommandLogger extends ProcessEngineLogger {
         ));
   }
 
+  public BadUserRequestException exceptionUpdateProcessDefinitionSuspensionStateByIdAndTenant() {
+    return new BadUserRequestException(exceptionMessage(
+        "032", "Cannot specify a tenant-id when update the suspension state of a process definition which is referenced by id."));
+  }
+
 }

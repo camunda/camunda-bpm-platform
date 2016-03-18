@@ -22,17 +22,24 @@ import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 public class ActivateProcessInstanceCmd extends AbstractSetProcessInstanceStateCmd {
 
   public ActivateProcessInstanceCmd(String executionId, String processDefinitionId, String processDefinitionKey) {
-    super(executionId, processDefinitionId, processDefinitionKey);
+    super(executionId, processDefinitionId, processDefinitionKey, false, null);
   }
 
+  public ActivateProcessInstanceCmd(String executionId, String processDefinitionId, String processDefinitionKey, boolean isTenantIdSet, String tenantId) {
+    super(executionId, processDefinitionId, processDefinitionKey, isTenantIdSet, tenantId);
+  }
+
+  @Override
   protected SuspensionState getNewSuspensionState() {
     return SuspensionState.ACTIVE;
   }
 
+  @Override
   protected ActivateJobCmd getNextCommand() {
     return new ActivateJobCmd(null, null, processInstanceId, processDefinitionId, processDefinitionKey);
   }
 
+  @Override
   protected String getLogEntryOperation() {
     return UserOperationLogEntry.OPERATION_TYPE_ACTIVATE;
   }

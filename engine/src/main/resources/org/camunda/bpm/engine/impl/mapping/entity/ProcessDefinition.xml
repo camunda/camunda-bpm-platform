@@ -44,6 +44,14 @@
       <if test="processDefinitionKey != null">
         and KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
       </if>
+      <if test="isTenantIdSet">
+        <if test="tenantId != null">
+          and TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+        </if>
+        <if test="tenantId == null">
+          and TENANT_ID_ is null
+        </if>
+      </if>
     </where>
   </update>
 

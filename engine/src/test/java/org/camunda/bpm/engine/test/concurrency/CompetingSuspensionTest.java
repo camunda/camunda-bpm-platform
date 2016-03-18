@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.SignalCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendProcessDefinitionCmd;
+import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -41,22 +42,32 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
       this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public synchronized void startAndWaitUntilControlIsReturned() {
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
 
+    @Override
     public void run() {
       try {
         processEngineConfiguration
           .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new SuspendProcessDefinitionCmd(processDefinitionId, null, true, null)));
+          .execute(new ControlledCommand<Void>(activeThread, createSuspendCommand()));
 
       }
       catch (OptimisticLockingException e) {
         this.exception = e;
       }
       LOG.debug(getName()+" ends");
+    }
+
+    protected SuspendProcessDefinitionCmd createSuspendCommand() {
+      UpdateProcessDefinitionSuspensionStateBuilderImpl builder = UpdateProcessDefinitionSuspensionStateBuilderImpl
+          .byId(null, processDefinitionId)
+          .includeProcessInstances(true);
+
+      return new SuspendProcessDefinitionCmd(builder);
     }
   }
 
@@ -69,11 +80,13 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
       this.executionId = executionId;
     }
 
+    @Override
     public synchronized void startAndWaitUntilControlIsReturned() {
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
 
+    @Override
     public void run() {
       try {
         processEngineConfiguration

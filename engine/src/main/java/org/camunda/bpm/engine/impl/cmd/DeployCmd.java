@@ -28,6 +28,7 @@ import java.util.concurrent.Callable;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -489,17 +490,18 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
   protected void scheduleProcessDefinitionActivation(CommandContext commandContext, DeploymentEntity deployment) {
     if (deploymentBuilder.getProcessDefinitionsActivationDate() != null) {
+      RepositoryService repositoryService = commandContext.getProcessEngineConfiguration().getRepositoryService();
+
       for (ProcessDefinitionEntity processDefinitionEntity : deployment.getDeployedArtifacts(ProcessDefinitionEntity.class)) {
 
         // If activation date is set, we first suspend all the process definition
-        SuspendProcessDefinitionCmd suspendProcessDefinitionCmd =
-                new SuspendProcessDefinitionCmd(processDefinitionEntity, false, null);
-        suspendProcessDefinitionCmd.execute(commandContext);
+        repositoryService.updateProcessDefinitionSuspensionStateById(processDefinitionEntity.getId())
+          .suspend();
 
         // And we schedule an activation at the provided date
-        ActivateProcessDefinitionCmd activateProcessDefinitionCmd =
-                new ActivateProcessDefinitionCmd(processDefinitionEntity, false, deploymentBuilder.getProcessDefinitionsActivationDate());
-        activateProcessDefinitionCmd.execute(commandContext);
+        repositoryService.updateProcessDefinitionSuspensionStateById(processDefinitionEntity.getId())
+          .executionDate(deploymentBuilder.getProcessDefinitionsActivationDate())
+          .activate();
       }
     }
   }

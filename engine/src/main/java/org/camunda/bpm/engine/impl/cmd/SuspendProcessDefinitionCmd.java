@@ -12,12 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.Date;
-
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
 
 /**
  * @author Daniel Meyer
@@ -26,32 +24,31 @@ import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
  */
 public class SuspendProcessDefinitionCmd extends AbstractSetProcessDefinitionStateCmd {
 
-  public SuspendProcessDefinitionCmd(ProcessDefinitionEntity processDefinitionEntity,
-          boolean includeProcessInstances, Date executionDate) {
-    super(processDefinitionEntity, includeProcessInstances, executionDate);
+  public SuspendProcessDefinitionCmd(UpdateProcessDefinitionSuspensionStateBuilderImpl builder) {
+    super(builder);
   }
 
-  public SuspendProcessDefinitionCmd(String processDefinitionId, String processDefinitionKey,
-          boolean suspendProcessInstances, Date suspensionDate) {
-    super(processDefinitionId, processDefinitionKey, suspendProcessInstances, suspensionDate);
-  }
-
+  @Override
   protected SuspensionState getNewSuspensionState() {
     return SuspensionState.SUSPENDED;
   }
 
+  @Override
   protected String getDelayedExecutionJobHandlerType() {
     return TimerSuspendProcessDefinitionHandler.TYPE;
   }
 
+  @Override
   protected AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd() {
     return new SuspendJobDefinitionCmd(null, processDefinitionId, processDefinitionKey, false, null);
   }
 
+  @Override
   protected SuspendProcessInstanceCmd getNextCommand() {
-    return new SuspendProcessInstanceCmd(null, processDefinitionId, processDefinitionKey);
+    return new SuspendProcessInstanceCmd(null, processDefinitionId, processDefinitionKey, isTenantIdSet, tenantId);
   }
 
+  @Override
   protected String getLogEntryOperation() {
     return UserOperationLogEntry.OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION;
   }
