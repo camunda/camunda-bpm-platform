@@ -124,7 +124,7 @@ public class MultiTenancyDecisionEvaluationTest extends PluggableProcessEngineTe
 
   public void testEvaluateDecisionByKeyAndTenantId() {
     deploymentForTenant(TENANT_ONE, DMN_FILE);
-    deploymentForTenant(TENANT_TWO, DMN_FILE);
+    deploymentForTenant(TENANT_TWO, DMN_FILE_SECOND_VERSION);
 
     DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
         .variables(createVariables())
@@ -149,16 +149,16 @@ public class MultiTenancyDecisionEvaluationTest extends PluggableProcessEngineTe
   public void testEvaluateDecisionByKeyVersionAndTenantId() {
     deploymentForTenant(TENANT_ONE, DMN_FILE);
 
-    deploymentForTenant(TENANT_TWO, DMN_FILE_SECOND_VERSION);
+    deploymentForTenant(TENANT_TWO, DMN_FILE);
     deploymentForTenant(TENANT_TWO, DMN_FILE_SECOND_VERSION);
 
     DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
         .variables(createVariables())
-        .version(2)
+        .version(1)
         .decisionDefinitionTenantId(TENANT_TWO)
         .evaluate();
 
-    assertThatDecisionHasResult(decisionResult, RESULT_OF_SECOND_VERSION);
+    assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
 
   protected VariableMap createVariables() {
