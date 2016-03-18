@@ -12,9 +12,15 @@
     </div>
   </div>
 
-  <section ng-if="task" class="task-card">
+  <section ng-if="task"
+           class="task-card">
     <header class="row">
       <div class="col-xs-12">
+        <div class="tenant-id"
+             ng-if="task.tenantId">
+          {{ task.tenantId }}
+        </div>
+
         <div class="names">
           <h2 class="task">{{ task.name || task.taskDefinitionKey || task.id }}</h2>
           <h4 class="process-definition"
@@ -24,10 +30,6 @@
           <h4 class="case-definition"
               ng-if="task.caseDefinitionId">
             {{ task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }}
-          </h4>
-          <h4 class="tenant-id"
-              ng-if="task.tenantId">
-            {{ task.tenantId }}
           </h4>
         </div>
 
