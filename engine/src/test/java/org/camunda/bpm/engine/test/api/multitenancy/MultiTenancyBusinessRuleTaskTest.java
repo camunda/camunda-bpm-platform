@@ -261,7 +261,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
         .businessRuleTask()
           .camundaDecisionRef("decision")
           .camundaDecisionRefBinding("latest")
-          .camundaDecisionRefTenantId(null)
+          .camundaDecisionRefTenantId("${null}")
           .camundaMapDecisionResult("singleEntry")
           .camundaResultVariable("decisionVar")
         .camundaAsyncAfter()
@@ -269,8 +269,8 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
         .done();
 
     deployment(DMN_FILE);
+    deploymentForTenant(TENANT_ONE, process);
     deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
-    deployment(process);
 
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold").execute();
