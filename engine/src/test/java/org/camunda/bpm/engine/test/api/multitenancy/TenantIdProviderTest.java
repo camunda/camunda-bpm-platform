@@ -21,21 +21,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderHistoricDecisionInstanceContext;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInstanceContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.api.multitenancy.TenantIdProviderTest.SetValueOnRootProcessInstanceTenantIdProvider.SetValueOnHistoricDecisionInstanceTenantIdProvider;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  * @author Daniel Meyer
  *
  */
 public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
+
+  protected static final String DMN_FILE = "org/camunda/bpm/engine/test/api/multitenancy/simpleDecisionTable.dmn";
+
+  protected static final String TENANT_ID = "tenant1";
 
   public TenantIdProviderTest() {
     super("org/camunda/bpm/engine/test/api/multitenancy/TenantIdProviderTest.camunda.cfg.xml");
@@ -70,7 +81,7 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
     TestTenantIdProvider.delegate = tenantIdProvider;
 
     // given a deployment with a tenant id
-    deploymentForTenant("t1", Bpmn.createExecutableProcess("testProcess").startEvent().done());
+    deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess("testProcess").startEvent().done());
 
     // if a process instance is started
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -113,7 +124,7 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
 
   public void testSetsTenantId() {
 
-    String tenantId = "tenant1";
+    String tenantId = TENANT_ID;
     SetValueTenantIdProvider tenantIdProvider = new SetValueTenantIdProvider(tenantId);
     TestTenantIdProvider.delegate = tenantIdProvider;
 
@@ -167,7 +178,7 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
     TestTenantIdProvider.delegate = tenantIdProvider;
 
     // given a deployment with a tenant id
-    deploymentForTenant("t1", Bpmn.createExecutableProcess("testProcess").startEvent().done(),
+    deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess("testProcess").startEvent().done(),
         Bpmn.createExecutableProcess("superProcess").startEvent().callActivity().calledElement("testProcess").done());
 
     // if a process instance is started
@@ -232,7 +243,7 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
 
   public void testSetsTenantId_SubProcessInstance() {
 
-    String tenantId = "tenant1";
+    String tenantId = TENANT_ID;
     SetValueOnSubProcessInstanceTenantIdProvider tenantIdProvider = new SetValueOnSubProcessInstanceTenantIdProvider(tenantId);
     TestTenantIdProvider.delegate = tenantIdProvider;
 
@@ -270,7 +281,7 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
 
   public void testTenantIdInheritedFromSuperProcessInstance() {
 
-    String tenantId = "tenant1";
+    String tenantId = TENANT_ID;
     SetValueOnRootProcessInstanceTenantIdProvider tenantIdProvider = new SetValueOnRootProcessInstanceTenantIdProvider(tenantId);
     TestTenantIdProvider.delegate = tenantIdProvider;
 
@@ -309,7 +320,7 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
     ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
     TestTenantIdProvider.delegate = tenantIdProvider;
 
-    deployment(repositoryService.createDeployment().tenantId("t1")
+    deployment(repositoryService.createDeployment().tenantId(TENANT_ID)
         .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/CaseWithProcessTask.cmmn"),
         Bpmn.createExecutableProcess("testProcess").startEvent().userTask().done());
 
@@ -379,6 +390,219 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
     assertThat(tenantIdProvider.parameters.get(0).getSuperCaseExecution(), is(notNullValue()));
   }
 
+  // historic decision instance //////////////////////////////////
+
+  public void testProviderCalledForDecisionDefinitionWithoutTenantId() {
+
+    ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
+    TestTenantIdProvider.delegate = tenantIdProvider;
+
+    // given a deployment without tenant id
+    deployment(DMN_FILE);
+
+    // if a decision definition is evaluated
+    decisionService.evaluateDecisionTableByKey("decision").variables(createVariables()).evaluate();
+
+    // then the tenant id provider is invoked
+    assertThat(tenantIdProvider.dmnParameters.size(), is(1));
+  }
+
+  public void testProviderNotCalledForDecisionDefinitionWithTenantId() {
+
+    ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
+    TestTenantIdProvider.delegate = tenantIdProvider;
+
+    // given a deployment with a tenant id
+    deploymentForTenant(TENANT_ID, DMN_FILE);
+
+    // if a decision definition is evaluated
+    decisionService.evaluateDecisionTableByKey("decision").variables(createVariables()).evaluate();
+
+    // then the tenant id provider is not invoked
+    assertThat(tenantIdProvider.dmnParameters.size(), is(0));
+  }
+
+  public void testProviderCalledWithDecisionDefinition() {
+
+    ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
+    TestTenantIdProvider.delegate = tenantIdProvider;
+
+    deployment(DMN_FILE);
+    DecisionDefinition deployedDecisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
+
+    // if a decision definition is evaluated
+    decisionService.evaluateDecisionTableByKey("decision").variables(createVariables()).evaluate();
+
+    // then the tenant id provider is passed in the decision definition
+    DecisionDefinition passedDecisionDefinition = tenantIdProvider.dmnParameters.get(0).getDecisionDefinition();
+    assertThat(passedDecisionDefinition, is(notNullValue()));
+    assertThat(passedDecisionDefinition.getId(), is(deployedDecisionDefinition.getId()));
+  }
+
+  public void testSetsTenantIdForHistoricDecisionInstance() {
+
+    String tenantId = TENANT_ID;
+    SetValueTenantIdProvider tenantIdProvider = new SetValueTenantIdProvider(tenantId);
+    TestTenantIdProvider.delegate = tenantIdProvider;
+
+    deployment(DMN_FILE);
+
+    // if a decision definition is evaluated
+    decisionService.evaluateDecisionTableByKey("decision").variables(createVariables()).evaluate();
+
+    // then the tenant id provider can set the tenant id to a value
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().singleResult();
+    assertThat(historicDecisionInstance.getTenantId(), is(tenantId));
+  }
+
+  public void testSetNullTenantIdForHistoricDecisionInstance() {
+
+    String tenantId = null;
+    SetValueTenantIdProvider tenantIdProvider = new SetValueTenantIdProvider(tenantId);
+    TestTenantIdProvider.delegate = tenantIdProvider;
+
+    deployment(DMN_FILE);
+
+    // if a decision definition is evaluated
+    decisionService.evaluateDecisionTableByKey("decision").variables(createVariables()).evaluate();
+
+    // then the tenant id provider can set the tenant id to null
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().singleResult();
+    assertThat(historicDecisionInstance.getTenantId(), is(nullValue()));
+  }
+
+  public void testProviderCalledForHistoricDecisionDefinitionWithoutTenantId_BusinessRuleTask() {
+
+    ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
+    TestTenantIdProvider.delegate = tenantIdProvider;
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
+      .startEvent()
+      .businessRuleTask()
+        .camundaDecisionRef("decision")
+      .endEvent()
+      .done();
+
+    // given a deployment without tenant id
+    deploymentWithoutTenant(DMN_FILE, process);
+
+    // if a decision definition is evaluated
+    runtimeService.startProcessInstanceByKey("testProcess", createVariables());
+
+    // then the tenant id provider is invoked
+    assertThat(tenantIdProvider.dmnParameters.size(), is(1));
+  }
+
+  public void testProviderNotCalledForHistoricDecisionDefinitionWithTenantId_BusinessRuleTask() {
+
+    ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
+    TestTenantIdProvider.delegate = tenantIdProvider;
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+        .businessRuleTask()
+          .camundaDecisionRef("decision")
+        .endEvent()
+        .done();
+
+    // given a deployment with a tenant id
+    deploymentForTenant(TENANT_ID, DMN_FILE, process);
+
+    // if a process instance is started
+    runtimeService.startProcessInstanceByKey("testProcess", createVariables());
+
+    // then the tenant id providers are not invoked
+    assertThat(tenantIdProvider.dmnParameters.size(), is(0));
+  }
+
+  public void testProviderCalledWithExecution_BusinessRuleTasks() {
+
+    ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
+    TestTenantIdProvider.delegate = tenantIdProvider;
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+        .businessRuleTask()
+          .camundaDecisionRef("decision")
+        .camundaAsyncAfter()
+        .endEvent()
+        .done();
+
+    deploymentWithoutTenant(DMN_FILE, process);
+
+    // if a process instance is started
+    runtimeService.startProcessInstanceByKey("testProcess", createVariables());
+    Execution execution = runtimeService.createExecutionQuery().processDefinitionKey("testProcess").singleResult();
+
+    // then the tenant id provider is invoked
+    assertThat(tenantIdProvider.dmnParameters.size(), is(1));
+    ExecutionEntity passedExecution = (ExecutionEntity) tenantIdProvider.dmnParameters.get(0).getExecution();
+    assertThat(passedExecution, is(notNullValue()));
+    assertThat(passedExecution.getParent().getId(), is(execution.getId()));
+  }
+
+  public void testSetsTenantIdForHistoricDecisionInstance_BusinessRuleTask() {
+
+    String tenantId = TENANT_ID;
+    SetValueOnHistoricDecisionInstanceTenantIdProvider tenantIdProvider = new SetValueOnHistoricDecisionInstanceTenantIdProvider(tenantId);
+    TestTenantIdProvider.delegate = tenantIdProvider;
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+        .businessRuleTask()
+          .camundaDecisionRef("decision")
+        .camundaAsyncAfter()
+        .endEvent()
+        .done();
+
+    deploymentWithoutTenant(DMN_FILE, process);
+
+    // if a process instance is started
+    runtimeService.createProcessInstanceByKey("testProcess").setVariables(createVariables()).execute();
+
+    // then the tenant id provider can set the tenant id to a value
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey("decision").singleResult();
+    assertThat(historicDecisionInstance.getTenantId(), is(tenantId));
+  }
+
+  public void testSetNullTenantIdForHistoricDecisionInstance_BusinessRuleTask() {
+
+    String tenantId = null;
+    SetValueOnHistoricDecisionInstanceTenantIdProvider tenantIdProvider = new SetValueOnHistoricDecisionInstanceTenantIdProvider(tenantId);
+    TestTenantIdProvider.delegate = tenantIdProvider;
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+        .businessRuleTask()
+          .camundaDecisionRef("decision")
+        .camundaAsyncAfter()
+        .endEvent()
+        .done();
+
+    deploymentWithoutTenant(DMN_FILE, process);
+
+    // if a process instance is started
+    runtimeService.createProcessInstanceByKey("testProcess").setVariables(createVariables()).execute();
+
+    // then the tenant id provider can set the tenant id to a value
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey("decision").singleResult();
+    assertThat(historicDecisionInstance.getTenantId(), is(nullValue()));
+  }
+
+  protected String deploymentForTenant(String tenantId, String classpathResource, BpmnModelInstance modelInstance) {
+    return deployment(repositoryService.createDeployment()
+        .tenantId(tenantId)
+        .addClasspathResource(classpathResource), modelInstance);
+  }
+
+  protected String deploymentWithoutTenant(String classpathResource, BpmnModelInstance modelInstance) {
+    return deployment(repositoryService.createDeployment().addClasspathResource(classpathResource), modelInstance);
+  }
+
+  protected VariableMap createVariables() {
+    return Variables.createVariables().putValue("status", "gold");
+  }
+
   // helpers //////////////////////////////////////////
 
   public static class TestTenantIdProvider implements TenantIdProvider {
@@ -397,14 +621,28 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
     public static void reset() {
       delegate = null;
     }
+
+    public String provideTenantIdForHistoricDecisionInstance(TenantIdProviderHistoricDecisionInstanceContext ctx) {
+      if (delegate != null) {
+        return delegate.provideTenantIdForHistoricDecisionInstance(ctx);
+      } else {
+        return null;
+      }
+    }
   }
 
   public static class ContextLoggingTenantIdProvider implements TenantIdProvider {
 
     protected List<TenantIdProviderProcessInstanceContext> parameters = new ArrayList<TenantIdProviderProcessInstanceContext>();
+    protected List<TenantIdProviderHistoricDecisionInstanceContext> dmnParameters = new ArrayList<TenantIdProviderHistoricDecisionInstanceContext>();
 
     public String provideTenantIdForProcessInstance(TenantIdProviderProcessInstanceContext ctx) {
       parameters.add(ctx);
+      return null;
+    }
+
+    public String provideTenantIdForHistoricDecisionInstance(TenantIdProviderHistoricDecisionInstanceContext ctx) {
+      dmnParameters.add(ctx);
       return null;
     }
 
@@ -423,6 +661,10 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
       return tenantIdToSet;
     }
 
+    public String provideTenantIdForHistoricDecisionInstance(TenantIdProviderHistoricDecisionInstanceContext ctx) {
+      return tenantIdToSet;
+    }
+
   }
 
   //only sets tenant ids on sub process instances
@@ -438,6 +680,10 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
       return ctx.getSuperExecution() != null ? tenantIdToSet : null;
     }
 
+    public String provideTenantIdForHistoricDecisionInstance(TenantIdProviderHistoricDecisionInstanceContext ctx) {
+      return null;
+    }
+
   }
 
   // only sets tenant ids on root process instances
@@ -451,6 +697,29 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
 
     public String provideTenantIdForProcessInstance(TenantIdProviderProcessInstanceContext ctx) {
       return ctx.getSuperExecution() == null ? tenantIdToSet : null;
+    }
+
+    public String provideTenantIdForHistoricDecisionInstance(TenantIdProviderHistoricDecisionInstanceContext ctx) {
+      return null;
+    }
+
+    //only sets tenant ids on historic decision instances when an execution exists
+    public static class SetValueOnHistoricDecisionInstanceTenantIdProvider implements TenantIdProvider {
+
+      private final String tenantIdToSet;
+
+      public SetValueOnHistoricDecisionInstanceTenantIdProvider(String tenantIdToSet) {
+        this.tenantIdToSet = tenantIdToSet;
+      }
+
+      public String provideTenantIdForProcessInstance(TenantIdProviderProcessInstanceContext ctx) {
+        return null;
+      }
+
+      public String provideTenantIdForHistoricDecisionInstance(TenantIdProviderHistoricDecisionInstanceContext ctx) {
+        return ctx.getExecution() != null ? tenantIdToSet : null;
+      }
+
     }
 
   }

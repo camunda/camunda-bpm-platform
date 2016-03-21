@@ -9,6 +9,8 @@
     <property name="processEngineName" value="TenantIdProviderTest" />
     <property name="jdbcUrl" value="jdbc:h2:mem:camunda-TenantIdProviderTest" />
 
+    <property name="history" value="${history.level}" />
+
     <property name="tenantIdProvider" ref="tenantIdProvider"></property>
 
   </bean>
