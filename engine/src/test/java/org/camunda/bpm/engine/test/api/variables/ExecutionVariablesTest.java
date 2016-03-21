@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.api.variables;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -110,6 +112,34 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
     assertNotNull(variable);
     assertEquals("foo", variable.getName());
     assertEquals(subProcessScopeExecutionId, variable.getExecutionId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ExecutionVariablesTest.testTreeCompactionForkParallelGateway.bpmn20.xml")
+  public void testTreeCompactionWithVariablesOnScopeAndConcurrentExecution() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Task task1 = taskService
+        .createTaskQuery()
+        .taskDefinitionKey("task1")
+        .singleResult();
+
+    Execution task2Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task2")
+        .singleResult();
+
+    // when
+    runtimeService.setVariable(processInstance.getId(), "foo", "baz");
+    runtimeService.setVariableLocal(task2Execution.getId(), "foo", "bar");
+    // and completing the other task, thereby pruning the concurrent execution
+    taskService.complete(task1.getId());
+
+    // then something happens
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+    assertNotNull(variable);
+    assertEquals("foo", variable.getName());
+    assertEquals(processInstance.getId(), variable.getExecutionId());
   }
 
   @Deployment
