@@ -107,7 +107,15 @@ public abstract class TestHelper {
     // if not found on method, try on class level
     if (deploymentAnnotation == null) {
       onMethod = false;
-      deploymentAnnotation = testClass.getAnnotation(Deployment.class);
+      Class<?> lookForAnnotationClass = testClass;
+      while (lookForAnnotationClass != Object.class) {
+        deploymentAnnotation = lookForAnnotationClass.getAnnotation(Deployment.class);
+        if (deploymentAnnotation != null) {
+          testClass = lookForAnnotationClass;
+          break;
+        }
+        lookForAnnotationClass = lookForAnnotationClass.getSuperclass();
+      }
     }
 
     if (deploymentAnnotation != null) {
@@ -512,5 +520,6 @@ public abstract class TestHelper {
       }
     }
   }
+
 
 }
