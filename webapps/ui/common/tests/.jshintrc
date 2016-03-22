@@ -5,6 +5,7 @@
     "expect": false,
     "element": false,
     "by": false,
-    "browser": false
+    "browser": false,
+    "protractor": false
   }
 }

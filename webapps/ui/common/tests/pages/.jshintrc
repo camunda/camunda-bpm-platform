@@ -1,7 +1,0 @@
-{
-  "mocha": true,
-  "node": true,
-  "globals": {
-    "expect": false
-  }
-}

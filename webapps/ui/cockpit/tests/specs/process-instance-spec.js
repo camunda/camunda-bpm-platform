@@ -5,6 +5,7 @@ var testHelper = require('../../../common/tests/test-helper');
 var setupFile = require('./process-setup');
 
 var dashboardPage = require('../pages/dashboard');
+var processesPage = require('../pages/processes');
 var definitionPage = require('../pages/process-definition');
 var instancePage = require('../pages/process-instance');
 
@@ -18,7 +19,8 @@ describe('Cockpit Process Instance Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.deployedProcessesList.selectProcess(0);
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcess(0);
       });
     });
 
@@ -88,7 +90,8 @@ describe('Cockpit Process Instance Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.deployedProcessesList.selectProcess(0);
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcess(0);
         definitionPage.processInstancesTab.selectInstanceId(0);
       });
     });
@@ -131,7 +134,8 @@ describe('Cockpit Process Instance Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.deployedProcessesList.selectProcess(0);
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcess(0);
         definitionPage.processInstancesTab.selectInstanceId(0);
         instancePage.userTasksTab.selectTab();
       });
@@ -190,6 +194,14 @@ describe('Cockpit Process Instance Spec', function() {
     describe('edit user identity links', function() {
 
       before(function() {
+        var el = element(by.css('[ng-click="close($event)"]'));
+        el.isPresent().then(function (yepNope) {
+          if (!yepNope) { return; }
+          el.isDisplayed().then(function (yepNope) {
+            if (!yepNope) { return; }
+            el.click();
+          });
+        });
         instancePage.userTasksTab.clickChangeUserIdentityLinksButton();
       });
 
@@ -244,7 +256,8 @@ describe('Cockpit Process Instance Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.deployedProcessesList.selectProcess(0);
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcess(0);
         definitionPage.processInstancesTab.selectInstanceId(0);
       });
     });
@@ -330,7 +343,8 @@ describe('Cockpit Process Instance Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.deployedProcessesList.selectProcess(0);
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcess(0);
       });
     });
 
@@ -356,7 +370,8 @@ describe('Cockpit Process Instance Spec', function() {
       return testHelper(setupFile.setup2, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.deployedProcessesList.selectProcess(0);
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcess(0);
       });
     });
 
@@ -379,12 +394,14 @@ describe('Cockpit Process Instance Spec', function() {
       return testHelper(setupFile.setup3, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.goToSection('Processes');
       });
     });
 
     function goToInstanceJobRetryModal(name) {
       dashboardPage.navigateToWebapp('Cockpit');
-      dashboardPage.deployedProcessesList.selectProcessByName(name);
+      dashboardPage.goToSection('Processes');
+      processesPage.deployedProcessesList.selectProcessByName(name);
       element(by.css('.ctn-content-bottom .instance-id a')).click();
       element(by.css('.ctn-toolbar [tooltip~="Retries"]')).click();
     }
@@ -431,44 +448,47 @@ describe('Cockpit Process Instance Spec', function() {
       });
     });
   });
-  
+
   describe('multi tenancy', function() {
-    
-  	before(function() { 
+
+    before(function() {
       return testHelper(setupFile.multiTenancySetup, function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.goToSection('Processes');
       });
     });
-  	
-	  it('should display tenant id of instance', function() {
-	  	
-	  	// first process definition is deployed for tenant with id 'tenant1'
-	  	dashboardPage.deployedProcessesList.selectProcess(0);
-	  	definitionPage.processInstancesTab.selectInstanceId(0);
-	    	
-	  	// when
-	  	instancePage.sidebarTabClick('Information');
 
-	  	// then
-	  	expect(instancePage.information.tenantId()).to.eventually.contain('tenant1');
-	  });
-	 	
-	  it('should not display tenant id of instance if not exists', function() {
-	  	
-	  	dashboardPage.navigateToWebapp('Cockpit');
-      // second process definition is deployed without tenant id
-      dashboardPage.deployedProcessesList.selectProcess(1);
+    it('should display tenant id of instance', function() {
+      dashboardPage.goToSection('Processes');
+
+      // first process definition is deployed for tenant with id 'tenant1'
+      processesPage.deployedProcessesList.selectProcess(0);
       definitionPage.processInstancesTab.selectInstanceId(0);
-	    
+
       // when
-	  	instancePage.sidebarTabClick('Information');
-	
-	  	// then
-	    expect(instancePage.information.tenantId()).to.eventually.contain('null');
-	  });
-		  
+      instancePage.sidebarTabClick('Information');
+
+      // then
+      expect(instancePage.information.tenantId()).to.eventually.contain('tenant1');
+    });
+
+    it('should not display tenant id of instance if not exists', function() {
+
+      dashboardPage.navigateToWebapp('Cockpit');
+      dashboardPage.goToSection('Processes');
+      // second process definition is deployed without tenant id
+      processesPage.deployedProcessesList.selectProcess(1);
+      definitionPage.processInstancesTab.selectInstanceId(0);
+
+      // when
+      instancePage.sidebarTabClick('Information');
+
+      // then
+      expect(instancePage.information.tenantId()).to.eventually.contain('null');
+    });
+
   });
-  
+
 });

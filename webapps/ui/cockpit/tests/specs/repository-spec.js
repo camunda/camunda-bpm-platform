@@ -20,7 +20,8 @@ describe('Repository Spec', function() {
       });
     });
 
-    it('shows an active link in the header', function () {
+    // handled by dashboard
+    xit('shows an active link in the header', function () {
       expect(repositoryPage.navbarItem(1).getText()).to.eventually.eql('Deployments');
       expect(repositoryPage.navbarItem(1).getAttribute('class')).to.eventually.contain('active');
     });

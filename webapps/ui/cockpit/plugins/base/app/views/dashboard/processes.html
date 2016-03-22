@@ -1,0 +1,15 @@
+<div cam-widget-loader
+     loading-state="{{ loadingState }}">
+  <ul ng-if="procDefStatsKeys.length">
+    <li ng-repeat="propName in procDefStatsKeys"
+        ng-init="prop = procDefStats[propName]">
+      <span class="value">{{ gimmeDaValue(prop.value) }}</span>
+      {{ gimmeDaLabel(prop) }}
+    </li>
+  </ul>
+  <div ng-if="!procDefStatsKeys.length"
+       class="well">
+    <span class="glyphicon glyphicon-info-sign"></span>
+    No process definitions available.
+  </div>
+</div>

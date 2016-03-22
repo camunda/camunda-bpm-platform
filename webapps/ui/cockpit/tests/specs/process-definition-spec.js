@@ -5,6 +5,7 @@ var testHelper = require('../../../common/tests/test-helper');
 var setupFile = require('./process-setup');
 
 var dashboardPage = require('../pages/dashboard');
+var processesPage = require('../pages/processes');
 var definitionPage = require('../pages/process-definition');
 
 
@@ -17,6 +18,7 @@ describe('Cockpit Process Definition Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.goToSection('Processes');
       });
     });
 
@@ -24,11 +26,11 @@ describe('Cockpit Process Definition Spec', function() {
     it('should go to process definition view', function() {
 
       // given
-      var runningInstances = dashboardPage.deployedProcessesList.runningInstances(0);
-      dashboardPage.deployedProcessesList.processName(0).then(function(processName) {
+      var runningInstances = processesPage.deployedProcessesList.runningInstances(0);
+      processesPage.deployedProcessesList.processName(0).then(function(processName) {
 
         // when
-        dashboardPage.deployedProcessesList.selectProcess(0);
+        processesPage.deployedProcessesList.selectProcess(0);
 
         // then
         expect(definitionPage.pageHeaderProcessDefinitionName()).to.eventually.eql(processName);
@@ -96,7 +98,8 @@ describe('Cockpit Process Definition Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.deployedProcessesList.selectProcess(0);
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcess(0);
       });
     });
 
@@ -148,88 +151,90 @@ describe('Cockpit Process Definition Spec', function() {
     });
 
   });
-  
+
   describe('multi tenancy', function() {
-  
-  	before(function() { 
+
+    before(function() {
       return testHelper(setupFile.multiTenancySetup, function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.goToSection('Processes');
       });
     });
-  	
-		describe('process definition with tenant id', function() {
-		
-		    before(function() { 
-		    	// first process definition is deployed for tenant with id 'tenant1'
-	        dashboardPage.deployedProcessesList.selectProcess(0);
-		    });
-		
-		    it('should display definition tenant id', function() {
-		        // when
-		        definitionPage.sidebarTabClick('Information');
-		
-		        // then
-		        expect(definitionPage.information.tenantId()).to.eventually.contain('tenant1');
-		      });
-		    
-		    it('should display definition version for tenant only', function() {
-		      // when
-		      definitionPage.sidebarTabClick('Information');
-		
-		      // then
-		      expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
-		      expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
-		    });
-		    
-		    it('should display running instances for tenant only', function() {
-		      // when
-		      definitionPage.sidebarTabClick('Information');
-		
-		      // then
-		      expect(definitionPage.information.definitionInstancesCurrent()).to.eventually.contain('1');
-		      expect(definitionPage.information.definitionInstancesAll()).to.eventually.contain('1');
-		    });
-		
-		  });
-		
-		describe('process definition without tenant id', function() {
-		
-		  before(function() { 
-		  	dashboardPage.navigateToWebapp('Cockpit');
-	      // second process definition is deployed without tenant id
-	      dashboardPage.deployedProcessesList.selectProcess(1);
-		  });
-		
-		  it('should not display definition tenant id', function() {
-		      // when
-		      definitionPage.sidebarTabClick('Information');
-		
-		      // then
-		      expect(definitionPage.information.tenantId()).to.eventually.contain('null');
-		    });
-		  
-		  it('should display definition version for non-tenant only', function() {
-		    // when
-		    definitionPage.sidebarTabClick('Information');
-		
-		    // then
-		    expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
-		    expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
-		  });
-		  
-		  it('should display running instances for non-tenant only', function() {
-		    // when
-		    definitionPage.sidebarTabClick('Information');
-		
-		    // then
-		    expect(definitionPage.information.definitionInstancesCurrent()).to.eventually.contain('1');
-		    expect(definitionPage.information.definitionInstancesAll()).to.eventually.contain('1');
-		  });
-		
-		});
-		
+
+    describe('process definition with tenant id', function() {
+
+        before(function() {
+          // first process definition is deployed for tenant with id 'tenant1'
+          processesPage.deployedProcessesList.selectProcess(0);
+        });
+
+        it('should display definition tenant id', function() {
+          // when
+          definitionPage.sidebarTabClick('Information');
+
+          // then
+          expect(definitionPage.information.tenantId()).to.eventually.contain('tenant1');
+        });
+
+        it('should display definition version for tenant only', function() {
+          // when
+          definitionPage.sidebarTabClick('Information');
+
+          // then
+          expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
+          expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
+        });
+
+        it('should display running instances for tenant only', function() {
+          // when
+          definitionPage.sidebarTabClick('Information');
+
+          // then
+          expect(definitionPage.information.definitionInstancesCurrent()).to.eventually.contain('1');
+          expect(definitionPage.information.definitionInstancesAll()).to.eventually.contain('1');
+        });
+
+      });
+
+    describe('process definition without tenant id', function() {
+
+      before(function() {
+        dashboardPage.navigateToWebapp('Cockpit');
+        // second process definition is deployed without tenant id
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcess(1);
+      });
+
+      it('should not display definition tenant id', function() {
+          // when
+          definitionPage.sidebarTabClick('Information');
+
+          // then
+          expect(definitionPage.information.tenantId()).to.eventually.contain('null');
+        });
+
+      it('should display definition version for non-tenant only', function() {
+        // when
+        definitionPage.sidebarTabClick('Information');
+
+        // then
+        expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
+        expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
+      });
+
+      it('should display running instances for non-tenant only', function() {
+        // when
+        definitionPage.sidebarTabClick('Information');
+
+        // then
+        expect(definitionPage.information.definitionInstancesCurrent()).to.eventually.contain('1');
+        expect(definitionPage.information.definitionInstancesAll()).to.eventually.contain('1');
+      });
+
+    });
+
   });
 
 });

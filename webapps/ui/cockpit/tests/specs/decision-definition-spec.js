@@ -5,6 +5,7 @@ var testHelper = require('../../../common/tests/test-helper');
 var setupFile = require('./decision-setup');
 
 var dashboardPage = require('../pages/dashboard');
+var decisionsPage = require('../pages/decisions');
 var definitionPage = require('../pages/decision-definition');
 
 
@@ -17,6 +18,7 @@ describe('Cockpit Decision Definition Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.goToSection('Decisions');
       });
     });
 
@@ -24,10 +26,10 @@ describe('Cockpit Decision Definition Spec', function() {
     it('should go to decision definition view', function() {
 
       // given
-      dashboardPage.deployedDecisionsList.decisionName(0).then(function(decisionName) {
+      decisionsPage.deployedDecisionsList.decisionName(0).then(function(decisionName) {
 
         // when
-        dashboardPage.deployedDecisionsList.selectDecision(0);
+        decisionsPage.deployedDecisionsList.selectDecision(0);
 
         // then
         expect(definitionPage.information.definitionName()).to.eventually.eql(decisionName);
@@ -43,7 +45,9 @@ describe('Cockpit Decision Definition Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.deployedDecisionsList.selectDecision(0);
+        dashboardPage.goToSection('Decisions');
+        decisionsPage.deployedDecisionsList.selectDecision(0);
+
       });
     });
 
@@ -72,7 +76,8 @@ describe('Cockpit Decision Definition Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.deployedDecisionsList.selectDecision(0);
+        dashboardPage.goToSection('Decisions');
+        decisionsPage.deployedDecisionsList.selectDecision(0);
       });
     });
 
@@ -90,7 +95,8 @@ describe('Cockpit Decision Definition Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.deployedDecisionsList.selectDecision(0);
+        dashboardPage.goToSection('Decisions');
+        decisionsPage.deployedDecisionsList.selectDecision(0);
       });
     });
 
@@ -115,58 +121,60 @@ describe('Cockpit Decision Definition Spec', function() {
     });
 
   });
-  
+
   describe('multi tenancy', function() {
-    
-  	before(function() { 
+
+    before(function() {
       return testHelper(setupFile.multiTenancySetup, function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.goToSection('Decisions');
       });
     });
-  	
-		describe('decision definition with tenant id', function() {
-		
-		    before(function() { 
-		    	// second decision definition is deployed for tenant with id 'tenant1'
-		    	dashboardPage.deployedDecisionsList.selectDecision(1);
-		    });
-		
-		    it('should display definition tenant id', function() {
-		        
-		    	expect(definitionPage.information.tenantId()).to.eventually.contain('tenant1');
-		    });
-		    
-		    it('should display definition version for tenant only', function() {
 
-		    	expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
-		      expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
-		    });
-		
-		  });
-		
-		describe('decision definition without tenant id', function() {
-		
-		  before(function() { 
-		  	dashboardPage.navigateToWebapp('Cockpit');
-	      // first decision definition is deployed without tenant id
-		  	dashboardPage.deployedDecisionsList.selectDecision(0);
-		  });
-		
-		  it('should not display definition tenant id', function() {
-		      
-		  	expect(definitionPage.information.tenantId()).to.eventually.contain('null');
-		  });
-		  
-		  it('should display definition version for non-tenant only', function() {
-		    
-		  	expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
-		    expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
-		  });
-		
-		});
-		
+    describe('decision definition with tenant id', function() {
+
+        before(function() {
+          // second decision definition is deployed for tenant with id 'tenant1'
+          decisionsPage.deployedDecisionsList.selectDecision(1);
+        });
+
+        it('should display definition tenant id', function() {
+
+          expect(definitionPage.information.tenantId()).to.eventually.contain('tenant1');
+        });
+
+        it('should display definition version for tenant only', function() {
+
+          expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
+          expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
+        });
+
+      });
+
+    describe('decision definition without tenant id', function() {
+
+      before(function() {
+        dashboardPage.navigateToWebapp('Cockpit');
+        // first decision definition is deployed without tenant id
+        dashboardPage.goToSection('Decisions');
+        decisionsPage.deployedDecisionsList.selectDecision(0);
+      });
+
+      it('should not display definition tenant id', function() {
+
+        expect(definitionPage.information.tenantId()).to.eventually.contain('null');
+      });
+
+      it('should display definition version for non-tenant only', function() {
+
+        expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
+        expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
+      });
+
+    });
+
   });
 
 });

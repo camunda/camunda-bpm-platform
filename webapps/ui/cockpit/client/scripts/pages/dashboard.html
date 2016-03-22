@@ -1,19 +1,30 @@
 <!-- # CE - camunda-cockpit-ui/client/scripts/pages/dashboard.html -->
-<div class="ctn-view">
-
-  <ul class="dashboard-menu">
-    <li ng-repeat="dashboardProvider in dashboardProviders">
-      <a ng-click="scrollToPlugin(dashboardProvider)">{{ dashboardProvider.dashboardMenuLabel }}</a>
-    </li>
-  </ul>
-
-
-  <div ng-repeat="dashboardProvider in dashboardProviders"
-       class="dashboard-view"
-       data-plugin-id="{{ dashboardProvider.id }}">
-    <view vars="dashboardVars"
-          provider="dashboardProvider"></view>
+<div class="ctn-view dashboard container-fluid">
+  <div class="sections row">
+    <section ng-repeat="plugin in dashboardPlugins"
+             ng-if="!plugin.noDashboardSection"
+             class="col-sm-4">
+      <header>
+        <h1 class="section-title">
+          <a ng-if="plugin.pagePath"
+             ng-href="{{ plugin.pagePath }}">{{ plugin.label }}</a>
+          <span ng-if="!plugin.pagePath">{{ plugin.label }}</span>
+        </h1>
+      </header>
+      <div class="stats">
+        <view data-plugin-id="{{ plugin.id }}"
+              provider="plugin"></view>
+      </div>
+    </section>
   </div>
 
-</div><!-- end .ctn-view -->
+  <hr ng-if="deprecateDashboardProviders.length" />
+
+  <div ng-repeat="plugin in deprecateDashboardProviders"
+       class="deprecate-dashboard-view row"
+       data-plugin-id="{{ plugin.id }}">
+    <view vars="dashboardVars"
+          provider="plugin"></view>
+  </div>
+</div>
 <!-- / CE - camunda-cockpit-ui/client/scripts/pages/dashboard.html -->

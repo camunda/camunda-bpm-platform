@@ -1,0 +1,9 @@
+<div cam-widget-loader
+     loading-state="{{ loadingState }}"
+     text-error="{{ loadingError }}">
+  <ul>
+    <li ng-if="count == 0">No decision definitions</li>
+    <li ng-if="count == 1">1 decision definition</li>
+    <li ng-if="count > 1">{{ count }} decision definitions</li>
+  </ul>
+</div>

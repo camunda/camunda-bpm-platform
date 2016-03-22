@@ -29,13 +29,13 @@ module.exports = Base.extend({
   runningInstances: function(item) {
     return this.processesList().get(item).element(by.binding('{{ statistic.instances }}')).getText();
   },
-  
+
   tenantId: function(item) {
     return this.processesList().get(item).element(by.css('.tenant-id')).getText();
   },
 
   getReportColumn: function() {
-    return this.pluginObject().element(by.css('th.report-link'))
+    return this.pluginObject().element(by.css('th.report-link'));
   }
 
 });

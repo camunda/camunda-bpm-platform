@@ -62,11 +62,9 @@
           cam-if-logged-in
           ng-controller="camHeaderViewsCtrl">
         <li ng-repeat="actionProvider in navbarActions"
-            ng-class="activeClass(actionProvider.id)">
-            <view ng-cloak
-                  provider="actionProvider"
-                  vars="navbarVars">
-            </view>
+            ng-if="actionProvider.pagePath"
+            ng-class="activeClass(actionProvider)">
+          <a ng-href="{{ actionProvider.pagePath }}">{{ actionProvider.label }}</a>
         </li>
       </ul>
     </div>
