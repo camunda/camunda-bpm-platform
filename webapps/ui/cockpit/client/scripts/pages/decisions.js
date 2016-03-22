@@ -1,7 +1,8 @@
 'use strict';
 
 var fs = require('fs');
-var template = fs.readFileSync(__dirname + '/dashboard.html', 'utf8');
+
+var template = fs.readFileSync(__dirname + '/decisions.html', 'utf8');
 
 var Controller = [
   '$scope',
@@ -13,28 +14,26 @@ function (
   page
 ) {
   var $rootScope = $scope.$root;
-
-  $scope.dashboardPlugins = Views.getProviders({
-    component: 'cockpit.dashboard.section'
-  });
-
-  // old plugins are still shown on the dashboard
-  $scope.dashboardVars = { read: [ 'processData' ] };
-  $scope.deprecateDashboardProviders = Views.getProviders({ component: 'cockpit.dashboard'});
-
   $rootScope.showBreadcrumbs = false;
 
+  // INITIALIZE PLUGINS
+  $scope.plugins = Views.getProviders({ component: 'cockpit.decisions.dashboard' });
+
   // reset breadcrumbs
-  page.breadcrumbsClear();
+  page.breadcrumbsAdd({
+    type: 'decisions',
+    label: 'Decisions',
+    href: '#/decisions'
+  });
 
   page.titleSet([
     'Camunda Cockpit',
-    'Dashboard'
+    'Decisions'
   ].join(' | '));
 }];
 
 var RouteConfig = [ '$routeProvider', function($routeProvider) {
-  $routeProvider.when('/dashboard', {
+  $routeProvider.when('/decisions', {
     template: template,
     controller: Controller,
     authentication: 'required',

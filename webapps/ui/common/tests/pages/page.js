@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 function injectParams(url, params) {
   var u = url;
@@ -112,10 +112,10 @@ Page.prototype.findElementIndexInRepeater = function(repeaterName, elementSelect
             deferred.fulfill(boundI);
           } else {
             noElementFound();
-          };
+          }
         });
       })(i);
-    };
+    }
   });
   return deferred;
 };

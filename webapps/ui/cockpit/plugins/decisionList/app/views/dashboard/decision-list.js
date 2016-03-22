@@ -5,14 +5,14 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/decision-list.html', 'utf8');
 
   module.exports = [ 'ViewsProvider', function (ViewsProvider) {
-    ViewsProvider.registerDefaultView('cockpit.dashboard', {
+    ViewsProvider.registerDefaultView('cockpit.decisions.dashboard', {
       id: 'decision-list',
       label: 'Deployed Decision Tables',
-      dashboardMenuLabel: 'DMN Decisions',
       template: template,
       controller: [
               '$scope', 'camAPI',
       function($scope,   camAPI) {
+        $scope.loadingState = 'LOADING';
 
         var decisionDefinitionService = camAPI.resource('decision-definition');
 
@@ -25,6 +25,12 @@ var template = fs.readFileSync(__dirname + '/decision-list.html', 'utf8');
           sortBy: 'name',
           sortOrder: 'asc'
         }, function(err, data) {
+          if (err) {
+            $scope.loadingError = err.message;
+            $scope.loadingState = 'ERROR';
+            throw err;
+          }
+          $scope.loadingState = 'LOADED';
           $scope.decisionCount = data.length;
           $scope.decisions = data;
         });

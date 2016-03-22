@@ -4,6 +4,7 @@ var testHelper = require('../../../common/tests/test-helper');
 var setupFile = require('./process-setup');
 
 var dashboardPage = require('../pages/dashboard');
+var processesPage = require('../pages/processes');
 var definitionPage = require('../pages/process-definition');
 var instancePage = require('../pages/process-instance');
 
@@ -15,7 +16,8 @@ describe('Cockpit Variable Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.deployedProcessesList.selectProcess(0);
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcess(0);
         definitionPage.processInstancesTab.selectInstanceId(0);
       });
     });

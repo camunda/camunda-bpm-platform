@@ -6,7 +6,13 @@
 var angular = require('angular'),
 
     // dashboard
-    processDefinitions = require('./dashboard/process-definitions'),
+    dashboardProcesses = require('./dashboard/processes'),
+    dashboardDecisions = require('./dashboard/decisions'),
+    dashboardDeployments = require('./dashboard/deployments'),
+    dashboardReports = require('./dashboard/reports'),
+
+    // processes dashboard
+    processDefinitions = require('./processesDashboard/process-definitions'),
 
     // process definition
     processInstanceTable = require('./processDefinition/processInstanceTable'),
@@ -34,6 +40,11 @@ var angular = require('angular'),
     activityInstanceStatisticsOverlayPI = require('./processInstance/activityInstanceStatisticsOverlay');
 
   var ngModule = angular.module('cockpit.plugin.base.views', []);
+
+  ngModule.config(dashboardProcesses);
+  ngModule.config(dashboardDecisions);
+  ngModule.config(dashboardDeployments);
+  ngModule.config(dashboardReports);
 
   ngModule.config(processDefinitions);
 

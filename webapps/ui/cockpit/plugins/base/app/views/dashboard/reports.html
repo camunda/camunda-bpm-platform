@@ -1,0 +1,10 @@
+<ul ng-show="plugins.length">
+  <li ng-repeat="plugin in plugins">
+    <a ng-href="#/reports?report={{ plugin.id }}">{{ plugin.label }}</a>
+  </li>
+</ul>
+<div class="well"
+     ng-hide="plugins.length">
+  <span class="glyphicon glyphicon-info-sign"></span>
+  No reports available.
+</div>

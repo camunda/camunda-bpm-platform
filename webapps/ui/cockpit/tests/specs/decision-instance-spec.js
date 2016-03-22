@@ -5,6 +5,7 @@ var testHelper = require('../../../common/tests/test-helper');
 var setupFile = require('./decision-setup');
 
 var dashboardPage = require('../pages/dashboard');
+var decisionsPage = require('../pages/decisions');
 var definitionPage = require('../pages/decision-definition');
 var instancePage = require('../pages/decision-instance');
 
@@ -18,16 +19,17 @@ describe('Cockpit Decision Instance Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.goToSection('Decisions');
       });
     });
 
     it('should go to decision defintion view', function() {
 
       // given
-      dashboardPage.deployedDecisionsList.decisionName(0).then(function(decisionName) {
+      decisionsPage.deployedDecisionsList.decisionName(0).then(function(decisionName) {
 
         // when
-        dashboardPage.deployedDecisionsList.selectDecision(0).then(function() {
+        decisionsPage.deployedDecisionsList.selectDecision(0).then(function() {
 
           // then
           expect(definitionPage.pageHeader().getText()).to.eventually.match(new RegExp(decisionName));
@@ -61,13 +63,14 @@ describe('Cockpit Decision Instance Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.goToSection('Decisions');
       });
     });
 
     it('should display decision table', function() {
 
       // when
-      dashboardPage.deployedDecisionsList.selectDecision(0);
+      decisionsPage.deployedDecisionsList.selectDecision(0);
       definitionPage.decisionInstancesTab.selectInstanceId(0);
 
       // then
@@ -97,13 +100,14 @@ describe('Cockpit Decision Instance Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.goToSection('Decisions');
       });
     });
 
     it('should go to decision instance view', function() {
 
       // when
-      dashboardPage.deployedDecisionsList.selectDecision(0);
+      decisionsPage.deployedDecisionsList.selectDecision(0);
       definitionPage.decisionInstancesTab.selectInstanceId(0);
 
       // then
@@ -139,13 +143,14 @@ describe('Cockpit Decision Instance Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.goToSection('Decisions');
       });
     });
 
     it('should go to decision instance view', function() {
 
       // when
-      dashboardPage.deployedDecisionsList.selectDecision(0);
+      decisionsPage.deployedDecisionsList.selectDecision(0);
       definitionPage.decisionInstancesTab.selectInstanceId(0);
 
       // then
@@ -183,13 +188,14 @@ describe('Cockpit Decision Instance Spec', function() {
 
           dashboardPage.navigateToWebapp('Cockpit');
           dashboardPage.authentication.userLogin('admin', 'admin');
+          dashboardPage.goToSection('Decisions');
         });
       });
 
       it('go to decision instance view', function() {
 
         // when
-        dashboardPage.deployedDecisionsList.selectDecision(0);
+        decisionsPage.deployedDecisionsList.selectDecision(0);
         definitionPage.decisionInstancesTab.selectInstanceId(0);
       });
 
@@ -212,7 +218,8 @@ describe('Cockpit Decision Instance Spec', function() {
 
           dashboardPage.navigateToWebapp('Cockpit');
           dashboardPage.authentication.userLogin('admin', 'admin');
-          dashboardPage.deployedDecisionsList.selectDecision(0);
+          dashboardPage.goToSection('Decisions');
+          decisionsPage.deployedDecisionsList.selectDecision(0);
           definitionPage.decisionInstancesTab.selectInstanceId(0);
         });
       });
@@ -226,36 +233,38 @@ describe('Cockpit Decision Instance Spec', function() {
     });
 
   });
-  
+
   describe('multi tenancy', function() {
-    
-  	before(function() { 
+
+    before(function() {
       return testHelper(setupFile.multiTenancySetup, function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.goToSection('Decisions');
       });
     });
-  	
-  	it('should not display tenant id of instance if not exists', function() {
-	  	
-	  	// first decision definition is deployed without tenant id
-	  	dashboardPage.deployedDecisionsList.selectDecision(0);
+
+    it('should not display tenant id of instance if not exists', function() {
+
+      // first decision definition is deployed without tenant id
+      decisionsPage.deployedDecisionsList.selectDecision(0);
       definitionPage.decisionInstancesTab.selectInstanceId(0);
-	    
+
       expect(instancePage.information.tenantId()).to.eventually.contain('null');
-	  });
-  	
-	  it('should display tenant id of instance', function() {
-	  	
-	  	dashboardPage.navigateToWebapp('Cockpit');
-	  	// second decision definition is deployed for tenant with id 'tenant1'
-    	dashboardPage.deployedDecisionsList.selectDecision(1);
-	  	definitionPage.decisionInstancesTab.selectInstanceId(0);
-	    	
-	  	expect(instancePage.information.tenantId()).to.eventually.contain('tenant1');
-	  });
-	 	  
+    });
+
+    it('should display tenant id of instance', function() {
+
+      dashboardPage.navigateToWebapp('Cockpit');
+      dashboardPage.goToSection('Decisions');
+      // second decision definition is deployed for tenant with id 'tenant1'
+      decisionsPage.deployedDecisionsList.selectDecision(1);
+      definitionPage.decisionInstancesTab.selectInstanceId(0);
+
+      expect(instancePage.information.tenantId()).to.eventually.contain('tenant1');
+    });
+
   });
 
 });

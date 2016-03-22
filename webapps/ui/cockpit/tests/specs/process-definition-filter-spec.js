@@ -4,8 +4,8 @@ var testHelper = require('../../../common/tests/test-helper');
 var setupFile = require('./process-setup');
 
 var dashboardPage = require('../pages/dashboard');
+var processesPage = require('../pages/processes');
 var definitionPage = require('../pages/process-definition');
-var instancePage = require('../pages/process-instance');
 
 
 describe('Cockpit Process Definition Filter Spec', function() {
@@ -16,7 +16,8 @@ describe('Cockpit Process Definition Filter Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.deployedProcessesList.selectProcess(0);
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcess(0);
       });
     });
 
@@ -77,7 +78,8 @@ describe('Cockpit Process Definition Filter Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.deployedProcessesList.selectProcess(0);
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcess(0);
       });
     });
 
@@ -85,7 +87,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
 
       // when
       definitionPage.sidebarTabClick('Filter');
-      definitionPage.filter.addFilterByBusinessKey('myBusinessKey')
+      definitionPage.filter.addFilterByBusinessKey('myBusinessKey');
 
       // then
       expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
@@ -131,7 +133,8 @@ describe('Cockpit Process Definition Filter Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.deployedProcessesList.selectProcess(0);
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcess(0);
       });
     });
 
@@ -171,7 +174,8 @@ describe('Cockpit Process Definition Filter Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.deployedProcessesList.selectProcess(0);
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcess(0);
       });
     });
 
