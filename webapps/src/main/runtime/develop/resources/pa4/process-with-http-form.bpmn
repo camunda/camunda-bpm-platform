@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="process-with-http-form" name="process-with-http-form" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>SequenceFlow_0oftx4f</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0oftx4f" sourceRef="StartEvent_1" targetRef="UserTask_0uwyrbt" />
+    <bpmn:endEvent id="EndEvent_0rryd15">
+      <bpmn:incoming>SequenceFlow_19g38js</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_19g38js" sourceRef="UserTask_0uwyrbt" targetRef="EndEvent_0rryd15" />
+    <bpmn:userTask id="UserTask_0uwyrbt" name="HTTP Form" camunda:formKey="embedded:http://localhost:8080/camunda/develop/forms/hello-track-start-form.html">
+      <bpmn:incoming>SequenceFlow_0oftx4f</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_19g38js</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="process-with-http-form">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="173" y="123" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="146" y="159" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0oftx4f_di" bpmnElement="SequenceFlow_0oftx4f">
+        <di:waypoint xsi:type="dc:Point" x="209" y="141" />
+        <di:waypoint xsi:type="dc:Point" x="231" y="141" />
+        <di:waypoint xsi:type="dc:Point" x="231" y="141" />
+        <di:waypoint xsi:type="dc:Point" x="252" y="141" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="120.5" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0rryd15_di" bpmnElement="EndEvent_0rryd15">
+        <dc:Bounds x="396" y="123" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="369" y="159" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_19g38js_di" bpmnElement="SequenceFlow_19g38js">
+        <di:waypoint xsi:type="dc:Point" x="352" y="141" />
+        <di:waypoint xsi:type="dc:Point" x="396" y="141" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="329" y="131" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_0uwyrbt_di" bpmnElement="UserTask_0uwyrbt">
+        <dc:Bounds x="252" y="101" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

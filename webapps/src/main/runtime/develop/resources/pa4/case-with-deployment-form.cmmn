@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cmmn:definitions id="_ac6f882b-8015-4402-aeb0-2e60b70b46c1"  targetNamespace="http://bpmn.io/schema/cmmn"
+ xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+ xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+ xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" 
+ xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" 
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+ xmlns:camunda="http://camunda.org/schema/1.0/cmmn">
+    <cmmn:case name="case-with-deployment-form" id="case-with-deployment-form">
+        <cmmn:casePlanModel autoComplete="false" name="Callcenter-Case" id="_0dcfb756-2a01-445e-905b-90299e95d0e0">
+            <cmmn:planItem definitionRef="PID__9b1c0031-5d22-40c9-af25-d03cf1bf107c" id="_9b1c0031-5d22-40c9-af25-d03cf1bf107c"/>
+            <cmmn:humanTask isBlocking="true" name="Form from Deployment (CMMN)" 
+            	id="PID__9b1c0031-5d22-40c9-af25-d03cf1bf107c" 
+            	camunda:assignee="demo"
+            	camunda:formKey="embedded:deployment:pa4/deployed-form.html">
+                <cmmn:defaultControl>
+                    <cmmn:manualActivationRule id="c08afa0f-092e-401d-b40d-f16528f1b9b2">
+                    	<cmmn:condition id="d7cf3f28-4784-4997-8f3d-d56876c5a99f">${false}</cmmn:condition>
+                    </cmmn:manualActivationRule>
+                </cmmn:defaultControl>
+            </cmmn:humanTask>
+        </cmmn:casePlanModel>        
+    </cmmn:case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram name="Untitled Diagram" id="_63756b30-8e54-483e-94e3-ec9a5367bc46" sharedStyle="_6f1279f3-1c3a-4c47-9e68-b34a7dd1738e">
+            <cmmndi:Size height="1050.0" width="1485.0"/>
+            <cmmndi:CMMNShape cmmnElementRef="_0dcfb756-2a01-445e-905b-90299e95d0e0" id="_11ba9ba6-d9db-4e10-b040-4d065a852f49">
+                <dc:Bounds height="600.0" width="800.0" x="150.0" y="109.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape cmmnElementRef="_9b1c0031-5d22-40c9-af25-d03cf1bf107c" id="_3f55cd6c-c5b1-4e16-814b-aa325740c647">
+                <dc:Bounds height="76.0" width="97.0" x="270.5" y="227.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+        </cmmndi:CMMNDiagram>
+        <cmmndi:CMMNStyle fontFamily="Arial,Helvetica,sans-serif" id="_6f1279f3-1c3a-4c47-9e68-b34a7dd1738e"/>
+    </cmmndi:CMMNDI>
+</cmmn:definitions>

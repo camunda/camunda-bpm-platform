@@ -35,11 +35,14 @@ var $ = require('jquery');
           '$invalid': true
         };
 
-        $scope.$watch('tasklistForm', function (value) {
-          if (value) {
-            showForm(container, value, formController.getParams());
+        $scope.$watch('asynchronousFormKey', function (formInfo) {
+          if (formInfo && formInfo.loaded) {            
+            showForm(container, formInfo, formController.getParams());
           }
-        });
+          if (formInfo && formInfo.failure) {
+            formController.notifyFormInitializationFailed(formInfo.error);
+          }
+        }, true);
 
         $scope.$watch(function() {
           return form && form.$valid;
