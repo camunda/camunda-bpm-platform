@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author roman.smirnov
@@ -243,6 +244,151 @@ public class ActivateJobTest extends PluggableProcessEngineTestCase {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  public void testActivationByIdUsingBuilder() {
+    // given
+
+    // a running process instance with a failed job
+    runtimeService.startProcessInstanceByKey("suspensionProcess",
+        Variables.createVariables().putValue("fail", true));
+
+    // suspended job definitions and corresponding jobs
+    managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
+
+    // the failed job
+    JobQuery jobQuery = managementService.createJobQuery();
+    Job job = jobQuery.singleResult();
+    assertTrue(job.isSuspended());
+
+    // when
+    // the job will be activated
+    managementService
+      .updateJobSuspensionState()
+      .byJobId(job.getId())
+      .activate();
+
+    // then
+    // the job should be active
+    assertEquals(1, jobQuery.active().count());
+    assertEquals(0, jobQuery.suspended().count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  public void testActivationByJobDefinitionIdUsingBuilder() {
+    // given
+
+    // a running process instance with a failed job
+    runtimeService.startProcessInstanceByKey("suspensionProcess",
+        Variables.createVariables().putValue("fail", true));
+
+    // suspended job definitions and corresponding jobs
+    managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
+
+    // the failed job
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertEquals(1, jobQuery.suspended().count());
+
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
+
+    // when
+    // the job will be activated
+    managementService
+      .updateJobSuspensionState()
+      .byJobDefinitionId(jobDefinition.getId())
+      .activate();
+
+    // then
+    // the job should be active
+    assertEquals(1, jobQuery.active().count());
+    assertEquals(0, jobQuery.suspended().count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  public void testActivationByProcessInstanceIdUsingBuilder() {
+    // given
+
+    // a running process instance with a failed job
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("suspensionProcess",
+        Variables.createVariables().putValue("fail", true));
+
+    // suspended job definitions and corresponding jobs
+    managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
+
+    // the failed job
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertEquals(1, jobQuery.suspended().count());
+
+    // when
+    // the job will be activated
+    managementService
+      .updateJobSuspensionState()
+      .byProcessInstanceId(processInstance.getId())
+      .activate();
+
+    // then
+    // the job should be active
+    assertEquals(1, jobQuery.active().count());
+    assertEquals(0, jobQuery.suspended().count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  public void testActivationByProcessDefinitionIdUsingBuilder() {
+    // given
+
+    // a running process instance with a failed job
+    runtimeService.startProcessInstanceByKey("suspensionProcess",
+        Variables.createVariables().putValue("fail", true));
+
+    // suspended job definitions and corresponding jobs
+    managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
+
+    // the failed job
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertEquals(1, jobQuery.suspended().count());
+
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    // when
+    // the job will be activated
+    managementService
+      .updateJobSuspensionState()
+      .byProcessDefinitionId(processDefinition.getId())
+      .activate();
+
+    // then
+    // the job should be active
+    assertEquals(1, jobQuery.active().count());
+    assertEquals(0, jobQuery.suspended().count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  public void testActivationByProcessDefinitionKeyUsingBuilder() {
+    // given
+
+    // a running process instance with a failed job
+    runtimeService.startProcessInstanceByKey("suspensionProcess",
+        Variables.createVariables().putValue("fail", true));
+
+    // suspended job definitions and corresponding jobs
+    managementService.suspendJobDefinitionByProcessDefinitionKey("suspensionProcess", true);
+
+    // the failed job
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertEquals(1, jobQuery.suspended().count());
+
+    // when
+    // the job will be activated
+    managementService
+      .updateJobSuspensionState()
+      .byProcessDefinitionKey("suspensionProcess")
+      .activate();
+
+    // then
+    // the job should be active
+    assertEquals(1, jobQuery.active().count());
+    assertEquals(0, jobQuery.suspended().count());
   }
 
 }

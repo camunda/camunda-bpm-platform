@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.test.api.multitenancy;
+package org.camunda.bpm.engine.test.api.multitenancy.suspensionstate;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.runtime.Job;
@@ -45,8 +46,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
   protected static final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
       .startEvent()
       .userTask()
+        .camundaAsyncBefore()
       .endEvent()
-      .done();
+    .done();
 
   @Override
   protected void setUp() throws Exception {
@@ -254,7 +256,7 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.suspended().count(), is(0L));
 
     // when execute the job to suspend the process definitions
-    Job job = managementService.createJobQuery().singleResult();
+    Job job = managementService.createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
 
     managementService.executeJob(job.getId());
@@ -276,7 +278,7 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.suspended().count(), is(0L));
 
     // when execute the job to suspend the process definition
-    Job job = managementService.createJobQuery().singleResult();
+    Job job = managementService.createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
 
     managementService.executeJob(job.getId());
@@ -299,7 +301,7 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.suspended().count(), is(0L));
 
     // when execute the job to suspend the process definition
-    Job job = managementService.createJobQuery().singleResult();
+    Job job = managementService.createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
 
     managementService.executeJob(job.getId());
@@ -323,7 +325,7 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.active().count(), is(0L));
 
     // when execute the job to activate the process definitions
-    Job job = managementService.createJobQuery().singleResult();
+    Job job = managementService.createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
 
     managementService.executeJob(job.getId());
@@ -347,7 +349,7 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.active().count(), is(0L));
 
     // when execute the job to activate the process definition
-    Job job = managementService.createJobQuery().singleResult();
+    Job job = managementService.createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
 
     managementService.executeJob(job.getId());
@@ -372,10 +374,105 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.active().count(), is(0L));
 
     // when execute the job to activate the process definition
-    Job job = managementService.createJobQuery().singleResult();
+    Job job = managementService.createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
 
     managementService.executeJob(job.getId());
+
+    assertThat(query.suspended().count(), is(2L));
+    assertThat(query.active().count(), is(1L));
+    assertThat(query.active().withoutTenantId().count(), is(1L));
+  }
+
+  public void testSuspendProcessDefinitionIncludingJobDefinitionsForAllTenants() {
+    // given activated jobs
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    assertThat(query.active().count(), is(3L));
+    assertThat(query.suspended().count(), is(0L));
+
+    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+      .suspend();
+
+    assertThat(query.active().count(), is(0L));
+    assertThat(query.suspended().count(), is(3L));
+  }
+
+  public void testSuspendProcessDefinitionIncludingJobDefinitionsForTenant() {
+    // given activated jobs
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    assertThat(query.active().count(), is(3L));
+    assertThat(query.suspended().count(), is(0L));
+
+    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+      .processDefinitionTenantId(TENANT_ONE)
+      .suspend();
+
+    assertThat(query.active().count(), is(2L));
+    assertThat(query.suspended().count(), is(1L));
+    assertThat(query.suspended().tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
+  public void testSuspendProcessDefinitionIncludingJobDefinitionsForNonTenant() {
+    // given activated jobs
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    assertThat(query.active().count(), is(3L));
+    assertThat(query.suspended().count(), is(0L));
+
+    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+      .processDefinitionWithoutTenantId()
+      .suspend();
+
+    assertThat(query.active().count(), is(2L));
+    assertThat(query.suspended().count(), is(1L));
+    assertThat(query.suspended().withoutTenantId().count(), is(1L));
+  }
+
+  public void testActivateProcessDefinitionIncludingJobDefinitionsForAllTenants() {
+    // given suspended jobs
+    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+      .suspend();
+
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    assertThat(query.active().count(), is(0L));
+    assertThat(query.suspended().count(), is(3L));
+
+    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+      .activate();
+
+    assertThat(query.suspended().count(), is(0L));
+    assertThat(query.active().count(), is(3L));
+  }
+
+  public void testActivateProcessDefinitionIncludingJobDefinitionsForTenant() {
+    // given suspended jobs
+    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+      .suspend();
+
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    assertThat(query.active().count(), is(0L));
+    assertThat(query.suspended().count(), is(3L));
+
+    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+      .processDefinitionTenantId(TENANT_ONE)
+      .activate();
+
+    assertThat(query.suspended().count(), is(2L));
+    assertThat(query.active().count(), is(1L));
+    assertThat(query.active().tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
+  public void testActivateProcessDefinitionIncludingJobDefinitionsForNonTenant() {
+    // given suspended jobs
+    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+      .suspend();
+
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    assertThat(query.active().count(), is(0L));
+    assertThat(query.suspended().count(), is(3L));
+
+    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+      .processDefinitionWithoutTenantId()
+      .activate();
 
     assertThat(query.suspended().count(), is(2L));
     assertThat(query.active().count(), is(1L));
@@ -395,7 +492,7 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
       fail("expected exception");
     } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
+      assertThat(e.getMessage(), containsString("Can only specify a tenant-id when update the suspension state which is referenced by process definition key"));
     }
   }
 
@@ -412,7 +509,7 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
       fail("expected exception");
     } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
+      assertThat(e.getMessage(), containsString("Can only specify a tenant-id when update the suspension state which is referenced by process definition key"));
     }
   }
 
@@ -429,7 +526,7 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
       fail("expected exception");
     } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
+      assertThat(e.getMessage(), containsString("Can only specify a tenant-id when update the suspension state which is referenced by process definition key"));
     }
   }
 
@@ -446,7 +543,7 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
       fail("expected exception");
     } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
+      assertThat(e.getMessage(), containsString("Can only specify a tenant-id when update the suspension state which is referenced by process definition key"));
     }
   }
 

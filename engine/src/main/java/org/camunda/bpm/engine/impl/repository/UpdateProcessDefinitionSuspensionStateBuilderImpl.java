@@ -91,7 +91,7 @@ public class UpdateProcessDefinitionSuspensionStateBuilderImpl implements Update
 
   protected void ensureEitherProcessDefinitionIdOrTenantId() {
     if(processDefinitionId != null && isTenantIdSet) {
-      throw LOG.exceptionUpdateProcessDefinitionSuspensionStateByIdAndTenant();
+      throw LOG.exceptionUpdateSuspensionStateForTenantOnlyByProcessDefinitionKey();
     }
   }
 

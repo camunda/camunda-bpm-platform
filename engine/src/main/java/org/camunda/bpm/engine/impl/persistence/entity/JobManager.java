@@ -279,6 +279,16 @@ public class JobManager extends AbstractManager {
   public void updateJobSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("isProcessDefinitionTenantIdSet", false);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", parameters);
+  }
+
+  public void updateJobSuspensionStateByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("isProcessDefinitionTenantIdSet", true);
+    parameters.put("processDefinitionTenantId", processDefinitionTenantId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", parameters);
   }
@@ -286,6 +296,17 @@ public class JobManager extends AbstractManager {
   public void updateStartTimerJobSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("isProcessDefinitionTenantIdSet", false);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    parameters.put("handlerType", TimerStartEventJobHandler.TYPE);
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", parameters);
+  }
+
+  public void updateStartTimerJobSuspensionStateByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("isProcessDefinitionTenantIdSet", true);
+    parameters.put("processDefinitionTenantId", processDefinitionTenantId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     parameters.put("handlerType", TimerStartEventJobHandler.TYPE);
     getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", parameters);

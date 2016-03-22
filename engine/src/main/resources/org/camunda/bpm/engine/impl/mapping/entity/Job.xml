@@ -38,7 +38,22 @@
         and PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
       </if>
       <if test="processDefinitionKey != null">
-        and PROCESS_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
+        <if test="!isProcessDefinitionTenantIdSet">      
+          and PROCESS_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
+        </if>
+        <if test="isProcessDefinitionTenantIdSet">
+          and PROCESS_DEF_ID_ IN (
+            SELECT ID_ 
+            FROM ${prefix}ACT_RE_PROCDEF PD
+            WHERE PD.KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
+            <if test="processDefinitionTenantId != null">
+              and PD.TENANT_ID_ = #{processDefinitionTenantId, jdbcType=VARCHAR}
+            </if>
+            <if test="processDefinitionTenantId == null">
+              and PD.TENANT_ID_ is null
+            </if>
+          )
+        </if>        
       </if>
       <if test="handlerType != null">
         and HANDLER_TYPE_ =  #{handlerType, jdbcType=VARCHAR}

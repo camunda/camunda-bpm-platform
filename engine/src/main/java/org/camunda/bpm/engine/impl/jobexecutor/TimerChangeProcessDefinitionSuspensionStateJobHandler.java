@@ -30,7 +30,7 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
   protected static final String JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY = "processDefinitionKey";
   protected static final String JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID = "processDefinitionTenantId";
 
-  private static final String JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES = "includeProcessInstances";
+  protected static final String JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES = "includeProcessInstances";
 
   public static String createJobHandlerConfigurationByProcessDefinitionId(String processDefinitionId, boolean includeProcessInstances) {
     JSONObject json = new JSONObject();

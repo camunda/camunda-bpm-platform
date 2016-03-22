@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskManager;
@@ -106,7 +107,35 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
         processDefinitionKey, propertyChange);
   }
 
+  protected UpdateJobSuspensionStateBuilderImpl createJobCommandBuilder() {
+    UpdateJobSuspensionStateBuilderImpl builder = new UpdateJobSuspensionStateBuilderImpl();
+
+    if (processInstanceId != null) {
+      builder.byProcessDefinitionId(processInstanceId);
+
+    } else if (processDefinitionId != null) {
+      builder.byProcessDefinitionId(processDefinitionId);
+
+    } else if (processDefinitionKey != null) {
+      builder.byProcessDefinitionKey(processDefinitionKey);
+
+      if (isTenantIdSet && tenantId != null) {
+        return builder.processDefinitionTenantId(tenantId);
+
+      } else if (isTenantIdSet) {
+        return builder.processDefinitionWithoutTenantId();
+      }
+    }
+    return builder;
+  }
+
   @Override
-  protected abstract AbstractSetJobStateCmd getNextCommand();
+  protected AbstractSetJobStateCmd getNextCommand() {
+    UpdateJobSuspensionStateBuilderImpl jobCommandBuilder = createJobCommandBuilder();
+
+    return getNextCommand(jobCommandBuilder);
+  }
+
+  protected abstract AbstractSetJobStateCmd getNextCommand(UpdateJobSuspensionStateBuilderImpl jobCommandBuilder);
 
 }

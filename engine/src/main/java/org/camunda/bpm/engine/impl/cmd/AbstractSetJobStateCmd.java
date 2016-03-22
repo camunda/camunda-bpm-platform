@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
@@ -33,21 +34,30 @@ public abstract class AbstractSetJobStateCmd extends AbstractSetStateCmd {
   protected String processDefinitionId;
   protected String processDefinitionKey;
 
-  public AbstractSetJobStateCmd(String jobId, String jobDefinitionId, String processInstanceId, String processDefinitionId, String processDefinitionKey) {
+  protected String processDefinitionTenantId;
+  protected boolean processDefinitionTenantIdSet = false;
+
+  public AbstractSetJobStateCmd(UpdateJobSuspensionStateBuilderImpl builder) {
     super(false, null);
-    this.jobId = jobId;
-    this.jobDefinitionId = jobDefinitionId;
-    this.processInstanceId = processInstanceId;
-    this.processDefinitionId = processDefinitionId;
-    this.processDefinitionKey = processDefinitionKey;
+
+    this.jobId = builder.getJobId();
+    this.jobDefinitionId = builder.getJobDefinitionId();
+    this.processInstanceId = builder.getProcessInstanceId();
+    this.processDefinitionId = builder.getProcessDefinitionId();
+    this.processDefinitionKey = builder.getProcessDefinitionKey();
+
+    this.processDefinitionTenantIdSet = builder.isProcessDefinitionTenantIdSet();
+    this.processDefinitionTenantId = builder.getProcessDefinitionTenantId();
   }
 
+  @Override
   protected void checkParameters(CommandContext commandContext) {
     if(jobId == null && jobDefinitionId == null && processInstanceId == null && processDefinitionId == null && processDefinitionKey == null) {
       throw new ProcessEngineException("Job id, job definition id, process instance id, process definition id nor process definition key cannot be null");
     }
   }
 
+  @Override
   protected void checkAuthorization(CommandContext commandContext) {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
 
@@ -104,30 +114,34 @@ public abstract class AbstractSetJobStateCmd extends AbstractSetStateCmd {
     }
   }
 
+  @Override
   protected void updateSuspensionState(CommandContext commandContext, SuspensionState suspensionState) {
     JobManager jobManager = commandContext.getJobManager();
 
     if (jobId != null) {
       jobManager.updateJobSuspensionStateById(jobId, suspensionState);
-    } else
 
-    if (jobDefinitionId != null) {
+    } else if (jobDefinitionId != null) {
       jobManager.updateJobSuspensionStateByJobDefinitionId(jobDefinitionId, suspensionState);
-    } else
 
-    if (processInstanceId != null) {
-        jobManager.updateJobSuspensionStateByProcessInstanceId(processInstanceId, suspensionState);
-    } else
+    } else if (processInstanceId != null) {
+      jobManager.updateJobSuspensionStateByProcessInstanceId(processInstanceId, suspensionState);
 
-    if (processDefinitionId != null) {
+    } else if (processDefinitionId != null) {
       jobManager.updateJobSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
-    } else
 
-    if (processDefinitionKey != null) {
-      jobManager.updateJobSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
+    } else if (processDefinitionKey != null) {
+
+      if (!processDefinitionTenantIdSet) {
+        jobManager.updateJobSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
+
+      } else {
+        jobManager.updateJobSuspensionStateByProcessDefinitionKeyAndTenantId(processDefinitionKey, processDefinitionTenantId, suspensionState);
+      }
     }
   }
 
+  @Override
   protected void logUserOperation(CommandContext commandContext) {
     PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, getNewSuspensionState().getName());
     commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), jobId, jobDefinitionId,

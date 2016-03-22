@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import org.camunda.bpm.engine.ManagementService;
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.management.UpdateJobSuspensionStateBuilder;
 import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-
-import javax.ws.rs.core.Response.Status;
 
 /**
  * @author roman.smirnov
@@ -29,6 +29,9 @@ public class JobSuspensionStateDto extends SuspensionStateDto {
   private String processInstanceId;
   private String processDefinitionId;
   private String processDefinitionKey;
+
+  private String processDefinitionTenantId;
+  private boolean processDefinitionWithoutTenantId;
 
   public String getJobId() {
     return jobId;
@@ -54,6 +57,15 @@ public class JobSuspensionStateDto extends SuspensionStateDto {
     this.processDefinitionKey = processDefinitionKey;
   }
 
+  public void setProcessDefinitionTenantId(String processDefinitionTenantId) {
+    this.processDefinitionTenantId = processDefinitionTenantId;
+  }
+
+  public void setProcessDefinitionWithoutTenantId(boolean processDefinitionWithoutTenantId) {
+    this.processDefinitionWithoutTenantId = processDefinitionWithoutTenantId;
+  }
+
+  @Override
   public void updateSuspensionState(ProcessEngine engine) {
     int params = (jobId != null ? 1 : 0)
                + (jobDefinitionId != null ? 1 : 0)
@@ -64,56 +76,41 @@ public class JobSuspensionStateDto extends SuspensionStateDto {
     if (params > 1) {
       String message = "Only one of jobId, jobDefinitionId, processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
-    }
 
-    ManagementService managementService = engine.getManagementService();
-
-    if (jobId != null) {
-      // activate/suspend job by id
-      if (getSuspended()) {
-        managementService.suspendJobById(jobId);
-      } else {
-        managementService.activateJobById(jobId);
-      }
-    } else
-
-    if (jobDefinitionId != null) {
-      // activate/suspend jobs by job definition id
-      if (getSuspended()) {
-        managementService.suspendJobByJobDefinitionId(jobDefinitionId);
-      } else {
-        managementService.activateJobByJobDefinitionId(jobDefinitionId);
-      }
-    } else
-
-    if (processInstanceId != null) {
-      // activate/suspend jobs by process instance id
-      if (getSuspended()) {
-        managementService.suspendJobByProcessInstanceId(processInstanceId);
-      } else {
-        managementService.activateJobByProcessInstanceId(processInstanceId);
-      }
-    } else
-
-    if (processDefinitionId != null) {
-      // activate/suspend jobs by process definition id
-      if (getSuspended()) {
-        managementService.suspendJobByProcessDefinitionId(processDefinitionId);
-      } else {
-        managementService.activateJobByProcessDefinitionId(processDefinitionId);
-      }
-    } else
-
-    if (processDefinitionKey != null) {
-      // activate/suspend jobs by process definition key
-      if (getSuspended()) {
-        managementService.suspendJobByProcessDefinitionKey(processDefinitionKey);
-      } else {
-        managementService.activateJobByProcessDefinitionKey(processDefinitionKey);
-      }
-    } else {
+    } else if(params == 0) {
       String message = "Either jobId, jobDefinitionId, processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
+    }
+
+    UpdateJobSuspensionStateBuilder updateJobSuspensionStateBuilder = engine.getManagementService().updateJobSuspensionState();
+
+    if (jobId != null) {
+      updateJobSuspensionStateBuilder.byJobId(jobId);
+
+    } else if (jobDefinitionId != null) {
+      updateJobSuspensionStateBuilder.byJobDefinitionId(jobDefinitionId);
+
+    } else if (processInstanceId != null) {
+      updateJobSuspensionStateBuilder.byProcessInstanceId(processInstanceId);
+
+    } else if (processDefinitionId != null) {
+      updateJobSuspensionStateBuilder.byProcessDefinitionId(processDefinitionId);
+
+    } else if (processDefinitionKey != null) {
+      updateJobSuspensionStateBuilder.byProcessDefinitionKey(processDefinitionKey);
+
+      if (processDefinitionTenantId != null) {
+        updateJobSuspensionStateBuilder.processDefinitionTenantId(processDefinitionTenantId);
+
+      } else if(processDefinitionWithoutTenantId) {
+        updateJobSuspensionStateBuilder.processDefinitionWithoutTenantId();
+      }
+    }
+
+    if(getSuspended()) {
+      updateJobSuspensionStateBuilder.suspend();
+    } else {
+      updateJobSuspensionStateBuilder.activate();
     }
   }
 

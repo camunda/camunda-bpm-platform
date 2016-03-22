@@ -12,8 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmd.AbstractSetJobDefinitionStateCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
 
@@ -26,6 +28,7 @@ public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler implemen
   protected static final String JOB_HANDLER_CFG_JOB_DEFINITION_ID = "jobDefinitionId";
   protected static final String JOB_HANDLER_CFG_PROCESS_DEFINITION_ID = "processDefinitionId";
   protected static final String JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY = "processDefinitionKey";
+  protected static final String JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID = "processDefinitionTenantId";
 
   protected static final String JOB_HANDLER_CFG_INCLUDE_JOBS = "includeJobs";
 
@@ -59,6 +62,22 @@ public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler implemen
     return json.toString();
   }
 
+  public static String createJobHandlerConfigurationByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId, boolean includeJobs) {
+    JSONObject json = new JSONObject();
+
+    json.put(JOB_HANDLER_CFG_BY, JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY);
+    json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY, processDefinitionKey);
+    json.put(JOB_HANDLER_CFG_INCLUDE_JOBS, includeJobs);
+
+    if (processDefinitionTenantId != null) {
+      json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID, processDefinitionTenantId);
+    } else {
+      json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID, JSONObject.NULL);
+    }
+
+    return json.toString();
+  }
+
   public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     AbstractSetJobDefinitionStateCmd cmd = getCommand(configuration);
     cmd.disableLogUserOperation();
@@ -83,6 +102,50 @@ public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler implemen
 
   protected String getBy(JSONObject configuration) {
     return configuration.getString(JOB_HANDLER_CFG_BY);
+  }
+
+  protected boolean isProcessDefinitionTenantIdSet(JSONObject config) {
+    return config.has(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID);
+  }
+
+  protected String getProcessDefinitionTenantId(JSONObject config) {
+    if (config.isNull(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID)) {
+      return null;
+    } else {
+      return config.getString(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID);
+    }
+  }
+
+  protected UpdateJobDefinitionSuspensionStateBuilderImpl createBuilder(JSONObject config) {
+    UpdateJobDefinitionSuspensionStateBuilderImpl builder = new UpdateJobDefinitionSuspensionStateBuilderImpl();
+
+    String by = getBy(config);
+
+    if (by.equals(JOB_HANDLER_CFG_JOB_DEFINITION_ID)) {
+      builder.byJobDefinitionId(getJobDefinitionId(config));
+
+    } else if (by.equals(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID)) {
+      builder.byProcessDefinitionId(getProcessDefinitionId(config));
+
+    } else if (by.equals(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY)) {
+      builder.byProcessDefinitionKey(getProcessDefinitionKey(config));
+
+      if (isProcessDefinitionTenantIdSet(config)) {
+        String processDefinitionTenantId = getProcessDefinitionTenantId(config);
+
+        if (processDefinitionTenantId != null) {
+          builder.processDefinitionTenantId(processDefinitionTenantId);
+
+        } else {
+          builder.processDefinitionWithoutTenantId();
+        }
+      }
+
+    } else {
+      throw new ProcessEngineException("Unexpected job handler configuration for property '" + JOB_HANDLER_CFG_BY + "': " + by);
+    }
+
+    return builder;
   }
 
   protected abstract AbstractSetJobDefinitionStateCmd getCommand(String configuration);

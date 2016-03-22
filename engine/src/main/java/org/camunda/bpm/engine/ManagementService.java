@@ -33,6 +33,8 @@ import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
 import org.camunda.bpm.engine.management.TablePageQuery;
+import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateBuilder;
+import org.camunda.bpm.engine.management.UpdateJobSuspensionStateBuilder;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
@@ -708,6 +710,27 @@ public interface ManagementService {
    *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void suspendJobByProcessDefinitionKey(String processDefinitionKey);
+
+  /**
+   * Activate or suspend jobs using a fluent builder. Specify the jobs by
+   * calling one of the <i>by</i> methods, like <i>byJobId</i>. To update the
+   * suspension state call {@link UpdateJobSuspensionStateBuilder#activate()} or
+   * {@link UpdateJobSuspensionStateBuilder#suspend()}.
+   *
+   * @return the builder to update the suspension state
+   */
+  UpdateJobSuspensionStateBuilder updateJobSuspensionState();
+
+  /**
+   * Activate or suspend job definitions using a fluent builder. Specify the job
+   * definitions by calling one of the <i>by</i> methods, like
+   * <i>byJobDefinitionId</i>. To update the suspension state call
+   * {@link UpdateJobDefinitionSuspensionStateBuilder#activate()} or
+   * {@link UpdateJobDefinitionSuspensionStateBuilder#suspend()}.
+   *
+   * @return the builder to update the suspension state
+   */
+  UpdateJobDefinitionSuspensionStateBuilder updateJobDefinitionSuspensionState();
 
   /**
    * Sets the number of retries that a job has left.

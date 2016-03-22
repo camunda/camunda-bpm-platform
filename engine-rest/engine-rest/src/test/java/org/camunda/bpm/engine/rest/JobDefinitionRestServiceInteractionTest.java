@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
+import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateBuilder;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.MockJobDefinitionBuilder;
@@ -59,6 +60,9 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
 
   private ProcessEngine namedProcessEngine;
   private ManagementService mockManagementService;
+
+  private UpdateJobDefinitionSuspensionStateBuilder mockSuspensionStateBuilder;
+
   private JobDefinitionQuery mockQuery;
 
   @Before
@@ -70,6 +74,9 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
 
     List<JobDefinition> mockJobDefinitions = Collections.singletonList(MockProvider.createMockJobDefinition());
     mockQuery = setUpMockJobDefinitionQuery(mockJobDefinitions);
+
+    mockSuspensionStateBuilder = mock(UpdateJobDefinitionSuspensionStateBuilder.class);
+    when(mockManagementService.updateJobDefinitionSuspensionState()).thenReturn(mockSuspensionStateBuilder);
   }
 
   private JobDefinitionQuery setUpMockJobDefinitionQuery(List<JobDefinition> mockedJobDefinitions) {
@@ -175,7 +182,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(SINGLE_JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).activateJobDefinitionById(MockProvider.EXAMPLE_JOB_DEFINITION_ID, false, null);
+    verify(mockSuspensionStateBuilder).byJobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -197,7 +205,10 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(SINGLE_JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).activateJobDefinitionById(MockProvider.EXAMPLE_JOB_DEFINITION_ID, false, executionDate);
+    verify(mockSuspensionStateBuilder).byJobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).executionDate(executionDate);
+    verify(mockSuspensionStateBuilder).includeJobs(false);
+    verify(mockSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -216,7 +227,9 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(SINGLE_JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).activateJobDefinitionById(MockProvider.EXAMPLE_JOB_DEFINITION_ID, true, null);
+    verify(mockSuspensionStateBuilder).byJobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).includeJobs(true);
+    verify(mockSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -238,7 +251,10 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(SINGLE_JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).activateJobDefinitionById(MockProvider.EXAMPLE_JOB_DEFINITION_ID, true, executionDate);
+    verify(mockSuspensionStateBuilder).byJobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).executionDate(executionDate);
+    verify(mockSuspensionStateBuilder).includeJobs(true);
+    verify(mockSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -250,8 +266,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
     String expectedMessage = "expectedMessage";
 
     doThrow(new ProcessEngineException(expectedMessage))
-      .when(mockManagementService)
-      .activateJobDefinitionById(eq(MockProvider.NON_EXISTING_JOB_DEFINITION_ID), eq(false), isNull(Date.class));
+      .when(mockSuspensionStateBuilder)
+      .activate();
 
     given()
       .pathParam("id", MockProvider.NON_EXISTING_JOB_DEFINITION_ID)
@@ -297,8 +313,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
 
     String expectedMessage = "expectedMessage";
     doThrow(new AuthorizationException(expectedMessage))
-      .when(mockManagementService)
-      .activateJobDefinitionById(eq(MockProvider.NON_EXISTING_JOB_DEFINITION_ID), eq(false), isNull(Date.class));
+      .when(mockSuspensionStateBuilder)
+      .activate();
 
     given()
       .pathParam("id", MockProvider.NON_EXISTING_JOB_DEFINITION_ID)
@@ -330,7 +346,9 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(SINGLE_JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).suspendJobDefinitionById(MockProvider.EXAMPLE_JOB_DEFINITION_ID, false, null);
+    verify(mockSuspensionStateBuilder).byJobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).includeJobs(false);
+    verify(mockSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -352,7 +370,10 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(SINGLE_JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).suspendJobDefinitionById(MockProvider.EXAMPLE_JOB_DEFINITION_ID, false, executionDate);
+    verify(mockSuspensionStateBuilder).byJobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).executionDate(executionDate);
+    verify(mockSuspensionStateBuilder).includeJobs(false);
+    verify(mockSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -371,7 +392,9 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(SINGLE_JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).suspendJobDefinitionById(MockProvider.EXAMPLE_JOB_DEFINITION_ID, true, null);
+    verify(mockSuspensionStateBuilder).byJobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).includeJobs(true);
+    verify(mockSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -393,7 +416,10 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(SINGLE_JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).suspendJobDefinitionById(MockProvider.EXAMPLE_JOB_DEFINITION_ID, true, executionDate);
+    verify(mockSuspensionStateBuilder).byJobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).executionDate(executionDate);
+    verify(mockSuspensionStateBuilder).includeJobs(true);
+    verify(mockSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -405,8 +431,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
     String expectedMessage = "expectedMessage";
 
     doThrow(new ProcessEngineException(expectedMessage))
-      .when(mockManagementService)
-      .suspendJobDefinitionById(eq(MockProvider.NON_EXISTING_JOB_DEFINITION_ID), eq(false), isNull(Date.class));
+      .when(mockSuspensionStateBuilder)
+      .suspend();
 
     given()
       .pathParam("id", MockProvider.NON_EXISTING_JOB_DEFINITION_ID)
@@ -474,8 +500,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
 
     String expectedMessage = "expectedMessage";
     doThrow(new AuthorizationException(expectedMessage))
-      .when(mockManagementService)
-      .suspendJobDefinitionById(eq(MockProvider.NON_EXISTING_JOB_DEFINITION_ID), eq(false), isNull(Date.class));
+      .when(mockSuspensionStateBuilder)
+      .suspend();
 
     given()
       .pathParam("id", MockProvider.NON_EXISTING_JOB_DEFINITION_ID)
@@ -506,7 +532,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).activateJobDefinitionByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, false, null);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -525,7 +552,9 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).activateJobDefinitionByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, true, null);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockSuspensionStateBuilder).includeJobs(true);
+    verify(mockSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -546,7 +575,9 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).activateJobDefinitionByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, false, executionDate);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockSuspensionStateBuilder).executionDate(executionDate);
+    verify(mockSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -568,7 +599,10 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).activateJobDefinitionByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, true, executionDate);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockSuspensionStateBuilder).executionDate(executionDate);
+    verify(mockSuspensionStateBuilder).includeJobs(true);
+    verify(mockSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -600,8 +634,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
 
     String expectedException = "expectedException";
     doThrow(new ProcessEngineException(expectedException))
-      .when(mockManagementService)
-      .activateJobDefinitionByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, false, null);
+      .when(mockSuspensionStateBuilder)
+      .activate();
 
     given()
       .contentType(ContentType.JSON)
@@ -623,8 +657,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
 
     String expectedException = "expectedException";
     doThrow(new AuthorizationException(expectedException))
-      .when(mockManagementService)
-      .activateJobDefinitionByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, false, null);
+      .when(mockSuspensionStateBuilder)
+      .activate();
 
     given()
       .contentType(ContentType.JSON)
@@ -636,6 +670,48 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
         .body("message", is(expectedException))
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testActivateJobDefinitionByProcessDefinitionKeyAndTenantId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(JOB_DEFINITION_SUSPENDED_URL);
+
+    verify(mockSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockSuspensionStateBuilder).processDefinitionTenantId(MockProvider.EXAMPLE_TENANT_ID);
+    verify(mockSuspensionStateBuilder).activate();
+  }
+
+  @Test
+  public void testActivateJobDefinitionByProcessDefinitionKeyWithoutTenantId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionWithoutTenantId", true);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(JOB_DEFINITION_SUSPENDED_URL);
+
+    verify(mockSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockSuspensionStateBuilder).processDefinitionWithoutTenantId();
+    verify(mockSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -653,7 +729,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).suspendJobDefinitionByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, false, null);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -672,7 +749,9 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).suspendJobDefinitionByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, true, null);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockSuspensionStateBuilder).includeJobs(true);
+    verify(mockSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -693,7 +772,9 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).suspendJobDefinitionByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, false, executionDate);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockSuspensionStateBuilder).executionDate(executionDate);
+    verify(mockSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -715,7 +796,10 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).suspendJobDefinitionByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, true, executionDate);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockSuspensionStateBuilder).executionDate(executionDate);
+    verify(mockSuspensionStateBuilder).includeJobs(true);
+    verify(mockSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -747,8 +831,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
 
     String expectedException = "expectedException";
     doThrow(new ProcessEngineException(expectedException))
-      .when(mockManagementService)
-      .suspendJobDefinitionByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, false, null);
+      .when(mockSuspensionStateBuilder)
+      .suspend();
 
     given()
       .contentType(ContentType.JSON)
@@ -770,8 +854,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
 
     String expectedException = "expectedException";
     doThrow(new AuthorizationException(expectedException))
-      .when(mockManagementService)
-      .suspendJobDefinitionByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, false, null);
+      .when(mockSuspensionStateBuilder)
+      .suspend();
 
     given()
       .contentType(ContentType.JSON)
@@ -783,6 +867,48 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
         .body("message", is(expectedException))
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testSuspendJobDefinitionByProcessDefinitionKeyAndTenantId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(JOB_DEFINITION_SUSPENDED_URL);
+
+    verify(mockSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockSuspensionStateBuilder).processDefinitionTenantId(MockProvider.EXAMPLE_TENANT_ID);
+    verify(mockSuspensionStateBuilder).suspend();
+  }
+
+  @Test
+  public void testSuspendJobDefinitionByProcessDefinitionKeyWithoutTenantId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionWithoutTenantId", true);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(JOB_DEFINITION_SUSPENDED_URL);
+
+    verify(mockSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockSuspensionStateBuilder).processDefinitionWithoutTenantId();
+    verify(mockSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -800,7 +926,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).activateJobDefinitionByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, null);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -819,7 +946,9 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).activateJobDefinitionByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, true, null);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).includeJobs(true);
+    verify(mockSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -840,7 +969,9 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).activateJobDefinitionByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, executionDate);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).executionDate(executionDate);
+    verify(mockSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -862,7 +993,10 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).activateJobDefinitionByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, true, executionDate);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).executionDate(executionDate);
+    verify(mockSuspensionStateBuilder).includeJobs(true);
+    verify(mockSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -894,8 +1028,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
 
     String expectedException = "expectedException";
     doThrow(new ProcessEngineException(expectedException))
-      .when(mockManagementService)
-      .activateJobDefinitionByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, null);
+      .when(mockSuspensionStateBuilder)
+      .activate();
 
     given()
       .contentType(ContentType.JSON)
@@ -917,8 +1051,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
 
     String expectedException = "expectedException";
     doThrow(new AuthorizationException(expectedException))
-      .when(mockManagementService)
-      .activateJobDefinitionByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, null);
+      .when(mockSuspensionStateBuilder)
+      .activate();
 
     given()
       .contentType(ContentType.JSON)
@@ -947,7 +1081,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).suspendJobDefinitionByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, null);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -966,7 +1101,9 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).suspendJobDefinitionByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, true, null);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).includeJobs(true);
+    verify(mockSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -987,7 +1124,9 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).suspendJobDefinitionByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, executionDate);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).executionDate(executionDate);
+    verify(mockSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -1009,7 +1148,10 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
 
-    verify(mockManagementService).suspendJobDefinitionByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, true, executionDate);
+    verify(mockSuspensionStateBuilder).byProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(mockSuspensionStateBuilder).executionDate(executionDate);
+    verify(mockSuspensionStateBuilder).includeJobs(true);
+    verify(mockSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -1041,8 +1183,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
 
     String expectedException = "expectedException";
     doThrow(new ProcessEngineException(expectedException))
-      .when(mockManagementService)
-      .suspendJobDefinitionByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, null);
+      .when(mockSuspensionStateBuilder)
+      .suspend();
 
     given()
       .contentType(ContentType.JSON)
@@ -1064,8 +1206,8 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
 
     String expectedException = "expectedException";
     doThrow(new AuthorizationException(expectedException))
-      .when(mockManagementService)
-      .suspendJobDefinitionByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, null);
+      .when(mockSuspensionStateBuilder)
+      .suspend();
 
     given()
       .contentType(ContentType.JSON)

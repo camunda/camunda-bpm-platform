@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
+import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
 
@@ -39,8 +40,8 @@ public class ActivateProcessDefinitionCmd extends AbstractSetProcessDefinitionSt
   }
 
   @Override
-  protected AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd() {
-    return new ActivateJobDefinitionCmd(null, processDefinitionId, processDefinitionKey, false, null);
+  protected AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd(UpdateJobDefinitionSuspensionStateBuilderImpl jobDefinitionSuspensionStateBuilder) {
+    return new ActivateJobDefinitionCmd(jobDefinitionSuspensionStateBuilder);
   }
 
   @Override

@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler;
+import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
@@ -94,12 +95,32 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
 
     commandContext.runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
-        AbstractSetJobDefinitionStateCmd jobDefinitionCmd = getSetJobDefinitionStateCmd();
+        UpdateJobDefinitionSuspensionStateBuilderImpl jobDefinitionSuspensionStateBuilder = createJobDefinitionCommandBuilder();
+        AbstractSetJobDefinitionStateCmd jobDefinitionCmd = getSetJobDefinitionStateCmd(jobDefinitionSuspensionStateBuilder);
         jobDefinitionCmd.disableLogUserOperation();
         jobDefinitionCmd.execute(commandContext);
         return null;
       }
     });
+  }
+
+  protected UpdateJobDefinitionSuspensionStateBuilderImpl createJobDefinitionCommandBuilder() {
+    UpdateJobDefinitionSuspensionStateBuilderImpl jobDefinitionBuilder = new UpdateJobDefinitionSuspensionStateBuilderImpl();
+
+    if (processDefinitionId != null) {
+      jobDefinitionBuilder.byProcessDefinitionId(processDefinitionId);
+
+    } else if (processDefinitionKey != null) {
+      jobDefinitionBuilder.byProcessDefinitionKey(processDefinitionKey);
+
+      if (isTenantIdSet && tenantId != null) {
+        jobDefinitionBuilder.processDefinitionTenantId(tenantId);
+
+      } else if (isTenantIdSet) {
+        jobDefinitionBuilder.processDefinitionWithoutTenantId();
+      }
+    }
+    return jobDefinitionBuilder;
   }
 
   @Override
@@ -141,8 +162,9 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
   /**
    * Subclasses should return the type of the {@link AbstractSetJobDefinitionStateCmd} here.
    * It will be used to suspend or activate the {@link JobDefinition}s.
+   * @param jobDefinitionSuspensionStateBuilder
    */
-  protected abstract AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd();
+  protected abstract AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd(UpdateJobDefinitionSuspensionStateBuilderImpl jobDefinitionSuspensionStateBuilder);
 
   @Override
   protected abstract AbstractSetProcessInstanceStateCmd getNextCommand();

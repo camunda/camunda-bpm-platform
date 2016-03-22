@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 
 /**
@@ -35,8 +36,8 @@ public class SuspendProcessInstanceCmd extends AbstractSetProcessInstanceStateCm
   }
 
   @Override
-  protected SuspendJobCmd getNextCommand() {
-    return new SuspendJobCmd(null, null, processInstanceId, processDefinitionId, processDefinitionKey);
+  protected SuspendJobCmd getNextCommand(UpdateJobSuspensionStateBuilderImpl jobCommandBuilder) {
+    return new SuspendJobCmd(jobCommandBuilder);
   }
 
   @Override
