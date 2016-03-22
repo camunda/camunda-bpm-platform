@@ -10,20 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.core.variable;
+package org.camunda.bpm.engine.impl.core.variable.scope;
 
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * @author Daniel Meyer
+ * @author Thorben Lindhauer
  *
  */
-public interface CoreVariableInstance {
+public interface VariableInstanceFactory<T extends CoreVariableInstance> {
 
-  String getName();
-
-  TypedValue getTypedValue(boolean deserializeValue);
-
-  void setValue(TypedValue typedValue);
-
+  T build(String name, TypedValue value, boolean isTransient);
 }

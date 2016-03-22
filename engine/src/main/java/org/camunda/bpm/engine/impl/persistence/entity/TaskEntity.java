@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -39,8 +40,14 @@ import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableListenerInvocationListener;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariableStoreObserver;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariablesProvider;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
@@ -51,7 +58,6 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.task.delegate.TaskListenerInvocation;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.IdentityLink;
@@ -67,7 +73,7 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  * @author Joram Barrez
  * @author Falko Menge
  */
-public class TaskEntity extends AbstractVariableScope implements Task, DelegateTask, Serializable, DbEntity, HasDbRevision, CommandContextListener {
+public class TaskEntity extends AbstractVariableScope implements Task, DelegateTask, Serializable, DbEntity, HasDbRevision, CommandContextListener, VariablesProvider<VariableInstanceEntity> {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
@@ -124,7 +130,11 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   protected boolean isFormKeyInitialized = false;
   protected String formKey;
 
-  protected transient AbstractPersistentVariableStore variableStore;
+  @SuppressWarnings({ "unchecked" })
+  protected transient VariableStore<VariableInstanceEntity> variableStore
+    = new VariableStore<VariableInstanceEntity>(this, Arrays.<VariableStoreObserver<VariableInstanceEntity>>asList(
+        new TaskEntityReferencer(this)));
+
 
   protected transient boolean skipCustomListeners = false;
 
@@ -152,7 +162,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   public TaskEntity(String taskId) {
     this.id = taskId;
-    this.variableStore = createVariableStore();
   }
 
   /** creates and initializes a new persistent task. */
@@ -452,13 +461,35 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   // variables ////////////////////////////////////////////////////////////////
 
-  protected AbstractPersistentVariableStore createVariableStore() {
-    return new TaskEntityVariableStore(this);
+  @Override
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected VariableStore<CoreVariableInstance> getVariableStore() {
+    return (VariableStore) variableStore;
   }
 
   @Override
-  protected CoreVariableStore getVariableStore() {
-    return variableStore;
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected VariableInstanceFactory<CoreVariableInstance> getVariableInstanceFactory() {
+    return (VariableInstanceFactory) VariableInstanceEntityFactory.INSTANCE;
+  }
+
+  @Override
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners(AbstractVariableScope sourceScope) {
+    return Arrays.<VariableInstanceLifecycleListener<CoreVariableInstance>>asList(
+        (VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE,
+        (VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE,
+        (VariableInstanceLifecycleListener) VariableInstanceHistoryListener.INSTANCE,
+        (VariableInstanceLifecycleListener) VariableListenerInvocationListener.INSTANCE
+      );
+  }
+
+  @Override
+  public Collection<VariableInstanceEntity> provideVariables() {
+    return Context
+        .getCommandContext()
+        .getVariableInstanceManager()
+        .findVariableInstancesByTaskId(id);
   }
 
   @Override
@@ -470,13 +501,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       return caseExecution;
     }
     return null;
-  }
-
-  protected List<VariableInstanceEntity> loadVariableInstances() {
-    return Context
-      .getCommandContext()
-      .getVariableInstanceManager()
-      .findVariableInstancesByTaskId(id);
   }
 
   @Override
@@ -1275,14 +1299,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   }
 
   public Collection<VariableInstanceEntity> getVariablesInternal() {
-    Map<String, VariableInstanceEntity> rawVariables = variableStore.getVariableInstancesWithoutInitialization();
-
-    if (rawVariables != null) {
-      return rawVariables.values();
-    }
-    else {
-      return null;
-    }
+    return variableStore.getVariables();
   }
 
   @Override
@@ -1354,5 +1371,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       processEngineConfiguration.getMetricsRegistry().markOccurrence(Metrics.ACTIVTY_INSTANCE_START);
     }
   }
+
 
 }

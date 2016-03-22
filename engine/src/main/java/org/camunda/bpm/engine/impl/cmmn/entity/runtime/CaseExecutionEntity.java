@@ -16,6 +16,8 @@ import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTI
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +36,14 @@ import org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
-import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableListenerInvocationListener;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariableStoreObserver;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariablesProvider;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
@@ -44,9 +53,14 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.CmmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.CaseExecutionEntityReferencer;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntityFactory;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntityPersistenceListener;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceHistoryListener;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceSequenceCounterListener;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
@@ -61,7 +75,7 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  * @author Roman Smirnov
  *
  */
-public class CaseExecutionEntity extends CmmnExecution implements CaseExecution, CaseInstance, DbEntity, HasDbRevision, HasDbReferences {
+public class CaseExecutionEntity extends CmmnExecution implements CaseExecution, CaseInstance, DbEntity, HasDbRevision, HasDbReferences, VariablesProvider<VariableInstanceEntity> {
 
   private static final long serialVersionUID = 1L;
 
@@ -92,7 +106,11 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   // associated entities /////////////////////////////////////////////////////
 
-  protected CaseExecutionEntityVariableStore variableStore = new CaseExecutionEntityVariableStore(this);
+  @SuppressWarnings({ "unchecked" })
+  protected VariableStore<VariableInstanceEntity> variableStore = new VariableStore<VariableInstanceEntity>(
+      this,
+      Arrays.<VariableStoreObserver<VariableInstanceEntity>>asList(
+          new CaseExecutionEntityReferencer(this)));
 
   // Persistence //////////////////////////////////////////////////////////////
 
@@ -613,15 +631,34 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   // variables //////////////////////////////////////////////////////////////
 
-  protected CoreVariableStore getVariableStore() {
-    return variableStore;
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected VariableStore<CoreVariableInstance> getVariableStore() {
+    return (VariableStore) variableStore;
   }
 
-  protected List<VariableInstanceEntity> loadVariableInstances() {
+  @Override
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected VariableInstanceFactory<CoreVariableInstance> getVariableInstanceFactory() {
+    return (VariableInstanceFactory) VariableInstanceEntityFactory.INSTANCE;
+  }
+
+  @Override
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners(AbstractVariableScope sourceScope) {
+    return Arrays.<VariableInstanceLifecycleListener<CoreVariableInstance>>asList(
+        (VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE,
+        (VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE,
+        (VariableInstanceLifecycleListener) VariableInstanceHistoryListener.INSTANCE,
+        (VariableInstanceLifecycleListener) VariableListenerInvocationListener.INSTANCE
+      );
+  }
+
+  @Override
+  public Collection<VariableInstanceEntity> provideVariables() {
     return Context
-        .getCommandContext()
-        .getVariableInstanceManager()
-        .findVariableInstancesByCaseExecutionId(id);
+      .getCommandContext()
+      .getVariableInstanceManager()
+      .findVariableInstancesByCaseExecutionId(id);
   }
 
   // toString /////////////////////////////////////////////////////////////
@@ -640,10 +677,15 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   // delete/remove ///////////////////////////////////////////////////////
 
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void remove() {
     super.remove();
 
-    variableStore.removeVariablesWithoutFiringEvents();
+    for (VariableInstanceEntity variableInstance : variableStore.getVariables()) {
+      invokeVariableLifecycleListenersDelete(variableInstance, this,
+          Arrays.<VariableInstanceLifecycleListener<CoreVariableInstance>>asList((VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE));
+      variableStore.removeVariable(variableInstance.getName());
+    }
 
     CommandContext commandContext = Context.getCommandContext();
 

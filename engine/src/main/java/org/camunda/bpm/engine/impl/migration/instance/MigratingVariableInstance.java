@@ -37,11 +37,7 @@ public class MigratingVariableInstance implements MigratingInstance {
 
   @Override
   public void detachState() {
-    // TODO: also manage the variable sets in the execution entities
-    // TODO: das doppelte Verketten irgendwie konsolidieren (auch son Zeug wie initializeBackpointer in dem Variable store)
     variable.getExecution().removeVariableInternal(variable);
-
-    variable.setExecution(null);
   }
 
   @Override

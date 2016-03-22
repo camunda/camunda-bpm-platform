@@ -12,9 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.core;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 
 /**
@@ -41,6 +43,14 @@ public class CoreLogger extends ProcessEngineLogger {
     logDebug(
         "003",
         "Performing atomic operation {} on {}", atomicOperation, e);
+  }
+
+  public ProcessEngineException duplicateVariableInstanceException(CoreVariableInstance variableInstance) {
+    return new ProcessEngineException(exceptionMessage(
+        "004",
+        "Cannot add variable instance with name {}. Variable already exists",
+        variableInstance.getName()
+      ));
   }
 
 }

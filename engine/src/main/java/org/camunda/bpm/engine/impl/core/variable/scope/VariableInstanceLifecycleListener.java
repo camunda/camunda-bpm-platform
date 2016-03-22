@@ -10,20 +10,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.core.variable;
+package org.camunda.bpm.engine.impl.core.variable.scope;
 
-import org.camunda.bpm.engine.variable.value.TypedValue;
+
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 
 /**
- * @author Daniel Meyer
+ * @author Thorben Lindhauer
  *
  */
-public interface CoreVariableInstance {
+public interface VariableInstanceLifecycleListener<T extends CoreVariableInstance> {
 
-  String getName();
+  void onCreate(T variableInstance, AbstractVariableScope sourceScope);
 
-  TypedValue getTypedValue(boolean deserializeValue);
+  void onDelete(T variableInstance, AbstractVariableScope sourceScope);
 
-  void setValue(TypedValue typedValue);
-
+  void onUpdate(T variableInstance, AbstractVariableScope sourceScope);
 }

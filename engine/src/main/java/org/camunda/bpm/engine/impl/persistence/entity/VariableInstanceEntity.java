@@ -111,8 +111,15 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     typedValueField.addImplicitUpdateListener(this);
   }
 
+  public VariableInstanceEntity(String name, TypedValue value, boolean isTransient) {
+    this();
+    this.name = name;
+    this.isTransient = isTransient;
+    typedValueField.setValue(value);
+  }
+
   public static VariableInstanceEntity createAndInsert(String name, TypedValue value) {
-    VariableInstanceEntity variableInstance = create(name, value);
+    VariableInstanceEntity variableInstance = create(name, value, false);
     insert(variableInstance);
 
     return variableInstance;
@@ -125,12 +132,8 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     .insert(variableInstance);
   }
 
-  public static VariableInstanceEntity create(String name, TypedValue value) {
-    VariableInstanceEntity variableInstance = new VariableInstanceEntity();
-    variableInstance.name = name;
-    variableInstance.setValue(value);
-
-    return variableInstance;
+  public static VariableInstanceEntity create(String name, TypedValue value, boolean isTransient) {
+    return new VariableInstanceEntity(name, value, isTransient);
   }
 
   public void delete() {
@@ -199,8 +202,14 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public void setCaseExecution(CaseExecutionEntity caseExecution) {
-    this.caseInstanceId = caseExecution.getCaseInstanceId();
-    this.caseExecutionId = caseExecution.getId();
+    if (caseExecution != null) {
+      this.caseInstanceId = caseExecution.getCaseInstanceId();
+      this.caseExecutionId = caseExecution.getId();
+    }
+    else {
+      this.caseInstanceId = null;
+      this.caseExecutionId = null;
+    }
   }
 
   // byte array value /////////////////////////////////////////////////////////
@@ -247,11 +256,15 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     return typedValueField.getTypedValue(deserializeValue);
   }
 
-  public TypedValue setValue(TypedValue value) {
+  public void setValue(TypedValue value) {
+    if(isTransient()) {
+      throw LOG.updateTransientVariableException(getName());
+    }
+
     // clear value fields
     clearValueFields();
 
-    return typedValueField.setValue(value);
+    typedValueField.setValue(value);
   }
 
   public void clearValueFields() {
@@ -417,15 +430,25 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public void setTask(TaskEntity task) {
-    this.taskId = task.getId();
-    this.tenantId = task.getTenantId();
+    if (task != null) {
+      this.taskId = task.getId();
+      this.tenantId = task.getTenantId();
 
-    if (task.getExecution() != null) {
-      setExecution(task.getExecution());
+      if (task.getExecution() != null) {
+        setExecution(task.getExecution());
+      }
+      if (task.getCaseExecution() != null) {
+        setCaseExecution(task.getCaseExecution());
+      }
     }
-    if (task.getCaseExecution() != null) {
-      setCaseExecution(task.getCaseExecution());
+    else {
+      this.taskId = null;
+      this.tenantId = null;
+      setExecution(null);
+      setCaseExecution(null);
     }
+
+
   }
 
   public String getActivityInstanceId() {

@@ -10,20 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.core.variable;
+package org.camunda.bpm.engine.impl.persistence.entity;
 
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-
 /**
- * @author Daniel Meyer
+ * @author Thorben Lindhauer
  *
  */
-public interface CoreVariableInstance {
+public class VariableInstanceEntityFactory implements VariableInstanceFactory<VariableInstanceEntity> {
 
-  String getName();
+  public static final VariableInstanceEntityFactory INSTANCE = new VariableInstanceEntityFactory();
 
-  TypedValue getTypedValue(boolean deserializeValue);
-
-  void setValue(TypedValue typedValue);
+  @Override
+  public VariableInstanceEntity build(String name, TypedValue value, boolean isTransient) {
+    return VariableInstanceEntity.create(name, value, isTransient);
+  }
 
 }
