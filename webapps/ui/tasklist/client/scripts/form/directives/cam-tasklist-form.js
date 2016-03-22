@@ -7,7 +7,8 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
   var EMBEDDED_KEY = 'embedded:',
       APP_KEY = 'app:',
-      ENGINE_KEY = 'engine:';
+      ENGINE_KEY = 'engine:',
+      DEPLOYMENT_KEY = 'deployment:';
 
   function compact(arr) {
     var a = [];
@@ -67,10 +68,16 @@ var angular = require('camunda-commons-ui/vendor/angular');
       controller: [
         '$scope',
         'Uri',
+        'camAPI',
       function(
         $scope,
-        Uri
+        Uri,
+        camAPI
       ) {
+
+        var processDefinitionResource = camAPI.resource('process-definition');
+        var caseDefinitionResource = camAPI.resource('case-definition');
+        var deploymentResource = camAPI.resource('deployment');
 
         // setup //////////////////////////////////////////////////////////////////
 
@@ -91,11 +98,30 @@ var angular = require('camunda-commons-ui/vendor/angular');
           }
         });
 
+        $scope.asynchronousFormKey = {
+          loaded: false,
+          failure: false
+        };
+
+        function setAsynchronousFormKeyFailure(err) {
+           $scope.asynchronousFormKey.failure = true;
+           $scope.asynchronousFormKey.error = err;
+        }
+
+        function setAsynchronousFormKey(formKey) {
+            $scope.asynchronousFormKey.key = formKey;
+            $scope.asynchronousFormKey.loaded = true;
+        }
+
         function parseForm(form) {
           var key = form.key,
               applicationContextPath = form.contextPath;
 
           // structure may be [embedded:][app:]formKey
+          // structure may be [embedded:][deployment:]formKey
+
+          // structure may be [app:]formKey
+          // structure may be [deployment:]formKey
 
           if (!key) {
             form.type = 'generic';
@@ -115,12 +141,62 @@ var angular = require('camunda-commons-ui/vendor/angular');
                 .join('/')
                 // prevents multiple "/" in the URI
                 .replace(/\/([\/]+)/, '/');
+              setAsynchronousFormKey(key);
             }
           }
 
-          if(key.indexOf(ENGINE_KEY) === 0) {
+          else if (key.indexOf(DEPLOYMENT_KEY) === 0) {
+            var resourceName = key.substring(DEPLOYMENT_KEY.length);
+
+            function loadResourceInDeployment(deploymentId)  {
+              deploymentResource.getResources(deploymentId, function(err, resourcesData) {
+                if (err) {
+                  setAsynchronousFormKeyFailure(err);
+                } else {
+                  var resourceFound = false;
+                  // Find the resource with the given name from the list of all resources of a deployment
+                  for (var index = 0; index < resourcesData.length; ++index) {
+                    if (resourcesData[index].name === resourceName) {
+                      key = Uri.appUri('engine://engine/:engine/deployment/' + deploymentId + '/resources/' + resourcesData[index].id + '/data');
+                      setAsynchronousFormKey(key);
+                      resourceFound = true;
+                      break;
+                    }
+                  }
+                  if (!resourceFound) {
+                    setAsynchronousFormKeyFailure(new Error("Resource " + resourceName + " not found in deployment"));
+                  }
+                }
+              });
+            }
+
+            if ($scope.params.processDefinitionId) {
+              processDefinitionResource.get($scope.params.processDefinitionId, function(err, deploymentData) {
+                if (err) {
+                  setAsynchronousFormKeyFailure(err);
+                } else {
+                  loadResourceInDeployment(deploymentData.deploymentId);
+                }
+              });
+            } else if ($scope.params.caseDefinitionId) {
+              caseDefinitionResource.get($scope.params.caseDefinitionId, function(err, deploymentData) {
+                if (err) {
+                  setAsynchronousFormKeyFailure(err);
+                } else {
+                  loadResourceInDeployment(deploymentData.deploymentId);
+                }
+              });
+            }
+          }
+
+          else if(key.indexOf(ENGINE_KEY) === 0) {
             // resolve relative prefix
             key = Uri.appUri(key);
+            setAsynchronousFormKey(key);
+          }
+
+          else {
+            setAsynchronousFormKey(key);
           }
 
           form.key = key;

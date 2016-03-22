@@ -298,6 +298,13 @@ public class DevProcessApplication extends ServletProcessApplication {
 
     // create invoice demo data
     new InvoiceDemoDataGenerator().createDemoData(engine);
+    
+    // create task with form from deployment
+    engine.getRuntimeService().startProcessInstanceByKey("process-with-deployment-form");
+    engine.getRuntimeService().startProcessInstanceByKey("process-with-invalid-form");
+    engine.getRuntimeService().startProcessInstanceByKey("process-with-http-form");
+    
+    engine.getCaseService().createCaseInstanceByKey("case-with-deployment-form");
   }
 
   private Date createArtificalDate(int offset) {

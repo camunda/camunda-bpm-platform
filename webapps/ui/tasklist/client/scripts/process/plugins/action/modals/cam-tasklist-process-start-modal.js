@@ -148,12 +148,14 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
       var processDefinitionId = processDefinition.id;
       var processDefinitionKey = processDefinition.key;
+      var deploymentId = processDefinition.deploymentId;
 
       $scope.options = angular.copy(DEFAULT_OPTIONS);
 
       $scope.params = {
         processDefinitionId : processDefinitionId,
-        processDefinitionKey : processDefinitionKey
+        processDefinitionKey : processDefinitionKey,
+        deploymentId : deploymentId
       };
 
       processStartData.set('currentProcessDefinitionId', {
