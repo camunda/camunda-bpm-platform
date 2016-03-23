@@ -63,8 +63,8 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     }
 
     protected SuspendProcessDefinitionCmd createSuspendCommand() {
-      UpdateProcessDefinitionSuspensionStateBuilderImpl builder = UpdateProcessDefinitionSuspensionStateBuilderImpl
-          .byId(null, processDefinitionId)
+      UpdateProcessDefinitionSuspensionStateBuilderImpl builder = new UpdateProcessDefinitionSuspensionStateBuilderImpl()
+          .byProcessDefinitionId(processDefinitionId)
           .includeProcessInstances(true);
 
       return new SuspendProcessDefinitionCmd(builder);

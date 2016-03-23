@@ -69,14 +69,18 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.suspended().count(), is(0L));
 
     // first suspend
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
 
     // then activate
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .activate();
 
     assertThat(query.active().count(), is(3L));
@@ -89,7 +93,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
       .suspend();
 
@@ -104,7 +110,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
       .suspend();
 
@@ -115,14 +123,18 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
   public void testActivateProcessDefinitionForTenant() {
     // given suspend process definitions
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
     assertThat(query.suspended().count(), is(3L));
     assertThat(query.active().count(), is(0L));
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
       .activate();
 
@@ -133,14 +145,18 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
   public void testActivateProcessDefinitionForNonTenant() {
     // given suspend process definitions
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
     assertThat(query.suspended().count(), is(3L));
     assertThat(query.active().count(), is(0L));
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
       .activate();
 
@@ -156,7 +172,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.suspended().count(), is(0L));
 
     // first suspend
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .includeProcessInstances(true)
       .suspend();
 
@@ -164,7 +182,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.suspended().count(), is(3L));
 
     // then activate
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .includeProcessInstances(true)
       .activate();
 
@@ -178,7 +198,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
       .includeProcessInstances(true)
       .suspend();
@@ -194,7 +216,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
       .includeProcessInstances(true)
       .suspend();
@@ -206,7 +230,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
   public void testActivateProcessDefinitionIncludeInstancesForTenant() {
     // given suspended process instances
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .includeProcessInstances(true)
       .suspend();
 
@@ -214,7 +240,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.suspended().count(), is(3L));
     assertThat(query.active().count(), is(0L));
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
       .includeProcessInstances(true)
       .activate();
@@ -226,7 +254,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
   public void testActivateProcessDefinitionIncludeInstancesForNonTenant() {
     // given suspended process instances
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .includeProcessInstances(true)
       .suspend();
 
@@ -234,7 +264,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.suspended().count(), is(3L));
     assertThat(query.active().count(), is(0L));
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
       .includeProcessInstances(true)
       .activate();
@@ -247,7 +279,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
   public void testDelayedSuspendProcessDefinitionsForAllTenants() {
     // given activated process definitions
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .executionDate(tomorrow())
       .suspend();
 
@@ -268,7 +302,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
   public void testDelayedSuspendProcessDefinitionsForTenant() {
     // given activated process definitions
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
       .executionDate(tomorrow())
       .suspend();
@@ -291,7 +327,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
   public void testDelayedSuspendProcessDefinitionsForNonTenant() {
     // given activated process definitions
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
       .executionDate(tomorrow())
       .suspend();
@@ -313,10 +351,14 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
   public void testDelayedActivateProcessDefinitionsForAllTenants() {
     // given suspended process definitions
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .executionDate(tomorrow())
       .activate();
 
@@ -336,10 +378,14 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
   public void testDelayedActivateProcessDefinitionsForTenant() {
     // given suspended process definitions
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
       .executionDate(tomorrow())
       .activate();
@@ -361,10 +407,14 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
   public void testDelayedActivateProcessDefinitionsForNonTenant() {
     // given suspended process definitions
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
       .executionDate(tomorrow())
       .activate();
@@ -390,7 +440,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
     assertThat(query.active().count(), is(0L));
@@ -403,7 +455,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
       .suspend();
 
@@ -418,7 +472,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
       .suspend();
 
@@ -429,14 +485,18 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
   public void testActivateProcessDefinitionIncludingJobDefinitionsForAllTenants() {
     // given suspended jobs
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
     JobDefinitionQuery query = managementService.createJobDefinitionQuery();
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .activate();
 
     assertThat(query.suspended().count(), is(0L));
@@ -445,14 +505,18 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
   public void testActivateProcessDefinitionIncludingJobDefinitionsForTenant() {
     // given suspended jobs
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
     JobDefinitionQuery query = managementService.createJobDefinitionQuery();
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
       .activate();
 
@@ -463,14 +527,18 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
   public void testActivateProcessDefinitionIncludingJobDefinitionsForNonTenant() {
     // given suspended jobs
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
     JobDefinitionQuery query = managementService.createJobDefinitionQuery();
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
 
-    repositoryService.updateProcessDefinitionSuspensionStateByKey(PROCESS_DEFINITION_KEY)
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
       .activate();
 
@@ -486,7 +554,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
         .singleResult();
 
     try {
-      repositoryService.updateProcessDefinitionSuspensionStateById(processDefinition.getId())
+      repositoryService
+        .updateProcessDefinitionSuspensionState()
+        .byProcessDefinitionId(processDefinition.getId())
         .processDefinitionTenantId(TENANT_ONE)
         .suspend();
 
@@ -503,7 +573,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
         .singleResult();
 
     try {
-      repositoryService.updateProcessDefinitionSuspensionStateById(processDefinition.getId())
+      repositoryService
+        .updateProcessDefinitionSuspensionState()
+        .byProcessDefinitionId(processDefinition.getId())
         .processDefinitionWithoutTenantId()
         .suspend();
 
@@ -520,7 +592,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
         .singleResult();
 
     try {
-      repositoryService.updateProcessDefinitionSuspensionStateById(processDefinition.getId())
+      repositoryService
+        .updateProcessDefinitionSuspensionState()
+        .byProcessDefinitionId(processDefinition.getId())
         .processDefinitionTenantId(TENANT_ONE)
         .activate();
 
@@ -537,7 +611,9 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
         .singleResult();
 
     try {
-      repositoryService.updateProcessDefinitionSuspensionStateById(processDefinition.getId())
+      repositoryService
+        .updateProcessDefinitionSuspensionState()
+        .byProcessDefinitionId(processDefinition.getId())
         .processDefinitionWithoutTenantId()
         .activate();
 

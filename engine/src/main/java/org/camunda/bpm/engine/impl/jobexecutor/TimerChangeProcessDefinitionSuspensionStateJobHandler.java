@@ -103,30 +103,29 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
   }
 
   protected UpdateProcessDefinitionSuspensionStateBuilderImpl createBuilder(JSONObject config) {
+    UpdateProcessDefinitionSuspensionStateBuilderImpl builder = new UpdateProcessDefinitionSuspensionStateBuilderImpl();
+
     String by = getBy(config);
 
     if (by.equals(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID)) {
-      return UpdateProcessDefinitionSuspensionStateBuilderImpl.byId(getProcessDefinitionId(config));
+      builder.byProcessDefinitionId(getProcessDefinitionId(config));
 
     } else if (by.equals(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY)) {
-      return createBuilderForKey(config);
+      builder.byProcessDefinitionKey(getProcessDefinitionKey(config));
+
+      if (isTenantIdSet(config)) {
+
+        String tenantId = getTenantId(config);
+        if (tenantId != null) {
+          builder.processDefinitionTenantId(tenantId);
+
+        } else {
+          builder.processDefinitionWithoutTenantId();
+        }
+      }
 
     } else {
       throw new ProcessEngineException("Unexpected job handler configuration for property '" + JOB_HANDLER_CFG_BY + "': " + by);
-    }
-  }
-
-  protected UpdateProcessDefinitionSuspensionStateBuilderImpl createBuilderForKey(JSONObject config) {
-    UpdateProcessDefinitionSuspensionStateBuilderImpl builder = UpdateProcessDefinitionSuspensionStateBuilderImpl.byKey(getProcessDefinitionKey(config));
-
-    if (isTenantIdSet(config)) {
-
-      String tenantId = getTenantId(config);
-      if (tenantId != null) {
-        builder.processDefinitionTenantId(tenantId);
-      } else {
-        builder.processDefinitionWithoutTenantId();
-      }
     }
     return builder;
   }

@@ -327,28 +327,15 @@ public interface RepositoryService {
   void activateProcessDefinitionByKey(String processDefinitionKey, boolean activateProcessInstances,  Date activationDate);
 
   /**
-   * Activate or suspend all process definitions with the given key using a
-   * fluent builder. To update the suspension state call
+   * Activate or suspend process definitions using a fluent builder. Specify the
+   * definitions by calling one of the <i>by</i> methods, like
+   * <i>byProcessDefinitionId</i>. To update the suspension state call
    * {@link UpdateProcessDefinitionSuspensionStateBuilder#activate()} or
    * {@link UpdateProcessDefinitionSuspensionStateBuilder#suspend()}.
    *
-   * @param processDefinitionKey
-   *          the key of the process definition
    * @return the builder to update the suspension state
    */
-  UpdateProcessDefinitionSuspensionStateBuilder updateProcessDefinitionSuspensionStateByKey(String processDefinitionKey);
-
-  /**
-   * Activate or suspend the process definitions with the given id using a
-   * fluent builder. To update the suspension state call
-   * {@link UpdateProcessDefinitionSuspensionStateBuilder#activate()} or
-   * {@link UpdateProcessDefinitionSuspensionStateBuilder#suspend()}.
-   *
-   * @param processDefinitionId
-   *          the id of the process definition
-   * @return the builder to update the suspension state
-   */
-  UpdateProcessDefinitionSuspensionStateBuilder updateProcessDefinitionSuspensionStateById(String processDefinitionId);
+  UpdateProcessDefinitionSuspensionStateBuilder updateProcessDefinitionSuspensionState();
 
   /**
    * Gives access to a deployed process model, e.g., a BPMN 2.0 XML file,

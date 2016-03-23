@@ -2281,7 +2281,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // suspend
     repositoryService
-      .updateProcessDefinitionSuspensionStateById(processDefinition.getId())
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionId(processDefinition.getId())
       .suspend();
 
     processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -2289,7 +2290,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // activate
     repositoryService
-      .updateProcessDefinitionSuspensionStateById(processDefinition.getId())
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionId(processDefinition.getId())
       .activate();
 
     processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -2304,7 +2306,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // suspend
     repositoryService
-      .updateProcessDefinitionSuspensionStateByKey(processDefinition.getKey())
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(processDefinition.getKey())
       .suspend();
 
     processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -2312,7 +2315,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // activate
     repositoryService
-      .updateProcessDefinitionSuspensionStateByKey(processDefinition.getKey())
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(processDefinition.getKey())
       .activate();
 
     processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -2328,7 +2332,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     long oneWeekFromStartTime = new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
 
     repositoryService
-      .updateProcessDefinitionSuspensionStateById(processDefinition.getId())
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionId(processDefinition.getId())
       .executionDate(new Date(oneWeekFromStartTime))
       .suspend();
 
@@ -2351,14 +2356,16 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // suspend
     repositoryService
-      .updateProcessDefinitionSuspensionStateByKey(processDefinition.getKey())
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(processDefinition.getKey())
       .suspend();
 
     // activate process definition in one week from now
     long oneWeekFromStartTime = new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
 
     repositoryService
-      .updateProcessDefinitionSuspensionStateById(processDefinition.getId())
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionId(processDefinition.getId())
       .executionDate(new Date(oneWeekFromStartTime))
       .activate();
 
@@ -2385,7 +2392,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // suspend
     repositoryService
-      .updateProcessDefinitionSuspensionStateById(processDefinition.getId())
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionId(processDefinition.getId())
       .includeProcessInstances(true)
       .suspend();
 
@@ -2397,7 +2405,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // activate
     repositoryService
-      .updateProcessDefinitionSuspensionStateById(processDefinition.getId())
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionId(processDefinition.getId())
       .includeProcessInstances(true)
       .activate();
 

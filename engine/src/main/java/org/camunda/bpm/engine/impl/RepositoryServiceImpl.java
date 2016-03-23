@@ -151,59 +151,63 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   public void suspendProcessDefinitionById(String processDefinitionId) {
-    updateProcessDefinitionSuspensionStateById(processDefinitionId)
+    updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionId(processDefinitionId)
       .suspend();
   }
 
   public void suspendProcessDefinitionById(String processDefinitionId, boolean suspendProcessInstances, Date suspensionDate) {
-    updateProcessDefinitionSuspensionStateById(processDefinitionId)
+    updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionId(processDefinitionId)
       .includeProcessInstances(suspendProcessInstances)
       .executionDate(suspensionDate)
       .suspend();
   }
 
   public void suspendProcessDefinitionByKey(String processDefinitionKey) {
-    updateProcessDefinitionSuspensionStateByKey(processDefinitionKey)
+    updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(processDefinitionKey)
       .suspend();
   }
 
   public void suspendProcessDefinitionByKey(String processDefinitionKey, boolean suspendProcessInstances, Date suspensionDate) {
-    updateProcessDefinitionSuspensionStateByKey(processDefinitionKey)
+    updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(processDefinitionKey)
       .includeProcessInstances(suspendProcessInstances)
       .executionDate(suspensionDate)
       .suspend();
   }
 
   public void activateProcessDefinitionById(String processDefinitionId) {
-    updateProcessDefinitionSuspensionStateById(processDefinitionId)
+    updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionId(processDefinitionId)
       .activate();
   }
 
   public void activateProcessDefinitionById(String processDefinitionId, boolean activateProcessInstances, Date activationDate) {
-    updateProcessDefinitionSuspensionStateById(processDefinitionId)
+    updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionId(processDefinitionId)
       .includeProcessInstances(activateProcessInstances)
       .executionDate(activationDate)
       .activate();
   }
 
   public void activateProcessDefinitionByKey(String processDefinitionKey) {
-    updateProcessDefinitionSuspensionStateByKey(processDefinitionKey)
+    updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(processDefinitionKey)
       .activate();
   }
 
   public void activateProcessDefinitionByKey(String processDefinitionKey, boolean activateProcessInstances, Date activationDate) {
-    updateProcessDefinitionSuspensionStateByKey(processDefinitionKey)
+    updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(processDefinitionKey)
       .includeProcessInstances(activateProcessInstances)
       .executionDate(activationDate)
       .activate();
   }
 
-  public UpdateProcessDefinitionSuspensionStateBuilder updateProcessDefinitionSuspensionStateByKey(String processDefinitionKey) {
-    return UpdateProcessDefinitionSuspensionStateBuilderImpl.byKey(commandExecutor, processDefinitionKey);
-  }
-
-  public UpdateProcessDefinitionSuspensionStateBuilder updateProcessDefinitionSuspensionStateById(String processDefinitionId) {
-    return UpdateProcessDefinitionSuspensionStateBuilderImpl.byId(commandExecutor, processDefinitionId);
+  public UpdateProcessDefinitionSuspensionStateBuilder updateProcessDefinitionSuspensionState() {
+    return new UpdateProcessDefinitionSuspensionStateBuilderImpl(commandExecutor);
   }
 
   public InputStream getProcessModel(String processDefinitionId) {

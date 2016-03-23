@@ -495,11 +495,15 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
       for (ProcessDefinitionEntity processDefinitionEntity : deployment.getDeployedArtifacts(ProcessDefinitionEntity.class)) {
 
         // If activation date is set, we first suspend all the process definition
-        repositoryService.updateProcessDefinitionSuspensionStateById(processDefinitionEntity.getId())
+        repositoryService
+          .updateProcessDefinitionSuspensionState()
+          .byProcessDefinitionId(processDefinitionEntity.getId())
           .suspend();
 
         // And we schedule an activation at the provided date
-        repositoryService.updateProcessDefinitionSuspensionStateById(processDefinitionEntity.getId())
+        repositoryService
+          .updateProcessDefinitionSuspensionState()
+          .byProcessDefinitionId(processDefinitionEntity.getId())
           .executionDate(deploymentBuilder.getProcessDefinitionsActivationDate())
           .activate();
       }

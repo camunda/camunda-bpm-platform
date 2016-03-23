@@ -39,8 +39,31 @@ public class UpdateProcessDefinitionSuspensionStateBuilderImpl implements Update
   protected String processDefinitionTenantId;
   protected boolean isTenantIdSet = false;
 
-  private UpdateProcessDefinitionSuspensionStateBuilderImpl(CommandExecutor commandExecutor) {
+  public UpdateProcessDefinitionSuspensionStateBuilderImpl(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
+  }
+
+  /**
+   * Creates a builder without CommandExecutor which can not be used to update
+   * the suspension state via {@link #activate()} or {@link #suspend()}. Can be
+   * used in combination with your own command.
+   */
+  public UpdateProcessDefinitionSuspensionStateBuilderImpl() {
+    this(null);
+  }
+
+  @Override
+  public UpdateProcessDefinitionSuspensionStateBuilderImpl byProcessDefinitionId(String processDefinitionId) {
+    ensureNotNull("processDefinitionId", processDefinitionId);
+    this.processDefinitionId = processDefinitionId;
+    return this;
+  }
+
+  @Override
+  public UpdateProcessDefinitionSuspensionStateBuilderImpl byProcessDefinitionKey(String processDefinitionKey) {
+    ensureNotNull("processDefinitionKey", processDefinitionKey);
+    this.processDefinitionKey = processDefinitionKey;
+    return this;
   }
 
   @Override
@@ -117,36 +140,6 @@ public class UpdateProcessDefinitionSuspensionStateBuilderImpl implements Update
 
   public boolean isTenantIdSet() {
     return isTenantIdSet;
-  }
-
-  public static UpdateProcessDefinitionSuspensionStateBuilderImpl byId(CommandExecutor commandExecutor, String processDefinitionId) {
-    UpdateProcessDefinitionSuspensionStateBuilderImpl builder = new UpdateProcessDefinitionSuspensionStateBuilderImpl(commandExecutor);
-    builder.processDefinitionId = processDefinitionId;
-    return builder;
-  }
-
-  public static UpdateProcessDefinitionSuspensionStateBuilderImpl byKey(CommandExecutor commandExecutor, String processDefinitionKey) {
-    UpdateProcessDefinitionSuspensionStateBuilderImpl builder = new UpdateProcessDefinitionSuspensionStateBuilderImpl(commandExecutor);
-    builder.processDefinitionKey = processDefinitionKey;
-    return builder;
-  }
-
-  /**
-   * Creates a builder without CommandExecutor which can not be used to update
-   * the suspension state via {@link #activate()} or {@link #suspend()}. Can be
-   * used in combination with your own command.
-   */
-  public static UpdateProcessDefinitionSuspensionStateBuilderImpl byId(String processDefinitionId) {
-    return byId(null, processDefinitionId);
-  }
-
-  /**
-   * Creates a builder without CommandExecutor which can not be used to update
-   * the suspension state via {@link #activate()} or {@link #suspend()}. Can be
-   * used in combination with your own command.
-   */
-  public static UpdateProcessDefinitionSuspensionStateBuilderImpl byKey(String processDefinitionKey) {
-    return byKey(null, processDefinitionKey);
   }
 
 }

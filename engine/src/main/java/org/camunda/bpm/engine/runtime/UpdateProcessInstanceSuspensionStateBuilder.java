@@ -52,7 +52,7 @@ public interface UpdateProcessInstanceSuspensionStateBuilder {
 
   /**
    * Specify that the process definition belongs to no tenant. Can only be used
-   * in combination with {@link #byProcessDefinitionKey(String)}
+   * in combination with {@link #byProcessDefinitionKey(String)}.
    *
    * @return the builder
    */
@@ -60,7 +60,7 @@ public interface UpdateProcessInstanceSuspensionStateBuilder {
 
   /**
    * Specify the id of the tenant the process definition belongs to. Can only be
-   * used in combination with {@link #byProcessDefinitionKey(String)}
+   * used in combination with {@link #byProcessDefinitionKey(String)}.
    *
    * @param tenantId
    *          the id of the tenant
