@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.test.api.variables;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -190,6 +188,56 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
 
     // then
     assertEquals(0, runtimeService.createVariableInstanceQuery().count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ExecutionVariablesTest.testTreeCompactionForkParallelGateway.bpmn20.xml")
+  public void testTreeCompactionAndExpansionWithConcurrentLocalVariables() {
+
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1").singleResult();
+    Task task2 = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
+
+    runtimeService.setVariableLocal(task1Execution.getId(), "var", "value");
+
+    // when compacting the tree
+    taskService.complete(task2.getId());
+
+    // and expanding again
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("task2")
+      .execute();
+
+    // then the variable is again assigned to task1's concurrent execution
+    Task task1 = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+
+    assertEquals(task1.getExecutionId(), variable.getExecutionId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ExecutionVariablesTest.testTreeCompactionForkParallelGateway.bpmn20.xml")
+  public void testTreeCompactionAndExpansionWithScopeExecutionVariables() {
+
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Task task2 = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
+
+    runtimeService.setVariableLocal(processInstance.getId(), "var", "value");
+
+    // when compacting the tree
+    taskService.complete(task2.getId());
+
+    // and expanding again
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("task2")
+      .execute();
+
+    // then the variable is still assigned to the scope execution execution
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+
+    assertEquals(processInstance.getId(), variable.getExecutionId());
   }
 
 }
