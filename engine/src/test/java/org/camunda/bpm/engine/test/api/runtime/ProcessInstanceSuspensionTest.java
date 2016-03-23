@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -2029,4 +2030,87 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
         .processInstanceId(processInstance1.getId()).singleResult();
     assertFalse(task1.isSuspended());
   }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testSuspendAndActivateProcessInstanceByIdUsingBuilder() {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    assertFalse(processInstance.isSuspended());
+
+    //suspend
+    runtimeService
+      .updateProcessInstanceSuspensionState()
+      .byProcessInstanceId(processInstance.getId())
+      .suspend();
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    assertEquals(0, query.active().count());
+    assertEquals(1, query.suspended().count());
+
+    //activate
+    runtimeService
+      .updateProcessInstanceSuspensionState()
+      .byProcessInstanceId(processInstance.getId())
+      .activate();
+
+    assertEquals(1, query.active().count());
+    assertEquals(0, query.suspended().count());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testSuspendAndActivateProcessInstanceByProcessDefinitionIdUsingBuilder() {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    assertEquals(1, query.active().count());
+    assertEquals(0, query.suspended().count());
+
+    //suspend
+    runtimeService
+      .updateProcessInstanceSuspensionState()
+      .byProcessDefinitionId(processDefinition.getId())
+      .suspend();
+
+    assertEquals(0, query.active().count());
+    assertEquals(1, query.suspended().count());
+
+    //activate
+    runtimeService
+      .updateProcessInstanceSuspensionState()
+      .byProcessDefinitionId(processDefinition.getId())
+      .activate();
+
+    assertEquals(1, query.active().count());
+    assertEquals(0, query.suspended().count());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testSuspendAndActivateProcessInstanceByProcessDefinitionKeyUsingBuilder() {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    assertEquals(1, query.active().count());
+    assertEquals(0, query.suspended().count());
+
+    //suspend
+    runtimeService
+      .updateProcessInstanceSuspensionState()
+      .byProcessDefinitionKey("oneTaskProcess")
+      .suspend();
+
+    assertEquals(0, query.active().count());
+    assertEquals(1, query.suspended().count());
+
+    //activate
+    runtimeService
+      .updateProcessInstanceSuspensionState()
+      .byProcessDefinitionKey("oneTaskProcess")
+      .activate();
+
+    assertEquals(1, query.active().count());
+    assertEquals(0, query.suspended().count());
+  }
+
 }

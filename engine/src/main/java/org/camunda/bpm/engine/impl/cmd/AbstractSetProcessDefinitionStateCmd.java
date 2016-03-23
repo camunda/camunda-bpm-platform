@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
+import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.management.JobDefinition;
 
 /**
@@ -123,6 +124,25 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
     return jobDefinitionBuilder;
   }
 
+  protected UpdateProcessInstanceSuspensionStateBuilderImpl createProcessInstanceCommandBuilder() {
+    UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceBuilder = new UpdateProcessInstanceSuspensionStateBuilderImpl();
+
+    if (processDefinitionId != null) {
+      processInstanceBuilder.byProcessDefinitionId(processDefinitionId);
+
+    } else if (processDefinitionKey != null) {
+      processInstanceBuilder.byProcessDefinitionKey(processDefinitionKey);
+
+      if (isTenantIdSet && tenantId != null) {
+        processInstanceBuilder.processDefinitionTenantId(tenantId);
+
+      } else if (isTenantIdSet) {
+        processInstanceBuilder.processDefinitionWithoutTenantId();
+      }
+    }
+    return processInstanceBuilder;
+  }
+
   @Override
   protected String getJobHandlerConfiguration() {
     String jobConfiguration = null;
@@ -167,5 +187,12 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
   protected abstract AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd(UpdateJobDefinitionSuspensionStateBuilderImpl jobDefinitionSuspensionStateBuilder);
 
   @Override
-  protected abstract AbstractSetProcessInstanceStateCmd getNextCommand();
+  protected AbstractSetProcessInstanceStateCmd getNextCommand() {
+    UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceCommandBuilder = createProcessInstanceCommandBuilder();
+
+    return getNextCommand(processInstanceCommandBuilder);
+  }
+
+  protected abstract AbstractSetProcessInstanceStateCmd getNextCommand(UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceCommandBuilder);
+
 }

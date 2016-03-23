@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHan
 import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
+import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
 
 /**
  * @author Daniel Meyer
@@ -45,8 +46,8 @@ public class ActivateProcessDefinitionCmd extends AbstractSetProcessDefinitionSt
   }
 
   @Override
-  protected ActivateProcessInstanceCmd getNextCommand() {
-    return new ActivateProcessInstanceCmd(null, processDefinitionId, processDefinitionKey, isTenantIdSet, tenantId);
+  protected ActivateProcessInstanceCmd getNextCommand(UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceCommandBuilder) {
+    return new ActivateProcessInstanceCmd(processInstanceCommandBuilder);
   }
 
   @Override

@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
 
 /**
  * @author Daniel Meyer
@@ -33,18 +34,17 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
   protected String processDefinitionId;
   protected String processDefinitionKey;
 
-  protected String tenantId;
-  protected boolean isTenantIdSet = false;
+  protected String processDefinitionTenantId;
+  protected boolean isProcessDefinitionTenantIdSet = false;
 
-  public AbstractSetProcessInstanceStateCmd(String processInstanceId, String processDefinitionId, String processDefinitionKey, boolean isTenantIdSet,
-      String tenantId) {
+  public AbstractSetProcessInstanceStateCmd(UpdateProcessInstanceSuspensionStateBuilderImpl builder) {
     super(true, null);
 
-    this.processInstanceId = processInstanceId;
-    this.processDefinitionId = processDefinitionId;
-    this.processDefinitionKey = processDefinitionKey;
-    this.isTenantIdSet = isTenantIdSet;
-    this.tenantId = tenantId;
+    this.processInstanceId = builder.getProcessInstanceId();
+    this.processDefinitionId = builder.getProcessDefinitionId();
+    this.processDefinitionKey = builder.getProcessDefinitionKey();
+    this.processDefinitionTenantId = builder.getProcessDefinitionTenantId();
+    this.isProcessDefinitionTenantIdSet = builder.isProcessDefinitionTenantIdSet();
   }
 
   @Override
@@ -86,11 +86,10 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
       taskManager.updateTaskSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
       externalTaskManager.updateExternalTaskSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
 
-    } else if (isTenantIdSet) {
-      executionManager.updateExecutionSuspensionStateByProcessDefinitionKeyAndTenantId(processDefinitionKey, tenantId, suspensionState);
-      // TODO update suspension state depending on the given tenant id - CAM-5650
-      taskManager.updateTaskSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
-      externalTaskManager.updateExternalTaskSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
+    } else if (isProcessDefinitionTenantIdSet) {
+      executionManager.updateExecutionSuspensionStateByProcessDefinitionKeyAndTenantId(processDefinitionKey, processDefinitionTenantId, suspensionState);
+      taskManager.updateTaskSuspensionStateByProcessDefinitionKeyAndTenantId(processDefinitionKey, processDefinitionTenantId, suspensionState);
+      externalTaskManager.updateExternalTaskSuspensionStateByProcessDefinitionKeyAndTenantId(processDefinitionKey, processDefinitionTenantId, suspensionState);
 
     } else {
       executionManager.updateExecutionSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
@@ -119,10 +118,10 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
     } else if (processDefinitionKey != null) {
       builder.byProcessDefinitionKey(processDefinitionKey);
 
-      if (isTenantIdSet && tenantId != null) {
-        return builder.processDefinitionTenantId(tenantId);
+      if (isProcessDefinitionTenantIdSet && processDefinitionTenantId != null) {
+        return builder.processDefinitionTenantId(processDefinitionTenantId);
 
-      } else if (isTenantIdSet) {
+      } else if (isProcessDefinitionTenantIdSet) {
         return builder.processDefinitionWithoutTenantId();
       }
     }

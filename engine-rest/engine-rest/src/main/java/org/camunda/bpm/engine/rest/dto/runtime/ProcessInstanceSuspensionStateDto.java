@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-
-import javax.ws.rs.core.Response.Status;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
 
 /**
  * @author roman.smirnov
@@ -27,6 +27,9 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
   private String processInstanceId;
   private String processDefinitionId;
   private String processDefinitionKey;
+
+  private String processDefinitionTenantId;
+  private boolean processDefinitionWithoutTenantId;
 
   public String getProcessInstanceId() {
     return processInstanceId;
@@ -44,6 +47,15 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     this.processDefinitionKey = processDefinitionKey;
   }
 
+  public void setProcessDefinitionTenantId(String processDefinitionTenantId) {
+    this.processDefinitionTenantId = processDefinitionTenantId;
+  }
+
+  public void setProcessDefinitionWithoutTenantId(boolean processDefinitionWithoutTenantId) {
+    this.processDefinitionWithoutTenantId = processDefinitionWithoutTenantId;
+  }
+
+  @Override
   public void updateSuspensionState(ProcessEngine engine) {
     int params = (processInstanceId != null ? 1 : 0)
                + (processDefinitionId != null ? 1 : 0)
@@ -52,38 +64,34 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     if (params > 1) {
       String message = "Only one of processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
-    }
-
-    RuntimeService runtimeService = engine.getRuntimeService();
-
-    if (processInstanceId != null) {
-      // activate/suspend process instance by id
-      if (getSuspended()) {
-        runtimeService.suspendProcessInstanceById(processInstanceId);
-      } else {
-        runtimeService.activateProcessInstanceById(processInstanceId);
-      }
-    } else
-
-    if (processDefinitionId != null) {
-      // activate/suspend process instances by process definition id
-      if (getSuspended()) {
-        runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinitionId);
-      } else {
-        runtimeService.activateProcessInstanceByProcessDefinitionId(processDefinitionId);
-      }
-    } else
-
-    if (processDefinitionKey != null) {
-      // activate/suspend process instances by process definition key
-      if (getSuspended()) {
-        runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinitionKey);
-      } else {
-        runtimeService.activateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
-      }
-    } else {
+    } else if(params == 0) {
       String message = "Either processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
+    }
+
+    UpdateProcessInstanceSuspensionStateBuilder updateSuspensionStateBuilder = engine.getRuntimeService().updateProcessInstanceSuspensionState();
+
+    if (processInstanceId != null) {
+      updateSuspensionStateBuilder.byProcessInstanceId(processInstanceId);
+
+    } else if (processDefinitionId != null) {
+      updateSuspensionStateBuilder.byProcessDefinitionId(processDefinitionId);
+
+    } else if (processDefinitionKey != null) {
+      updateSuspensionStateBuilder.byProcessDefinitionKey(processDefinitionKey);
+
+      if (processDefinitionTenantId != null) {
+        updateSuspensionStateBuilder.processDefinitionTenantId(processDefinitionTenantId);
+
+      } else if(processDefinitionWithoutTenantId) {
+        updateSuspensionStateBuilder.processDefinitionWithoutTenantId();
+      }
+    }
+
+    if (getSuspended()) {
+      updateSuspensionStateBuilder.suspend();
+    } else {
+      updateSuspensionStateBuilder.activate();
     }
   }
 

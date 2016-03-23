@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
 
 /**
  *
@@ -22,12 +23,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
  */
 public class SuspendProcessInstanceCmd extends AbstractSetProcessInstanceStateCmd {
 
-  public SuspendProcessInstanceCmd(String executionId, String processDefinitionId, String processDefinitionKey) {
-    super(executionId, processDefinitionId, processDefinitionKey, false, null);
-  }
-
-  public SuspendProcessInstanceCmd(String executionId, String processDefinitionId, String processDefinitionKey, boolean isTenantIdSet, String tenantId) {
-    super(executionId, processDefinitionId, processDefinitionKey, isTenantIdSet, tenantId);
+  public SuspendProcessInstanceCmd(UpdateProcessInstanceSuspensionStateBuilderImpl builder) {
+    super(builder);
   }
 
   @Override

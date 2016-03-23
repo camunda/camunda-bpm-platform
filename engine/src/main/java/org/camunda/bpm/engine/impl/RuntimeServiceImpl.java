@@ -20,11 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
-import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.form.FormData;
-import org.camunda.bpm.engine.impl.cmd.ActivateProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.FindActiveActivityIdsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
@@ -37,9 +34,11 @@ import org.camunda.bpm.engine.impl.cmd.PatchExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.RemoveExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SignalCmd;
-import org.camunda.bpm.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanBuilderImpl;
+import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
+import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
@@ -53,6 +52,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -318,27 +318,43 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   public void suspendProcessInstanceById(String processInstanceId) {
-    commandExecutor.execute(new SuspendProcessInstanceCmd(processInstanceId, null, null));
+    updateProcessInstanceSuspensionState()
+      .byProcessInstanceId(processInstanceId)
+      .suspend();
   }
 
   public void suspendProcessInstanceByProcessDefinitionId(String processDefinitionId) {
-    commandExecutor.execute(new SuspendProcessInstanceCmd(null, processDefinitionId, null));
+    updateProcessInstanceSuspensionState()
+      .byProcessDefinitionId(processDefinitionId)
+      .suspend();
   }
 
   public void suspendProcessInstanceByProcessDefinitionKey(String processDefinitionKey) {
-    commandExecutor.execute(new SuspendProcessInstanceCmd(null, null, processDefinitionKey));
+    updateProcessInstanceSuspensionState()
+      .byProcessDefinitionKey(processDefinitionKey)
+      .suspend();
   }
 
   public void activateProcessInstanceById(String processInstanceId) {
-    commandExecutor.execute(new ActivateProcessInstanceCmd(processInstanceId, null, null));
+    updateProcessInstanceSuspensionState()
+      .byProcessInstanceId(processInstanceId)
+      .activate();
   }
 
   public void activateProcessInstanceByProcessDefinitionId(String processDefinitionId) {
-    commandExecutor.execute(new ActivateProcessInstanceCmd(null, processDefinitionId, null));
+    updateProcessInstanceSuspensionState()
+      .byProcessDefinitionId(processDefinitionId)
+      .activate();
   }
 
   public void activateProcessInstanceByProcessDefinitionKey(String processDefinitionKey) {
-    commandExecutor.execute(new ActivateProcessInstanceCmd(null, null, processDefinitionKey));
+    updateProcessInstanceSuspensionState()
+      .byProcessDefinitionKey(processDefinitionKey)
+      .activate();
+  }
+
+  public UpdateProcessInstanceSuspensionStateBuilder updateProcessInstanceSuspensionState() {
+    return new UpdateProcessInstanceSuspensionStateBuilderImpl(commandExecutor);
   }
 
   public ProcessInstance startProcessInstanceByMessage(String messageName) {

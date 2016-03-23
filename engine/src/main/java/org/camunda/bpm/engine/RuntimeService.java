@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
@@ -39,6 +38,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
@@ -1315,6 +1315,17 @@ public interface RuntimeService {
    *          if the user has no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void activateProcessInstanceByProcessDefinitionKey(String processDefinitionKey);
+
+  /**
+   * Activate or suspend process instances using a fluent builder. Specify the
+   * instances by calling one of the <i>by</i> methods, like
+   * <i>byProcessInstanceId</i>. To update the suspension state call
+   * {@link UpdateProcessInstanceSuspensionStateBuilder#activate()} or
+   * {@link UpdateProcessInstanceSuspensionStateBuilder#suspend()}.
+   *
+   * @return the builder to update the suspension state
+   */
+  UpdateProcessInstanceSuspensionStateBuilder updateProcessInstanceSuspensionState();
 
   // Events ////////////////////////////////////////////////////////////////////////
 
