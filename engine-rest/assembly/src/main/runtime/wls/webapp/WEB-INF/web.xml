@@ -4,16 +4,16 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
   <display-name>camunda bpm rest api</display-name>
-  
+
   <filter>
     <filter-name>CacheControlFilter</filter-name>
-    <filter-class>org.camunda.bpm.engine.rest.filter.CacheControlFilter</filter-class>    
+    <filter-class>org.camunda.bpm.engine.rest.filter.CacheControlFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>CacheControlFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-  
+
   <!-- Http Basic Authentication Filter -->
   <!-- <filter>
     <filter-name>camunda-auth</filter-name>
@@ -30,7 +30,7 @@
     <filter-name>camunda-auth</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping> -->
-  
+
   <servlet>
     <servlet-name>Engine API</servlet-name>
     <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
@@ -41,6 +41,11 @@
     <!-- disable Moxy as Jersey default JSON processor in case running on WLS 12R2 and above -->
     <init-param>
       <param-name>jersey.config.server.disableMoxyJson</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <!-- disable META-INF services scanning, so no auto-configuration happens -->
+    <init-param>
+      <param-name>jersey.config.server.disableMetainfServicesLookup</param-name>
       <param-value>true</param-value>
     </init-param>
     <!-- Enable to debug Jersey requests -->
