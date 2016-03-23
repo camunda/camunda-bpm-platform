@@ -51,6 +51,8 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
 
   protected Date evaluatedBefore;
   protected Date evaluatedAfter;
+  
+  protected String userId;
 
   protected boolean includeInput = false;
   protected boolean includeOutputs = false;
@@ -174,6 +176,13 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
 
   public HistoricDecisionInstanceQuery orderByTenantId() {
     return orderBy(HistoricDecisionInstanceQueryProperty.TENANT_ID);
+  }
+
+  @Override
+  public HistoricDecisionInstanceQuery userId(String userId) {
+    ensureNotNull(NotValidException.class, "userId", userId);
+    this.userId = userId;
+    return this;
   }
 
   @Override

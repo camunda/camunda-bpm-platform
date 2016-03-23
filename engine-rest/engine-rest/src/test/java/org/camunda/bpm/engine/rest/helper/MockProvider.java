@@ -704,6 +704,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATION_TIME = "2015-09-07T11:00:00";
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATED_BEFORE = "2015-09-08T11:00:00";
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATED_AFTER = "2015-09-06T11:00:00";
+  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_USER_ID = "aUserId";
   public static final Double EXAMPLE_HISTORIC_DECISION_INSTANCE_COLLECT_RESULT_VALUE = 42.0;
   public static final String EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_ID = "aDecisionInputInstanceId";
   public static final String EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CLAUSE_ID = "aDecisionInputClauseId";
@@ -2355,6 +2356,7 @@ public abstract class MockProvider {
     when(mock.getActivityId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_ID);
     when(mock.getActivityInstanceId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID);
     when(mock.getEvaluationTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATION_TIME));
+    when(mock.getUserId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_USER_ID);
     when(mock.getCollectResultValue()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_COLLECT_RESULT_VALUE);
     when(mock.getTenantId()).thenReturn(tenantId);
 

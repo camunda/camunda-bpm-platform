@@ -101,6 +101,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
     String returnedCaseInstanceId = from(content).getString("caseInstanceId");
     String returnedActivityId = from(content).getString("activityId");
     String returnedActivityInstanceId = from(content).getString("activityInstanceId");
+    String returnedUserId = from(content).getString("userId");
     List<Map<String, Object>> returnedInputs = from(content).getList("inputs");
     List<Map<String, Object>> returnedOutputs = from(content).getList("outputs");
     Double returnedCollectResultValue = from(content).getDouble("collectResultValue");
@@ -119,6 +120,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
     assertThat(returnedCaseInstanceId, is(MockProvider.EXAMPLE_CASE_INSTANCE_ID));
     assertThat(returnedActivityId, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_ID));
     assertThat(returnedActivityInstanceId, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID));
+    assertThat(returnedUserId, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_USER_ID));
     assertThat(returnedInputs, is(nullValue()));
     assertThat(returnedOutputs, is(nullValue()));
     assertThat(returnedCollectResultValue, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_COLLECT_RESULT_VALUE));

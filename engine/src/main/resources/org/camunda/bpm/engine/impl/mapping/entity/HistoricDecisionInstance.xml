@@ -198,6 +198,10 @@
       <if test="evaluatedAfter != null">
         and RES.EVAL_TIME_ &gt;= #{evaluatedAfter}
       </if>
+      
+      <if test="userId != null">
+        and RES.USER_ID_ = #{userId} 
+      </if>
 
       <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
         and RES.TENANT_ID_ in
