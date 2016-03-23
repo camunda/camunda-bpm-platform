@@ -48,7 +48,7 @@ import java.lang.reflect.Type;
 */
 @Provider
 @Consumes(MediaType.MULTIPART_FORM_DATA)
-public final class MultipartPayloadProvider implements MessageBodyReader<MultipartFormData> {
+public class MultipartPayloadProvider implements MessageBodyReader<MultipartFormData> {
 
   public static final String TYPE_NAME = "multipart";
   public static final String SUB_TYPE_NAME = "form-data";
