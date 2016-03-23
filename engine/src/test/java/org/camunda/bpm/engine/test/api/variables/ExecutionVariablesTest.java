@@ -88,6 +88,37 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
     assertEquals(variableBeforeCompaction.getId(), variableAfterCompaction.getId());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ExecutionVariablesTest.testTreeCompactionForkParallelGateway.bpmn20.xml")
+  public void testStableVariableInstanceIdsOnCompactionAndExpansion() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Execution task1Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task1")
+        .singleResult();
+
+    Task task2 = taskService
+        .createTaskQuery()
+        .taskDefinitionKey("task2")
+        .singleResult();
+
+    // when
+    runtimeService.setVariableLocal(task1Execution.getId(), "foo", "bar");
+    VariableInstance variableBeforeCompaction = runtimeService.createVariableInstanceQuery().singleResult();
+
+    // compacting the tree
+    taskService.complete(task2.getId());
+
+    // expanding the tree
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("task2")
+      .execute();
+
+    // then the variable still exists
+    VariableInstance variableAfterCompaction = runtimeService.createVariableInstanceQuery().singleResult();
+    assertEquals(variableBeforeCompaction.getId(), variableAfterCompaction.getId());
+  }
+
   @Deployment
   public void testTreeCompactionForkParallelGateway() {
     // given
