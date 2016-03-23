@@ -36,18 +36,6 @@
     <div class="ctn-column ctn-sidebar ctn-scroll"
          ctn-collapsable="left">
       <dl class="process-information">
-        <dt>Definition ID:</dt>
-        <dd>{{ decisionDefinition.id }}</dd>
-
-        <dt>Definition Key:</dt>
-        <dd class="definition-key">{{ decisionDefinition.key }}</dd>
-
-        <dt>Definition Name:</dt>
-        <dd class="definition-name"
-            ng-if="decisionDefinition.name && decisionDefinition.name !== decisionDefinition.key">{{ decisionDefinition.name }}</dd>
-        <dd class="definition-name"
-            ng-if="!decisionDefinition.name || decisionDefinition.name === decisionDefinition.key"><span class="null-value">null</span></dd>
-
         <dt>Definition Version:</dt>
         <dd class="definition-version">
           <span ng-if="!allDefinitions || !decisionDefinition"
@@ -74,7 +62,19 @@
             {{ decisionDefinition.version }}
           </span>
         </dd>
-        
+
+        <dt>Definition ID:</dt>
+        <dd>{{ decisionDefinition.id }}</dd>
+
+        <dt>Definition Key:</dt>
+        <dd class="definition-key">{{ decisionDefinition.key }}</dd>
+
+        <dt>Definition Name:</dt>
+        <dd class="definition-name"
+            ng-if="decisionDefinition.name && decisionDefinition.name !== decisionDefinition.key">{{ decisionDefinition.name }}</dd>
+        <dd class="definition-name"
+            ng-if="!decisionDefinition.name || decisionDefinition.name === decisionDefinition.key"><span class="null-value">null</span></dd>
+
         <dt>Tenant ID:</dt>
         <dd class="tenant-id"
             ng-if="decisionDefinition.tenantId">{{ decisionDefinition.tenantId }}</dd>

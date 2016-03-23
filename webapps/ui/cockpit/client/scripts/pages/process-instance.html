@@ -79,6 +79,9 @@
                 <dd ng-if="!processInstance.businessKey"
                     class="business-key"><span class="null-value">null</span></dd>
 
+                <dt>Definition Version:</dt>
+                <dd class="definition-version">{{ processDefinition.version }}</dd>
+
                 <dt>Definition ID:</dt>
                 <dd class="definition-id">
                   <a ng-href="#/process-definition/{{ processDefinition.id }}/runtime">{{ processDefinition.id }}</a>
@@ -89,9 +92,6 @@
 
                 <dt>Definition Key:</dt>
                 <dd class="definition-key">{{ processDefinition.key }}</dd>
-
-                <dt>Definition Version:</dt>
-                <dd class="definition-version">{{ processDefinition.version }}</dd>
 
                 <dt>Tenant ID:</dt>
                 <dd class="tenant-id"
