@@ -45,6 +45,9 @@
         </dt>
         <dd class="instance-id">{{ decisionInstance.id }}</dd>
 
+        <dt>Definition Version:</dt>
+        <dd class="definition-version">{{decisionDefinition.version}}</dd>
+
         <dt>Definition ID:</dt>
         <dd class="definition-id">
           <a ng-href="#/decision-definition/{{ decisionInstance.decisionDefinitionId }}">{{ decisionInstance.decisionDefinitionId }}</a>
@@ -58,9 +61,6 @@
             ng-if="decisionInstance.decisionDefinitionName && decisionInstance.decisionDefinitionName !== decisionInstance.key">{{ decisionInstance.decisionDefinitionName }}</dd>
         <dd class="definition-name"
             ng-if="!decisionInstance.decisionDefinitionName || decisionInstance.decisionDefinitionName === decisionInstance.key"><span class="null-value">null</span></dd>
-
-        <dt>Definition Version:</dt>
-        <dd class="definition-version">{{decisionDefinition.version}}</dd>
 
         <dt>Tenant ID:</dt>
         <dd class="tenant-id"

@@ -61,18 +61,6 @@
             <div class="tab-content"
                  ng-show="sidebarTab === 'info'">
               <dl class="process-information">
-                <dt>Definition ID:</dt>
-                <dd class="definition-id">{{ processDefinition.id }}</dd>
-
-                <dt>Definition Key:</dt>
-                <dd class="definition-key">{{ processDefinition.key }}</dd>
-
-                <dt>Definition Name:</dt>
-                <dd class="definition-name"
-                    ng-if="processDefinition.name && processDefinition.name !== processDefinition.key">{{ processDefinition.name }}</dd>
-                <dd class="definition-name"
-                    ng-if="!processDefinition.name || processDefinition.name === processDefinition.key"><span class="null-value">null</span></dd>
-
                 <dt>Definition Version:</dt>
                 <dd class="definition-version">
                   <span ng-if="!instanceStatistics.$loaded"
@@ -99,6 +87,18 @@
                     {{ processDefinition.version }}
                   </span>
                 </dd>
+
+                <dt>Definition ID:</dt>
+                <dd class="definition-id">{{ processDefinition.id }}</dd>
+
+                <dt>Definition Key:</dt>
+                <dd class="definition-key">{{ processDefinition.key }}</dd>
+
+                <dt>Definition Name:</dt>
+                <dd class="definition-name"
+                    ng-if="processDefinition.name && processDefinition.name !== processDefinition.key">{{ processDefinition.name }}</dd>
+                <dd class="definition-name"
+                    ng-if="!processDefinition.name || processDefinition.name === processDefinition.key"><span class="null-value">null</span></dd>
 
                 <dt>Tenant ID:</dt>
                 <dd class="tenant-id"
