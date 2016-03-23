@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -40,7 +41,7 @@ import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
 /**
  * @author Tom Baeyens
  */
-public class ProcessEngineImpl implements ProcessEngine {
+public class ProcessEngineImpl implements ProcessEngine, ProcessEngineServices {
 
   private final static ProcessEngineLogger LOG = ProcessEngineLogger.INSTANCE;
 
@@ -152,50 +153,62 @@ public class ProcessEngineImpl implements ProcessEngine {
     return name;
   }
 
+  @Override
   public IdentityService getIdentityService() {
     return identityService;
   }
 
+  @Override
   public ManagementService getManagementService() {
     return managementService;
   }
 
+  @Override
   public TaskService getTaskService() {
     return taskService;
   }
 
+  @Override
   public HistoryService getHistoryService() {
     return historicDataService;
   }
 
+  @Override
   public RuntimeService getRuntimeService() {
     return runtimeService;
   }
 
+  @Override
   public RepositoryService getRepositoryService() {
     return repositoryService;
   }
 
+  @Override
   public FormService getFormService() {
     return formService;
   }
 
+  @Override
   public AuthorizationService getAuthorizationService() {
     return authorizationService;
   }
 
+  @Override
   public CaseService getCaseService() {
     return caseService;
   }
 
+  @Override
   public FilterService getFilterService() {
     return filterService;
   }
 
+  @Override
   public ExternalTaskService getExternalTaskService() {
     return externalTaskService;
   }
 
+  @Override
   public DecisionService getDecisionService() {
     return decisionService;
   }
