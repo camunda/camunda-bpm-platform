@@ -237,7 +237,6 @@ public class MigrationPlanCreationTest {
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasInstructionFailures("userTask",
-          "Type of the target activity 'receiveTask' is not supported by the migration",
           "Activities are of different type which is not supported by the migration (userTask != receiveTask)"
         );
     }

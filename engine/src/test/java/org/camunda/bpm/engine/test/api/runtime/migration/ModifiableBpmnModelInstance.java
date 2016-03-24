@@ -18,12 +18,17 @@ import java.util.Collection;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.AbstractActivityBuilder;
 import org.camunda.bpm.model.bpmn.builder.AbstractBaseElementBuilder;
+import org.camunda.bpm.model.bpmn.builder.AbstractFlowNodeBuilder;
 import org.camunda.bpm.model.bpmn.builder.EndEventBuilder;
 import org.camunda.bpm.model.bpmn.builder.SubProcessBuilder;
 import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
+import org.camunda.bpm.model.bpmn.instance.Activity;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
+import org.camunda.bpm.model.bpmn.instance.FlowNode;
+import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
+import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.instance.DomDocument;
@@ -101,6 +106,10 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
     return getBuilderForElementById(activityId, AbstractActivityBuilder.class);
   }
 
+  public AbstractFlowNodeBuilder flowNodeBuilder(String flowNodeId) {
+    return getBuilderForElementById(flowNodeId, AbstractFlowNodeBuilder.class);
+  }
+
   public UserTaskBuilder userTaskBuilder(String userTaskId) {
     return getBuilderForElementById(userTaskId, UserTaskBuilder.class);
   }
@@ -133,6 +142,39 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
     parent.addChildElement(eventSubProcess);
 
     return eventSubProcess.builder();
+  }
+
+  public ModifiableBpmnModelInstance removeFlowNode(String flowNodeId) {
+    FlowNode flowNode = getModelElementById(flowNodeId);
+    ModelElementInstance scope = flowNode.getParentElement();
+
+    scope.removeChildElement(flowNode);
+    for (SequenceFlow outgoingFlow : flowNode.getOutgoing()) {
+      scope.removeChildElement(outgoingFlow);
+    }
+    for (SequenceFlow incomingFlow : flowNode.getIncoming()) {
+      scope.removeChildElement(incomingFlow);
+    }
+
+    return this;
+  }
+
+  public ModifiableBpmnModelInstance asyncBeforeInnerMiActivity(String activityId) {
+    Activity activity = modelInstance.getModelElementById(activityId);
+
+    MultiInstanceLoopCharacteristics miCharacteristics = (MultiInstanceLoopCharacteristics) activity.getUniqueChildElementByType(MultiInstanceLoopCharacteristics.class);
+    miCharacteristics.setCamundaAsyncBefore(true);
+
+    return this;
+  }
+
+  public ModifiableBpmnModelInstance asyncAfterInnerMiActivity(String activityId) {
+    Activity activity = modelInstance.getModelElementById(activityId);
+
+    MultiInstanceLoopCharacteristics miCharacteristics = (MultiInstanceLoopCharacteristics) activity.getUniqueChildElementByType(MultiInstanceLoopCharacteristics.class);
+    miCharacteristics.setCamundaAsyncAfter(true);
+
+    return this;
   }
 
 }

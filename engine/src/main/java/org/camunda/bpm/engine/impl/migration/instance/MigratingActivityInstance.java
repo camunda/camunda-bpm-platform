@@ -32,11 +32,10 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
  * @author Thorben Lindhauer
  *
  */
-public class MigratingActivityInstance implements MigratingInstance, RemovingInstance {
+public class MigratingActivityInstance extends MigratingProcessElementInstance implements MigratingInstance, RemovingInstance {
 
   public static final MigrationLogger MIGRATION_LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
-  protected MigrationInstruction migrationInstruction;
   protected ActivityInstance activityInstance;
   // scope execution for actual scopes,
   // concurrent execution in case of non-scope activity with expanded tree
@@ -46,13 +45,8 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
   protected List<MigratingInstance> migratingDependentInstances = new ArrayList<MigratingInstance>();
   protected List<EmergingInstance> emergingDependentInstances = new ArrayList<EmergingInstance>();
 
-  protected ScopeImpl sourceScope;
-  protected ScopeImpl targetScope;
-  // changes from source to target scope during migration
-  protected ScopeImpl currentScope;
-
-  protected Set<MigratingActivityInstance> childInstances = new HashSet<MigratingActivityInstance>();
-  protected MigratingActivityInstance parentInstance;
+  protected Set<MigratingActivityInstance> childActivityInstances = new HashSet<MigratingActivityInstance>();
+  protected Set<MigratingTransitionInstance> childTransitionInstances = new HashSet<MigratingTransitionInstance>();
 
   // behaves differently if the current activity is scope or not
   protected MigratingActivityInstanceBehavior instanceBehavior;
@@ -97,7 +91,7 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
   }
 
   public void detachChildren() {
-    Set<MigratingActivityInstance> childrenCopy = new HashSet<MigratingActivityInstance>(childInstances);
+    Set<MigratingActivityInstance> childrenCopy = new HashSet<MigratingActivityInstance>(childActivityInstances);
     // First detach all dependent entities, only then detach the activity instances.
     // This is because detaching activity instances may trigger execution tree compaction which in turn
     // may overwrite certain dependent entities (e.g. variables)
@@ -106,6 +100,11 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
     }
 
     for (MigratingActivityInstance child : childrenCopy) {
+      child.detachState();
+    }
+
+    Set<MigratingTransitionInstance> transitionChildrenCopy = new HashSet<MigratingTransitionInstance>(childTransitionInstances);
+    for (MigratingTransitionInstance child : transitionChildrenCopy) {
       child.detachState();
     }
   }
@@ -129,21 +128,22 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
 
     instanceBehavior.detachState();
 
-    if (parentInstance != null) {
-      parentInstance.getChildren().remove(this);
-      parentInstance = null;
-    }
+    setParent(null);
   }
 
   public void attachState(MigratingActivityInstance activityInstance) {
 
-    activityInstance.getChildren().add(this);
     this.setParent(activityInstance);
     instanceBehavior.attachState(activityInstance);
 
     for (MigratingInstance dependentInstance : migratingDependentInstances) {
       dependentInstance.attachState(this);
     }
+  }
+
+  @Override
+  public void attachState(MigratingTransitionInstance targetTranisitionInstance) {
+    throw MIGRATION_LOGGER.cannotAttachToTransitionInstance(this);
   }
 
   public void migrateDependentEntities() {
@@ -178,36 +178,43 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
     emergingDependentInstances.add(emergingInstance);
   }
 
+  public void addChild(MigratingTransitionInstance transitionInstance) {
+    this.childTransitionInstances.add(transitionInstance);
+  }
+
+  public void removeChild(MigratingTransitionInstance transitionInstance) {
+    this.childTransitionInstances.remove(transitionInstance);
+  }
+
+  public void addChild(MigratingActivityInstance activityInstance) {
+    this.childActivityInstances.add(activityInstance);
+  }
+
+  public void removeChild(MigratingActivityInstance activityInstance) {
+    this.childActivityInstances.remove(activityInstance);
+  }
+
   public ActivityInstance getActivityInstance() {
     return activityInstance;
   }
 
-  public ScopeImpl getSourceScope() {
-    return sourceScope;
-  }
-
-  public ScopeImpl getTargetScope() {
-    return targetScope;
-  }
-
-  public ScopeImpl getCurrentScope() {
-    return currentScope;
-  }
-
-  public Set<MigratingActivityInstance> getChildren() {
+  /**
+   * Returns a copy of all children, modifying the returned set does not have any further effect.
+   * @return
+   */
+  public Set<MigratingProcessElementInstance> getChildren() {
+    Set<MigratingProcessElementInstance> childInstances = new HashSet<MigratingProcessElementInstance>();
+    childInstances.addAll(childActivityInstances);
+    childInstances.addAll(childTransitionInstances);
     return childInstances;
   }
 
-  public MigratingActivityInstance getParent() {
-    return parentInstance;
+  public Set<MigratingActivityInstance> getChildActivityInstances() {
+    return childActivityInstances;
   }
 
-  public void setParent(MigratingActivityInstance parentInstance) {
-    this.parentInstance = parentInstance;
-  }
-
-  public MigrationInstruction getMigrationInstruction() {
-    return migrationInstruction;
+  public Set<MigratingTransitionInstance> getChildTransitionInstances() {
+    return childTransitionInstances;
   }
 
   public boolean migrates() {
@@ -238,6 +245,18 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
     instanceBehavior.destroyAttachableExecution(execution);
   }
 
+  @Override
+  public void setParent(MigratingActivityInstance parentInstance) {
+    if (this.parentInstance != null) {
+      this.parentInstance.removeChild(this);
+    }
+
+    this.parentInstance = parentInstance;
+
+    if (parentInstance != null) {
+      parentInstance.addChild(this);
+    }
+  }
 
 
   protected interface MigratingActivityInstanceBehavior {
@@ -441,10 +460,6 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
 
     @Override
     public void remove() {
-      parentInstance.getChildren().remove(MigratingActivityInstance.this);
-      for (MigratingActivityInstance child : childInstances) {
-        child.parentInstance = null;
-      }
 
       ExecutionEntity currentExecution = resolveRepresentativeExecution();
       ExecutionEntity parentExecution = currentExecution.getParent();
@@ -455,6 +470,14 @@ public class MigratingActivityInstance implements MigratingInstance, RemovingIns
       currentExecution.deleteCascade("migration");
 
       parentInstance.destroyAttachableExecution(parentExecution);
+
+      setParent(null);
+      for (MigratingTransitionInstance child : childTransitionInstances) {
+        child.setParent(null);
+      }
+      for (MigratingActivityInstance child : childActivityInstances) {
+        child.setParent(null);
+      }
     }
 
     @Override

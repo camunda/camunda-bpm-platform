@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.migration.instance;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -64,12 +63,23 @@ public abstract class MigratingJobInstance implements MigratingInstance, Removin
   }
 
   public void attachState(MigratingActivityInstance newOwningInstance) {
-    ExecutionEntity newScopeExecution = newOwningInstance.resolveRepresentativeExecution();
-    jobEntity.setExecution(newScopeExecution);
+    attachTo(newOwningInstance.resolveRepresentativeExecution());
 
     for (MigratingInstance dependentInstance : migratingDependentInstances) {
       dependentInstance.attachState(newOwningInstance);
     }
+  }
+
+  public void attachState(MigratingTransitionInstance targetTranisitionInstance) {
+    attachTo(targetTranisitionInstance.resolveRepresentativeExecution());
+
+    for (MigratingInstance dependentInstance : migratingDependentInstances) {
+      dependentInstance.attachState(targetTranisitionInstance);
+    }
+  }
+
+  protected void attachTo(ExecutionEntity execution) {
+    jobEntity.setExecution(execution);
   }
 
   public void migrateState() {
@@ -77,6 +87,7 @@ public abstract class MigratingJobInstance implements MigratingInstance, Removin
     String activityId = targetScope.getId();
     jobEntity.setActivityId(activityId);
     migrateJobHandlerConfiguration();
+
     if (targetJobDefinitionEntity != null) {
       jobEntity.setJobDefinition(targetJobDefinitionEntity);
     }

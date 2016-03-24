@@ -156,6 +156,16 @@ public class ProcessInstanceSnapshot {
     }
   }
 
+  public Job getJobById(String jobId) {
+    for (Job job : getJobs()) {
+      if (jobId.equals(job.getId())) {
+        return job;
+      }
+    }
+
+    return null;
+  }
+
   public void setJobs(List<Job> jobs) {
     this.jobs = jobs;
   }

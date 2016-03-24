@@ -14,7 +14,7 @@ package org.camunda.bpm.engine.impl.migration.instance.parser;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessElementInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingVariableInstance;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -23,10 +23,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
  * @author Thorben Lindhauer
  *
  */
-public class VariableInstanceHandler implements MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<VariableInstanceEntity>> {
+public class VariableInstanceHandler implements MigratingDependentInstanceParseHandler<MigratingProcessElementInstance, List<VariableInstanceEntity>> {
 
   @Override
-  public void handle(MigratingInstanceParseContext parseContext, MigratingActivityInstance owningInstance, List<VariableInstanceEntity> variables) {
+  public void handle(MigratingInstanceParseContext parseContext, MigratingProcessElementInstance owningInstance, List<VariableInstanceEntity> variables) {
 
     ExecutionEntity representativeExecution = owningInstance.resolveRepresentativeExecution();
 

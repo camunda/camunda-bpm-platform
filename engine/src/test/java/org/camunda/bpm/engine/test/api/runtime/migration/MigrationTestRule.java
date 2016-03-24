@@ -288,17 +288,23 @@ public class MigrationTestRule extends TestWatcher {
 
     Job jobBefore = snapshotBeforeMigration.getJobForDefinitionId(jobDefinitionBefore.getId());
     assertNotNull("Expected that a timer job for activity '" + activityIdBefore + "' exists before migration", jobBefore);
-    assertTimerJob(jobBefore);
 
-    JobDefinition jobDefinitionAfter = snapshotAfterMigration.getJobDefinitionForActivityIdAndType(activityIdAfter, handlerType);
+    assertJobMigrated(jobBefore, activityIdAfter);
+  }
+
+  public void assertJobMigrated(Job jobBefore, String activityIdAfter) {
+
+    Job jobAfter = snapshotAfterMigration.getJobById(jobBefore.getId());
+    assertNotNull("Expected that a job with id '" + jobBefore.getId() + "' exists after migration", jobAfter);
+
+    JobDefinition jobDefinitionAfter = snapshotAfterMigration.getJobDefinitionForActivityIdAndType(activityIdAfter, ((JobEntity) jobBefore).getJobHandlerType());
     assertNotNull("Expected that a job definition for activity '" + activityIdAfter + "' exists after migration", jobDefinitionAfter);
 
-    Job jobAfter = snapshotAfterMigration.getJobForDefinitionId(jobDefinitionAfter.getId());
-    assertNotNull("Expected that a timer job for activity '" + activityIdAfter + "' exists after migration", jobAfter);
-    assertTimerJob(jobAfter);
-
     assertEquals(jobBefore.getId(), jobAfter.getId());
+    assertEquals("Expected that job is assigned to job definition '" + jobDefinitionAfter.getId() + "' after migration",
+        jobDefinitionAfter.getId(), jobAfter.getJobDefinitionId());
     assertEquals(jobBefore.getDuedate(), jobAfter.getDuedate());
+    assertEquals(((JobEntity) jobBefore).getType(), ((JobEntity) jobAfter).getType());
     assertEquals(jobDefinitionAfter.getProcessDefinitionId(), jobAfter.getProcessDefinitionId());
     assertEquals(jobDefinitionAfter.getProcessDefinitionKey(), jobAfter.getProcessDefinitionKey());
   }

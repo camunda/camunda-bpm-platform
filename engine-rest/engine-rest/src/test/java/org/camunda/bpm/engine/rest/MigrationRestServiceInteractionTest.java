@@ -45,14 +45,15 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingActivityInstanceValidationReport;
+import org.camunda.bpm.engine.migration.MigratingActivityInstanceValidationReport;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationReport;
+import org.camunda.bpm.engine.migration.MigratingTransitionInstanceValidationReport;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationInstructionValidationReport;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationReport;
@@ -520,8 +521,8 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     when(instanceReport1.getSourceScopeId()).thenReturn(EXAMPLE_ACTIVITY_ID);
     when(instanceReport1.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
 
-    MigratingActivityInstanceValidationReport instanceReport2 = mock(MigratingActivityInstanceValidationReport.class);
-    when(instanceReport2.getActivityInstanceId()).thenReturn(EXAMPLE_ACTIVITY_INSTANCE_ID);
+    MigratingTransitionInstanceValidationReport instanceReport2 = mock(MigratingTransitionInstanceValidationReport.class);
+    when(instanceReport2.getTransitionInstanceId()).thenReturn("transitionInstanceId");
     when(instanceReport2.getMigrationInstruction()).thenReturn(migrationInstruction);
     when(instanceReport2.getSourceScopeId()).thenReturn(EXAMPLE_ACTIVITY_ID);
     when(instanceReport2.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
@@ -529,7 +530,8 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     MigratingProcessInstanceValidationReport processInstanceReport = mock(MigratingProcessInstanceValidationReport.class);
     when(processInstanceReport.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(processInstanceReport.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
-    when(processInstanceReport.getReports()).thenReturn(Arrays.asList(instanceReport1, instanceReport2));
+    when(processInstanceReport.getActivityInstanceReports()).thenReturn(Arrays.asList(instanceReport1));
+    when(processInstanceReport.getTransitionInstanceReports()).thenReturn(Arrays.asList(instanceReport2));
 
     doThrow(new MigratingProcessInstanceValidationException("fooo", processInstanceReport))
       .when(migrationPlanExecutionBuilderMock).execute();
@@ -552,25 +554,26 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .body("validationReport.failures", hasSize(2))
       .body("validationReport.failures[0]", is("failure1"))
       .body("validationReport.failures[1]", is("failure2"))
-      .body("validationReport.instanceValidationReports", hasSize(2))
-      .body("validationReport.instanceValidationReports[0].migrationInstruction.sourceActivityIds", hasSize(1))
-      .body("validationReport.instanceValidationReports[0].migrationInstruction.sourceActivityIds[0]", is(EXAMPLE_ACTIVITY_ID))
-      .body("validationReport.instanceValidationReports[0].migrationInstruction.targetActivityIds", hasSize(1))
-      .body("validationReport.instanceValidationReports[0].migrationInstruction.targetActivityIds[0]", is(ANOTHER_EXAMPLE_ACTIVITY_ID))
-      .body("validationReport.instanceValidationReports[0].activityInstanceId", is(EXAMPLE_ACTIVITY_INSTANCE_ID))
-      .body("validationReport.instanceValidationReports[0].sourceScopeId", is(EXAMPLE_ACTIVITY_ID))
-      .body("validationReport.instanceValidationReports[0].failures", hasSize(2))
-      .body("validationReport.instanceValidationReports[0].failures[0]", is("failure1"))
-      .body("validationReport.instanceValidationReports[0].failures[1]", is("failure2"))
-      .body("validationReport.instanceValidationReports[1].migrationInstruction.sourceActivityIds", hasSize(1))
-      .body("validationReport.instanceValidationReports[1].migrationInstruction.sourceActivityIds[0]", is(EXAMPLE_ACTIVITY_ID))
-      .body("validationReport.instanceValidationReports[1].migrationInstruction.targetActivityIds", hasSize(1))
-      .body("validationReport.instanceValidationReports[1].migrationInstruction.targetActivityIds[0]", is(ANOTHER_EXAMPLE_ACTIVITY_ID))
-      .body("validationReport.instanceValidationReports[1].activityInstanceId", is(EXAMPLE_ACTIVITY_INSTANCE_ID))
-      .body("validationReport.instanceValidationReports[1].sourceScopeId", is(EXAMPLE_ACTIVITY_ID))
-      .body("validationReport.instanceValidationReports[1].failures", hasSize(2))
-      .body("validationReport.instanceValidationReports[1].failures[0]", is("failure1"))
-      .body("validationReport.instanceValidationReports[1].failures[1]", is("failure2"))
+      .body("validationReport.activityInstanceValidationReports", hasSize(1))
+      .body("validationReport.activityInstanceValidationReports[0].migrationInstruction.sourceActivityIds", hasSize(1))
+      .body("validationReport.activityInstanceValidationReports[0].migrationInstruction.sourceActivityIds[0]", is(EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.activityInstanceValidationReports[0].migrationInstruction.targetActivityIds", hasSize(1))
+      .body("validationReport.activityInstanceValidationReports[0].migrationInstruction.targetActivityIds[0]", is(ANOTHER_EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.activityInstanceValidationReports[0].activityInstanceId", is(EXAMPLE_ACTIVITY_INSTANCE_ID))
+      .body("validationReport.activityInstanceValidationReports[0].sourceScopeId", is(EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.activityInstanceValidationReports[0].failures", hasSize(2))
+      .body("validationReport.activityInstanceValidationReports[0].failures[0]", is("failure1"))
+      .body("validationReport.activityInstanceValidationReports[0].failures[1]", is("failure2"))
+      .body("validationReport.transitionInstanceValidationReports", hasSize(1))
+      .body("validationReport.transitionInstanceValidationReports[0].migrationInstruction.sourceActivityIds", hasSize(1))
+      .body("validationReport.transitionInstanceValidationReports[0].migrationInstruction.sourceActivityIds[0]", is(EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.transitionInstanceValidationReports[0].migrationInstruction.targetActivityIds", hasSize(1))
+      .body("validationReport.transitionInstanceValidationReports[0].migrationInstruction.targetActivityIds[0]", is(ANOTHER_EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.transitionInstanceValidationReports[0].transitionInstanceId", is("transitionInstanceId"))
+      .body("validationReport.transitionInstanceValidationReports[0].sourceScopeId", is(EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.transitionInstanceValidationReports[0].failures", hasSize(2))
+      .body("validationReport.transitionInstanceValidationReports[0].failures[0]", is("failure1"))
+      .body("validationReport.transitionInstanceValidationReports[0].failures[1]", is("failure2"))
     .when()
       .post(EXECUTE_MIGRATION_URL);
   }

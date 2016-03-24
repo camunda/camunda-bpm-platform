@@ -29,9 +29,17 @@ public interface MigratingInstance {
    * Restore this instance's state as a subordinate to the given activity instance
    * (e.g. in the execution tree).
    * Restoration should restore the state that was detached
-   * before (i.e. the source process definition state)
+   * before.
    */
   void attachState(MigratingActivityInstance targetActivityInstance);
+
+  /**
+   * Restore this instance's state as a subordinate to the given transition instance
+   * (e.g. in the execution tree).
+   * Restoration should restore the state that was detached
+   * before.
+   */
+  void attachState(MigratingTransitionInstance targetTranisitionInstance);
 
   /**
    * Migrate state from the source process definition

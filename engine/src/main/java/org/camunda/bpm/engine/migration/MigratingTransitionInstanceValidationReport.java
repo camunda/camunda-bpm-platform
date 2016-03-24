@@ -11,26 +11,26 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.impl.migration.validation.instance;
+package org.camunda.bpm.engine.migration;
 
 import java.util.List;
 
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 
 /**
- * Collects all failures for a migrating activity instance.
+ * Collects all failures for a migrating transition instance.
  */
-public interface MigratingActivityInstanceValidationReport {
+public interface MigratingTransitionInstanceValidationReport {
 
   /**
-   * @return the id of the source scope of the migrated activity instance
+   * @return the id of the source scope of the migrating transition instance
    */
   String getSourceScopeId();
 
   /**
-   * @return the activity instance id of this report
+   * @return the transition instance id of this report
    */
-  String getActivityInstanceId();
+  String getTransitionInstanceId();
 
   /**
    * @return the migration instruction that cannot be applied

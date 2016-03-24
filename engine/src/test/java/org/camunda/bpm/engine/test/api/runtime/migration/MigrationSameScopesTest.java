@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -163,7 +164,35 @@ public class MigrationSameScopesTest {
       Assert.fail("should not succeed because the userTask2 instance is not mapped");
     } catch (MigratingProcessInstanceValidationException e) {
       assertThat(e.getValidationReport())
-        .hasActivityInstanceFailures("userTask2", "Leaf activity was not mapped by the migration");
+        .hasActivityInstanceFailures("userTask2", "There is no migration instruction for this instance's activity");
+    }
+  }
+
+  @Test
+  public void testCannotMigrateWhenNotAllTransitionInstancesAreMapped() {
+    // given
+    BpmnModelInstance model = ModifiableBpmnModelInstance.modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
+        .activityBuilder("userTask1")
+        .camundaAsyncBefore()
+        .moveToActivity("userTask2")
+        .camundaAsyncBefore()
+        .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(model);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(model);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask1", "userTask1")
+      .build();
+
+
+    // when
+    try {
+      testHelper.createProcessInstanceAndMigrate(migrationPlan);
+      Assert.fail("should not succeed because the userTask2 instance is not mapped");
+    } catch (MigratingProcessInstanceValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasTransitionInstanceFailures("userTask2", "There is no migration instruction for this instance's activity");
     }
   }
 

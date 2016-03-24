@@ -23,7 +23,9 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingJobInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessElementInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingTransitionInstance;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingProcessInstanceValidationReportImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -37,6 +39,7 @@ import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 /**
  * @author Thorben Lindhauer
@@ -211,8 +214,12 @@ public class MigratingInstanceParseContext {
     return organizedInstructions;
   }
 
-  public void handleDependentJobs(MigratingActivityInstance migratingInstance, List<JobEntity> jobs) {
-    parser.getDependentJobHandler().handle(this, migratingInstance, jobs);
+  public void handleDependentActivityInstanceJobs(MigratingActivityInstance migratingInstance, List<JobEntity> jobs) {
+    parser.getDependentActivityInstanceJobHandler().handle(this, migratingInstance, jobs);
+  }
+
+  public void handleDependentTransitionInstanceJobs(MigratingTransitionInstance migratingInstance, List<JobEntity> jobs) {
+    parser.getDependentTransitionInstanceJobHandler().handle(this, migratingInstance, jobs);
   }
 
   public void handleDependentEventSubscriptions(MigratingActivityInstance migratingInstance, List<EventSubscriptionEntity> eventSubscriptions) {
@@ -223,8 +230,12 @@ public class MigratingInstanceParseContext {
     parser.getDependentTaskHandler().handle(this, migratingInstance, tasks);
   }
 
-  public void handleDependentVariables(MigratingActivityInstance migratingInstance, List<VariableInstanceEntity> variables) {
+  public void handleDependentVariables(MigratingProcessElementInstance migratingInstance, List<VariableInstanceEntity> variables) {
     parser.getDependentVariablesHandler().handle(this, migratingInstance, variables);
+  }
+
+  public void handleTransitionInstance(TransitionInstance transitionInstance) {
+    parser.getTransitionInstanceHandler().handle(this, transitionInstance);
   }
 
   public void validateNoEntitiesLeft(MigratingProcessInstanceValidationReportImpl processInstanceReport) {

@@ -18,7 +18,9 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessElementInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingTransitionInstance;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingProcessInstanceValidationReportImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -31,6 +33,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 /**
  * Builds a {@link MigratingProcessInstance}, a data structure that contains meta-data for the activity
@@ -44,13 +47,18 @@ public class MigratingInstanceParser {
 
   protected MigratingInstanceParseHandler<ActivityInstance> activityInstanceHandler =
       new ActivityInstanceHandler();
-  protected MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<JobEntity>> dependentJobHandler =
-      new JobInstanceHandler();
+  protected MigratingInstanceParseHandler<TransitionInstance> transitionInstanceHandler =
+      new TransitionInstanceHandler();
+
+  protected MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<JobEntity>> dependentActivityInstanceJobHandler =
+      new ActivityInstanceJobHandler();
+  protected MigratingDependentInstanceParseHandler<MigratingTransitionInstance, List<JobEntity>> dependentTransitionInstanceJobHandler =
+      new TransitionInstanceJobHandler();
   protected MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<EventSubscriptionEntity>> dependentEventSubscriptionHandler =
       new EventSubscriptionInstanceHandler();
   protected MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<TaskEntity>> dependentTaskHandler =
       new TaskInstanceHandler();
-  protected MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<VariableInstanceEntity>> dependentVariableHandler =
+  protected MigratingDependentInstanceParseHandler<MigratingProcessElementInstance, List<VariableInstanceEntity>> dependentVariableHandler =
       new VariableInstanceHandler();
   protected MigratingInstanceParseHandler<IncidentEntity> incidentHandler =
       new IncidentInstanceHandler();
@@ -112,12 +120,20 @@ public class MigratingInstanceParser {
     return activityInstanceHandler;
   }
 
+  public MigratingInstanceParseHandler<TransitionInstance> getTransitionInstanceHandler() {
+    return transitionInstanceHandler;
+  }
+
   public MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<EventSubscriptionEntity>> getDependentEventSubscriptionHandler() {
     return dependentEventSubscriptionHandler;
   }
 
-  public MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<JobEntity>> getDependentJobHandler() {
-    return dependentJobHandler;
+  public MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<JobEntity>> getDependentActivityInstanceJobHandler() {
+    return dependentActivityInstanceJobHandler;
+  }
+
+  public MigratingDependentInstanceParseHandler<MigratingTransitionInstance, List<JobEntity>> getDependentTransitionInstanceJobHandler() {
+    return dependentTransitionInstanceJobHandler;
   }
 
   public MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<TaskEntity>> getDependentTaskHandler() {
@@ -128,7 +144,7 @@ public class MigratingInstanceParser {
     return incidentHandler;
   }
 
-  public MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<VariableInstanceEntity>> getDependentVariablesHandler() {
+  public MigratingDependentInstanceParseHandler<MigratingProcessElementInstance, List<VariableInstanceEntity>> getDependentVariablesHandler() {
     return dependentVariableHandler;
   }
 

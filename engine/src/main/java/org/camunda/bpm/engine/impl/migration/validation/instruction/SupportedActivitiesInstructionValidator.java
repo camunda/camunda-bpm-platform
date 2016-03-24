@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.migration.validation.instruction;
 
 import org.camunda.bpm.engine.impl.migration.validation.activity.HasNoEventSubProcessChildActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.HasNoEventSubProcessParentActivityValidator;
-import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedBoundaryEventActivityValidator;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
@@ -30,10 +29,6 @@ public class SupportedActivitiesInstructionValidator implements MigrationInstruc
   }
 
   public void validateSourceActivity(ValidatingMigrationInstruction instruction, ActivityImpl activity, MigrationInstructionValidationReportImpl report) {
-    if (!SupportedActivityValidator.INSTANCE.valid(activity)) {
-      report.addFailure("Type of the source activity '" + activity.getId() + "' is not supported by the migration");
-    }
-
     if (!SupportedBoundaryEventActivityValidator.INSTANCE.valid(activity)) {
       report.addFailure("Type of the source boundary event '" + activity.getId() + "' is not supported by migration");
     }
@@ -48,10 +43,6 @@ public class SupportedActivitiesInstructionValidator implements MigrationInstruc
   }
 
   public void validateTargetActivity(ValidatingMigrationInstruction instruction, ActivityImpl activity, MigrationInstructionValidationReportImpl report) {
-    if (!SupportedActivityValidator.INSTANCE.valid(activity)) {
-      report.addFailure("Type of the target activity '" + activity.getId() + "' is not supported by the migration");
-    }
-
     if (!SupportedBoundaryEventActivityValidator.INSTANCE.valid(activity)) {
       report.addFailure("Type of the target boundary event '" + activity.getId() + "' is not supported by migration");
     }

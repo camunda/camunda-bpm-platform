@@ -36,7 +36,6 @@ import org.camunda.bpm.engine.impl.tree.ActivityExecutionMappingCollector;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionTuple;
 import org.camunda.bpm.engine.impl.tree.OutputVariablesPropagator;
 import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
-import org.camunda.bpm.engine.impl.tree.ReferenceWalker.WalkCondition;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 
 

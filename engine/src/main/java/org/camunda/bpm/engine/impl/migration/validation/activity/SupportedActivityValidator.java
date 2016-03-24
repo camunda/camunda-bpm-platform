@@ -24,6 +24,12 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
+/**
+ * *Supported* refers to whether an activity instance of a certain activity type can be migrated.
+ * This validator is irrelevant for transition instances which can be migrated at any activity type.
+ * Thus, this validator is only used during migration instruction generation and migrating activity instance validation,
+ * not during migration instruction validation.
+ */
 public class SupportedActivityValidator implements MigrationActivityValidator {
 
   public static SupportedActivityValidator INSTANCE = new SupportedActivityValidator();

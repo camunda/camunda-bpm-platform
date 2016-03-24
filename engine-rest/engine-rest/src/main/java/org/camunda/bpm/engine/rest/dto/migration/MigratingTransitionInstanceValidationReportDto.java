@@ -16,12 +16,12 @@ package org.camunda.bpm.engine.rest.dto.migration;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.migration.MigratingActivityInstanceValidationReport;
+import org.camunda.bpm.engine.migration.MigratingTransitionInstanceValidationReport;
 
-public class MigratingActivityInstanceValidationReportDto {
+public class MigratingTransitionInstanceValidationReportDto {
 
   protected MigrationInstructionDto migrationInstruction;
-  protected String activityInstanceId;
+  protected String transitionInstanceId;
   protected String sourceScopeId;
   protected List<String> failures;
 
@@ -33,12 +33,12 @@ public class MigratingActivityInstanceValidationReportDto {
     this.migrationInstruction = migrationInstruction;
   }
 
-  public String getActivityInstanceId() {
-    return activityInstanceId;
+  public String getTransitionInstanceId() {
+    return transitionInstanceId;
   }
 
-  public void setActivityInstanceId(String activityInstanceId) {
-    this.activityInstanceId = activityInstanceId;
+  public void setTransitionInstanceId(String transitionInstanceId) {
+    this.transitionInstanceId = transitionInstanceId;
   }
 
   public List<String> getFailures() {
@@ -57,18 +57,18 @@ public class MigratingActivityInstanceValidationReportDto {
     this.sourceScopeId = sourceScopeId;
   }
 
-  public static List<MigratingActivityInstanceValidationReportDto> from(List<MigratingActivityInstanceValidationReport> reports) {
-    ArrayList<MigratingActivityInstanceValidationReportDto> dtos = new ArrayList<MigratingActivityInstanceValidationReportDto>();
-    for (MigratingActivityInstanceValidationReport report : reports) {
-      dtos.add(MigratingActivityInstanceValidationReportDto.from(report));
+  public static List<MigratingTransitionInstanceValidationReportDto> from(List<MigratingTransitionInstanceValidationReport> reports) {
+    ArrayList<MigratingTransitionInstanceValidationReportDto> dtos = new ArrayList<MigratingTransitionInstanceValidationReportDto>();
+    for (MigratingTransitionInstanceValidationReport report : reports) {
+      dtos.add(MigratingTransitionInstanceValidationReportDto.from(report));
     }
     return dtos;
   }
 
-  public static MigratingActivityInstanceValidationReportDto from(MigratingActivityInstanceValidationReport report) {
-    MigratingActivityInstanceValidationReportDto dto = new MigratingActivityInstanceValidationReportDto();
+  public static MigratingTransitionInstanceValidationReportDto from(MigratingTransitionInstanceValidationReport report) {
+    MigratingTransitionInstanceValidationReportDto dto = new MigratingTransitionInstanceValidationReportDto();
     dto.setMigrationInstruction(MigrationInstructionDto.from(report.getMigrationInstruction()));
-    dto.setActivityInstanceId(report.getActivityInstanceId());
+    dto.setTransitionInstanceId(report.getTransitionInstanceId());
     dto.setFailures(report.getFailures());
     dto.setSourceScopeId(report.getSourceScopeId());
     return dto;

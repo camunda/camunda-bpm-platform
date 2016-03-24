@@ -209,12 +209,14 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
   public void setExecution(ExecutionEntity execution) {
     if (execution != null) {
+      this.execution = execution;
       executionId = execution.getId();
       processInstanceId = execution.getProcessInstanceId();
-      execution.addJob(this);
+      this.execution.addJob(this);
     }
     else {
       this.execution.removeJob(this);
+      this.execution = execution;
       processInstanceId = null;
       executionId = null;
     }
@@ -612,18 +614,18 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
       }
     }
   }
-  
+
   /**
-   * 
+   *
    * Unlock from current lock owner
-   * 
+   *
    */
 
   public void unlock() {
     this.lockOwner = null;
     this.lockExpirationTime = null;
   }
-  
+
   public abstract String getType();
 
   @Override

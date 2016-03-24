@@ -13,13 +13,17 @@
 
 package org.camunda.bpm.engine.impl.migration.instance;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
+import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 public class MigratingEventSubscriptionInstance implements MigratingInstance, RemovingInstance, EmergingInstance {
+
+  public static final MigrationLogger MIGRATION_LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
   protected EventSubscriptionEntity eventSubscriptionEntity;
   protected ScopeImpl targetScope;
@@ -50,6 +54,11 @@ public class MigratingEventSubscriptionInstance implements MigratingInstance, Re
 
   public void attachState(MigratingActivityInstance newOwningInstance) {
     eventSubscriptionEntity.setExecution(newOwningInstance.resolveRepresentativeExecution());
+  }
+
+  @Override
+  public void attachState(MigratingTransitionInstance targetTranisitionInstance) {
+    throw MIGRATION_LOGGER.cannotAttachToTransitionInstance(this);
   }
 
   public void migrateState() {

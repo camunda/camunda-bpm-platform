@@ -21,7 +21,8 @@ public class MigratingProcessInstanceValidationReportDto {
 
   protected String processInstanceId;
   protected List<String> failures;
-  protected List<MigratingActivityInstanceValidationReportDto> instanceValidationReports;
+  protected List<MigratingActivityInstanceValidationReportDto> activityInstanceValidationReports;
+  protected List<MigratingTransitionInstanceValidationReportDto> transitionInstanceValidationReports;
 
   public String getProcessInstanceId() {
     return processInstanceId;
@@ -39,19 +40,28 @@ public class MigratingProcessInstanceValidationReportDto {
     this.failures = failures;
   }
 
-  public List<MigratingActivityInstanceValidationReportDto> getInstanceValidationReports() {
-    return instanceValidationReports;
+  public List<MigratingActivityInstanceValidationReportDto> getActivityInstanceValidationReports() {
+    return activityInstanceValidationReports;
   }
 
-  public void setInstanceValidationReports(List<MigratingActivityInstanceValidationReportDto> instanceValidationReports) {
-    this.instanceValidationReports = instanceValidationReports;
+  public void setActivityInstanceValidationReports(List<MigratingActivityInstanceValidationReportDto> activityInstanceValidationReports) {
+    this.activityInstanceValidationReports = activityInstanceValidationReports;
+  }
+
+  public List<MigratingTransitionInstanceValidationReportDto> getTransitionInstanceValidationReports() {
+    return transitionInstanceValidationReports;
+  }
+
+  public void setTransitionInstanceValidationReports(List<MigratingTransitionInstanceValidationReportDto> transitionInstanceValidationReports) {
+    this.transitionInstanceValidationReports = transitionInstanceValidationReports;
   }
 
   public static MigratingProcessInstanceValidationReportDto from(MigratingProcessInstanceValidationReport validationReport) {
     MigratingProcessInstanceValidationReportDto dto = new MigratingProcessInstanceValidationReportDto();
     dto.setProcessInstanceId(validationReport.getProcessInstanceId());
     dto.setFailures(validationReport.getFailures());
-    dto.setInstanceValidationReports(MigratingActivityInstanceValidationReportDto.from(validationReport.getReports()));
+    dto.setActivityInstanceValidationReports(MigratingActivityInstanceValidationReportDto.from(validationReport.getActivityInstanceReports()));
+    dto.setTransitionInstanceValidationReports(MigratingTransitionInstanceValidationReportDto.from(validationReport.getTransitionInstanceReports()));
     return dto;
   }
 

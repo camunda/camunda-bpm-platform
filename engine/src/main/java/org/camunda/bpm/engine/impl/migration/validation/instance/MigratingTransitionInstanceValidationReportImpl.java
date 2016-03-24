@@ -16,29 +16,29 @@ package org.camunda.bpm.engine.impl.migration.validation.instance;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
-import org.camunda.bpm.engine.migration.MigratingActivityInstanceValidationReport;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingTransitionInstance;
+import org.camunda.bpm.engine.migration.MigratingTransitionInstanceValidationReport;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 
-public class MigratingActivityInstanceValidationReportImpl implements MigratingActivityInstanceValidationReport {
+public class MigratingTransitionInstanceValidationReportImpl implements MigratingTransitionInstanceValidationReport {
 
-  protected String activityInstanceId;
+  protected String transitionInstanceId;
   protected String sourceScopeId;
   protected MigrationInstruction migrationInstruction;
   protected List<String> failures = new ArrayList<String>();
 
-  public MigratingActivityInstanceValidationReportImpl(MigratingActivityInstance migratingActivityInstance) {
-    this.activityInstanceId = migratingActivityInstance.getActivityInstance().getId();
-    this.sourceScopeId = migratingActivityInstance.getSourceScope().getId();
-    this.migrationInstruction = migratingActivityInstance.getMigrationInstruction();
+  public MigratingTransitionInstanceValidationReportImpl(MigratingTransitionInstance migratingTransitionInstance) {
+    this.transitionInstanceId = migratingTransitionInstance.getTransitionInstance().getId();
+    this.sourceScopeId = migratingTransitionInstance.getSourceScope().getId();
+    this.migrationInstruction = migratingTransitionInstance.getMigrationInstruction();
   }
 
   public String getSourceScopeId() {
     return sourceScopeId;
   }
 
-  public String getActivityInstanceId() {
-    return activityInstanceId;
+  public String getTransitionInstanceId() {
+    return transitionInstanceId;
   }
 
   public MigrationInstruction getMigrationInstruction() {

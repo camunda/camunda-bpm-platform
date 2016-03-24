@@ -12,22 +12,16 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Collections;
 
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.hamcrest.CoreMatchers;
@@ -132,54 +126,6 @@ public class MigrationProcessInstanceTest {
     }
     catch (ProcessEngineException e) {
       assertThat(e.getMessage(), CoreMatchers.containsString("process instance id is null"));
-    }
-  }
-
-  @Test
-  public void testNotMigrateProcessInstanceWithAsyncTransition() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
-      .userTaskBuilder("userTask")
-        .camundaAsyncBefore()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
-
-    try {
-      testHelper.createProcessInstanceAndMigrate(migrationPlan);
-      fail("Should not be able to migrate");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasFailures("Process instance contains not migrated jobs")
-        .hasActivityInstanceFailures(sourceProcessDefinition.getId(), "Has active asynchronous child transitions");
-    }
-  }
-
-  @Test
-  public void testNotMigrateProcessInstanceWithNestedAsyncTransition() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.TRIPLE_SUBPROCESS_PROCESS)
-      .userTaskBuilder("userTask")
-      .camundaAsyncBefore()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
-
-    try {
-      testHelper.createProcessInstanceAndMigrate(migrationPlan);
-      fail("Should not be able to migrate");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasFailures("Process instance contains not migrated jobs")
-        .hasActivityInstanceFailures("subProcess3", "Has active asynchronous child transitions");
     }
   }
 

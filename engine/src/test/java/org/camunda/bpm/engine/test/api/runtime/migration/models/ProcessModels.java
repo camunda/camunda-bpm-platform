@@ -27,15 +27,24 @@ public class ProcessModels {
   public static final String PROCESS_KEY = "Process";
 
 
-  protected static ProcessBuilder newModel() {
+  public static ProcessBuilder newModel() {
     return Bpmn.createExecutableProcess(PROCESS_KEY);
   }
 
   public static final BpmnModelInstance ONE_TASK_PROCESS =
       newModel()
-      .startEvent()
+      .startEvent("startEvent")
       .userTask("userTask").name("User Task")
-      .endEvent()
+      .endEvent("endEvent")
+      .done();
+
+  public static final BpmnModelInstance TWO_TASKS_PROCESS =
+      newModel()
+      .startEvent("startEvent")
+      .userTask("userTask1")
+      .sequenceFlowId("flow1")
+      .userTask("userTask2")
+      .endEvent("endEvent")
       .done();
 
   public static final BpmnModelInstance SUBPROCESS_PROCESS =
@@ -43,7 +52,7 @@ public class ProcessModels {
       .startEvent()
       .subProcess("subProcess")
         .embeddedSubProcess()
-          .startEvent()
+          .startEvent("subProcessStart")
           .userTask("userTask").name("User Task")
           .endEvent("subProcessEnd")
         .subProcessDone()

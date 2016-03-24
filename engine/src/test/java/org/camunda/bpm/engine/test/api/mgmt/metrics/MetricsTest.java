@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -150,6 +151,10 @@ public class MetricsTest extends AbstractMetricsTest {
         .endEvent()
       .done());
     runtimeService.startProcessInstanceByKey("testProcess");
+
+    TimeZone.setDefault(TimeZone.getTimeZone("CET"));
+
+    ClockUtil.setCurrentTime(new Date(1459042200000L));
 
     // when
     managementService.reportDbMetricsNow();

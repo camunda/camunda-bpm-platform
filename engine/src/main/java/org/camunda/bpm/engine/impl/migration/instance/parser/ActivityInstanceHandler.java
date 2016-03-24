@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.MigrationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 /**
  * @author Thorben Lindhauer
@@ -63,7 +64,6 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
     MigratingActivityInstance parentInstance = parseContext.getMigratingActivityInstanceById(element.getParentActivityInstanceId());
 
     if (parentInstance != null) {
-      parentInstance.getChildren().add(migratingInstance);
       migratingInstance.setParent(parentInstance);
     }
 
@@ -74,11 +74,19 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
 
     parseContext.submit(migratingInstance);
 
+    parseTransitionInstances(parseContext, migratingInstance);
+
     parseDependentInstances(parseContext, migratingInstance);
   }
 
+  public void parseTransitionInstances(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance) {
+    for (TransitionInstance transitionInstance : migratingInstance.getActivityInstance().getChildTransitionInstances()) {
+      parseContext.handleTransitionInstance(transitionInstance);
+    }
+  }
+
   public void parseDependentInstances(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance) {
-    parseContext.handleDependentJobs(migratingInstance, migratingInstance.resolveRepresentativeExecution().getJobs());
+    parseContext.handleDependentActivityInstanceJobs(migratingInstance, migratingInstance.resolveRepresentativeExecution().getJobs());
     parseContext.handleDependentEventSubscriptions(migratingInstance, migratingInstance.resolveRepresentativeExecution().getEventSubscriptions());
     parseContext.handleDependentTasks(migratingInstance, migratingInstance.resolveRepresentativeExecution().getTasks());
     parseContext.handleDependentVariables(migratingInstance, collectActivityInstanceVariables(migratingInstance));
@@ -116,7 +124,7 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
     return variables;
   }
 
-  protected List<VariableInstanceEntity> getConcurrentLocalVariables(ExecutionEntity execution) {
+  public static List<VariableInstanceEntity> getConcurrentLocalVariables(ExecutionEntity execution) {
     List<VariableInstanceEntity> variables = new ArrayList<VariableInstanceEntity>();
 
     for (VariableInstanceEntity variable : execution.getVariablesInternal()) {

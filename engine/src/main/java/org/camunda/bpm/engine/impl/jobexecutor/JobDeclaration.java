@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -147,8 +149,10 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
   }
 
   protected JobHandler resolveJobHandler() {
-    // TODO: throw exception if job handler not present
-    return Context.getProcessEngineConfiguration().getJobHandlers().get(jobHandlerType);
+     JobHandler jobHandler = Context.getProcessEngineConfiguration().getJobHandlers().get(jobHandlerType);
+     ensureNotNull("Cannot find job handler '" + jobHandlerType + "' from job '" + this + "'", "jobHandler", jobHandler);
+
+     return jobHandler;
   }
 
   protected String resolveJobHandlerType(S context) {

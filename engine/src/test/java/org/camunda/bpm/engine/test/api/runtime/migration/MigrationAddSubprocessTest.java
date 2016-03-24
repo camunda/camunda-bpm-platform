@@ -800,4 +800,31 @@ public class MigrationAddSubprocessTest {
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
+  @Test
+  public void testAddScopeDoesNotBecomeAsync() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
+        .activityBuilder("subProcess")
+        .camundaAsyncBefore()
+      .done());
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    // when
+    testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then the async flag for the subprocess was not relevant for instantiation
+    testHelper.assertActivityTreeAfterMigration().hasStructure(
+        describeActivityInstanceTree(targetProcessDefinition.getId())
+          .beginScope("subProcess")
+            .activity("userTask", testHelper.getSingleActivityInstanceBeforeMigration("userTask").getId())
+        .done());
+
+    Assert.assertEquals(0, testHelper.snapshotAfterMigration.getJobs().size());
+  }
+
 }

@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.migration.instance;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -21,6 +23,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
  *
  */
 public class MigratingTaskInstance implements MigratingInstance {
+
+  public static final MigrationLogger MIGRATION_LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
   protected TaskEntity userTask;
   protected MigratingActivityInstance migratingActivityInstance;
@@ -55,6 +59,11 @@ public class MigratingTaskInstance implements MigratingInstance {
     }
 
     userTask.setExecution(representativeExecution);
+  }
+
+  @Override
+  public void attachState(MigratingTransitionInstance targetTranisitionInstance) {
+    throw MIGRATION_LOGGER.cannotAttachToTransitionInstance(this);
   }
 
   @Override

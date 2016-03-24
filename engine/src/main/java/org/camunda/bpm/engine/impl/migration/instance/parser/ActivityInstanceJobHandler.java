@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
 import org.camunda.bpm.engine.impl.migration.instance.EmergingJobInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingJobInstance;
@@ -24,13 +25,14 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class JobInstanceHandler implements MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<JobEntity>> {
+public class ActivityInstanceJobHandler implements MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<JobEntity>> {
 
   @Override
   public void handle(MigratingInstanceParseContext parseContext, MigratingActivityInstance activityInstance, List<JobEntity> elements) {

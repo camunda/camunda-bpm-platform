@@ -1652,7 +1652,7 @@ public class MigrationBoundaryEventsTest {
     assertEquals(jobAfterMigration.getId(), incidentAfterMigration.getConfiguration());
 
     // and the activity and process definition references were updated
-    assertEquals("newUserTask", incidentAfterMigration.getActivityId());
+    assertEquals("newBoundary", incidentAfterMigration.getActivityId());
     assertEquals(targetProcessDefinition.getId(), incidentAfterMigration.getProcessDefinitionId());
   }
 

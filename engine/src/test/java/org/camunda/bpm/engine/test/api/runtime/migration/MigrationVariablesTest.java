@@ -24,10 +24,13 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.AsyncProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.camunda.bpm.engine.variable.Variables;
@@ -795,6 +798,72 @@ public class MigrationVariablesTest {
     Assert.assertNotNull(task2VariableAfterMigration);
     Assert.assertEquals("task2Value", task2VariableAfterMigration.getValue());
 
+  }
+
+  @Test
+  public void testVariableAtConcurrentExecutionInTransition() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities()
+        .build();
+
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .createProcessInstanceById(sourceProcessDefinition.getId())
+        .startBeforeActivity("userTask")
+        .startBeforeActivity("userTask")
+        .execute();
+
+    Execution concurrentExecution = runtimeService.createExecutionQuery().activityId("userTask").list().get(0);
+    Job jobForExecution = rule.getManagementService().createJobQuery().executionId(concurrentExecution.getId()).singleResult();
+
+    runtimeService.setVariableLocal(concurrentExecution.getId(), "var", "value");
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    Job jobAfterMigration = rule.getManagementService().createJobQuery().jobId(jobForExecution.getId()).singleResult();
+
+    testHelper.assertVariableMigratedToExecution(
+        testHelper.snapshotBeforeMigration.getSingleVariable("var"),
+        jobAfterMigration.getExecutionId());
+  }
+
+  @Test
+  public void testVariableAtConcurrentExecutionInTransitionAddParentScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_USER_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .build();
+
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .createProcessInstanceById(sourceProcessDefinition.getId())
+        .startBeforeActivity("userTask")
+        .startBeforeActivity("userTask")
+        .execute();
+
+    Execution concurrentExecution = runtimeService.createExecutionQuery().activityId("userTask").list().get(0);
+    Job jobForExecution = rule.getManagementService().createJobQuery().executionId(concurrentExecution.getId()).singleResult();
+
+    runtimeService.setVariableLocal(concurrentExecution.getId(), "var", "value");
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    Job jobAfterMigration = rule.getManagementService().createJobQuery().jobId(jobForExecution.getId()).singleResult();
+
+    testHelper.assertVariableMigratedToExecution(
+        testHelper.snapshotBeforeMigration.getSingleVariable("var"),
+        jobAfterMigration.getExecutionId());
   }
 
 }

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.migration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingInstance;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingProcessInstanceValidationReportImpl;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationPlanValidationReportImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -79,6 +80,14 @@ public class MigrationLogger extends ProcessEngineLogger {
         "Cannot destroy a subordinate of activity instance '{}'. Activity '{}' is not a scope",
         activityInstance.getActivityInstance().getId(),
         activityInstance.getActivityInstance().getActivityId()));
+  }
+
+  public ProcessEngineException cannotAttachToTransitionInstance(MigratingInstance attachingInstance) {
+    return new ProcessEngineException(exceptionMessage(
+        "007",
+        "{}",
+        "Cannot attach instance '{}' to a transition instance",
+        attachingInstance));
   }
 
 }

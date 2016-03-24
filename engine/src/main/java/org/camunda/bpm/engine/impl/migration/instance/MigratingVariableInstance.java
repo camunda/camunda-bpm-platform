@@ -55,6 +55,13 @@ public class MigratingVariableInstance implements MigratingInstance {
   }
 
   @Override
+  public void attachState(MigratingTransitionInstance owningActivityInstance) {
+    ExecutionEntity representativeExecution = owningActivityInstance.resolveRepresentativeExecution();
+
+    representativeExecution.addVariableInternal(variable);
+  }
+
+  @Override
   public void migrateState() {
     // nothing to do
   }
