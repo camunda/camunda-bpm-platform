@@ -70,25 +70,12 @@ var moment = require('camunda-commons-ui/vendor/moment');
         /**
          * observe the list of tasks
          */
-         var focusFirst = false;
         $scope.state = tasksData.observe('taskList', function (taskList) {
           $scope.totalItems = taskList.count;
           $scope.tasks = taskList._embedded.task;
           if(taskList._embedded.assignee) {
             parseAssignees(taskList._embedded.assignee);
           }
-
-          if(focusFirst) {
-            $timeout(function() {
-              // focus the first item on the new list of tasks
-              var el = document.querySelector('[cam-tasks] .tasks-list li:first-child a');
-              if(el) {
-                el.focus();
-              }
-            },0,false);
-          }
-          focusFirst = false;
-
         });
 
         $scope.$on('shortcut:focusList', function() {
@@ -120,7 +107,6 @@ var moment = require('camunda-commons-ui/vendor/moment');
             $scope.pageSize = $scope.query.maxResults;
             // Sachbearbeiter starts counting at '1'
             $scope.pageNum = ($scope.query.firstResult / $scope.pageSize) + 1;
-            focusFirst = true;
           }
         });
 

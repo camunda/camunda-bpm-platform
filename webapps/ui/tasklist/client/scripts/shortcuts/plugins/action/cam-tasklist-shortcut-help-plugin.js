@@ -32,13 +32,20 @@ function (
   }
 
   $scope.showHelp = function() {
-    $modal.open({
+    var modalInstance = $modal.open({
       // creates a child scope of a provided scope
       scope: $scope,
       windowClass: 'shortcut-modal',
       size: 'lg',
       template: showHelpTemplate
     });
+
+    modalInstance.result.then(function(result) {
+      document.querySelector('a.showShortcutHelp').focus();
+    }, function() {
+      document.querySelector('a.showShortcutHelp').focus();
+    });
+
   };
 
 }];

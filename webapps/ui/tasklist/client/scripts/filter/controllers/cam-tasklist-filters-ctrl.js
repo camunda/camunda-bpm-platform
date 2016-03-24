@@ -63,21 +63,28 @@ var template = fs.readFileSync(__dirname + '/../modals/cam-tasklist-filter-modal
       $scope.userCanCreateFilter = userCanCreateFilter;
     });
 
+    var doAfterFilterUpdate = [];
+    filtersData.observe('filters', function(filters) {
+      doAfterFilterUpdate.forEach(function(fct) {
+        fct(filters);
+      });
+      doAfterFilterUpdate = [];
+    });
+
     // open modal /////////////////////////////////////////////////////////////////////////////
 
     var focusFilter = function(filter) {
-      // wait for modal to close
-      $timeout(function() {
-        // wait for filter list refresh
-        $timeout(function() {
-          if(filter) {
-            $('.task-filters .content h4 a:contains(\''+filter.name+'\')')[0].focus();
-          } else {
-            document.querySelector('.task-filters header button.btn-link').focus();
-          }
+      if(filter) {
+        doAfterFilterUpdate.push(function(newFilters) {
+          $timeout(function() {
+            $('.task-filters .content div.item.active .actions a')[0].focus();
+          });
         });
-      });
+      } else {
+        document.querySelector('.task-filters header button.btn-link').focus();
+      }
     };
+
     $scope.$on('shortcut:focusFilter', function() {
       $('.task-filters .content h4 a')[0].focus();
     });
