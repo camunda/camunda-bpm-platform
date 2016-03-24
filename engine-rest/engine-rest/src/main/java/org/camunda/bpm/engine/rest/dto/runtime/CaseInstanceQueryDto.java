@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
@@ -39,6 +42,7 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
   protected static final String SORT_BY_INSTANCE_ID_VALUE = "caseInstanceId";
   protected static final String SORT_BY_DEFINITION_KEY_VALUE = "caseDefinitionKey";
   protected static final String SORT_BY_DEFINITION_ID_VALUE = "caseDefinitionId";
+  protected static final String SORT_BY_TENANT_ID = "tenantId";
 
   protected static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -46,6 +50,7 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_INSTANCE_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEFINITION_KEY_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEFINITION_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   protected String caseInstanceId;
@@ -57,6 +62,8 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
   protected String subProcessInstance;
   protected String superCaseInstance;
   protected String subCaseInstance;
+  protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
   protected Boolean active;
   protected Boolean completed;
   protected Boolean terminated;
@@ -113,6 +120,16 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
   @CamundaQueryParam("subCaseInstance")
   public void setSubCaseInstance(String subCaseInstance) {
     this.subCaseInstance = subCaseInstance;
+  }
+
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
   }
 
   @CamundaQueryParam(value = "active", converter = BooleanConverter.class)
@@ -174,6 +191,12 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
     if (subCaseInstance != null) {
       query.subCaseInstanceId(subCaseInstance);
     }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
+    }
     if (active != null && active == true) {
       query.active();
     }
@@ -220,6 +243,8 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
       query.orderByCaseDefinitionKey();
     } else if (sortBy.equals(SORT_BY_DEFINITION_ID_VALUE)) {
       query.orderByCaseDefinitionId();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 

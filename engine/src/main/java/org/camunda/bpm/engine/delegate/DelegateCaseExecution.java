@@ -34,6 +34,8 @@ public interface DelegateCaseExecution extends BaseDelegateExecution, ProcessEng
 
   String getActivityName();
 
+  String getTenantId();
+
   boolean isAvailable();
 
   boolean isEnabled();

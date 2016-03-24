@@ -1,5 +1,6 @@
 drop index ACT_IDX_CASE_EXEC_BUSKEY;
 drop index ACT_IDX_CASE_DEF_TENANT_ID;
+drop index ACT_IDX_CASE_EXEC_TENANT_ID;
 
 drop index ACT_IDX_CASE_EXE_CASE_INST;
 drop index ACT_IDX_CASE_EXE_PARENT;

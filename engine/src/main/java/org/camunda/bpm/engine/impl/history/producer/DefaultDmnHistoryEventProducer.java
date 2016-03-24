@@ -88,13 +88,12 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     // set current time as evaluation time
     event.setEvaluationTime(ClockUtil.getCurrentTime());
 
-    // TODO: set tenant id (using next lines) when delegate case execution is extended with it
-//    DecisionDefinition decisionDefinition = (DecisionDefinition) evaluationEvent.getDecisionTable();
-//    String tenantId = execution.getTenantId();
-//    if (tenantId == null) {
-//      tenantId = provideTenantId(decisionDefinition, event);
-//    }
-//    event.setTenantId(tenantId);
+    DecisionDefinition decisionDefinition = (DecisionDefinition) evaluationEvent.getDecisionTable();
+    String tenantId = execution.getTenantId();
+    if (tenantId == null) {
+      tenantId = provideTenantId(decisionDefinition, event);
+    }
+    event.setTenantId(tenantId);
 
     return event;
   }

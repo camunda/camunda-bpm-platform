@@ -220,8 +220,9 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_ONE).execute();
     runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_TWO).execute();
 
-    assertThatStartedCaseInstanceForTenant(TENANT_ONE);
-    assertThatStartedCaseInstanceForTenant(TENANT_TWO);
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("Case_1");
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
   public void testStartCaseInstanceWithLatestBindingSameVersion() {
@@ -240,8 +241,9 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_ONE).execute();
     runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_TWO).execute();
 
-    assertThatStartedCaseInstanceForTenant(TENANT_ONE);
-    assertThatStartedCaseInstanceForTenant(TENANT_TWO);
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("Case_1");
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
   public void testStartCaseInstanceWithLatestBindingDifferentVersion() {
@@ -262,10 +264,11 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_ONE).execute();
     runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_TWO).execute();
 
-    assertThatStartedCaseInstanceForTenant(TENANT_ONE);
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("Case_1");
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
 
     CaseDefinition latestCaseDefinitionTenantTwo = repositoryService.createCaseDefinitionQuery().tenantIdIn(TENANT_TWO).latestVersion().singleResult();
-    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionId(latestCaseDefinitionTenantTwo.getId());
+    query = caseService.createCaseInstanceQuery().caseDefinitionId(latestCaseDefinitionTenantTwo.getId());
     assertThat(query.count(), is(1L));
   }
 
@@ -286,8 +289,9 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_ONE).execute();
     runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_TWO).execute();
 
-    assertThatStartedCaseInstanceForTenant(TENANT_ONE);
-    assertThatStartedCaseInstanceForTenant(TENANT_TWO);
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("Case_1");
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
   public void testFailStartCaseInstanceFromOtherTenantWithDeploymentBinding() {
@@ -418,7 +422,9 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
     runtimeService.startProcessInstanceByKey("callingProcess");
 
-    assertThatStartedCaseInstanceForTenant(TENANT_ONE);
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("Case_1");
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+
   }
 
   public void testCaseRefTenantIdExpression() {
@@ -436,14 +442,8 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
     runtimeService.startProcessInstanceByKey("callingProcess");
 
-    assertThatStartedCaseInstanceForTenant(TENANT_ONE);
-  }
-
-  protected void assertThatStartedCaseInstanceForTenant(String tenantId) {
-    CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().tenantIdIn(tenantId).singleResult();
-    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionId(caseDefinition.getId());
-    // TODO check the tenant-id of the case instance - CAM-5197
-    assertThat(query.count(), is(1L));
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("Case_1");
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
   protected String deploymentForTenant(String tenantId, String classpathResource, BpmnModelInstance modelInstance) {

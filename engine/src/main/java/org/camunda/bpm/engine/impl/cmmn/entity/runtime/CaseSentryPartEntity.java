@@ -42,6 +42,7 @@ public class CaseSentryPartEntity extends CmmnSentryPart implements DbEntity, Ha
   protected String caseInstanceId;
   protected String caseExecutionId;
   protected String sourceCaseExecutionId;
+  protected String tenantId;
   private boolean forcedUpdate;
 
   // id ///////////////////////////////////////////////////////////////////
@@ -147,6 +148,14 @@ public class CaseSentryPartEntity extends CmmnSentryPart implements DbEntity, Ha
 
   public int getRevisionNext() {
     return revision + 1;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 
   public void forceUpdate() {

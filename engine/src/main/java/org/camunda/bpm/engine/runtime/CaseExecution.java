@@ -101,4 +101,10 @@ public interface CaseExecution {
    */
   boolean isTerminated();
 
+  /**
+   * The id of the tenant this case execution belongs to. Can be <code>null</code>
+   * if the case execution belongs to no single tenant.
+   */
+  String getTenantId();
+
 }

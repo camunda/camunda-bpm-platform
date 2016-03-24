@@ -29,6 +29,7 @@ create table ACT_RU_CASE_EXECUTION (
     PREV_STATE_ integer,
     CURRENT_STATE_ integer,
     REQUIRED_ boolean,
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -45,6 +46,7 @@ create table ACT_RU_CASE_SENTRY_PART (
     STANDARD_EVENT_ varchar(255),
     SOURCE_ varchar(255),
     SATISFIED_ boolean,
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -109,4 +111,5 @@ alter table ACT_RU_CASE_SENTRY_PART
     foreign key (CASE_EXEC_ID_)
     references ACT_RU_CASE_EXECUTION(ID_);
     
-create index ACT_IDX_CASE_DEF_TENANT_ID on ACT_RE_CASE_DEF(TENANT_ID_);    
+create index ACT_IDX_CASE_DEF_TENANT_ID on ACT_RE_CASE_DEF(TENANT_ID_);
+create index ACT_IDX_CASE_EXEC_TENANT_ID on ACT_RU_CASE_EXECUTION(TENANT_ID_);

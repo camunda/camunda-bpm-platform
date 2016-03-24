@@ -26,7 +26,9 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -39,6 +41,9 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 
 public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngineTestCase {
+
+  protected static final String CMMN_FILE = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
+  protected static final String SET_VARIABLE_CMMN_FILE = "org/camunda/bpm/engine/test/api/multitenancy/HumanTaskSetVariableExecutionListener.cmmn";
 
   protected static final String PROCESS_DEFINITION_KEY = "testProcess";
   protected static final String TENANT_ID = "tenant1";
@@ -57,7 +62,6 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
   }
 
   public void testPropagateTenantIdToProcessInstance() {
-
     deploymentForTenant(TENANT_ID,  Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
         .startEvent()
         .userTask()
@@ -400,6 +404,49 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
     assertThat(externalTasks.get(0).getTenantId(), is(TENANT_ID));
   }
 
+  public void testPropagateTenantIdToVariableInstanceOnCreateCaseInstance() {
+
+    deploymentForTenant(TENANT_ID, CMMN_FILE);
+
+    VariableMap variables = Variables.putValue("var", "test");
+
+    CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
+    caseService.createCaseInstanceById(caseDefinition.getId(), variables);
+
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
+    assertThat(variableInstance, is(notNullValue()));
+    // inherit the tenant id from case instance
+    assertThat(variableInstance.getTenantId(), is(TENANT_ID));
+  }
+
+  public void testPropagateTenantIdToVariableInstanceFromCaseExecution() {
+
+    deploymentForTenant(TENANT_ID, SET_VARIABLE_CMMN_FILE);
+
+    createCaseInstance();
+
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
+    assertThat(variableInstance, is(notNullValue()));
+    // inherit the tenant id from case execution
+    assertThat(variableInstance.getTenantId(), is(TENANT_ID));
+  }
+
+  public void testPropagateTenantIdToVariableInstanceFromHumanTask() {
+
+    deploymentForTenant(TENANT_ID, CMMN_FILE);
+
+    createCaseInstance();
+
+    VariableMap variables = Variables.createVariables().putValue("var", "test");
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
+    caseService.manuallyStartCaseExecution(caseExecution.getId(), variables);
+
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
+    assertThat(variableInstance, is(notNullValue()));
+    // inherit the tenant id from human task
+    assertThat(variableInstance.getTenantId(), is(TENANT_ID));
+  }
+
   public static class SetVariableTask implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
@@ -415,6 +462,11 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
         .singleResult();
 
     runtimeService.startProcessInstanceById(processDefinition.getId());
+  }
+
+  protected void createCaseInstance() {
+    CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
+    caseService.createCaseInstanceById(caseDefinition.getId());
   }
 
 }

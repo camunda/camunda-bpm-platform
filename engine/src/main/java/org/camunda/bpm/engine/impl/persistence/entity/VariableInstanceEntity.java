@@ -205,10 +205,12 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     if (caseExecution != null) {
       this.caseInstanceId = caseExecution.getCaseInstanceId();
       this.caseExecutionId = caseExecution.getId();
+      this.tenantId = caseExecution.getTenantId();
     }
     else {
       this.caseInstanceId = null;
       this.caseExecutionId = null;
+      this.tenantId = null;
     }
   }
 

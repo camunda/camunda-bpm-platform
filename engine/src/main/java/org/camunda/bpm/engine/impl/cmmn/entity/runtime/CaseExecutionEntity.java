@@ -55,6 +55,7 @@ import org.camunda.bpm.engine.impl.history.producer.CmmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.CaseExecutionEntityReferencer;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntityFactory;
@@ -390,6 +391,11 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     // set case definition
     child.setCaseDefinition(getCaseDefinition());
 
+    // inherit the tenant id from parent case execution
+    if(tenantId != null) {
+      child.setTenantId(tenantId);
+    }
+
     return child;
   }
 
@@ -460,6 +466,16 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   public ExecutionEntity createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId) {
     ExecutionEntity subProcessInstance = (ExecutionEntity) processDefinition.createProcessInstance(businessKey, caseInstanceId);
 
+    // inherit the tenant-id from the process definition
+    String tenantId = ((ProcessDefinitionEntity) processDefinition).getTenantId();
+    if (tenantId != null) {
+      subProcessInstance.setTenantId(tenantId);
+    }
+    else {
+      // if process definition has no tenant id, inherit this case instance's tenant id
+      subProcessInstance.setTenantId(this.tenantId);
+    }
+
     // manage bidirectional super-subprocess relation
     subProcessInstance.setSuperCaseExecution(this);
     setSubProcessInstance(subProcessInstance);
@@ -495,6 +511,16 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   public CaseExecutionEntity createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey) {
     CaseExecutionEntity subCaseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance(businessKey);
+
+    // inherit the tenant-id from the case definition
+    String tenantId = ((CaseDefinitionEntity) caseDefinition).getTenantId();
+    if (tenantId != null) {
+      subCaseInstance.setTenantId(tenantId);
+    }
+    else {
+      // if case definition has no tenant id, inherit this case instance's tenant id
+      subCaseInstance.setTenantId(this.tenantId);
+    }
 
     // manage bidirectional super-sub-case-instances relation
     subCaseInstance.setSuperCaseExecution(this);

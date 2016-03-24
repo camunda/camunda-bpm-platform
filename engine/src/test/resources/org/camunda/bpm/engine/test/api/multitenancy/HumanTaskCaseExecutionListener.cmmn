@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<definitions id="_7f0c94c0-2a22-445d-b4b7-4fd181e08248"
+                  xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+                  xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  targetNamespace="Examples">
+  <case id="case" name="Case">
+
+    <casePlanModel id="CasePlanModel_1">
+
+      <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
+      <planItem id="PI_HumanTask_2" definitionRef="HumanTask_2" />
+
+      <humanTask id="HumanTask_1" name="A HumanTask">
+        <extensionElements>
+          <camunda:caseExecutionListener class="org.camunda.bpm.engine.test.api.multitenancy.listener.AssertingCaseExecutionListener"/>
+        </extensionElements>
+      </humanTask>
+      <humanTask id="HumanTask_2" name="Another HumanTask" />
+    </casePlanModel>
+  </case>
+
+</definitions>

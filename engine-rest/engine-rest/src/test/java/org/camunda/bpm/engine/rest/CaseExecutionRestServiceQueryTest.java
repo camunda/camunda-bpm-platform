@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -193,6 +194,11 @@ public class CaseExecutionRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder.verify(mockedQuery).orderByCaseDefinitionId();
     inOrder.verify(mockedQuery).asc();
 
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
+    inOrder.verify(mockedQuery).asc();
+
     // desc
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("caseExecutionId", "desc", Status.OK);
@@ -208,6 +214,12 @@ public class CaseExecutionRestServiceQueryTest extends AbstractRestServiceTest {
     executeAndVerifySorting("caseDefinitionId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByCaseDefinitionId();
     inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
+    inOrder.verify(mockedQuery).desc();
+
   }
 
   @Test
@@ -313,6 +325,7 @@ public class CaseExecutionRestServiceQueryTest extends AbstractRestServiceTest {
     String returnedActivityName = from(content).getString("[0].activityName");
     String returnedActivityType = from(content).getString("[0].activityType");
     String returnedActivityDescription = from(content).getString("[0].activityDescription");
+    String returnedTenantId = from(content).getString("[0].tenantId");
     boolean returnedRequired = from(content).getBoolean("[0].required");
     boolean returnedActiveState = from(content).getBoolean("[0].active");
     boolean returnedEnabledState = from(content).getBoolean("[0].enabled");
@@ -326,6 +339,7 @@ public class CaseExecutionRestServiceQueryTest extends AbstractRestServiceTest {
     assertThat(returnedActivityName).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME);
     assertThat(returnedActivityType).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_TYPE);
     assertThat(returnedActivityDescription).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_DESCRIPTION);
+    assertThat(returnedTenantId).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
     assertThat(returnedRequired).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_REQUIRED);
     assertThat(returnedEnabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ENABLED);
     assertThat(returnedActiveState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
@@ -367,6 +381,7 @@ public class CaseExecutionRestServiceQueryTest extends AbstractRestServiceTest {
     String returnedActivityName = from(content).getString("[0].activityName");
     String returnedActivityType = from(content).getString("[0].activityType");
     String returnedActivityDescription = from(content).getString("[0].activityDescription");
+    String returnedTenantId = from(content).getString("[0].tenantId");
     boolean returnedRequired = from(content).getBoolean("[0].required");
     boolean returnedActiveState = from(content).getBoolean("[0].active");
     boolean returnedEnabledState = from(content).getBoolean("[0].enabled");
@@ -380,6 +395,7 @@ public class CaseExecutionRestServiceQueryTest extends AbstractRestServiceTest {
     assertThat(returnedActivityName).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME);
     assertThat(returnedActivityType).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_TYPE);
     assertThat(returnedActivityDescription).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_DESCRIPTION);
+    assertThat(returnedTenantId).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
     assertThat(returnedRequired).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_REQUIRED);
     assertThat(returnedEnabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ENABLED);
     assertThat(returnedActiveState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
@@ -396,6 +412,7 @@ public class CaseExecutionRestServiceQueryTest extends AbstractRestServiceTest {
     queryParameters.put("caseInstanceId", "aCaseInstanceId");
     queryParameters.put("businessKey", "aBusinessKey");
     queryParameters.put("activityId", "anActivityId");
+    queryParameters.put("tenantIdIn", "aTenantId");
     queryParameters.put("required", "true");
     queryParameters.put("active", "true");
     queryParameters.put("enabled", "true");
@@ -415,6 +432,7 @@ public class CaseExecutionRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockedQuery).caseInstanceId(queryParameters.get("caseInstanceId"));
     verify(mockedQuery).caseInstanceBusinessKey(queryParameters.get("businessKey"));
     verify(mockedQuery).activityId(queryParameters.get("activityId"));
+    verify(mockedQuery).tenantIdIn(queryParameters.get("tenantIdIn"));
     verify(mockedQuery).required();
     verify(mockedQuery).active();
     verify(mockedQuery).enabled();
@@ -1032,6 +1050,66 @@ public class CaseExecutionRestServiceQueryTest extends AbstractRestServiceTest {
       .post(CASE_EXECUTION_COUNT_QUERY_URL);
 
     verify(mockedQuery).count();
+  }
+
+  @Test
+  public void testTenantIdListParameter() {
+    mockedQuery = setUpMockCaseExecutionQuery(createMockCaseExecutionsTwoTenants());
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(CASE_EXECUTION_QUERY_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> caseExecutions = from(content).getList("");
+    assertThat(caseExecutions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void testTenantIdListPostParameter() {
+    mockedQuery = setUpMockCaseExecutionQuery(createMockCaseExecutionsTwoTenants());
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST.split(","));
+
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(CASE_EXECUTION_QUERY_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> caseExecutions = from(content).getList("");
+    assertThat(caseExecutions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  private List<CaseExecution> createMockCaseExecutionsTwoTenants() {
+    return Arrays.asList(
+        MockProvider.createMockCaseExecution(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockCaseExecution(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
   }
 
 }

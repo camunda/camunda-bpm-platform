@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
@@ -39,6 +40,7 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
   protected static final String SORT_BY_EXECUTION_ID_VALUE = "caseExecutionId";
   protected static final String SORT_BY_DEFINITION_KEY_VALUE = "caseDefinitionKey";
   protected static final String SORT_BY_DEFINITION_ID_VALUE = "caseDefinitionId";
+  protected static final String SORT_BY_TENANT_ID = "tenantId";
 
   protected static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -46,6 +48,7 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
     VALID_SORT_BY_VALUES.add(SORT_BY_EXECUTION_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEFINITION_KEY_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEFINITION_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   protected String caseExecutionId;
@@ -54,6 +57,7 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
   protected String caseInstanceId;
   protected String businessKey;
   protected String activityId;
+  protected List<String> tenantIds;
   protected Boolean required;
   protected Boolean enabled;
   protected Boolean active;
@@ -97,6 +101,11 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
   @CamundaQueryParam("activityId")
   public void setActivityId(String activityId) {
     this.activityId = activityId;
+  }
+
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
   }
 
   @CamundaQueryParam(value="required", converter = BooleanConverter.class)
@@ -163,6 +172,10 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
 
     if (activityId != null) {
       query.activityId(activityId);
+    }
+
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
     }
 
     if (required != null && required == true) {
@@ -245,6 +258,8 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
       query.orderByCaseDefinitionKey();
     } else if (sortBy.equals(SORT_BY_DEFINITION_ID_VALUE)) {
       query.orderByCaseDefinitionId();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 

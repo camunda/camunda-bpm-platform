@@ -164,6 +164,7 @@ public class CaseExecutionRestServiceInteractionTest extends AbstractRestService
         .body("activityName", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME))
         .body("activityType", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_TYPE))
         .body("activityDescription", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_DESCRIPTION))
+        .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
         .body("required", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_REQUIRED))
         .body("active", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ACTIVE))
         .body("enabled", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ENABLED))

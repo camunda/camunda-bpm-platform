@@ -2131,11 +2131,16 @@ public abstract class MockProvider {
   }
 
   public static CaseInstance createMockCaseInstance() {
+    return createMockCaseInstance(EXAMPLE_TENANT_ID);
+  }
+
+  public static CaseInstance createMockCaseInstance(String tenantId) {
     CaseInstance mock = mock(CaseInstance.class);
 
     when(mock.getId()).thenReturn(EXAMPLE_CASE_INSTANCE_ID);
     when(mock.getBusinessKey()).thenReturn(EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
     when(mock.getCaseDefinitionId()).thenReturn(EXAMPLE_CASE_INSTANCE_CASE_DEFINITION_ID);
+    when(mock.getTenantId()).thenReturn(tenantId);
     when(mock.isActive()).thenReturn(EXAMPLE_CASE_INSTANCE_IS_ACTIVE);
     when(mock.isCompleted()).thenReturn(EXAMPLE_CASE_INSTANCE_IS_COMPLETED);
     when(mock.isTerminated()).thenReturn(EXAMPLE_CASE_INSTANCE_IS_TERMINATED);
@@ -2151,6 +2156,10 @@ public abstract class MockProvider {
   }
 
   public static CaseExecution createMockCaseExecution() {
+    return createMockCaseExecution(EXAMPLE_TENANT_ID);
+  }
+
+  public static CaseExecution createMockCaseExecution(String tenantId) {
     CaseExecution mock = mock(CaseExecution.class);
 
     when(mock.getId()).thenReturn(EXAMPLE_CASE_EXECUTION_ID);
@@ -2161,6 +2170,7 @@ public abstract class MockProvider {
     when(mock.getActivityName()).thenReturn(EXAMPLE_CASE_EXECUTION_ACTIVITY_NAME);
     when(mock.getActivityType()).thenReturn(EXAMPLE_CASE_EXECUTION_ACTIVITY_TYPE);
     when(mock.getActivityDescription()).thenReturn(EXAMPLE_CASE_EXECUTION_ACTIVITY_DESCRIPTION);
+    when(mock.getTenantId()).thenReturn(tenantId);
     when(mock.isRequired()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_REQUIRED);
     when(mock.isActive()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
     when(mock.isEnabled()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_ENABLED);

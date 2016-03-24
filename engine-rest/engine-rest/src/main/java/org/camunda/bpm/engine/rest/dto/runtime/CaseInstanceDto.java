@@ -24,6 +24,7 @@ public class CaseInstanceDto extends LinkableDto {
   protected String id;
   protected String caseDefinitionId;
   protected String businessKey;
+  protected String tenantId;
   protected boolean active;
   protected boolean completed;
   protected boolean terminated;
@@ -38,6 +39,10 @@ public class CaseInstanceDto extends LinkableDto {
 
   public String getBusinessKey() {
     return businessKey;
+  }
+
+  public String getTenantId() {
+    return tenantId;
   }
 
   public boolean isActive() {
@@ -58,6 +63,7 @@ public class CaseInstanceDto extends LinkableDto {
     result.id = instance.getId();
     result.caseDefinitionId = instance.getCaseDefinitionId();
     result.businessKey = instance.getBusinessKey();
+    result.tenantId = instance.getTenantId();
     result.active = instance.isActive();
     result.completed = instance.isCompleted();
     result.terminated = instance.isTerminated();

@@ -158,6 +158,7 @@ public class CaseInstanceRestServiceInteractionTest extends AbstractRestServiceT
         .body("id", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_ID))
         .body("businessKey", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY))
         .body("caseDefinitionId", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_CASE_DEFINITION_ID))
+        .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
         .body("active", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_IS_ACTIVE))
         .body("completed", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_IS_COMPLETED))
         .body("terminated", equalTo(MockProvider.EXAMPLE_CASE_INSTANCE_IS_TERMINATED))
