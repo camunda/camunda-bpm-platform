@@ -1,7 +1,6 @@
 'use strict';
 
-var $ = require('jquery');
-window.jQuery = $;
+var $ = window.jQuery = window.$ = require('jquery');
 
 var commons = require('camunda-commons-ui/lib');
 var sdk = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular');
@@ -67,6 +66,24 @@ var dataDepend = require('angular-data-depend');
     }));
 
     var uriConfig = parseUriConfig();
+
+    if (typeof window.tasklistConf !== 'undefined' && window.tasklistConf.polyfills) {
+      var polyfills = window.tasklistConf.polyfills;
+
+      if (polyfills.indexOf('placeholder') > -1) {
+        var load = window.requirejs;
+        var appRoot = uriConfig['app-root'];
+
+        load([
+          appRoot + '/app/tasklist/scripts/placeholders.utils.js',
+          appRoot + '/app/tasklist/scripts/placeholders.main.js'
+        ], function () {
+          load([
+            appRoot + '/app/tasklist/scripts/placeholders.jquery.js'
+          ], function () {});
+        });
+      }
+    }
 
     var tasklistApp = angular.module('cam.tasklist', ngDeps);
 

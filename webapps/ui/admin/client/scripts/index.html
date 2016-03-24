@@ -98,6 +98,8 @@
             version="v${project.version}"></footer>
 
     <script type="application/javascript">
+      var adminConf = window.adminConf = {};
+
       window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
       window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
 
@@ -106,15 +108,13 @@
       };
     </script>
 
-    <script type="application/javascript" data-main="$APP_ROOT/app/admin/camunda-admin-bootstrap" src="$APP_ROOT/lib/require.js"></script>
+    <!--[if lte IE 9]><script type="text/javascript">
+      adminConf.polyfills = adminConf.polyfills || [];
+      adminConf.polyfills.push('placeholder');
+    </script><![endif]-->
 
-    <!--[if lte IE 9]>
-    <script type="text/javascript"
-            src="$APP_ROOT/app/admin/scripts/placeholders.utils.js"></script>
-    <script type="text/javascript"
-            src="$APP_ROOT/app/admin/scripts/placeholders.main.js"></script>
-    <script type="text/javascript"
-            src="$APP_ROOT/app/admin/scripts/placeholders.jquery.js"></script>
-    <![endif]-->
+    <script type="application/javascript"
+            src="$APP_ROOT/lib/require.js"
+            data-main="$APP_ROOT/app/admin/camunda-admin-bootstrap"></script>
   </body>
 </html>
