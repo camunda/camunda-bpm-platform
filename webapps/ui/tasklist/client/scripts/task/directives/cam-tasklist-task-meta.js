@@ -288,10 +288,30 @@ var angular = require('camunda-commons-ui/vendor/angular');
             if (groupsChanged) {
               taskMetaData.set('taskId', { taskId: $scope.task.id });
               taskMetaData.changed('taskList');
+
+              // okay, here is where it gets ugly: since the groups have changed, a listener to the event we just fired
+              // will update the task. that means that the complete html of the task is going to be replaced at some point in the future
+              // after this replacement, we have to set the focus to the groups trigger again
+              doAfterGroupsLoaded.push(function() {
+                $timeout(function() {
+                  document.querySelector('.meta .groups a').focus();
+                });
+              });
+
+            } else {
+              document.querySelector('.meta .groups a').focus();
             }
           }
 
         };
+
+        var doAfterGroupsLoaded = [];
+        $scope.$watch('groupNames', function(status) {
+          doAfterGroupsLoaded.forEach(function(fct) {
+            fct();
+          });
+          doAfterGroupsLoaded = [];
+        });
 
         function notify(action) {
           var messages = notifications[action];
