@@ -41,8 +41,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.runtime.CaseExecution;
-import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.DoubleValue;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
@@ -288,11 +286,11 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     return tenantId;
   }
 
-  protected Execution getExecution(HistoricDecisionInstanceEntity event) {
+  protected DelegateExecution getExecution(HistoricDecisionInstanceEntity event) {
     return Context.getCommandContext().getExecutionManager().findExecutionById(event.getExecutionId());
   }
 
-  protected CaseExecution getCaseExecution(HistoricDecisionInstanceEntity event) {
+  protected DelegateCaseExecution getCaseExecution(HistoricDecisionInstanceEntity event) {
       return Context.getCommandContext().getCaseExecutionManager().findCaseExecutionById(event.getCaseExecutionId());
   }
 

@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.cfg.multitenancy;
 
+import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.runtime.CaseExecution;
-import org.camunda.bpm.engine.runtime.Execution;
 
 /**
  * Provides information about a historic decision instance to a {@link TenantIdProvider} implementation.
@@ -26,20 +26,20 @@ public class TenantIdProviderHistoricDecisionInstanceContext {
 
   protected DecisionDefinition decisionDefinition;
 
-  protected Execution execution;
+  protected DelegateExecution execution;
 
-  protected CaseExecution caseExecution;
+  protected DelegateCaseExecution caseExecution;
 
   public TenantIdProviderHistoricDecisionInstanceContext(DecisionDefinition decisionDefinition) {
     this.decisionDefinition = decisionDefinition;
   }
 
-  public TenantIdProviderHistoricDecisionInstanceContext(DecisionDefinition decisionDefinition, Execution execution) {
+  public TenantIdProviderHistoricDecisionInstanceContext(DecisionDefinition decisionDefinition, DelegateExecution execution) {
     this(decisionDefinition);
     this.execution = execution;
   }
 
-  public TenantIdProviderHistoricDecisionInstanceContext(DecisionDefinition decisionDefinition, CaseExecution caseExecution) {
+  public TenantIdProviderHistoricDecisionInstanceContext(DecisionDefinition decisionDefinition, DelegateCaseExecution caseExecution) {
     this(decisionDefinition);
     this.caseExecution = caseExecution;
   }
@@ -55,7 +55,7 @@ public class TenantIdProviderHistoricDecisionInstanceContext {
    * @return the execution. This method returns the execution of the process instance
    * which evaluated the decision definition.
    */
-  public Execution getExecution() {
+  public DelegateExecution getExecution() {
     return execution;
   }
 
@@ -63,7 +63,7 @@ public class TenantIdProviderHistoricDecisionInstanceContext {
    * @return the case execution. This method returns the case execution of the CMMN case task
    * which evaluated the decision definition.
    */
-  public CaseExecution getCaseExecution() {
+  public DelegateCaseExecution getCaseExecution() {
     return caseExecution;
   }
 
