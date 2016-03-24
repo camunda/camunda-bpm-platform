@@ -7,11 +7,12 @@ var pagesModule = require('./pages/main'),
     resourcesModule = require('./resources/main'),
     camCommonsUi = require('camunda-commons-ui/lib'),
     sdk = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular'),
-    angular = require('camunda-commons-ui/vendor/angular'),
-    $ = require('jquery');
+    angular = require('camunda-commons-ui/vendor/angular');
 
 
   var APP_NAME = 'cam.admin';
+  var $ = window.jQuery = window.$ = require('jquery');
+
 
   module.exports = function(pluginDependencies) {
 
@@ -97,6 +98,24 @@ var pagesModule = require('./pages/main'),
       getUserProfile($scope.authentication);
     }]);
 
+
+    if (typeof window.adminConf !== 'undefined' && window.adminConf.polyfills) {
+      var polyfills = window.adminConf.polyfills;
+
+      if (polyfills.indexOf('placeholder') > -1) {
+        var load = window.requirejs;
+        var appRoot = $('head base').attr('app-root');
+
+        load([
+          appRoot + '/app/tasklist/scripts/placeholders.utils.js',
+          appRoot + '/app/tasklist/scripts/placeholders.main.js'
+        ], function () {
+          load([
+            appRoot + '/app/tasklist/scripts/placeholders.jquery.js'
+          ], function () {});
+        });
+      }
+    }
 
     $(document).ready(function () {
       angular.bootstrap(document, [ appNgModule.name ]);

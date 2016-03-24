@@ -5,6 +5,7 @@ define('camunda-tasklist-bootstrap', [
   // 'angular'
 ], function (camundaTasklistUi) {
   'use strict';
+  console.info('jQuery', window.jQuery);
 
   require.config({
     baseUrl: '../../../lib'
@@ -32,7 +33,6 @@ define('camunda-tasklist-bootstrap', [
     }));
 
     require(dependencies, function(angular) {
-
       // we now loaded the tasklist and the plugins, great
       // before we start initializing the tasklist though (and leave the requirejs context),
       // lets see if we should load some custom scripts first

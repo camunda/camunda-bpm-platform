@@ -90,9 +90,7 @@
   <script type="text/javascript">
     // override the following line to include configuration
     var tasklistConf = {};
-  </script>
 
-  <script type="text/javascript">
     window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
     window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
 
@@ -102,18 +100,14 @@
   </script>
 
   <script type="text/javascript" src="$APP_ROOT/app/tasklist/scripts/config.js"></script>
+
+  <!--[if lte IE 9]><script type="text/javascript">
+    tasklistConf.polyfills = tasklistConf.polyfills || [];
+    tasklistConf.polyfills.push('placeholder');
+  </script><![endif]-->
+
   <script type="application/javascript"
           src="$APP_ROOT/lib/require.js"
           data-main="$APP_ROOT/app/tasklist/camunda-tasklist-bootstrap"></script>
-
-  <!--[if lte IE 9]>
-  <script type="text/javascript"
-          src="$APP_ROOT/app/tasklist/scripts/placeholders.utils.js"></script>
-  <script type="text/javascript"
-          src="$APP_ROOT/app/tasklist/scripts/placeholders.main.js"></script>
-  <script type="text/javascript"
-          src="$APP_ROOT/app/tasklist/scripts/placeholders.jquery.js"></script>
-  <![endif]-->
-
 </body>
 </html>
