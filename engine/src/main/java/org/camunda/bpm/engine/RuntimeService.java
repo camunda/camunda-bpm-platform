@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
@@ -1201,6 +1202,8 @@ public interface RuntimeService {
    * one process instance from the hierarchy will not suspend other
    * process instances from that hierarchy.</p>
    *
+   * <p>Note: for more complex suspend commands use {@link #updateProcessInstanceSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          if no such processInstance can be found.
    * @throws AuthorizationException
@@ -1234,6 +1237,8 @@ public interface RuntimeService {
    * one process instance from the hierarchy will not suspend other
    * process instances from that hierarchy.</p>
    *
+   * <p>Note: for more complex suspend commands use {@link #updateProcessInstanceSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          if no such processInstance can be found.
    * @throws AuthorizationException
@@ -1266,6 +1271,8 @@ public interface RuntimeService {
    * one process instance from the hierarchy will not suspend other
    * process instances from that hierarchy.</p>
    *
+   * <p>Note: for more complex suspend commands use {@link #updateProcessInstanceSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          if no such processInstance can be found.
    * @throws AuthorizationException
@@ -1279,6 +1286,8 @@ public interface RuntimeService {
    * <p>If you have a process instance hierarchy, activating
    * one process instance from the hierarchy will not activate other
    * process instances from that hierarchy.</p>
+   *
+   * <p>Note: for more complex activate commands use {@link #updateProcessInstanceSuspensionState()}.</p>
    *
    * @throws ProcessEngineException
    *          if no such processInstance can be found.
@@ -1295,6 +1304,8 @@ public interface RuntimeService {
    * one process instance from the hierarchy will not activate other
    * process instances from that hierarchy.</p>
    *
+   * <p>Note: for more complex activate commands use {@link #updateProcessInstanceSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          if the process definition id is null
    * @throws AuthorizationException
@@ -1308,6 +1319,8 @@ public interface RuntimeService {
    * <p>If you have a process instance hierarchy, activating
    * one process instance from the hierarchy will not activate other
    * process instances from that hierarchy.</p>
+   *
+   * <p>Note: for more complex activate commands use {@link #updateProcessInstanceSuspensionState()}.</p>
    *
    * @throws ProcessEngineException
    *          if the process definition id is null
@@ -1325,7 +1338,7 @@ public interface RuntimeService {
    *
    * @return the builder to update the suspension state
    */
-  UpdateProcessInstanceSuspensionStateBuilder updateProcessInstanceSuspensionState();
+  UpdateProcessInstanceSuspensionStateSelectBuilder updateProcessInstanceSuspensionState();
 
   // Events ////////////////////////////////////////////////////////////////////////
 

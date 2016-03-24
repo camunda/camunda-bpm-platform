@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.test.api.multitenancy.suspensionstate;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -21,7 +20,6 @@ import static org.junit.Assert.assertThat;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -430,34 +428,6 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
     assertThat(query.suspended().count(), is(2L));
     assertThat(query.active().count(), is(1L));
     assertThat(query.active().withoutTenantId().count(), is(1L));
-  }
-
-  public void testFailToUpdateJobDefinitionSuspensionStateByProcessDefinitionIdForTenant() {
-    try {
-      managementService
-        .updateJobDefinitionSuspensionState()
-        .byProcessDefinitionId("id")
-        .processDefinitionTenantId(TENANT_ONE)
-        .suspend();
-
-      fail("expected exception");
-    } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Can only specify a tenant-id when update the suspension state which is referenced by process definition key"));
-    }
-  }
-
-  public void testFailToUpdateJobDefinitionSuspensionStateByJobDefinitionIdForTenant() {
-    try {
-      managementService
-        .updateJobDefinitionSuspensionState()
-        .byJobDefinitionId("id")
-        .processDefinitionWithoutTenantId()
-        .activate();
-
-      fail("expected exception");
-    } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Can only specify a tenant-id when update the suspension state which is referenced by process definition key"));
-    }
   }
 
   protected Date tomorrow() {

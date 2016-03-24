@@ -13,11 +13,9 @@
 
 package org.camunda.bpm.engine.test.api.multitenancy.suspensionstate;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -150,61 +148,5 @@ public class MultiTenancyJobSuspensionStateTest extends PluggableProcessEngineTe
     assertThat(query.active().count(), is(1L));
     assertThat(query.active().withoutTenantId().count(), is(1L));
   }
-
-  public void testFailToUpdateJobSuspensionStateByProcessDefinitionIdForTenant() {
-    try {
-      managementService
-        .updateJobSuspensionState()
-        .byProcessDefinitionId("id")
-        .processDefinitionTenantId(TENANT_ONE)
-        .suspend();
-
-      fail("expected exception");
-    } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Can only specify a tenant-id when update the suspension state which is referenced by process definition key"));
-    }
-  }
-
-  public void testFailToUpdateJobSuspensionStateByProcessInstanceIdForTenant() {
-   try {
-      managementService
-        .updateJobSuspensionState()
-        .byProcessInstanceId("id")
-        .processDefinitionWithoutTenantId()
-        .activate();
-
-      fail("expected exception");
-    } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Can only specify a tenant-id when update the suspension state which is referenced by process definition key"));
-    }
-  }
-
-  public void testFailToUpdateJobSuspensionStateByJobDefinitionIdForTenant() {
-    try {
-      managementService
-        .updateJobSuspensionState()
-        .byJobDefinitionId("id")
-        .processDefinitionTenantId(TENANT_ONE)
-        .activate();
-
-      fail("expected exception");
-    } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Can only specify a tenant-id when update the suspension state which is referenced by process definition key"));
-    }
-  }
-
-  public void testFailToUpdateJobSuspensionStateByJobIdForTenant() {
-    try {
-       managementService
-         .updateJobSuspensionState()
-         .byJobId("id")
-         .processDefinitionWithoutTenantId()
-         .suspend();
-
-       fail("expected exception");
-     } catch(BadUserRequestException e) {
-       assertThat(e.getMessage(), containsString("Can only specify a tenant-id when update the suspension state which is referenced by process definition key"));
-     }
-   }
 
 }

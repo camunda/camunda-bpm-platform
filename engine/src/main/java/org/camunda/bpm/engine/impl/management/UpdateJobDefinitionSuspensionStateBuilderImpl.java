@@ -24,8 +24,11 @@ import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.cmd.SuspendJobDefinitionCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateBuilder;
+import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateSelectBuilder;
+import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateTenantBuilder;
 
-public class UpdateJobDefinitionSuspensionStateBuilderImpl implements UpdateJobDefinitionSuspensionStateBuilder {
+public class UpdateJobDefinitionSuspensionStateBuilderImpl
+    implements UpdateJobDefinitionSuspensionStateBuilder, UpdateJobDefinitionSuspensionStateSelectBuilder, UpdateJobDefinitionSuspensionStateTenantBuilder {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 

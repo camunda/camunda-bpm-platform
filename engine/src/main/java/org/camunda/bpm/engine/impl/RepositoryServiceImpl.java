@@ -67,7 +67,7 @@ import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.repository.Resource;
-import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateBuilder;
+import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
@@ -206,7 +206,7 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
       .activate();
   }
 
-  public UpdateProcessDefinitionSuspensionStateBuilder updateProcessDefinitionSuspensionState() {
+  public UpdateProcessDefinitionSuspensionStateSelectBuilder updateProcessDefinitionSuspensionState() {
     return new UpdateProcessDefinitionSuspensionStateBuilderImpl(commandExecutor);
   }
 

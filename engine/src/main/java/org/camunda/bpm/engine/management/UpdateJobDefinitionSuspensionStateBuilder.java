@@ -25,51 +25,6 @@ import org.camunda.bpm.engine.authorization.Resources;
 public interface UpdateJobDefinitionSuspensionStateBuilder {
 
   /**
-   * Selects the job definition with the given id.
-   *
-   * @param jobDefinitionId
-   *          id of the job definition
-   * @return the builder
-   */
-  UpdateJobDefinitionSuspensionStateBuilder byJobDefinitionId(String jobDefinitionId);
-
-  /**
-   * Selects the job definitions of the process definition with the given id.
-   *
-   * @param processDefinitionId
-   *          id of the process definition
-   * @return the builder
-   */
-  UpdateJobDefinitionSuspensionStateBuilder byProcessDefinitionId(String processDefinitionId);
-
-  /**
-   * Selects the job definitions of the process definitions with the given key.
-   *
-   * @param processDefinitionKey
-   *          key of the process definition
-   * @return the builder
-   */
-  UpdateJobDefinitionSuspensionStateBuilder byProcessDefinitionKey(String processDefinitionKey);
-
-  /**
-   * Specify that the process definition belongs to no tenant. Can only be used
-   * in combination with {@link #byProcessDefinitionKey(String)}.
-   *
-   * @return the builder
-   */
-  UpdateJobDefinitionSuspensionStateBuilder processDefinitionWithoutTenantId();
-
-  /**
-   * Specify the id of the tenant the process definition belongs to. Can only be
-   * used in combination with {@link #byProcessDefinitionKey(String)}.
-   *
-   * @param tenantId
-   *          the id of the tenant
-   * @return the builder
-   */
-  UpdateJobDefinitionSuspensionStateBuilder processDefinitionTenantId(String tenantId);
-
-  /**
    * Specify if the suspension states of the jobs of the provided job
    * definitions should also be updated. Default is <code>false</code>.
    *

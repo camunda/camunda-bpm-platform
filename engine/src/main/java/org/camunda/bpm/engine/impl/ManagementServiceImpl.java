@@ -60,8 +60,8 @@ import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePageQuery;
-import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateBuilder;
-import org.camunda.bpm.engine.management.UpdateJobSuspensionStateBuilder;
+import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateSelectBuilder;
+import org.camunda.bpm.engine.management.UpdateJobSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.JobQuery;
 
 
@@ -323,7 +323,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
       .suspend();
   }
 
-  public UpdateJobDefinitionSuspensionStateBuilder updateJobDefinitionSuspensionState() {
+  public UpdateJobDefinitionSuspensionStateSelectBuilder updateJobDefinitionSuspensionState() {
     return new UpdateJobDefinitionSuspensionStateBuilderImpl(commandExecutor);
   }
 
@@ -387,7 +387,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
       .suspend();
   }
 
-  public UpdateJobSuspensionStateBuilder updateJobSuspensionState() {
+  public UpdateJobSuspensionStateSelectBuilder updateJobSuspensionState() {
     return new UpdateJobSuspensionStateBuilderImpl(commandExecutor);
   }
 

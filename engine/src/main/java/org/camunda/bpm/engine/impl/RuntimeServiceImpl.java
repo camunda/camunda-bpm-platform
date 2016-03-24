@@ -52,7 +52,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
-import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -353,7 +353,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
       .activate();
   }
 
-  public UpdateProcessInstanceSuspensionStateBuilder updateProcessInstanceSuspensionState() {
+  public UpdateProcessInstanceSuspensionStateSelectBuilder updateProcessInstanceSuspensionState() {
     return new UpdateProcessInstanceSuspensionStateBuilderImpl(commandExecutor);
   }
 

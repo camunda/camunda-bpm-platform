@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.test.api.multitenancy.suspensionstate;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -21,7 +20,9 @@ import static org.junit.Assert.assertThat;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderHistoricDecisionInstanceContext;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInstanceContext;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -547,80 +548,72 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
     assertThat(query.active().withoutTenantId().count(), is(1L));
   }
 
-  public void testFailToSuspendProcessDefinitionByIdForTenant() {
-    ProcessDefinition processDefinition = repositoryService
-        .createProcessDefinitionQuery()
-        .tenantIdIn(TENANT_ONE)
-        .singleResult();
+  public void testSuspendProcessDefinitionByIdIncludeInstancesFromAllTenants() {
+    // given active process instances with tenant id of process definition without tenant id
+    TestTenantIdProvider tenantIdProvider = new TestTenantIdProvider();
+    processEngineConfiguration.setTenantIdProvider(tenantIdProvider);
 
-    try {
-      repositoryService
-        .updateProcessDefinitionSuspensionState()
-        .byProcessDefinitionId(processDefinition.getId())
-        .processDefinitionTenantId(TENANT_ONE)
-        .suspend();
+    tenantIdProvider.tenantId = TENANT_ONE;
+    runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionWithoutTenantId().execute();
 
-      fail("expected exception");
-    } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Can only specify a tenant-id when update the suspension state which is referenced by process definition key"));
-    }
-  }
+    tenantIdProvider.tenantId = TENANT_TWO;
+    runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionWithoutTenantId().execute();
 
-  public void testFailToSuspendProcessDefinitionByIdForNonTenant() {
     ProcessDefinition processDefinition = repositoryService
         .createProcessDefinitionQuery()
         .withoutTenantId()
         .singleResult();
 
-    try {
-      repositoryService
-        .updateProcessDefinitionSuspensionState()
-        .byProcessDefinitionId(processDefinition.getId())
-        .processDefinitionWithoutTenantId()
-        .suspend();
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId());
+    assertThat(query.active().count(), is(3L));
+    assertThat(query.suspended().count(), is(0L));
 
-      fail("expected exception");
-    } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Can only specify a tenant-id when update the suspension state which is referenced by process definition key"));
-    }
+    // suspend all instances of process definition
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionId(processDefinition.getId())
+      .includeProcessInstances(true)
+      .suspend();
+
+    assertThat(query.active().count(), is(0L));
+    assertThat(query.suspended().count(), is(3L));
   }
 
-  public void testFailToActivateProcessDefinitionByIdForTenant() {
-    ProcessDefinition processDefinition = repositoryService
-        .createProcessDefinitionQuery()
-        .tenantIdIn(TENANT_ONE)
-        .singleResult();
+  public void testActivateProcessDefinitionByIdIncludeInstancesFromAllTenants() {
+    // given suspended process instances with tenant id of process definition without tenant id
+    TestTenantIdProvider tenantIdProvider = new TestTenantIdProvider();
+    processEngineConfiguration.setTenantIdProvider(tenantIdProvider);
 
-    try {
-      repositoryService
-        .updateProcessDefinitionSuspensionState()
-        .byProcessDefinitionId(processDefinition.getId())
-        .processDefinitionTenantId(TENANT_ONE)
-        .activate();
+    tenantIdProvider.tenantId = TENANT_ONE;
+    runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionWithoutTenantId().execute();
 
-      fail("expected exception");
-    } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Can only specify a tenant-id when update the suspension state which is referenced by process definition key"));
-    }
-  }
+    tenantIdProvider.tenantId = TENANT_TWO;
+    runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionWithoutTenantId().execute();
 
-  public void testFailToActivateProcessDefinitionByIdForNonTenant() {
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
+      .includeProcessInstances(true)
+      .suspend();
+
     ProcessDefinition processDefinition = repositoryService
         .createProcessDefinitionQuery()
         .withoutTenantId()
         .singleResult();
 
-    try {
-      repositoryService
-        .updateProcessDefinitionSuspensionState()
-        .byProcessDefinitionId(processDefinition.getId())
-        .processDefinitionWithoutTenantId()
-        .activate();
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId());
+    assertThat(query.suspended().count(), is(3L));
+    assertThat(query.active().count(), is(0L));
 
-      fail("expected exception");
-    } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Can only specify a tenant-id when update the suspension state which is referenced by process definition key"));
-    }
+    // activate all instance of process definition
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionId(processDefinition.getId())
+      .includeProcessInstances(true)
+      .activate();
+
+    assertThat(query.suspended().count(), is(0L));
+    assertThat(query.active().count(), is(3L));
   }
 
   protected Date tomorrow() {
@@ -631,6 +624,8 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
   @Override
   public void tearDown() throws Exception {
+    processEngineConfiguration.setTenantIdProvider(null);
+
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
@@ -639,6 +634,21 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
         return null;
       }
     });
+  }
+
+  protected class TestTenantIdProvider implements TenantIdProvider {
+
+    protected String tenantId;
+
+    @Override
+    public String provideTenantIdForProcessInstance(TenantIdProviderProcessInstanceContext ctx) {
+      return tenantId;
+    }
+
+    @Override
+    public String provideTenantIdForHistoricDecisionInstance(TenantIdProviderHistoricDecisionInstanceContext ctx) {
+      return tenantId;
+    }
   }
 
 }

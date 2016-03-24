@@ -26,24 +26,6 @@ import org.camunda.bpm.engine.authorization.Resources;
 public interface UpdateProcessDefinitionSuspensionStateBuilder {
 
   /**
-   * Selects the process definition with the given id.
-   *
-   * @param processDefinitionId
-   *          id of the process definition
-   * @return the builder
-   */
-  UpdateProcessDefinitionSuspensionStateBuilder byProcessDefinitionId(String processDefinitionId);
-
-  /**
-   * Selects the process definitions with the given key.
-   *
-   * @param processDefinitionKey
-   *          key of the process definition
-   * @return the builder
-   */
-  UpdateProcessDefinitionSuspensionStateBuilder byProcessDefinitionKey(String processDefinitionKey);
-
-  /**
    * Specify if the suspension states of the process instances of the provided
    * process definitions should also be updated. Default is <code>false</code>.
    *
@@ -66,24 +48,6 @@ public interface UpdateProcessDefinitionSuspensionStateBuilder {
    * @return the builder
    */
   UpdateProcessDefinitionSuspensionStateBuilder executionDate(Date executionDate);
-
-  /**
-   * Specify that the process definition belongs to no tenant. Can only be used
-   * in combination with {@link #byProcessDefinitionKey(String)}.
-   *
-   * @return the builder
-   */
-  UpdateProcessDefinitionSuspensionStateBuilder processDefinitionWithoutTenantId();
-
-  /**
-   * Specify the id of the tenant the process definition belongs to. Can only be
-   * used in combination with {@link #byProcessDefinitionKey(String)}.
-   *
-   * @param tenantId
-   *          the id of the tenant
-   * @return the builder
-   */
-  UpdateProcessDefinitionSuspensionStateBuilder processDefinitionTenantId(String tenantId);
 
   /**
    * Activates the provided process definitions.

@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateBuilder;
+import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
@@ -193,6 +194,8 @@ public interface RepositoryService {
    * <strong>Note: all the process instances of the process definition will still be active
    * (ie. not suspended)!</strong>
    *
+   * <p>Note: for more complex suspend commands use {@link #updateProcessDefinitionSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          If no such processDefinition can be found.
    * @throws AuthorizationException
@@ -205,6 +208,8 @@ public interface RepositoryService {
    *
    * If a process definition is in state suspended, it will not be possible to start new process instances
    * based on the process definition.
+   *
+   * <p>Note: for more complex suspend commands use {@link #updateProcessDefinitionSuspensionState()}.</p>
    *
    * @param suspendProcessInstances If true, all the process instances of the provided process definition
    *                                will be suspended too.
@@ -233,6 +238,8 @@ public interface RepositoryService {
    * <strong>Note: all the process instances of the process definition will still be active
    * (ie. not suspended)!</strong>
    *
+   * <p>Note: for more complex suspend commands use {@link #updateProcessDefinitionSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          If no such processDefinition can be found.
    * @throws AuthorizationException
@@ -245,6 +252,8 @@ public interface RepositoryService {
    *
    * If a process definition is in state suspended, it will not be possible to start new process instances
    * based on the process definition.
+   *
+   * <p>Note: for more complex suspend commands use {@link #updateProcessDefinitionSuspensionState()}.</p>
    *
    * @param suspendProcessInstances If true, all the process instances of the provided process definition
    *                                will be suspended too.
@@ -267,6 +276,8 @@ public interface RepositoryService {
   /**
    * Activates the process definition with the given id.
    *
+   * <p>Note: for more complex activate commands use {@link #updateProcessDefinitionSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          If no such processDefinition can be found or if the process definition is already in state active.
    * @throws AuthorizationException
@@ -276,6 +287,8 @@ public interface RepositoryService {
 
   /**
    * Activates the process definition with the given id.
+   *
+   * <p>Note: for more complex activate commands use {@link #updateProcessDefinitionSuspensionState()}.</p>
    *
    * @param suspendProcessInstances If true, all the process instances of the provided process definition
    *                                will be activated too.
@@ -298,6 +311,8 @@ public interface RepositoryService {
   /**
    * Activates the process definition with the given key (=id in the bpmn20.xml file).
    *
+   * <p>Note: for more complex activate commands use {@link #updateProcessDefinitionSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          If no such processDefinition can be found.
    * @throws AuthorizationException
@@ -307,6 +322,8 @@ public interface RepositoryService {
 
   /**
    * Activates the process definition with the given key (=id in the bpmn20.xml file).
+   *
+   * <p>Note: for more complex activate commands use {@link #updateProcessDefinitionSuspensionState()}.</p>
    *
    * @param suspendProcessInstances If true, all the process instances of the provided process definition
    *                                will be activated too.
@@ -335,7 +352,7 @@ public interface RepositoryService {
    *
    * @return the builder to update the suspension state
    */
-  UpdateProcessDefinitionSuspensionStateBuilder updateProcessDefinitionSuspensionState();
+  UpdateProcessDefinitionSuspensionStateSelectBuilder updateProcessDefinitionSuspensionState();
 
   /**
    * Gives access to a deployed process model, e.g., a BPMN 2.0 XML file,

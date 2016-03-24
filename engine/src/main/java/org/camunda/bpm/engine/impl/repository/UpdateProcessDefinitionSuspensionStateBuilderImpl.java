@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.repository;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 
 import java.util.Date;
 
@@ -23,8 +24,11 @@ import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.cmd.SuspendProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateBuilder;
+import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateSelectBuilder;
+import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateTenantBuilder;
 
-public class UpdateProcessDefinitionSuspensionStateBuilderImpl implements UpdateProcessDefinitionSuspensionStateBuilder {
+public class UpdateProcessDefinitionSuspensionStateBuilderImpl implements UpdateProcessDefinitionSuspensionStateBuilder,
+    UpdateProcessDefinitionSuspensionStateSelectBuilder, UpdateProcessDefinitionSuspensionStateTenantBuilder {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
@@ -96,8 +100,7 @@ public class UpdateProcessDefinitionSuspensionStateBuilderImpl implements Update
 
   @Override
   public void activate() {
-    ensureEitherProcessDefinitionIdOrTenantId();
-    ensureNotNull("commandExecutor", commandExecutor);
+    varidateParameters();
 
     ActivateProcessDefinitionCmd command = new ActivateProcessDefinitionCmd(this);
     commandExecutor.execute(command);
@@ -105,17 +108,20 @@ public class UpdateProcessDefinitionSuspensionStateBuilderImpl implements Update
 
   @Override
   public void suspend() {
-    ensureEitherProcessDefinitionIdOrTenantId();
-    ensureNotNull("commandExecutor", commandExecutor);
+    varidateParameters();
 
     SuspendProcessDefinitionCmd command = new SuspendProcessDefinitionCmd(this);
     commandExecutor.execute(command);
   }
 
-  protected void ensureEitherProcessDefinitionIdOrTenantId() {
+  protected void varidateParameters() {
+    ensureOnlyOneNotNull("Need to specify either a process instance id or a process definition key.", processDefinitionId, processDefinitionKey);
+
     if(processDefinitionId != null && isTenantIdSet) {
       throw LOG.exceptionUpdateSuspensionStateForTenantOnlyByProcessDefinitionKey();
     }
+
+    ensureNotNull("commandExecutor", commandExecutor);
   }
 
   public String getProcessDefinitionKey() {

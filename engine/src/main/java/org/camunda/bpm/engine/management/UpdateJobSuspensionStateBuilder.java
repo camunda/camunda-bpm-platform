@@ -23,69 +23,6 @@ import org.camunda.bpm.engine.authorization.Resources;
 public interface UpdateJobSuspensionStateBuilder {
 
   /**
-   * Selects the job with the given id.
-   *
-   * @param jobId
-   *          id of the job
-   * @return the builder
-   */
-  UpdateJobSuspensionStateBuilder byJobId(String jobId);
-
-  /**
-   * Selects the jobs of the job definition with the given id.
-   *
-   * @param jobDefinitionId
-   *          id of the job definition
-   * @return the builder
-   */
-  UpdateJobSuspensionStateBuilder byJobDefinitionId(String jobDefinitionId);
-
-  /**
-   * Selects the jobs of the process instance with the given id.
-   *
-   * @param processInstanceId
-   *          id of the process instance
-   * @return the builder
-   */
-  UpdateJobSuspensionStateBuilder byProcessInstanceId(String processInstanceId);
-
-  /**
-   * Selects the jobs of the process definition with the given id.
-   *
-   * @param processDefinitionId
-   *          id of the process definition
-   * @return the builder
-   */
-  UpdateJobSuspensionStateBuilder byProcessDefinitionId(String processDefinitionId);
-
-  /**
-   * Selects the jobs of the process definitions with the given key.
-   *
-   * @param processDefinitionKey
-   *          key of the process definition
-   * @return the builder
-   */
-  UpdateJobSuspensionStateBuilder byProcessDefinitionKey(String processDefinitionKey);
-
-  /**
-   * Specify that the process definition belongs to no tenant. Can only be used
-   * in combination with {@link #byProcessDefinitionKey(String)}.
-   *
-   * @return the builder
-   */
-  UpdateJobSuspensionStateBuilder processDefinitionWithoutTenantId();
-
-  /**
-   * Specify the id of the tenant the process definition belongs to. Can only be
-   * used in combination with {@link #byProcessDefinitionKey(String)}.
-   *
-   * @param tenantId
-   *          the id of the tenant
-   * @return the builder
-   */
-  UpdateJobSuspensionStateBuilder processDefinitionTenantId(String tenantId);
-
-  /**
    * Activates the provided jobs.
    *
    * @throws AuthorizationException
