@@ -29,13 +29,6 @@ var angular = require('camunda-commons-ui/vendor/angular');
     $scope.dashboardVars = { read: [ 'processData' ] };
     $scope.dashboardProviders = Views.getProviders({ component: 'cockpit.processes.dashboard'});
 
-    $scope.scrollToPlugin = function (clickedPlugin) {
-      var targeted = $('[data-plugin-id="'  + clickedPlugin.id + '"]');
-      if (targeted[0]) {
-        targeted[0].scrollIntoView();
-      }
-    };
-
     Data.instantiateProviders('cockpit.dashboard.data', {$scope: $scope, processData : processData});
 
     // INITIALIZE PLUGINS
