@@ -121,6 +121,10 @@ public abstract class MockProvider {
   public static final String ANOTHER_EXAMPLE_TENANT_ID = "anotherTenantId";
   public static final String EXAMPLE_TENANT_ID_LIST = EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID;
 
+  // semantic Versions
+  public static final String EXAMPLE_SEMANTIC_VERSION = "aSemanticVersion";
+  public static final String ANOTHER_EXAMPLE_SEMANTIC_VERSION = "anotherSemanticVersion";
+
   // engine
   public static final String EXAMPLE_PROCESS_ENGINE_NAME = "default";
   public static final String ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME = "anotherEngineName";

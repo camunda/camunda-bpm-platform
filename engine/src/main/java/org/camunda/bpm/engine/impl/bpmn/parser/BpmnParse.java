@@ -569,6 +569,9 @@ public class BpmnParse extends Parse {
     processDefinition.setTaskDefinitions(new HashMap<String, TaskDefinition>());
     processDefinition.setDeploymentId(deployment.getId());
     processDefinition.setProperty(PROPERTYNAME_JOB_PRIORITY, parseJobPriority(processElement));
+    processDefinition.setSemanticVersion(
+      processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "semanticVersion")
+    );
 
     LOG.parsingElement("process", processDefinition.getKey());
 

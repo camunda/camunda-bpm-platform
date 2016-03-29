@@ -138,6 +138,13 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
    */
   ProcessDefinitionQuery incidentMessageLike(String incidentMessageLike);
 
+  /**
+   * Only selects process definitions with a specific semantic version
+   */
+  ProcessDefinitionQuery semanticVersion(String semanticVersion);
+
+  ProcessDefinitionQuery semanticVersionLike(String semanticVersionLike);
+
   // Support for event subscriptions /////////////////////////////////////
 
   /**
@@ -187,5 +194,10 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
    * Note that the ordering of process instances without tenant id is database-specific. */
   ProcessDefinitionQuery orderByTenantId();
+
+  /**
+   * Order by semantic version (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
+  ProcessDefinitionQuery orderBySemanticVersion();
 
 }

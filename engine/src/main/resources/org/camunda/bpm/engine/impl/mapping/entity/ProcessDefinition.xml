@@ -7,7 +7,7 @@
   <!-- PROCESSDEFINITION INSERT -->
 
   <insert id="insertProcessDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity">
-    insert into ${prefix}ACT_RE_PROCDEF(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, HAS_START_FORM_KEY_, SUSPENSION_STATE_, TENANT_ID_, REV_)
+    insert into ${prefix}ACT_RE_PROCDEF(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, HAS_START_FORM_KEY_, SUSPENSION_STATE_, TENANT_ID_, SEMANTIC_VERSION_, REV_)
     values (#{id, jdbcType=VARCHAR},
             #{category, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
@@ -19,6 +19,7 @@
             #{hasStartFormKey, jdbcType=BOOLEAN},
             #{suspensionState, jdbcType=INTEGER},
             #{tenantId, jdbcType=VARCHAR},
+            #{semanticVersion, jdbcType=VARCHAR},
             1
            )
   </insert>
@@ -76,6 +77,7 @@
     <result property="hasStartFormKey" column="HAS_START_FORM_KEY_" jdbcType="BOOLEAN"/>
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="semanticVersion" column="SEMANTIC_VERSION_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- PROCESSDEFINITION SELECT -->
@@ -257,7 +259,13 @@
         <if test="tenantIds == null">
           and RES.TENANT_ID_ is null
         </if>
-      </if>      
+      </if>
+      <if test="semanticVersion != null">
+        and RES.SEMANTIC_VERSION_ = #{semanticVersion}
+      </if>
+      <if test="semanticVersionLike != null">
+        and RES.SEMANTIC_VERSION_ like #{semanticVersionLike}
+      </if>
       
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
 

@@ -42,4 +42,9 @@ public interface ProcessDefinition extends ResourceDefinition {
   /** Returns true if the process definition is in suspended state. */
   boolean isSuspended();
 
+  /**
+   * Semantic version of the process definition. Returns null when no semantic version is set.
+   */
+  String getSemanticVersion();
+
 }

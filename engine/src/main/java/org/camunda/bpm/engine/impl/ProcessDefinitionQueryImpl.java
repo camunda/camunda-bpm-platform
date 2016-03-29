@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Documentation;
+import org.camunda.bpm.model.xml.impl.type.attribute.StringAttribute;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 
@@ -72,6 +73,9 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
   protected boolean includeDefinitionsWithoutTenantId = false;
+
+  protected String semanticVersion;
+  protected String semanticVersionLike;
 
   public ProcessDefinitionQueryImpl() {
   }
@@ -234,6 +238,20 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return this;
   }
 
+  public ProcessDefinitionQuery semanticVersion(String semanticVersion) {
+    ensureNotNull("semanticVersion", semanticVersion);
+    this.semanticVersion = semanticVersion;
+
+    return this;
+  }
+
+  public ProcessDefinitionQuery semanticVersionLike(String semanticVersionLike) {
+    ensureNotNull("semanticVersionLike", semanticVersionLike);
+    this.semanticVersionLike = semanticVersionLike;
+
+    return this;
+  }
+
   //sorting ////////////////////////////////////////////
 
   public ProcessDefinitionQuery orderByDeploymentId() {
@@ -263,6 +281,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public ProcessDefinitionQuery orderByTenantId() {
     return orderBy(ProcessDefinitionQueryProperty.TENANT_ID);
   }
+
+  public ProcessDefinitionQuery orderBySemanticVersion() { return orderBy(ProcessDefinitionQueryProperty.SEMANTIC_VERSION);}
 
   //results ////////////////////////////////////////////
 
@@ -375,6 +395,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
   public String getIncidentMessageLike() {
     return incidentMessageLike;
+  }
+
+  public String getSemanticVersion() {
+    return semanticVersion;
   }
 
   public ProcessDefinitionQueryImpl startableByUser(String userId) {

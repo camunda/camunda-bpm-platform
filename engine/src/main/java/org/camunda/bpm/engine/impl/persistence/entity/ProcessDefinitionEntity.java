@@ -62,6 +62,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   protected boolean hasStartFormKey;
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
   protected String tenantId;
+  protected String semanticVersion;
   protected boolean isIdentityLinksInitialized = false;
   protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
   protected Set<Expression> candidateStarterUserIdExpressions = new HashSet<Expression>();
@@ -439,4 +440,11 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     this.tenantId = tenantId;
   }
 
+  public String getSemanticVersion() {
+    return semanticVersion;
+  }
+
+  public void setSemanticVersion(String semanticVersion) {
+    this.semanticVersion = semanticVersion;
+  }
 }

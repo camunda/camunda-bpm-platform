@@ -287,6 +287,8 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     verify(mockedQuery).incidentType(queryParameters.get("incidentType"));
     verify(mockedQuery).incidentMessage(queryParameters.get("incidentMessage"));
     verify(mockedQuery).incidentMessageLike(queryParameters.get("incidentMessageLike"));
+    verify(mockedQuery).semanticVersion(queryParameters.get("semanticVersion"));
+    verify(mockedQuery).semanticVersionLike(queryParameters.get("semanticVersionLike"));
     verify(mockedQuery).list();
   }
 
@@ -312,6 +314,8 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     parameters.put("incidentType", "incType");
     parameters.put("incidentMessage", "incMessage");
     parameters.put("incidentMessageLike", "incMessageLike");
+    parameters.put("semanticVersion", "semVer");
+    parameters.put("semanticVersionLike", "semVerLike");
 
     return parameters;
   }
@@ -395,6 +399,24 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
   }
 
   @Test
+  public void testProcessDefinitionSemanticVersion() {
+    List<ProcessDefinition> processDefinitions = Arrays.asList(
+      MockProvider.mockDefinition().semanticVersion(MockProvider.EXAMPLE_SEMANTIC_VERSION).build(),
+      MockProvider.mockDefinition().id(MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).semanticVersion(MockProvider.ANOTHER_EXAMPLE_SEMANTIC_VERSION).build());
+    mockedQuery = setUpMockDefinitionQuery(processDefinitions);
+
+    Response response = given()
+      .queryParam("semanticVersion", MockProvider.EXAMPLE_SEMANTIC_VERSION)
+      .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .get(PROCESS_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).semanticVersion(MockProvider.EXAMPLE_SEMANTIC_VERSION);
+    verify(mockedQuery).list();
+  }
+
+  @Test
   public void testSortingParameters() {
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("category", "asc", Status.OK);
@@ -435,6 +457,16 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     executeAndVerifySuccessfulSorting("tenantId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySuccessfulSorting("semanticVersion", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderBySemanticVersion();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySuccessfulSorting("semanticVersion", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderBySemanticVersion();
+    inOrder.verify(mockedQuery).asc();
   }
 
   @Test

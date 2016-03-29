@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.helper;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 public class MockDefinitionBuilder {
@@ -31,6 +32,7 @@ public class MockDefinitionBuilder {
   private boolean suspended = false;
   private boolean startFormKey = false;
   private String tenantId = null;
+  private String semanticVersion = null;
 
   public MockDefinitionBuilder id(String id) {
     this.id = id;
@@ -92,6 +94,12 @@ public class MockDefinitionBuilder {
     return this;
   }
 
+  public MockDefinitionBuilder semanticVersion(String semanticVersion) {
+    this.semanticVersion = semanticVersion;
+
+    return this;
+  }
+
   public ProcessDefinition build() {
     ProcessDefinition mockDefinition = mock(ProcessDefinition.class);
     when(mockDefinition.getId()).thenReturn(id);
@@ -106,6 +114,7 @@ public class MockDefinitionBuilder {
     when(mockDefinition.isSuspended()).thenReturn(suspended);
     when(mockDefinition.hasStartFormKey()).thenReturn(startFormKey);
     when(mockDefinition.getTenantId()).thenReturn(tenantId);
+    when(mockDefinition.getSemanticVersion()).thenReturn(semanticVersion);
     return mockDefinition;
   }
 }
