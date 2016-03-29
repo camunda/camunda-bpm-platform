@@ -1,10 +1,6 @@
 'use strict';
 
 function checkActive(plugin, path) {
-  var checked = plugin.id;
-  if (checked === 'processes') {
-    checked = 'process';
-  }
   return path.indexOf(plugin.id) > -1;
 }
 
