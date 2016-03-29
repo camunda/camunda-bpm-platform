@@ -14,6 +14,9 @@ function (
     label: 'Decisions',
     template: template,
     pagePath: '#/decisions',
+    checkActive: function (path) {
+      return path.indexOf('#/decision') > -1;
+    },
     controller: [
       '$scope',
       'camAPI',
