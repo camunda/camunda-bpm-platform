@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.management.UpdateJobSuspensionStateBuilder;
+import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+
+import javax.ws.rs.core.Response.Status;
 
 /**
  * @author roman.smirnov
@@ -82,7 +82,8 @@ public class JobSuspensionStateDto extends SuspensionStateDto {
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
 
-    UpdateJobSuspensionStateBuilder updateJobSuspensionStateBuilder = engine.getManagementService().updateJobSuspensionState();
+    UpdateJobSuspensionStateBuilderImpl updateJobSuspensionStateBuilder =
+        (UpdateJobSuspensionStateBuilderImpl) engine.getManagementService().updateJobSuspensionState();
 
     if (jobId != null) {
       updateJobSuspensionStateBuilder.byJobId(jobId);

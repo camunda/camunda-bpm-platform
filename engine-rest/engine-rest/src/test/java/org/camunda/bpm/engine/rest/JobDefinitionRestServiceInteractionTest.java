@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -22,17 +21,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
-import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateBuilder;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.MockJobDefinitionBuilder;
@@ -42,6 +39,8 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.InOrder;
+
+import javax.ws.rs.core.Response.Status;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
@@ -61,7 +60,7 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
   private ProcessEngine namedProcessEngine;
   private ManagementService mockManagementService;
 
-  private UpdateJobDefinitionSuspensionStateBuilder mockSuspensionStateBuilder;
+  private UpdateJobDefinitionSuspensionStateBuilderImpl mockSuspensionStateBuilder;
 
   private JobDefinitionQuery mockQuery;
 
@@ -75,7 +74,7 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
     List<JobDefinition> mockJobDefinitions = Collections.singletonList(MockProvider.createMockJobDefinition());
     mockQuery = setUpMockJobDefinitionQuery(mockJobDefinitions);
 
-    mockSuspensionStateBuilder = mock(UpdateJobDefinitionSuspensionStateBuilder.class);
+    mockSuspensionStateBuilder = mock(UpdateJobDefinitionSuspensionStateBuilderImpl.class);
     when(mockManagementService.updateJobDefinitionSuspensionState()).thenReturn(mockSuspensionStateBuilder);
   }
 

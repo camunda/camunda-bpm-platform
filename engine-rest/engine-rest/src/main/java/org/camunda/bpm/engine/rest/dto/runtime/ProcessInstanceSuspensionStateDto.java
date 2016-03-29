@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
+
+import javax.ws.rs.core.Response.Status;
 
 /**
  * @author roman.smirnov
@@ -69,7 +69,8 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
 
-    UpdateProcessInstanceSuspensionStateBuilder updateSuspensionStateBuilder = engine.getRuntimeService().updateProcessInstanceSuspensionState();
+    UpdateProcessInstanceSuspensionStateBuilderImpl updateSuspensionStateBuilder =
+        (UpdateProcessInstanceSuspensionStateBuilderImpl) engine.getRuntimeService().updateProcessInstanceSuspensionState();
 
     if (processInstanceId != null) {
       updateSuspensionStateBuilder.byProcessInstanceId(processInstanceId);

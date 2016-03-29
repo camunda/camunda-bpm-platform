@@ -29,14 +29,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.management.UpdateJobSuspensionStateBuilder;
+import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
@@ -50,6 +48,8 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.InOrder;
+
+import javax.ws.rs.core.Response.Status;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
@@ -72,7 +72,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   private ProcessEngine namedProcessEngine;
   private ManagementService mockManagementService;
 
-  private UpdateJobSuspensionStateBuilder mockSuspensionStateBuilder;
+  private UpdateJobSuspensionStateBuilderImpl mockSuspensionStateBuilder;
 
   private JobQuery mockQuery;
 
@@ -98,7 +98,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     mockManagementService = mock(ManagementService.class);
     when(mockManagementService.createJobQuery()).thenReturn(mockQuery);
 
-    mockSuspensionStateBuilder = mock(UpdateJobSuspensionStateBuilder.class);
+    mockSuspensionStateBuilder = mock(UpdateJobSuspensionStateBuilderImpl.class);
     when(mockManagementService.updateJobSuspensionState()).thenReturn(mockSuspensionStateBuilder);
 
     namedProcessEngine = getProcessEngine(MockProvider.EXAMPLE_PROCESS_ENGINE_NAME);

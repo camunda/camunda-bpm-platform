@@ -14,13 +14,13 @@ package org.camunda.bpm.engine.rest.dto.management;
 
 import java.util.Date;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
-import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateBuilder;
+import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+
+import javax.ws.rs.core.Response.Status;
 
 /**
  * @author roman.smirnov
@@ -83,7 +83,8 @@ public class JobDefinitionSuspensionStateDto extends SuspensionStateDto {
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
 
-    UpdateJobDefinitionSuspensionStateBuilder updateJobDefinitionSuspensionStateBuilder = engine.getManagementService().updateJobDefinitionSuspensionState();
+    UpdateJobDefinitionSuspensionStateBuilderImpl updateJobDefinitionSuspensionStateBuilder =
+        (UpdateJobDefinitionSuspensionStateBuilderImpl) engine.getManagementService().updateJobDefinitionSuspensionState();
 
     if (jobDefinitionId != null) {
       updateJobDefinitionSuspensionStateBuilder.byJobDefinitionId(jobDefinitionId);
