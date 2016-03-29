@@ -14,7 +14,6 @@
             <th class="instances">Running Instances</th>
             <th class="name">Name</th>
             <th class="tenant-id">Tenant ID</th>
-            <th class="migration-links">Migration</th>
             <th ng-if="hasHistoryPlugin"
                 class="history-link">History view</th>
             <th ng-if="hasReportPlugin"
@@ -41,14 +40,6 @@
 
             <td class="tenant-id">
               {{ statistic.definition.tenantId }}
-            </td>
-
-            <td class="migration-links">
-              <a ng-href="#/migration?sourceKey={{ statistic.definition.key }}&targetKey={{ statistic.definition.key }}&sourceVersion={{ (statistic.definition.key - 1) }}&targetVersion={{ statistic.definition.version }}"
-                 ng-if="statistic.definition.version > 1"
-                 tooltip="Migrate">
-                <span class="glyphicon glyphicon-arrow-up"></span>
-              </a>
             </td>
 
             <td ng-if="hasHistoryPlugin"
