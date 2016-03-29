@@ -9,10 +9,8 @@ var template = fs.readFileSync(__dirname + '/processes.html', 'utf8');
 
 module.exports = [
   'ViewsProvider',
-  // 'dataDepend',
 function (
-  ViewsProvider/*,
-  dataDepend*/
+  ViewsProvider
 ) {
   ViewsProvider.registerDefaultView('cockpit.dashboard.section', {
     id: 'processes',
