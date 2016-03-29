@@ -100,7 +100,7 @@ public class UpdateProcessDefinitionSuspensionStateBuilderImpl implements Update
 
   @Override
   public void activate() {
-    varidateParameters();
+    validateParameters();
 
     ActivateProcessDefinitionCmd command = new ActivateProcessDefinitionCmd(this);
     commandExecutor.execute(command);
@@ -108,13 +108,13 @@ public class UpdateProcessDefinitionSuspensionStateBuilderImpl implements Update
 
   @Override
   public void suspend() {
-    varidateParameters();
+    validateParameters();
 
     SuspendProcessDefinitionCmd command = new SuspendProcessDefinitionCmd(this);
     commandExecutor.execute(command);
   }
 
-  protected void varidateParameters() {
+  protected void validateParameters() {
     ensureOnlyOneNotNull("Need to specify either a process instance id or a process definition key.", processDefinitionId, processDefinitionKey);
 
     if(processDefinitionId != null && isTenantIdSet) {

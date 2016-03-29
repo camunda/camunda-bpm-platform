@@ -109,7 +109,7 @@ public class UpdateProcessInstanceSuspensionStateBuilderImpl implements UpdatePr
   protected void validateParameters() {
     ensureOnlyOneNotNull("Need to specify either a process instance id, a process definition id or a process definition key.", processInstanceId, processDefinitionId, processDefinitionKey);
 
-    if (isProcessDefinitionTenantIdSet & (processInstanceId != null || processDefinitionId != null)) {
+    if (isProcessDefinitionTenantIdSet && (processInstanceId != null || processDefinitionId != null)) {
       throw LOG.exceptionUpdateSuspensionStateForTenantOnlyByProcessDefinitionKey();
     }
 
