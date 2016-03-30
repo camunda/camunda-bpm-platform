@@ -52,6 +52,9 @@ button {
 [cam-widget-header] [ng-transclude] {
   float: right;
   border-right: 1px solid darken(@gray-lighter, 10%);
+  @media screen and (max-width: (@grid-float-breakpoint - 1)) {
+    border-right: none;
+  }
   > ul > li:hover {
     border-color: transparent;
   }
