@@ -5,7 +5,6 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-tasks.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-var moment = require('camunda-commons-ui/vendor/moment');
 
   var $ = angular.element;
 
@@ -25,13 +24,11 @@ var moment = require('camunda-commons-ui/vendor/moment');
         '$location',
         'search',
         '$timeout',
-        '$element',
       function(
         $scope,
         $location,
         search,
-        $timeout,
-        $element
+        $timeout
       ) {
 
         function updateSilently(params) {
@@ -44,17 +41,6 @@ var moment = require('camunda-commons-ui/vendor/moment');
         $scope.now = (new Date()).toJSON();
 
         $scope.filterProperties = null;
-
-        function setScrollableTop() {
-          var height = 0;
-          angular.forEach(angular.element('.content view'), function (el) {
-            height += angular.element(el).outerHeight();
-          });
-          var $scrollable = angular.element('.content [cam-tasks]');
-          $scrollable[0].style.top = height + 'px';
-        }
-        // the search plugin $broadcast from $scope.$root ($emit doesn't work)
-        $scope.$on('plugin:search:change', setScrollableTop);
 
         var tasksData = $scope.tasklistData.newChild($scope);
 
