@@ -38,7 +38,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
     }
     return value;
   };
-  
+
   var getQueryValueBySearch = function(search) {
     if (search.basic) {
       return true;
@@ -61,15 +61,12 @@ var angular = require('camunda-commons-ui/vendor/angular');
   var Controller = [
    '$scope',
    '$translate',
-   '$timeout',
   function (
     $scope,
-    $translate,
-    $timeout
+    $translate
   ) {
 
     $scope.searches = [];
-    $scope.allSearches = [];
     $scope.translations = {};
 
     angular.forEach(searchConfig.tooltips, function(value, key) {
@@ -113,13 +110,6 @@ var angular = require('camunda-commons-ui/vendor/angular');
       });
 
       searchData.set('searchQuery', query);
-    }, true);
-
-    $scope.$watch('allSearches', function() {
-      // wait for angular to update the html
-      $timeout(function() {
-        $scope.$root.$broadcast('plugin:search:change');
-      });
     }, true);
 
     searchData.observe('currentFilter', function(filter) {
