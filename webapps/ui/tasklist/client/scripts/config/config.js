@@ -35,7 +35,7 @@ var camTasklistConf = {
       "description": "set the focus to the first filter in the list"
     },
     "focusList": {
-      "key": "ctrl+shift+l",
+      "key": "ctrl+alt+l",
       "description": "sets the focus to the first task in the list"
     },
     "focusForm": {
