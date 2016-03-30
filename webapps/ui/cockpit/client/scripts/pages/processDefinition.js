@@ -192,15 +192,15 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     }]);
 
     processData.provide('instances.all', [ 'processDefinition', function(definition) {
-    
+
 	  var queryParams = { processDefinitionKey : definition.key }
-    	
+
 	  if(definition.tenantId) {
     	queryParams.tenantIdIn = [ definition.tenantId ];
       } else {
     	queryParams.withoutTenantId = true;
       }
-    	
+
       return ProcessInstanceResource.count(queryParams).$promise;
     }]);
 
@@ -225,18 +225,18 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     }]);
 
     processData.provide('allProcessDefinitions', [ 'processDefinition', function(definition) {
-      
-      var queryParams = { 
-        'key' : definition.key, 
-        'sortBy': 'version', 
+
+      var queryParams = {
+        'key' : definition.key,
+        'sortBy': 'version',
         'sortOrder': 'desc' }
-     	
+
    	  if(definition.tenantId) {
        	queryParams.tenantIdIn = [ definition.tenantId ];
       }	else {
     	queryParams.withoutTenantId = true;
       }
-    	
+
       return ProcessDefinitionResource.query(queryParams).$promise;
     }]);
 
@@ -340,7 +340,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     Data.instantiateProviders('cockpit.processDefinition.data', { $scope: $scope, processData : processData });
 
     $scope.hasReportPlugin = Views.getProviders({ component: 'cockpit.report' }).length > 0;
-    $scope.hasMigrationPlugin = Views.getProviders({ component: 'cockpit.navbar.action' }).filter(function(plugin) {
+    $scope.hasMigrationPlugin = Views.getProviders({ component: 'cockpit.processes.dashboard' }).filter(function(plugin) {
       return plugin.id === 'migration';
     }).length > 0;
 
