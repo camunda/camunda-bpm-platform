@@ -237,4 +237,50 @@ describe('Cockpit Process Definition Spec', function() {
 
   });
 
+  describe('semantic versioning', function() {
+
+    before(function() {
+      return testHelper(setupFile.semanticVersionSetup, function() {
+
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.goToSection('Processes');
+      });
+    });
+
+    describe('process definition with a semantic version', function() {
+      before(function() {
+        dashboardPage.navigateToWebapp('Cockpit');
+        // second process definition is deployed without tenant id
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcess(0);
+      });
+
+      it('should display definition semantic version', function() {
+        // when
+        definitionPage.sidebarTabClick('Information');
+
+        // then
+        expect(definitionPage.information.semanticVersion()).to.eventually.contain('1.0.0');
+      });
+    });
+
+    describe('process definition without a semantic version', function() {
+      before(function() {
+        dashboardPage.navigateToWebapp('Cockpit');
+        // second process definition is deployed without tenant id
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcess(1);
+      });
+
+      it('should display null on missing definition semantic version', function() {
+        // when
+        definitionPage.sidebarTabClick('Information');
+
+        // then
+        expect(definitionPage.information.semanticVersion()).to.eventually.contain('null');
+      });
+    });
+  })
+
 });

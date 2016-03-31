@@ -181,5 +181,24 @@ module.exports = {
                 }
               }
             }])
+        ),
+  
+    semanticVersionSetup: 
+        combine(
+          operation('deployment', 'create', [{
+            deploymentName:  'user-tasks',
+            files: [{
+              name: 'user-tasks.bpmn',
+              content: readResource('user-tasks.bpmn')
+            }]
+          }]),
+
+          operation('deployment', 'create', [{
+            deploymentName:  'invoice-deployment-binding',
+            files: [{
+              name: 'invoice-deployment-binding.bpmn',
+              content: readResource('invoice-deployment-binding.bpmn')
+            }]
+          }])
         )
 };
