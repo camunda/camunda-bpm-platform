@@ -12,11 +12,14 @@
  */
 package org.camunda.bpm.engine.impl.batch.history;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
+import org.camunda.bpm.engine.impl.HistoricBatchQueryProperty;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -26,18 +29,34 @@ public class HistoricBatchQueryImpl extends AbstractQuery<HistoricBatchQuery, Hi
   private static final long serialVersionUID = 1L;
 
   protected String batchId;
+  protected String type;
 
   public HistoricBatchQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
 
   public HistoricBatchQuery batchId(String batchId) {
+    ensureNotNull("Batch id", batchId);
     this.batchId = batchId;
     return this;
   }
 
   public String getBatchId() {
     return batchId;
+  }
+
+  public HistoricBatchQuery type(String type) {
+    ensureNotNull("Type", type);
+    this.type = type;
+    return this;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public HistoricBatchQuery orderById() {
+    return orderBy(HistoricBatchQueryProperty.ID);
   }
 
   @Override

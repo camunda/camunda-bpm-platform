@@ -13,14 +13,14 @@
 
 package org.camunda.bpm.engine.impl;
 
-import org.camunda.bpm.engine.batch.BatchQuery;
+import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
 import org.camunda.bpm.engine.query.QueryProperty;
 
 /**
- * Contains the possible properties that can be used in a {@link BatchQuery}.
+ * Contains the possible properties that can be used in a {@link HistoricBatchQuery}.
  *
  */
-public interface BatchQueryProperty {
+public interface HistoricBatchQueryProperty {
 
   QueryProperty ID = new QueryPropertyImpl("ID_");
 

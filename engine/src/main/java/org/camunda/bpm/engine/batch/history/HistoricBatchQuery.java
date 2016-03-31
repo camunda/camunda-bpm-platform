@@ -19,7 +19,19 @@ import org.camunda.bpm.engine.query.Query;
  */
 public interface HistoricBatchQuery extends Query<HistoricBatchQuery, HistoricBatch> {
 
-  /** Only select historic batch instances for the given batch id. */
+  /**
+   * Only select historic batch instances for the given batch id.
+   */
   HistoricBatchQuery batchId(String batchId);
+
+  /**
+   * Only select historic batches of the given type.
+   */
+  HistoricBatchQuery type(String type);
+
+  /**
+   * Returns historic batches sorted by id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   */
+  HistoricBatchQuery orderById();
 
 }
