@@ -5,7 +5,6 @@ define('camunda-tasklist-bootstrap', [
   // 'angular'
 ], function (camundaTasklistUi) {
   'use strict';
-  console.info('jQuery', window.jQuery);
 
   require.config({
     baseUrl: '../../../lib'
