@@ -229,12 +229,12 @@ var angular = require('camunda-commons-ui/vendor/angular'),
       var queryParams = {
         'key' : definition.key,
         'sortBy': 'version',
-        'sortOrder': 'desc' }
+        'sortOrder': 'desc' };
 
    	  if(definition.tenantId) {
        	queryParams.tenantIdIn = [ definition.tenantId ];
       }	else {
-    	queryParams.withoutTenantId = true;
+    	  queryParams.withoutTenantId = true;
       }
 
       return ProcessDefinitionResource.query(queryParams).$promise;

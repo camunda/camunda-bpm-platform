@@ -106,6 +106,12 @@
                 <dd class="tenant-id"
                     ng-if="!processDefinition.tenantId"><span class="null-value">null</span></dd>
 
+                <dt>Semantic Version:</dt>
+                <dd class="semantic-version"
+                    ng-if="processDefinition.semanticVersion">{{ processDefinition.semanticVersion }}</dd>
+                <dd class="semantic-version"
+                    ng-if="!processDefinition.semanticVersion"><span class="null-value">null</span></dd>
+
                 <dt>Deployment ID:</dt>
                 <dd class="deployment-id">
                   <a ng-href="{{ getDeploymentUrl() }}">{{ processDefinition.deploymentId }}</a>

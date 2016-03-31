@@ -61,6 +61,10 @@ module.exports = Base.extend({
   
   tenantId: function () {
     return this.listElement().element(by.css('.tenant-id')).getText();
+  },
+
+  semanticVersion: function() {
+    return this.listElement().element(by.css('.semantic-version')).getText();
   }
   
 });
