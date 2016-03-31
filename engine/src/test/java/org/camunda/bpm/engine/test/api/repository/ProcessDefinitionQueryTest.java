@@ -603,7 +603,7 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
   @org.camunda.bpm.engine.test.Deployment(resources={"org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml"})
   public void testQueryBySemanticVersion() {
     assertEquals(1, repositoryService.createProcessDefinitionQuery()
-      .semanticVersion("sem-ver-1")
+      .semanticVersion("sem-ver-2")
       .count());
   }
 
@@ -614,14 +614,18 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
       .count());
   }
 
-  @org.camunda.bpm.engine.test.Deployment(resources={"org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml"})
+  @org.camunda.bpm.engine.test.Deployment(resources={
+    "org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/repository/SemanticVersionTest.testParsingSemanticVersion.bpmn20.xml"
+  })
   public void testQueryOrderBySemanticVersion() {
     List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery()
+      .semanticVersionLike("sem-ver-%")
       .orderBySemanticVersion()
       .asc()
       .list();
 
-    assertEquals("sem-ver-1", processDefinitionList.get(3).getSemanticVersion());
+    assertEquals("sem-ver-2", processDefinitionList.get(1).getSemanticVersion());
   }
 
 
