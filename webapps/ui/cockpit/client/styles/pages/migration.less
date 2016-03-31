@@ -1,37 +1,66 @@
+@progress-indicator-height: 60px;
+
 .migration-page {
   height: ~"calc(100vh - (@{header-height} + @{breadcrumb-height} + @{footer-height}))";
   margin-top: @breadcrumb-height;
-  background-color: @body-bg;
-  overflow: auto;
-  form > h4 {
-    margin-top: 0;
+  // padding-top: @grid-gutter-width * 0.5;
+  padding-bottom: @grid-gutter-width * 0.5;
+
+  section {
+    height: ~"calc(100% - @{progress-indicator-height})";
+    position: relative;
+
+    margin-left: -(@grid-gutter-width * 0.5);
+    margin-right: -(@grid-gutter-width * 0.5);
+    padding-left: (@grid-gutter-width * 0.5);
+    padding-right: (@grid-gutter-width * 0.5);
+
+    overflow: hidden;
   }
 
-  h4.center-block {
-    max-width: 75%;
-    margin-top: 70px;
-    color: @gray;
+  header,
+  footer {
+    overflow: hidden;
   }
 
-  option.empty-value {
-    color: @gray-light;
-  }
+  // header {
+  //   height: 60px;
+  //   line-height: 60px;
+  //   > h1 {
+  //     margin: 0;
+  //   }
+  // }
 
-  > .row > div {
+  footer {
     padding-top: (@grid-gutter-width * 0.5);
-    &.col-sm-6 {
-      min-height: 250px;
-      padding-bottom: (@grid-gutter-width * 0.5);
-      position: relative;
+    height: (36px + (@grid-gutter-width * 0.5));
+    line-height: 36px;
+  }
 
-      &:first-of-type {
-        border-right: 1px solid @gray-lighter;
-      }
-    }
+  .section-content {
+    border: 1px solid @gray-lighter;
+    border-width: 1px 0;
 
-    &.col-xs-12 {
-      border-top: 1px solid @gray-lighter;
-    }
+    padding-top: (@grid-gutter-width * 0.5);
+    padding-bottom: (@grid-gutter-width * 0.5);
+
+    overflow: auto;
+    // height: ~"calc(100% - (60px + (36px + (@{grid-gutter-width} * 0.5)))) ";
+    height: ~"calc(100% - (36px + (@{grid-gutter-width} * 0.5)))";
+  }
+
+  .page-mapping,
+  .page-instances,
+  .page-confirm,
+  .page-progress {
+    display: none;
+  }
+
+  &.page-mapping-active .page-mapping,
+  &.page-instances-active .page-instances,
+  &.page-confirm-active .page-confirm,
+  &.page-progress-active .page-progress {
+    display: block;
   }
 
   [cam-widget-bpmn-viewer] {
@@ -56,7 +85,113 @@
     color: #143d52;
   }
 
-  .content-page {
-    padding-top: 20px;
+  .instance-number code {
+    font-weight: 700;
+  }
+
+  .activity-mapping {
+    margin-top: @grid-gutter-width * 0.5;
+  }
+
+  .source-process,
+  .target-process {
+    margin-bottom: @grid-gutter-width * 0.5;
+  }
+
+  .process-definition-id {
+    font-family: @font-family-monospace;
+    font-weight: bold;
+  }
+}
+
+
+.page-flow-nav {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: @progress-indicator-height;
+  padding: (@grid-gutter-width * 0.5) 0;
+  background-color: @body-bg;
+
+  &:before,
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    height: 2px;
+    top: 50%;
+    left: 12.5%;
+    margin-top: -1px;
+  }
+
+  &:before {
+    z-index: 2;
+    background-color: @brand-primary;
+    transition: width 0.218s linear;
+  }
+  &:after {
+    z-index: 1;
+    right: 12.5%;
+    background-color: @gray-lighter;
+  }
+
+
+  .page-mapping-active & {
+    &:before {
+      width: 0%;
+    }
+  }
+  .page-instances-active & {
+    &:before {
+      width: 25%;
+    }
+  }
+  .page-confirm-active & {
+    &:before {
+      width: 50%;
+    }
+  }
+  .page-progress-active & {
+    &:before {
+      width: 75%;
+    }
+  }
+
+  ul {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    display: table;
+    table-layout: fixed;
+  }
+
+  a {
+    font-size: 16px;
+    line-height: @grid-gutter-width;
+    height: @grid-gutter-width;
+    padding: 0 @padding-base-horizontal;
+    display: inline-block;
+    min-width: 33%;
+    background-color: @body-bg;
+  }
+
+  li {
+    position: relative;
+    z-index: 2;
+    display: table-cell;
+    list-style: none;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+
+    &.active a,
+    &.disabled a {
+      cursor: default;
+      color: @text-color;
+    }
+
+    &.active a {
+      color: @gray-base;
+    }
   }
 }
