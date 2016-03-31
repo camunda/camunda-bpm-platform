@@ -48,6 +48,18 @@ public interface CaseInstanceBuilder {
   CaseInstanceBuilder businessKey(String businessKey);
 
   /**
+   * Specify the id of the tenant the case definition belongs to. Can only be
+   * used when the definition is referenced by <code>key</code> and not by <code>id</code>.
+   */
+  CaseInstanceBuilder caseDefinitionTenantId(String tenantId);
+
+  /**
+   * Specify that the case definition belongs to no tenant. Can only be
+   * used when the definition is referenced by <code>key</code> and not by <code>id</code>.
+   */
+  CaseInstanceBuilder caseDefinitionWithoutTenantId();
+
+  /**
    * <p>Pass a variable to the case instance.</p>
    *
    * <p>Invoking this method multiple times allows passing multiple variables.</p>
