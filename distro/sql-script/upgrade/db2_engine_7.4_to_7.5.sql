@@ -1,3 +1,10 @@
+-- semantic version --
+
+ALTER TABLE ACT_RE_PROCDEF
+  ADD SEMANTIC_VERSION_ varchar(64);
+
+create index ACT_IDX_PROCDEF_SEM_VER on ACT_RE_PROCDEF(SEMANTIC_VERSION_)
+
 -- tenant id --
 
 ALTER TABLE ACT_RE_DEPLOYMENT

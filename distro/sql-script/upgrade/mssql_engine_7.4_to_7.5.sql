@@ -4,6 +4,13 @@ alter table ACT_RU_EXECUTION
     foreign key (PROC_INST_ID_)
     references ACT_RU_EXECUTION (ID_);
 
+-- semantic version --
+
+ALTER TABLE ACT_RE_PROCDEF
+  ADD SEMANTIC_VERSION_ nvarchar(64);
+
+create index ACT_IDX_PROCDEF_SEM_VER on ACT_RE_PROCDEF(SEMANTIC_VERSION_)
+
 -- tenant id --
 
 ALTER TABLE ACT_RE_DEPLOYMENT
