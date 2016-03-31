@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -124,8 +125,9 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
     preExecute(commandContext);
     JobHandler jobHandler = getJobHandler();
+    JobHandlerConfiguration configuration = getJobHandlerConfiguration();
     ensureNotNull("Cannot find job handler '" + jobHandlerType + "' from job '" + this + "'", "jobHandler", jobHandler);
-    jobHandler.execute(jobHandlerConfiguration, execution, commandContext, tenantId);
+    jobHandler.execute(configuration, execution, commandContext, tenantId);
     postExecute(commandContext);
   }
 
@@ -451,6 +453,14 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     return jobHandlers.get(jobHandlerType);
   }
 
+  public JobHandlerConfiguration getJobHandlerConfiguration() {
+    return getJobHandler().newConfiguration(jobHandlerConfiguration);
+  }
+
+  public void setJobHandlerConfiguration(JobHandlerConfiguration configuration) {
+    this.jobHandlerConfiguration = configuration.toCanonicalString();
+  }
+
   public String getJobHandlerType() {
     return jobHandlerType;
   }
@@ -459,11 +469,11 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.jobHandlerType = jobHandlerType;
   }
 
-  public String getJobHandlerConfiguration() {
+  public String getJobHandlerConfigurationRaw() {
     return jobHandlerConfiguration;
   }
 
-  public void setJobHandlerConfiguration(String jobHandlerConfiguration) {
+  public void setJobHandlerConfigurationRaw(String jobHandlerConfiguration) {
     this.jobHandlerConfiguration = jobHandlerConfiguration;
   }
 

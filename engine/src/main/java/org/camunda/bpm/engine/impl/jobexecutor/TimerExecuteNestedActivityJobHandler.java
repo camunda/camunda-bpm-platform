@@ -32,8 +32,8 @@ public class TimerExecuteNestedActivityJobHandler extends TimerEventJobHandler {
     return TYPE;
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    String activityId = getKey(configuration);
+  public void execute(TimerJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+    String activityId = configuration.getTimerElementKey();
     ActivityImpl activity = execution.getProcessDefinition().findActivity(activityId);
 
     ensureNotNull("Error while firing timer: boundary event activity " + configuration + " not found", "boundary event activity", activity);

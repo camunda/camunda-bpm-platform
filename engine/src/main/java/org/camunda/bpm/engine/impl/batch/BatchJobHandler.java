@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
  * A batch job handler manages batch jobs based
  * on the configuration {@link T}.
  */
-public interface BatchJobHandler<T> extends JobHandler {
+public interface BatchJobHandler<T> extends JobHandler<BatchJobConfiguration> {
 
   /**
    * Converts the configuration of the batch to a byte array.

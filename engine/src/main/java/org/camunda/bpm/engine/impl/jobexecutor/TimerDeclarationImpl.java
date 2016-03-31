@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.calendar.BusinessCalendar;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
@@ -45,6 +44,8 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
   protected boolean isInterruptingTimer; // For boundary timers
   protected String eventScopeActivityId = null;
   protected Boolean isParallelMultiInstance;
+
+  protected String rawJobHandlerConfiguration;
 
   public TimerDeclarationImpl(Expression expression, TimerDeclarationType type, String jobHandlerType) {
     super(jobHandlerType);
@@ -80,6 +81,10 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
     }
 
     return timer;
+  }
+
+  public void setRawJobHandlerConfiguration(String rawJobHandlerConfiguration) {
+    this.rawJobHandlerConfiguration = rawJobHandlerConfiguration;
   }
 
   protected void postInitialize(ExecutionEntity context, TimerEntity job) {
@@ -168,6 +173,11 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
 
   protected ExecutionEntity resolveExecution(ExecutionEntity context) {
     return context;
+  }
+
+  @Override
+  protected JobHandlerConfiguration resolveJobHandlerConfiguration(ExecutionEntity context) {
+    return resolveJobHandler().newConfiguration(rawJobHandlerConfiguration);
   }
 
   public static List<TimerDeclarationImpl> getDeclarationsForScope(PvmScope scope) {

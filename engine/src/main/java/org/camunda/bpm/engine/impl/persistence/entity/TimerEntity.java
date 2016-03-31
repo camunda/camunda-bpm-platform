@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.RepeatingFailedJobListener;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
 
 
 /**
@@ -60,26 +61,29 @@ public class TimerEntity extends JobEntity {
   }
 
   protected void preExecute(CommandContext commandContext) {
-    if (repeat != null && !TimerEventJobHandler.isFollowUpJobCreated(getJobHandlerConfiguration())) {
-      // this timer is a repeating timer and
-      // a follow up timer job has not been scheduled yet
+    if (getJobHandler() instanceof TimerEventJobHandler) {
+      TimerJobConfiguration configuration = (TimerJobConfiguration) getJobHandlerConfiguration();
+      if (repeat != null && !configuration.isFollowUpJobCreated()) {
+        // this timer is a repeating timer and
+        // a follow up timer job has not been scheduled yet
 
-      Date newDueDate = calculateRepeat();
+        Date newDueDate = calculateRepeat();
 
-      if (newDueDate != null) {
-        // the listener is added to the transaction as SYNC on ROLLABCK,
-        // when it is necessary to schedule a new timer job invocation.
-        // If the transaction does not rollback, it is ignored.
-        ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
-        RepeatingFailedJobListener listener = createRepeatingFailedJobListener(commandExecutor);
+        if (newDueDate != null) {
+          // the listener is added to the transaction as SYNC on ROLLABCK,
+          // when it is necessary to schedule a new timer job invocation.
+          // If the transaction does not rollback, it is ignored.
+          ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+          CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
+          RepeatingFailedJobListener listener = createRepeatingFailedJobListener(commandExecutor);
 
-        commandContext.getTransactionContext().addTransactionListener(
-            TransactionState.ROLLED_BACK,
-            listener);
+          commandContext.getTransactionContext().addTransactionListener(
+              TransactionState.ROLLED_BACK,
+              listener);
 
-        // create a new timer job
-        createNewTimerJob(newDueDate);
+          // create a new timer job
+          createNewTimerJob(newDueDate);
+        }
       }
     }
   }

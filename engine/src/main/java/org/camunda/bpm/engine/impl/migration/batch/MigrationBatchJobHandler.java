@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
+import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -138,15 +139,17 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
 
     ByteArrayManager byteArrayManager = commandContext.getByteArrayManager();
     for (JobEntity job : jobs) {
-      byteArrayManager.deleteByteArrayById(job.getJobHandlerConfiguration());
+      byteArrayManager.deleteByteArrayById(job.getJobHandlerConfigurationRaw());
 
       job.delete();
     }
   }
 
   @Override
-  public void execute(String configurationId, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    ByteArrayEntity configurationEntity = commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, configurationId);
+  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+    ByteArrayEntity configurationEntity = commandContext
+        .getDbEntityManager()
+        .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
     MigrationBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
@@ -157,6 +160,11 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
         .execute();
 
     commandContext.getByteArrayManager().delete(configurationEntity);
+  }
+
+  @Override
+  public BatchJobConfiguration newConfiguration(String canonicalString) {
+    return new BatchJobConfiguration(canonicalString);
   }
 
 }

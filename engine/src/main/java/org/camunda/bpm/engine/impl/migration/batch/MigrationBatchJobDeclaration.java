@@ -13,7 +13,9 @@
 package org.camunda.bpm.engine.impl.migration.batch;
 
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
@@ -39,8 +41,8 @@ public class MigrationBatchJobDeclaration extends JobDeclaration<ByteArrayEntity
   }
 
   @Override
-  protected String resolveJobHandlerConfiguration(ByteArrayEntity configuration) {
-    return configuration.getId();
+  protected JobHandlerConfiguration resolveJobHandlerConfiguration(ByteArrayEntity configuration) {
+    return new BatchJobConfiguration(configuration.getId());
   }
 
 }

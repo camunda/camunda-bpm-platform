@@ -16,14 +16,14 @@ package org.camunda.bpm.engine.impl.migration.instance;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
-public class MigratingJobInstance implements MigratingInstance, RemovingInstance {
+public abstract class MigratingJobInstance implements MigratingInstance, RemovingInstance {
 
   protected JobEntity jobEntity;
   protected JobDefinitionEntity targetJobDefinitionEntity;
@@ -31,7 +31,8 @@ public class MigratingJobInstance implements MigratingInstance, RemovingInstance
 
   protected List<MigratingInstance> migratingDependentInstances = new ArrayList<MigratingInstance>();
 
-  public MigratingJobInstance(JobEntity jobEntity, JobDefinitionEntity jobDefinitionEntity, ScopeImpl targetScope) {
+  public MigratingJobInstance(JobEntity jobEntity, JobDefinitionEntity jobDefinitionEntity,
+      ScopeImpl targetScope) {
     this.jobEntity = jobEntity;
     this.targetJobDefinitionEntity = jobDefinitionEntity;
     this.targetScope = targetScope;
@@ -75,7 +76,7 @@ public class MigratingJobInstance implements MigratingInstance, RemovingInstance
     // update activity reference
     String activityId = targetScope.getId();
     jobEntity.setActivityId(activityId);
-    updateJobConfiguration(activityId);
+    migrateJobHandlerConfiguration();
     if (targetJobDefinitionEntity != null) {
       jobEntity.setJobDefinition(targetJobDefinitionEntity);
     }
@@ -104,10 +105,6 @@ public class MigratingJobInstance implements MigratingInstance, RemovingInstance
     return targetScope;
   }
 
-  protected void updateJobConfiguration(String activityId) {
-    String configuration = jobEntity.getJobHandlerConfiguration();
-    configuration = TimerEventJobHandler.updateKeyInConfiguration(configuration, activityId);
-    jobEntity.setJobHandlerConfiguration(configuration);
-  }
+  protected abstract void migrateJobHandlerConfiguration();
 
 }

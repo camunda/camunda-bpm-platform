@@ -13,7 +13,9 @@
 
 package org.camunda.bpm.engine.impl.batch;
 
+import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler.BatchMonitorJobConfiguration;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
@@ -38,8 +40,8 @@ public class BatchMonitorJobDeclaration extends JobDeclaration<BatchEntity, Mess
   }
 
   @Override
-  protected String resolveJobHandlerConfiguration(BatchEntity batch) {
-    return batch.getId();
+  protected JobHandlerConfiguration resolveJobHandlerConfiguration(BatchEntity batch) {
+    return new BatchMonitorJobConfiguration(batch.getId());
   }
 
   @Override

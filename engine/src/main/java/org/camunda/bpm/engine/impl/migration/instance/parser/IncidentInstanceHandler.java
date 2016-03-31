@@ -29,6 +29,7 @@ public class IncidentInstanceHandler implements MigratingInstanceParseHandler<In
       MigratingJobInstance owningInstance = parseContext.getMigratingJobInstanceById(incident.getConfiguration());
       parseContext.consume(incident);
       if (owningInstance.migrates()) {
+
         MigratingIncident migratingIncident = new MigratingIncident(incident, (ScopeImpl) owningInstance.getTargetScope().getEventScope());
         owningInstance.addMigratingDependentInstance(migratingIncident);
       }

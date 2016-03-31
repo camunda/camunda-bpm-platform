@@ -15,15 +15,17 @@ package org.camunda.bpm.engine.impl.batch;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler.BatchMonitorJobConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
  * Job handler for batch monitor jobs. The batch monitor job
  * polls for the completion of the batch.
  */
-public class BatchMonitorJobHandler implements JobHandler {
+public class BatchMonitorJobHandler implements JobHandler<BatchMonitorJobConfiguration> {
 
   public static final String TYPE = "batch-monitor-job";
 
@@ -31,8 +33,10 @@ public class BatchMonitorJobHandler implements JobHandler {
     return TYPE;
   }
 
-  public void execute(String batchId, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    BatchEntity batch = commandContext.getBatchManager().findBatchById(batchId);
+  public void execute(BatchMonitorJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+
+    String batchId = configuration.getBatchId();
+    BatchEntity batch = commandContext.getBatchManager().findBatchById(configuration.getBatchId());
     ensureNotNull("Batch with id '" + batchId + "' cannot be found", "batch", batch);
 
     boolean completed = batch.isCompleted();
@@ -42,6 +46,28 @@ public class BatchMonitorJobHandler implements JobHandler {
     }
     else {
       batch.delete(false);
+    }
+  }
+
+  @Override
+  public BatchMonitorJobConfiguration newConfiguration(String canonicalString) {
+    return new BatchMonitorJobConfiguration(canonicalString);
+  }
+
+  public static class BatchMonitorJobConfiguration implements JobHandlerConfiguration {
+    protected String batchId;
+
+    public BatchMonitorJobConfiguration(String batchId) {
+      this.batchId = batchId;
+    }
+
+    public String getBatchId() {
+      return batchId;
+    }
+
+    @Override
+    public String toCanonicalString() {
+      return batchId;
     }
   }
 

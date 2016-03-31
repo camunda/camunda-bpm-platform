@@ -644,7 +644,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
   protected Job fetchFirstJobByHandlerConfiguration(List<Job> jobs, String configuration) {
     for (Job job : jobs) {
       JobEntity jobEntity = (JobEntity) job;
-      String jobConfig = jobEntity.getJobHandlerConfiguration();
+      String jobConfig = jobEntity.getJobHandlerConfigurationRaw();
       if (configuration.equals(jobConfig)) {
         return job;
       }

@@ -17,6 +17,7 @@ import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 
@@ -89,11 +90,11 @@ public abstract class AbstractSetStateCmd implements Command<Void> {
   protected void scheduleSuspensionStateUpdate(CommandContext commandContext) {
     TimerEntity timer = new TimerEntity();
 
-    String jobHandlerConfiguration = getJobHandlerConfiguration();
+    JobHandlerConfiguration jobHandlerConfiguration = getJobHandlerConfiguration();
 
     timer.setDuedate(executionDate);
     timer.setJobHandlerType(getDelayedExecutionJobHandlerType());
-    timer.setJobHandlerConfiguration(jobHandlerConfiguration);
+    timer.setJobHandlerConfigurationRaw(jobHandlerConfiguration.toCanonicalString());
 
     commandContext.getJobManager().schedule(timer);
   }
@@ -102,7 +103,7 @@ public abstract class AbstractSetStateCmd implements Command<Void> {
     return null;
   }
 
-  protected String getJobHandlerConfiguration() {
+  protected JobHandlerConfiguration getJobHandlerConfiguration() {
     return null;
   }
 

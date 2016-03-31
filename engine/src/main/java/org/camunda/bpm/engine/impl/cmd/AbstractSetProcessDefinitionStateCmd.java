@@ -17,7 +17,8 @@ import java.util.concurrent.Callable;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler.ProcessDefinitionSuspensionStateConfiguration;
 import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
@@ -144,23 +145,17 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
   }
 
   @Override
-  protected String getJobHandlerConfiguration() {
-    String jobConfiguration = null;
+  protected JobHandlerConfiguration getJobHandlerConfiguration() {
 
     if (processDefinitionId != null) {
-      jobConfiguration = TimerChangeProcessDefinitionSuspensionStateJobHandler
-          .createJobHandlerConfigurationByProcessDefinitionId(processDefinitionId, isIncludeSubResources());
+      return ProcessDefinitionSuspensionStateConfiguration.byProcessDefinitionId(processDefinitionId, isIncludeSubResources());
 
     } else if (isTenantIdSet) {
-      jobConfiguration = TimerChangeProcessDefinitionSuspensionStateJobHandler
-          .createJobHandlerConfigurationByProcessDefinitionKeyAndTenantId(processDefinitionKey, tenantId, isIncludeSubResources());
+      return ProcessDefinitionSuspensionStateConfiguration.byProcessDefinitionKeyAndTenantId(processDefinitionKey, tenantId, isIncludeSubResources());
 
     } else {
-      jobConfiguration = TimerChangeProcessDefinitionSuspensionStateJobHandler
-          .createJobHandlerConfigurationByProcessDefinitionKey(processDefinitionKey, isIncludeSubResources());
+      return ProcessDefinitionSuspensionStateConfiguration.byProcessDefinitionKey(processDefinitionKey, isIncludeSubResources());
     }
-
-    return jobConfiguration;
   }
 
   @Override

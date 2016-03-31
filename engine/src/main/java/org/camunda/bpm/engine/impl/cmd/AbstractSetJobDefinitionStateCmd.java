@@ -17,7 +17,8 @@ import java.util.Date;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeJobDefinitionSuspensionStateJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeJobDefinitionSuspensionStateJobHandler.JobDefinitionSuspensionStateConfiguration;
 import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
@@ -125,29 +126,24 @@ public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateC
   }
 
   @Override
-  protected String getJobHandlerConfiguration() {
-    String jobConfiguration = null;
+  protected JobHandlerConfiguration getJobHandlerConfiguration() {
 
     if (jobDefinitionId != null) {
-      jobConfiguration = TimerChangeJobDefinitionSuspensionStateJobHandler
-          .createJobHandlerConfigurationByJobDefinitionId(jobDefinitionId, isIncludeSubResources());
+      return JobDefinitionSuspensionStateConfiguration.byJobDefinitionId(jobDefinitionId, isIncludeSubResources());
 
     } else if (processDefinitionId != null) {
-      jobConfiguration = TimerChangeJobDefinitionSuspensionStateJobHandler
-          .createJobHandlerConfigurationByProcessDefinitionId(processDefinitionId, isIncludeSubResources());
+      return JobDefinitionSuspensionStateConfiguration.byProcessDefinitionId(processDefinitionId, isIncludeSubResources());
 
-    } else if (processDefinitionKey != null) {
+    } else {
 
       if (!isProcessDefinitionTenantIdSet) {
-        jobConfiguration = TimerChangeJobDefinitionSuspensionStateJobHandler
-            .createJobHandlerConfigurationByProcessDefinitionKey(processDefinitionKey, isIncludeSubResources());
+        return JobDefinitionSuspensionStateConfiguration.byProcessDefinitionKey(processDefinitionKey, isIncludeSubResources());
 
       } else {
-        jobConfiguration = TimerChangeJobDefinitionSuspensionStateJobHandler
-            .createJobHandlerConfigurationByProcessDefinitionKeyAndTenantId(processDefinitionKey, processDefinitionTenantId, isIncludeSubResources());
+        return JobDefinitionSuspensionStateConfiguration.ByProcessDefinitionKeyAndTenantId(processDefinitionKey, processDefinitionTenantId, isIncludeSubResources());
       }
     }
-    return jobConfiguration;
+
   }
 
   @Override

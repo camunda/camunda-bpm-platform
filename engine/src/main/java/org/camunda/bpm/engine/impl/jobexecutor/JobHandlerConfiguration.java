@@ -12,24 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import org.camunda.bpm.engine.impl.cmd.AbstractSetJobDefinitionStateCmd;
-import org.camunda.bpm.engine.impl.cmd.SuspendJobDefinitionCmd;
-
 /**
- * @author roman.smirnov
+ * @author Thorben Lindhauer
+ *
  */
-public class TimerSuspendJobDefinitionHandler extends TimerChangeJobDefinitionSuspensionStateJobHandler {
+public interface JobHandlerConfiguration {
 
-  public static final String TYPE = "suspend-job-definition";
-
-  public String getType() {
-    return TYPE;
-  }
-
-  @Override
-  protected AbstractSetJobDefinitionStateCmd getCommand(JobDefinitionSuspensionStateConfiguration configuration) {
-
-    return new SuspendJobDefinitionCmd(configuration.createBuilder());
-  }
-
+  String toCanonicalString();
 }

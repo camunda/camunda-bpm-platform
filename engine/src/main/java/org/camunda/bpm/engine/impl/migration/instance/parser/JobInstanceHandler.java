@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.migration.instance.EmergingJobInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingJobInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingTimerJobInstance;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
@@ -49,14 +50,16 @@ public class JobInstanceHandler implements MigratingDependentInstanceParseHandle
         ActivityImpl timerJobTargetActivity = parseContext.getTargetProcessDefinition().findActivity(timerJobMigrationInstruction.getTargetActivityId());
         migratingActivityIds.add(timerJobTargetActivity.getId());
         JobDefinitionEntity targetJobDefinitionEntity = parseContext.getTargetJobDefinition(timerJobTargetActivity.getActivityId(), job.getJobHandlerType());
-        MigratingJobInstance migratingTimerJobInstance = new MigratingJobInstance(job, targetJobDefinitionEntity, timerJobTargetActivity);
+
+        MigratingJobInstance migratingTimerJobInstance =
+            new MigratingTimerJobInstance(job, targetJobDefinitionEntity, timerJobTargetActivity);
         activityInstance.addMigratingDependentInstance(migratingTimerJobInstance);
         parseContext.submit(migratingTimerJobInstance);
 
       }
       else {
         // the timer job is removed
-        MigratingJobInstance removingJobInstance = new MigratingJobInstance(job);
+        MigratingJobInstance removingJobInstance = new MigratingTimerJobInstance(job);
         activityInstance.addRemovingDependentInstance(removingJobInstance);
         parseContext.submit(removingJobInstance);
 

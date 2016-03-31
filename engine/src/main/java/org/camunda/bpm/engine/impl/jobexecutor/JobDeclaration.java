@@ -44,7 +44,7 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
   protected String jobDefinitionId;
 
   protected String jobHandlerType;
-  protected String jobHandlerConfiguration;
+  protected JobHandlerConfiguration jobHandlerConfiguration;
   protected String jobConfiguration;
 
   protected boolean exclusive = JobEntity.DEFAULT_EXCLUSIVE;
@@ -146,21 +146,16 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
     return jobHandlerType;
   }
 
+  protected JobHandler resolveJobHandler() {
+    // TODO: throw exception if job handler not present
+    return Context.getProcessEngineConfiguration().getJobHandlers().get(jobHandlerType);
+  }
+
   protected String resolveJobHandlerType(S context) {
     return jobHandlerType;
   }
 
-  public String getJobHandlerConfiguration() {
-    return jobHandlerConfiguration;
-  }
-
-  protected String resolveJobHandlerConfiguration(S context) {
-    return jobHandlerConfiguration;
-  }
-
-  public void setJobHandlerConfiguration(String jobHandlerConfiguration) {
-    this.jobHandlerConfiguration = jobHandlerConfiguration;
-  }
+  protected abstract JobHandlerConfiguration resolveJobHandlerConfiguration(S context);
 
   protected boolean resolveExclusive(S context) {
     return exclusive;
@@ -186,10 +181,6 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
 
   public void setExclusive(boolean exclusive) {
     this.exclusive = exclusive;
-  }
-
-  public void setJobHandlerType(String jobHandlerType) {
-    this.jobHandlerType = jobHandlerType;
   }
 
   public String getActivityId() {

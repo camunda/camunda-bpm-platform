@@ -14,8 +14,6 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.impl.cmd.AbstractSetJobDefinitionStateCmd;
 import org.camunda.bpm.engine.impl.cmd.ActivateJobDefinitionCmd;
-import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
 
 /**
  * @author roman.smirnov
@@ -29,13 +27,8 @@ public class TimerActivateJobDefinitionHandler extends TimerChangeJobDefinitionS
   }
 
   @Override
-  protected AbstractSetJobDefinitionStateCmd getCommand(String configuration) {
-    JSONObject config = new JSONObject(configuration);
-
-    UpdateJobDefinitionSuspensionStateBuilderImpl builder = createBuilder(config)
-        .includeJobs(getIncludeJobs(config));
-
-    return new ActivateJobDefinitionCmd(builder);
+  protected AbstractSetJobDefinitionStateCmd getCommand(JobDefinitionSuspensionStateConfiguration configuration) {
+    return new ActivateJobDefinitionCmd(configuration.createBuilder());
   }
 
 }

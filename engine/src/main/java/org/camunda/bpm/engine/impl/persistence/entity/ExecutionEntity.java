@@ -57,6 +57,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
+import org.camunda.bpm.engine.impl.interceptor.AtomicOperationInvocation;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
@@ -618,8 +619,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     return false;
   }
 
-  @SuppressWarnings({"unchecked", "deprecation"})
-  public void scheduleAtomicOperationAsync(AtomicOperation executionOperation) {
+  @SuppressWarnings({"unchecked"})
+  public void scheduleAtomicOperationAsync(AtomicOperationInvocation executionOperationInvocation) {
 
     MessageJobDeclaration messageJobDeclaration = null;
 
@@ -627,7 +628,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
         .getProperty(BpmnParse.PROPERTYNAME_MESSAGE_JOB_DECLARATION);
     if (messageJobDeclarations != null) {
       for (MessageJobDeclaration declaration : messageJobDeclarations) {
-        if (declaration.isApplicableForOperation(executionOperation)) {
+        if (declaration.isApplicableForOperation(executionOperationInvocation.getOperation())) {
           messageJobDeclaration = declaration;
           break;
         }
@@ -635,9 +636,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
 
     if (messageJobDeclaration != null) {
-      MessageEntity message = messageJobDeclaration.createJobInstance(this);
-      messageJobDeclaration.setJobHandlerConfiguration(message, this, executionOperation);
-
+      MessageEntity message = messageJobDeclaration.createJobInstance(executionOperationInvocation);
       Context.getCommandContext().getJobManager().send(message);
 
     } else {

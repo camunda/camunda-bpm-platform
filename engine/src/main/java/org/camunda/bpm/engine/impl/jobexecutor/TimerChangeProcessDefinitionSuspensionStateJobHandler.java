@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmd.AbstractSetProcessDefinitionStateCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler.ProcessDefinitionSuspensionStateConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
@@ -23,7 +24,7 @@ import org.camunda.bpm.engine.impl.util.json.JSONObject;
  * @author Joram Barrez
  * @author roman.smirnov
  */
-public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler implements JobHandler {
+public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler implements JobHandler<ProcessDefinitionSuspensionStateConfiguration> {
 
   protected static final String JOB_HANDLER_CFG_BY = "by";
   protected static final String JOB_HANDLER_CFG_PROCESS_DEFINITION_ID = "processDefinitionId";
@@ -32,104 +33,132 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
 
   protected static final String JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES = "includeProcessInstances";
 
-  public static String createJobHandlerConfigurationByProcessDefinitionId(String processDefinitionId, boolean includeProcessInstances) {
-    JSONObject json = new JSONObject();
-
-    json.put(JOB_HANDLER_CFG_BY, JOB_HANDLER_CFG_PROCESS_DEFINITION_ID);
-    json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID, processDefinitionId);
-    json.put(JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES, includeProcessInstances);
-
-    return json.toString();
-  }
-
-  public static String createJobHandlerConfigurationByProcessDefinitionKey(String processDefinitionKey, boolean includeProcessInstances) {
-    JSONObject json = new JSONObject();
-
-    json.put(JOB_HANDLER_CFG_BY, JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY);
-    json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY, processDefinitionKey);
-    json.put(JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES, includeProcessInstances);
-
-    return json.toString();
-  }
-
-  public static String createJobHandlerConfigurationByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String tenantId, boolean includeProcessInstances) {
-    JSONObject json = new JSONObject();
-
-    json.put(JOB_HANDLER_CFG_BY, JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY);
-    json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY, processDefinitionKey);
-    json.put(JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES, includeProcessInstances);
-
-    if (tenantId != null) {
-      json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID, tenantId);
-    } else {
-      json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID, JSONObject.NULL);
-    }
-
-    return json.toString();
-  }
-
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(ProcessDefinitionSuspensionStateConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     AbstractSetProcessDefinitionStateCmd cmd = getCommand(configuration);
     cmd.disableLogUserOperation();
     cmd.execute(commandContext);
   }
 
-  protected String getProcessDefinitionId(JSONObject config) {
-    return config.getString(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID);
+  protected abstract AbstractSetProcessDefinitionStateCmd getCommand(ProcessDefinitionSuspensionStateConfiguration configuration);
+
+  @Override
+  public ProcessDefinitionSuspensionStateConfiguration newConfiguration(String canonicalString) {
+    JSONObject jsonObject = new JSONObject(canonicalString);
+
+    return ProcessDefinitionSuspensionStateConfiguration.fromJson(jsonObject);
   }
 
-  protected String getProcessDefinitionKey(JSONObject config) {
-    return config.getString(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY);
-  }
+  public static class ProcessDefinitionSuspensionStateConfiguration implements JobHandlerConfiguration {
 
-  protected String getBy(JSONObject config) {
-    return config.getString(JOB_HANDLER_CFG_BY);
-  }
+    protected String processDefinitionKey;
+    protected String processDefinitionId;
+    protected boolean includeProcessInstances;
+    protected String tenantId;
+    protected boolean isTenantIdSet;
+    protected String by;
 
-  protected boolean getIncludeProcessInstances(JSONObject config) {
-    return config.getBoolean(JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES);
-  }
+    @Override
+    public String toCanonicalString() {
+      JSONObject json = new JSONObject();
 
-  protected boolean isTenantIdSet(JSONObject config) {
-    return config.has(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID);
-  }
+      json.put(JOB_HANDLER_CFG_BY, by);
+      json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY, processDefinitionKey);
+      json.put(JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES, includeProcessInstances);
+      json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID, processDefinitionId);
 
-  protected String getTenantId(JSONObject config) {
-    if (config.isNull(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID)) {
-      return null;
-    } else {
-      return config.getString(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID);
-    }
-  }
-
-  protected UpdateProcessDefinitionSuspensionStateBuilderImpl createBuilder(JSONObject config) {
-    UpdateProcessDefinitionSuspensionStateBuilderImpl builder = new UpdateProcessDefinitionSuspensionStateBuilderImpl();
-
-    String by = getBy(config);
-
-    if (by.equals(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID)) {
-      builder.byProcessDefinitionId(getProcessDefinitionId(config));
-
-    } else if (by.equals(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY)) {
-      builder.byProcessDefinitionKey(getProcessDefinitionKey(config));
-
-      if (isTenantIdSet(config)) {
-
-        String tenantId = getTenantId(config);
+      if (isTenantIdSet) {
         if (tenantId != null) {
-          builder.processDefinitionTenantId(tenantId);
-
+          json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID, tenantId);
         } else {
-          builder.processDefinitionWithoutTenantId();
+          json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID, JSONObject.NULL);
         }
       }
 
-    } else {
-      throw new ProcessEngineException("Unexpected job handler configuration for property '" + JOB_HANDLER_CFG_BY + "': " + by);
+      return json.toString();
     }
-    return builder;
-  }
 
-  protected abstract AbstractSetProcessDefinitionStateCmd getCommand(String configuration);
+    public UpdateProcessDefinitionSuspensionStateBuilderImpl createBuilder() {
+      UpdateProcessDefinitionSuspensionStateBuilderImpl builder = new UpdateProcessDefinitionSuspensionStateBuilderImpl();
+
+      if (by.equals(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID)) {
+        builder.byProcessDefinitionId(processDefinitionId);
+
+      } else if (by.equals(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY)) {
+        builder.byProcessDefinitionKey(processDefinitionKey);
+
+        if (isTenantIdSet) {
+
+          if (tenantId != null) {
+            builder.processDefinitionTenantId(tenantId);
+
+          } else {
+            builder.processDefinitionWithoutTenantId();
+          }
+        }
+
+      } else {
+        throw new ProcessEngineException("Unexpected job handler configuration for property '" + JOB_HANDLER_CFG_BY + "': " + by);
+      }
+
+      builder.includeProcessInstances(includeProcessInstances);
+
+      return builder;
+    }
+
+    public static ProcessDefinitionSuspensionStateConfiguration fromJson(JSONObject jsonObject) {
+      ProcessDefinitionSuspensionStateConfiguration config = new ProcessDefinitionSuspensionStateConfiguration();
+
+      config.by = jsonObject.getString(JOB_HANDLER_CFG_BY);
+      if (jsonObject.has(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID)) {
+        config.processDefinitionId = jsonObject.getString(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID);
+      }
+      if (jsonObject.has(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY)) {
+        config.processDefinitionKey = jsonObject.getString(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY);
+      }
+      if (jsonObject.has(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID)) {
+        config.isTenantIdSet = true;
+        if (!jsonObject.isNull(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID)) {
+          config.tenantId = jsonObject.getString(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID);
+        }
+      }
+      if (jsonObject.has(JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES)) {
+        config.includeProcessInstances = jsonObject.getBoolean(JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES);
+      }
+
+      return config;
+    }
+
+    public static ProcessDefinitionSuspensionStateConfiguration byProcessDefinitionId(String processDefinitionId, boolean includeProcessInstances) {
+      ProcessDefinitionSuspensionStateConfiguration configuration = new ProcessDefinitionSuspensionStateConfiguration();
+
+      configuration.by = JOB_HANDLER_CFG_PROCESS_DEFINITION_ID;
+      configuration.processDefinitionId = processDefinitionId;
+      configuration.includeProcessInstances = includeProcessInstances;
+
+      return configuration;
+    }
+
+    public static ProcessDefinitionSuspensionStateConfiguration byProcessDefinitionKey(String processDefinitionKey, boolean includeProcessInstances) {
+      ProcessDefinitionSuspensionStateConfiguration configuration = new ProcessDefinitionSuspensionStateConfiguration();
+
+      configuration.by = JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY;
+      configuration.processDefinitionKey = processDefinitionKey;
+      configuration.includeProcessInstances = includeProcessInstances;
+
+      return configuration;
+    }
+
+    public static ProcessDefinitionSuspensionStateConfiguration byProcessDefinitionKeyAndTenantId(String processDefinitionKey, String tenantId, boolean includeProcessInstances) {
+      ProcessDefinitionSuspensionStateConfiguration configuration = byProcessDefinitionKey(processDefinitionKey, includeProcessInstances);
+
+      configuration.isTenantIdSet = true;
+      configuration.tenantId = tenantId;
+
+      return configuration;
+
+    }
+
+
+  }
 
 }

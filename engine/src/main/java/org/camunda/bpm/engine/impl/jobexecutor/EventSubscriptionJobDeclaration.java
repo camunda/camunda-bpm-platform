@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler.EventSubscriptionJobConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
@@ -83,8 +84,8 @@ public class EventSubscriptionJobDeclaration extends JobDeclaration<EventSubscri
     return context.getExecution();
   }
 
-  protected String resolveJobHandlerConfiguration(EventSubscriptionEntity context) {
-    return context.getId();
+  protected JobHandlerConfiguration resolveJobHandlerConfiguration(EventSubscriptionEntity context) {
+    return new EventSubscriptionJobConfiguration(context.getId());
   }
 
   @SuppressWarnings("unchecked")

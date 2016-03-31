@@ -14,8 +14,10 @@ package org.camunda.bpm.engine.impl.batch;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler.BatchSeedJobConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
@@ -26,7 +28,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
  * created to oversee the completion of the batch
  * (see {@link BatchMonitorJobHandler}).
  */
-public class BatchSeedJobHandler implements JobHandler {
+public class BatchSeedJobHandler implements JobHandler<BatchSeedJobConfiguration> {
 
   public static final String TYPE = "batch-seed-job";
 
@@ -34,7 +36,9 @@ public class BatchSeedJobHandler implements JobHandler {
     return TYPE;
   }
 
-  public void execute(String batchId, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(BatchSeedJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+
+    String batchId = configuration.getBatchId();
     BatchEntity batch = commandContext.getBatchManager().findBatchById(batchId);
     ensureNotNull("Batch with id '" + batchId + "' cannot be found", "batch", batch);
 
@@ -50,6 +54,28 @@ public class BatchSeedJobHandler implements JobHandler {
     }
     else {
       batch.createMonitorJob();
+    }
+  }
+
+  @Override
+  public BatchSeedJobConfiguration newConfiguration(String canonicalString) {
+    return new BatchSeedJobConfiguration(canonicalString);
+  }
+
+  public static class BatchSeedJobConfiguration implements JobHandlerConfiguration {
+    protected String batchId;
+
+    public BatchSeedJobConfiguration(String batchId) {
+      this.batchId = batchId;
+    }
+
+    public String getBatchId() {
+      return batchId;
+    }
+
+    @Override
+    public String toCanonicalString() {
+      return batchId;
     }
   }
 

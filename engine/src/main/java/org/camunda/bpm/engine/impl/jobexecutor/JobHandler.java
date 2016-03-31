@@ -19,10 +19,11 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 /**
  * @author Tom Baeyens
  */
-public interface JobHandler {
+public interface JobHandler<T extends JobHandlerConfiguration> {
 
   String getType();
 
-  void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId);
+  void execute(T configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId);
 
+  T newConfiguration(String canonicalString);
 }

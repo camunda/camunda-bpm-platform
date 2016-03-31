@@ -2988,7 +2988,7 @@ public class BpmnParse extends Parse {
   protected void parseTimerStartEventDefinition(Element timerEventDefinition, ActivityImpl timerActivity, ProcessDefinitionEntity processDefinition) {
     timerActivity.getProperties().set(BpmnProperties.TYPE, "startTimerEvent");
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerStartEventJobHandler.TYPE);
-    timerDeclaration.setJobHandlerConfiguration(processDefinition.getKey());
+    timerDeclaration.setRawJobHandlerConfiguration(processDefinition.getKey());
 
     List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) processDefinition.getProperty(PROPERTYNAME_START_TIMER);
     if (timerDeclarations == null) {
@@ -3006,7 +3006,7 @@ public class BpmnParse extends Parse {
 
     timerDeclaration.setActivity(timerActivity);
     timerDeclaration.setEventScopeActivityId(timerActivity.getEventScope().getId());
-    timerDeclaration.setJobHandlerConfiguration(timerActivity.getFlowScope().getId());
+    timerDeclaration.setRawJobHandlerConfiguration(timerActivity.getFlowScope().getId());
     timerDeclaration.setInterruptingTimer(interrupting);
 
     if (interrupting) {
@@ -3107,7 +3107,7 @@ public class BpmnParse extends Parse {
     // Parse the timer declaration
     // TODO move the timer declaration into the bpmn activity or next to the TimerSession
     TimerDeclarationImpl timerDeclaration = new TimerDeclarationImpl(expression, type, jobHandlerType);
-    timerDeclaration.setJobHandlerConfiguration(timerActivity.getId());
+    timerDeclaration.setRawJobHandlerConfiguration(timerActivity.getId());
     timerDeclaration.setExclusive("true".equals(timerEventDefinition.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "exclusive", String.valueOf(JobEntity.DEFAULT_EXCLUSIVE))));
     if(timerActivity.getId() == null) {
       addError("Attribute \"id\" is required!",timerEventDefinition);
