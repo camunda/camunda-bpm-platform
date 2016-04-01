@@ -34,6 +34,8 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.type.FileValueTypeImpl;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.camunda.commons.utils.IoUtil;
+import static org.hamcrest.core.IsEqual.equalTo;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -198,6 +200,18 @@ public class FileValueTypeImplTest {
     assertThat(info, hasEntry(FileValueTypeImpl.VALUE_INFO_FILE_NAME, (Object) fileName));
     assertThat(info, hasEntry(FileValueTypeImpl.VALUE_INFO_FILE_MIME_TYPE, (Object) fileType));
     assertThat(info, hasEntry(FileValueTypeImpl.VALUE_INFO_FILE_ENCODING, (Object) encoding));
+  }
+    
+  @Test
+  public void fileByteArrayIsEqualToFileValueContent() throws IOException {
+    InputStream file = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
+    String fileName = "simpleFile.txt";
+    String fileType = "text/plain";
+    Charset encoding = Charset.forName("UTF-8");    
+    
+    FileValue fileValue = Variables.fileValue(fileName).file(file).create();      
+    file = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
+    assertThat(IoUtil.inputStreamAsByteArray(file), equalTo(IoUtil.inputStreamAsByteArray(fileValue.getValue())));
   }
 
   @Test
