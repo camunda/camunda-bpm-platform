@@ -105,4 +105,9 @@ public interface Job {
    */
   String getTenantId();
 
+  String getCaseExecutionId();
+  String getCaseInstanceId();
+  String getCaseDefinitionId();
+  String getCaseDefinitionKey();
+
 }
