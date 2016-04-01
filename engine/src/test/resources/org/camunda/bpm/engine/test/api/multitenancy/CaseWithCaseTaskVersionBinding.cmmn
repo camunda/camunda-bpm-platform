@@ -4,16 +4,12 @@
                   xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   targetNamespace="Examples">
-  <case id="testCase" name="One Process Task Case">
+  <case id="caseTaskCaseVersion" name="Case Task Case">
 
     <casePlanModel id="CasePlanModel_1">
-      <planItem id="PI_ProcessTask_1" definitionRef="ProcessTask_1" />
+      <planItem id="PI_CaseTask_1" definitionRef="CaseTask_1" />
 
-      <processTask id="ProcessTask_1" name="A Process Task" processRef="testProcess">
-        <extensionElements>
-          <camunda:in variables="all" />
-        </extensionElements>
-      </processTask>
+      <caseTask id="CaseTask_1" name="A Case Task" caseRef="oneTaskCase" camunda:caseBinding="version" camunda:caseVersion="1"/>
     </casePlanModel>
   </case>
 
