@@ -44,6 +44,10 @@ public abstract class TimerJobDeclaration<S> extends JobDeclaration<S, TimerEnti
     return repeat;
   }
 
+  public TimerDeclarationType getTimerDeclarationType() {
+    return type;
+  }
+
   protected TimerEntity newJobInstance(S execution) {
 
     TimerEntity timer = new TimerEntity(this);

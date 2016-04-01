@@ -219,6 +219,10 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     persistentState.put("exceptionMessage", exceptionMessage);
     persistentState.put("suspensionState", suspensionState);
     persistentState.put("processDefinitionId", processDefinitionId);
+    persistentState.put("caseDefinitionKey", caseDefinitionKey);
+    persistentState.put("caseDefinitionId", caseDefinitionId);
+    persistentState.put("caseExecutionId", caseExecutionId);
+    persistentState.put("caseInstanceId", caseInstanceId);
     persistentState.put("jobDefinitionId", jobDefinitionId);
     persistentState.put("deploymentId", deploymentId);
     persistentState.put("jobHandlerConfiguration", jobHandlerConfiguration);
@@ -252,6 +256,8 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     if (caseExecution != null) {
       caseExecutionId = caseExecution.getId();
       caseInstanceId = caseExecution.getCaseInstanceId();
+      caseDefinitionId = caseExecution.getCaseDefinitionId();
+      caseDefinitionKey = ((CaseDefinitionEntity) caseExecution.getCaseDefinition()).getKey();
       caseExecution.addJob(this);
     }
     else {
@@ -645,11 +651,11 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.tenantId = tenantId;
   }
 
-  public String getCasExecutionId() {
+  public String getCaseExecutionId() {
     return caseExecutionId;
   }
 
-  public void setCasExecutionId(String caseExecutionId) {
+  public void setCaseExecutionId(String caseExecutionId) {
     this.caseExecutionId = caseExecutionId;
   }
 
@@ -697,18 +703,18 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
       }
     }
   }
-  
+
   /**
-   * 
+   *
    * Unlock from current lock owner
-   * 
+   *
    */
 
   public void unlock() {
     this.lockOwner = null;
     this.lockExpirationTime = null;
   }
-  
+
   public abstract String getType();
 
   @Override

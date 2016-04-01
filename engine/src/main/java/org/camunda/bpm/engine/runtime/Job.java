@@ -105,4 +105,28 @@ public interface Job {
    */
   String getTenantId();
 
+  /**
+   * Returns the specific case execution which created this job.
+   * Can be <code>null</code> if the job was not a part of a case
+   */
+  String getCaseExecutionId();
+
+  /**
+   * Returns the case instance to which this job is associated with
+   * Can be <code>null</code> if the job was not a part of a case
+   */
+  String getCaseInstanceId();
+
+  /**
+   * Returns the id of the case definition that created the job
+   * Can be <code>null</code> if the job was not a part of a case
+   */
+  String getCaseDefinitionId();
+
+  /**
+   * Returns the key of the case definition that created this job
+   * Can be <code>null</code> if the job was not a part of a case
+   */
+  String getCaseDefinitionKey();
+
 }
