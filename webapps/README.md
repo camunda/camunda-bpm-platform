@@ -47,7 +47,7 @@ Contains resources like images, [`.less`](http://lesscss.org) stylesheets as wel
 
 ### Prerequisite
 
-You need [node.js](http://nodejs.org) - we recommend using [nvm](https://github.com/creationix/nvm#install-script) to install node.js.
+You need [node.js](http://nodejs.org) in version <= 4.4.1 with a npm version <= 2.14.20 - we recommend using [nvm](https://github.com/creationix/nvm#install-script) to install node.js.
 You will also need to install [grunt](http://gruntjs.com) globally using `npm install -g grunt-cli`.
 
 ### Setup
