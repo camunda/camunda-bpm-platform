@@ -30,6 +30,7 @@ public class IoUtil {
    * Returns the input stream as {@link String}.
    *
    * @param inputStream the input stream
+   * @return the input stream as {@link String}.
    */
   public static String inputStreamAsString(InputStream inputStream) {
     return new String(inputStreamAsByteArray(inputStream), ENCODING_CHARSET);
@@ -39,6 +40,7 @@ public class IoUtil {
    * Returns the input stream as {@link byte[]}.
    *
    * @param inputStream the input stream
+   * @return the input stream as {@link byte[]}.
    */
   public static byte[] inputStreamAsByteArray(InputStream inputStream) {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -61,6 +63,7 @@ public class IoUtil {
    * Returns the {@link Reader} content as {@link String}.
    *
    * @param reader the {@link Reader}
+   * @return the {@link Reader} content as {@link String}
    */
   public static String readerAsString(Reader reader) {
     StringBuilder buffer = new StringBuilder();

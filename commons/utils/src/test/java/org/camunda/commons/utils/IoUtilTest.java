@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -37,7 +36,28 @@ public class IoUtilTest {
     String string = IoUtil.inputStreamAsString(inputStream);
     assertThat(string).isEqualTo("test");
   }
-
+  
+  @Test
+  public void shouldTransformFromInputStreamToByteArray() {
+    String testString = "Test String";
+    InputStream inputStream = IoUtil.stringAsInputStream(testString);
+    assertThat(IoUtil.inputStreamAsByteArray(inputStream)).isEqualTo(testString.getBytes(IoUtil.ENCODING_CHARSET));
+  }  
+  
+  @Test
+  public void shouldTransformFromStringToInputStreamToByteArray() {
+    String testString = "Test String";
+    InputStream inputStream = IoUtil.stringAsInputStream(testString);
+    
+    String newString = IoUtil.inputStreamAsString(inputStream);
+    assertThat(testString).isEqualTo(newString);   
+    
+    inputStream = IoUtil.stringAsInputStream(testString);
+    byte[] newBytes = newString.getBytes(IoUtil.ENCODING_CHARSET);
+    assertThat(IoUtil.inputStreamAsByteArray(inputStream)).isEqualTo(newBytes);
+  }  
+  
+  
   @Test
   public void getFileContentAsString() {
     assertThat(IoUtil.fileAsString(TEST_FILE_NAME)).isEqualTo("This is a Test!");
