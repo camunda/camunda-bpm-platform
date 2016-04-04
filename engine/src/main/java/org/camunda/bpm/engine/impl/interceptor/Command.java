@@ -19,6 +19,6 @@ package org.camunda.bpm.engine.impl.interceptor;
  */
 public interface Command <T> {
 
-  T execute(CommandContext commandContext) throws Exception;
+  T execute(CommandContext commandContext);
   
 }

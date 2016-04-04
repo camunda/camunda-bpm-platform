@@ -15,14 +15,9 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.delegate.BpmnError;
-import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -32,43 +27,36 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
  * 
  * @author Christopher Zell
  */
-public class HandleExternalTaskBpmnErrorCmd implements Command<Void> {
-
-  protected String externalTaskId;
-  protected String workerId;
+public class HandleExternalTaskBpmnErrorCmd extends HandleExternalTaskCmd {
+  /**
+   * The error code of the corresponding bpmn error.
+   */
   protected String errorCode;
   
   public HandleExternalTaskBpmnErrorCmd(String externalTaskId, String workerId, String errorCode) {
-    this.externalTaskId = externalTaskId;
-    this.workerId = workerId;    
+    super(externalTaskId, workerId);
     this.errorCode = errorCode;
   }
   
   @Override
-  public Void execute(CommandContext commandContext) throws Exception  {
-    validateInput();
+  protected void validateInput() {
+    super.validateInput();
+    EnsureUtil.ensureNotNull("errorCode", errorCode);
+  }
 
-    ExternalTaskEntity externalTask = commandContext.getExternalTaskManager().findExternalTaskById(externalTaskId);
-    EnsureUtil.ensureNotNull(NotFoundException.class,
-        "Cannot find external task with id " + externalTaskId, "externalTask", externalTask);
+  @Override
+  public String getBadUserRequestMessage() {
+    return "Bpmn error of External Task " + externalTaskId + " cannot be reported by worker '" + workerId;
+  }
 
-    if (!workerId.equals(externalTask.getWorkerId())) {
-      throw new BadUserRequestException("Failure of External Task " + externalTaskId + " cannot be reported by worker '" + workerId
-          + "'. It is locked by worker '" + externalTask.getWorkerId() + "'.");
-    }    
-        
+  @Override
+  public void execute(ExternalTaskEntity externalTask) {
     ActivityExecution activityExecution = externalTask.getExecution();
     BpmnError bpmnError = new BpmnError(errorCode);
-    ( (ExternalTaskActivityBehavior) activityExecution.getActivity().getActivityBehavior()).propagateBpmnError(bpmnError, activityExecution);
-    return null;
-  }
-  
-  /**
-   * Validates the current input of the command.
-   */
-  protected void validateInput() {
-    EnsureUtil.ensureNotNull("externalTaskId", externalTaskId);
-    EnsureUtil.ensureNotNull("workerId", workerId);
-    EnsureUtil.ensureNotNull("errorCode", errorCode);
+    try {
+      ( (ExternalTaskActivityBehavior) activityExecution.getActivity().getActivityBehavior()).propagateBpmnError(bpmnError, activityExecution);      
+    } catch (Exception ex) {
+      ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER.errorPropagationException(workerId, ex);
+    }    
   }
 }
