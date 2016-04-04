@@ -14,6 +14,7 @@ package org.camunda.bpm.model.cmmn.impl.instance;
 
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_DECISION_BINDING;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_DECISION_VERSION;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_DECISION_TENANT_ID;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_MAP_DECISION_RESULT;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_RESULT_VARIABLE;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_NS;
@@ -51,6 +52,7 @@ public class DecisionTaskImpl extends TaskImpl implements DecisionTask {
   protected static Attribute<String> camundaResultVariableAttribute;
   protected static Attribute<String> camundaDecisionBindingAttribute;
   protected static Attribute<String> camundaDecisionVersionAttribute;
+  protected static Attribute<String> camundaDecisionTenantIdAttribute;
   protected static Attribute<String> camundaMapDecisionResultAttribute;
 
   public DecisionTaskImpl(ModelTypeInstanceContext instanceContext) {
@@ -101,6 +103,14 @@ public class DecisionTaskImpl extends TaskImpl implements DecisionTask {
     camundaDecisionVersionAttribute.setValue(this, camundaDecisionVersion);
   }
 
+  public String getCamundaDecisionTenantId() {
+    return camundaDecisionTenantIdAttribute.getValue(this);
+  }
+
+  public void setCamundaDecisionTenantId(String camundaDecisionTenantId) {
+    camundaDecisionTenantIdAttribute.setValue(this, camundaDecisionTenantId);
+  }
+
   @Override
   public String getCamundaMapDecisionResult() {
     return camundaMapDecisionResultAttribute.getValue(this);
@@ -137,6 +147,10 @@ public class DecisionTaskImpl extends TaskImpl implements DecisionTask {
     camundaDecisionVersionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_DECISION_VERSION)
       .namespace(CAMUNDA_NS)
       .build();
+
+    camundaDecisionTenantIdAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_DECISION_TENANT_ID)
+        .namespace(CAMUNDA_NS)
+        .build();
 
     camundaMapDecisionResultAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_MAP_DECISION_RESULT)
       .namespace(CAMUNDA_NS)

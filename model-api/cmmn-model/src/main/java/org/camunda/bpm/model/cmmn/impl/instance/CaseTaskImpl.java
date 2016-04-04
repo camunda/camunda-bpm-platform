@@ -14,6 +14,7 @@ package org.camunda.bpm.model.cmmn.impl.instance;
 
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_BINDING;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_VERSION;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_TENANT_ID;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_CASE_REF;
@@ -48,6 +49,7 @@ public class CaseTaskImpl extends TaskImpl implements CaseTask {
 
   protected static Attribute<String> camundaCaseBindingAttribute;
   protected static Attribute<String> camundaCaseVersionAttribute;
+  protected static Attribute<String> camundaCaseTenantIdAttribute;
 
   public CaseTaskImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -89,6 +91,14 @@ public class CaseTaskImpl extends TaskImpl implements CaseTask {
     camundaCaseVersionAttribute.setValue(this, camundaCaseVersion);
   }
 
+  public String getCamundaCaseTenantId() {
+    return camundaCaseTenantIdAttribute.getValue(this);
+  }
+
+  public void setCamundaCaseTenantId(String camundaCaseTenantId) {
+    camundaCaseTenantIdAttribute.setValue(this, camundaCaseTenantId);
+  }
+
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CaseTask.class, CMMN_ELEMENT_CASE_TASK)
         .extendsType(Task.class)
@@ -111,6 +121,10 @@ public class CaseTaskImpl extends TaskImpl implements CaseTask {
     camundaCaseVersionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_CASE_VERSION)
       .namespace(CAMUNDA_NS)
       .build();
+
+    camundaCaseTenantIdAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_CASE_TENANT_ID)
+        .namespace(CAMUNDA_NS)
+        .build();
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 

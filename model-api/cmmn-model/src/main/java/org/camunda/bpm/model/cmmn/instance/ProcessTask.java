@@ -40,4 +40,8 @@ public interface ProcessTask extends Task {
 
   void setCamundaProcessVersion(String camundaProcessVersion);
 
+  String getCamundaProcessTenantId();
+
+  void setCamundaProcessTenantId(String camundaProcessTenantId);
+
 }

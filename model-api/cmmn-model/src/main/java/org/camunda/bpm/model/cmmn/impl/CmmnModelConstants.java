@@ -236,8 +236,10 @@ public class CmmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_VARIABLES = "variables";
   public static final String CAMUNDA_ATTRIBUTE_PROCESS_BINDING = "processBinding";
   public static final String CAMUNDA_ATTRIBUTE_PROCESS_VERSION = "processVersion";
+  public static final String CAMUNDA_ATTRIBUTE_PROCESS_TENANT_ID = "processTenantId";
   public static final String CAMUNDA_ATTRIBUTE_CASE_BINDING = "caseBinding";
   public static final String CAMUNDA_ATTRIBUTE_CASE_VERSION = "caseVersion";
+  public static final String CAMUNDA_ATTRIBUTE_CASE_TENANT_ID = "caseTenantId";
   public static final String CAMUNDA_ATTRIBUTE_EVENT = "event";
   public static final String CAMUNDA_ATTRIBUTE_CLASS = "class";
   public static final String CAMUNDA_ATTRIBUTE_EXPRESSION = "expression";
@@ -250,6 +252,7 @@ public class CmmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_RESULT_VARIABLE = "resultVariable";
   public static final String CAMUNDA_ATTRIBUTE_DECISION_BINDING = "decisionBinding";
   public static final String CAMUNDA_ATTRIBUTE_DECISION_VERSION = "decisionVersion";
+  public static final String CAMUNDA_ATTRIBUTE_DECISION_TENANT_ID = "decisionTenantId";
   public static final String CAMUNDA_ATTRIBUTE_MAP_DECISION_RESULT = "mapDecisionResult";
 
 }

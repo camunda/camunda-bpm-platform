@@ -14,6 +14,7 @@ package org.camunda.bpm.model.cmmn.impl.instance;
 
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_PROCESS_BINDING;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_PROCESS_VERSION;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_PROCESS_TENANT_ID;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_PROCESS_REF;
@@ -46,6 +47,7 @@ public class ProcessTaskImpl extends TaskImpl implements ProcessTask {
 
   protected static Attribute<String> camundaProcessBindingAttribute;
   protected static Attribute<String> camundaProcessVersionAttribute;
+  protected static Attribute<String> camundaProcessTenantIdAttribute;
 
   public ProcessTaskImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -87,6 +89,14 @@ public class ProcessTaskImpl extends TaskImpl implements ProcessTask {
     camundaProcessVersionAttribute.setValue(this, camundaProcessVersion);
   }
 
+  public String getCamundaProcessTenantId() {
+    return camundaProcessTenantIdAttribute.getValue(this);
+  }
+
+  public void setCamundaProcessTenantId(String camundaProcessTenantId) {
+    camundaProcessTenantIdAttribute.setValue(this, camundaProcessTenantId);
+  }
+
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ProcessTask.class, CMMN_ELEMENT_PROCESS_TASK)
         .namespaceUri(CMMN11_NS)
@@ -109,6 +119,10 @@ public class ProcessTaskImpl extends TaskImpl implements ProcessTask {
     camundaProcessVersionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_PROCESS_VERSION)
       .namespace(CAMUNDA_NS)
       .build();
+
+    camundaProcessTenantIdAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_PROCESS_TENANT_ID)
+        .namespace(CAMUNDA_NS)
+        .build();
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 

@@ -40,4 +40,8 @@ public interface CaseTask extends Task {
 
   void setCamundaCaseVersion(String camundaCaseVersion);
 
+  String getCamundaCaseTenantId();
+
+  void setCamundaCaseTenantId(String camundaCaseTenantId);
+
 }

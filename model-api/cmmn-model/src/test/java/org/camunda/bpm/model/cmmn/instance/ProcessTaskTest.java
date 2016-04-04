@@ -38,7 +38,8 @@ public class ProcessTaskTest extends CmmnModelElementInstanceTest {
     return Arrays.asList(
         new AttributeAssumption("processRef"),
         new AttributeAssumption(CAMUNDA_NS, "processBinding"),
-        new AttributeAssumption(CAMUNDA_NS, "processVersion")
+        new AttributeAssumption(CAMUNDA_NS, "processVersion"),
+        new AttributeAssumption(CAMUNDA_NS, "processTenantId")
       );
   }
 

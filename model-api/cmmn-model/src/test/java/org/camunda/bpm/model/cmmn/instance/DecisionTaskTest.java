@@ -40,7 +40,8 @@ public class DecisionTaskTest extends CmmnModelElementInstanceTest {
         new AttributeAssumption(CAMUNDA_NS, "resultVariable"),
         new AttributeAssumption(CAMUNDA_NS, "decisionBinding"),
         new AttributeAssumption(CAMUNDA_NS, "decisionVersion"),
-        new AttributeAssumption(CAMUNDA_NS, "mapDecisionResult")
+        new AttributeAssumption(CAMUNDA_NS, "mapDecisionResult"),
+        new AttributeAssumption(CAMUNDA_NS, "decisionTenantId")
       );
   }
 

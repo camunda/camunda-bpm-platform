@@ -44,6 +44,10 @@ public interface DecisionTask extends Task {
 
   void setCamundaDecisionVersion(String camundaDecisionVersion);
 
+  String getCamundaDecisionTenantId();
+
+  void setCamundaDecisionTenantId(String camundaDecisionTenantId);
+
   String getCamundaMapDecisionResult();
 
   void setCamundaMapDecisionResult(String camundaMapDecisionResult);

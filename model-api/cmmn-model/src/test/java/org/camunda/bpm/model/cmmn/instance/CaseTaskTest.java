@@ -38,7 +38,8 @@ public class CaseTaskTest extends CmmnModelElementInstanceTest {
     return Arrays.asList(
           new AttributeAssumption("caseRef"),
           new AttributeAssumption(CAMUNDA_NS, "caseBinding"),
-          new AttributeAssumption(CAMUNDA_NS, "caseVersion")
+          new AttributeAssumption(CAMUNDA_NS, "caseVersion"),
+          new AttributeAssumption(CAMUNDA_NS, "caseTenantId")
         );
   }
 }
