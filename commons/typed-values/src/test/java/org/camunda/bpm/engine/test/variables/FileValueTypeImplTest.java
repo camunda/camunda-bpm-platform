@@ -12,14 +12,16 @@
  */
 package org.camunda.bpm.engine.test.variables;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +37,6 @@ import org.camunda.bpm.engine.variable.impl.type.FileValueTypeImpl;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.commons.utils.IoUtil;
-import static org.hamcrest.core.IsEqual.equalTo;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -109,7 +110,7 @@ public class FileValueTypeImplTest {
     assertThat(value.getType(), is(instanceOf(FileValueTypeImpl.class)));
     checkStreamFromValue(value, "text");
   }
-  
+
   @Test(expected = IllegalArgumentException.class)
   public void createValueFromObject() throws IOException, URISyntaxException {
     type.createValue(new Object(), Collections.<String, Object> singletonMap(FileValueTypeImpl.VALUE_INFO_FILE_NAME, "simpleFile.txt"));
@@ -201,17 +202,27 @@ public class FileValueTypeImplTest {
     assertThat(info, hasEntry(FileValueTypeImpl.VALUE_INFO_FILE_MIME_TYPE, (Object) fileType));
     assertThat(info, hasEntry(FileValueTypeImpl.VALUE_INFO_FILE_ENCODING, (Object) encoding));
   }
-    
+
   @Test
   public void fileByteArrayIsEqualToFileValueContent() throws IOException {
     InputStream file = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
     String fileName = "simpleFile.txt";
-    String fileType = "text/plain";
-    Charset encoding = Charset.forName("UTF-8");    
-    
-    FileValue fileValue = Variables.fileValue(fileName).file(file).create();      
+
+    FileValue fileValue = Variables.fileValue(fileName).file(file).create();
     file = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
-    assertThat(IoUtil.inputStreamAsByteArray(file), equalTo(IoUtil.inputStreamAsByteArray(fileValue.getValue())));
+    assertThat(IoUtil.inputStreamAsByteArray(fileValue.getValue()), equalTo(IoUtil.inputStreamAsByteArray(file)));
+  }
+
+  @Test
+  public void fileByteArrayIsEqualToFileValueContentCase2() throws IOException {
+
+    byte[] bytes = new byte[]{ -16, -128, -128, -128 };
+    InputStream byteStream = new ByteArrayInputStream(bytes);
+
+    String fileName = "simpleFile.txt";
+
+    FileValue fileValue = Variables.fileValue(fileName).file(byteStream).create();
+    assertThat(IoUtil.inputStreamAsByteArray(fileValue.getValue()), equalTo(bytes));
   }
 
   @Test
