@@ -3212,7 +3212,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     migratingActivityInstanceValidators.add(new AdditionalFlowScopeActivityInstanceValidator());
     migratingActivityInstanceValidators.add(new NoUnmappedLeafInstanceValidator());
-//    migratingActivityInstanceValidators.add(new NoActiveTransitionsActivityInstanceValidator());
     migratingActivityInstanceValidators.add(new VariableConflictActivityInstanceValidator());
     migratingActivityInstanceValidators.add(new SupportedActivityInstanceValidator());
 
