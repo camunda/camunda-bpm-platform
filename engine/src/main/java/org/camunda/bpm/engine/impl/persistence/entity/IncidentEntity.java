@@ -122,15 +122,15 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
         .getExecutionManager()
         .findExecutionById(context.getExecutionId());
 
-      // inherit further properties from execution
+      // inherit properties from execution
       newIncident.setExecution(execution);
 
-    } else {
-      // set further properties from context
-      newIncident.setActivityId(context.getActivityId());
-      newIncident.setProcessDefinitionId(context.getProcessDefinitionId());
-      newIncident.setTenantId(context.getTenantId());
     }
+
+    // set further properties from context
+    newIncident.setActivityId(context.getActivityId());
+    newIncident.setProcessDefinitionId(context.getProcessDefinitionId());
+    newIncident.setTenantId(context.getTenantId());
 
     // insert new incident (and create a new historic incident)
     insert(newIncident);

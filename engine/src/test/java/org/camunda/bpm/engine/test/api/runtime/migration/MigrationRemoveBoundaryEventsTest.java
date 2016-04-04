@@ -856,7 +856,7 @@ public class MigrationRemoveBoundaryEventsTest {
     // if the timer job is triggered the failing delegate fails and an incident is created
     executeJob(jobBeforeMigration);
     Incident incidentBeforeMigration = rule.getRuntimeService().createIncidentQuery().singleResult();
-    assertEquals("userTask", incidentBeforeMigration.getActivityId());
+    assertEquals("boundary", incidentBeforeMigration.getActivityId());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())

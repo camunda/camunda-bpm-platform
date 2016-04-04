@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
 
 public class IncidentTest extends PluggableProcessEngineTestCase {
 
@@ -491,6 +492,30 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals("theStart", incident.getActivityId());
     assertNull(incident.getProcessInstanceId());
     assertNull(incident.getExecutionId());
+  }
+
+  public void testBoundaryEventIncidentActivityId() {
+    deployment(Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .userTask("userTask")
+        .endEvent()
+        .moveToActivity("userTask")
+        .boundaryEvent("boundaryEvent")
+        .timerWithDuration("PT5S")
+        .endEvent()
+        .done());
+
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+    Job timerJob = managementService.createJobQuery().singleResult();
+
+    // when creating an incident
+    managementService.setJobRetries(timerJob.getId(), 0);
+
+    // then
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+    assertNotNull(incident);
+    assertEquals("boundaryEvent", incident.getActivityId());
   }
 
 }
