@@ -134,6 +134,26 @@ public interface ExternalTaskService {
   public void handleFailure(String externalTaskId, String workerId, String errorMessage, int retries, long retryTimeout);
 
   /**
+   * <p>Signals that an business error appears, which should be handled by the process engine. 
+   * The task must be assigned to the given worker.</p>
+   * 
+   * 
+   * @param externalTaskId the id of the external task to report a bpmn error
+   * @param workerId the id of the worker that reports the bpmn error
+   * @param errorCode the error code of the corresponding bmpn error
+   * @since 7.5
+   * 
+   * @throws NotFoundException if no external task with the given id exists
+   * @throws BadUserRequestException if the task is assigned to a different worker
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   */
+  public void handleBpmnError(String externalTaskId, String workerId, String errorCode);
+  
+  /**
    * Unlocks an external task instance.
    *
    * @param externalTaskId the id of the task to unlock

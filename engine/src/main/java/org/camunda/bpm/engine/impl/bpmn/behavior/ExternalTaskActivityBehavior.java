@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -21,6 +22,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
  * activities that have camunda:type="external".
  *
  * @author Thorben Lindhauer
+ * @author Christopher Zell
  */
 public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior {
 
@@ -37,5 +39,17 @@ public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior {
 
   public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
     leave(execution);
+  }
+  
+  /**
+   * Overrides the propagateBpmnError method to made it public.
+   * Is used to propagate the bpmn error from an external task.
+   * @param error the error which should be propagated
+   * @param execution the current activity execution
+   * @throws Exception throwsn an exception if no handler was found
+   */
+  @Override  
+  public void propagateBpmnError(BpmnError error, ActivityExecution execution) throws Exception {
+    super.propagateBpmnError(error, execution);
   }
 }
