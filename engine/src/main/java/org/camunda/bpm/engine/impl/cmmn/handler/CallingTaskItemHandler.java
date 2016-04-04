@@ -94,8 +94,16 @@ public abstract class CallingTaskItemHandler extends TaskItemHandler {
   }
 
   protected void initializeTenantId(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, BaseCallableElement callableElement) {
-    // TODO allow to use a custom tenant id provider - CAM-5415
-    DefaultCallableElementTenantIdProvider tenantIdProvider = new DefaultCallableElementTenantIdProvider();
+    ParameterValueProvider tenantIdProvider;
+
+    ExpressionManager expressionManager = context.getExpressionManager();
+    String tenantId = getTenantId(element, activity, context);
+    if (tenantId != null && tenantId.length() > 0) {
+      tenantIdProvider = createParameterValueProvider(tenantId, expressionManager);
+    } else {
+      tenantIdProvider = new DefaultCallableElementTenantIdProvider();
+    }
+
     callableElement.setTenantIdProvider(tenantIdProvider);
   }
 
@@ -119,5 +127,7 @@ public abstract class CallingTaskItemHandler extends TaskItemHandler {
   protected abstract String getBinding(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context);
 
   protected abstract String getVersion(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context);
+
+  protected abstract String getTenantId(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context);
 
 }

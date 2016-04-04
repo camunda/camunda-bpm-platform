@@ -50,4 +50,10 @@ public class CaseTaskItemHandler extends ProcessOrCaseTaskItemHandler {
     return definition.getCamundaCaseVersion();
   }
 
+  protected String getTenantId(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    CaseTask definition = getDefinition(element);
+
+    return definition.getCamundaCaseTenantId();
+  }
+
 }

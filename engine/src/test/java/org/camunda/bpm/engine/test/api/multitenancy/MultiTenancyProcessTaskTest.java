@@ -35,6 +35,9 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
   protected static final String CMMN_VERSION = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithProcessTaskVersionBinding.cmmn";
   protected static final String CMMN_VERSION_2 = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithProcessTaskVersionBinding_v2.cmmn";
 
+  protected static final String CMMN_TENANT_CONST = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithProcessTaskTenantIdConst.cmmn";
+  protected static final String CMMN_TENANT_EXPR = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithProcessTaskTenantIdExpr.cmmn";
+
   protected static final String PROCESS_TASK_ID = "PI_ProcessTask_1";
 
   protected static final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess("testProcess")
@@ -160,6 +163,32 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("no processes deployed with key = 'testProcess'"));
     }
+  }
+
+  public void testProcessRefTenantIdConstant() {
+    deployment(CMMN_TENANT_CONST);
+    deploymentForTenant(TENANT_ONE, PROCESS);
+
+    caseService.withCaseDefinitionByKey("testCase").create();
+
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(PROCESS_TASK_ID).singleResult();
+    caseService.withCaseExecution(caseExecution.getId()).manualStart();
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
+  public void testProcessRefTenantIdExpression() {
+    deployment(CMMN_TENANT_EXPR);
+    deploymentForTenant(TENANT_ONE, PROCESS);
+
+    caseService.withCaseDefinitionByKey("testCase").create();
+
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(PROCESS_TASK_ID).singleResult();
+    caseService.withCaseExecution(caseExecution.getId()).manualStart();
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
   protected void createCaseInstance(String caseDefinitionKey, String tenantId) {

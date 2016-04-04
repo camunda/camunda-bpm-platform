@@ -34,6 +34,9 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
   protected static final String CMMN_VERSION = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithCaseTaskVersionBinding.cmmn";
   protected static final String CMMN_VERSION_2 = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithCaseTaskVersionBinding_v2.cmmn";
 
+  protected static final String CMMN_TENANT_CONST = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithCaseTaskTenantIdConst.cmmn";
+  protected static final String CMMN_TENANT_EXPR = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithCaseTaskTenantIdExpr.cmmn";
+
   protected static final String CMMN_CASE = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
 
   protected static final String CASE_TASK_ID = "PI_CaseTask_1";
@@ -156,6 +159,32 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("no case definition deployed with key = 'oneTaskCase'"));
     }
+  }
+
+  public void testCaseRefTenantIdConstant() {
+    deployment(CMMN_TENANT_CONST);
+    deploymentForTenant(TENANT_ONE, CMMN_CASE);
+
+    caseService.withCaseDefinitionByKey("caseTaskCase").create();
+
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(CASE_TASK_ID).singleResult();
+    caseService.withCaseExecution(caseExecution.getId()).manualStart();
+
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
+  public void testCaseRefTenantIdExpression() {
+    deployment(CMMN_TENANT_EXPR);
+    deploymentForTenant(TENANT_ONE, CMMN_CASE);
+
+    caseService.withCaseDefinitionByKey("caseTaskCase").create();
+
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(CASE_TASK_ID).singleResult();
+    caseService.withCaseExecution(caseExecution.getId()).manualStart();
+
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
   protected String deploymentForTenant(String tenantId, String classpathResource, BpmnModelInstance modelInstance) {
