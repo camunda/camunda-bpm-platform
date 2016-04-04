@@ -26,6 +26,7 @@ import java.util.Set;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -1182,19 +1183,26 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   protected boolean isAutoFireHistoryEvents() {
-    // as long as the process instance is starting (ie. before activity instance
-    // of
-    // the selected initial (start event) is created), the variable scope should
-    // not
-    // automatic fire history events for variable updates.
+    // as long as the process instance is starting (i.e. before activity instance
+    // of the selected initial (start event) is created), the variable scope should
+    // not automatic fire history events for variable updates.
 
     // firing the events is triggered by the processInstanceStart context after
-    // the initial activity
-    // has been initialized. The effect is that the activity instance id of the
-    // historic variable instances
-    // will be the activity instance id of the start event.
+    // the initial activity has been initialized. The effect is that the activity instance id of the
+    // historic variable instances will be the activity instance id of the start event.
 
-    return startContext == null || (startContext != null && !startContext.isDelayFireHistoricVariableEvents());
+    // if a variable is updated while the process instance is starting then the
+    // update history event is lost and the updated value is handled as initial value.
+
+    ActivityImpl currentActivity = getActivity();
+
+    return !(startContext != null && startContext.isDelayFireHistoricVariableEvents())
+        && !(currentActivity != null && isAsyncStartEvent(currentActivity));
+  }
+
+  protected boolean isAsyncStartEvent(ActivityImpl activity) {
+    return activity.isAsyncBefore()
+        && activity.getActivityBehavior() instanceof NoneStartEventActivityBehavior;
   }
 
   public void fireHistoricVariableInstanceCreateEvents() {

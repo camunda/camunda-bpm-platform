@@ -914,14 +914,14 @@ public class BpmnParse extends Parse {
     if (timerEventDefinition != null) {
       parseTimerStartEventDefinition(timerEventDefinition, startEventActivity, processDefinition);
     } else if (messageEventDefinition != null) {
-      startEventActivity.getProperties().set(BpmnProperties.TYPE, "messageStartEvent");
+      startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_MESSAGE);
 
       EventSubscriptionDeclaration messageDefinition = parseMessageEventDefinition(messageEventDefinition);
       messageDefinition.setActivityId(startEventActivity.getId());
       messageDefinition.setStartEvent(true);
       addEventSubscriptionDeclaration(messageDefinition, processDefinition, startEventElement);
     } else if (signalEventDefinition != null){
-      startEventActivity.getProperties().set(BpmnProperties.TYPE, "signalStartEvent");
+      startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_SIGNAL);
       startEventActivity.setEventScope(scope);
 
       parseSignalCatchEventDefinition(signalEventDefinition, startEventActivity, true);
@@ -993,13 +993,13 @@ public class BpmnParse extends Parse {
         parseErrorStartEventDefinition(errorEventDefinition, startEventActivity);
 
       } else if (messageEventDefinition != null) {
-        startEventActivity.getProperties().set(BpmnProperties.TYPE, "messageStartEvent");
+        startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_MESSAGE);
 
         EventSubscriptionDeclaration eventSubscriptionDeclaration = parseMessageEventDefinition(messageEventDefinition);
         parseEventDefinitionForSubprocess(eventSubscriptionDeclaration, startEventActivity, messageEventDefinition);
 
       } else if (signalEventDefinition != null) {
-        startEventActivity.getProperties().set(BpmnProperties.TYPE, "signalStartEvent");
+        startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_SIGNAL);
 
         EventSubscriptionDeclaration eventSubscriptionDeclaration = parseSignalEventDefinition(signalEventDefinition);
         parseEventDefinitionForSubprocess(eventSubscriptionDeclaration, startEventActivity, signalEventDefinition);
@@ -1011,7 +1011,7 @@ public class BpmnParse extends Parse {
         parseCompensationEventSubprocess(startEventActivity, startEventElement, scopeActivity, compensateEventDefinition);
 
       } else if (escalationEventDefinitionElement != null) {
-        startEventActivity.getProperties().set(BpmnProperties.TYPE, "escalationStartEvent");
+        startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_ESCALATION);
 
         EscalationEventDefinition escalationEventDefinition = createEscalationEventDefinitionForEscalationHandler(escalationEventDefinitionElement, scopeActivity, isInterrupting);
         addEscalationEventDefinition(startEventActivity.getEventScope(), escalationEventDefinition, escalationEventDefinitionElement);
@@ -1051,7 +1051,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseCompensationEventSubprocess(ActivityImpl startEventActivity, Element startEventElement, ActivityImpl scopeActivity, Element compensateEventDefinition) {
-    startEventActivity.getProperties().set(BpmnProperties.TYPE, "compensationStartEvent");
+    startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_COMPENSATION);
     scopeActivity.setProperty(PROPERTYNAME_IS_FOR_COMPENSATION, Boolean.TRUE);
 
     if (scopeActivity.getFlowScope() instanceof ProcessDefinitionEntity) {
@@ -1077,7 +1077,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseErrorStartEventDefinition(Element errorEventDefinition, ActivityImpl startEventActivity) {
-    startEventActivity.getProperties().set(BpmnProperties.TYPE, "errorStartEvent");
+    startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_ERROR);
     String errorRef = errorEventDefinition.attribute("errorRef");
     Error error = null;
     // the error event definition executes the event subprocess activity which
@@ -2986,7 +2986,7 @@ public class BpmnParse extends Parse {
 
   @SuppressWarnings("unchecked")
   protected void parseTimerStartEventDefinition(Element timerEventDefinition, ActivityImpl timerActivity, ProcessDefinitionEntity processDefinition) {
-    timerActivity.getProperties().set(BpmnProperties.TYPE, "startTimerEvent");
+    timerActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_TIMER);
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerStartEventJobHandler.TYPE);
     timerDeclaration.setRawJobHandlerConfiguration(processDefinition.getKey());
 
@@ -3000,7 +3000,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseTimerStartEventDefinitionForEventSubprocess(Element timerEventDefinition, ActivityImpl timerActivity, boolean interrupting) {
-    timerActivity.getProperties().set(BpmnProperties.TYPE, "startTimerEvent");
+    timerActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_TIMER);
 
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerStartEventSubprocessJobHandler.TYPE);
 
