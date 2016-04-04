@@ -53,8 +53,8 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
   }
 
   public void testEvaluateDecisionRefWithoutTenantIdConstant() {
-    deployment(CMMN_WITHOUT_TENANT);
-    deploymentForTenant(TENANT_ONE, DMN_FILE);
+    deploymentForTenant(TENANT_ONE, CMMN_WITHOUT_TENANT);
+    deployment(DMN_FILE);
     deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
 
     CaseInstance caseInstance = caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("status", "gold").create();
