@@ -152,10 +152,6 @@ public class MetricsTest extends AbstractMetricsTest {
       .done());
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    TimeZone.setDefault(TimeZone.getTimeZone("CET"));
-
-    ClockUtil.setCurrentTime(new Date(1459042200000L));
-
     // when
     managementService.reportDbMetricsNow();
 
