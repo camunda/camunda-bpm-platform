@@ -32,10 +32,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
-import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -57,6 +59,8 @@ import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateTenantBuilder;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.SerializableValueType;
@@ -70,9 +74,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -109,7 +110,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
   }
 
   private RuntimeServiceImpl runtimeServiceMock;
-  private UpdateProcessInstanceSuspensionStateBuilderImpl mockUpdateSuspensionStateBuilder;
+
+  private UpdateProcessInstanceSuspensionStateTenantBuilder mockUpdateSuspensionStateBuilder;
+  private UpdateProcessInstanceSuspensionStateSelectBuilder mockUpdateSuspensionStateSelectBuilder;
 
   @Before
   public void setUpRuntimeData() {
@@ -122,8 +125,13 @@ public class ProcessInstanceRestServiceInteractionTest extends
     // activity instances
     when(runtimeServiceMock.getActivityInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_ACTIVITY_INSTANCE);
 
-    mockUpdateSuspensionStateBuilder = mock(UpdateProcessInstanceSuspensionStateBuilderImpl.class);
-    when(runtimeServiceMock.updateProcessInstanceSuspensionState()).thenReturn(mockUpdateSuspensionStateBuilder);
+    mockUpdateSuspensionStateSelectBuilder = mock(UpdateProcessInstanceSuspensionStateSelectBuilder.class);
+    when(runtimeServiceMock.updateProcessInstanceSuspensionState()).thenReturn(mockUpdateSuspensionStateSelectBuilder);
+
+    mockUpdateSuspensionStateBuilder = mock(UpdateProcessInstanceSuspensionStateTenantBuilder.class);
+    when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceId(anyString())).thenReturn(mockUpdateSuspensionStateBuilder);
+    when(mockUpdateSuspensionStateSelectBuilder.byProcessDefinitionId(anyString())).thenReturn(mockUpdateSuspensionStateBuilder);
+    when(mockUpdateSuspensionStateSelectBuilder.byProcessDefinitionKey(anyString())).thenReturn(mockUpdateSuspensionStateBuilder);
 
     // runtime service
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
@@ -1550,7 +1558,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(SINGLE_PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(mockUpdateSuspensionStateBuilder).byProcessInstanceId(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceId(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     verify(mockUpdateSuspensionStateBuilder).activate();
   }
 
@@ -1617,7 +1625,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(SINGLE_PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(mockUpdateSuspensionStateBuilder).byProcessInstanceId(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceId(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     verify(mockUpdateSuspensionStateBuilder).suspend();
   }
 
@@ -1706,7 +1714,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(mockUpdateSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     verify(mockUpdateSuspensionStateBuilder).activate();
   }
 
@@ -1772,7 +1780,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(mockUpdateSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     verify(mockUpdateSuspensionStateBuilder).suspend();
   }
 
@@ -1839,7 +1847,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(mockUpdateSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     verify(mockUpdateSuspensionStateBuilder).processDefinitionTenantId(MockProvider.EXAMPLE_TENANT_ID);
     verify(mockUpdateSuspensionStateBuilder).activate();
   }
@@ -1860,7 +1868,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(mockUpdateSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     verify(mockUpdateSuspensionStateBuilder).processDefinitionWithoutTenantId();
     verify(mockUpdateSuspensionStateBuilder).activate();
   }
@@ -1881,7 +1889,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(mockUpdateSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     verify(mockUpdateSuspensionStateBuilder).processDefinitionTenantId(MockProvider.EXAMPLE_TENANT_ID);
     verify(mockUpdateSuspensionStateBuilder).suspend();
   }
@@ -1902,7 +1910,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(mockUpdateSuspensionStateBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     verify(mockUpdateSuspensionStateBuilder).processDefinitionWithoutTenantId();
     verify(mockUpdateSuspensionStateBuilder).suspend();
   }
@@ -1922,7 +1930,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(mockUpdateSuspensionStateBuilder).byProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     verify(mockUpdateSuspensionStateBuilder).activate();
   }
 
@@ -1988,7 +1996,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(mockUpdateSuspensionStateBuilder).byProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     verify(mockUpdateSuspensionStateBuilder).suspend();
   }
 

@@ -12,12 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-
-import javax.ws.rs.core.Response.Status;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateTenantBuilder;
 
 /**
  * @author roman.smirnov
@@ -69,30 +71,35 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
 
-    UpdateProcessInstanceSuspensionStateBuilderImpl updateSuspensionStateBuilder =
-        (UpdateProcessInstanceSuspensionStateBuilderImpl) engine.getRuntimeService().updateProcessInstanceSuspensionState();
-
-    if (processInstanceId != null) {
-      updateSuspensionStateBuilder.byProcessInstanceId(processInstanceId);
-
-    } else if (processDefinitionId != null) {
-      updateSuspensionStateBuilder.byProcessDefinitionId(processDefinitionId);
-
-    } else if (processDefinitionKey != null) {
-      updateSuspensionStateBuilder.byProcessDefinitionKey(processDefinitionKey);
-
-      if (processDefinitionTenantId != null) {
-        updateSuspensionStateBuilder.processDefinitionTenantId(processDefinitionTenantId);
-
-      } else if(processDefinitionWithoutTenantId) {
-        updateSuspensionStateBuilder.processDefinitionWithoutTenantId();
-      }
-    }
+    UpdateProcessInstanceSuspensionStateBuilder updateSuspensionStateBuilder = createUpdateSuspensionStateBuilder(engine);
 
     if (getSuspended()) {
       updateSuspensionStateBuilder.suspend();
     } else {
       updateSuspensionStateBuilder.activate();
+    }
+  }
+
+  protected UpdateProcessInstanceSuspensionStateBuilder createUpdateSuspensionStateBuilder(ProcessEngine engine) {
+    UpdateProcessInstanceSuspensionStateSelectBuilder selectBuilder = engine.getRuntimeService().updateProcessInstanceSuspensionState();
+
+    if (processInstanceId != null) {
+      return selectBuilder.byProcessInstanceId(processInstanceId);
+
+    } else if (processDefinitionId != null) {
+      return selectBuilder.byProcessDefinitionId(processDefinitionId);
+
+    } else {
+      UpdateProcessInstanceSuspensionStateTenantBuilder tenantBuilder = selectBuilder.byProcessDefinitionKey(processDefinitionKey);
+
+      if (processDefinitionTenantId != null) {
+        tenantBuilder.processDefinitionTenantId(processDefinitionTenantId);
+
+      } else if (processDefinitionWithoutTenantId) {
+        tenantBuilder.processDefinitionWithoutTenantId();
+      }
+
+      return tenantBuilder;
     }
   }
 

@@ -14,13 +14,15 @@ package org.camunda.bpm.engine.rest.dto.management;
 
 import java.util.Date;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
-import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
+import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateBuilder;
+import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateSelectBuilder;
+import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateTenantBuilder;
 import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-
-import javax.ws.rs.core.Response.Status;
 
 /**
  * @author roman.smirnov
@@ -83,38 +85,43 @@ public class JobDefinitionSuspensionStateDto extends SuspensionStateDto {
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
 
-    UpdateJobDefinitionSuspensionStateBuilderImpl updateJobDefinitionSuspensionStateBuilder =
-        (UpdateJobDefinitionSuspensionStateBuilderImpl) engine.getManagementService().updateJobDefinitionSuspensionState();
-
-    if (jobDefinitionId != null) {
-      updateJobDefinitionSuspensionStateBuilder.byJobDefinitionId(jobDefinitionId);
-
-    } else if (processDefinitionId != null) {
-      updateJobDefinitionSuspensionStateBuilder.byProcessDefinitionId(processDefinitionId);
-
-    } else if (processDefinitionKey != null) {
-      updateJobDefinitionSuspensionStateBuilder.byProcessDefinitionKey(processDefinitionKey);
-
-      if (processDefinitionTenantId != null) {
-        updateJobDefinitionSuspensionStateBuilder.processDefinitionTenantId(processDefinitionTenantId);
-
-      } else if (processDefinitionWithoutTenantId) {
-        updateJobDefinitionSuspensionStateBuilder.processDefinitionWithoutTenantId();
-      }
-    }
+    UpdateJobDefinitionSuspensionStateBuilder updateSuspensionStateBuilder = createUpdateSuspensionStateBuilder(engine);
 
     if (executionDate != null && !executionDate.equals("")) {
       Date delayedExecutionDate = DateTimeUtil.parseDate(executionDate);
 
-      updateJobDefinitionSuspensionStateBuilder.executionDate(delayedExecutionDate);
+      updateSuspensionStateBuilder.executionDate(delayedExecutionDate);
     }
 
-    updateJobDefinitionSuspensionStateBuilder.includeJobs(includeJobs);
+    updateSuspensionStateBuilder.includeJobs(includeJobs);
 
     if (getSuspended()) {
-      updateJobDefinitionSuspensionStateBuilder.suspend();
+      updateSuspensionStateBuilder.suspend();
     } else {
-      updateJobDefinitionSuspensionStateBuilder.activate();
+      updateSuspensionStateBuilder.activate();
+    }
+  }
+
+  protected UpdateJobDefinitionSuspensionStateBuilder createUpdateSuspensionStateBuilder(ProcessEngine engine) {
+    UpdateJobDefinitionSuspensionStateSelectBuilder selectBuilder = engine.getManagementService().updateJobDefinitionSuspensionState();
+
+    if (jobDefinitionId != null) {
+      return selectBuilder.byJobDefinitionId(jobDefinitionId);
+
+    } else if (processDefinitionId != null) {
+      return selectBuilder.byProcessDefinitionId(processDefinitionId);
+
+    } else {
+      UpdateJobDefinitionSuspensionStateTenantBuilder tenantBuilder = selectBuilder.byProcessDefinitionKey(processDefinitionKey);
+
+      if (processDefinitionTenantId != null) {
+        tenantBuilder.processDefinitionTenantId(processDefinitionTenantId);
+
+      } else if (processDefinitionWithoutTenantId) {
+        tenantBuilder.processDefinitionWithoutTenantId();
+      }
+
+      return tenantBuilder;
     }
   }
 
