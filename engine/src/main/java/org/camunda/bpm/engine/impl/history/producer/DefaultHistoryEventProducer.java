@@ -17,6 +17,7 @@ import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionS
 import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.batch.Batch;
@@ -33,6 +34,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
@@ -58,6 +60,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.task.IdentityLink;
 
 /**
  * @author Daniel Meyer
@@ -658,6 +661,52 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return evt;
   }
 
+  // Historic identity link
+  @Override
+  public HistoryEvent createHistoricIdentityLinkAddEvent(IdentityLink identityLink) {
+    return createHistoricIdentityLinkEvt(identityLink, HistoryEventTypes.IDENTITY_LINK_ADD);
+  }
+
+  @Override
+  public HistoryEvent createHistoricIdentityLinkDeleteEvent(IdentityLink identityLink) {
+    return createHistoricIdentityLinkEvt(identityLink, HistoryEventTypes.IDENTITY_LINK_DELETE);
+  }
+
+  protected HistoryEvent createHistoricIdentityLinkEvt(IdentityLink identityLink, HistoryEventTypes eventType) {
+    // create historic identity link event
+    HistoricIdentityLinkEventEntity evt = newIdentityLinkEventEntity();
+    // Mapping all the values of identity link to HistoricIdentityLinkEvent
+    initHistoricIdentityLinkEvent(evt, identityLink, eventType);
+    return evt;
+  }
+
+  protected HistoricIdentityLinkEventEntity newIdentityLinkEventEntity() {
+    return new HistoricIdentityLinkEventEntity();
+  }
+
+  protected void initHistoricIdentityLinkEvent(HistoricIdentityLinkEventEntity evt, IdentityLink identityLink, HistoryEventType eventType) {
+    evt.setTime(ClockUtil.getCurrentTime());
+    evt.setType(identityLink.getType());
+    evt.setUserId(identityLink.getUserId());
+    evt.setGroupId(identityLink.getGroupId());
+    evt.setTaskId(identityLink.getTaskId());
+    evt.setProcessDefId(identityLink.getProcessDefId());
+
+    // There is a conflict in HistoryEventTypes for 'delete' keyword,
+    // So HistoryEventTypes.IDENTITY_LINK_ADD /
+    // HistoryEventTypes.IDENTITY_LINK_DELETE is provided with the event name
+    // 'add-identity-link' /'delete-identity-link'
+    // and changed to 'add'/'delete' (While inserting it into the database) on
+    // Historic identity link add / delete event
+    String operationType = "add";
+    if (eventType.getEventName().equals(HistoryEventTypes.IDENTITY_LINK_DELETE.getEventName())) {
+      operationType = "delete";
+    }
+
+    evt.setOperationType(operationType);
+    evt.setEventType(eventType.getEventName());
+    evt.setAssignerId(Context.getCommandContext().getAuthenticatedUserId());
+  }
   // Batch
 
   @Override
@@ -797,5 +846,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   protected void initSequenceCounter(long sequenceCounter, HistoryEvent event) {
     event.setSequenceCounter(sequenceCounter);
   }
+
+
 
 }

@@ -10,7 +10,8 @@ drop index ACT_IDX_HI_ACT_INST_STATS on ACT_HI_ACTINST;
 drop index ACT_IDX_HI_ACT_INST_TENANT_ID on ACT_HI_ACTINST;
 
 drop index ACT_IDX_HI_TASK_INST_TENANT_ID on ACT_HI_TASKINST;
-
+drop index ACT_IDX_HI_IDENT_LNK_USER on ACT_HI_IDENTITYLINK;
+drop index ACT_IDX_HI_IDENT_LNK_GROUP on ACT_HI_IDENTITYLINK;
 drop index ACT_IDX_HI_DETAIL_PROC_INST on ACT_HI_DETAIL;
 drop index ACT_IDX_HI_DETAIL_ACT_INST on ACT_HI_DETAIL;
 drop index ACT_IDX_HI_DETAIL_CASE_INST on ACT_HI_DETAIL;
@@ -43,3 +44,4 @@ drop table if exists ACT_HI_OP_LOG;
 drop table if exists ACT_HI_INCIDENT;
 drop table if exists ACT_HI_JOB_LOG;
 drop table if exists ACT_HI_BATCH;
+drop table if exists ACT_HI_IDENTITYLINK;

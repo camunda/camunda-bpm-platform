@@ -124,7 +124,17 @@ public enum HistoryEventTypes implements HistoryEventType {
    *
    * @since 7.5
    */
-  BATCH_END("batch", "end");
+  BATCH_END("batch", "end"),
+
+  /**
+   * fired when an identity link is added
+   */
+  IDENTITY_LINK_ADD("identity-link-add", "add-identity-link"),
+
+  /**
+   * fired when an identity link is removed
+   */
+  IDENTITY_LINK_DELETE("identity-link-delete", "delete-identity-link");
 
   private HistoryEventTypes(String entityType, String eventName) {
     this.entityType = eventName;

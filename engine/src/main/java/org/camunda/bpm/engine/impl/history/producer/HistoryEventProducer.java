@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.task.IdentityLink;
 
 /**
  * <p>The producer for history events. The history event producer is
@@ -224,5 +225,19 @@ public interface HistoryEventProducer {
    * @since 7.5
    */
   HistoryEvent createBatchEndEvent(Batch batch);
+  
+  /**
+   * Fired when an identity link is added 
+   * @param identitylink
+   * @return
+   */
+  HistoryEvent createHistoricIdentityLinkAddEvent(IdentityLink identitylink);
+  
+  /**
+   * Fired when an identity links is deleted
+   * @param identityLink
+   * @return
+   */
+  HistoryEvent createHistoricIdentityLinkDeleteEvent(IdentityLink identityLink);
 
 }

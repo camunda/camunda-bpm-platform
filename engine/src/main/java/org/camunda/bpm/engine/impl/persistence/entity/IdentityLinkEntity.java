@@ -15,14 +15,21 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.task.IdentityLink;
 
 
 /**
  * @author Joram Barrez
+ * @author Deivarayan Azhagappan
  */
 public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity {
   
@@ -56,6 +63,13 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
       .getDbEntityManager()
       .insert(identityLinkEntity);
     return identityLinkEntity;
+  }
+  
+  public void insert() {
+    Context
+      .getCommandContext()
+      .getDbEntityManager()
+      .insert(this);
   }
   
   public boolean isUser() {
@@ -149,7 +163,28 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
     this.processDef = processDef;
     this.processDefId = processDef.getId();
   }
+  
+  public void fireHistoricIdentityLinkEvent(HistoryEventType eventType) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
 
+    HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
+    if(historyLevel.isHistoryEventProduced(eventType, this)) {
+
+      final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
+      final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
+
+      HistoryEvent event = null;
+      if (HistoryEvent.IDENTITY_LINK_ADD.equals(eventType.getEventName())) {
+        event = eventProducer.createHistoricIdentityLinkAddEvent(this);
+      } else if (HistoryEvent.IDENTITY_LINK_DELETE.equals(eventType.getEventName())) {
+        event = eventProducer.createHistoricIdentityLinkDeleteEvent(this);
+      }
+      
+      if(event != null) {
+        eventHandler.handleEvent(event);
+      }
+    }
+  }
   @Override
   public String toString() {
     return this.getClass().getSimpleName()

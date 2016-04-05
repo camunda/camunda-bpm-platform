@@ -18,6 +18,7 @@
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricCaseActivityInstance.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricDetail.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricIncident.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricIdentityLink.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricProcessInstance.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricCaseInstance.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricStatistics.xml" />
@@ -47,7 +48,7 @@
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Report.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Batch.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricBatch.xml" />
-
+    
     <!-- CMMN -->
 
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/CaseDefinition.xml" />

@@ -147,6 +147,8 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
         || HistoryEventTypes.CASE_INSTANCE_CREATE.getEventName().equals(eventType)
         || HistoryEventTypes.DMN_DECISION_EVALUATE.getEventName().equals(eventType)
         || HistoryEventTypes.BATCH_START.getEventName().equals(eventType)
+        || HistoryEventTypes.IDENTITY_LINK_ADD.getEventName().equals(eventType)
+        || HistoryEventTypes.IDENTITY_LINK_DELETE.getEventName().equals(eventType)
         ;
   }
 

@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.event.SignalEventHandler;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
@@ -426,6 +427,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
         }
         identityLink.setType(IdentityLinkType.CANDIDATE);
         dbEntityManager.insert(identityLink);
+        identityLink.fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_ADD);
       }
     }
   }

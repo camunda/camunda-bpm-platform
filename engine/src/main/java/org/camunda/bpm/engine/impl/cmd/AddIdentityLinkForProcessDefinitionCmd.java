@@ -60,7 +60,6 @@ public class AddIdentityLinkForProcessDefinitionCmd implements Command<Void>, Se
     EnsureUtil.ensureNotNull("Cannot find process definition with id " + processDefinitionId, "processDefinition", processDefinition);
 
     processDefinition.addIdentityLink(userId, groupId);
-
     return null;
   }
   

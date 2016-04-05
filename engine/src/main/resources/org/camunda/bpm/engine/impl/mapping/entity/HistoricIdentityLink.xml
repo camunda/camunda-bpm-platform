@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkEntity">
+
+  <!-- INSERT HISTORIC IDENTITY LINK -->
+  
+  <insert id="insertHistoricIdentityLinkEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkEventEntity">
+    insert into ${prefix}ACT_HI_IDENTITYLINK (
+    		ID_,
+    		TIMESTAMP_,
+    		TYPE_,
+    		USER_ID_, 
+    		GROUP_ID_, 
+    		TASK_ID_, 
+    		PROC_DEF_ID_, 
+    		OPERATION_TYPE_,
+    		ASSIGNER_ID_)
+    values (#{id, jdbcType=VARCHAR},
+            #{time, jdbcType=TIMESTAMP},  
+            #{type, jdbcType=VARCHAR},
+            #{userId, jdbcType=VARCHAR},
+            #{groupId, jdbcType=VARCHAR},
+            #{taskId, jdbcType=VARCHAR},
+            #{processDefId, jdbcType=VARCHAR},
+            #{operationType, jdbcType=VARCHAR},
+            #{assignerId, jdbcType=VARCHAR}
+           )
+  </insert>
+  
+  <!-- HISTORIC IDENTITY LINK DELETE -->
+
+  <delete id="deleteHistoricIdentityLink" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkEntity">
+    delete from ${prefix}ACT_HI_IDENTITYLINK where ID_ = #{id}
+  </delete>
+
+  <delete id="deleteHistoricIdentityLinksByProcessDefinitionId">
+    delete from ${prefix}ACT_HI_IDENTITYLINK where PROC_DEF_ID_ = #{processDefId}
+  </delete>
+  
+  <delete id="deleteHistoricIdentityLinksByTaskId">
+    delete from ${prefix}ACT_HI_IDENTITYLINK where TASK_ID_ = #{taskId}
+  </delete>
+  
+  <!-- HISTORIC IDENTITY LINK RESULTMAP -->
+
+  <resultMap id="historicIdentityLinkResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="type" column="TYPE_" jdbcType="VARCHAR" />
+    <result property="time" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
+    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
+    <result property="groupId" column="GROUP_ID_" jdbcType="VARCHAR" />
+    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="processDefId" column="PROCESS_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="operationType" column="OPERATION_TYPE_" jdbcType="VARCHAR"/>
+    <result property="assignerId" column="ASSIGNER_ID_" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="selectHistoricIdentityLinkByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIdentityLinkQueryImpl" resultMap="historicIdentityLinkResultMap">
+  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select RES.* 
+    ${limitBetween}
+    <include refid="selectHistoricIdentityLinkByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectHistoricIdentityLinkCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIdentityLinkQueryImpl" resultType="long">
+    select count(*)
+    <include refid="selectHistoricIdentityLinkByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectHistoricIdentityLinkByQueryCriteriaSql">
+    from ${prefix}ACT_HI_IDENTITYLINK RES
+    <where>
+      <if test="identityLinkId != null">
+        RES.ID_ = #{identityLinkId}
+      </if>
+      <if test="identityLinkType != null">
+        and RES.TYPE_ = #{identityLinkType}
+      </if>
+      <if test="userId != null">
+        and RES.USER_ID_ = #{userId}
+      </if>
+      <if test="groupId != null">
+        and RES.GROUP_ID_ = #{groupId}
+      </if>
+      <if test="taskId != null">
+        and RES.TASK_ID_ = #{taskId}
+      </if>
+      <if test="processDefId != null">
+        and RES.PROC_DEF_ID_ = #{processDefId}
+      </if>
+      <if test="operationType != null">
+        and RES.OPERATION_TYPE_ = #{operationType}
+      </if>
+      <if test="assignerId != null">
+        and RES.ASSIGNER_ID_ = #{assignerId}
+      </if>
+	  <if test="dateBefore != null">
+        and RES.TIMESTAMP_ &lt;= #{dateBefore}
+      </if>
+      <if test="dateAfter != null">
+        and RES.TIMESTAMP_ &gt;= #{dateAfter}
+      </if>
+    </where>
+  </sql>
+</mapper>

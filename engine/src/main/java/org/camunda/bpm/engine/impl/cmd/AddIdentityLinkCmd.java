@@ -78,7 +78,7 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkUpdateTask(task);
-
+    
     if (IdentityLinkType.ASSIGNEE.equals(type)) {
       task.setAssignee(userId);
     } else if (IdentityLinkType.OWNER.equals(type)) {

@@ -122,6 +122,19 @@ create table ACT_HI_DETAIL (
     primary key (ID_)
 );
 
+create table ACT_HI_IDENTITYLINK (
+    ID_ varchar(64),
+    TIMESTAMP_ timestamp not null,
+    TYPE_ varchar(255),
+    USER_ID_ varchar(255),
+    GROUP_ID_ varchar(255),
+    TASK_ID_ varchar(64),
+    PROC_DEF_ID_ varchar(64),
+    OPERATION_TYPE_ varchar(64),
+    ASSIGNER_ID_ varchar(64),
+    primary key (ID_)
+);
+
 create table ACT_HI_COMMENT (
     ID_ varchar(64) not null,
     TYPE_ varchar(255),
@@ -253,7 +266,8 @@ create index ACT_IDX_HI_DETAIL_TIME on ACT_HI_DETAIL(TIME_);
 create index ACT_IDX_HI_DETAIL_NAME on ACT_HI_DETAIL(NAME_);
 create index ACT_IDX_HI_DETAIL_TASK_ID on ACT_HI_DETAIL(TASK_ID_);
 create index ACT_IDX_HI_DETAIL_TENANT_ID on ACT_HI_DETAIL(TENANT_ID_);
-
+create index ACT_IDX_HI_IDENT_LNK_USER on ACT_HI_IDENTITYLINK(USER_ID_);
+create index ACT_IDX_HI_IDENT_LNK_GROUP on ACT_HI_IDENTITYLINK(GROUP_ID_);
 create index ACT_IDX_HI_TASK_INST_TENANT_ID on ACT_HI_TASKINST(TENANT_ID_);
 
 create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_VARINST(PROC_INST_ID_);

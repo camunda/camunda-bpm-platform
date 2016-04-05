@@ -58,7 +58,6 @@ public class DeleteIdentityLinkForProcessDefinitionCmd implements Command<Object
       .findLatestProcessDefinitionById(processDefinitionId);
 
     ensureNotNull("Cannot find process definition with id " + processDefinitionId, "processDefinition", processDefinition);
-
     processDefinition.deleteIdentityLink(userId, groupId);
 
     return null;

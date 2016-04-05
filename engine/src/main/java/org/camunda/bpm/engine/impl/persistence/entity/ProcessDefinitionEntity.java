@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -154,6 +155,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     identityLinkEntity.setUserId(userId);
     identityLinkEntity.setGroupId(groupId);
     identityLinkEntity.setType(IdentityLinkType.CANDIDATE);
+    identityLinkEntity.fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_ADD);
     return identityLinkEntity;
   }
 
@@ -164,6 +166,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
       .findIdentityLinkByProcessDefinitionUserAndGroup(id, userId, groupId);
 
     for (IdentityLinkEntity identityLink: identityLinks) {
+      identityLink.fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_DELETE);
       Context
         .getCommandContext()
         .getDbEntityManager()

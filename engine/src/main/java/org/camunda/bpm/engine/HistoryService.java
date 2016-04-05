@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkQuery;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.history.HistoricJobLog;
@@ -87,6 +88,9 @@ public interface HistoryService {
   /** Creates a new programmatic query to search for {@link HistoricIncident historic incidents}. */
   HistoricIncidentQuery createHistoricIncidentQuery();
 
+  /** Creates a new programmatic query to search for {@link HistoricIdentityLink historic identity links}. */
+  HistoricIdentityLinkQuery createHistoricIdentityLinkQuery();
+  
   /** Creates a new programmatic query to search for {@link HistoricCaseInstance}s. */
   HistoricCaseInstanceQuery createHistoricCaseInstanceQuery();
 

@@ -194,6 +194,20 @@ create table ACT_HI_BATCH (
     END_TIME_ datetime2,
     primary key (ID_)
 );
+create table ACT_HI_IDENTITYLINK (
+    ID_ nvarchar(64),
+    TIMESTAMP_ datetime2 not null,
+    TYPE_ nvarchar(255),
+    USER_ID_ nvarchar(255),
+    GROUP_ID_ nvarchar(255),
+    TASK_ID_ nvarchar(64),
+    PROC_DEF_ID_ nvarchar(64),
+    OPERATION_TYPE_ nvarchar(64),
+    ASSIGNER_ID_ nvarchar(64),
+    primary key (ID_)
+);
+create index ACT_IDX_HI_IDENT_LNK_USER on ACT_HI_IDENTITYLINK(USER_ID_);
+create index ACT_IDX_HI_IDENT_LNK_GROUP on ACT_HI_IDENTITYLINK(GROUP_ID_);
 
 create index ACT_IDX_JOB_JOB_DEF_ID on ACT_RU_JOB(JOB_DEF_ID_);
 create index ACT_IDX_HI_JOB_LOG_JOB_DEF_ID on ACT_HI_JOB_LOG(JOB_DEF_ID_);

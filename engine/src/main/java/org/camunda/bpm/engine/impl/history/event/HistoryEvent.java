@@ -78,6 +78,10 @@ public class HistoryEvent implements Serializable, DbEntity {
   @Deprecated
   public static final String INCIDENT_RESOLVE = HistoryEventTypes.INCIDENT_RESOLVE.getEventName();
 
+  public static final String IDENTITY_LINK_ADD = HistoryEventTypes.IDENTITY_LINK_ADD.getEventName();
+  
+  public static final String IDENTITY_LINK_DELETE = HistoryEventTypes.IDENTITY_LINK_DELETE.getEventName();
+  
   /** each {@link HistoryEvent} has a unique id */
   protected String id;
 

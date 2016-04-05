@@ -61,6 +61,7 @@ import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricDetailQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricIdentityLinkQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricIncidentQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricJobLogQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
@@ -915,6 +916,12 @@ public class AuthorizationManager extends AbstractManager {
     configureQuery(query, PROCESS_DEFINITION, "SELF.PROC_DEF_KEY_", READ_HISTORY);
   }
 
+  //historic identity link query ////////////////////////////////
+
+  public void configureHistoricIdentityLinkQuery(HistoricIdentityLinkQueryImpl query) {
+   configureQuery(query, PROCESS_DEFINITION, "SELF.PROC_DEF_KEY_", READ_HISTORY);
+  }
+ 
   public void configureHistoricDecisionInstanceQuery(HistoricDecisionInstanceQueryImpl query) {
     configureQuery(query, DECISION_DEFINITION, "SELF.DEC_DEF_KEY_", READ_HISTORY);
   }

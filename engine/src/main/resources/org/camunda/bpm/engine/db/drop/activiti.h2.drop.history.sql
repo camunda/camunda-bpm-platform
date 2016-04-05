@@ -19,7 +19,8 @@ drop index ACT_IDX_HI_DETAIL_TIME;
 drop index ACT_IDX_HI_DETAIL_NAME;
 drop index ACT_IDX_HI_DETAIL_TASK_ID;
 drop index ACT_IDX_HI_DETAIL_TENANT_ID;
-
+drop index ACT_IDX_HI_IDENT_LNK_USER;
+drop index ACT_IDX_HI_IDENT_LNK_GROUP;
 drop index ACT_IDX_HI_PROCVAR_PROC_INST;
 drop index ACT_IDX_HI_PROCVAR_NAME_TYPE;
 drop index ACT_IDX_HI_CASEVAR_CASE_INST;
@@ -43,3 +44,4 @@ drop table ACT_HI_OP_LOG if exists;
 drop table ACT_HI_INCIDENT if exists;
 drop table ACT_HI_JOB_LOG if exists;
 drop table ACT_HI_BATCH if exists;
+drop table ACT_HI_IDENTITYLINK if exists;

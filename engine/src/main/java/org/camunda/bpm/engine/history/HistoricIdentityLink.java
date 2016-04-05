@@ -1,3 +1,7 @@
+package org.camunda.bpm.engine.history;
+
+import java.util.Date;
+
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,31 +15,28 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.task;
-
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.UserQuery;
 
-
 /**
- * An identity link is used to associate a task with a certain identity.
+ * An historic identity link stores the association of a task with a certain identity.
  * 
- * For example:
- * - a user can be an assignee (= identity link type) for a task
+ * For example, historic identity link is logged on the following conditions:
+ * - a user can be an assignee/Candidate/Owner (= identity link type) for a task
  * - a group can be a candidate-group (= identity link type) for a task
+ * - a user can be an candidate in the scope of process definition
+ * - a group can be a candidate-group in the scope of process definition
  * 
- * @author Joram Barrez
+ * For every log, an operation type (add/delete) is added to the database
+ * based on the identity link operation
  */
-public interface IdentityLink {
+public interface HistoricIdentityLink {
   
   /**
-   * Get the Id of identityLink 
-   */
-   String getId();	
-  /**
-   * Returns the type of link.
+   * Returns the type of link (Candidate or Assignee or Owner).
    * See {@link IdentityLinkType} for the native supported types by the process engine.
-   */
+   *
+   * */
   String getType();
   
   /**
@@ -56,7 +57,18 @@ public interface IdentityLink {
   String getTaskId();
 
   /**
-   * Get the process definition id
+   * Returns the userId of the user who assigns a task to the user
+   * 
    */
-  public String getProcessDefId();
+  String getAssignerId();
+  
+  /**
+   * Returns the type of identity link history (Create or Delete identity link)
+   */
+  String getOperationType();
+  
+  /**
+   * Returns the time of identity link event (Creation/Deletion)
+   */
+  Date getTime();
 }

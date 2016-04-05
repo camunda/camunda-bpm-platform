@@ -24,7 +24,8 @@ drop index ACT_IDX_HI_PROCVAR_PROC_INST;
 drop index ACT_IDX_HI_PROCVAR_NAME_TYPE;
 drop index ACT_IDX_HI_CASEVAR_CASE_INST;
 drop index ACT_IDX_HI_VAR_INST_TENANT_ID;
-
+drop index ACT_IDX_HI_IDENT_LNK_USER;
+drop index ACT_IDX_HI_IDENT_LNK_GROUP;
 drop index ACT_IDX_HI_INCIDENT_TENANT_ID;
 
 drop index ACT_IDX_HI_JOB_LOG_PROCINST;
@@ -43,3 +44,4 @@ drop table ACT_HI_OP_LOG;
 drop table ACT_HI_INCIDENT;
 drop table ACT_HI_JOB_LOG;
 drop table ACT_HI_BATCH;
+drop table ACT_HI_IDENTITYLINK;

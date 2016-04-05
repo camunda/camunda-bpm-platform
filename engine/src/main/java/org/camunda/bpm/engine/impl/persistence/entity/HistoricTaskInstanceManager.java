@@ -119,6 +119,10 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
           .getAttachmentManager()
           .deleteAttachmentsByTaskId(taskId);
 
+        commandContext
+          .getHistoricIdentityLinkManager()
+          .deleteHistoricIdentityLinksByTaskId(taskId);
+        
         getDbEntityManager().delete(historicTaskInstance);
       }
     }
