@@ -9,7 +9,8 @@
     <casePlanModel id="CasePlanModel_1">
       <planItem id="PI_DecisionTask_1" definitionRef="DecisionTask_1" />
 
-      <decisionTask id="DecisionTask_1" name="A Decision Task" decisionRef="decision" />
+      <decisionTask id="DecisionTask_1" name="A Decision Task" decisionRef="decision" camunda:mapDecisionResult="singleEntry"
+        camunda:resultVariable="decisionVar"/>
     </casePlanModel>
   </case>
 

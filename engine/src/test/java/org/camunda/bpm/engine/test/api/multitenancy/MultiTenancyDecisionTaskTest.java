@@ -13,19 +13,24 @@
 
 package org.camunda.bpm.engine.test.api.multitenancy;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
+  protected static final String CMMN_LATEST = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithDecisionTask.cmmn";
+  protected static final String CMMN_DEPLOYMENT = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithDecisionTaskDeploymentBinding.cmmn";
+  protected static final String CMMN_VERSION = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithDecisionTaskVersionBinding.cmmn";
+  protected static final String CMMN_VERSION_2 = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithDecisionTaskVersionBinding_v2.cmmn";
   protected static final String CMMN_CONST = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithDecisionTaskTenantIdConst.cmmn";
   protected static final String CMMN_WITHOUT_TENANT = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithDecisionTaskWithoutTenantId.cmmn";
   protected static final String CMMN_EXPR = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithDecisionTaskTenantIdExpr.cmmn";
@@ -38,6 +43,114 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
 
   protected static final String RESULT_OF_VERSION_ONE = "A";
   protected static final String RESULT_OF_VERSION_TWO = "C";
+
+  public void testEvaluateDecisionWithDeploymentBinding() {
+    deploymentForTenant(TENANT_ONE, CMMN_DEPLOYMENT, DMN_FILE);
+    deploymentForTenant(TENANT_TWO, CMMN_DEPLOYMENT, DMN_FILE_VERSION_TWO);
+
+    CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
+    CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
+
+    startDecisionTask(DECISION_TASK_ID, TENANT_ONE);
+    startDecisionTask(DECISION_TASK_ID, TENANT_TWO);
+
+    assertThat((String)caseService.getVariable(caseInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+    assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
+  }
+
+  public void testEvaluateDecisionWithLatestBindingSameVersion() {
+    deploymentForTenant(TENANT_ONE, CMMN_LATEST, DMN_FILE);
+    deploymentForTenant(TENANT_TWO, CMMN_LATEST, DMN_FILE_VERSION_TWO);
+
+    CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
+    CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
+
+    startDecisionTask(DECISION_TASK_ID, TENANT_ONE);
+    startDecisionTask(DECISION_TASK_ID, TENANT_TWO);
+
+    assertThat((String)caseService.getVariable(caseInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+    assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
+  }
+
+  public void testEvaluateDecisionWithLatestBindingDifferentVersions() {
+    deploymentForTenant(TENANT_ONE, CMMN_LATEST, DMN_FILE);
+
+    deploymentForTenant(TENANT_TWO, CMMN_LATEST, DMN_FILE);
+    deploymentForTenant(TENANT_TWO, CMMN_LATEST, DMN_FILE_VERSION_TWO);
+
+    CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
+    CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
+
+    startDecisionTask(DECISION_TASK_ID, TENANT_ONE);
+    startDecisionTask(DECISION_TASK_ID, TENANT_TWO);
+
+    assertThat((String)caseService.getVariable(caseInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+    assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
+  }
+
+  public void testEvaluateDecisionWithVersionBinding() {
+    deploymentForTenant(TENANT_ONE, CMMN_VERSION, DMN_FILE);
+    deploymentForTenant(TENANT_ONE, DMN_FILE_VERSION_TWO);
+
+    deploymentForTenant(TENANT_TWO, CMMN_VERSION, DMN_FILE_VERSION_TWO);
+    deploymentForTenant(TENANT_TWO, DMN_FILE);
+
+    CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
+    CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
+
+    startDecisionTask(DECISION_TASK_ID, TENANT_ONE);
+    startDecisionTask(DECISION_TASK_ID, TENANT_TWO);
+
+    assertThat((String)caseService.getVariable(caseInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+    assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
+  }
+
+  public void testFailEvaluateDecisionFromOtherTenantWithDeploymentBinding() {
+    deploymentForTenant(TENANT_ONE, CMMN_DEPLOYMENT);
+    deploymentForTenant(TENANT_TWO, DMN_FILE);
+
+    createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
+
+    try {
+      startDecisionTask(DECISION_TASK_ID, TENANT_ONE);
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("no decision definition deployed with key = 'decision'"));
+    }
+  }
+
+  public void testFailEvaluateDecisionFromOtherTenantWithLatestBinding() {
+    deploymentForTenant(TENANT_ONE, CMMN_LATEST);
+    deploymentForTenant(TENANT_TWO, DMN_FILE);
+
+    createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
+
+    try {
+      startDecisionTask(DECISION_TASK_ID, TENANT_ONE);
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("no decision definition deployed with key 'decision'"));
+    }
+  }
+
+  public void testFailEvaluateDecisionFromOtherTenantWithVersionBinding() {
+    deploymentForTenant(TENANT_ONE, CMMN_VERSION_2, DMN_FILE);
+
+    deploymentForTenant(TENANT_TWO, DMN_FILE);
+    deploymentForTenant(TENANT_TWO, DMN_FILE);
+
+    createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
+
+    try {
+      startDecisionTask(DECISION_TASK_ID, TENANT_ONE);
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("no decision definition deployed with key = 'decision', version = '2' and tenant-id 'tenant1'"));
+    }
+  }
 
   public void testEvaluateDecisionRefTenantIdConstant() {
     deployment(CMMN_CONST);
@@ -78,10 +191,13 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     assertThat((String)caseService.getVariable(caseInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
   }
 
-  protected String deploymentForTenant(String tenantId, String classpathResource, BpmnModelInstance modelInstance) {
-    return deployment(repositoryService.createDeployment()
-        .tenantId(tenantId)
-        .addClasspathResource(classpathResource), modelInstance);
+  protected CaseInstance createCaseInstance(String caseDefinitionKey, String tenantId) {
+    return caseService.withCaseDefinitionByKey(caseDefinitionKey).caseDefinitionTenantId(tenantId).create();
+  }
+
+  protected void startDecisionTask(String activityId, String tenantId) {
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(activityId).tenantIdIn(tenantId).singleResult();
+    caseService.withCaseExecution(caseExecution.getId()).setVariable("status", "gold").manualStart();
   }
 
 }
