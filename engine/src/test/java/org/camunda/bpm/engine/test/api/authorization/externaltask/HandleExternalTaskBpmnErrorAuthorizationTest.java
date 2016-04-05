@@ -1,4 +1,7 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
+/*
+ * Copyright 2016 camunda services GmbH.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -16,16 +19,18 @@ import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
 /**
- * @author Thorben Lindhauer
- * @author Christopher Zell
+ * Tests the authorization of the bpmn error handling of an external task.
+ * 
+ * @author Christopher Zell <christopher.zell@camunda.org>
  */
 @RunWith(Parameterized.class)
-public class CompleteExternalTaskAuthorizationTest extends HandleExternalTaskAuthorizationTest {
+public class HandleExternalTaskBpmnErrorAuthorizationTest extends HandleExternalTaskAuthorizationTest {
 
   @Override
   public void testExternalTaskApi(LockedExternalTask task) {
-    engineRule.getExternalTaskService().complete(task.getId(), "workerId");    
+    engineRule.getExternalTaskService().handleBpmnError(task.getId(), "workerId", "errorCode");
   }
 
   @Override
@@ -33,3 +38,4 @@ public class CompleteExternalTaskAuthorizationTest extends HandleExternalTaskAut
     Assert.assertEquals(0, engineRule.getExternalTaskService().createExternalTaskQuery().count());
   }
 }
+
