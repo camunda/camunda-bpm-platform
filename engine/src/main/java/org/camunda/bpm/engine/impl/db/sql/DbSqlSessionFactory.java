@@ -227,8 +227,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBeforeNativeQueryStatements.put(DB2, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
 
     databaseSpecificBitAnd1.put(DB2, "BITAND(");
-    databaseSpecificBitAnd2.put(DB2, ",");
-    databaseSpecificBitAnd3.put(DB2, ")");
+    databaseSpecificBitAnd2.put(DB2, ", CAST(");
+    databaseSpecificBitAnd3.put(DB2, " AS Integer))");
     databaseSpecificDatepart1.put(DB2, "");
     databaseSpecificDatepart2.put(DB2, "(");
     databaseSpecificDatepart3.put(DB2, ")");
