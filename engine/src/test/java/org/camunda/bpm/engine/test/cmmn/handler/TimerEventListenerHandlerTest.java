@@ -19,6 +19,10 @@ import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.handler.TimerEventListenerItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventListenerJobDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventListenerJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerJobDeclaration;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.PlanItemTransition;
 import org.camunda.bpm.model.cmmn.instance.*;
@@ -135,13 +139,96 @@ public class TimerEventListenerHandlerTest extends CmmnElementHandlerTest {
 
   @Test
   public void testTimerExpression(){
+    //given:
     //create a timer expression;
     TimerExpression timerExprElement = createElement(timerEventListener, TimerExpression.class);
     timerExprElement.setText("${aTest}");
     Cmmn.validateModel(modelInstance);
 
+    //when
     CmmnActivity newActivity = timerEventListenerItemHandler.handleElement(planItem, context);
+
+    //then
    assertNotNull(newActivity.getProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION));
 
   }
+
+  @Test
+  public void testJobHandlerType(){
+    //given:
+    //create a timer expression;
+    TimerExpression timerExprElement = createElement(timerEventListener, TimerExpression.class);
+    timerExprElement.setText("R/10S");
+    Cmmn.validateModel(modelInstance);
+
+    //when
+    CmmnActivity newActivity = timerEventListenerItemHandler.handleElement(planItem, context);
+
+    //then
+    Object jobDeclr=newActivity.getProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION);
+    assertNotNull(jobDeclr);
+    assertTrue(jobDeclr instanceof TimerEventListenerJobDeclaration);
+    JobDeclaration timerEventListenerJobDeclaration=(JobDeclaration)jobDeclr;
+    assertEquals(TimerEventListenerJobHandler.TYPE ,timerEventListenerJobDeclaration.getJobHandlerType());
+  }
+
+  @Test
+  public void testCycleTimerExpression(){
+    //given:
+    //create a timer expression;
+    TimerExpression timerExprElement = createElement(timerEventListener, TimerExpression.class);
+    timerExprElement.setText("R/10S");
+    Cmmn.validateModel(modelInstance);
+
+    //when
+    CmmnActivity newActivity = timerEventListenerItemHandler.handleElement(planItem, context);
+
+    //then
+    Object jobDeclr=newActivity.getProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION);
+    assertNotNull(jobDeclr);
+    assertTrue(jobDeclr instanceof TimerEventListenerJobDeclaration);
+    TimerEventListenerJobDeclaration timerEventListenerJobDeclaration=(TimerEventListenerJobDeclaration)jobDeclr;
+    assertTrue("CYCLE".equals(timerEventListenerJobDeclaration.getTimerDeclarationType()));
+  }
+
+  @Test
+  public void testDurationTimerExpression(){
+    //given:
+    //create a timer expression;
+    TimerExpression timerExprElement = createElement(timerEventListener, TimerExpression.class);
+    timerExprElement.setText("P5S");
+    Cmmn.validateModel(modelInstance);
+
+    //when
+    CmmnActivity newActivity = timerEventListenerItemHandler.handleElement(planItem, context);
+
+    //then
+    Object jobDeclr=newActivity.getProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION);
+    assertNotNull(jobDeclr);
+    assertTrue(jobDeclr instanceof TimerEventListenerJobDeclaration);
+    TimerEventListenerJobDeclaration timerEventListenerJobDeclaration=(TimerEventListenerJobDeclaration)jobDeclr;
+    assertTrue("DURATION".equals(timerEventListenerJobDeclaration.getTimerDeclarationType()));
+  }
+
+  @Test
+  public void testDateTimerExpression(){
+    //given:
+    //create a timer expression;
+    TimerExpression timerExprElement = createElement(timerEventListener, TimerExpression.class);
+    timerExprElement.setText("2016/04/06 10:10:10");
+    Cmmn.validateModel(modelInstance);
+
+    //when
+    CmmnActivity newActivity = timerEventListenerItemHandler.handleElement(planItem, context);
+
+    //then
+    Object jobDeclr=newActivity.getProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION);
+    assertNotNull(jobDeclr);
+    assertTrue(jobDeclr instanceof TimerEventListenerJobDeclaration);
+    TimerEventListenerJobDeclaration timerEventListenerJobDeclaration=(TimerEventListenerJobDeclaration)jobDeclr;
+    assertTrue("DATE".equals(timerEventListenerJobDeclaration.getTimerDeclarationType()));
+  }
+
+
+
 }
