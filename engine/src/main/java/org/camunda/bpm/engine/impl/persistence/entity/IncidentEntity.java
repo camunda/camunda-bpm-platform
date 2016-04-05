@@ -80,6 +80,9 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
         // create a new incident
         IncidentEntity newIncident = create(incidentType);
         newIncident.setExecution(superExecution);
+        newIncident.setActivityId(superExecution.getCurrentActivityId());
+        newIncident.setProcessDefinitionId(superExecution.getProcessDefinitionId());
+        newIncident.setTenantId(superExecution.getTenantId());
 
         // set cause and root cause
         newIncident.setCauseIncidentId(id);
@@ -96,24 +99,16 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     }
   }
 
-  /**
-   * use {@link #createAndInsertIncident(String, IncidentContext, String)}
-   */
-  @Deprecated
-  public static IncidentEntity createAndInsertIncident(String incidentType, String executionId, String configuration, String message) {
-    IncidentContext ctx = new IncidentContext();
-    ctx.setExecutionId(executionId);
-    ctx.setConfiguration(configuration);
-
-    return createAndInsertIncident(incidentType, ctx, message);
-  }
-
   public static IncidentEntity createAndInsertIncident(String incidentType, IncidentContext context, String message) {
     // create new incident
     IncidentEntity newIncident = create(incidentType);
-
-    newIncident.setConfiguration(context.getConfiguration());
     newIncident.setIncidentMessage(message);
+
+    // set properties from incident context
+    newIncident.setConfiguration(context.getConfiguration());
+    newIncident.setActivityId(context.getActivityId());
+    newIncident.setProcessDefinitionId(context.getProcessDefinitionId());
+    newIncident.setTenantId(context.getTenantId());
 
     if(context.getExecutionId() != null) {
       // fetch execution
@@ -122,15 +117,9 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
         .getExecutionManager()
         .findExecutionById(context.getExecutionId());
 
-      // inherit properties from execution
+      // link incident with execution
       newIncident.setExecution(execution);
-
     }
-
-    // set further properties from context
-    newIncident.setActivityId(context.getActivityId());
-    newIncident.setProcessDefinitionId(context.getProcessDefinitionId());
-    newIncident.setTenantId(context.getTenantId());
 
     // insert new incident (and create a new historic incident)
     insert(newIncident);
@@ -372,20 +361,13 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
   public void setExecution(ExecutionEntity execution) {
     if (execution != null) {
       executionId = execution.getId();
-      activityId = execution.getActivityId();
       processInstanceId = execution.getProcessInstanceId();
-      processDefinitionId = execution.getProcessDefinitionId();
-      tenantId = execution.getTenantId();
-
       execution.addIncident(this);
     }
     else {
       getExecution().removeIncident(this);
       executionId = null;
-      activityId = null;
       processInstanceId = null;
-      processDefinitionId = null;
-      tenantId = null;
     }
   }
 
