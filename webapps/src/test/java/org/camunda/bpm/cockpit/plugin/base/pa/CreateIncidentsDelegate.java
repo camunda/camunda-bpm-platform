@@ -14,22 +14,33 @@ package org.camunda.bpm.cockpit.plugin.base.pa;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 
 public class CreateIncidentsDelegate implements JavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    
-    IncidentEntity.createAndInsertIncident("anIncident", execution.getId(), "test1", "aMessage");
-    IncidentEntity.createAndInsertIncident("anIncident", execution.getId(), "test2", "aMessage");
-    IncidentEntity.createAndInsertIncident("anIncident", execution.getId(), "test3", "aMessage");
 
-    IncidentEntity.createAndInsertIncident("anotherIncident", execution.getId(), "test1", "anotherMessage");
-    IncidentEntity.createAndInsertIncident("anotherIncident", execution.getId(), "test2", "anotherMessage");
-    IncidentEntity.createAndInsertIncident("anotherIncident", execution.getId(), "test3", "anotherMessage");
-    IncidentEntity.createAndInsertIncident("anotherIncident", execution.getId(), "test4", "anotherMessage");
-    IncidentEntity.createAndInsertIncident("anotherIncident", execution.getId(), "test5", "anotherMessage");
+    IncidentEntity.createAndInsertIncident("anIncident", createIncidentContext(execution, "test1"), "aMessage");
+    IncidentEntity.createAndInsertIncident("anIncident", createIncidentContext(execution, "test2"), "aMessage");
+    IncidentEntity.createAndInsertIncident("anIncident", createIncidentContext(execution, "test3"), "aMessage");
+
+    IncidentEntity.createAndInsertIncident("anotherIncident", createIncidentContext(execution, "test1"), "anotherMessage");
+    IncidentEntity.createAndInsertIncident("anotherIncident", createIncidentContext(execution, "test2"), "anotherMessage");
+    IncidentEntity.createAndInsertIncident("anotherIncident", createIncidentContext(execution, "test3"), "anotherMessage");
+    IncidentEntity.createAndInsertIncident("anotherIncident", createIncidentContext(execution, "test4"), "anotherMessage");
+    IncidentEntity.createAndInsertIncident("anotherIncident", createIncidentContext(execution, "test5"), "anotherMessage");
+  }
+
+  private IncidentContext createIncidentContext(DelegateExecution execution, String configuration) {
+    IncidentContext incidentContext = new IncidentContext();
+    incidentContext.setExecutionId(execution.getId());
+    incidentContext.setActivityId(execution.getCurrentActivityId());
+    incidentContext.setProcessDefinitionId(execution.getProcessDefinitionId());
+    incidentContext.setTenantId(execution.getTenantId());
+    incidentContext.setConfiguration(configuration);
+    return incidentContext;
   }
 
 }
