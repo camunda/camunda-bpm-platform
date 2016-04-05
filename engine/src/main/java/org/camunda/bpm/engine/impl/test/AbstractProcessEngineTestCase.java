@@ -99,9 +99,14 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
     try {
 
-      deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
+      boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, getClass(), getName());
+      // ignore test case when current history level is too low
+      if (hasRequiredHistoryLevel) {
 
-      super.runBare();
+        deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
+
+        super.runBare();
+      }
 
     }
     catch (AssertionFailedError e) {

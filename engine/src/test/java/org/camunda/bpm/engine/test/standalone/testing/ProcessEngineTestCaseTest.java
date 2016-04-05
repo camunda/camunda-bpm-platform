@@ -13,11 +13,17 @@
 
 package org.camunda.bpm.engine.test.standalone.testing;
 
+import static org.hamcrest.CoreMatchers.either;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineTestCase;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 
 /**
@@ -43,6 +49,34 @@ public class ProcessEngineTestCaseTest extends ProcessEngineTestCase {
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  public void testRequiredHistoryLevelAudit() {
+
+    assertThat(currentHistoryLevel(),
+        either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
+        .or(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
+        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  public void testRequiredHistoryLevelActivity() {
+
+    assertThat(currentHistoryLevel(),
+        either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
+        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testRequiredHistoryLevelFull() {
+
+    assertThat(currentHistoryLevel(), is(ProcessEngineConfiguration.HISTORY_FULL));
+  }
+
+  protected String currentHistoryLevel() {
+    return processEngine.getProcessEngineConfiguration().getHistory();
+  }
+
+  @Override
   protected void tearDown() throws Exception {
     super.tearDown();
     processEngine.close();
