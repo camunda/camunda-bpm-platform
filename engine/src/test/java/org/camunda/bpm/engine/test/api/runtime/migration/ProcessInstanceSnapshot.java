@@ -106,15 +106,19 @@ public class ProcessInstanceSnapshot {
     return eventSubscriptions;
   }
 
-  public EventSubscription getEventSubscriptionForActivityIdAndEventName(String activityId, String eventName) {
-
-    List<EventSubscription> collectedEventsubscriptions = new ArrayList<EventSubscription>();
-
-    for (EventSubscription eventSubscription : getEventSubscriptions()) {
-      if (activityId.equals(eventSubscription.getActivityId()) && eventName.equals(eventSubscription.getEventName())) {
-        collectedEventsubscriptions.add(eventSubscription);
+  public EventSubscription getEventSubscriptionById(String id) {
+    for (EventSubscription subscription : eventSubscriptions) {
+      if (subscription.getId().equals(id)) {
+        return subscription;
       }
     }
+
+    return null;
+  }
+
+  public EventSubscription getEventSubscriptionForActivityIdAndEventName(String activityId, String eventName) {
+
+    List<EventSubscription> collectedEventsubscriptions = getEventSubscriptionsForActivityIdAndEventName(activityId, eventName);
 
     if (collectedEventsubscriptions.isEmpty()) {
       return null;
@@ -125,6 +129,19 @@ public class ProcessInstanceSnapshot {
     else {
       throw new RuntimeException("There is more than one event subscription for activity " + activityId + " and event " + eventName);
     }
+  }
+
+  public List<EventSubscription> getEventSubscriptionsForActivityIdAndEventName(String activityId, String eventName) {
+
+    List<EventSubscription> collectedEventsubscriptions = new ArrayList<EventSubscription>();
+
+    for (EventSubscription eventSubscription : getEventSubscriptions()) {
+      if (activityId.equals(eventSubscription.getActivityId()) && eventName.equals(eventSubscription.getEventName())) {
+        collectedEventsubscriptions.add(eventSubscription);
+      }
+    }
+
+    return collectedEventsubscriptions;
   }
 
   public void setEventSubscriptions(List<EventSubscription> eventSubscriptions) {

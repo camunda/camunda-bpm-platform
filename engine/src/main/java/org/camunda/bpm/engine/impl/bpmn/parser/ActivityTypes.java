@@ -32,4 +32,6 @@ public class ActivityTypes {
   public static final String START_EVENT_COMPENSATION = "compensationStartEvent";
   public static final String START_EVENT_ERROR = "errorStartEvent";
 
+  public static final String INTERMEDIATE_EVENT_MESSAGE = "intermediateMessageCatch";
+
 }

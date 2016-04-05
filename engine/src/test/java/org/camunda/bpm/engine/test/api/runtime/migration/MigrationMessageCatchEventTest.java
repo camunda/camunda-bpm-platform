@@ -12,15 +12,14 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 
-import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.MessageReceiveModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -38,17 +37,10 @@ public class MigrationMessageCatchEventTest {
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
 
   @Test
-  public void testCannotMigrateActivityInstance() {
+  public void testMigrateEventSubscription() {
     // given
-    BpmnModelInstance model = ProcessModels.newModel()
-      .startEvent()
-      .intermediateCatchEvent("messageCatch")
-        .message("Message")
-      .endEvent()
-      .done();
-
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(model);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(model);
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -56,16 +48,69 @@ public class MigrationMessageCatchEventTest {
       .build();
 
     // when
-    try {
-      testHelper.createProcessInstanceAndMigrate(migrationPlan);
-      Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
-      // then
-      assertThat(e.getValidationReport())
-        .hasActivityInstanceFailures("messageCatch",
-          "The type of the source activity is not supported for activity instance migration"
-        );
-    }
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    testHelper.assertEventSubscriptionMigrated("messageCatch", "messageCatch", MessageReceiveModels.MESSAGE_NAME);
+
+    // and it is possible to trigger the receive task
+    rule.getRuntimeService().correlateMessage(MessageReceiveModels.MESSAGE_NAME);
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
   }
+
+  @Test
+  public void testMigrateEventSubscriptionChangeActivityId() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS)
+        .changeElementId("messageCatch", "newMessageCatch"));
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("messageCatch", "newMessageCatch")
+      .build();
+
+    // when
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    testHelper.assertEventSubscriptionMigrated("messageCatch", "newMessageCatch", MessageReceiveModels.MESSAGE_NAME);
+
+    // and it is possible to trigger the receive task
+    rule.getRuntimeService().correlateMessage(MessageReceiveModels.MESSAGE_NAME);
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateEventSubscriptionChangeMessageName() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.newModel()
+        .startEvent()
+        .intermediateCatchEvent("messageCatch")
+          .message("new" + MessageReceiveModels.MESSAGE_NAME)
+        .userTask("userTask")
+        .endEvent()
+        .done());
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("messageCatch", "messageCatch")
+        .build();
+
+    // when
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then the message event subscription's event name has not changed
+    testHelper.assertEventSubscriptionMigrated("messageCatch", "messageCatch", MessageReceiveModels.MESSAGE_NAME);
+
+    // and it is possible to trigger the receive task
+    rule.getRuntimeService().correlateMessage(MessageReceiveModels.MESSAGE_NAME);
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
 }

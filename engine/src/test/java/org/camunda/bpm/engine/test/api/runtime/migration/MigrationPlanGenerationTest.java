@@ -19,6 +19,7 @@ import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.migrate;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.MessageReceiveModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.MigrationPlanAssert;
@@ -503,6 +504,21 @@ public class MigrationPlanGenerationTest {
       .hasEmptyInstructions();
   }
 
+  @Test
+  public void testMapReceiveTasks() {
+    assertGeneratedMigrationPlan(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS, MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS)
+      .hasInstructions(
+        migrate("receiveTask").to("receiveTask"),
+        migrate("userTask").to("userTask"));
+  }
+
+  @Test
+  public void testMapMessageCatchEvents() {
+    assertGeneratedMigrationPlan(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS, MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS)
+      .hasInstructions(
+        migrate("messageCatch").to("messageCatch"),
+        migrate("userTask").to("userTask"));
+  }
 
   // helper
 

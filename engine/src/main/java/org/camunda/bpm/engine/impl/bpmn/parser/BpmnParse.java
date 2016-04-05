@@ -1413,7 +1413,7 @@ public class BpmnParse extends Parse {
 
   protected void parseIntermediateMessageEventDefinition(Element messageEventDefinition, ActivityImpl nestedActivity) {
 
-    nestedActivity.getProperties().set(BpmnProperties.TYPE, "intermediateMessageCatch");
+    nestedActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_MESSAGE);
 
     EventSubscriptionDeclaration messageDefinition = parseMessageEventDefinition(messageEventDefinition);
     messageDefinition.setActivityId(nestedActivity.getId());

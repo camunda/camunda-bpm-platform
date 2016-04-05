@@ -12,12 +12,16 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 
-import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
+import java.util.List;
+
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.EventSubscription;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.MessageReceiveModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
@@ -40,15 +44,8 @@ public class MigrationReceiveTaskTest {
   @Test
   public void testCannotMigrateActivityInstance() {
     // given
-    BpmnModelInstance model = ProcessModels.newModel()
-      .startEvent()
-      .receiveTask("receiveTask")
-        .message("Message")
-      .endEvent()
-      .done();
-
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(model);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(model);
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -56,16 +53,178 @@ public class MigrationReceiveTaskTest {
       .build();
 
     // when
-    try {
-      testHelper.createProcessInstanceAndMigrate(migrationPlan);
-      Assert.fail("should fail");
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    testHelper.assertEventSubscriptionMigrated("receiveTask", "receiveTask", MessageReceiveModels.MESSAGE_NAME);
+
+    // and it is possible to trigger the receive task
+    rule.getRuntimeService().correlateMessage(MessageReceiveModels.MESSAGE_NAME);
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateEventSubscriptionProperties() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("receiveTask", "receiveTask")
+      .build();
+
+    // when
+    testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    EventSubscription eventSubscriptionBefore = testHelper.snapshotBeforeMigration.getEventSubscriptions().get(0);
+
+    List<EventSubscription> eventSubscriptionsAfter = testHelper.snapshotAfterMigration.getEventSubscriptions();
+    Assert.assertEquals(1, eventSubscriptionsAfter.size());
+    EventSubscription eventSubscriptionAfter = eventSubscriptionsAfter.get(0);
+    Assert.assertEquals(eventSubscriptionBefore.getCreated(), eventSubscriptionAfter.getCreated());
+    Assert.assertEquals(eventSubscriptionBefore.getExecutionId(), eventSubscriptionAfter.getExecutionId());
+    Assert.assertEquals(eventSubscriptionBefore.getProcessInstanceId(), eventSubscriptionAfter.getProcessInstanceId());
+  }
+
+  @Test
+  public void testMigrateEventSubscriptionChangeActivityId() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS)
+        .changeElementId("receiveTask", "newReceiveTask"));
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("receiveTask", "newReceiveTask")
+      .build();
+
+    // when
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    testHelper.assertEventSubscriptionMigrated("receiveTask", "newReceiveTask", MessageReceiveModels.MESSAGE_NAME);
+
+    // and it is possible to trigger the receive task
+    rule.getRuntimeService().correlateMessage(MessageReceiveModels.MESSAGE_NAME);
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateEventSubscriptionChangeMessageName() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.newModel()
+        .startEvent()
+        .receiveTask("receiveTask")
+          .message("new" + MessageReceiveModels.MESSAGE_NAME)
+        .userTask("userTask")
+        .endEvent()
+        .done());
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("receiveTask", "receiveTask")
+        .build();
+
+    // when
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then the message event subscription's event name has not changed
+    testHelper.assertEventSubscriptionMigrated("receiveTask", "receiveTask", MessageReceiveModels.MESSAGE_NAME);
+
+    // and it is possible to trigger the receive task
+    rule.getRuntimeService().correlateMessage(MessageReceiveModels.MESSAGE_NAME);
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateParallelMultiInstanceEventSubscription() {
+    BpmnModelInstance parallelMiReceiveTaskProcess = modify(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS)
+      .activityBuilder("receiveTask")
+        .multiInstance()
+        .parallel()
+        .cardinality("3")
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(parallelMiReceiveTaskProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(parallelMiReceiveTaskProcess);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("receiveTask#multiInstanceBody", "receiveTask#multiInstanceBody")
+      .mapActivities("receiveTask", "receiveTask")
+      .build();
+
+    // when
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    testHelper.assertEventSubscriptionsMigrated("receiveTask", "receiveTask", MessageReceiveModels.MESSAGE_NAME);
+
+    // and it is possible to trigger the receive tasks
+    rule.getRuntimeService().createMessageCorrelation(MessageReceiveModels.MESSAGE_NAME).correlateAll();
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateSequentialMultiInstanceEventSubscription() {
+    BpmnModelInstance parallelMiReceiveTaskProcess = modify(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS)
+      .activityBuilder("receiveTask")
+        .multiInstance()
+        .sequential()
+        .cardinality("3")
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(parallelMiReceiveTaskProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(parallelMiReceiveTaskProcess);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("receiveTask#multiInstanceBody", "receiveTask#multiInstanceBody")
+      .mapActivities("receiveTask", "receiveTask")
+      .build();
+
+    // when
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    testHelper.assertEventSubscriptionsMigrated("receiveTask", "receiveTask", MessageReceiveModels.MESSAGE_NAME);
+
+    // and it is possible to trigger the receive tasks
+    for (int i = 0; i < 3; i++) {
+      rule.getRuntimeService().correlateMessage(MessageReceiveModels.MESSAGE_NAME);
     }
-    catch (MigratingProcessInstanceValidationException e) {
-      // then
-      assertThat(e.getValidationReport())
-        .hasActivityInstanceFailures("receiveTask",
-          "The type of the source activity is not supported for activity instance migration"
-        );
-    }
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateEventSubscriptionAddParentScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(MessageReceiveModels.SUBPROCESS_RECEIVE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("receiveTask", "receiveTask")
+      .build();
+
+    // when
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    testHelper.assertEventSubscriptionMigrated("receiveTask", "receiveTask", MessageReceiveModels.MESSAGE_NAME);
+
+    // and it is possible to trigger the receive task
+    rule.getRuntimeService().correlateMessage(MessageReceiveModels.MESSAGE_NAME);
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
   }
 }

@@ -208,14 +208,30 @@ public class MigrationTestRule extends TestWatcher {
     return assertThat(snapshotAfterMigration.getActivityTree());
   }
 
+  public void assertEventSubscriptionsMigrated(String activityIdBefore, String activityIdAfter, String eventName) {
+    List<EventSubscription> eventSubscriptionsBefore = snapshotBeforeMigration.getEventSubscriptionsForActivityIdAndEventName(activityIdAfter, eventName);
+
+    for (EventSubscription eventSubscription : eventSubscriptionsBefore) {
+      assertEventSubscriptionMigrated(eventSubscription, activityIdAfter, eventName);
+    }
+  }
+
+  protected void assertEventSubscriptionMigrated(EventSubscription eventSubscriptionBefore, String activityIdAfter, String eventName) {
+    EventSubscription eventSubscriptionAfter = snapshotAfterMigration.getEventSubscriptionById(eventSubscriptionBefore.getId());
+    assertNotNull("Expected that an event subscription with id '" + eventSubscriptionBefore.getId() + "' "
+        + "exists after migration", eventSubscriptionAfter);
+
+    assertEquals(eventSubscriptionBefore.getEventType(), eventSubscriptionAfter.getEventType());
+    assertEquals(activityIdAfter, eventSubscriptionAfter.getActivityId());
+    assertEquals(eventName, eventSubscriptionAfter.getEventName());
+  }
+
+
   public void assertEventSubscriptionMigrated(String activityIdBefore, String activityIdAfter, String eventName) {
     EventSubscription eventSubscriptionBefore = snapshotBeforeMigration.getEventSubscriptionForActivityIdAndEventName(activityIdBefore, eventName);
     assertNotNull("Expected that an event subscription for activity '" + activityIdBefore + "' exists before migration", eventSubscriptionBefore);
-    EventSubscription eventSubscriptionAfter = snapshotAfterMigration.getEventSubscriptionForActivityIdAndEventName(activityIdAfter, eventName);
-    assertNotNull("Expected that an event subscription for activity '" + activityIdAfter + "' exists after migration", eventSubscriptionAfter);
 
-    assertEquals(eventSubscriptionBefore.getId(), eventSubscriptionAfter.getId());
-    assertEquals(eventSubscriptionBefore.getEventType(), eventSubscriptionAfter.getEventType());
+    assertEventSubscriptionMigrated(eventSubscriptionBefore, activityIdAfter, eventName);
   }
 
   public void assertEventSubscriptionRemoved(String activityId, String eventName) {

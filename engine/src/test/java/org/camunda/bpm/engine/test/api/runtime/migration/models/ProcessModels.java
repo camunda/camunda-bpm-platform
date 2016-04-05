@@ -254,8 +254,6 @@ public class ProcessModels {
     .startEvent()
     .businessRuleTask("decisionTask")
       .camundaDecisionRef("testDecision")
-    .intermediateCatchEvent("catch")
-      .message("Message")
     .intermediateThrowEvent("throw")
       .message("Message")
     .endEvent()
