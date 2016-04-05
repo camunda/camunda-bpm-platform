@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.test;
 
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,9 +51,11 @@ import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.junit.Assert;
+import org.junit.runner.Description;
 import org.slf4j.Logger;
 
 
@@ -184,6 +187,69 @@ public abstract class TestHelper {
     return r.append("." + suffix).toString();
   }
 
+  public static boolean annotationRequiredHistoryLevelCheck(ProcessEngine processEngine, Description description) {
+    RequiredHistoryLevel annotation = description.getAnnotation(RequiredHistoryLevel.class);
+
+    if (annotation != null) {
+      return historyLevelCheck(processEngine, annotation);
+
+    } else {
+      return annotationRequiredHistoryLevelCheck(processEngine, description.getTestClass(), description.getMethodName());
+    }
+  }
+
+  private static boolean historyLevelCheck(ProcessEngine processEngine, RequiredHistoryLevel annotation) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+
+    HistoryLevel requiredHistoryLevel = getHistoryLevelForName(processEngineConfiguration.getHistoryLevels(), annotation.value());
+    HistoryLevel currentHistoryLevel = processEngineConfiguration.getHistoryLevel();
+
+    return currentHistoryLevel.getId() >= requiredHistoryLevel.getId();
+  }
+
+  private static HistoryLevel getHistoryLevelForName(List<HistoryLevel> historyLevels, String name) {
+    for (HistoryLevel historyLevel : historyLevels) {
+
+      if (historyLevel.getName().equalsIgnoreCase(name)) {
+        return historyLevel;
+      }
+    }
+    throw new IllegalArgumentException("Unknown history level: " + name);
+  }
+
+  public static boolean annotationRequiredHistoryLevelCheck(ProcessEngine processEngine, Class<?> testClass, String methodName) {
+    RequiredHistoryLevel annotation = getAnnotation(processEngine, testClass, methodName, RequiredHistoryLevel.class);
+
+    if (annotation != null) {
+      return historyLevelCheck(processEngine, annotation);
+    } else {
+      return true;
+    }
+  }
+
+  private static <T extends Annotation> T getAnnotation(ProcessEngine processEngine, Class<?> testClass, String methodName, Class<T> annotationClass) {
+    Method method = null;
+
+    try {
+      method = testClass.getDeclaredMethod(methodName, (Class<?>[]) null);
+
+    } catch (Exception e) {
+      return null;
+    }
+
+    T annotation = method.getAnnotation(annotationClass);
+
+    // if not found on method, try on class level
+    if (annotation == null) {
+
+      Class<?> lookForAnnotationClass = testClass;
+      while (annotation == null && lookForAnnotationClass != Object.class) {
+        annotation = lookForAnnotationClass.getAnnotation(annotationClass);
+        lookForAnnotationClass = lookForAnnotationClass.getSuperclass();
+      }
+    }
+    return annotation;
+  }
 
   /**
    * Ensures that the deployment cache and database is clean after a test. If not the cache
@@ -520,6 +586,8 @@ public abstract class TestHelper {
       }
     }
   }
+
+
 
 
 }
