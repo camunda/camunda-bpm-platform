@@ -56,7 +56,7 @@ public class HandleExternalTaskBpmnErrorCmd extends HandleExternalTaskCmd {
     try {
       ( (ExternalTaskActivityBehavior) activityExecution.getActivity().getActivityBehavior()).propagateBpmnError(bpmnError, activityExecution);      
     } catch (Exception ex) {
-      ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER.errorPropagationException(workerId, ex);
+      throw ProcessEngineLogger.CMD_LOGGER.exceptionBpmnErrorPropagationFailed(errorCode, ex);
     }    
   }
 }

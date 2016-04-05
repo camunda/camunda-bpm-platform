@@ -203,4 +203,7 @@ public class CommandLogger extends ProcessEngineLogger {
         "032", "Can only specify a tenant-id when update the suspension state which is referenced by process definition key."));
   }
 
+  public ProcessEngineException exceptionBpmnErrorPropagationFailed(String errorCode, Throwable cause) {
+    return new ProcessEngineException(exceptionMessage("032", "Propagation of bpmn error {} failed. ", errorCode), cause);
+  }
 }
