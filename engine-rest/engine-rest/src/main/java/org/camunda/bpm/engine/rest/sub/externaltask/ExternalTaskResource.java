@@ -21,6 +21,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.externaltask.CompleteExternalTaskDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskBpmnError;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskFailureDto;
 import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
@@ -49,6 +50,11 @@ public interface ExternalTaskResource {
   @Path("/failure")
   @Consumes(MediaType.APPLICATION_JSON)
   void handleFailure(ExternalTaskFailureDto dto);
+  
+  @POST
+  @Path("/bpmnError")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void handleBpmnError(ExternalTaskBpmnError dto);
 
   @POST
   @Path("/unlock")

@@ -72,6 +72,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   protected static final String SINGLE_EXTERNAL_TASK_URL = EXTERNAL_TASK_URL + "/{id}";
   protected static final String COMPLETE_EXTERNAL_TASK_URL = SINGLE_EXTERNAL_TASK_URL + "/complete";
   protected static final String HANDLE_EXTERNAL_TASK_FAILURE_URL = SINGLE_EXTERNAL_TASK_URL + "/failure";
+  protected static final String HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL = SINGLE_EXTERNAL_TASK_URL + "/bpmnError";
   protected static final String UNLOCK_EXTERNAL_TASK_URL = SINGLE_EXTERNAL_TASK_URL + "/unlock";
   protected static final String RETRIES_EXTERNAL_TASK_URL = SINGLE_EXTERNAL_TASK_URL + "/retries";
 
@@ -462,6 +463,98 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
       .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
   }
 
+  
+  
+  @Test
+  public void testHandleBpmnError() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("workerId", "aWorkerId");
+    parameters.put("errorCode", "anErrorCode");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
+
+    verify(externalTaskService).handleBpmnError("anExternalTaskId", "aWorkerId", "anErrorCode");
+    verifyNoMoreInteractions(externalTaskService);
+  }
+
+  @Test
+  public void testHandleBpmnErrorNonExistingTask() {
+    doThrow(new NotFoundException())
+      .when(externalTaskService)
+      .handleBpmnError(any(String.class), any(String.class), any(String.class));
+
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("workerId", "aWorkerId");
+    parameters.put("errorCode", "errorCode");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("External task with id anExternalTaskId does not exist"))
+    .when()
+      .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
+  }
+
+  @Test
+  public void testHandleBpmnErrorThrowsAuthorizationException() {
+    doThrow(new AuthorizationException("aMessage"))
+      .when(externalTaskService)
+      .handleBpmnError(any(String.class), any(String.class), any(String.class));
+
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("workerId", "aWorkerId");
+    parameters.put("errorCode", "errorCode");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo("aMessage"))
+    .when()
+      .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
+  }
+
+  @Test
+  public void testHandleBpmnErrorThrowsBadUserRequestException() {
+    doThrow(new BadUserRequestException("aMessage"))
+      .when(externalTaskService)
+      .handleBpmnError(any(String.class), any(String.class), any(String.class));
+
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("workerId", "aWorkerId");
+    parameters.put("errorCode", "errorCode");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("aMessage"))
+    .when()
+      .post(HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL);
+  }
+  
+  
   @Test
   public void testSetRetries() {
     Map<String, String> parameters = new HashMap<String, String>();
