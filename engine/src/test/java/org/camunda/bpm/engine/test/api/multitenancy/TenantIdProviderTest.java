@@ -589,12 +589,6 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
     assertThat(historicDecisionInstance.getTenantId(), is(nullValue()));
   }
 
-  protected String deploymentForTenant(String tenantId, String classpathResource, BpmnModelInstance modelInstance) {
-    return deployment(repositoryService.createDeployment()
-        .tenantId(tenantId)
-        .addClasspathResource(classpathResource), modelInstance);
-  }
-
   protected String deploymentWithoutTenant(String classpathResource, BpmnModelInstance modelInstance) {
     return deployment(repositoryService.createDeployment().addClasspathResource(classpathResource), modelInstance);
   }

@@ -302,10 +302,4 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
   }
 
-  protected String deploymentForTenant(String tenantId, String classpathResource, BpmnModelInstance modelInstance) {
-    return deployment(repositoryService.createDeployment()
-        .tenantId(tenantId)
-        .addClasspathResource(classpathResource), modelInstance);
-  }
-
 }

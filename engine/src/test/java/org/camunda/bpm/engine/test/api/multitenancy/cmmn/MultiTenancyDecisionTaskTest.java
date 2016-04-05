@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.test.api.multitenancy;
+package org.camunda.bpm.engine.test.api.multitenancy.cmmn;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -51,9 +51,6 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
     CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
 
-    startDecisionTask(DECISION_TASK_ID, TENANT_ONE);
-    startDecisionTask(DECISION_TASK_ID, TENANT_TWO);
-
     assertThat((String)caseService.getVariable(caseInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
     assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
   }
@@ -64,9 +61,6 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
 
     CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
     CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
-
-    startDecisionTask(DECISION_TASK_ID, TENANT_ONE);
-    startDecisionTask(DECISION_TASK_ID, TENANT_TWO);
 
     assertThat((String)caseService.getVariable(caseInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
     assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
@@ -80,9 +74,6 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
 
     CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
     CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
-
-    startDecisionTask(DECISION_TASK_ID, TENANT_ONE);
-    startDecisionTask(DECISION_TASK_ID, TENANT_TWO);
 
     assertThat((String)caseService.getVariable(caseInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
     assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
@@ -98,9 +89,6 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
     CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
 
-    startDecisionTask(DECISION_TASK_ID, TENANT_ONE);
-    startDecisionTask(DECISION_TASK_ID, TENANT_TWO);
-
     assertThat((String)caseService.getVariable(caseInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
     assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
   }
@@ -109,10 +97,8 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     deploymentForTenant(TENANT_ONE, CMMN_DEPLOYMENT);
     deploymentForTenant(TENANT_TWO, DMN_FILE);
 
-    createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
-
     try {
-      startDecisionTask(DECISION_TASK_ID, TENANT_ONE);
+      createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -124,10 +110,8 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     deploymentForTenant(TENANT_ONE, CMMN_LATEST);
     deploymentForTenant(TENANT_TWO, DMN_FILE);
 
-    createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
-
     try {
-      startDecisionTask(DECISION_TASK_ID, TENANT_ONE);
+      createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -141,10 +125,8 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     deploymentForTenant(TENANT_TWO, DMN_FILE);
     deploymentForTenant(TENANT_TWO, DMN_FILE);
 
-    createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
-
     try {
-      startDecisionTask(DECISION_TASK_ID, TENANT_ONE);
+      createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -192,12 +174,11 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
   }
 
   protected CaseInstance createCaseInstance(String caseDefinitionKey, String tenantId) {
-    return caseService.withCaseDefinitionByKey(caseDefinitionKey).caseDefinitionTenantId(tenantId).create();
-  }
+    CaseInstance caseInstance = caseService.withCaseDefinitionByKey(caseDefinitionKey).caseDefinitionTenantId(tenantId).create();
 
-  protected void startDecisionTask(String activityId, String tenantId) {
-    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(activityId).tenantIdIn(tenantId).singleResult();
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(DECISION_TASK_ID).tenantIdIn(tenantId).singleResult();
     caseService.withCaseExecution(caseExecution.getId()).setVariable("status", "gold").manualStart();
+    return caseInstance;
   }
 
 }

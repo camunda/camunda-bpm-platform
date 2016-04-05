@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.test.api.multitenancy;
+package org.camunda.bpm.engine.test.api.multitenancy.cmmn;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -48,9 +48,6 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
     createCaseInstance("caseTaskCaseDeployment", TENANT_ONE);
     createCaseInstance("caseTaskCaseDeployment", TENANT_TWO);
 
-    startCaseTask(CASE_TASK_ID, TENANT_ONE);
-    startCaseTask(CASE_TASK_ID, TENANT_TWO);
-
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
@@ -63,9 +60,6 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
 
     createCaseInstance("caseTaskCase", TENANT_ONE);
     createCaseInstance("caseTaskCase", TENANT_TWO);
-
-    startCaseTask(CASE_TASK_ID, TENANT_ONE);
-    startCaseTask(CASE_TASK_ID, TENANT_TWO);
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
@@ -81,9 +75,6 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
 
     createCaseInstance("caseTaskCase", TENANT_ONE);
     createCaseInstance("caseTaskCase", TENANT_TWO);
-
-    startCaseTask(CASE_TASK_ID, TENANT_ONE);
-    startCaseTask(CASE_TASK_ID, TENANT_TWO);
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
@@ -102,9 +93,6 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
     createCaseInstance("caseTaskCaseVersion", TENANT_ONE);
     createCaseInstance("caseTaskCaseVersion", TENANT_TWO);
 
-    startCaseTask(CASE_TASK_ID, TENANT_ONE);
-    startCaseTask(CASE_TASK_ID, TENANT_TWO);
-
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
@@ -115,10 +103,8 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
     deploymentForTenant(TENANT_ONE, CMMN_DEPLOYMENT);
     deploymentForTenant(TENANT_TWO, CMMN_CASE);
 
-    createCaseInstance("caseTaskCaseDeployment", TENANT_ONE);
-
     try {
-      startCaseTask(CASE_TASK_ID, TENANT_ONE);
+      createCaseInstance("caseTaskCaseDeployment", TENANT_ONE);
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -131,10 +117,8 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
     deploymentForTenant(TENANT_ONE, CMMN_LATEST);
     deploymentForTenant(TENANT_TWO, CMMN_CASE);
 
-    createCaseInstance("caseTaskCase", TENANT_ONE);
-
     try {
-      startCaseTask(CASE_TASK_ID, TENANT_ONE);
+      createCaseInstance("caseTaskCase", TENANT_ONE);
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -149,10 +133,8 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
     deploymentForTenant(TENANT_TWO, CMMN_CASE);
     deploymentForTenant(TENANT_TWO, CMMN_CASE);
 
-    createCaseInstance("caseTaskCaseVersion", TENANT_ONE);
-
     try {
-      startCaseTask(CASE_TASK_ID, TENANT_ONE);
+      createCaseInstance("caseTaskCaseVersion", TENANT_ONE);
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -188,10 +170,9 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
 
   protected void createCaseInstance(String caseDefinitionKey, String tenantId) {
     caseService.withCaseDefinitionByKey(caseDefinitionKey).caseDefinitionTenantId(tenantId).create();
-  }
 
-  protected void startCaseTask(String activityId, String tenantId) {
-    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(activityId).tenantIdIn(tenantId).singleResult();
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(CASE_TASK_ID).tenantIdIn(tenantId).singleResult();
     caseService.withCaseExecution(caseExecution.getId()).manualStart();
   }
+
 }

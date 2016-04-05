@@ -424,6 +424,12 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     return deployment(deploymentBuilder, resources);
   }
 
+  protected String deploymentForTenant(String tenantId, String classpathResource, BpmnModelInstance modelInstance) {
+    return deployment(repositoryService.createDeployment()
+        .tenantId(tenantId)
+        .addClasspathResource(classpathResource), modelInstance);
+  }
+
   protected String deployment(DeploymentBuilder deploymentBuilder, BpmnModelInstance... bpmnModelInstances) {
     for (int i = 0; i < bpmnModelInstances.length; i++) {
       BpmnModelInstance bpmnModelInstance = bpmnModelInstances[i];

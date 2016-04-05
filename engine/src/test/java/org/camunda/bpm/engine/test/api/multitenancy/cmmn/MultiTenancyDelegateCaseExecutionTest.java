@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.test.api.multitenancy;
+package org.camunda.bpm.engine.test.api.multitenancy.cmmn;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;

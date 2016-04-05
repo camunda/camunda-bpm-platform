@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.test.api.multitenancy;
+package org.camunda.bpm.engine.test.api.multitenancy.cmmn;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -54,9 +54,6 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
     createCaseInstance("testCaseDeployment", TENANT_ONE);
     createCaseInstance("testCaseDeployment", TENANT_TWO);
 
-    startProcessTask(PROCESS_TASK_ID, TENANT_ONE);
-    startProcessTask(PROCESS_TASK_ID, TENANT_TWO);
-
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
@@ -69,9 +66,6 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
 
     createCaseInstance("testCase", TENANT_ONE);
     createCaseInstance("testCase", TENANT_TWO);
-
-    startProcessTask(PROCESS_TASK_ID, TENANT_ONE);
-    startProcessTask(PROCESS_TASK_ID, TENANT_TWO);
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
@@ -87,9 +81,6 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
 
     createCaseInstance("testCase", TENANT_ONE);
     createCaseInstance("testCase", TENANT_TWO);
-
-    startProcessTask(PROCESS_TASK_ID, TENANT_ONE);
-    startProcessTask(PROCESS_TASK_ID, TENANT_TWO);
 
     ProcessDefinition latestProcessTenantTwo = repositoryService.createProcessDefinitionQuery()
         .tenantIdIn(TENANT_TWO).processDefinitionKey("testProcess").latestVersion().singleResult();
@@ -107,9 +98,6 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
     createCaseInstance("testCaseVersion", TENANT_ONE);
     createCaseInstance("testCaseVersion", TENANT_TWO);
 
-    startProcessTask(PROCESS_TASK_ID, TENANT_ONE);
-    startProcessTask(PROCESS_TASK_ID, TENANT_TWO);
-
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
@@ -120,10 +108,8 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
     deploymentForTenant(TENANT_ONE, CMMN_DEPLOYMENT);
     deploymentForTenant(TENANT_TWO, PROCESS);
 
-    createCaseInstance("testCaseDeployment", TENANT_ONE);
-
     try {
-      startProcessTask(PROCESS_TASK_ID, TENANT_ONE);
+      createCaseInstance("testCaseDeployment", TENANT_ONE);
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -136,10 +122,8 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
     deploymentForTenant(TENANT_ONE, CMMN_LATEST);
     deploymentForTenant(TENANT_TWO, PROCESS);
 
-    createCaseInstance("testCase", TENANT_ONE);
-
     try {
-      startProcessTask(PROCESS_TASK_ID, TENANT_ONE);
+      createCaseInstance("testCase", TENANT_ONE);
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -154,10 +138,8 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
     deploymentForTenant(TENANT_TWO, PROCESS);
     deploymentForTenant(TENANT_TWO, PROCESS);
 
-    createCaseInstance("testCaseVersion", TENANT_ONE);
-
     try {
-      startProcessTask(PROCESS_TASK_ID, TENANT_ONE);
+      createCaseInstance("testCaseVersion", TENANT_ONE);
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -193,17 +175,9 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
 
   protected void createCaseInstance(String caseDefinitionKey, String tenantId) {
     caseService.withCaseDefinitionByKey(caseDefinitionKey).caseDefinitionTenantId(tenantId).create();
-  }
 
-  protected void startProcessTask(String activityId, String tenantId) {
-    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(activityId).tenantIdIn(tenantId).singleResult();
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(PROCESS_TASK_ID).tenantIdIn(tenantId).singleResult();
     caseService.withCaseExecution(caseExecution.getId()).manualStart();
-  }
-
-  protected String deploymentForTenant(String tenantId, String classpathResource, BpmnModelInstance modelInstance) {
-    return deployment(repositoryService.createDeployment()
-        .tenantId(tenantId)
-        .addClasspathResource(classpathResource), modelInstance);
   }
 
 }

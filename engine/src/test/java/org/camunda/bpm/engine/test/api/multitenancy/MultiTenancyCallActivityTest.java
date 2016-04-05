@@ -446,10 +446,4 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  protected String deploymentForTenant(String tenantId, String classpathResource, BpmnModelInstance modelInstance) {
-    return deployment(repositoryService.createDeployment()
-        .tenantId(tenantId)
-        .addClasspathResource(classpathResource), modelInstance);
-  }
-
 }
