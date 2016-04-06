@@ -7,7 +7,7 @@
   <process id="oneExternalTaskProcess">
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="externalTask" />
-    <serviceTask id="externalTask" camunda:type="external" camunda:topic="externalTaskTopic" />
+    <serviceTask id="externalTask" camunda:type="external" camunda:topic="externalTaskTopic" camunda:taskPriority="7"/>
     <sequenceFlow id="flow2" sourceRef="externalTask" targetRef="end" />
     <endEvent id="end" />
   </process>

@@ -13,10 +13,10 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.DefaultPriorityProvider;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
@@ -27,21 +27,9 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
  * @author Thorben Lindhauer
  *
  */
-public class DefaultJobPriorityProvider implements JobPriorityProvider {
+public class DefaultJobPriorityProvider extends DefaultPriorityProvider<JobDeclaration<?, ?>> {
 
   private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
-
-  public static long DEFAULT_PRIORITY = 0;
-
-  public static long DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = 0;
-
-  public long getDefaultPriority() {
-    return DEFAULT_PRIORITY;
-  }
-
-  public long getDefaultPriorityOnResolutionFailure() {
-    return DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE;
-  }
 
   @Override
   public long determinePriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
@@ -81,7 +69,7 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
       ParameterValueProvider priorityProvider = (ParameterValueProvider) processDefinition.getProperty(BpmnParse.PROPERTYNAME_JOB_PRIORITY);
 
       if (priorityProvider != null) {
-        return evaluateValueProvider(priorityProvider, execution, jobDeclaration);
+        return evaluateValueProvider(priorityProvider, execution, describeContext(jobDeclaration, execution));
       }
     }
 
@@ -103,66 +91,21 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
     if (jobDeclaration != null) {
       ParameterValueProvider priorityProvider = jobDeclaration.getJobPriorityProvider();
       if (priorityProvider != null) {
-        return evaluateValueProvider(priorityProvider, execution, jobDeclaration);
+        return evaluateValueProvider(priorityProvider, execution, describeContext(jobDeclaration, execution));
       }
     }
 
     return null;
   }
 
-  protected Long evaluateValueProvider(ParameterValueProvider valueProvider, ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
-    Object value;
-    try {
-      value = valueProvider.getValue(execution);
-
-    } catch (ProcessEngineException e) {
-
-      if (Context.getProcessEngineConfiguration().isEnableGracefulDegradationOnContextSwitchFailure()
-          && isSymptomOfContextSwitchFailure(e, execution)) {
-
-        value = getDefaultPriorityOnResolutionFailure();
-
-        LOG.couldNotDeterminePriority(execution, value, e);
-
-      }
-      else {
-        throw e;
-      }
-    }
-
-    if (!(value instanceof Number)) {
-      throw new ProcessEngineException(describeContext(jobDeclaration, execution)
-          + ": Priority value is not an Integer");
-    }
-    else {
-      Number numberValue = (Number) value;
-      if (isValidLongValue(numberValue)) {
-        return numberValue.longValue();
-      }
-      else {
-        throw new ProcessEngineException(describeContext(jobDeclaration, execution)
-            + ": Priority value must be either Short, Integer, or Long");
-      }
-    }
+  @Override
+  protected void logNotDeterminingPriority(ExecutionEntity execution, Object value, ProcessEngineException e) {
+    LOG.couldNotDeterminePriority(execution, value, e);
   }
-
-  protected boolean isSymptomOfContextSwitchFailure(Throwable t, ExecutionEntity contextExecution) {
-    // a context switch failure can occur, if the current engine has no PA registration for the deployment
-    // subclasses may assert the actual throwable to narrow down the diagnose
-    return ProcessApplicationContextUtil.getTargetProcessApplication(contextExecution) == null;
-  }
-
+  
   protected String describeContext(JobDeclaration<?, ?> jobDeclaration, ExecutionEntity executionEntity) {
     return "Job " + jobDeclaration.getActivityId()
             + "/" + jobDeclaration.getJobHandlerType() + " instantiated "
             + "in context of " + executionEntity;
   }
-
-  protected boolean isValidLongValue(Number value) {
-    return
-      value instanceof Short ||
-      value instanceof Integer ||
-      value instanceof Long;
-  }
-
 }

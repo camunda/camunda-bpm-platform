@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import org.camunda.bpm.engine.delegate.BpmnError;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
+import org.camunda.bpm.engine.impl.externaltask.DefaultExternalTaskPriorityProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -27,19 +29,29 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior {
 
   protected String topicName;
+  protected ParameterValueProvider priorityValueProvider;
 
-  public ExternalTaskActivityBehavior(String topicName) {
+  public ExternalTaskActivityBehavior(String topicName, ParameterValueProvider paramValueProvider) {
     this.topicName = topicName;
+    this.priorityValueProvider = paramValueProvider;    
   }
 
+  @Override
   public void execute(ActivityExecution execution) throws Exception {
-
-    ExternalTaskEntity.createAndInsert((ExecutionEntity) execution, topicName);
+    ExecutionEntity executionEntity = (ExecutionEntity) execution;
+    DefaultExternalTaskPriorityProvider provider = new DefaultExternalTaskPriorityProvider();      
+    long priority = provider.determinePriority(executionEntity, this);
+    ExternalTaskEntity.createAndInsert(executionEntity, topicName, priority);
   }
 
+  @Override
   public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
     leave(execution);
   }
+
+  public ParameterValueProvider getPriorityValueProvider() {
+    return priorityValueProvider;
+  }  
   
   /**
    * Overrides the propagateBpmnError method to made it public.

@@ -255,6 +255,7 @@ create table ACT_RU_EXT_TASK (
   ACT_ID_ nvarchar(255),
   ACT_INST_ID_ nvarchar(64),
   TENANT_ID_ nvarchar(64),
+  PRIORITY_ numeric(19,0) NOT NULL DEFAULT 0,
   primary key (ID_)
 );
 

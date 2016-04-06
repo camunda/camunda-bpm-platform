@@ -145,6 +145,7 @@ import org.camunda.bpm.engine.impl.util.xml.Namespace;
 import org.camunda.bpm.engine.impl.util.xml.Parse;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 /**
  * Specific parsing of one BPMN 2.0 XML file, created by the {@link BpmnParser}.
@@ -187,6 +188,7 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_THROWS_COMPENSATION = "throwsCompensation";
   public static final String PROPERTYNAME_CONSUMES_COMPENSATION = "consumesCompensation";
   public static final String PROPERTYNAME_JOB_PRIORITY = "jobPriority";
+  public static final String PROPERTYNAME_TASK_PRIORITY = "taskPriority";
 
   /**
    * @deprecated use {@link BpmnProperties#TYPE}
@@ -568,7 +570,7 @@ public class BpmnParse extends Parse {
     processDefinition.setProperty(PROPERTYNAME_DOCUMENTATION, parseDocumentation(processElement));
     processDefinition.setTaskDefinitions(new HashMap<String, TaskDefinition>());
     processDefinition.setDeploymentId(deployment.getId());
-    processDefinition.setProperty(PROPERTYNAME_JOB_PRIORITY, parseJobPriority(processElement));
+    processDefinition.setProperty(PROPERTYNAME_JOB_PRIORITY, parsePriority(processElement, PROPERTYNAME_JOB_PRIORITY));
     processDefinition.setSemanticVersion(
       processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "semanticVersion")
     );
@@ -1709,7 +1711,7 @@ public class BpmnParse extends Parse {
     activity.getProperties().set(BpmnProperties.TYPE, activityElement.getTagName());
     activity.setProperty("line", activityElement.getLine());
 
-    activity.setProperty(PROPERTYNAME_JOB_PRIORITY, parseJobPriority(activityElement));
+    activity.setProperty(PROPERTYNAME_JOB_PRIORITY, parsePriority(activityElement, PROPERTYNAME_JOB_PRIORITY));
 
     if (isCompensationHandler(activityElement)) {
       activity.setProperty(PROPERTYNAME_IS_FOR_COMPENSATION, true);
@@ -2100,22 +2102,22 @@ public class BpmnParse extends Parse {
       addJobDeclarationToProcessDefinition(messageJobDeclaration, activity.getProcessDefinition());
     }
   }
+    
+  protected ParameterValueProvider parsePriority(Element element, String priorityAttribute) {
+    String priorityAttributeValue = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, priorityAttribute);
 
-  protected ParameterValueProvider parseJobPriority(Element element) {
-    String priorityAttribute = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "jobPriority");
-
-    if (priorityAttribute == null) {
+    if (priorityAttributeValue == null) {
       return null;
 
     } else {
-      Object value = priorityAttribute;
-      if (!StringUtil.isExpression(priorityAttribute)) {
+      Object value = priorityAttributeValue;
+      if (!StringUtil.isExpression(priorityAttributeValue)) {
         // constant values must be valid integers
         try {
-          value = Integer.parseInt(priorityAttribute);
+          value = Integer.parseInt(priorityAttributeValue);
 
         } catch (NumberFormatException e) {
-          addError("Value '" + priorityAttribute + "' for attribute 'jobPriority' is not a valid number", element);
+          addError("Value '" + priorityAttributeValue + "' for attribute 'jobPriority' is not a valid number", element);
         }
       }
 
@@ -2197,12 +2199,12 @@ public class BpmnParse extends Parse {
     activity.setScope(true);
 
     String topicName = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "topic");
-
     if (topicName == null) {
       addError("External tasks must specify a 'topic' attribute in the camunda namespace", serviceTaskElement);
     }
-
-    activity.setActivityBehavior(new ExternalTaskActivityBehavior(topicName));
+    
+    ParameterValueProvider provider = parsePriority(serviceTaskElement, PROPERTYNAME_TASK_PRIORITY);    
+    activity.setActivityBehavior(new ExternalTaskActivityBehavior(topicName, provider));
   }
 
   protected void validateFieldDeclarationsForEmail(Element serviceTaskElement, List<FieldDeclaration> fieldDeclarations) {

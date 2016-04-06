@@ -54,6 +54,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected String activityId;
   protected String activityInstanceId;
   protected String tenantId;
+  protected long priority;
 
   protected ExecutionEntity execution;
 
@@ -156,6 +157,14 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   }
   public boolean areRetriesLeft() {
     return retries == null || retries > 0;
+  }
+
+  public long getPriority() {
+    return priority;
+  }
+
+  public void setPriority(long priority) {
+    this.priority = priority;
   }
 
   public Object getPersistentState() {
@@ -282,7 +291,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
       throw LOG.suspendedEntityException(EntityTypes.EXTERNAL_TASK, id);
     }
   }
-
+  
   @Override
   public String toString() {
     return "ExternalTaskEntity ["
@@ -291,6 +300,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
         + ", topicName=" + topicName
         + ", workerId=" + workerId
         + ", lockExpirationTime=" + lockExpirationTime
+        + ", priority=" + priority
         + ", executionId=" + executionId + "]";
   }
 
@@ -299,7 +309,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     lockExpirationTime = null;
   }
 
-  public static ExternalTaskEntity createAndInsert(ExecutionEntity execution, String topic) {
+  public static ExternalTaskEntity createAndInsert(ExecutionEntity execution, String topic, long priority) {
     ExternalTaskEntity externalTask = new ExternalTaskEntity();
 
     externalTask.setTopicName(topic);
@@ -309,6 +319,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     externalTask.setActivityId(execution.getActivityId());
     externalTask.setActivityInstanceId(execution.getActivityInstanceId());
     externalTask.setTenantId(execution.getTenantId());
+    externalTask.setPriority(priority);
 
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
     externalTask.setProcessDefinitionKey(processDefinition.getKey());

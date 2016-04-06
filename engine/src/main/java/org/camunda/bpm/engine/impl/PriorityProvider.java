@@ -1,4 +1,7 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
+/*
+ * Copyright 2016 camunda services GmbH.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,22 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.jobexecutor;
+package org.camunda.bpm.engine.impl;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
-
 /**
- * @author Thorben Lindhauer
  *
+ * @author Christopher Zell <christopher.zell@camunda.org>
+ * @param <T> the type of the extra param to determine the priority
  */
-public interface JobPriorityProvider {
+public interface PriorityProvider<T> {
+  
 
   /**
    *
    * @param execution may be null when the job is not created in the context of a
    *   running process instance (e.g. a timer start event)
-   * @param jobDeclaration
+   * @param param
+   * @return the determined priority
    */
-  long determinePriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration);
+  long determinePriority(ExecutionEntity execution, T param);
 }
