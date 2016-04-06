@@ -33,5 +33,6 @@ public class ActivityTypes {
   public static final String START_EVENT_ERROR = "errorStartEvent";
 
   public static final String INTERMEDIATE_EVENT_MESSAGE = "intermediateMessageCatch";
+  public static final String INTERMEDIATE_EVENT_TIMER = "intermediateTimer";
 
 }

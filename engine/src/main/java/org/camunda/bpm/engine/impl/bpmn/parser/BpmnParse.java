@@ -3070,7 +3070,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseIntermediateTimerEventDefinition(Element timerEventDefinition, ActivityImpl timerActivity) {
-    timerActivity.getProperties().set(BpmnProperties.TYPE, "intermediateTimer");
+    timerActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_TIMER);
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerCatchIntermediateEventJobHandler.TYPE);
 
     Element timeCycleElement = timerEventDefinition.element("timeCycle");

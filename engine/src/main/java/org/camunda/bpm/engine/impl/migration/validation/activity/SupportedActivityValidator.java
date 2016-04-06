@@ -54,6 +54,7 @@ public class SupportedActivityValidator implements MigrationActivityValidator {
     SUPPORTED_ACTIVITY_BEHAVIORS.add(CaseCallActivityBehavior.class);
 
     SUPPORTED_ACTIVITY_TYPES.add(ActivityTypes.INTERMEDIATE_EVENT_MESSAGE);
+    SUPPORTED_ACTIVITY_TYPES.add(ActivityTypes.INTERMEDIATE_EVENT_TIMER);
   }
 
   public boolean valid(ActivityImpl activity) {

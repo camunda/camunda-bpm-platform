@@ -12,15 +12,17 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 
-import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.Assert;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.TimerCatchModels;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -38,17 +40,10 @@ public class MigrationTimerCatchEventTest {
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
 
   @Test
-  public void testCannotMigrateActivityInstance() {
+  public void testMigrateJob() {
     // given
-    BpmnModelInstance model = ProcessModels.newModel()
-      .startEvent()
-      .intermediateCatchEvent("timerCatch")
-        .timerWithDuration("PT5S")
-      .endEvent()
-      .done();
-
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(model);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(model);
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -56,16 +51,130 @@ public class MigrationTimerCatchEventTest {
       .build();
 
     // when
-    try {
-      testHelper.createProcessInstanceAndMigrate(migrationPlan);
-      Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
-      // then
-      assertThat(e.getValidationReport())
-        .hasActivityInstanceFailures("timerCatch",
-          "The type of the source activity is not supported for activity instance migration"
-        );
-    }
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    testHelper.assertJobMigrated(
+        testHelper.snapshotBeforeMigration.getJobs().get(0),
+        "timerCatch");
+
+    testHelper.assertExecutionTreeAfterMigration()
+      .hasProcessDefinitionId(targetProcessDefinition.getId())
+      .matches(
+        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
+          .child("timerCatch").scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("timerCatch"))
+        .done());
+
+    testHelper.assertActivityTreeAfterMigration().hasStructure(
+      describeActivityInstanceTree(targetProcessDefinition.getId())
+        .activity("timerCatch", testHelper.getSingleActivityInstanceBeforeMigration("timerCatch").getId())
+      .done());
+
+    // and it is possible to trigger the event
+    Job jobAfterMigration = testHelper.snapshotAfterMigration.getJobs().get(0);
+    rule.getManagementService().executeJob(jobAfterMigration.getId());
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateJobChangeActivityId() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(TimerCatchModels.ONE_TIMER_CATCH_PROCESS)
+        .changeElementId("timerCatch", "newTimerCatch"));
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("timerCatch", "newTimerCatch")
+      .build();
+
+    // when
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    testHelper.assertJobMigrated(
+        testHelper.snapshotBeforeMigration.getJobs().get(0),
+        "newTimerCatch");
+
+    // and it is possible to trigger the event
+    Job jobAfterMigration = testHelper.snapshotAfterMigration.getJobs().get(0);
+    rule.getManagementService().executeJob(jobAfterMigration.getId());
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateJobChangeTimerConfiguration() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.newModel()
+      .startEvent()
+      .intermediateCatchEvent("timerCatch")
+        .timerWithDuration("PT50M")
+      .userTask("userTask")
+      .endEvent()
+      .done());
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("timerCatch", "timerCatch")
+      .build();
+
+    // when
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    testHelper.assertJobMigrated(       // this also asserts that the due has not changed
+        testHelper.snapshotBeforeMigration.getJobs().get(0),
+        "timerCatch");
+
+    // and it is possible to trigger the event
+    Job jobAfterMigration = testHelper.snapshotAfterMigration.getJobs().get(0);
+    rule.getManagementService().executeJob(jobAfterMigration.getId());
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateJobAddParentScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(TimerCatchModels.SUBPROCESS_TIMER_CATCH_PROCESS);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("timerCatch", "timerCatch")
+      .build();
+
+    // when
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    testHelper.assertJobMigrated(
+        testHelper.snapshotBeforeMigration.getJobs().get(0),
+        "timerCatch");
+
+    testHelper.assertExecutionTreeAfterMigration()
+      .hasProcessDefinitionId(targetProcessDefinition.getId())
+      .matches(
+        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
+          .child(null).scope()
+            .child("timerCatch").scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("timerCatch"))
+        .done());
+
+    testHelper.assertActivityTreeAfterMigration().hasStructure(
+      describeActivityInstanceTree(targetProcessDefinition.getId())
+        .beginScope("subProcess")
+          .activity("timerCatch", testHelper.getSingleActivityInstanceBeforeMigration("timerCatch").getId())
+      .done());
+
+    // and it is possible to trigger the event
+    Job jobAfterMigration = testHelper.snapshotAfterMigration.getJobs().get(0);
+    rule.getManagementService().executeJob(jobAfterMigration.getId());
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
   }
 }
