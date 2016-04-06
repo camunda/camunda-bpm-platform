@@ -106,6 +106,7 @@ public class StatisticsRestTest extends AbstractRestServiceTest {
       .body("[0].definition.resource", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME))
       .body("[0].definition.diagram", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME))
       .body("[0].definition.tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+      .body("[0].definition.semanticVersion", equalTo(MockProvider.EXAMPLE_SEMANTIC_VERSION))
     .when().get(PROCESS_DEFINITION_STATISTICS_URL);
   }
 

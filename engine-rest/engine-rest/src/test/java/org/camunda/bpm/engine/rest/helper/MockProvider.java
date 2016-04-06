@@ -974,6 +974,7 @@ public abstract class MockProvider {
     when(statistics.getName()).thenReturn(EXAMPLE_PROCESS_DEFINITION_NAME);
     when(statistics.getKey()).thenReturn(EXAMPLE_PROCESS_DEFINITION_KEY);
     when(statistics.getTenantId()).thenReturn(EXAMPLE_TENANT_ID);
+    when(statistics.getSemanticVersion()).thenReturn(EXAMPLE_SEMANTIC_VERSION);
     when(statistics.getCategory()).thenReturn(EXAMPLE_PROCESS_DEFINITION_CATEGORY);
     when(statistics.getDeploymentId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
     when(statistics.getDiagramResourceName()).thenReturn(EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME);
@@ -996,6 +997,7 @@ public abstract class MockProvider {
     when(anotherStatistics.getName()).thenReturn(EXAMPLE_PROCESS_DEFINITION_NAME);
     when(anotherStatistics.getKey()).thenReturn(EXAMPLE_PROCESS_DEFINITION_KEY);
     when(anotherStatistics.getTenantId()).thenReturn(ANOTHER_EXAMPLE_TENANT_ID);
+    when(anotherStatistics.getSemanticVersion()).thenReturn(ANOTHER_EXAMPLE_SEMANTIC_VERSION);
 
     IncidentStatistics anotherIncidentStaticits = mock(IncidentStatistics.class);
     when(anotherIncidentStaticits.getIncidentType()).thenReturn(ANOTHER_EXAMPLE_INCIDENT_TYPE);
