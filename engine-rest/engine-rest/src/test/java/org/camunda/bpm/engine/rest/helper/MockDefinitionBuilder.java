@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.rest.helper;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 public class MockDefinitionBuilder {
@@ -96,7 +95,6 @@ public class MockDefinitionBuilder {
 
   public MockDefinitionBuilder semanticVersion(String semanticVersion) {
     this.semanticVersion = semanticVersion;
-
     return this;
   }
 

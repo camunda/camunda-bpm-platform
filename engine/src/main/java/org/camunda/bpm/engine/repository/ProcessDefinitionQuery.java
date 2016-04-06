@@ -143,6 +143,9 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
    */
   ProcessDefinitionQuery semanticVersion(String semanticVersion);
 
+  /**
+   * Only selects process definitions with a semantic version like the given
+   */
   ProcessDefinitionQuery semanticVersionLike(String semanticVersionLike);
 
   // Support for event subscriptions /////////////////////////////////////

@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Documentation;
-import org.camunda.bpm.model.xml.impl.type.attribute.StringAttribute;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 
@@ -282,7 +281,9 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return orderBy(ProcessDefinitionQueryProperty.TENANT_ID);
   }
 
-  public ProcessDefinitionQuery orderBySemanticVersion() { return orderBy(ProcessDefinitionQueryProperty.SEMANTIC_VERSION);}
+  public ProcessDefinitionQuery orderBySemanticVersion() {
+    return orderBy(ProcessDefinitionQueryProperty.SEMANTIC_VERSION);
+  }
 
   //results ////////////////////////////////////////////
 
