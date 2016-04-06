@@ -144,7 +144,11 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery semanticVersion(String semanticVersion);
 
   /**
-   * Only selects process definitions with a semantic version like the given
+   * Only selects process definitions with a semantic version like the given.
+   *
+   * <strong>Note:</strong> sorting by semanticVersion is a string based sort.
+   * There is no interpretation of the version which can lead to a sorting like:
+   * v0.1.0 v0.10.0 v0.2.0.
    */
   ProcessDefinitionQuery semanticVersionLike(String semanticVersionLike);
 
@@ -200,6 +204,10 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
 
   /**
    * Order by semantic version (needs to be followed by {@link #asc()} or {@link #desc()}).
+   *
+   * <strong>Note:</strong> sorting by semanticVersion is a string based sort.
+   * There is no interpretation of the version which can lead to a sorting like:
+   * v0.1.0 v0.10.0 v0.2.0.
    */
   ProcessDefinitionQuery orderBySemanticVersion();
 
