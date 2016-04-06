@@ -188,7 +188,7 @@ create table ACT_HI_BATCH (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 create table ACT_HI_IDENTITYLINK (
-    ID_ varchar(64),
+    ID_ varchar(64) not null,
     TIMESTAMP_ timestamp not null,
     TYPE_ varchar(255),
     USER_ID_ varchar(255),

@@ -314,7 +314,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 2);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcessWithMultipleCandidateUser.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/OneTaskProcessWithMultipleCandidateUser.bpmn20.xml" })
   public void testHistoricIdentityLinkQueryPaging() {
     startProcessInstance(PROCESS_DEFINITION_KEY_MULTIPLE_CANDIDATE_USER);
 
@@ -326,7 +326,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
     assertEquals(3, query.listPage(1, 4).size());
   }
   
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcessWithMultipleCandidateUser.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/OneTaskProcessWithMultipleCandidateUser.bpmn20.xml" })
   public void testHistoricIdentityLinkQuerySorting() {
     
     // Pre test - Historical identity link is added as part of deployment

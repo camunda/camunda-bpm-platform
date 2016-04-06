@@ -123,7 +123,7 @@ create table ACT_HI_DETAIL (
 );
 
 create table ACT_HI_IDENTITYLINK (
-    ID_ nvarchar(64),
+    ID_ nvarchar(64) not null,
     TIMESTAMP_ datetime2 not null,
     TYPE_ nvarchar(255),
     USER_ID_ nvarchar(255),

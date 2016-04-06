@@ -20,7 +20,7 @@ public class HistoricIdentityLinkTestByXml extends PluggableProcessEngineTestCas
   private static final String XML_GROUP = "demoGroups";
   private static final String XML_ASSIGNEE = "assignee";
   
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcessWithCandidateUser.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/OneTaskProcessWithCandidateUser.bpmn20.xml" })
   public void testShouldAddTaskCandidateforAddIdentityLinkUsingXml() {
 
     // Pre test
@@ -37,7 +37,7 @@ public class HistoricIdentityLinkTestByXml extends PluggableProcessEngineTestCas
     assertEquals(query.userId(XML_USER).count(), 1);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcessWithTaskAssignee.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/OneTaskProcessWithTaskAssignee.bpmn20.xml" })
   public void testShouldAddTaskAssigneeforAddIdentityLinkUsingXml() {
 
     // Pre test
@@ -56,7 +56,7 @@ public class HistoricIdentityLinkTestByXml extends PluggableProcessEngineTestCas
     
   }
   
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcessWithCandidateGroups.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/OneTaskProcessWithCandidateGroups.bpmn20.xml" })
   public void testShouldAddTaskCandidateGroupforAddIdentityLinkUsingXml() {
 
     // Pre test
@@ -73,7 +73,7 @@ public class HistoricIdentityLinkTestByXml extends PluggableProcessEngineTestCas
     assertEquals(query.groupId(XML_GROUP).count(), 1);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcessWithCandidateStarterUsers.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/OneTaskProcessWithCandidateStarterUsers.bpmn20.xml" })
   public void testShouldAddProcessCandidateStarterUserforAddIdentityLinkUsingXml() {
 
     // Pre test - Historical identity link is added as part of deployment
@@ -95,7 +95,7 @@ public class HistoricIdentityLinkTestByXml extends PluggableProcessEngineTestCas
     HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
     assertEquals(query.userId(XML_USER).count(), 1);
   }
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcessWithCandidateStarterGroups.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/OneTaskProcessWithCandidateStarterGroups.bpmn20.xml" })
   public void testShouldAddProcessCandidateStarterGroupforAddIdentityLinkUsingXml() {
 
     // Pre test - Historical identity link is added as part of deployment
