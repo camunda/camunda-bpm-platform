@@ -50,7 +50,24 @@ describe('Admin Authorizations Spec', function() {
     authorizationsPage.abortNewAuthorizationButton().click();
   }
 
-  describe('application authorizations', function() {
+  describe('Application authorizations with normal user', function() {
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
+        // given
+        authorizationsPage.navigateToWebapp('Admin');
+      })
+    });
+
+    it('should not show authorization navbar item for normal user', function() {
+      // when
+      authorizationsPage.authentication.userLogin('ringo', 'cam123');
+      
+      // then
+      expect(authorizationsPage.checkNavbarItem('Authorizations').isPresent()).to.eventually.be.false
+    });
+  });
+
+  describe('Application authorizations', function() {
 
     before(function() {
       return testHelper(setupFile.setup1, function() {

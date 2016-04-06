@@ -8,6 +8,23 @@ var setupFile = require('./system-setup');
 
 testHelper.expectStringEqual = require('../../../common/tests/string-equal');
 
+describe('Admin system Spec with normal user', function() {
+  before(function() {
+    return testHelper(setupFile.setup1, function() {
+      // given
+      systemPage.navigateToWebapp('Admin');
+    })
+  });
+
+  it('should not show authorization navbar item for normal user', function() {
+    // when
+    systemPage.authentication.userLogin('ringo', 'cam123');
+
+    // then
+    expect(systemPage.checkNavbarItem('System').isPresent()).to.eventually.be.false
+  });
+});
+
 describe('Admin system Spec', function() {
 
   before(function() {

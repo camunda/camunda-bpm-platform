@@ -10,6 +10,14 @@ module.exports = {
   setup1:
 
     combine(
+      operation('user', 'create', [{
+        id:         'ringo',
+        password:   'cam123',
+        firstName:  'Ringo',
+        lastName:   'Starr',
+        email:      'ringo.starr@the-beatles.com'
+      }]),
+
       operation('task', 'create', [{
         id: '1',
         name: 'Task 1',
