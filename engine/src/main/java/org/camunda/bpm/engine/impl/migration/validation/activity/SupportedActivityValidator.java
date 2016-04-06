@@ -19,13 +19,12 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CaseCallActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelMultiInstanceActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
-import org.camunda.bpm.engine.impl.bpmn.parser.ActivityTypes;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
@@ -40,8 +39,6 @@ public class SupportedActivityValidator implements MigrationActivityValidator {
   public static SupportedActivityValidator INSTANCE = new SupportedActivityValidator();
 
   public static List<Class<? extends ActivityBehavior>> SUPPORTED_ACTIVITY_BEHAVIORS = new ArrayList<Class<? extends ActivityBehavior>>();
-  public static List<String> SUPPORTED_ACTIVITY_TYPES = new ArrayList<String>();
-
 
   static {
     SUPPORTED_ACTIVITY_BEHAVIORS.add(SubProcessActivityBehavior.class);
@@ -52,15 +49,11 @@ public class SupportedActivityValidator implements MigrationActivityValidator {
     SUPPORTED_ACTIVITY_BEHAVIORS.add(ReceiveTaskActivityBehavior.class);
     SUPPORTED_ACTIVITY_BEHAVIORS.add(CallActivityBehavior.class);
     SUPPORTED_ACTIVITY_BEHAVIORS.add(CaseCallActivityBehavior.class);
-
-    SUPPORTED_ACTIVITY_TYPES.add(ActivityTypes.INTERMEDIATE_EVENT_MESSAGE);
-    SUPPORTED_ACTIVITY_TYPES.add(ActivityTypes.INTERMEDIATE_EVENT_TIMER);
+    SUPPORTED_ACTIVITY_BEHAVIORS.add(IntermediateCatchEventActivityBehavior.class);
   }
 
   public boolean valid(ActivityImpl activity) {
-    return activity != null &&
-        (SUPPORTED_ACTIVITY_BEHAVIORS.contains(activity.getActivityBehavior().getClass())
-            || SUPPORTED_ACTIVITY_TYPES.contains(activity.getProperties().get(BpmnProperties.TYPE)));
+    return activity != null && SUPPORTED_ACTIVITY_BEHAVIORS.contains(activity.getActivityBehavior().getClass());
   }
 
 }
