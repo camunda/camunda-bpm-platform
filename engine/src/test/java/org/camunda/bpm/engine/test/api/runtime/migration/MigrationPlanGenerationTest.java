@@ -19,6 +19,7 @@ import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.migrate;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.CallActivityModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MessageReceiveModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
@@ -517,6 +518,38 @@ public class MigrationPlanGenerationTest {
     assertGeneratedMigrationPlan(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS, MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS)
       .hasInstructions(
         migrate("messageCatch").to("messageCatch"),
+        migrate("userTask").to("userTask"));
+  }
+
+  @Test
+  public void testMapCallActivitiesToBpmnTest() {
+    assertGeneratedMigrationPlan(CallActivityModels.oneBpmnCallActivityProcess("foo"), CallActivityModels.oneBpmnCallActivityProcess("foo"))
+      .hasInstructions(
+        migrate("callActivity").to("callActivity"),
+        migrate("userTask").to("userTask"));
+  }
+
+  @Test
+  public void testMapCallActivitiesToCmmnTest() {
+    assertGeneratedMigrationPlan(CallActivityModels.oneCmmnCallActivityProcess("foo"), CallActivityModels.oneCmmnCallActivityProcess("foo"))
+      .hasInstructions(
+        migrate("callActivity").to("callActivity"),
+        migrate("userTask").to("userTask"));
+  }
+
+  @Test
+  public void testMapCallActivitiesFromBpmnToCmmnTest() {
+    assertGeneratedMigrationPlan(CallActivityModels.oneBpmnCallActivityProcess("foo"), CallActivityModels.oneCmmnCallActivityProcess("foo"))
+      .hasInstructions(
+        migrate("callActivity").to("callActivity"),
+        migrate("userTask").to("userTask"));
+  }
+
+  @Test
+  public void testMapCallActivitiesFromCmmnToBpmnTest() {
+    assertGeneratedMigrationPlan(CallActivityModels.oneCmmnCallActivityProcess("foo"), CallActivityModels.oneBpmnCallActivityProcess("foo"))
+      .hasInstructions(
+        migrate("callActivity").to("callActivity"),
         migrate("userTask").to("userTask"));
   }
 

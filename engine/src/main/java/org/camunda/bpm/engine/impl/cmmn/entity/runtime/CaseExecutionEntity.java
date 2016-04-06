@@ -426,10 +426,16 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   }
 
   public void setSuperExecution(PvmExecutionImpl superExecution) {
+    if (this.superExecutionId != null) {
+      ensureSuperExecutionInstanceInitialized();
+      this.superExecution.setSubCaseInstance(null);
+    }
+
     this.superExecution = (ExecutionEntity) superExecution;
 
     if (superExecution != null) {
       this.superExecutionId = superExecution.getId();
+      this.superExecution.setSubCaseInstance(this);
     } else {
       this.superExecutionId = null;
     }
@@ -769,6 +775,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     persistentState.put("parentId", parentId);
     persistentState.put("currentState", currentState);
     persistentState.put("previousState", previousState);
+    persistentState.put("superExecutionId", superExecutionId);
     return persistentState;
   }
 

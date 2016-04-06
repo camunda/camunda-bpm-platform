@@ -505,7 +505,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     removeEventSubscriptionsExceptCompensation();
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   protected void clearExecution() {
     // delete all the variable instances
     for (VariableInstanceEntity variableInstance : variableStore.getVariables()) {
@@ -869,13 +868,16 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @Override
   public void setSuperExecution(PvmExecutionImpl superExecution) {
-    this.superExecution = (ExecutionEntity) superExecution;
-    if (superExecution != null) {
-      superExecution.setSubProcessInstance(null);
+    if (this.superExecutionId != null) {
+      ensureSuperExecutionInitialized();
+      this.superExecution.setSubProcessInstance(null);
     }
+
+    this.superExecution = (ExecutionEntity) superExecution;
 
     if (superExecution != null) {
       this.superExecutionId = superExecution.getId();
+      this.superExecution.setSubProcessInstance(this);
     } else {
       this.superExecutionId = null;
     }

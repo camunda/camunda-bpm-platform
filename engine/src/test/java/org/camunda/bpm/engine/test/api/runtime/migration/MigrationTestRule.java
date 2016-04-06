@@ -24,8 +24,10 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.management.JobDefinition;
@@ -33,6 +35,7 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -53,6 +56,7 @@ import org.junit.runner.Description;
 public class MigrationTestRule extends TestWatcher {
 
   public static final String DEFAULT_BPMN_RESOURCE_NAME = "process.bpmn20.xml";
+  public static final String DEFAULT_CMMN_RESOURCE_NAME = "case.cmmn";
 
   protected ProcessEngineRule processEngineRule;
   protected ProcessEngine processEngine;
@@ -81,10 +85,23 @@ public class MigrationTestRule extends TestWatcher {
       .processInstanceId(processInstanceId)
       .singleResult();
 
-    if (processInstance!=null) {
+    if (processInstance != null) {
       Assert.fail("Process instance with id " + processInstanceId + " is not finished");
     }
   }
+
+  public void assertCaseEnded(String caseInstanceId) {
+    CaseInstance caseInstance = processEngine
+      .getCaseService()
+      .createCaseInstanceQuery()
+      .caseInstanceId(caseInstanceId)
+      .singleResult();
+
+    if (caseInstance != null) {
+      Assert.fail("Case instance with id " + caseInstanceId + " is not finished");
+    }
+  }
+
 
   public ProcessDefinition findProcessDefinition(String key, int version) {
     return processEngine.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey(key)
@@ -105,6 +122,16 @@ public class MigrationTestRule extends TestWatcher {
       .deploymentId(deployment.getId())
       .singleResult();
   }
+
+  public void deploy(String classpathResource) {
+    Deployment deployment = processEngine.getRepositoryService()
+      .createDeployment()
+      .addClasspathResource(classpathResource)
+      .deploy();
+
+    processEngineRule.manageDeployment(deployment);
+  }
+
 
   /**
    * Deploys a bpmn model instance and returns its corresponding process definition object
@@ -127,6 +154,10 @@ public class MigrationTestRule extends TestWatcher {
 
   public String getSingleExecutionIdForActivityBeforeMigration(String activityId) {
     return getSingleExecutionIdForActivity(snapshotBeforeMigration.getActivityTree(), activityId);
+  }
+
+  public String getSingleExecutionIdForActivityAfterMigration(String activityId) {
+    return getSingleExecutionIdForActivity(snapshotAfterMigration.getActivityTree(), activityId);
   }
 
   public ActivityInstance getSingleActivityInstance(ActivityInstance tree, String activityId) {
@@ -368,5 +399,22 @@ public class MigrationTestRule extends TestWatcher {
     Assert.assertEquals(variableBefore.getValue(), variableAfter.getValue());
   }
 
+  public void assertSuperExecutionOfCaseInstance(String caseInstanceId, String expectedSuperExecutionId) {
+    CaseExecutionEntity calledInstance = (CaseExecutionEntity) processEngine.getCaseService()
+        .createCaseInstanceQuery()
+        .caseInstanceId(caseInstanceId)
+        .singleResult();
+
+    Assert.assertEquals(expectedSuperExecutionId, calledInstance.getSuperExecutionId());
+  }
+
+  public void assertSuperExecutionOfProcessInstance(String processInstance, String expectedSuperExecutionId) {
+    ExecutionEntity calledInstance = (ExecutionEntity) processEngine.getRuntimeService()
+        .createProcessInstanceQuery()
+        .processInstanceId(processInstance)
+        .singleResult();
+
+    Assert.assertEquals(expectedSuperExecutionId, calledInstance.getSuperExecutionId());
+  }
 
 }
