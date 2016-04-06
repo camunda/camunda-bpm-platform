@@ -64,6 +64,13 @@ public abstract class AbstractQueryDto<T extends Query<?, ?>>  extends AbstractS
     super(objectMapper, queryParameters);
   }
 
+  /**
+   * <strong>Note:</strong> sorting by semanticVersion is a string based sort.
+   * There is no interpretation of the version which can lead to a sorting like:
+   * v0.1.0 v0.10.0 v0.2.0.
+   *
+   * @param sortBy Sort results by given parameter
+   */
   @CamundaQueryParam("sortBy")
   public void setSortBy(String sortBy) {
     if (!isValidSortByValue(sortBy)) {
