@@ -241,12 +241,7 @@ public abstract class TestHelper {
 
     // if not found on method, try on class level
     if (annotation == null) {
-
-      Class<?> lookForAnnotationClass = testClass;
-      while (annotation == null && lookForAnnotationClass != Object.class) {
-        annotation = lookForAnnotationClass.getAnnotation(annotationClass);
-        lookForAnnotationClass = lookForAnnotationClass.getSuperclass();
-      }
+      annotation = testClass.getAnnotation(annotationClass);
     }
     return annotation;
   }

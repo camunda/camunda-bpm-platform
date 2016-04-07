@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test;
 
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -38,6 +39,7 @@ import java.lang.annotation.RetentionPolicy;
  * </pre>
  */
 @Retention(RetentionPolicy.RUNTIME)
+@Inherited
 public @interface RequiredHistoryLevel {
 
   /**
