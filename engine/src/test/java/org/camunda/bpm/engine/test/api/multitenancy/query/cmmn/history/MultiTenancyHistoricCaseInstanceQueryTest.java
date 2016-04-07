@@ -33,11 +33,9 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
 
   @Override
   protected void setUp() {
-    deployment(CMMN_FILE);
     deploymentForTenant(TENANT_ONE, CMMN_FILE);
     deploymentForTenant(TENANT_TWO, CMMN_FILE);
 
-    createCaseInstance(null);
     createCaseInstance(TENANT_ONE);
     createCaseInstance(TENANT_TWO);
   }
@@ -46,7 +44,7 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
     HistoricCaseInstanceQuery query = historyService
         .createHistoricCaseInstanceQuery();
 
-    assertThat(query.count(), is(3L));
+    assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantId() {
@@ -103,7 +101,7 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
   }
 
   public void testQuerySortingDesc() {
-    // exclude case instances without tenant id because of database-specific ordering
+    // exclude historic case instances without tenant id because of database-specific ordering
     List<HistoricCaseInstance> historicCaseInstances = historyService.createHistoricCaseInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO)
         .orderByTenantId()
@@ -117,11 +115,7 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
 
   protected void createCaseInstance(String tenantId) {
     CaseInstanceBuilder builder = caseService.withCaseDefinitionByKey("oneTaskCase");
-    if (tenantId == null) {
-      builder.caseDefinitionWithoutTenantId().create();
-    } else {
-      builder.caseDefinitionTenantId(tenantId).create();
-    }
+    builder.caseDefinitionTenantId(tenantId).create();
   }
 
 }
