@@ -441,6 +441,7 @@
                 <exclude>**/TenantIdProviderTest.java</exclude>
                 <exclude>**/MigrationHistoryVariablesTest.java</exclude>
                 <exclude>**/HistoricBatchQueryTest.java</exclude>
+                <exclude>**/HistoricIdentityLink*Test*.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -492,6 +493,7 @@
                 <exclude>**/TenantIdProviderTest.java</exclude>
                 <exclude>**/MigrationHistoryVariablesTest.java</exclude>
                 <exclude>**/HistoricBatchQueryTest.java</exclude>
+                <exclude>**/HistoricIdentityLink*Test*.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -538,6 +540,7 @@
                 <exclude>**/TenantIdProviderTest.java</exclude>
                 <exclude>**/MigrationHistoryVariablesTest.java</exclude>
                 <exclude>**/HistoricBatchQueryTest.java</exclude>
+                <exclude>**/HistoricIdentityLink*Test*.java</exclude>
               </excludes>
             </configuration>
           </plugin>
