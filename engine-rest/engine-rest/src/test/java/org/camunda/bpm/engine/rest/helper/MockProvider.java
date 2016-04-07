@@ -1573,6 +1573,10 @@ public abstract class MockProvider {
   }
 
   public static HistoricCaseActivityInstance createMockHistoricCaseActivityInstance() {
+    return createMockHistoricCaseActivityInstance(EXAMPLE_TENANT_ID);
+  }
+
+  public static HistoricCaseActivityInstance createMockHistoricCaseActivityInstance(String tenantId) {
     HistoricCaseActivityInstance mock = mock(HistoricCaseActivityInstance.class);
 
     when(mock.getId()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_ID);
@@ -1588,6 +1592,7 @@ public abstract class MockProvider {
     when(mock.getCalledCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CALLED_CASE_INSTANCE_ID);
     when(mock.getCreateTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATE_TIME));
     when(mock.getEndTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME));
+    when(mock.getTenantId()).thenReturn(tenantId);
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_DURATION);
     when(mock.isRequired()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_REQUIRED);
     when(mock.isAvailable()).thenReturn(EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_AVAILABLE);

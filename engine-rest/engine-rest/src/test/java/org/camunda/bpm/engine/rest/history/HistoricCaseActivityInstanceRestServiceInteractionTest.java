@@ -87,6 +87,7 @@ public class HistoricCaseActivityInstanceRestServiceInteractionTest extends Abst
     String returnedCalledCaseInstanceId = from(content).getString("calledCaseInstanceId");
     String returnedCreateTime = from(content).getString("createTime");
     String returnedEndTime = from(content).getString("endTime");
+    String returnedTenantId = from(content).getString("tenantId");
     long returnedDurationInMillis = from(content).getLong("durationInMillis");
     boolean required = from(content).getBoolean("required");
     boolean available = from(content).getBoolean("available");
@@ -109,6 +110,7 @@ public class HistoricCaseActivityInstanceRestServiceInteractionTest extends Abst
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CALLED_CASE_INSTANCE_ID, returnedCalledCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATE_TIME, returnedCreateTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME, returnedEndTime);
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_DURATION, returnedDurationInMillis);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_REQUIRED, required);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_AVAILABLE, available);

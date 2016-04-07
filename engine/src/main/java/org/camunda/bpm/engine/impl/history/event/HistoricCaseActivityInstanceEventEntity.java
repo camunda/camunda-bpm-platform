@@ -56,6 +56,9 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
   /** the id of the called case in case of a case task */
   protected String calledCaseInstanceId;
 
+  /** id of the tenant which belongs to the case activity instance  */
+  protected String tenantId;
+
   /** the flag whether this case activity is required */
   protected boolean required = false;
 
@@ -129,6 +132,14 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
     this.calledCaseInstanceId = calledCaseInstanceId;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   public Date getCreateTime() {
     return startTime;
   }
@@ -190,6 +201,7 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
            + ", caseExecutionId=" + caseExecutionId
            + ", caseDefinitionId=" + caseDefinitionId
            + ", caseInstanceId=" + caseInstanceId
+           + ", tenantId=" + tenantId
            + "]";
   }
 }

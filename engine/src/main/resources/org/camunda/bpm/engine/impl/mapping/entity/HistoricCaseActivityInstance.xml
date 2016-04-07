@@ -36,7 +36,8 @@
         END_TIME_,
         DURATION_,
         STATE_,
-        REQUIRED_
+        REQUIRED_,
+        TENANT_ID_
       ) values (
         #{id, jdbcType=VARCHAR},
         #{parentCaseActivityInstanceId, jdbcType=VARCHAR},
@@ -52,7 +53,8 @@
         #{endTime, jdbcType=TIMESTAMP},
         #{durationInMillis, jdbcType=BIGINT},
         #{caseActivityInstanceState, jdbcType=INTEGER},
-        #{required, jdbcType=BOOLEAN}
+        #{required, jdbcType=BOOLEAN},
+        #{tenantId, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -108,6 +110,7 @@
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
     <result property="caseActivityInstanceState" column="STATE_" jdbcType="INTEGER" />
     <result property="required" column="REQUIRED_" jdbcType="BOOLEAN" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- HISTORIC CASE ACTIVITY INSTANCE SELECT -->
@@ -175,6 +178,13 @@
       </if>
       <if test="required">
         and RES.REQUIRED_ = ${trueConstant}
+      </if>
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
       </if>
     </where>
   </sql>

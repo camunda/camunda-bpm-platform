@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -40,6 +41,7 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
   protected static final String SORT_BY_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME_VALUE = "endTime";
   protected static final String SORT_BY_HISTORIC_CASE_ACTIVITY_INSTANCE_DURATION_VALUE = "duration";
   protected static final String SORT_BY_CASE_DEFINITION_ID_VALUE = "caseDefinitionId";
+  protected static final String SORT_BY_TENANT_ID = "tenantId";
 
   protected static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -54,6 +56,7 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
     VALID_SORT_BY_VALUES.add(SORT_BY_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_HISTORIC_CASE_ACTIVITY_INSTANCE_DURATION_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_CASE_DEFINITION_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   protected String caseActivityInstanceId;
@@ -76,6 +79,7 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
   protected Boolean active;
   protected Boolean completed;
   protected Boolean terminated;
+  protected List<String> tenantIds;
 
   public HistoricCaseActivityInstanceQueryDto() {
   }
@@ -184,6 +188,11 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
     this.terminated = terminated;
   }
 
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -256,6 +265,9 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
     if (terminated != null && terminated) {
       query.terminated();
     }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
   }
 
   protected void applySortBy(HistoricCaseActivityInstanceQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
@@ -279,6 +291,8 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
       query.orderByHistoricCaseActivityInstanceDuration();
     } else if (sortBy.equals(SORT_BY_CASE_DEFINITION_ID_VALUE)) {
       query.orderByCaseDefinitionId();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 
