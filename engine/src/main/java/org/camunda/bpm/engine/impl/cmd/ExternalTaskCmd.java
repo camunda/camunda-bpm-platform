@@ -15,41 +15,40 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
- * Represents an abstract class for the handle of external task commands.
+ * Represents a base class for the external task commands.
+ * Contains functionality to get the external task by id and check 
+ * the authorization for the execution of a command on the requested external task.
  * 
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public abstract class HandleExternalTaskCmd extends ExternalTaskCmd {
+public abstract class ExternalTaskCmd implements Command<Void> {
   
   /**
-   * The reported worker id.
+   * The corresponding external task id.
    */
-  protected String workerId;
-  
-  public HandleExternalTaskCmd(String externalTaskId, String workerId) {
-    super(externalTaskId);
-    this.workerId = workerId;
-  }
+  protected String externalTaskId;
 
+  public ExternalTaskCmd(String externalTaskId) {
+    this.externalTaskId = externalTaskId;
+  }
+  
+  
   @Override
   public Void execute(CommandContext commandContext) {
+    EnsureUtil.ensureNotNull("externalTaskId", externalTaskId);
     validateInput();    
 
     ExternalTaskEntity externalTask = commandContext.getExternalTaskManager().findExternalTaskById(externalTaskId);
     EnsureUtil.ensureNotNull(NotFoundException.class,
         "Cannot find external task with id " + externalTaskId, "externalTask", externalTask);
-
-    if (!workerId.equals(externalTask.getWorkerId())) {      
-      throw new BadUserRequestException(getBadUserRequestMessage() + "'. It is locked by worker '" + externalTask.getWorkerId() + "'.");
-    }
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkUpdateProcessInstanceById(externalTask.getProcessInstanceId());
@@ -60,18 +59,15 @@ public abstract class HandleExternalTaskCmd extends ExternalTaskCmd {
   }
   
   /**
-   * Returns the bad user request message. Which is used to create an specific message
-   *  for the BadUserRequestException if an worker has no rights to execute commands of the external task.
+   * Executes the specific external task commands, which belongs to the current sub class.
    * 
-   * @return the specific bad user request message
+   * @param externalTask the external task which is used for the command execution
    */
-  public abstract String getBadUserRequestMessage();
-    
+  protected abstract void execute(ExternalTaskEntity externalTask);
+  
   /**
    * Validates the current input of the command.
    */
-  @Override
-  protected void validateInput() {
-    EnsureUtil.ensureNotNull("workerId", workerId);
-  }
+  protected abstract void validateInput();  
+  
 }

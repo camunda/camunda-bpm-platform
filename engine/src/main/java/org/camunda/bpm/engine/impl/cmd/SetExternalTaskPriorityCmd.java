@@ -1,4 +1,7 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
+/*
+ * Copyright 2016 camunda services GmbH.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -16,25 +19,29 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
- * @author Thorben Lindhauer
- * @author Christopher Zell
+ * Represents the command to set the priority of an existing external task.
+ * 
+ * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class SetExternalTaskRetriesCmd extends ExternalTaskCmd {
-
-  protected int retries;
-
-  public SetExternalTaskRetriesCmd(String externalTaskId, int retries) {
-    super(externalTaskId);
-    this.retries = retries;
-  }
+public class SetExternalTaskPriorityCmd extends ExternalTaskCmd {
   
-  @Override
-  protected void validateInput() {
-    EnsureUtil.ensureGreaterThanOrEqual("retries", retries, 0);
+  /**
+   * The priority that should set on the external task.
+   */
+  protected long priority;
+
+  public SetExternalTaskPriorityCmd(String externalTaskId, long priority) {
+    super(externalTaskId);
+    this.priority = priority;
   }
 
   @Override
   protected void execute(ExternalTaskEntity externalTask) {
-    externalTask.setRetriesAndManageIncidents(retries);
+    externalTask.setPriority(priority);    
+  }
+
+  @Override
+  protected void validateInput() {
+    EnsureUtil.ensureGreaterThanOrEqual("priority", priority, 0);
   }
 }

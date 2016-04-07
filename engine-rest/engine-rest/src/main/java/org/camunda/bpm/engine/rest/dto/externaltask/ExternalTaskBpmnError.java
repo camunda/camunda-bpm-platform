@@ -17,7 +17,7 @@ package org.camunda.bpm.engine.rest.dto.externaltask;
 
 /**
  *
- * @author Christopher Zell <christopher.zell@camunda.org>
+ * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public class ExternalTaskBpmnError {
 

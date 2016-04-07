@@ -21,6 +21,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
@@ -47,7 +48,11 @@ public class ExternalTaskManager extends AbstractManager {
   }
 
   public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<String> topics, int maxResults) {
-    if (topics.size() == 0) {
+    return selectExternalTasksForTopics(topics, maxResults, false);
+  }
+
+  public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<String> topics, int maxResults, boolean usePriority) {
+    if (topics.isEmpty()) {
       return new ArrayList<ExternalTaskEntity>();
     }
 
@@ -58,7 +63,10 @@ public class ExternalTaskManager extends AbstractManager {
     ListQueryParameterObject parameter = new ListQueryParameterObject(parameters, 0, maxResults);
     configureAuthorizationCheck(parameter);
 
-    return getDbEntityManager().selectList("selectExternalTasksForTopics", parameter);
+    DbEntityManager manager = getDbEntityManager();
+    return usePriority
+      ? manager.selectList("selectExternalTasksForTopicsWithPriority", parameter)
+      : manager.selectList("selectExternalTasksForTopics", parameter);
   }
 
   public List<ExternalTask> findExternalTasksByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
@@ -72,7 +80,7 @@ public class ExternalTaskManager extends AbstractManager {
   }
 
   protected void updateExternalTaskSuspensionState(String processInstanceId,
-      String processDefinitionId, String processDefinitionKey, SuspensionState suspensionState) {
+    String processDefinitionId, String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("processDefinitionId", processDefinitionId);

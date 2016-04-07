@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
  * Represents a default priority provider, which contains some functionality to evaluate the priority.
  * Can be used as base class for other priority providers. *  
  * 
- * @author Christopher Zell <christopher.zell@camunda.org>
+ * @author Christopher Zell <christopher.zell@camunda.com>
  * @param <T> the type of the param to determine the priority
  */
 public abstract class DefaultPriorityProvider<T> implements PriorityProvider<T> {

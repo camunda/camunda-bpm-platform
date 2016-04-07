@@ -38,7 +38,7 @@ import org.junit.runners.Parameterized;
 /**
  * Represents a base class for  some similar handle external task authorization test cases.
  * 
- * @author Christopher Zell <christopher.zell@camunda.org>
+ * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public abstract class HandleExternalTaskAuthorizationTest {
 

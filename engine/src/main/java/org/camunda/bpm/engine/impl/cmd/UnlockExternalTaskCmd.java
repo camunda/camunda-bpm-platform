@@ -12,42 +12,24 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
  * @author Thorben Lindhauer
- *
+ * @author Christopher Zell
  */
-public class UnlockExternalTaskCmd implements Command<Void> {
-
-  protected String externalTaskId;
+public class UnlockExternalTaskCmd extends ExternalTaskCmd {
 
   public UnlockExternalTaskCmd(String externalTaskId) {
-    this.externalTaskId = externalTaskId;
+    super(externalTaskId);
   }
-
-  public Void execute(CommandContext commandContext) {
-    validateInput();
-
-    ExternalTaskEntity externalTask = commandContext.getExternalTaskManager().findExternalTaskById(externalTaskId);
-    EnsureUtil.ensureNotNull(NotFoundException.class,
-        "Cannot find external task with id " + externalTaskId, "externalTask", externalTask);
-
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateProcessInstanceById(externalTask.getProcessInstanceId());
-
-    externalTask.unlock();
-
-    return null;
-  }
-
+  
+  @Override
   protected void validateInput() {
-    EnsureUtil.ensureNotNull("externalTaskId", externalTaskId);
   }
 
+  @Override
+  protected void execute(ExternalTaskEntity externalTask) {
+    externalTask.unlock();
+  }
 }

@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
  * engine.
  *
  * @author Thorben Lindhauer
+ * @author Christopher Zell
  */
 public interface ExternalTaskService {
 
@@ -70,6 +71,51 @@ public interface ExternalTaskService {
    */
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId);
 
+  
+  
+  /**
+   * <p>Defines fetching of external tasks by using a fluent builder.
+   * The following parameters must be specified:
+   * A worker id, a maximum number of tasks to fetch and a flag that indicates 
+   * whether priority should be regarded or not. 
+   * The builder allows to specify multiple topics to fetch tasks for and
+   * individual lock durations. For every topic, variables can be fetched
+   * in addition.Is the priority enabled the tasks with the highest priority are fetched.</p>
+   *
+   * <p>Returned tasks are locked for the given worker until
+   * <code>now + lockDuration</code> expires.
+   * Locked tasks cannot be fetched or completed by other workers. When the lock time has expired,
+   * a task may be fetched and locked by other workers.</p>
+   *
+   * <p>Returns at most <code>maxTasks</code> tasks. The tasks are arbitrarily
+   * distributed among the specified topics. Example: Fetching 10 tasks of topics
+   * "a"/"b"/"c" may return 3/3/4 tasks, or 10/0/0 tasks, etc.</p>
+   *
+   * <p>May return less than <code>maxTasks</code> tasks, if there exist not enough
+   * unlocked tasks matching the provided topics or if parallel fetching by other workers
+   * results in locking failures.</p>
+   *
+   * <p>
+   *   Returns only tasks that the currently authenticated user has at least one
+   *   permission out of all of the following groups for:
+   *
+   *   <ul>
+   *     <li>{@link Permissions#READ} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#READ_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   * </p>
+   *
+   * @param maxTasks the maximum number of tasks to return
+   * @param workerId the id of the worker to lock the tasks for
+   * @param usePriority the flag to enable the priority fetching mechanism
+   * @return a builder to define and execute an external task fetching operation
+   */
+  public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority);
+  
   /**
    * <p>Completes an external task on behalf of a worker. The given task must be
    * assigned to the worker.</p>
@@ -182,6 +228,20 @@ public interface ExternalTaskService {
    */
   public void setRetries(String externalTaskId, int retries);
 
+    /**
+   * Sets the priority for an external task. 
+   *
+   * @param externalTaskId the id of the task to set the
+   * @param priority the new priority of the task
+   * @throws NotFoundException if no external task with the given id exists
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   */
+  public void setPriority(String externalTaskId, long priority);
+  
   /**
    * <p>
    *   Queries for tasks that the currently authenticated user has at least one

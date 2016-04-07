@@ -159,6 +159,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     return retries == null || retries > 0;
   }
 
+  @Override
   public long getPriority() {
     return priority;
   }
@@ -182,6 +183,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     persistentState.put("activityInstanceId", activityInstanceId);
     persistentState.put("suspensionState", suspensionState);
     persistentState.put("tenantId", tenantId);
+    persistentState.put("priority", priority);
 
     return persistentState;
   }
