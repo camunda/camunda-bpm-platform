@@ -565,6 +565,82 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testSetAuthenticatedTenantIdToGenericId() {
+    try {
+      identityService.setAuthenticatedTenantIds(Arrays.asList("*"));
+
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("At least one invalid tenant id provided: id cannot be *. * is a reserved identifier.", e.getMessage());
+      assertNull(identityService.getCurrentAuthentication());
+    }
+  }
+
+  public void testSetAuthenticatedUserId() {
+    identityService.setAuthenticatedUserId("john");
+
+    Authentication currentAuthentication = identityService.getCurrentAuthentication();
+
+    assertNotNull(currentAuthentication);
+    assertEquals("john", currentAuthentication.getUserId());
+    assertNull(currentAuthentication.getGroupIds());
+    assertNull(currentAuthentication.getTenantIds());
+  }
+
+  public void testSetAuthenticatedUserAndGroups() {
+    List<String> groups = Arrays.asList("sales", "development");
+
+    identityService.setAuthentication("john", groups);
+
+    Authentication currentAuthentication = identityService.getCurrentAuthentication();
+
+    assertNotNull(currentAuthentication);
+    assertEquals("john", currentAuthentication.getUserId());
+    assertEquals(groups, currentAuthentication.getGroupIds());
+    assertNull(currentAuthentication.getTenantIds());
+  }
+
+  public void testSetAuthenticatedUserGroupsAndTenants() {
+    List<String> groups = Arrays.asList("sales", "development");
+    List<String> tenants = Arrays.asList("tenant1", "tenant2");
+
+    identityService.setAuthentication("john", groups, tenants);
+
+    Authentication currentAuthentication = identityService.getCurrentAuthentication();
+
+    assertNotNull(currentAuthentication);
+    assertEquals("john", currentAuthentication.getUserId());
+    assertEquals(groups, currentAuthentication.getGroupIds());
+    assertEquals(tenants, currentAuthentication.getTenantIds());
+  }
+
+  public void testSetAuthenticatedTenants() {
+    List<String> tenants = Arrays.asList("tenant1", "tenant2");
+
+    identityService.setAuthenticatedTenantIds(tenants);
+
+    Authentication currentAuthentication = identityService.getCurrentAuthentication();
+
+    assertNotNull(currentAuthentication);
+    assertEquals(tenants, currentAuthentication.getTenantIds());
+    assertNull(currentAuthentication.getUserId());
+    assertNull(currentAuthentication.getGroupIds());
+  }
+
+  public void testSetAuthenticatedTenantsToUser() {
+    List<String> tenants = Arrays.asList("tenant1", "tenant2");
+
+    identityService.setAuthenticatedUserId("john");
+    identityService.setAuthenticatedTenantIds(tenants);
+
+    Authentication currentAuthentication = identityService.getCurrentAuthentication();
+
+    assertNotNull(currentAuthentication);
+    assertEquals("john", currentAuthentication.getUserId());
+    assertEquals(tenants, currentAuthentication.getTenantIds());
+    assertNull(currentAuthentication.getGroupIds());
+  }
+
   public void testAuthentication() {
     User user = identityService.newUser("johndoe");
     user.setPassword("xxx");

@@ -130,6 +130,9 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
       if (auth.getGroupIds() != null) {
         EnsureUtil.ensureValidIndividualResourceIds("At least one invalid group id provided", auth.getGroupIds());
       }
+      if (auth.getTenantIds() != null) {
+        EnsureUtil.ensureValidIndividualResourceIds("At least one invalid tenant id provided", auth.getTenantIds());
+      }
 
       currentAuthentication.set(auth);
     }
@@ -137,6 +140,20 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
 
   public void setAuthentication(String userId, List<String> groups) {
     setAuthentication(new Authentication(userId, groups));
+  }
+
+  public void setAuthentication(String userId, List<String> groups, List<String> tenantIds) {
+    setAuthentication(new Authentication(userId, groups, tenantIds));
+  }
+
+  public void setAuthenticatedTenantIds(List<String> tenantIds) {
+    Authentication currentAuthentication = getCurrentAuthentication();
+    if (currentAuthentication == null) {
+      currentAuthentication = new Authentication();
+    }
+
+    Authentication newAuthentication = new Authentication(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), tenantIds);
+    setAuthentication(newAuthentication);
   }
 
   public void clearAuthentication() {
@@ -178,4 +195,5 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   public void setUserAccount(String userId, String userPassword, String accountName, String accountUsername, String accountPassword, Map<String, String> accountDetails) {
     commandExecutor.execute(new SetUserInfoCmd(userId, userPassword, accountName, accountUsername, accountPassword, accountDetails));
   }
+
 }
