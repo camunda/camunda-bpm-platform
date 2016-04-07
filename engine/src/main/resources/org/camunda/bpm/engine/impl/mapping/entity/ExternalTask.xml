@@ -20,6 +20,7 @@
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="priority" column="PRIORITY_" jdbcType="BIGINT" />
     <!-- note: if you add mappings here, make sure to select the columns in 'columnSelection' -->
   </resultMap>
 
@@ -39,6 +40,7 @@
       ACT_ID_,
       ACT_INST_ID_,
       TENANT_ID_,
+      PRIORITY_,
       REV_
     ) values (
       #{id, jdbcType=VARCHAR},
@@ -55,6 +57,7 @@
       #{activityId, jdbcType=VARCHAR},
       #{activityInstanceId, jdbcType=VARCHAR},
       #{tenantId, jdbcType=VARCHAR},
+      #{priority, jdbcType=BIGINT},
       1
     )
   </insert>
@@ -74,7 +77,8 @@
       PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
       ACT_ID_ = #{activityId, jdbcType=VARCHAR},
       ACT_INST_ID_ = #{activityInstanceId, jdbcType=VARCHAR},
-      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
+      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
+      PRIORITY_ = #{priority, jdbcType=BIGINT}
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
@@ -241,6 +245,7 @@
     RES.ACT_ID_,
     RES.ACT_INST_ID_,
     RES.SUSPENSION_STATE_,
-    RES.TENANT_ID_
+    RES.TENANT_ID_,
+    RES.PRIORITY_
   </sql>
 </mapper>
