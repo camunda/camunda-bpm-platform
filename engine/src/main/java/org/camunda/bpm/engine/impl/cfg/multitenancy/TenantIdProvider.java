@@ -15,9 +15,9 @@ package org.camunda.bpm.engine.impl.cfg.multitenancy;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 /**
- * SPI which can be implemented to assign tenant ids to process instances and historic decision instances.
+ * SPI which can be implemented to assign tenant ids to process instances, case instances and historic decision instances.
  *<p>
- * The SPI is invoked if the process definition does not have a tenant id or if the decision definition or
+ * The SPI is invoked if the process definition, case definition or decision definition does not have a tenant id or
  * execution does not have a tenant id.
  *<p>
  * An implementation of this SPI can be set on the {@link ProcessEngineConfigurationImpl}.
@@ -36,6 +36,16 @@ public interface TenantIdProvider {
    * @return a tenant id or null if case the implementation does not assign a tenant id to the process instance
    */
   String provideTenantIdForProcessInstance(TenantIdProviderProcessInstanceContext ctx);
+
+  /**
+   * Invoked when a case instance is started and the Case Definition does not have a tenant id.
+   *<p>
+   * Implementors can either return a tenant id or null. If null is returned the case instance is not assigned a tenant id.
+   *
+   * @param ctx holds information about the case instance which is about to be started.
+   * @return a tenant id or null if case the implementation does not assign a tenant id to case process instance
+   */
+  String provideTenantIdForCaseInstance(TenantIdProviderCaseInstanceContext ctx);
 
   /**
    * Invoked when a historic decision instance is created and the Decision Definition or the Execution does not have a tenant id.

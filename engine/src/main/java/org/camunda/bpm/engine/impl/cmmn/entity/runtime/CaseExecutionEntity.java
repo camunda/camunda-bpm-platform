@@ -27,6 +27,8 @@ import java.util.Set;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderCaseInstanceContext;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnSentryPart;
@@ -65,8 +67,11 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceSequenceCo
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -373,6 +378,38 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   @Override
   public boolean isCaseInstanceExecution() {
     return parentId == null;
+  }
+
+  @Override
+  public void create(Map<String, Object> variables) {
+    // determine tenant Id if null
+    if(tenantId == null) {
+      provideTenantId(variables);
+    }
+    super.create(variables);
+  }
+
+  protected void provideTenantId(Map<String, Object> variables) {
+    TenantIdProvider tenantIdProvider = Context.getProcessEngineConfiguration().getTenantIdProvider();
+
+    if(tenantIdProvider != null) {
+      VariableMap variableMap = Variables.fromMap(variables);
+      CaseDefinition caseDefinition = (CaseDefinition) getCaseDefinition();
+
+      TenantIdProviderCaseInstanceContext ctx = null;
+
+      if(superExecutionId != null) {
+        ctx = new TenantIdProviderCaseInstanceContext(caseDefinition, variableMap, getSuperExecution());
+      }
+      else if(superCaseExecutionId != null) {
+        ctx = new TenantIdProviderCaseInstanceContext(caseDefinition, variableMap, getSuperCaseExecution());
+      }
+      else {
+        ctx = new TenantIdProviderCaseInstanceContext(caseDefinition, variableMap);
+      }
+
+      tenantId = tenantIdProvider.provideTenantIdForCaseInstance(ctx);
+    }
   }
 
   protected CaseExecutionEntity createCaseExecution(CmmnActivity activity) {

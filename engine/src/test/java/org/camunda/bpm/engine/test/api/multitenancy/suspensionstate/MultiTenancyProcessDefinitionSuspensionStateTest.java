@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderCaseInstanceContext;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderHistoricDecisionInstanceContext;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInstanceContext;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -647,6 +648,11 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
     @Override
     public String provideTenantIdForHistoricDecisionInstance(TenantIdProviderHistoricDecisionInstanceContext ctx) {
+      return tenantId;
+    }
+
+    @Override
+    public String provideTenantIdForCaseInstance(TenantIdProviderCaseInstanceContext ctx) {
       return tenantId;
     }
   }
