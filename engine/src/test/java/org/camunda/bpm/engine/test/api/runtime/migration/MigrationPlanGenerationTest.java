@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.CallActivityModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.EventBasedGatewayModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MessageReceiveModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
@@ -551,6 +552,22 @@ public class MigrationPlanGenerationTest {
       .hasInstructions(
         migrate("callActivity").to("callActivity"),
         migrate("userTask").to("userTask"));
+  }
+
+  @Test
+  public void testMapEventBasedGateway() {
+    assertGeneratedMigrationPlan(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS, EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS)
+      .hasInstructions(
+        migrate("eventBasedGateway").to("eventBasedGateway"));
+  }
+
+  @Test
+  public void testMapEventBasedGatewayWithIdenticalFollowingEvents() {
+    assertGeneratedMigrationPlan(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS, EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS)
+      .hasInstructions(
+        migrate("eventBasedGateway").to("eventBasedGateway"),
+        migrate("timerCatch").to("timerCatch"),
+        migrate("afterTimerCatch").to("afterTimerCatch"));
   }
 
   // helper
