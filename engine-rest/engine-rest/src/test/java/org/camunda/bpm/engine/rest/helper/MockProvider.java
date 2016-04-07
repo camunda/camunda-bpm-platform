@@ -56,6 +56,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormField;
+import org.camunda.bpm.engine.history.HistoricIdentityLink;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -612,6 +613,18 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_HIST_INCIDENT_STATE_OPEN = false;
   public static final boolean EXAMPLE_HIST_INCIDENT_STATE_DELETED = false;
   public static final boolean EXAMPLE_HIST_INCIDENT_STATE_RESOLVED = true;
+
+  // Historic Identity Link
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_TYPE = "assignee";
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_OPERATION_TYPE = "add";
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_TIME = "2014-01-05T00:00:00";
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_DATE_BEFORE = "2014-01-01T00:00:00";
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_DATE_AFTER = "2014-01-06T00:00:00";
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_ASSIGNER_ID = "aAssignerId";
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_TASK_ID = "aTaskId";
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_USER_ID = "aUserId";
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_GROUP_ID = "aGroupId";
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_PROC_DEF_ID = "aProcDefId";
 
   // case definition
   public static final String EXAMPLE_CASE_DEFINITION_ID = "aCaseDefnitionId";
@@ -1861,6 +1874,27 @@ public abstract class MockProvider {
     when(identityLink.getGroupId()).thenReturn(EXAMPLE_GROUP_ID2);
 
     return identityLink;
+  }
+
+  // Historic identity link
+  public static HistoricIdentityLink createMockHistoricIdentityLink() {
+    HistoricIdentityLink identityLink = mock(HistoricIdentityLink.class);
+
+    when(identityLink.getAssignerId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_ASSIGNER_ID);
+    when(identityLink.getGroupId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_GROUP_ID);
+    when(identityLink.getTaskId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_TASK_ID);
+    when(identityLink.getUserId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_USER_ID);
+    when(identityLink.getGroupId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_GROUP_ID);
+    when(identityLink.getType()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_TYPE);
+    when(identityLink.getOperationType()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_OPERATION_TYPE);
+    when(identityLink.getTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HIST_IDENTITY_LINK_TIME));
+    return identityLink;
+  }
+
+  public static List<HistoricIdentityLink> createMockHistoricIdentityLinks() {
+    List<HistoricIdentityLink> entries = new ArrayList<HistoricIdentityLink>();
+    entries.add(createMockHistoricIdentityLink());
+    return entries;
   }
 
   // job definition
