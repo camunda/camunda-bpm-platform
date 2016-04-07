@@ -32,7 +32,8 @@
         STATE_,
         CREATE_USER_ID_,
         SUPER_CASE_INSTANCE_ID_,
-        SUPER_PROCESS_INSTANCE_ID_
+        SUPER_PROCESS_INSTANCE_ID_,
+        TENANT_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{caseInstanceId, jdbcType=VARCHAR},
@@ -44,7 +45,8 @@
         #{state, jdbcType=INTEGER},
         #{createUserId, jdbcType=VARCHAR},
         #{superCaseInstanceId, jdbcType=VARCHAR},
-        #{superProcessInstanceId, jdbcType=VARCHAR}
+        #{superProcessInstanceId, jdbcType=VARCHAR},
+        #{tenantId, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -90,6 +92,7 @@
     <result property="createUserId" column="CREATE_USER_ID_" jdbcType="VARCHAR" />
     <result property="superCaseInstanceId" column="SUPER_CASE_INSTANCE_ID_" jdbcType="VARCHAR" />
     <result property="superProcessInstanceId" column="SUPER_PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- HISTORIC CASE INSTANCE SELECT -->
@@ -192,6 +195,13 @@
       </if>
       <if test="subProcessInstanceId != null">
         and RES.CASE_INST_ID_ = (select SUPER_CASE_INSTANCE_ID_ from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{subProcessInstanceId})
+      </if>
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
       </if>
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
         and EXISTS (

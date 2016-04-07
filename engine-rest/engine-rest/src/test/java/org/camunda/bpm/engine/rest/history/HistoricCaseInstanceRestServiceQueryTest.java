@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest.history;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.argThat;
@@ -14,6 +15,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -197,6 +199,16 @@ public class HistoricCaseInstanceRestServiceQueryTest extends AbstractRestServic
     executeAndVerifySorting("duration", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByCaseInstanceDuration();
     inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
+    inOrder.verify(mockedQuery).desc();
   }
 
   @Test
@@ -315,6 +327,7 @@ public class HistoricCaseInstanceRestServiceQueryTest extends AbstractRestServic
     String returnedCreateUserId = from(content).getString("[0].createUserId");
     String returnedSuperCaseInstanceId = from(content).getString("[0].superCaseInstanceId");
     String returnedSuperProcessInstanceId = from(content).getString("[0].superProcessInstanceId");
+    String returnedTenantId = from(content).getString("[0].tenantId");
     boolean active = from(content).getBoolean("[0].active");
     boolean completed = from(content).getBoolean("[0].completed");
     boolean terminated = from(content).getBoolean("[0].terminated");
@@ -329,6 +342,7 @@ public class HistoricCaseInstanceRestServiceQueryTest extends AbstractRestServic
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_USER_ID, returnedCreateUserId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_CASE_INSTANCE_ID, returnedSuperCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_PROCESS_INSTANCE_ID, returnedSuperProcessInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_ACTIVE, active);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_COMPLETED, completed);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_TERMINATED, terminated);
@@ -843,6 +857,67 @@ public class HistoricCaseInstanceRestServiceQueryTest extends AbstractRestServic
     verify(mockedQuery).variableValueEquals(variableName, variableValue);
     verify(mockedQuery).variableValueNotEquals(eq(anotherVariableName), argThat(EqualsPrimitiveValue.numberValue(anotherVariableValue)));
   }
+
+  @Test
+  public void testTenantIdListParameter() {
+    mockedQuery = setUpMockHistoricCaseInstanceQuery(createMockHistoricCaseInstancesTwoTenants());
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_CASE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> historicCaseInstances = from(content).getList("");
+    assertThat(historicCaseInstances).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void testTenantIdListPostParameter() {
+    mockedQuery = setUpMockHistoricCaseInstanceQuery(createMockHistoricCaseInstancesTwoTenants());
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST.split(","));
+
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_CASE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> historicCaseInstances = from(content).getList("");
+    assertThat(historicCaseInstances).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  private List<HistoricCaseInstance> createMockHistoricCaseInstancesTwoTenants() {
+    return Arrays.asList(
+        MockProvider.createMockHistoricCaseInstance(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockHistoricCaseInstance(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
+  }
+
 
   protected void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
     given()

@@ -53,6 +53,12 @@ public interface HistoricCaseInstance {
   /** The process instance id of a potential super process instance or null if no super process instance exists. */
   String getSuperProcessInstanceId();
 
+  /**
+   * The id of the tenant this historic case instance belongs to. Can be <code>null</code>
+   * if the historic case instance belongs to no single tenant.
+   */
+  String getTenantId();
+
   /** Check if the case is active. */
   boolean isActive();
 

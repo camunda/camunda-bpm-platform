@@ -1727,6 +1727,10 @@ public abstract class MockProvider {
   }
 
   public static HistoricCaseInstance createMockHistoricCaseInstance() {
+    return createMockHistoricCaseInstance(EXAMPLE_TENANT_ID);
+  }
+
+  public static HistoricCaseInstance createMockHistoricCaseInstance(String tenantId) {
     HistoricCaseInstance mock = mock(HistoricCaseInstance.class);
 
     when(mock.getId()).thenReturn(EXAMPLE_CASE_INSTANCE_ID);
@@ -1738,6 +1742,7 @@ public abstract class MockProvider {
     when(mock.getCreateUserId()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_USER_ID);
     when(mock.getSuperCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_CASE_INSTANCE_ID);
     when(mock.getSuperProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_PROCESS_INSTANCE_ID);
+    when(mock.getTenantId()).thenReturn(tenantId);
     when(mock.isActive()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_IS_ACTIVE);
     when(mock.isCompleted()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_IS_COMPLETED);
     when(mock.isTerminated()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_IS_TERMINATED);

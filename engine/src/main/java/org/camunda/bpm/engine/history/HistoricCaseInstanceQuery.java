@@ -104,6 +104,9 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
    */
   HistoricCaseInstanceQuery subProcessInstanceId(String subProcessInstanceId);
 
+  /** Only select historic case instances with one of the given tenant ids. */
+  HistoricCaseInstanceQuery tenantIdIn(String... tenantIds);
+
   /** Only select historic case instances which are active */
   HistoricCaseInstanceQuery active();
 
@@ -207,5 +210,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
 
   /** Order by the duration of the case instance (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricCaseInstanceQuery orderByCaseInstanceDuration();
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of historic case instances without tenant id is database-specific.
+   */
+  HistoricCaseInstanceQuery orderByTenantId();
 
 }

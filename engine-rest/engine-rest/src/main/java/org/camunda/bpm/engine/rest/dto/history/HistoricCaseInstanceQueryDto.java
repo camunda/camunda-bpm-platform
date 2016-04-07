@@ -43,6 +43,7 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
   public static final String SORT_BY_CASE_INSTANCE_CREATE_TIME_VALUE = "createTime";
   public static final String SORT_BY_CASE_INSTANCE_CLOSE_TIME_VALUE = "closeTime";
   public static final String SORT_BY_CASE_INSTANCE_DURATION_VALUE = "duration";
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   public static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -53,6 +54,7 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
     VALID_SORT_BY_VALUES.add(SORT_BY_CASE_INSTANCE_CREATE_TIME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_CASE_INSTANCE_CLOSE_TIME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_CASE_INSTANCE_DURATION_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   public String caseInstanceId;
@@ -68,6 +70,7 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
   public String subCaseInstanceId;
   private String superProcessInstanceId;
   private String subProcessInstanceId;
+  private List<String> tenantIds;
   public String createdBy;
 
   public Date createdBefore;
@@ -152,6 +155,11 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
   @CamundaQueryParam("subProcessInstanceId")
   public void setSubProcessInstanceId(String subProcessInstanceId) {
     this.subProcessInstanceId = subProcessInstanceId;
+  }
+
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
   }
 
   @CamundaQueryParam("createdBy")
@@ -261,6 +269,9 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
     if (subProcessInstanceId != null) {
       query.subProcessInstanceId(subProcessInstanceId);
     }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
     if (createdBy != null) {
       query.createdBy(createdBy);
     }
@@ -332,6 +343,8 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
       query.orderByCaseInstanceCloseTime();
     } else if (sortBy.equals(SORT_BY_CASE_INSTANCE_DURATION_VALUE)) {
       query.orderByCaseInstanceDuration();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 
