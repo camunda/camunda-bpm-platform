@@ -145,7 +145,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   }
 
   @Override
-  public Statement apply(Statement base, Description description) {
+  public Statement apply(final Statement base, final Description description) {
 
     if (processEngine == null) {
       initializeProcessEngine();
@@ -153,22 +153,15 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
     initializeServices();
 
-    boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, description);
+    final boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, description);
+    return new Statement() {
 
-    if (hasRequiredHistoryLevel) {
-      // run test case
-      return base;
-
-    } else {
-      // ignore test case
-      return new Statement() {
-
-        @Override
-        public void evaluate() throws Throwable {
-          Assume.assumeTrue("ignored because the current history level is too low", false);
-        }
-      };
-    }
+      @Override
+      public void evaluate() throws Throwable {
+        Assume.assumeTrue("ignored because the current history level is too low", hasRequiredHistoryLevel);
+        ProcessEngineRule.super.apply(base, description).evaluate();
+      }
+    };
   }
 
   protected void initializeProcessEngine() {
