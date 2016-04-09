@@ -22,7 +22,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDuedateDto;
-import org.camunda.bpm.engine.rest.dto.runtime.JobPriorityDto;
+import org.camunda.bpm.engine.rest.dto.runtime.PriorityDto;
 import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
 
@@ -59,6 +59,6 @@ public interface JobResource {
   @PUT
   @Path("/priority")
   @Consumes(MediaType.APPLICATION_JSON)
-  void setJobPriority(JobPriorityDto dto);
+  void setJobPriority(PriorityDto dto);
 
 }

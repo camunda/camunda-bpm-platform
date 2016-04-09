@@ -75,6 +75,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   protected static final String HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL = SINGLE_EXTERNAL_TASK_URL + "/bpmnError";
   protected static final String UNLOCK_EXTERNAL_TASK_URL = SINGLE_EXTERNAL_TASK_URL + "/unlock";
   protected static final String RETRIES_EXTERNAL_TASK_URL = SINGLE_EXTERNAL_TASK_URL + "/retries";
+  protected static final String PRIORITY_EXTERNAL_TASK_URL = SINGLE_EXTERNAL_TASK_URL + "/priority";
 
   protected ExternalTaskService externalTaskService;
 
@@ -95,6 +96,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     // fetching
     fetchTopicBuilder = mock(ExternalTaskQueryTopicBuilder.class);
     when(externalTaskService.fetchAndLock(anyInt(), any(String.class))).thenReturn(fetchTopicBuilder);
+    when(externalTaskService.fetchAndLock(anyInt(), any(String.class), any(Boolean.class))).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.topic(any(String.class), anyLong())).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.variables(anyListOf(String.class))).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.variables(any(String[].class))).thenReturn(fetchTopicBuilder);
@@ -118,6 +120,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("maxTasks", 5);
     parameters.put("workerId", "aWorkerId");
+    parameters.put("usePriority", true);
 
     Map<String, Object> topicParameter = new HashMap<String, Object>();
     topicParameter.put("topicName", "aTopicName");
@@ -152,7 +155,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
       .when().post(FETCH_EXTERNAL_TASK_URL);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId");
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
     inOrder.verify(fetchTopicBuilder).execute();
@@ -186,7 +189,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
       .post(FETCH_EXTERNAL_TASK_URL);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
-    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId");
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
     inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
     inOrder.verify(fetchTopicBuilder).execute();
     verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
@@ -613,6 +616,67 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .put(RETRIES_EXTERNAL_TASK_URL);
   }
+  
+  
+  
+  @Test
+  public void testSetPriority() {
+    Map<String, String> parameters = new HashMap<String, String>();
+    parameters.put("priority", "5");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(PRIORITY_EXTERNAL_TASK_URL);
+
+    verify(externalTaskService).setPriority("anExternalTaskId", 5);
+    verifyNoMoreInteractions(externalTaskService);
+  }
+
+  @Test
+  public void testSetPriorityNonExistingTask() {
+    doThrow(new NotFoundException()).when(externalTaskService).setPriority(any(String.class), anyInt());
+
+    Map<String, String> parameters = new HashMap<String, String>();
+    parameters.put("priority", "5");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("External task with id anExternalTaskId does not exist"))
+    .when()
+      .put(PRIORITY_EXTERNAL_TASK_URL);
+  }
+
+  @Test
+  public void testSetPriorityThrowsAuthorizationException() {
+    doThrow(new AuthorizationException("aMessage")).when(externalTaskService).setPriority(any(String.class), anyInt());
+
+    Map<String, String> parameters = new HashMap<String, String>();
+    parameters.put("priority", "5");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo("aMessage"))
+    .when()
+      .put(PRIORITY_EXTERNAL_TASK_URL);
+  }
 
   @Test
   public void testGetSingleExternalTask() {
@@ -637,6 +701,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
       .body("topicName", equalTo(MockProvider.EXTERNAL_TASK_TOPIC_NAME))
       .body("workerId", equalTo(MockProvider.EXTERNAL_TASK_WORKER_ID))
       .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+      .body("priority", equalTo(MockProvider.EXTERNAL_TASK_PRIORITY))
     .when()
       .get(SINGLE_EXTERNAL_TASK_URL);
   }

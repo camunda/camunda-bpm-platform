@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskBpmnError;
+import org.camunda.bpm.engine.rest.dto.runtime.PriorityDto;
 
 /**
  * @author Thorben Lindhauer
@@ -68,6 +69,17 @@ public class ExternalTaskResourceImpl implements ExternalTaskResource {
 
     try {
       externalTaskService.setRetries(externalTaskId, dto.getRetries());
+    } catch (NotFoundException e) {
+      throw new RestException(Status.NOT_FOUND, e, "External task with id " + externalTaskId + " does not exist");
+    }
+  }
+
+  @Override
+  public void setPriority(PriorityDto dto) {
+    ExternalTaskService externalTaskService = engine.getExternalTaskService();
+
+    try {
+      externalTaskService.setPriority(externalTaskId, dto.getPriority());
     } catch (NotFoundException e) {
       throw new RestException(Status.NOT_FOUND, e, "External task with id " + externalTaskId + " does not exist");
     }

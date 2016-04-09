@@ -735,6 +735,7 @@ public abstract class MockProvider {
   public static final boolean EXTERNAL_TASK_SUSPENDED = true;
   public static final String EXTERNAL_TASK_TOPIC_NAME = "aTopic";
   public static final String EXTERNAL_TASK_WORKER_ID = "aWorkerId";
+  public static final int EXTERNAL_TASK_PRIORITY = 0;
 
   // tasks
   public static Task createMockTask() {

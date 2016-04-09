@@ -22,6 +22,7 @@ public class FetchExternalTasksDto {
 
   protected int maxTasks;
   protected String workerId;
+  protected boolean usePriority = false;
   protected List<FetchExternalTaskTopicDto> topics;
 
   public int getMaxTasks() {
@@ -41,6 +42,14 @@ public class FetchExternalTasksDto {
   }
   public void setTopics(List<FetchExternalTaskTopicDto> topics) {
     this.topics = topics;
+  }
+
+  public boolean isUsePriority() {
+    return usePriority;
+  }
+
+  public void setUsePriority(boolean usePriority) {
+    this.usePriority = usePriority;
   }
 
   public static class FetchExternalTaskTopicDto {

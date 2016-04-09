@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDuedateDto;
-import org.camunda.bpm.engine.rest.dto.runtime.JobPriorityDto;
+import org.camunda.bpm.engine.rest.dto.runtime.PriorityDto;
 import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -108,7 +108,7 @@ public class JobResourceImpl implements JobResource {
   }
 
   @Override
-  public void setJobPriority(JobPriorityDto dto) {
+  public void setJobPriority(PriorityDto dto) {
     if (dto.getPriority() == null) {
       throw new RestException(Status.BAD_REQUEST, "Priority for job '" + jobId + "' cannot be null.");
     }

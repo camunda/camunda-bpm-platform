@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-public class JobPriorityDto {
+public class PriorityDto {
 
   protected Long priority;
 
