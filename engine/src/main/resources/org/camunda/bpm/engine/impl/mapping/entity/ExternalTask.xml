@@ -149,7 +149,7 @@
   </select>
   
   <select id="selectExternalTasksForTopicsWithPriority" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="externalTaskResultMap">
-    ${limitBefore}
+    ${limitBeforeNativeQuery}
     select RES.* ${limitBetween}
     from ${prefix}ACT_RU_EXT_TASK RES
     <where>
@@ -164,7 +164,7 @@
       </if>
     </where>
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
-    order by RES.PRIORITY_ DESC
+    ${orderBy}
     ${limitAfter}
   </select>
   

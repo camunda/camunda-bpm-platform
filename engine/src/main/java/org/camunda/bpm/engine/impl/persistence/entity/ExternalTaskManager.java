@@ -64,10 +64,15 @@ public class ExternalTaskManager extends AbstractManager {
     configureAuthorizationCheck(parameter);
 
     DbEntityManager manager = getDbEntityManager();
-    return usePriority
-      ? manager.selectList("selectExternalTasksForTopicsWithPriority", parameter)
-      : manager.selectList("selectExternalTasksForTopics", parameter);
-  }
+    List<ExternalTaskEntity> entities;
+    if (usePriority) {
+      parameter.setOrderBy("PRIORITY_ DESC");        
+      entities = manager.selectList("selectExternalTasksForTopicsWithPriority", parameter);
+    }
+    else 
+      entities = manager.selectList("selectExternalTasksForTopics", parameter);
+    return entities;
+    }
 
   public List<ExternalTask> findExternalTasksByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
     configureAuthorizationCheck(externalTaskQuery);

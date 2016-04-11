@@ -167,7 +167,7 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
   public ExternalTaskQuery orderByTenantId() {
     return orderBy(ExternalTaskQueryProperty.TENANT_ID);
   }
-
+  
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
