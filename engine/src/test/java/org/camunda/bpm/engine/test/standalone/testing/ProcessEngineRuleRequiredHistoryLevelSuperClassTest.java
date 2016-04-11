@@ -13,11 +13,11 @@
 
 package org.camunda.bpm.engine.test.standalone.testing;
 
-import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 /**
@@ -30,7 +30,7 @@ public class ProcessEngineRuleRequiredHistoryLevelSuperClassTest extends Process
   public void requiredHistoryLevelOnSuperClass() {
 
     assertThat(currentHistoryLevel(),
-        either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
+        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
         .or(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
         .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }

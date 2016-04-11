@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.test.standalone.testing;
 
-import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -24,6 +23,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineTestCase;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.hamcrest.CoreMatchers;
 
 
 /**
@@ -53,7 +53,7 @@ public class ProcessEngineTestCaseTest extends ProcessEngineTestCase {
   public void testRequiredHistoryLevelAudit() {
 
     assertThat(currentHistoryLevel(),
-        either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
+        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
         .or(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
         .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
@@ -62,7 +62,7 @@ public class ProcessEngineTestCaseTest extends ProcessEngineTestCase {
   public void testRequiredHistoryLevelActivity() {
 
     assertThat(currentHistoryLevel(),
-        either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
+        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
         .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
 

@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.test.standalone.testing;
 
-import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -25,6 +24,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -70,7 +70,7 @@ public class ProcessEngineRuleJunit4Test {
   public void requiredHistoryLevelAudit() {
 
     assertThat(currentHistoryLevel(),
-        either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
+        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
         .or(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
         .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
@@ -80,7 +80,7 @@ public class ProcessEngineRuleJunit4Test {
   public void requiredHistoryLevelActivity() {
 
     assertThat(currentHistoryLevel(),
-        either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
+        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
         .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
 
