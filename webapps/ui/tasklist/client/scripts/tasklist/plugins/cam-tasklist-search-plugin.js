@@ -55,6 +55,9 @@ var angular = require('camunda-commons-ui/vendor/angular');
        ['assignee', 'owner', 'candidateGroup', 'candidateUser', 'involvedUser'].indexOf(type) !== -1) {
       out += 'Expression';
     }
+    if(type === 'priority' && operator !== 'eq') {
+      out = operator + 'Priority';
+    }
     return out;
   };
 
