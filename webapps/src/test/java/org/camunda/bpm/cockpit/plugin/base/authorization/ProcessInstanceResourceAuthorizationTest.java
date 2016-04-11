@@ -24,6 +24,7 @@ import java.util.List;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.CalledProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.CalledProcessInstanceQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.sub.resources.ProcessInstanceResource;
+import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.junit.After;
@@ -43,6 +44,7 @@ public class ProcessInstanceResourceAuthorizationTest extends AuthorizationTest 
 
   protected ProcessInstanceResource resource;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     super.setUp();
@@ -54,6 +56,7 @@ public class ProcessInstanceResourceAuthorizationTest extends AuthorizationTest 
     startProcessInstances(CALLING_USER_TASK_PROCESS_KEY, 3);
   }
 
+  @Override
   @After
   public void tearDown() {
     deleteDeployment(deploymentId);
@@ -205,24 +208,26 @@ public class ProcessInstanceResourceAuthorizationTest extends AuthorizationTest 
   protected List<CalledProcessInstanceDto> executeCalledInstancesQueryWithAuthorization(CalledProcessInstanceQueryDto query) {
     Authentication currentAuthentication = getCurrentAuthentication();
 
-    query.getPermissionChecks().clear();
-    query.setAuthorizationCheckEnabled(true);
+    AuthorizationCheck authCheck = query.getAuthCheck();
+
+    authCheck.getPermissionChecks().clear();
+    authCheck.setAuthorizationCheckEnabled(true);
     String currentUserId = currentAuthentication.getUserId();
     List<String> currentGroupIds = currentAuthentication.getGroupIds();
-    query.setAuthUserId(currentUserId);
-    query.setAuthGroupIds(currentGroupIds);
+    authCheck.setAuthUserId(currentUserId);
+    authCheck.setAuthGroupIds(currentGroupIds);
 
     PermissionCheck firstPermCheck = new PermissionCheck();
     firstPermCheck.setResource(PROCESS_INSTANCE);
     firstPermCheck.setResourceIdQueryParam("EXEC1.PROC_INST_ID_");
     firstPermCheck.setPermission(READ);
-    query.addAtomicPermissionCheck(firstPermCheck);
+    authCheck.addAtomicPermissionCheck(firstPermCheck);
 
     PermissionCheck secondPermCheck = new PermissionCheck();
     secondPermCheck.setResource(PROCESS_DEFINITION);
     secondPermCheck.setResourceIdQueryParam("PROCDEF.KEY_");
     secondPermCheck.setPermission(READ_INSTANCE);
-    query.addAtomicPermissionCheck(secondPermCheck);
+    authCheck.addAtomicPermissionCheck(secondPermCheck);
 
     return getQueryService().executeQuery("selectCalledProcessInstances", query);
   }

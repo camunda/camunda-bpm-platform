@@ -21,6 +21,7 @@ import org.camunda.bpm.cockpit.db.QueryService;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.webapp.plugin.resource.AbstractAppPluginResource;
@@ -79,14 +80,16 @@ public class AbstractCockpitPluginResource extends AbstractAppPluginResource<Coc
   protected void configureAuthorizationCheck(QueryParameters<?> query) {
     Authentication currentAuthentication = getCurrentAuthentication();
 
-    query.getPermissionChecks().clear();
+    AuthorizationCheck authCheck = query.getAuthCheck();
+
+    authCheck.getPermissionChecks().clear();
 
     if (isAuthorizationEnabled() && currentAuthentication != null) {
-      query.setAuthorizationCheckEnabled(true);
+      authCheck.setAuthorizationCheckEnabled(true);
       String currentUserId = currentAuthentication.getUserId();
       List<String> currentGroupIds = currentAuthentication.getGroupIds();
-      query.setAuthUserId(currentUserId);
-      query.setAuthGroupIds(currentGroupIds);
+      authCheck.setAuthUserId(currentUserId);
+      authCheck.setAuthGroupIds(currentGroupIds);
     }
   }
 
@@ -98,7 +101,7 @@ public class AbstractCockpitPluginResource extends AbstractAppPluginResource<Coc
     permCheck.setResource(resource);
     permCheck.setResourceIdQueryParam(queryParam);
     permCheck.setPermission(permission);
-    query.addAtomicPermissionCheck(permCheck);
+    query.getAuthCheck().addAtomicPermissionCheck(permCheck);
   }
 
 }
