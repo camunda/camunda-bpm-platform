@@ -10,19 +10,22 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
   var Controller = [
     '$scope',
-    '$rootScope',
+    '$location',
+    '$timeout',
     'Views',
     'Data',
     'dataDepend',
     'page',
   function (
     $scope,
-    $rootScope,
+    $location,
+    $timeout,
     Views,
     Data,
     dataDepend,
     page
   ) {
+    var $rootScope = $scope.$root;
 
     var processData = $scope.processData = dataDepend.create($scope);
 
@@ -43,6 +46,17 @@ var angular = require('camunda-commons-ui/vendor/angular');
       if(typeof dashboardPlugins[i].initialize === 'function') {
          dashboardPlugins[i].initialize(initData);
       }
+    }
+
+
+    var search = $location.search();
+    if (search.targetPlugin) {
+      $timeout(function () {
+        var el = angular.element('[data-plugin-id="' + search.targetPlugin + '"]');
+        if (el.length) {
+          el[0].scrollIntoView();
+        }
+      }, 100);
     }
 
     $rootScope.showBreadcrumbs = true;

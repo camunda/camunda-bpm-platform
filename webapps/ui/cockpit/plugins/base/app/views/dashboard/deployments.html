@@ -2,8 +2,8 @@
      loading-state="{{ loadingState }}"
      text-error="{{ loadingError }}">
   <ul>
-    <li ng-if="count == 0">No deployments</li>
-    <li ng-if="count == 1">1 deployment</li>
-    <li ng-if="count > 1">{{ count }} deployments</li>
+    <a href="#/repository" ng-if="count == 0">No deployments</a>
+    <a href="#/repository" ng-if="count == 1">1 deployment</a>
+    <a href="#/repository" ng-if="count > 1">{{ count }} deployments</a>
   </ul>
 </div>
