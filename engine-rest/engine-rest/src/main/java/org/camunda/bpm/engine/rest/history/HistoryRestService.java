@@ -61,4 +61,8 @@ public interface HistoryRestService {
 
   @Path(HistoricIdentityLinkRestService.PATH)
   HistoricIdentityLinkRestService getIdentityLinkService();
+
+  @Path(HistoricBatchRestService.PATH)
+  HistoricBatchRestService getBatchService();
+
 }

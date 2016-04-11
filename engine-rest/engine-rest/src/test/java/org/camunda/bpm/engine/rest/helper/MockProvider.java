@@ -36,6 +36,8 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
@@ -752,6 +754,18 @@ public abstract class MockProvider {
   public static final String EXTERNAL_TASK_TOPIC_NAME = "aTopic";
   public static final String EXTERNAL_TASK_WORKER_ID = "aWorkerId";
   public static final int EXTERNAL_TASK_PRIORITY = 0;
+
+  // batch
+  public static final String EXAMPLE_BATCH_ID = "aBatchId";
+  public static final String EXAMPLE_BATCH_TYPE = "aBatchType";
+  public static final int EXAMPLE_BATCH_SIZE = 10;
+  public static final int EXAMPLE_BATCH_JOBS_PER_SEED = 11;
+  public static final int EXAMPLE_INVOCATIONS_PER_BATCH_JOB = 12;
+  public static final String EXAMPLE_SEED_JOB_DEFINITION_ID = "aSeedJobDefinitionId";
+  public static final String EXAMPLE_MONITOR_JOB_DEFINITION_ID = "aMonitorJobDefinitionId";
+  public static final String EXAMPLE_BATCH_JOB_DEFINITION_ID = "aBatchJobDefinitionId";
+  public static final String EXAMPLE_HISTORIC_BATCH_START_TIME = "2016-04-12T15:29:33";
+  public static final String EXAMPLE_HISTORIC_BATCH_END_TIME = "2016-04-12T16:23:34";
 
   // tasks
   public static Task createMockTask() {
@@ -2548,6 +2562,54 @@ public abstract class MockProvider {
 
   public static DmnDecisionTableResult createMockDecisionResult() {
     return mockDecisionResult().build();
+  }
+
+  public static MockBatchBuilder mockBatch() {
+    return new MockBatchBuilder()
+      .id(EXAMPLE_BATCH_ID)
+      .type(EXAMPLE_BATCH_TYPE)
+      .size(EXAMPLE_BATCH_SIZE)
+      .batchJobsPerSeed(EXAMPLE_BATCH_JOBS_PER_SEED)
+      .invocationsPerBatchJob(EXAMPLE_INVOCATIONS_PER_BATCH_JOB)
+      .seedJobDefinitionId(EXAMPLE_SEED_JOB_DEFINITION_ID)
+      .monitorJobDefinitionId(EXAMPLE_MONITOR_JOB_DEFINITION_ID)
+      .batchJobDefinitionId(EXAMPLE_BATCH_JOB_DEFINITION_ID)
+      .tenantId(EXAMPLE_TENANT_ID);
+  }
+
+  public static Batch createMockBatch() {
+    return mockBatch().build();
+  }
+
+  public static List<Batch> createMockBatches() {
+    List<Batch> mockList = new ArrayList<Batch>();
+    mockList.add(createMockBatch());
+    return mockList;
+  }
+
+  public static MockHistoricBatchBuilder mockHistoricBatch() {
+    return new MockHistoricBatchBuilder()
+      .id(EXAMPLE_BATCH_ID)
+      .type(EXAMPLE_BATCH_TYPE)
+      .size(EXAMPLE_BATCH_SIZE)
+      .batchJobsPerSeed(EXAMPLE_BATCH_JOBS_PER_SEED)
+      .invocationsPerBatchJob(EXAMPLE_INVOCATIONS_PER_BATCH_JOB)
+      .seedJobDefinitionId(EXAMPLE_SEED_JOB_DEFINITION_ID)
+      .monitorJobDefinitionId(EXAMPLE_MONITOR_JOB_DEFINITION_ID)
+      .batchJobDefinitionId(EXAMPLE_BATCH_JOB_DEFINITION_ID)
+      .tenantId(EXAMPLE_TENANT_ID)
+      .startTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_START_TIME))
+      .endTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_END_TIME));
+  }
+
+  public static HistoricBatch createMockHistoricBatch() {
+    return mockHistoricBatch().build();
+  }
+
+  public static List<HistoricBatch> createMockHistoricBatches() {
+    List<HistoricBatch> mockList = new ArrayList<HistoricBatch>();
+    mockList.add(createMockHistoricBatch());
+    return mockList;
   }
 
 }

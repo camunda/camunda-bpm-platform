@@ -19,10 +19,11 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.rest.MigrationRestService;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -54,18 +55,28 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
 
   public void executeMigrationPlan(MigrationExecutionDto migrationExecution) {
-    MigrationPlanDto migrationPlanDto = migrationExecution.getMigrationPlan();
+    MigrationPlan migrationPlan = createMigrationPlan(migrationExecution);
     List<String> processInstanceIds = migrationExecution.getProcessInstanceIds();
 
+    processEngine.getRuntimeService()
+      .newMigration(migrationPlan).processInstanceIds(processInstanceIds).execute();
+  }
+
+  public BatchDto executeMigrationPlanAsync(MigrationExecutionDto migrationExecution) {
+    MigrationPlan migrationPlan = createMigrationPlan(migrationExecution);
+    List<String> processInstanceIds = migrationExecution.getProcessInstanceIds();
+
+    Batch batch = processEngine.getRuntimeService()
+      .newMigration(migrationPlan).processInstanceIds(processInstanceIds).executeAsync();
+    return BatchDto.fromBatch(batch);
+  }
+
+  protected MigrationPlan createMigrationPlan(MigrationExecutionDto migrationExecution) {
+    MigrationPlanDto migrationPlanDto = migrationExecution.getMigrationPlan();
     try {
-      MigrationPlan migrationPlan = MigrationPlanDto.toMigrationPlan(processEngine, migrationPlanDto);
-      processEngine.getRuntimeService()
-        .newMigration(migrationPlan).processInstanceIds(processInstanceIds).execute();
+      return MigrationPlanDto.toMigrationPlan(processEngine, migrationPlanDto);
     }
     catch (MigrationPlanValidationException e) {
-      throw e;
-    }
-    catch (MigratingProcessInstanceValidationException e) {
       throw e;
     }
     catch (BadUserRequestException e) {

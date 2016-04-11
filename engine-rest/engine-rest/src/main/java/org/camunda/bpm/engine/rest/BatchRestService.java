@@ -13,31 +13,37 @@
 
 package org.camunda.bpm.engine.rest;
 
-import javax.ws.rs.POST;
+import java.util.List;
+
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
-import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
-import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
+import org.camunda.bpm.engine.rest.sub.batch.BatchResource;
 
-public interface MigrationRestService {
+public interface BatchRestService {
 
-  String PATH = "/migration";
+  String PATH = "/batch";
 
-  @POST
-  @Path("/generate")
+  @Path("/{id}")
+  BatchResource getBatch(@PathParam("id") String batchId);
+
+  @GET
   @Produces(MediaType.APPLICATION_JSON)
-  MigrationPlanDto generateMigrationPlan(MigrationPlanDto initialMigrationPlan);
+  List<BatchDto> getBatches(@Context UriInfo uriInfo,
+                            @QueryParam("firstResult") Integer firstResult,
+                            @QueryParam("maxResults") Integer maxResults);
 
-  @POST
-  @Path("/execute")
-  void executeMigrationPlan(MigrationExecutionDto migrationPlan);
-
-  @POST
-  @Path("/executeAsync")
+  @GET
+  @Path("/count")
   @Produces(MediaType.APPLICATION_JSON)
-  BatchDto executeMigrationPlanAsync(MigrationExecutionDto migrationPlan);
+  CountResultDto getBatchesCount(@Context UriInfo uriInfo);
 
 }

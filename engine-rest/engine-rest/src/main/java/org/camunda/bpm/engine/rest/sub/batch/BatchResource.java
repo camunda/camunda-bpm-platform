@@ -11,33 +11,24 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.rest;
+package org.camunda.bpm.engine.rest.sub.batch;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
-import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
-import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
 
-public interface MigrationRestService {
+public interface BatchResource {
 
-  String PATH = "/migration";
-
-  @POST
-  @Path("/generate")
+  @GET
   @Produces(MediaType.APPLICATION_JSON)
-  MigrationPlanDto generateMigrationPlan(MigrationPlanDto initialMigrationPlan);
+  BatchDto getBatch();
 
-  @POST
-  @Path("/execute")
-  void executeMigrationPlan(MigrationExecutionDto migrationPlan);
-
-  @POST
-  @Path("/executeAsync")
-  @Produces(MediaType.APPLICATION_JSON)
-  BatchDto executeMigrationPlanAsync(MigrationExecutionDto migrationPlan);
+  @DELETE
+  void deleteBatch(@Context UriInfo uriInfo);
 
 }

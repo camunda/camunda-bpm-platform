@@ -18,8 +18,18 @@ import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.ANOTHER_EXAMPLE_ACTIVITY_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_BATCH_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_BATCH_JOBS_PER_SEED;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_BATCH_JOB_DEFINITION_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_BATCH_SIZE;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_BATCH_TYPE;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_INVOCATIONS_PER_BATCH_JOB;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_MONITOR_JOB_DEFINITION_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_SEED_JOB_DEFINITION_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TENANT_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_ACTIVITY_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_PROCESS_DEFINITION_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.fest.assertions.MapAssert.entry;
 import static org.hamcrest.CoreMatchers.is;
@@ -46,6 +56,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.migration.MigratingActivityInstanceValidationReport;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationReport;
@@ -79,6 +90,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   protected static final String MIGRATION_URL = TEST_RESOURCE_ROOT_PATH + "/migration";
   protected static final String GENERATE_MIGRATION_URL = MIGRATION_URL + "/generate";
   protected static final String EXECUTE_MIGRATION_URL = MIGRATION_URL + "/execute";
+  protected static final String EXECUTE_MIGRATION_ASYNC_URL = MIGRATION_URL + "/executeAsync";
 
   protected RuntimeService runtimeServiceMock;
   protected MigrationPlanBuilder migrationPlanBuilderMock;
@@ -578,6 +590,278 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .post(EXECUTE_MIGRATION_URL);
   }
 
+  @Test
+  public void executeMigrationPlanAsync() {
+    Batch batchMock = createMockBatch();
+    when(migrationPlanExecutionBuilderMock.executeAsync()).thenReturn(batchMock);
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+        .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("id", is(EXAMPLE_BATCH_ID))
+      .body("type", is(EXAMPLE_BATCH_TYPE))
+      .body("size", is(EXAMPLE_BATCH_SIZE))
+      .body("batchJobsPerSeed", is(EXAMPLE_BATCH_JOBS_PER_SEED))
+      .body("invocationsPerBatchJob", is(EXAMPLE_INVOCATIONS_PER_BATCH_JOB))
+      .body("seedJobDefinitionId", is(EXAMPLE_SEED_JOB_DEFINITION_ID))
+      .body("monitorJobDefinitionId", is(EXAMPLE_MONITOR_JOB_DEFINITION_ID))
+      .body("batchJobDefinitionId", is(EXAMPLE_BATCH_JOB_DEFINITION_ID))
+      .body("tenantId", is(EXAMPLE_TENANT_ID))
+    .when()
+      .post(EXECUTE_MIGRATION_ASYNC_URL);
+
+    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution);
+    verifyMigrationPlanAsyncExecutionInteraction(migrationExecution);
+  }
+
+  @Test
+  public void executeMigrationPlanAsyncWithNullSourceProcessInstanceId() {
+    String message = "source process definition id is null";
+    when(runtimeServiceMock.createMigrationPlan(isNull(String.class), anyString()))
+      .thenThrow(new BadUserRequestException(message));
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(null, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+        .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("message", is(message))
+    .when()
+      .post(EXECUTE_MIGRATION_ASYNC_URL);
+  }
+
+  @Test
+  public void executeMigrationPlanAsyncWithNonExistingSourceProcessInstanceId() {
+    String message = "source process definition with id " + NON_EXISTING_PROCESS_DEFINITION_ID + " does not exist";
+    when(runtimeServiceMock.createMigrationPlan(eq(NON_EXISTING_PROCESS_DEFINITION_ID), anyString()))
+      .thenThrow(new BadUserRequestException(message));
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(NON_EXISTING_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+        .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("message", is(message))
+    .when()
+      .post(EXECUTE_MIGRATION_ASYNC_URL);
+  }
+
+  @Test
+  public void executeMigrationPlanAsyncWithNullTargetProcessInstanceId() {
+    String message = "target process definition id is null";
+    when(runtimeServiceMock.createMigrationPlan(anyString(), isNull(String.class)))
+      .thenThrow(new BadUserRequestException(message));
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, null)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+        .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("message", is(message))
+    .when()
+      .post(EXECUTE_MIGRATION_ASYNC_URL);
+  }
+
+  @Test
+  public void executeMigrationPlanAsyncWithNonExistingTargetProcessInstanceId() {
+    String message = "target process definition with id " + NON_EXISTING_PROCESS_DEFINITION_ID + " does not exist";
+    when(runtimeServiceMock.createMigrationPlan(anyString(), eq(NON_EXISTING_PROCESS_DEFINITION_ID)))
+      .thenThrow(new BadUserRequestException(message));
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, NON_EXISTING_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+        .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("message", is(message))
+    .when()
+      .post(EXECUTE_MIGRATION_ASYNC_URL);
+  }
+
+  @Test
+  public void executeMigrationPlanAsyncWithNullSourceActivityId() {
+    String message = "sourceActivityId is null";
+    when(migrationPlanBuilderMock.mapActivities(isNull(String.class), anyString()))
+      .thenThrow(new BadUserRequestException(message));
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(null, ANOTHER_EXAMPLE_ACTIVITY_ID)
+        .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("message", is(message))
+    .when()
+      .post(EXECUTE_MIGRATION_ASYNC_URL);
+  }
+
+  @Test
+  public void executeMigrationPlanAsyncWithNonExistingSourceActivityId() {
+    String message = "sourceActivity is null";
+    when(migrationPlanBuilderMock.mapActivities(eq(NON_EXISTING_ACTIVITY_ID), anyString()))
+      .thenThrow(new BadUserRequestException(message));
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(NON_EXISTING_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+        .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("message", is(message))
+    .when()
+      .post(EXECUTE_MIGRATION_ASYNC_URL);
+  }
+
+  @Test
+  public void executeMigrationPlanAsyncWithNullTargetActivityId() {
+    String message = "targetActivityId is null";
+    when(migrationPlanBuilderMock.mapActivities(anyString(), isNull(String.class)))
+      .thenThrow(new BadUserRequestException(message));
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, null)
+        .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("message", is(message))
+    .when()
+      .post(EXECUTE_MIGRATION_ASYNC_URL);
+  }
+
+  @Test
+  public void executeMigrationPlanAsyncWithNonExistingTargetActivityId() {
+    String message = "targetActivity is null";
+    when(migrationPlanBuilderMock.mapActivities(anyString(), eq(NON_EXISTING_ACTIVITY_ID)))
+      .thenThrow(new BadUserRequestException(message));
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, NON_EXISTING_ACTIVITY_ID)
+        .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("message", is(message))
+    .when()
+      .post(EXECUTE_MIGRATION_URL);
+  }
+
+  @Test
+  public void executeMigrationPlanAsyncValidationException() {
+
+    MigrationInstruction migrationInstruction = mock(MigrationInstruction.class);
+    when(migrationInstruction.getSourceActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
+    when(migrationInstruction.getTargetActivityId()).thenReturn(ANOTHER_EXAMPLE_ACTIVITY_ID);
+
+    MigrationInstructionValidationReport instructionReport1 = mock(MigrationInstructionValidationReport.class);
+    when(instructionReport1.getMigrationInstruction()).thenReturn(migrationInstruction);
+    when(instructionReport1.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
+
+    MigrationInstructionValidationReport instructionReport2 = mock(MigrationInstructionValidationReport.class);
+    when(instructionReport2.getMigrationInstruction()).thenReturn(migrationInstruction);
+    when(instructionReport2.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
+
+    MigrationPlanValidationReport validationReport = mock(MigrationPlanValidationReport.class);
+    when(validationReport.getInstructionReports()).thenReturn(Arrays.asList(instructionReport1, instructionReport2));
+
+    when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(MigrationPlanValidationException.class.getSimpleName()))
+      .body("message", is("fooo"))
+      .body("validationReport.instructionReports", hasSize(2))
+      .body("validationReport.instructionReports[0].instruction.sourceActivityIds", hasSize(1))
+      .body("validationReport.instructionReports[0].instruction.sourceActivityIds[0]", is(EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.instructionReports[0].instruction.targetActivityIds", hasSize(1))
+      .body("validationReport.instructionReports[0].instruction.targetActivityIds[0]", is(ANOTHER_EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.instructionReports[0].failures", hasSize(2))
+      .body("validationReport.instructionReports[0].failures[0]", is("failure1"))
+      .body("validationReport.instructionReports[0].failures[1]", is("failure2"))
+    .when()
+      .post(EXECUTE_MIGRATION_ASYNC_URL);
+  }
+
   protected void verifyGenerateMigrationPlanResponse(Response response) {
     String responseContent = response.asString();
     String sourceProcessDefinitionId = from(responseContent).getString("sourceProcessDefinitionId");
@@ -625,6 +909,14 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     inOrder.verify(runtimeServiceMock).newMigration(any(MigrationPlan.class));
     inOrder.verify(migrationPlanExecutionBuilderMock).processInstanceIds(eq(migrationExecution.getProcessInstanceIds()));
     inOrder.verify(migrationPlanExecutionBuilderMock).execute();
+    inOrder.verifyNoMoreInteractions();
+  }
+
+  protected void verifyMigrationPlanAsyncExecutionInteraction(MigrationExecutionDto migrationExecution) {
+    InOrder inOrder = inOrder(runtimeServiceMock, migrationPlanExecutionBuilderMock);
+    inOrder.verify(runtimeServiceMock).newMigration(any(MigrationPlan.class));
+    inOrder.verify(migrationPlanExecutionBuilderMock).processInstanceIds(eq(migrationExecution.getProcessInstanceIds()));
+    inOrder.verify(migrationPlanExecutionBuilderMock).executeAsync();
     inOrder.verifyNoMoreInteractions();
   }
 
