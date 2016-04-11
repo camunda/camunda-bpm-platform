@@ -44,25 +44,22 @@ function (
           label: [
             'process definition',
             'process definitions'
-          ]
+          ],
+          link: '#/processes?targetPlugin=process-definition'
         },
         instances: {
           label: [
             'running instance',
             'running instances'
-          ]
+          ],
+          link: '#/processes?targetPlugin=search-process-instances&searchQuery=%5B%7B%22type%22:%22PIunfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D'
         },
         incidents: {
           label: [
             'incident',
             'incidents'
-          ]
-        },
-        failedJobs: {
-          label: [
-            'failed job',
-            'failed jobs'
-          ]
+          ],
+          link: ''
         }
       };
 
@@ -70,7 +67,16 @@ function (
         return prop.label[(prop.value === 1) ? 0 : 1];
       };
       $scope.gimmeDaValue = function (count) {
-        return count === 0 ? 'No' : count;
+        if (!count) {
+          return 'No';
+        }
+        if (count >= 1000000) {
+          return Math.round(count / 1000000) + 'M';
+        }
+        if (count >= 1000) {
+          return Math.round(count / 1000) + 'K';
+        }
+        return count;
       };
       $scope.loadingState = 'LOADING';
       // should I mention how much I love AngularJS?
@@ -90,11 +96,9 @@ function (
 
         procStats.incidents.value = 0;
         procStats.instances.value = 0;
-        procStats.failedJobs.value = 0;
 
         each(defStats, function (stats) {
           procStats.instances.value += stats.instances || 0;
-          procStats.failedJobs.value += stats.failedJobs || 0;
           procStats.incidents.value += stats.incidents.length;
         });
       });
