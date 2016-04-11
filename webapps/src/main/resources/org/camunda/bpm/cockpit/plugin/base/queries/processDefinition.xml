@@ -51,7 +51,7 @@
       ${prefix}ACT_RU_EXECUTION EXEC2
     on
       EXEC1.SUPER_EXEC_ = EXEC2.ID_
-    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
     inner join
         ${prefix}ACT_RE_PROCDEF PROCDEF
     on
