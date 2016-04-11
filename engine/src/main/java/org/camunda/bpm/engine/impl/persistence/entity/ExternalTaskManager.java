@@ -19,7 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
+import org.camunda.bpm.engine.impl.ExternalTaskQueryProperty;
+import org.camunda.bpm.engine.impl.JobQueryProperty;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
@@ -31,6 +35,8 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
  */
 public class ExternalTaskManager extends AbstractManager {
 
+  public static QueryOrderingProperty EXT_TASK_PRIORITY_ORDERING_PROPERTY = new QueryOrderingProperty(ExternalTaskQueryProperty.PRIORITY, Direction.DESCENDING);
+  
   public ExternalTaskEntity findExternalTaskById(String id) {
     return getDbEntityManager().selectById(ExternalTaskEntity.class, id);
   }
@@ -59,19 +65,16 @@ public class ExternalTaskManager extends AbstractManager {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("topics", topics);
     parameters.put("now", ClockUtil.getCurrentTime());
+    parameters.put("applyOrdering", usePriority);
+    List<QueryOrderingProperty> orderingProperties = new ArrayList<QueryOrderingProperty>();
+    orderingProperties.add(EXT_TASK_PRIORITY_ORDERING_PROPERTY);
+    parameters.put("orderingProperties", orderingProperties);
 
     ListQueryParameterObject parameter = new ListQueryParameterObject(parameters, 0, maxResults);
     configureAuthorizationCheck(parameter);
 
     DbEntityManager manager = getDbEntityManager();
-    List<ExternalTaskEntity> entities;
-    if (usePriority) {
-      parameter.setOrderBy("PRIORITY_ DESC");        
-      entities = manager.selectList("selectExternalTasksForTopicsWithPriority", parameter);
-    }
-    else 
-      entities = manager.selectList("selectExternalTasksForTopics", parameter);
-    return entities;
+    return manager.selectList("selectExternalTasksForTopics", parameter);
     }
 
   public List<ExternalTask> findExternalTasksByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {

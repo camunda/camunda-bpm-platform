@@ -64,6 +64,11 @@ public class QueryOrderingProperty implements Serializable {
   public QueryOrderingProperty() {
   }
 
+  public QueryOrderingProperty(QueryProperty queryProperty, Direction direction) {
+    this.queryProperty = queryProperty;
+    this.direction = direction;
+  }
+
   public QueryOrderingProperty(String relation, QueryProperty queryProperty) {
     this.relation = relation;
     this.queryProperty = queryProperty;
