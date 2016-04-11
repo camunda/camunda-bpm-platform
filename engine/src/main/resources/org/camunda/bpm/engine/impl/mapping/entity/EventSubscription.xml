@@ -66,7 +66,7 @@
   <sql id="selectEventSubscriptionByQueryCriteriaSql">
     from ${prefix}ACT_RU_EVENT_SUBSCR RES
 
-    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       left join ${prefix}ACT_RU_EXECUTION EXECUTION
       on RES.EXECUTION_ID_ = EXECUTION.ID_
 

@@ -34,7 +34,6 @@ import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -84,6 +83,7 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
+import org.camunda.bpm.engine.impl.db.TenantCheck;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
@@ -273,22 +273,36 @@ public class AuthorizationManager extends AbstractManager {
     final Authentication currentAuthentication = getCurrentAuthentication();
     CommandContext commandContext = getCommandContext();
 
-    query.getPermissionChecks().clear();
+    AuthorizationCheck authCheck = query.getAuthCheck();
+
+    authCheck.getPermissionChecks().clear();
 
     if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
-      query.setAuthorizationCheckEnabled(true);
+      authCheck.setAuthorizationCheckEnabled(true);
 
       String currentUserId = currentAuthentication.getUserId();
       List<String> currentGroupIds = filterAuthenticatedGroupIds(currentAuthentication.getGroupIds());
 
-      query.setAuthUserId(currentUserId);
-      query.setAuthGroupIds(currentGroupIds);
+      authCheck.setAuthUserId(currentUserId);
+      authCheck.setAuthGroupIds(currentGroupIds);
     }
     else {
-      query.setAuthorizationCheckEnabled(false);
-      query.setAuthUserId(null);
-      query.setAuthGroupIds(null);
+      authCheck.setAuthorizationCheckEnabled(false);
+      authCheck.setAuthUserId(null);
+      authCheck.setAuthGroupIds(null);
+    }
+
+    // TODO separate tenant check from authorization - CAM-5739
+    TenantCheck tenantCheck = query.getTenantCheck();
+
+    if (Context.getProcessEngineConfiguration().isTenantCheckEnabled() && currentAuthentication != null) {
+      tenantCheck.setTenantCheckEnabled(true);
+      tenantCheck.setAuthTenantIds(currentAuthentication.getTenantIds());
+
+    } else {
+      tenantCheck.setTenantCheckEnabled(false);
+      tenantCheck.setAuthTenantIds(null);
     }
   }
 
@@ -314,7 +328,7 @@ public class AuthorizationManager extends AbstractManager {
       permCheck.setResourceIdQueryParam(queryParam);
       permCheck.setPermission(permission);
 
-      query.addAtomicPermissionCheck(permCheck);
+      query.getAuthCheck().addAtomicPermissionCheck(permCheck);
     }
   }
 
@@ -789,7 +803,7 @@ public class AuthorizationManager extends AbstractManager {
   // task query //////////////////////////////////////////////
 
   public void configureTaskQuery(TaskQueryImpl query) {
-    query.getPermissionChecks().clear();
+    query.getAuthCheck().getPermissionChecks().clear();
     query.getTaskPermissionChecks().clear();
 
     Authentication currentAuthentication = getCurrentAuthentication();
@@ -833,7 +847,7 @@ public class AuthorizationManager extends AbstractManager {
   // variable instance query /////////////////////////////
 
   protected void configureVariableInstanceQuery(VariableInstanceQueryImpl query) {
-    query.getPermissionChecks().clear();
+    query.getAuthCheck().getPermissionChecks().clear();
     query.getTaskPermissionChecks().clear();
 
     Authentication currentAuthentication = getCurrentAuthentication();
@@ -921,7 +935,7 @@ public class AuthorizationManager extends AbstractManager {
   public void configureHistoricIdentityLinkQuery(HistoricIdentityLinkQueryImpl query) {
    configureQuery(query, PROCESS_DEFINITION, "SELF.PROC_DEF_KEY_", READ_HISTORY);
   }
- 
+
   public void configureHistoricDecisionInstanceQuery(HistoricDecisionInstanceQueryImpl query) {
     configureQuery(query, DECISION_DEFINITION, "SELF.DEC_DEF_KEY_", READ_HISTORY);
   }
@@ -1083,7 +1097,7 @@ public class AuthorizationManager extends AbstractManager {
         .done()
       .build();
 
-    addPermissionCheck(parameter, permissionCheck);
+    addPermissionCheck(parameter.getAuthCheck(), permissionCheck);
   }
 
   public void configureDecisionDefinitionQuery(DecisionDefinitionQueryImpl query) {

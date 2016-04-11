@@ -225,7 +225,7 @@
         left join ${prefix}ACT_RU_EXECUTION E1 on RES.EXECUTION_ID_ = E1.ID_
     </if>
 
-    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       left join ${prefix}ACT_RE_PROCDEF PROCDEF on RES.PROC_DEF_ID_ = PROCDEF.ID_
     </if>
 
@@ -492,7 +492,7 @@
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.contextualAuthorizationCheck" />
-
+ 
     </where>
   </sql>
 

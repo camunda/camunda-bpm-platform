@@ -19,7 +19,7 @@ import java.util.List;
 import org.camunda.bpm.engine.authorization.Permissions;
 
 /**
- * <p>Input for the authorization check alogrithm</p>
+ * <p>Input for the authorization check algorithm</p>
  *
  * @author Daniel Meyer
  *
@@ -50,6 +50,11 @@ public class AuthorizationCheck implements Serializable {
   // getters / setters /////////////////////////////////////////
 
   public boolean isAuthorizationCheckEnabled() {
+    return isAuthorizationCheckEnabled;
+  }
+
+  /** is used by myBatis */
+  public boolean getIsAuthorizationCheckEnabled() {
     return isAuthorizationCheckEnabled;
   }
 

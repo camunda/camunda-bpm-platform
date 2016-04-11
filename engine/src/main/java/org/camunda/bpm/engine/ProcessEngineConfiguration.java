@@ -211,6 +211,13 @@ public abstract class ProcessEngineConfiguration {
    */
   protected boolean authorizationEnabledForCustomCode = false;
 
+  /**
+   * If the value of this flag is set <code>true</code> then the process engine
+   * performs tenant checks to ensure that an authenticated user can only access
+   * data that belongs to one of his tenants.
+   */
+  protected boolean tenantCheckEnabled = true;
+
   protected ValueTypeResolver valueTypeResolver;
 
   /** use one of the static createXxxx methods instead */
@@ -609,6 +616,15 @@ public abstract class ProcessEngineConfiguration {
 
   public ProcessEngineConfiguration setAuthorizationEnabledForCustomCode(boolean authorizationEnabledForCustomCode) {
     this.authorizationEnabledForCustomCode = authorizationEnabledForCustomCode;
+    return this;
+  }
+
+  public boolean isTenantCheckEnabled() {
+    return tenantCheckEnabled;
+  }
+
+  public ProcessEngineConfiguration setTenantCheckEnabled(boolean isTenantCheckEnabled) {
+    this.tenantCheckEnabled = isTenantCheckEnabled;
     return this;
   }
 

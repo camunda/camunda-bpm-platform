@@ -484,9 +484,24 @@
 
   <!-- reusable authorization check for queries. -->
   <sql id="queryAuthorizationCheck">
-    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
 
+        <bind name="permissionChecks" value="authCheck.permissionChecks" />
+        <bind name="authUserId" value="authCheck.authUserId" />
+        <bind name="authGroupIds" value="authCheck.authGroupIds" />
         AND (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />) = 1
+
+    </if>
+  </sql>
+  
+  <!-- reusable single authorization check for queries. -->
+  <sql id="querySingleAuthorizationCheck">
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+
+        <bind name="authUserId" value="authCheck.authUserId" />
+        <bind name="authGroupIds" value="authCheck.authGroupIds" />
+        <bind name="permCheck" value="authCheck.permissionChecks.atomicChecks[0]" />
+        (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck" />) = 1
 
     </if>
   </sql>
@@ -617,7 +632,10 @@
   </sql>
 
   <sql id="contextualAuthorizationCheck">
-    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <bind name="authUserId" value="authCheck.authUserId" />
+      <bind name="authGroupIds" value="authCheck.authGroupIds" />
+    
       AND
         ( CASE
 
@@ -625,7 +643,8 @@
             <!-- variable instance or task exists in context of a process instance -->
             RES.EXECUTION_ID_ is not null
           THEN
-            (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
+            (<bind name="permissionChecks" value="authCheck.permissionChecks" />
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
 
           WHEN
             <!-- variable instance or task exists in context of a case instance -->

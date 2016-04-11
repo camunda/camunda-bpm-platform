@@ -138,17 +138,14 @@
   <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
     from ${prefix}ACT_HI_PROCINST RES
 
-    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       LEFT JOIN (
         SELECT
             DISTINCT SELF.PROC_DEF_KEY_ AS KEY_
         FROM
             ${prefix}ACT_HI_PROCINST SELF
         WHERE
-            1 = (
-                <bind name="permCheck" value="permissionChecks.atomicChecks[0]" />
-                <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck" />
-            )
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
       ) AUTH
       ON AUTH.KEY_ = RES.PROC_DEF_KEY_
     </if>
@@ -272,7 +269,7 @@
         </foreach>
       </if>
 
-      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
         and ((RES.PROC_DEF_KEY_ is not null and AUTH.KEY_ is not null) or RES.PROC_DEF_KEY_ is null)
       </if>
 

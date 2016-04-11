@@ -121,6 +121,8 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       deleteDeployments();
 
       identityService.clearAuthentication();
+      processEngineConfiguration.setTenantCheckEnabled(true);
+
       // only fail if no test failure was recorded
       TestHelper.assertAndEnsureCleanDbAndCache(processEngine, exception == null);
       ClockUtil.reset();
