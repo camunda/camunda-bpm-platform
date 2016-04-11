@@ -15,59 +15,22 @@ package org.camunda.bpm.engine.test.standalone.testing;
 
 import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.junit.Rule;
 import org.junit.Test;
 
-
-/**
- * Test runners follow the this rule:
- *   - if the class extends Testcase, run as Junit 3
- *   - otherwise use Junit 4
- *
- * So this test can be included in the regular test suite without problems.
- *
- * @author Joram Barrez
- */
-public class ProcessEngineRuleJunit4Test {
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+public class ProcessEngineRuleRequiredHistoryLevelClassTest {
 
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  public final ProcessEngineRule engineRule = new ProcessEngineRule(true);
 
   @Test
-  @Deployment
-  public void ruleUsageExample() {
-    RuntimeService runtimeService = engineRule.getRuntimeService();
-    runtimeService.startProcessInstanceByKey("ruleUsage");
-
-    TaskService taskService = engineRule.getTaskService();
-    Task task = taskService.createTaskQuery().singleResult();
-    assertEquals("My Task", task.getName());
-
-    taskService.complete(task.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-  }
-
-  /**
-   * The rule should work with tests that have no deployment annotation
-   */
-  @Test
-  public void testWithoutDeploymentAnnotation() {
-    assertEquals("aString", "aString");
-  }
-
-  @Test
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-  public void requiredHistoryLevelAudit() {
+  public void requiredHistoryLevelOnClass() {
 
     assertThat(currentHistoryLevel(),
         either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
@@ -77,18 +40,11 @@ public class ProcessEngineRuleJunit4Test {
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
-  public void requiredHistoryLevelActivity() {
+  public void overrideRequiredHistoryLevelOnClass() {
 
     assertThat(currentHistoryLevel(),
         either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
         .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
-  }
-
-  @Test
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-  public void requiredHistoryLevelFull() {
-
-    assertThat(currentHistoryLevel(), is(ProcessEngineConfiguration.HISTORY_FULL));
   }
 
   protected String currentHistoryLevel() {
