@@ -48,7 +48,7 @@ public abstract class HandleExternalTaskCmd extends ExternalTaskCmd {
         "Cannot find external task with id " + externalTaskId, "externalTask", externalTask);
 
     if (!workerId.equals(externalTask.getWorkerId())) {      
-      throw new BadUserRequestException(getBadUserRequestMessage() + "'. It is locked by worker '" + externalTask.getWorkerId() + "'.");
+      throw new BadUserRequestException(getErrorMessageOnWrongWorkerAccess() + "'. It is locked by worker '" + externalTask.getWorkerId() + "'.");
     }
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
@@ -60,12 +60,12 @@ public abstract class HandleExternalTaskCmd extends ExternalTaskCmd {
   }
   
   /**
-   * Returns the bad user request message. Which is used to create an specific message
+   * Returns the error message. Which is used to create an specific message
    *  for the BadUserRequestException if an worker has no rights to execute commands of the external task.
    * 
-   * @return the specific bad user request message
+   * @return the specific error message
    */
-  public abstract String getBadUserRequestMessage();
+  public abstract String getErrorMessageOnWrongWorkerAccess();
     
   /**
    * Validates the current input of the command.

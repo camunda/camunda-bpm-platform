@@ -15,11 +15,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.delegate.BpmnError;
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
@@ -45,18 +41,12 @@ public class HandleExternalTaskBpmnErrorCmd extends HandleExternalTaskCmd {
   }
 
   @Override
-  public String getBadUserRequestMessage() {
+  public String getErrorMessageOnWrongWorkerAccess() {
     return "Bpmn error of External Task " + externalTaskId + " cannot be reported by worker '" + workerId;
   }
 
   @Override
   public void execute(ExternalTaskEntity externalTask) {
-    ActivityExecution activityExecution = externalTask.getExecution();
-    BpmnError bpmnError = new BpmnError(errorCode);
-    try {
-      ( (ExternalTaskActivityBehavior) activityExecution.getActivity().getActivityBehavior()).propagateBpmnError(bpmnError, activityExecution);      
-    } catch (Exception ex) {
-      throw ProcessEngineLogger.CMD_LOGGER.exceptionBpmnErrorPropagationFailed(errorCode, ex);
-    }    
+    externalTask.bpmnError(errorCode);
   }
 }

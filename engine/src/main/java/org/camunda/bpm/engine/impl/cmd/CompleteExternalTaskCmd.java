@@ -30,7 +30,7 @@ public class CompleteExternalTaskCmd extends HandleExternalTaskCmd {
   }
 
   @Override
-  public String getBadUserRequestMessage() {
+  public String getErrorMessageOnWrongWorkerAccess() {
     return "External Task " + externalTaskId + " cannot be completed by worker '" + workerId;
   }
 

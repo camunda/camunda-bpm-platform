@@ -1349,9 +1349,9 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
   
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml")
   public void testHandleBpmnError() {
-    // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");    
+    // when
     List<LockedExternalTask> externalTasks = helperHandleBpmnError(1, WORKER_ID, TOPIC_NAME, LOCK_TIME,  "ERROR-OCCURED");
+    //then
     assertEquals(0, externalTasks.size());
     assertEquals(0, externalTaskService.createExternalTaskQuery().count());
     Task afterBpmnError = taskService.createTaskQuery().singleResult();
@@ -1364,7 +1364,11 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
   public void testHandleBpmnErrorWithoutDefinedBoundary() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");    
+    
+    //when
     List<LockedExternalTask> externalTasks = helperHandleBpmnError(1, WORKER_ID, TOPIC_NAME, LOCK_TIME,  "ERROR-OCCURED");
+    
+    //then
     assertEquals(0, externalTasks.size());
     assertEquals(0, externalTaskService.createExternalTaskQuery().count());
     Task afterBpmnError = taskService.createTaskQuery().singleResult();
@@ -1398,9 +1402,6 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
   
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml")
   public void testHandleBpmnErrorLockExpiredTask() {
-    // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");    
-
     // when
     List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
       .topic(TOPIC_NAME, LOCK_TIME)
@@ -1434,7 +1435,8 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml")
   public void testHandleBpmnErrorReclaimedLockExpiredTaskWithBoundary() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+    runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+    //then
     handleBpmnErrorReclaimedLockExpiredTask();    
   }
   
@@ -1482,7 +1484,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  public void testHandleBpmnNullTaskId() {
+  public void testHandleBpmnNullTaskId() {    
     try {
       externalTaskService.handleBpmnError(null, WORKER_ID, "ERROR-OCCURED");
       fail("exception expected");
@@ -1494,12 +1496,15 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
   
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testHandleBpmnNullErrorCode() {
+    //given
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 
+    //when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(1, WORKER_ID)
         .topic(TOPIC_NAME, LOCK_TIME)
         .execute();
 
+    //then
     LockedExternalTask task = tasks.get(0);
     try {
       externalTaskService.handleBpmnError(task.getId(), WORKER_ID, null);
@@ -1547,16 +1552,6 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
       assertTextPresent("Propagation of bpmn error ERROR-OCCURED failed.", e.getMessage());
     }
-
-    assertProcessNotEnded(processInstance.getId());
-
-    // when activating the process instance again
-    runtimeService.activateProcessInstanceById(processInstance.getId());
-
-    // then the task can be completed
-    externalTaskService.complete(task.getId(), WORKER_ID);
-
-    assertProcessEnded(processInstance.getId());
   }
   
   protected Date nowPlus(long millis) {

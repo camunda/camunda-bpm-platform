@@ -181,7 +181,9 @@ public interface ExternalTaskService {
 
   /**
    * <p>Signals that an business error appears, which should be handled by the process engine. 
-   * The task must be assigned to the given worker.</p>
+   * The task must be assigned to the given worker. The error will be propagated to the next error handler.
+   * Is no existing error handler for the given bpmn error the activity instance of the external task
+   * ends.</p>
    * 
    * 
    * @param externalTaskId the id of the external task to report a bpmn error

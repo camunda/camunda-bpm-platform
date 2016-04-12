@@ -17,14 +17,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -224,6 +227,18 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     this.errorMessage = errorMessage;
     this.lockExpirationTime = new Date(ClockUtil.getCurrentTime().getTime() + retryDuration);
     setRetriesAndManageIncidents(retries);
+  }
+  
+  public void bpmnError(String errorCode) {
+    ensureActive();
+    ActivityExecution activityExecution = getExecution();
+    BpmnError bpmnError = new BpmnError(errorCode);
+    try {      
+      ExternalTaskActivityBehavior behavior = ((ExternalTaskActivityBehavior) activityExecution.getActivity().getActivityBehavior());
+      behavior.propagateBpmnError(bpmnError, activityExecution);      
+    } catch (Exception ex) {
+      throw ProcessEngineLogger.CMD_LOGGER.exceptionBpmnErrorPropagationFailed(errorCode, ex);
+    }    
   }
 
   public void setRetriesAndManageIncidents(int retries) {
