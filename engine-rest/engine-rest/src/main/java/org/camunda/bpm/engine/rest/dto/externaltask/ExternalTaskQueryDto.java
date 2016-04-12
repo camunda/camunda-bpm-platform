@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.dto.converter.LongConverter;
 
 /**
  * @author Thorben Lindhauer
@@ -41,6 +42,7 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
   public static final String SORT_BY_PROCESS_DEFINITION_ID = "processDefinitionId";
   public static final String SORT_BY_PROCESS_DEFINITION_KEY = "processDefinitionKey";
   public static final String SORT_BY_TENANT_ID = "tenantId";
+  public static final String SORT_BY_PRIORITY = "priority";
 
   public static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -51,6 +53,7 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_KEY);
     VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
+    VALID_SORT_BY_VALUES.add(SORT_BY_PRIORITY);
   }
 
   protected String externalTaskId;
@@ -69,6 +72,8 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
   protected Boolean noRetriesLeft;
   protected String workerId;
   protected List<String> tenantIds;
+  protected Long priorityHigherThanOrEquals;
+  protected Long priorityLowerThanOrEquals;
 
   public ExternalTaskQueryDto() {
   }
@@ -156,6 +161,15 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
   public void setTenantIdIn(List<String> tenantIds) {
     this.tenantIds = tenantIds;
   }
+  @CamundaQueryParam(value="priorityHigherThanOrEquals", converter = LongConverter.class)
+  public void setPriorityHigherThanOrEquals(Long priorityHigherThanOrEquals) {
+    this.priorityHigherThanOrEquals = priorityHigherThanOrEquals;
+  }
+
+  @CamundaQueryParam(value="priorityLowerThanOrEquals", converter = LongConverter.class)
+  public void setPriorityLowerThanOrEquals(Long priorityLowerThanOrEquals) {
+    this.priorityLowerThanOrEquals = priorityLowerThanOrEquals;
+  }
 
   @Override
   protected boolean isValidSortByValue(String value) {
@@ -205,6 +219,12 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
     if (suspended != null && suspended) {
       query.suspended();
     }
+    if (priorityHigherThanOrEquals != null) {
+      query.priorityHigherThanOrEquals(priorityHigherThanOrEquals);
+    }
+    if (priorityLowerThanOrEquals != null) {
+      query.priorityLowerThanOrEquals(priorityLowerThanOrEquals);
+    }
     if (withRetriesLeft != null && withRetriesLeft) {
       query.withRetriesLeft();
     }
@@ -237,7 +257,8 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
       query.orderByProcessInstanceId();
     } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
       query.orderByTenantId();
+    } else if (sortBy.equals(SORT_BY_PRIORITY)) {
+      query.orderByPriority();
     }
   }
-
 }

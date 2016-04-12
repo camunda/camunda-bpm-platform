@@ -556,6 +556,23 @@ public class TestOrderingUtil {
 
     };
   }
+  
+  public static NullTolerantComparator<ExternalTask> externalTaskByPriority() {
+    return new NullTolerantComparator<ExternalTask>() {
+
+      @Override
+      public int compare(ExternalTask o1, ExternalTask o2) {
+        return Long.valueOf(o1.getPriority())
+            .compareTo(o2.getPriority());
+      }
+
+      @Override
+      public boolean hasNullProperty(ExternalTask object) {
+        return false;
+      }
+
+    };
+  }
 
   // batch
 

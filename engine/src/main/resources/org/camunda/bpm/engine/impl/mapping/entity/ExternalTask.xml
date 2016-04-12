@@ -224,6 +224,12 @@
             and RES.SUSPENSION_STATE_ = 2
         </if>
       </if>
+      <if test="priorityHigherThanOrEquals != null">
+        and RES.PRIORITY_ &gt;= #{priorityHigherThanOrEquals}
+      </if>
+      <if test="priorityLowerThanOrEquals != null">
+        and RES.PRIORITY_ &lt;= #{priorityLowerThanOrEquals}
+      </if>
       <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
         and RES.TENANT_ID_ in
         <foreach item="tenantId" index="index" collection="tenantIds"
