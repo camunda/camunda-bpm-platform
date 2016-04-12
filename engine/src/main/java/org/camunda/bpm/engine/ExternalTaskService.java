@@ -71,13 +71,13 @@ public interface ExternalTaskService {
    */
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId);
 
-  
-  
+
+
   /**
    * <p>Defines fetching of external tasks by using a fluent builder.
    * The following parameters must be specified:
-   * A worker id, a maximum number of tasks to fetch and a flag that indicates 
-   * whether priority should be regarded or not. 
+   * A worker id, a maximum number of tasks to fetch and a flag that indicates
+   * whether priority should be regarded or not.
    * The builder allows to specify multiple topics to fetch tasks for and
    * individual lock durations. For every topic, variables can be fetched
    * in addition.Is the priority enabled the tasks with the highest priority are fetched.</p>
@@ -115,7 +115,7 @@ public interface ExternalTaskService {
    * @return a builder to define and execute an external task fetching operation
    */
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority);
-  
+
   /**
    * <p>Completes an external task on behalf of a worker. The given task must be
    * assigned to the worker.</p>
@@ -180,17 +180,16 @@ public interface ExternalTaskService {
   public void handleFailure(String externalTaskId, String workerId, String errorMessage, int retries, long retryTimeout);
 
   /**
-   * <p>Signals that an business error appears, which should be handled by the process engine. 
+   * <p>Signals that an business error appears, which should be handled by the process engine.
    * The task must be assigned to the given worker. The error will be propagated to the next error handler.
    * Is no existing error handler for the given bpmn error the activity instance of the external task
    * ends.</p>
-   * 
-   * 
+   *
    * @param externalTaskId the id of the external task to report a bpmn error
    * @param workerId the id of the worker that reports the bpmn error
    * @param errorCode the error code of the corresponding bmpn error
    * @since 7.5
-   * 
+   *
    * @throws NotFoundException if no external task with the given id exists
    * @throws BadUserRequestException if the task is assigned to a different worker
    * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
@@ -200,7 +199,7 @@ public interface ExternalTaskService {
    *   </ul>
    */
   public void handleBpmnError(String externalTaskId, String workerId, String errorCode);
-  
+
   /**
    * Unlocks an external task instance.
    *
@@ -230,8 +229,8 @@ public interface ExternalTaskService {
    */
   public void setRetries(String externalTaskId, int retries);
 
-    /**
-   * Sets the priority for an external task. 
+  /**
+   * Sets the priority for an external task.
    *
    * @param externalTaskId the id of the task to set the
    * @param priority the new priority of the task
@@ -243,7 +242,7 @@ public interface ExternalTaskService {
    *   </ul>
    */
   public void setPriority(String externalTaskId, long priority);
-  
+
   /**
    * <p>
    *   Queries for tasks that the currently authenticated user has at least one

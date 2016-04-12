@@ -36,7 +36,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 public class ExternalTaskManager extends AbstractManager {
 
   public static QueryOrderingProperty EXT_TASK_PRIORITY_ORDERING_PROPERTY = new QueryOrderingProperty(ExternalTaskQueryProperty.PRIORITY, Direction.DESCENDING);
-  
+
   public ExternalTaskEntity findExternalTaskById(String id) {
     return getDbEntityManager().selectById(ExternalTaskEntity.class, id);
   }
@@ -75,7 +75,7 @@ public class ExternalTaskManager extends AbstractManager {
 
     DbEntityManager manager = getDbEntityManager();
     return manager.selectList("selectExternalTasksForTopics", parameter);
-    }
+  }
 
   public List<ExternalTask> findExternalTasksByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
     configureAuthorizationCheck(externalTaskQuery);
