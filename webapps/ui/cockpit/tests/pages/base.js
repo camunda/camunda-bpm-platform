@@ -8,22 +8,6 @@ module.exports = Page.extend({
     return element(by.css('.ctn-header .badge'));
   },
 
-  breadCrumb: function(item) {
-    // 0 = home
-    // 1 = 1st bread crumb
-    // ...
-
-    item = item + 1;
-    if(item == 2)
-      return element(by.css('.breadcrumbs-panel ul li:nth-child(' + item + ')')).element(by.css('a'));
-    else
-      return element(by.css('.breadcrumbs-panel ul li:nth-child(' + item + ')'));
-  },
-
-  selectBreadCrumb: function(item) {
-    this.breadCrumb(item).click();
-  },
-
   navbar: function () {
     return element(by.css('[cam-widget-header]'));
   },
@@ -33,7 +17,7 @@ module.exports = Page.extend({
   },
 
   navbarItem: function (idx) {
-    return this.navbarItems().get(idx);//this.navbar().element(by.css('[ng-transclude] > ul > li:nth-child(' + (idx + 1) + ')'));
+    return this.navbarItems().get(idx);
   },
 
   navbarItemClick: function () {

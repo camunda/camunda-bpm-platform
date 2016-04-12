@@ -21,10 +21,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
     page,
     camAPI
   ) {
-    page.titleSet([
-      'Camunda Cockpit',
-      'Deployments'
-    ].join(' | '));
+    $scope.$root.showBreadcrumbs = true;
+
+    page.breadcrumbsClear();
+
+    page.titleSet('Deployments');
 
     // utilities /////////////////////////////////////////////////////////////////
 

@@ -262,27 +262,41 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     $scope.breadcrumbData = processData.observe([ 'processDefinition', 'parent' ], function(definition, parent) {
       page.breadcrumbsClear();
 
+      page.breadcrumbsAdd({
+        label: 'Processes',
+        href: '#/processes/'
+      });
+
       if (parent) {
         page.breadcrumbsAdd({
           type: 'processDefinition',
-          label: parent.name || parent.id,
+          label: parent.name || (parent.id.slice(0, 8) +'…'),
           href: '#/process-definition/'+ parent.id +'/runtime',
           processDefinition: parent
         });
       }
 
+
+      var plugins = Views.getProviders({ component: 'cockpit.processDefinition.view' });
+
       page.breadcrumbsAdd({
         type: 'processDefinition',
         label: definition.name || definition.key || definition.id,
         href: '#/process-definition/'+ definition.id +'/runtime',
-        processDefinition: definition
+        processDefinition: definition,
+
+        choices: plugins.sort(function (a, b) {
+          return a.priority < b.priority ? -1 : (a.priority > b.priority ? 1 : 0);
+        }).map(function (plugin) {
+          return {
+            active: plugin.id === 'runtime',
+            label: plugin.label,
+            href: '#/process-definition/' + definition.id + '/' + plugin.id
+          };
+        })
       });
 
-      page.titleSet([
-        'Camunda Cockpit',
-        definition.name || definition.key || definition.id,
-        'Definition View'
-      ].join(' | '));
+      page.titleSet((definition.name || definition.key || definition.id).toString());
     });
 
     $scope.instanceStatistics = processData.observe([ 'instances.all', 'instances.current' ], function(allCount, currentCount) {

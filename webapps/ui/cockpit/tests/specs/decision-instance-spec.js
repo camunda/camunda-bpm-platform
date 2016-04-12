@@ -23,7 +23,7 @@ describe('Cockpit Decision Instance Spec', function() {
       });
     });
 
-    it('should go to decision defintion view', function() {
+    it('should go to decision definition view', function() {
 
       // given
       decisionsPage.deployedDecisionsList.decisionName(0).then(function(decisionName) {
@@ -32,8 +32,7 @@ describe('Cockpit Decision Instance Spec', function() {
         decisionsPage.deployedDecisionsList.selectDecision(0).then(function() {
 
           // then
-          expect(definitionPage.pageHeader().getText()).to.eventually.match(new RegExp(decisionName));
-          expect(definitionPage.pageHeader().getText()).to.eventually.match(/DECISION DEFINITION/);
+          expect(dashboardPage.breadcrumb.activeCrumb().getText()).to.eventually.eql(decisionName);
         });
       })
     });
@@ -48,7 +47,8 @@ describe('Cockpit Decision Instance Spec', function() {
         definitionPage.decisionInstancesTab.selectInstanceId(0).then(function() {
 
           // then
-          expect(instancePage.information.instanceId()).to.eventually.match(new RegExp(instanceId));
+          expect(instancePage.information.instanceId()).to.eventually.eql(instanceId);
+          expect(dashboardPage.breadcrumb.activeCrumb().getText()).to.eventually.eql(instanceId);
         });
       });
     });
@@ -105,13 +105,15 @@ describe('Cockpit Decision Instance Spec', function() {
     });
 
     it('should go to decision instance view', function() {
-
       // when
       decisionsPage.deployedDecisionsList.selectDecision(0);
-      definitionPage.decisionInstancesTab.selectInstanceId(0);
 
-      // then
-      expect(instancePage.pageHeader().getText()).to.eventually.match(/DECISION INSTANCE/);
+      definitionPage.decisionInstancesTab.instanceId(0).then(function (instanceId) {
+        definitionPage.decisionInstancesTab.selectInstanceId(0);
+
+        // then
+        expect(dashboardPage.breadcrumb.activeCrumb().getText()).to.eventually.eql(instanceId);
+      });
     });
 
 
@@ -148,13 +150,15 @@ describe('Cockpit Decision Instance Spec', function() {
     });
 
     it('should go to decision instance view', function() {
-
       // when
       decisionsPage.deployedDecisionsList.selectDecision(0);
-      definitionPage.decisionInstancesTab.selectInstanceId(0);
 
-      // then
-      expect(instancePage.pageHeader().getText()).to.eventually.match(/DECISION INSTANCE/);
+      definitionPage.decisionInstancesTab.instanceId(0).then(function (instanceId) {
+        definitionPage.decisionInstancesTab.selectInstanceId(0);
+
+        // then
+        expect(dashboardPage.breadcrumb.activeCrumb().getText()).to.eventually.eql(instanceId);
+      });
     });
 
 

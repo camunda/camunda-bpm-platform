@@ -45,19 +45,15 @@ var angular = require('camunda-commons-ui/vendor/angular');
       }
     }
 
-    $rootScope.showBreadcrumbs = false;
+    $rootScope.showBreadcrumbs = true;
 
-    // reset breadcrumbs
+    page.breadcrumbsClear();
+
     page.breadcrumbsAdd({
-      type: 'processes',
-      label: 'Processes',
-      href: '#/processes'
+      label: 'Processes'
     });
 
-    page.titleSet([
-      'Camunda Cockpit',
-      'Processes'
-    ].join(' | '));
+    page.titleSet('Processes');
   }];
 
   var RouteConfig = [ '$routeProvider', function($routeProvider) {

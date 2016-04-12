@@ -11,11 +11,7 @@ module.exports = Table.extend({
 
 
   isInstanceSuspended: function(idx) {
-    return this.tableItem(idx, '.state .badge-suspended')
-      .getAttribute('class')
-      .then(function(classes) {
-        return classes.indexOf('ng-hide') === -1;
-      });
+    return this.tableItem(idx, '.state .badge-suspended').isDisplayed();
   },
 
   selectInstanceId: function(idx) {

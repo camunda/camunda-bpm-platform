@@ -1,9 +1,10 @@
 @progress-indicator-height: 60px;
 
 .migration-page {
-  height: ~"calc(100vh - (@{header-height} + @{breadcrumb-height} + @{footer-height}))";
-  margin-top: @breadcrumb-height;
-  // padding-top: @grid-gutter-width * 0.5;
+  position: absolute;
+  top: @breadcrumb-height;
+  bottom: 0;
+  width: 100%;
   padding-bottom: @grid-gutter-width * 0.5;
 
   section {
@@ -23,14 +24,6 @@
     overflow: hidden;
   }
 
-  // header {
-  //   height: 60px;
-  //   line-height: 60px;
-  //   > h1 {
-  //     margin: 0;
-  //   }
-  // }
-
   footer {
     padding-top: (@grid-gutter-width * 0.5);
     height: (36px + (@grid-gutter-width * 0.5));
@@ -45,7 +38,6 @@
     padding-bottom: (@grid-gutter-width * 0.5);
 
     overflow: auto;
-    // height: ~"calc(100% - (60px + (36px + (@{grid-gutter-width} * 0.5)))) ";
     height: ~"calc(100% - (36px + (@{grid-gutter-width} * 0.5)))";
   }
 

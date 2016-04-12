@@ -60,18 +60,16 @@ function(
 
   // breadcrumb //////////////////////////////////////////////////////////////
 
-  page.titleSet([
-    'Camunda Cockpit',
-    'Reports'
-  ].join(' | '));
+  $scope.$root.showBreadcrumbs = true;
 
   page.breadcrumbsClear();
-
-  $scope.$root.showBreadcrumbs = true;
 
   page.breadcrumbsAdd({
     label: 'Reports'
   });
+
+  page.titleSet('Reports');
+
 
   // provide data ///////////////////////////////////////////////////////////
 

@@ -1,28 +1,5 @@
 <!-- # CE - camunda-cockpit-ui/client/scripts/pages/process-definition.html -->
 <div class="ctn-fixed-view">
-  <div class="ctn-header">
-    <h1>
-      <span class="inner">
-        <span class="process-name-prefix">
-          <span>Process</span>
-          <span>definition</span>
-        </span>
-        <span class="process-name">{{ processDefinition.name || processDefinition.key }}</span>
-
-        <span class="badge badge-warning badge-suspended"
-              ng-show="processDefinition.suspended"
-              tooltip="Currently suspended"
-              tooltip-placement="top">
-          <span class="glyphicon glyphicon-pause white"></span>
-        </span>
-      </span>
-    </h1>
-
-    <div class="view-pills-wrapper">
-      <div class="view-pills" id="cockpit.processDefinition.view"></div>
-    </div>
-  </div>
-
   <div class="ctn-content-container"
        ctn-collapsable-parent="sidebar">
 
