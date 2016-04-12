@@ -170,6 +170,29 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery processUnfinished();
 
   /**
+   * Only select historic task instances which have mapping
+   * with Historic identity links based on user id
+   */
+  HistoricTaskInstanceQuery taskInvolvedUser(String involvedUser);
+
+  /**
+   * Only select historic task instances which have mapping
+   * with Historic identity links based on group id
+   */
+  HistoricTaskInstanceQuery taskInvolvedGroup(String involvedGroup);
+
+  /**
+   * Only select historic task instances which have mapping
+   * with Historic identity links with the condition of user being a candidate
+   */
+  HistoricTaskInstanceQuery taskHadCandidateUser(String candidateUser);
+
+  /**
+   * Only select historic task instances which have mapping
+   * with Historic identity links with the condition of group being a candidate
+   */
+  HistoricTaskInstanceQuery taskHadCandidateGroup(String candidateGroup);
+  /**
    * Only select historic task instances which have a local task variable with the
    * given name set to the given value. Make sure history-level is configured
    * >= AUDIT when this feature is used.

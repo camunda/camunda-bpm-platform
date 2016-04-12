@@ -33,6 +33,10 @@ import org.camunda.bpm.engine.identity.UserQuery;
 public interface HistoricIdentityLink {
   
   /**
+   * Returns the id of historic identity link (Candidate or Assignee or Owner).
+   */
+  String getId();
+  /**
    * Returns the type of link (Candidate or Assignee or Owner).
    * See {@link IdentityLinkType} for the native supported types by the process engine.
    *
@@ -63,7 +67,7 @@ public interface HistoricIdentityLink {
   String getAssignerId();
   
   /**
-   * Returns the type of identity link history (Create or Delete identity link)
+   * Returns the type of identity link history (add or delete identity link)
    */
   String getOperationType();
   
@@ -71,4 +75,9 @@ public interface HistoricIdentityLink {
    * Returns the time of identity link event (Creation/Deletion)
    */
   Date getTime();
+
+  /**
+   * Returns the id of the related process definition 
+   */
+  String getProcessDefinitionId();
 }

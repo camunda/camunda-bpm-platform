@@ -638,8 +638,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     getIdentityLinks().add(identityLink);
     
     fireAddIdentityLinkAuthorizationProvider(type, userId, groupId);
-    identityLink.fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_ADD);
-    
     return identityLink;
   }
   
@@ -667,11 +665,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
     for (IdentityLinkEntity identityLink: identityLinks) {
       fireDeleteIdentityLinkAuthorizationProvider(type, userId, groupId);
-      identityLink.fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_DELETE);
-      Context
-        .getCommandContext()
-        .getDbEntityManager()
-        .delete(identityLink);
+      identityLink.delete();
     }
   }
 

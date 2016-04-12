@@ -149,13 +149,13 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   }
 
   public IdentityLinkEntity addIdentityLink(String userId, String groupId) {
-    IdentityLinkEntity identityLinkEntity = IdentityLinkEntity.createAndInsert();
+    IdentityLinkEntity identityLinkEntity = IdentityLinkEntity.newIdentityLink();
     getIdentityLinks().add(identityLinkEntity);
     identityLinkEntity.setProcessDef(this);
     identityLinkEntity.setUserId(userId);
     identityLinkEntity.setGroupId(groupId);
     identityLinkEntity.setType(IdentityLinkType.CANDIDATE);
-    identityLinkEntity.fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_ADD);
+    identityLinkEntity.insert();
     return identityLinkEntity;
   }
 
@@ -166,11 +166,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
       .findIdentityLinkByProcessDefinitionUserAndGroup(id, userId, groupId);
 
     for (IdentityLinkEntity identityLink: identityLinks) {
-      identityLink.fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_DELETE);
-      Context
-        .getCommandContext()
-        .getDbEntityManager()
-        .delete(identityLink);
+      identityLink.delete();
     }
   }
 

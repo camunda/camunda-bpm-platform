@@ -10,31 +10,38 @@ import org.camunda.bpm.engine.query.Query;
  */
 public interface HistoricIdentityLinkQuery extends Query<HistoricIdentityLinkQuery, HistoricIdentityLink>{
   
-	HistoricIdentityLinkQuery identityLinkId(String id);
-	
+  /** Only select historic identity links which have the date before the give date. **/
 	HistoricIdentityLinkQuery dateBefore(Date dateBefore);
-	
+
+	/** Only select historic identity links which have the date after the give date. **/
 	HistoricIdentityLinkQuery dateAfter(Date dateAfter);
 	
-	HistoricIdentityLinkQuery identityLinkType(String identityLinkType);
+	/** Only select historic identity links which have the given identity link type. **/
+	HistoricIdentityLinkQuery type(String type);
 	
+	/** Only select historic identity links which have the given user id. **/
 	HistoricIdentityLinkQuery userId(String userId);
 	
+	/** Only select historic identity links which have the given group id. **/
 	HistoricIdentityLinkQuery groupId(String groupId);
 	
+	/** Only select historic identity links which have the given task id. **/
 	HistoricIdentityLinkQuery taskId(String taskId);
 	
-	HistoricIdentityLinkQuery processDefId(String processDefId);
+	/** Only select historic identity links which have the given process definition id. **/
+	HistoricIdentityLinkQuery processDefinitionId(String processDefinitionId);
 	
+	/** Only select historic identity links which have the given operation type (add/delete). **/
 	HistoricIdentityLinkQuery operationType(String operationType);
 	
+	/** Only select historic identity links which have the given assigner id. **/
 	HistoricIdentityLinkQuery assignerId(String assignerId);
 	
-	/** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
-	HistoricIdentityLinkQuery orderByIdentityLinkId();
+	/** Order by time (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricIdentityLinkQuery orderByTime();
   
-	/** Order by identityLinkType (needs to be followed by {@link #asc()} or {@link #desc()}). */
-	HistoricIdentityLinkQuery orderByIdentityLinkType();
+	/** Order by type (needs to be followed by {@link #asc()} or {@link #desc()}). */
+	HistoricIdentityLinkQuery orderByType();
 	
 	/** Order by userId (needs to be followed by {@link #asc()} or {@link #desc()}). */
 	HistoricIdentityLinkQuery orderByUserId();
@@ -46,7 +53,7 @@ public interface HistoricIdentityLinkQuery extends Query<HistoricIdentityLinkQue
 	HistoricIdentityLinkQuery orderByTaskId();
 	
 	/** Order by processDefId (needs to be followed by {@link #asc()} or {@link #desc()}). */
-	HistoricIdentityLinkQuery orderByProcessDefId();
+	HistoricIdentityLinkQuery orderByProcessDefinitionId();
 	
 	/** Order by operationType (needs to be followed by {@link #asc()} or {@link #desc()}). */
 	HistoricIdentityLinkQuery orderByOperationType();

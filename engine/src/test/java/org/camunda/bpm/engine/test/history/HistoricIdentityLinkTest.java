@@ -85,8 +85,8 @@ public class HistoricIdentityLinkTest extends PluggableProcessEngineTestCase {
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 2);
     
     query = historyService.createHistoricIdentityLinkQuery();
-    assertEquals(query.identityLinkType(IdentityLinkType.ASSIGNEE).count(), 4);
-    assertEquals(query.identityLinkType(IdentityLinkType.OWNER).count(), 1);
+    assertEquals(query.type(IdentityLinkType.ASSIGNEE).count(), 4);
+    assertEquals(query.type(IdentityLinkType.OWNER).count(), 1);
   }
   
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -116,7 +116,7 @@ public class HistoricIdentityLinkTest extends PluggableProcessEngineTestCase {
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 0);
     
     query = historyService.createHistoricIdentityLinkQuery();
-    assertEquals(query.identityLinkType(IdentityLinkType.ASSIGNEE).count(), 1);
+    assertEquals(query.type(IdentityLinkType.ASSIGNEE).count(), 1);
   }
   
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -158,10 +158,10 @@ public class HistoricIdentityLinkTest extends PluggableProcessEngineTestCase {
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 3);
     
     query = historyService.createHistoricIdentityLinkQuery();
-    assertEquals(query.identityLinkType(IdentityLinkType.ASSIGNEE).count(), 6);
+    assertEquals(query.type(IdentityLinkType.ASSIGNEE).count(), 6);
     
     query = historyService.createHistoricIdentityLinkQuery();
-    assertEquals(query.identityLinkType(IdentityLinkType.OWNER).count(), 1);
+    assertEquals(query.type(IdentityLinkType.OWNER).count(), 1);
   }
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testShouldAddTaskCandidateForAddAndDeleteIdentityLink() {
@@ -247,7 +247,7 @@ public class HistoricIdentityLinkTest extends PluggableProcessEngineTestCase {
 
     // Basic Query test
     HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
-    assertEquals(query.identityLinkType(IdentityLinkType.ASSIGNEE).count(), 2);
+    assertEquals(query.type(IdentityLinkType.ASSIGNEE).count(), 2);
   }
 
   @SuppressWarnings("deprecation")
@@ -305,7 +305,7 @@ public class HistoricIdentityLinkTest extends PluggableProcessEngineTestCase {
 
     // Basic Query test
     HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
-    assertEquals(query.identityLinkType(IdentityLinkType.OWNER).count(), 2);
+    assertEquals(query.type(IdentityLinkType.OWNER).count(), 2);
   }
 
   public void testShouldAddIdentityLinkForTaskCreationWithAssigneeAndOwner() {
@@ -333,11 +333,11 @@ public class HistoricIdentityLinkTest extends PluggableProcessEngineTestCase {
     
     // Basic Query test
     HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
-    assertEquals(query.identityLinkType(IdentityLinkType.ASSIGNEE).count(), 1);
+    assertEquals(query.type(IdentityLinkType.ASSIGNEE).count(), 1);
     assertEquals(query.userId(USER_1).count(), 1);
     
     query = historyService.createHistoricIdentityLinkQuery();
-    assertEquals(query.identityLinkType(IdentityLinkType.OWNER).count(), 1);
+    assertEquals(query.type(IdentityLinkType.OWNER).count(), 1);
     assertEquals(query.userId(OWNER_1).count(), 1);
     
     taskService.deleteTask(taskAssigneeId,true);

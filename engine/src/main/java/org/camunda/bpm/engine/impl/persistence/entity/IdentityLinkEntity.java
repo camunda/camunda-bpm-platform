@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.task.IdentityLink;
@@ -58,20 +59,31 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
   
   public static IdentityLinkEntity createAndInsert() {
     IdentityLinkEntity identityLinkEntity = new IdentityLinkEntity();
-    Context
-      .getCommandContext()
-      .getDbEntityManager()
-      .insert(identityLinkEntity);
+    identityLinkEntity.insert();
     return identityLinkEntity;
   }
   
+  public static IdentityLinkEntity newIdentityLink() {
+    IdentityLinkEntity identityLinkEntity = new IdentityLinkEntity();
+     return identityLinkEntity;
+  }
+
   public void insert() {
     Context
       .getCommandContext()
       .getDbEntityManager()
       .insert(this);
+    fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_ADD);
   }
-  
+
+  public void delete() {
+    Context
+      .getCommandContext()
+      .getDbEntityManager()
+      .delete(this);
+    fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_DELETE);
+  }
+
   public boolean isUser() {
     return userId != null;
   }

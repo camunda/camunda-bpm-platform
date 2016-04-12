@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.standalone.history;
 import java.util.Collections;
 import java.util.List;
 
+import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -97,5 +98,119 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
 
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", Variables.numberValue(null)).count());
   }
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testTaskInvolvedUser() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    // if
+    identityService.setAuthenticatedUserId("aAssignerId");
+    taskService.addCandidateUser(taskId, "aUserId");
+    taskService.addCandidateUser(taskId, "bUserId");
+    taskService.deleteCandidateUser(taskId, "aUserId");
+    taskService.deleteCandidateUser(taskId, "bUserId");
+    Task taskAssignee = taskService.newTask("newTask");
+    taskAssignee.setAssignee("aUserId");
+    taskService.saveTask(taskAssignee);
+    // query test
+    assertEquals(2, historyService.createHistoricTaskInstanceQuery().taskInvolvedUser("aUserId").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskInvolvedUser("bUserId").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskInvolvedUser("invalidUserId").count());
+    taskService.deleteTask("newTask",true);
+  }
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testTaskInvolvedGroup() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    // if
+    identityService.setAuthenticatedUserId("aAssignerId");
+    taskService.addCandidateGroup(taskId, "aGroupId");
+    taskService.addCandidateGroup(taskId, "bGroupId");
+    taskService.deleteCandidateGroup(taskId, "aGroupId");
+    taskService.deleteCandidateGroup(taskId, "bGroupId");
+    // query test
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskInvolvedGroup("aGroupId").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskInvolvedGroup("bGroupId").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskInvolvedGroup("invalidGroupId").count());
+    
+    taskService.deleteTask("newTask",true);
+  }
 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testTaskHadCandidateUser() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    // if
+    identityService.setAuthenticatedUserId("aAssignerId");
+    taskService.addCandidateUser(taskId, "aUserId");
+    taskService.addCandidateUser(taskId, "bUserId");
+    taskService.deleteCandidateUser(taskId, "bUserId");
+    Task taskAssignee = taskService.newTask("newTask");
+    taskAssignee.setAssignee("aUserId");
+    taskService.saveTask(taskAssignee);
+    // query test
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskHadCandidateUser("aUserId").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskHadCandidateUser("bUserId").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskHadCandidateUser("invalidUserId").count());
+    // delete test
+    taskService.deleteTask("newTask",true);
+  }
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testTaskHadCandidateGroup() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    // if
+    identityService.setAuthenticatedUserId("aAssignerId");
+    taskService.addCandidateGroup(taskId, "bGroupId");
+    taskService.deleteCandidateGroup(taskId, "bGroupId");
+    // query test
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskHadCandidateGroup("bGroupId").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskHadCandidateGroup("invalidGroupId").count());
+    // delete test
+    taskService.deleteTask("newTask",true);
+  }
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testGroupTaskQuery() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    // if
+    identityService.setAuthenticatedUserId("aAssignerId");
+    taskService.addCandidateUser(taskId, "aUserId");
+    taskService.addCandidateGroup(taskId, "aGroupId");
+    taskService.addCandidateGroup(taskId, "bGroupId");
+    Task taskOne = taskService.newTask("taskOne");
+    taskOne.setAssignee("aUserId");
+    taskService.saveTask(taskOne);
+    Task taskTwo = taskService.newTask("taskTwo");
+    taskTwo.setAssignee("aUserId");
+    taskService.saveTask(taskTwo);
+    Task taskThree = taskService.newTask("taskThree");
+    taskThree.setOwner("aUserId");
+    taskService.saveTask(taskThree);
+    taskService.deleteCandidateGroup(taskId, "aGroupId");
+    taskService.deleteCandidateGroup(taskId, "bGroupId");
+    historyService.createHistoricTaskInstanceQuery();
+    
+    // Query test
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+    assertEquals(4, query.taskInvolvedUser("aUserId").count());
+    query = historyService.createHistoricTaskInstanceQuery();
+    assertEquals(1, query.taskHadCandidateUser("aUserId").count());
+    query = historyService.createHistoricTaskInstanceQuery();
+    assertEquals(1, query.taskHadCandidateGroup("aGroupId").count());
+    assertEquals(1, query.taskHadCandidateGroup("bGroupId").count());
+    assertEquals(0, query.taskInvolvedUser("aUserId").count());
+    query = historyService.createHistoricTaskInstanceQuery();
+    assertEquals(4, query.taskInvolvedUser("aUserId").count());
+    assertEquals(1, query.taskHadCandidateUser("aUserId").count());
+    assertEquals(1, query.taskInvolvedUser("aUserId").count());
+    // delete task
+    taskService.deleteTask("taskOne",true);
+    taskService.deleteTask("taskTwo",true);
+    taskService.deleteTask("taskThree",true);
+  }
 }

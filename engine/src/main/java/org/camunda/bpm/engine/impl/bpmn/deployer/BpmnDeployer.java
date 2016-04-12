@@ -426,8 +426,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
           identityLink.setGroupId(expr.toString());
         }
         identityLink.setType(IdentityLinkType.CANDIDATE);
-        dbEntityManager.insert(identityLink);
-        identityLink.fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_ADD);
+        identityLink.insert();
       }
     }
   }

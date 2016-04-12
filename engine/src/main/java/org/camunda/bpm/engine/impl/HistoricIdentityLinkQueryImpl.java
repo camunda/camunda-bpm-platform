@@ -18,14 +18,13 @@ public class HistoricIdentityLinkQueryImpl extends AbstractVariableQueryImpl<His
     implements HistoricIdentityLinkQuery {
 
   private static final long serialVersionUID = 1L;
-  protected String identityLinkId;
   protected Date dateBefore;
   protected Date dateAfter;
-  protected String identityLinkType;
+  protected String type;
   protected String userId;
   protected String groupId;
   protected String taskId;
-  protected String processDefId;
+  protected String processDefinitionId;
   protected String operationType;
   protected String assignerId;
 
@@ -36,12 +35,8 @@ public class HistoricIdentityLinkQueryImpl extends AbstractVariableQueryImpl<His
     super(commandExecutor);
   }
   
-  public String getIdentityLinkId() {
-    return identityLinkId;
-  }
-
-  public String getIdentityLinkType() {
-    return identityLinkType;
+  public String getType() {
+    return type;
   }
 
   public String getUserId() {
@@ -56,8 +51,8 @@ public class HistoricIdentityLinkQueryImpl extends AbstractVariableQueryImpl<His
     return taskId;
   }
 
-  public String getProcessDefId() {
-    return processDefId;
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
   }
 
   public String getOperationType() {
@@ -77,16 +72,9 @@ public class HistoricIdentityLinkQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   @Override
-  public HistoricIdentityLinkQuery identityLinkId(String identityLinkId) {
-    ensureNotNull("id", identityLinkId);
-    this.identityLinkId = identityLinkId;
-    return this;
-  }
-
-  @Override
-  public HistoricIdentityLinkQuery identityLinkType(String identityLinkType) {
-    ensureNotNull("type", identityLinkType);
-    this.identityLinkType = identityLinkType;
+  public HistoricIdentityLinkQuery type(String type) {
+    ensureNotNull("type", type);
+    this.type = type;
     return this;
   }
 
@@ -124,9 +112,9 @@ public class HistoricIdentityLinkQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   @Override
-  public HistoricIdentityLinkQuery processDefId(String processDefId) {
-    ensureNotNull("processDefId", processDefId);
-    this.processDefId = processDefId;
+  public HistoricIdentityLinkQuery processDefinitionId(String processDefinitionId) {
+    ensureNotNull("processDefId", processDefinitionId);
+    this.processDefinitionId = processDefinitionId;
     return this;
   }
 
@@ -145,13 +133,13 @@ public class HistoricIdentityLinkQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   @Override
-  public HistoricIdentityLinkQuery orderByIdentityLinkId() {
-    orderBy(HistoricIdentityLinkQueryProperty.ID);
+  public HistoricIdentityLinkQuery orderByTime() {
+    orderBy(HistoricIdentityLinkQueryProperty.TIME);
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery orderByIdentityLinkType() {
+  public HistoricIdentityLinkQuery orderByType() {
     orderBy(HistoricIdentityLinkQueryProperty.TYPE);
     return this;
   }
@@ -175,8 +163,8 @@ public class HistoricIdentityLinkQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   @Override
-  public HistoricIdentityLinkQuery orderByProcessDefId() {
-    orderBy(HistoricIdentityLinkQueryProperty.PROC_DEF_ID);
+  public HistoricIdentityLinkQuery orderByProcessDefinitionId() {
+    orderBy(HistoricIdentityLinkQueryProperty.PROC_DEFINITION_ID);
     return this;
   }
 
@@ -207,5 +195,4 @@ public class HistoricIdentityLinkQueryImpl extends AbstractVariableQueryImpl<His
       .getHistoricIdentityLinkManager()
       .findHistoricIdentityLinkByQueryCriteria(this, page);
   }
-
 }

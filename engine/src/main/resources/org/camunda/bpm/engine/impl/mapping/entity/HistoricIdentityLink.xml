@@ -23,7 +23,7 @@
             #{userId, jdbcType=VARCHAR},
             #{groupId, jdbcType=VARCHAR},
             #{taskId, jdbcType=VARCHAR},
-            #{processDefId, jdbcType=VARCHAR},
+            #{processDefinitionId, jdbcType=VARCHAR},
             #{operationType, jdbcType=VARCHAR},
             #{assignerId, jdbcType=VARCHAR}
            )
@@ -36,7 +36,7 @@
   </delete>
 
   <delete id="deleteHistoricIdentityLinksByProcessDefinitionId">
-    delete from ${prefix}ACT_HI_IDENTITYLINK where PROC_DEF_ID_ = #{processDefId}
+    delete from ${prefix}ACT_HI_IDENTITYLINK where PROC_DEF_ID_ = #{processDefinitionId}
   </delete>
   
   <delete id="deleteHistoricIdentityLinksByTaskId">
@@ -52,7 +52,7 @@
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
     <result property="groupId" column="GROUP_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
-    <result property="processDefId" column="PROCESS_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROCESS_DEF_ID_" jdbcType="VARCHAR" />
     <result property="operationType" column="OPERATION_TYPE_" jdbcType="VARCHAR"/>
     <result property="assignerId" column="ASSIGNER_ID_" jdbcType="VARCHAR" />
   </resultMap>
@@ -75,11 +75,8 @@
   <sql id="selectHistoricIdentityLinkByQueryCriteriaSql">
     from ${prefix}ACT_HI_IDENTITYLINK RES
     <where>
-      <if test="identityLinkId != null">
-        RES.ID_ = #{identityLinkId}
-      </if>
-      <if test="identityLinkType != null">
-        and RES.TYPE_ = #{identityLinkType}
+      <if test="type != null">
+        and RES.TYPE_ = #{type}
       </if>
       <if test="userId != null">
         and RES.USER_ID_ = #{userId}
@@ -90,8 +87,8 @@
       <if test="taskId != null">
         and RES.TASK_ID_ = #{taskId}
       </if>
-      <if test="processDefId != null">
-        and RES.PROC_DEF_ID_ = #{processDefId}
+      <if test="processDefinitionId != null">
+        and RES.PROC_DEF_ID_ = #{processDefinitionId}
       </if>
       <if test="operationType != null">
         and RES.OPERATION_TYPE_ = #{operationType}

@@ -22,7 +22,7 @@ public class HistoricIdentityLinkEventEntity extends HistoryEvent {
 
   protected String taskId;
 
-  protected String processDefId;
+  protected String processDefinitionId;
 
   protected String operationType;
 
@@ -76,12 +76,12 @@ public class HistoricIdentityLinkEventEntity extends HistoryEvent {
     this.taskId = taskId;
   }
 
-  public String getProcessDefId() {
-    return processDefId;
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
   }
 
-  public void setProcessDefId(String processDefId) {
-    this.processDefId = processDefId;
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
   }
 
   public String getOperationType() {
