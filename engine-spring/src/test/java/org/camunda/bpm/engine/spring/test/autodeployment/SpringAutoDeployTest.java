@@ -46,6 +46,10 @@ public class SpringAutoDeployTest extends PvmTestCase {
   protected static final String CTX_CMMN_BPMN_TOGETHER_PATH
       = "org/camunda/bpm/engine/spring/test/autodeployment/SpringAutoDeployCmmnBpmnTest-context.xml";
 
+  protected static final String CTX_TENANT_ID_PATH
+  = "org/camunda/bpm/engine/spring/test/autodeployment/SpringAutoDeployTenantIdTest-context.xml";
+
+
   protected ApplicationContext applicationContext;
   protected RepositoryService repositoryService;
 
@@ -145,6 +149,32 @@ public class SpringAutoDeployTest extends PvmTestCase {
     createAppContext(CTX_CREATE_DROP_CLEAN_DB);
     assertEquals(1, repositoryService.createDeploymentQuery().count());
     assertEquals(3, repositoryService.createProcessDefinitionQuery().count());
+  }
+
+  public void testAutoDeployTenantId() {
+    createAppContext(CTX_TENANT_ID_PATH);
+
+    CaseDefinitionQuery caseDefinitionQuery = repositoryService.createCaseDefinitionQuery();
+    ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
+
+    assertEquals(1, caseDefinitionQuery.count());
+    assertEquals(3, processDefinitionQuery.count());
+
+    assertEquals(1, caseDefinitionQuery.tenantIdIn("tenant1").count());
+    assertEquals(3, processDefinitionQuery.tenantIdIn("tenant1").count());
+  }
+
+  public void testAutoDeployWithoutTenantId() {
+    createAppContext(CTX_CMMN_BPMN_TOGETHER_PATH);
+
+    CaseDefinitionQuery caseDefinitionQuery = repositoryService.createCaseDefinitionQuery();
+    ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
+
+    assertEquals(1, caseDefinitionQuery.count());
+    assertEquals(3, processDefinitionQuery.count());
+
+    assertEquals(1, caseDefinitionQuery.withoutTenantId().count());
+    assertEquals(3, processDefinitionQuery.withoutTenantId().count());
   }
 
   // --Helper methods ----------------------------------------------------------
