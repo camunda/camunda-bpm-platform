@@ -746,6 +746,9 @@ public class MigrationTransitionInstancesTest {
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
+
+
+
   @Test
   public void testMigrateAsyncBeforeInnerMultiInstance() {
     // given
@@ -930,6 +933,38 @@ public class MigrationTransitionInstancesTest {
           "There is no migration instruction for this instance's activity"
         );
     }
+  }
+
+  @Test
+  public void testCannotMigrateUnmappedTransitionInstanceWithIncident() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+
+    // the user task is not mapped in the migration plan, i.e. there is no instruction to migrate the job
+    // and the incident
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .build();
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
+
+    Job job = rule.getManagementService().createJobQuery().singleResult();
+    rule.getManagementService().setJobRetries(job.getId(), 0);
+
+    // when
+    try {
+      testHelper.migrateProcessInstance(migrationPlan, processInstance);
+      Assert.fail("should fail");
+    }
+    catch (MigratingProcessInstanceValidationException e) {
+      // then
+      assertThat(e.getValidationReport())
+        .hasTransitionInstanceFailures("userTask",
+          "There is no migration instruction for this instance's activity"
+        );
+    }
+
   }
 
   @Test
