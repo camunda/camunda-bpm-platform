@@ -54,7 +54,6 @@ public class ProcessEngineTestCaseTest extends ProcessEngineTestCase {
 
     assertThat(currentHistoryLevel(),
         CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
-        .or(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
         .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
 
@@ -63,6 +62,7 @@ public class ProcessEngineTestCaseTest extends ProcessEngineTestCase {
 
     assertThat(currentHistoryLevel(),
         CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
+        .or(is(ProcessEngineConfiguration.HISTORY_AUDIT))
         .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
 

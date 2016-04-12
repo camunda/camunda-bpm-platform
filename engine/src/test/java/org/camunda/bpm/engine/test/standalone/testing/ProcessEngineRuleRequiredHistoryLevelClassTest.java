@@ -34,7 +34,6 @@ public class ProcessEngineRuleRequiredHistoryLevelClassTest {
 
     assertThat(currentHistoryLevel(),
         CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
-        .or(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
         .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
 
@@ -44,6 +43,7 @@ public class ProcessEngineRuleRequiredHistoryLevelClassTest {
 
     assertThat(currentHistoryLevel(),
         CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
+        .or(is(ProcessEngineConfiguration.HISTORY_AUDIT))
         .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
 

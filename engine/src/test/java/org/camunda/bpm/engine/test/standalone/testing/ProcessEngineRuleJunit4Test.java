@@ -71,7 +71,6 @@ public class ProcessEngineRuleJunit4Test {
 
     assertThat(currentHistoryLevel(),
         CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
-        .or(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
         .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
 
@@ -81,6 +80,7 @@ public class ProcessEngineRuleJunit4Test {
 
     assertThat(currentHistoryLevel(),
         CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
+        .or(is(ProcessEngineConfiguration.HISTORY_AUDIT))
         .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
 
