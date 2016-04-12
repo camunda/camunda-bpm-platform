@@ -932,4 +932,24 @@ public class MigrationTransitionInstancesTest {
     }
   }
 
+  @Test
+  public void testMigrateAsyncBeforeTransitionInstanceToDifferentProcessKey() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS)
+        .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities()
+        .build();
+
+    // when
+    testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    testHelper.assertJobMigrated("userTask", "userTask", AsyncContinuationJobHandler.TYPE);
+  }
+
+
 }
