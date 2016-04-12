@@ -2117,7 +2117,7 @@ public class BpmnParse extends Parse {
           value = Integer.parseInt(priorityAttributeValue);
 
         } catch (NumberFormatException e) {
-          addError("Value '" + priorityAttributeValue + "' for attribute 'jobPriority' is not a valid number", element);
+          addError("Value '" + priorityAttributeValue + "' for attribute '" + priorityAttribute + "' is not a valid number", element);
         }
       }
 

@@ -16,7 +16,6 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
  * Represents the command to set the priority of an existing external task.
@@ -42,6 +41,5 @@ public class SetExternalTaskPriorityCmd extends ExternalTaskCmd {
 
   @Override
   protected void validateInput() {
-    EnsureUtil.ensureGreaterThanOrEqual("priority", priority, 0);
   }
 }

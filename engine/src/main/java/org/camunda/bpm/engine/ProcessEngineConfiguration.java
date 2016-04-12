@@ -147,6 +147,7 @@ public abstract class ProcessEngineConfiguration {
   protected boolean jobExecutorAcquireByPriority = false;
 
   protected boolean producePrioritizedJobs = true;
+  protected boolean producePrioritizedExternalTasks = true;
 
   /**
    * The flag will be used inside the method "JobManager#send()". It will be used to decide whether to notify the
@@ -661,4 +662,11 @@ public abstract class ProcessEngineConfiguration {
     this.jobExecutorAcquireByPriority = jobExecutorAcquireByPriority;
   }
 
+  public boolean isProducePrioritizedExternalTasks() {
+    return producePrioritizedExternalTasks;
+  }
+
+  public void setProducePrioritizedExternalTasks(boolean producePrioritizedExternalTasks) {
+    this.producePrioritizedExternalTasks = producePrioritizedExternalTasks;
+  }
 }

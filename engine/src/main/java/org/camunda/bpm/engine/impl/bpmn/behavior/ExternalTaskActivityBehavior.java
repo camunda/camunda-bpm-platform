@@ -13,8 +13,9 @@
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import org.camunda.bpm.engine.delegate.BpmnError;
+import org.camunda.bpm.engine.impl.PriorityProvider;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
-import org.camunda.bpm.engine.impl.externaltask.DefaultExternalTaskPriorityProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -38,8 +39,8 @@ public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior {
 
   @Override
   public void execute(ActivityExecution execution) throws Exception {
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    DefaultExternalTaskPriorityProvider provider = new DefaultExternalTaskPriorityProvider();      
+    ExecutionEntity executionEntity = (ExecutionEntity) execution;    
+    PriorityProvider<ExternalTaskActivityBehavior> provider = Context.getProcessEngineConfiguration().getExternalTaskPriorityProvider();
     long priority = provider.determinePriority(executionEntity, this);
     ExternalTaskEntity.createAndInsert(executionEntity, topicName, priority);
   }

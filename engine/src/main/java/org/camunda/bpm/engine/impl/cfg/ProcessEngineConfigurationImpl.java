@@ -82,6 +82,7 @@ import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
@@ -122,6 +123,7 @@ import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.event.EventHandler;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.event.SignalEventHandler;
+import org.camunda.bpm.engine.impl.externaltask.DefaultExternalTaskPriorityProvider;
 import org.camunda.bpm.engine.impl.form.engine.FormEngine;
 import org.camunda.bpm.engine.impl.form.engine.HtmlFormEngine;
 import org.camunda.bpm.engine.impl.form.engine.JuelFormEngine;
@@ -291,6 +293,7 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -371,6 +374,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected JobExecutor jobExecutor;
 
   protected PriorityProvider<JobDeclaration<?, ?>> jobPriorityProvider;
+  // EXTERNAL TASK /////////////////////////////////////////////////////////////
+  protected PriorityProvider<ExternalTaskActivityBehavior> externalTaskPriorityProvider;
 
   // MYBATIS SQL SESSION FACTORY //////////////////////////////////////////////
 
@@ -618,6 +623,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initIdGenerator();
     initDeployers();
     initJobProvider();
+    initExternalTaskPriorityProvider();
     initBatchHandlers();
     initJobExecutor();
     initDataSource();
@@ -1383,7 +1389,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       jobPriorityProvider = new DefaultJobPriorityProvider();
     }
   }
+  // external task /////////////////////////////////////////////////////////////
 
+  protected void initExternalTaskPriorityProvider() {
+    if (producePrioritizedExternalTasks && externalTaskPriorityProvider == null) {
+      externalTaskPriorityProvider = new DefaultExternalTaskPriorityProvider();
+    }
+  }
   // history //////////////////////////////////////////////////////////////////
 
   public void initHistoryLevel() {
@@ -3169,6 +3181,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   }
 
+  public PriorityProvider<ExternalTaskActivityBehavior> getExternalTaskPriorityProvider() {
+    return externalTaskPriorityProvider;
+  }
+
+  public void setExternalTaskPriorityProvider(PriorityProvider<ExternalTaskActivityBehavior> externalTaskPriorityProvider) {
+    this.externalTaskPriorityProvider = externalTaskPriorityProvider;
+  }
+  
   public List<MigrationInstructionValidator> getDefaultMigrationInstructionValidators() {
     List<MigrationInstructionValidator> migrationInstructionValidators  = new ArrayList<MigrationInstructionValidator>();
     migrationInstructionValidators.add(new SupportedActivitiesInstructionValidator());

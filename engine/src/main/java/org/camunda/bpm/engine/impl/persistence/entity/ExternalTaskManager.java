@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
 import org.camunda.bpm.engine.impl.ExternalTaskQueryProperty;
-import org.camunda.bpm.engine.impl.JobQueryProperty;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
@@ -51,10 +50,6 @@ public class ExternalTaskManager extends AbstractManager {
 
   public List<ExternalTaskEntity> findExternalTasksByExecutionId(String id) {
     return getDbEntityManager().selectList("selectExternalTasksByExecutionId", id);
-  }
-
-  public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<String> topics, int maxResults) {
-    return selectExternalTasksForTopics(topics, maxResults, false);
   }
 
   public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<String> topics, int maxResults, boolean usePriority) {
