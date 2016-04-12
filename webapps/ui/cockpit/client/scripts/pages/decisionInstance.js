@@ -69,21 +69,25 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
     page.breadcrumbsClear();
 
-    page.breadcrumbsAdd({
-      type: 'decisionDefinition',
-      label: decisionInstance.decisionDefinitionName || ((decisionInstance.decisionDefinitionKey || decisionInstance.decisionDefinitionId).slice(0, 8) +'…'),
-      href: '#/decision-definition/'+ decisionInstance.decisionDefinitionId
-    });
-
-    page.breadcrumbsAdd({
-      type: 'decisionInstance',
-      label: decisionInstance.id.slice(0, 8) +'…',
-      href: '#/decision-instance/'+ decisionInstance.id
-    });
+    page.breadcrumbsAdd([
+      {
+        label: 'Decisions',
+        href: '#/decisions/'
+      },
+      {
+        type: 'decisionDefinition',
+        label: decisionInstance.decisionDefinitionName || ((decisionInstance.decisionDefinitionKey || decisionInstance.decisionDefinitionId)),
+        href: '#/decision-definition/'+ decisionInstance.decisionDefinitionId
+      },
+      {
+        type: 'decisionInstance',
+        label: decisionInstance.id,
+        href: '#/decision-instance/'+ decisionInstance.id
+      }
+    ]);
 
     page.titleSet([
-      'Camunda Cockpit',
-      decisionInstance.id.slice(0, 8) +'…',
+      decisionInstance.id,
       'Instance View'
     ].join(' | '));
 

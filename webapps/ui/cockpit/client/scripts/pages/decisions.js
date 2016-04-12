@@ -14,22 +14,19 @@ function (
   page
 ) {
   var $rootScope = $scope.$root;
-  $rootScope.showBreadcrumbs = false;
+
+  $rootScope.showBreadcrumbs = true;
+
+  page.breadcrumbsClear();
+
+  page.breadcrumbsAdd({
+    label: 'Decisions'
+  });
+
+  page.titleSet('Decisions');
 
   // INITIALIZE PLUGINS
   $scope.plugins = Views.getProviders({ component: 'cockpit.decisions.dashboard' });
-
-  // reset breadcrumbs
-  page.breadcrumbsAdd({
-    type: 'decisions',
-    label: 'Decisions',
-    href: '#/decisions'
-  });
-
-  page.titleSet([
-    'Camunda Cockpit',
-    'Decisions'
-  ].join(' | '));
 }];
 
 var RouteConfig = [ '$routeProvider', function($routeProvider) {

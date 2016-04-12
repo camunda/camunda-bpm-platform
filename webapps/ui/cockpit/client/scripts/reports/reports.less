@@ -1,21 +1,19 @@
 .reports-wrapper {
-  position: relative;
+  position: absolute;
   top: @breadcrumb-height;
-  .ctn-header {
-    display: block;
-    margin-bottom: (@grid-gutter-width * 0.5);
-    border-bottom: 1px solid #e5e5e5;
-    > h1 {
-      padding: 0 10px;
-    }
-  }
+  bottom: 0;
+  width: 100%;
+  overflow: auto;
 }
 
+.reports-plugin-wrapper,
 .no-reports-available,
 .reporting-chart-holder,
 .chart-info {
   margin-top: @grid-gutter-width * 0.5;
 }
+
+
 
 .reporting-table {
   > thead > tr > th:first-of-type {

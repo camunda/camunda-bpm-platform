@@ -53,13 +53,13 @@ var angular = require('camunda-commons-ui/vendor/angular'),
         sortBy: 'version',
         sortOrder: 'desc'
       }
-      
+
       if(decisionDefinition.tenantId) {
     	queryParams.tenantIdIn = decisionDefinition.tenantId;
       } else {
     	queryParams.withoutTenantId = true;
       }
-        
+
       decisionDefinitionService.list(queryParams, function(err, data) {
         if(!err) {
           deferred.resolve(data);
@@ -89,14 +89,19 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     $scope.breadcrumbData = decisionData.observe([ 'decisionDefinition' ], function(definition) {
       page.breadcrumbsClear();
 
-      page.breadcrumbsAdd({
-        type: 'decisionDefinition',
-        label: definition.name || definition.key || definition.id,
-        href: '#/decision-definition/'+ definition.id
-      });
+      page.breadcrumbsAdd([
+        {
+          label: 'Decisions',
+          href: '#/decisions'
+        },
+        {
+          type: 'decisionDefinition',
+          label: definition.name || definition.key || definition.id,
+          href: '#/decision-definition/'+ definition.id
+        }
+      ]);
 
       page.titleSet([
-        'Camunda Cockpit',
         definition.name || definition.key || definition.id,
         'Definition View'
       ].join(' | '));

@@ -22,15 +22,13 @@ function (
   $scope.dashboardVars = { read: [ 'processData' ] };
   $scope.deprecateDashboardProviders = Views.getProviders({ component: 'cockpit.dashboard'});
 
-  $rootScope.showBreadcrumbs = false;
+
+  $rootScope.showBreadcrumbs = true;
 
   // reset breadcrumbs
   page.breadcrumbsClear();
 
-  page.titleSet([
-    'Camunda Cockpit',
-    'Dashboard'
-  ].join(' | '));
+  page.titleSet('Dashboard');
 }];
 
 var RouteConfig = [ '$routeProvider', function($routeProvider) {

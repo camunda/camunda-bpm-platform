@@ -402,7 +402,12 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     processData.observe([
              'processDefinition', 'processInstance', 'superProcessInstanceCount'],
     function (processDefinition,   processInstance,   superProcessInstanceCount) {
-      var crumbs = [];
+      var crumbs = [
+        {
+          label: 'Processes',
+          href: '#/processes/'
+        }
+      ];
 
       if (superProcessInstanceCount.count) {
         crumbs.push(function(index) {
@@ -411,14 +416,30 @@ var angular = require('camunda-commons-ui/vendor/angular'),
       }
 
       crumbs.push({
-        label: processDefinition.name || ((processDefinition.key || processDefinition.id).slice(0, 8) +'…'),
+        label: processDefinition.name || processDefinition.key || processDefinition.id,
         href: '#/process-definition/'+ (processDefinition.id) +'/runtime',
         keepSearchParams : [ 'viewbox' ]
       });
+
+
+      var plugins = Views.getProviders({ component: 'cockpit.processInstance.view' });
+
       crumbs.push({
+        type: 'processInstance',
         divider: ':',
-        label: processInstance.name || ((processInstance.key || processInstance.id).slice(0, 8) +'…'),
-        href: '#/process-instance/'+ (processInstance.id) +'/runtime'
+        label: processInstance.name || processInstance.key || processInstance.id,
+        href: '#/process-instance/'+ (processInstance.id) +'/runtime',
+        processInstance: processInstance,
+
+        choices: plugins.sort(function (a, b) {
+          return a.priority < b.priority ? -1 : (a.priority > b.priority ? 1 : 0);
+        }).map(function (plugin) {
+          return {
+            active: plugin.id === 'runtime',
+            label: plugin.label,
+            href: '#/process-instance/' + processInstance.id + '/' + plugin.id
+          };
+        })
       });
 
       page
@@ -426,7 +447,6 @@ var angular = require('camunda-commons-ui/vendor/angular'),
         .breadcrumbsAdd(crumbs);
 
       page.titleSet([
-        'Camunda Cockpit',
         $scope.processDefinition.name || $scope.processDefinition.id,
         'Instance View'
       ].join(' | '));

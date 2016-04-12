@@ -15,17 +15,11 @@ module.exports = Base.extend({
   },
 
   pageHeaderProcessDefinitionName: function() {
-    return element(by.binding('processDefinition.key')).getText().then(function(fullString) {
-      return fullString.replace('PROCESS DEFINITION\n', '');
-    });
+    return this.breadcrumb.activeCrumb().getText();
   },
 
   isDefinitionSuspended: function() {
-    return element(by.css('.ctn-header .badge'))
-      .getAttribute('class')
-      .then(function(classes) {
-        return classes.indexOf('ng-hide') === -1;
-      });
+    return element(by.css('.cam-breadcrumb .active .badge-suspended')).isPresent();
   },
 
   getReportLink: function() {

@@ -4,7 +4,15 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/breadcrumbs.html', 'utf8');
 
-  module.exports = ['$location', 'routeUtil', function ($location, routeUtil) {
+  module.exports = [
+    '$location',
+    'routeUtil',
+    'page',
+  function (
+    $location,
+    routeUtil,
+    page
+  ) {
     return {
       scope: {
         divider: '@'
@@ -24,6 +32,15 @@ var template = fs.readFileSync(__dirname + '/breadcrumbs.html', 'utf8');
           return routeUtil.redirectTo(crumb.href, $location.search(), crumb.keepSearchParams);
         };
 
+        scope.getActiveChoice = function (choices) {
+          var label;
+          choices.forEach(function (choice) {
+            if (choice.active) {
+              label = choice.label;
+            }
+          });
+          return label || 'Sooooo fucking screwed';
+        };
       },
 
       controller: [

@@ -33,7 +33,7 @@ describe('Cockpit Process Definition Spec', function() {
         processesPage.deployedProcessesList.selectProcess(0);
 
         // then
-        expect(definitionPage.pageHeaderProcessDefinitionName()).to.eventually.eql(processName);
+        expect(dashboardPage.breadcrumb.activeCrumb().getText()).to.eventually.eql(processName);
         expect(definitionPage.processInstancesTab.isTabSelected()).to.eventually.be.true;
         runningInstances.then(function(noOfInstances) {
           expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(parseInt(noOfInstances, 10));

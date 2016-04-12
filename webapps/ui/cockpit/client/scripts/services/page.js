@@ -33,7 +33,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
     // sure... we could put that in the titleSet() function
     // or elsewhere but it's almost philosophical
     $rootScope.$on('page.title.changed', function() {
-      headTitle.text(page.title);
+      headTitle.text(['Camunda Cockpit', page.title].join(' | '));
     });
 
 
@@ -73,7 +73,6 @@ var angular = require('camunda-commons-ui/vendor/angular');
        */
       titleSet: function(newTitle) {
         page.title = newTitle;
-        // $rootScope.$broadcast('page.changed', 'title', page.title);
         $rootScope.$broadcast('page.title.changed', page.title);
         return this;
       },

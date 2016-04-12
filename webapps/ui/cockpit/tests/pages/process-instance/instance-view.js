@@ -37,11 +37,7 @@ module.exports = Base.extend({
   },
 
   isInstanceSuspended: function() {
-    return element(by.css('.ctn-header .badge'))
-      .getAttribute('class')
-      .then(function(classes) {
-        return classes.indexOf('ng-hide') === -1;
-      });
+    return element(by.css('.cam-breadcrumb .active .badge-suspended')).isPresent();
   },
 
   sidebarTabClick: function (name) {

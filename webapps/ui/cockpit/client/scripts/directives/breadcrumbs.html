@@ -1,7 +1,8 @@
 <!-- # CE - camunda-cockpit-ui/client/scripts/directives/breadcrumbs.html -->
-<ul class="breadcrumb">
-  <li>
-    <a href="#">Home</a>
+<ul class="cam-breadcrumb">
+  <li ng-class="{ active: !breadcrumbs || !breadcrumbs.length }">
+    <a href="#"
+       class="text">Dashboard</a>
   </li>
 
   <li ng-repeat="(index, crumb) in breadcrumbs"
@@ -9,19 +10,44 @@
       data-index="{{ index }}">
     <span class="divider">{{ crumb.divider || divider }}</span>
 
-    <span ng-if="!!crumb.href">
-      <a ng-if="!$last"
-         href="{{ getHref(crumb) }}">{{ crumb.label }}</a>
+    <a ng-if="!!crumb.href && !$last"
+       href="{{ getHref(crumb) }}"
+       class="text">{{ crumb.label }}</a>
 
-      <span ng-if="!!$last">{{ crumb.label }}</span>
+    <span ng-if="!!crumb.href && !!$last"
+          class="text">{{ crumb.label }}</span>
+
+    <a ng-if="!crumb.href && !!crumb.callback"
+       ng-click="crumb.callback(index, breadcrumbs)"
+       href
+       class="text">{{ crumb.label }}</a>
+
+    <span ng-if="!crumb.href && !crumb.callback"
+          class="text">{{ crumb.label }}</span>
+
+    <span ng-if="(crumb.type === 'processDefinition' && crumb.processDefinition.suspended) || (crumb.type === 'processInstance' && crumb.processInstance.suspended)"
+          class="badge badge-warning badge-suspended"
+          tooltip="Currently suspended"
+          tooltip-placement="bottom">
+      <span class="glyphicon glyphicon-pause white"></span>
     </span>
 
-    <span ng-if="!crumb.href">
-      <a ng-if="!!crumb.callback"
-         ng-click="crumb.callback(index, breadcrumbs)"
-         href>{{ crumb.label }}</a>
+    <span ng-if="!!crumb.choices && crumb.choices.length > 1"
+          class="dropdown">
+      <span class="divider">:</span>
 
-      <span ng-if="!crumb.callback">{{ crumb.label }}</span>
+      <a class="dropdown-toggle"
+         href>
+        {{ getActiveChoice(crumb.choices) }}
+        <span class="caret"></span>
+      </a>
+
+      <ul class="dropdown-menu dropdown-menu-right">
+        <li ng-repeat="choice in crumb.choices"
+            ng-class="{active: choice.active}">
+          <a href="{{ choice.href }}">{{ choice.label }}</a>
+        </li>
+      </ul>
     </span>
   </li>
 </ul>
