@@ -5,26 +5,26 @@ import java.util.Date;
 import org.camunda.bpm.engine.history.HistoricIdentityLink;
 
 public class HistoricIdentityLinkDto {
-  protected String identityLinkId;
+  protected String id;
   protected Date time;
-  protected String identityLinkType;
+  protected String type;
   protected String userId;
   protected String groupId;
   protected String taskId;
-  protected String processDefId;
+  protected String processDefinitionId;
   protected String operationType;
   protected String assignerId;
 
-  public String getIdentityLinkId() {
-    return identityLinkId;
+  public String getId() {
+    return id;
   }
 
   public Date getTime() {
     return time;
   }
 
-  public String getIdentityLinkType() {
-    return identityLinkType;
+  public String getType() {
+    return type;
   }
 
   public String getUserId() {
@@ -39,8 +39,8 @@ public class HistoricIdentityLinkDto {
     return taskId;
   }
 
-  public String getProcessDefId() {
-    return processDefId;
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
   }
 
   public String getOperationType() {
@@ -53,12 +53,14 @@ public class HistoricIdentityLinkDto {
 
   public static HistoricIdentityLinkDto fromHistoricIdentityLink(HistoricIdentityLink historicIdentityLink) {
     HistoricIdentityLinkDto dto = new HistoricIdentityLinkDto();
+    dto.id = historicIdentityLink.getId();
     dto.assignerId = historicIdentityLink.getAssignerId();
     dto.groupId = historicIdentityLink.getGroupId();
     dto.operationType = historicIdentityLink.getOperationType();
     dto.taskId = historicIdentityLink.getTaskId();
     dto.time = historicIdentityLink.getTime();
-    dto.identityLinkType = historicIdentityLink.getType();
+    dto.type = historicIdentityLink.getType();
+    dto.processDefinitionId = historicIdentityLink.getProcessDefinitionId();
     dto.userId = historicIdentityLink.getUserId();
     return dto;
   }

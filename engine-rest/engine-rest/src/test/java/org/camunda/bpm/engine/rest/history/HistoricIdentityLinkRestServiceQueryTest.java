@@ -155,26 +155,26 @@ public class HistoricIdentityLinkRestServiceQueryTest extends AbstractRestServic
     inOrder.verify(mockedQuery).orderByOperationType();
     inOrder.verify(mockedQuery).desc();
 
-    // processDefId
+    // processDefinitionId
     inOrder = Mockito.inOrder(mockedQuery);
-    executeAndVerifySorting("processDefId", "asc", Status.OK);
-    inOrder.verify(mockedQuery).orderByProcessDefId();
+    executeAndVerifySorting("processDefinitionId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByProcessDefinitionId();
     inOrder.verify(mockedQuery).asc();
 
     inOrder = Mockito.inOrder(mockedQuery);
-    executeAndVerifySorting("processDefId", "desc", Status.OK);
-    inOrder.verify(mockedQuery).orderByProcessDefId();
+    executeAndVerifySorting("processDefinitionId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByProcessDefinitionId();
     inOrder.verify(mockedQuery).desc();
 
-    // identityLinkType
+    // type
     inOrder = Mockito.inOrder(mockedQuery);
-    executeAndVerifySorting("identityLinkType", "asc", Status.OK);
-    inOrder.verify(mockedQuery).orderByIdentityLinkType();
+    executeAndVerifySorting("type", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByType();
     inOrder.verify(mockedQuery).asc();
 
     inOrder = Mockito.inOrder(mockedQuery);
-    executeAndVerifySorting("identityLinkType", "desc", Status.OK);
-    inOrder.verify(mockedQuery).orderByIdentityLinkType();
+    executeAndVerifySorting("type", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByType();
     inOrder.verify(mockedQuery).desc();
   }
 
@@ -194,7 +194,8 @@ public class HistoricIdentityLinkRestServiceQueryTest extends AbstractRestServic
     String returnedUserId = from(content).getString("[0].userId");
     String returnedGroupId = from(content).getString("[0].groupId");
     String returnedTaskId = from(content).getString("[0].taskId");
-    String returnedIdentityLinkType = from(content).getString("[0].identityLinkType");
+    String returnedType = from(content).getString("[0].type");
+    String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
     String returnedOperationType = from(content).getString("[0].operationType");
     Date loggedDate = DateTimeUtil.parseDate(from(content).getString("[0].time"));
 
@@ -203,7 +204,8 @@ public class HistoricIdentityLinkRestServiceQueryTest extends AbstractRestServic
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_USER_ID, returnedUserId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_GROUP_ID, returnedGroupId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TASK_ID, returnedTaskId);
-    Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TYPE, returnedIdentityLinkType);
+    Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_ID, returnedProcessDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TYPE, returnedType);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_OPERATION_TYPE, returnedOperationType);
   }
 
@@ -280,21 +282,21 @@ public class HistoricIdentityLinkRestServiceQueryTest extends AbstractRestServic
   }
 
   @Test
-  public void testQueryByProcessDefId() {
-    String processDefId = MockProvider.EXAMPLE_HIST_IDENTITY_LINK_PROC_DEF_ID;
+  public void testQueryByProcessDefinitionId() {
+    String processDefinitionId = MockProvider.EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_ID;
 
-    given().queryParam("processDefId", processDefId).then().expect().statusCode(Status.OK.getStatusCode()).when().get(HISTORY_IDENTITY_LINK_QUERY_URL);
+    given().queryParam("processDefinitionId", processDefinitionId).then().expect().statusCode(Status.OK.getStatusCode()).when().get(HISTORY_IDENTITY_LINK_QUERY_URL);
 
-    verify(mockedQuery).processDefId(processDefId);
+    verify(mockedQuery).processDefinitionId(processDefinitionId);
   }
 
   @Test
-  public void testQueryByIdentityLinkType() {
-    String identityLinkType = MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TYPE;
+  public void testQueryByType() {
+    String type = MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TYPE;
 
-    given().queryParam("identityLinkType", identityLinkType).then().expect().statusCode(Status.OK.getStatusCode()).when().get(HISTORY_IDENTITY_LINK_QUERY_URL);
+    given().queryParam("type", type).then().expect().statusCode(Status.OK.getStatusCode()).when().get(HISTORY_IDENTITY_LINK_QUERY_URL);
 
-    verify(mockedQuery).identityLinkType(identityLinkType);
+    verify(mockedQuery).type(type);
   }
 
   @Test
@@ -344,9 +346,9 @@ public class HistoricIdentityLinkRestServiceQueryTest extends AbstractRestServic
     parameters.put("userId", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_USER_ID);
     parameters.put("groupId", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_GROUP_ID);
     parameters.put("taskId", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TASK_ID);
-    parameters.put("processDefId", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_PROC_DEF_ID);
+    parameters.put("processDefinitionId", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_ID);
     parameters.put("operationType", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_OPERATION_TYPE);
-    parameters.put("identityLinkType", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TYPE);
+    parameters.put("type", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TYPE);
     return parameters;
   }
   protected void verifyStringParameterQueryInvocations() {
@@ -357,9 +359,9 @@ public class HistoricIdentityLinkRestServiceQueryTest extends AbstractRestServic
     verify(mockedQuery).taskId(stringQueryParameters.get("taskId"));
     verify(mockedQuery).dateBefore(DateTimeUtil.parseDate(stringQueryParameters.get("dateBefore")));
     verify(mockedQuery).dateAfter(DateTimeUtil.parseDate(stringQueryParameters.get("dateAfter")));
-    verify(mockedQuery).identityLinkType(stringQueryParameters.get("identityLinkType"));
+    verify(mockedQuery).type(stringQueryParameters.get("type"));
     verify(mockedQuery).operationType(stringQueryParameters.get("operationType"));
-    verify(mockedQuery).processDefId(stringQueryParameters.get("processDefId"));
+    verify(mockedQuery).processDefinitionId(stringQueryParameters.get("processDefinitionId"));
     verify(mockedQuery).list();
   }
 }

@@ -22,36 +22,35 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class HistoricIdentityLinkQueryDto extends AbstractQueryDto<HistoricIdentityLinkQuery> {
 
-  private static final String SORT_BY_IDENTITY_LINK_ID = "identityLinkId";
-  private static final String SORT_BY_IDENTITY_LINK_TYPE = "identityLinkType";
+  private static final String SORT_BY_TIME = "time";
+  private static final String SORT_BY_TYPE = "type";
   private static final String SORT_BY_USER_ID = "userId";
   private static final String SORT_BY_GROUP_ID = "groupId";
   private static final String SORT_BY_TASK_ID = "taskId";
-  private static final String SORT_BY_PROCESS_DEF_ID = "processDefId";
+  private static final String SORT_BY_PROCESS_DEFINITION_ID = "processDefinitionId";
   private static final String SORT_BY_OPERATION_TYPE = "operationType";
   private static final String SORT_BY_ASSIGNER_ID = "assignerId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
     VALID_SORT_BY_VALUES = new ArrayList<String>();
-    VALID_SORT_BY_VALUES.add(SORT_BY_IDENTITY_LINK_ID);
-    VALID_SORT_BY_VALUES.add(SORT_BY_IDENTITY_LINK_TYPE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TIME);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TYPE);
     VALID_SORT_BY_VALUES.add(SORT_BY_USER_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_GROUP_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_TASK_ID);
-    VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEF_ID);
+    VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_OPERATION_TYPE);
     VALID_SORT_BY_VALUES.add(SORT_BY_ASSIGNER_ID);
   }
 
-  protected String identityLinkId;
   protected Date dateBefore;
   protected Date dateAfter;
-  protected String identityLinkType;
+  protected String type;
   protected String userId;
   protected String groupId;
   protected String taskId;
-  protected String processDefId;
+  protected String processDefinitionId;
   protected String operationType;
   protected String assignerId;
 
@@ -72,14 +71,9 @@ public class HistoricIdentityLinkQueryDto extends AbstractQueryDto<HistoricIdent
     return engine.getHistoryService().createHistoricIdentityLinkQuery();
   }
 
-  @CamundaQueryParam("identityLinkId")
-  public void setIdentityLinkId(String identityLinkId) {
-    this.identityLinkId = identityLinkId;
-  }
-
-  @CamundaQueryParam("identityLinkType")
-  public void setIdentityLinkType(String identityLinkType) {
-    this.identityLinkType = identityLinkType;
+  @CamundaQueryParam("type")
+  public void setType(String type) {
+    this.type = type;
   }
 
   @CamundaQueryParam("userId")
@@ -107,9 +101,9 @@ public class HistoricIdentityLinkQueryDto extends AbstractQueryDto<HistoricIdent
     this.taskId = taskId;
   }
 
-  @CamundaQueryParam("processDefId")
-  public void setProcessDefId(String processDefId) {
-    this.processDefId = processDefId;
+  @CamundaQueryParam("processDefinitionId")
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
   }
 
   @CamundaQueryParam("operationType")
@@ -124,17 +118,14 @@ public class HistoricIdentityLinkQueryDto extends AbstractQueryDto<HistoricIdent
 
   @Override
   protected void applyFilters(HistoricIdentityLinkQuery query) {
-    if (identityLinkId != null) {
-      query.identityLinkId(identityLinkId);
-    }
     if (dateBefore != null) {
       query.dateBefore(dateBefore);
     }
     if (dateAfter != null) {
       query.dateAfter(dateAfter);
     }
-    if (identityLinkType != null) {
-      query.identityLinkType(identityLinkType);
+    if (type != null) {
+      query.type(type);
     }
     if (userId != null) {
       query.userId(userId);
@@ -145,8 +136,8 @@ public class HistoricIdentityLinkQueryDto extends AbstractQueryDto<HistoricIdent
     if (taskId != null) {
       query.taskId(taskId);
     }
-    if (processDefId != null) {
-      query.processDefId(processDefId);
+    if (processDefinitionId != null) {
+      query.processDefinitionId(processDefinitionId);
     }
     if (operationType != null) {
       query.operationType(operationType);
@@ -158,10 +149,10 @@ public class HistoricIdentityLinkQueryDto extends AbstractQueryDto<HistoricIdent
 
   @Override
   protected void applySortBy(HistoricIdentityLinkQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
-    if (sortBy.equals(SORT_BY_IDENTITY_LINK_ID)) {
-      query.orderByIdentityLinkId();
-    } else if (sortBy.equals(SORT_BY_IDENTITY_LINK_TYPE)) {
-      query.orderByIdentityLinkType();
+    if (sortBy.equals(SORT_BY_TIME)) {
+      query.orderByTime();
+    } else if (sortBy.equals(SORT_BY_TYPE)) {
+      query.orderByType();
     } else if (sortBy.equals(SORT_BY_USER_ID)) {
       query.orderByUserId();
     } else if (sortBy.equals(SORT_BY_GROUP_ID)) {
@@ -172,8 +163,8 @@ public class HistoricIdentityLinkQueryDto extends AbstractQueryDto<HistoricIdent
       query.orderByOperationType();
     } else if (sortBy.equals(SORT_BY_ASSIGNER_ID)) {
       query.orderByAssignerId();
-    } else if (sortBy.equals(SORT_BY_PROCESS_DEF_ID)) {
-      query.orderByProcessDefId();
+    } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_ID)) {
+      query.orderByProcessDefinitionId();
     }
   }
 }

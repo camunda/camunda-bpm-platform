@@ -580,7 +580,10 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_ID = "aCaseDefinitionId";
   public static final String EXAMPLE_HISTORIC_TASK_INST_CASE_INST_ID = "aCaseInstanceId";
   public static final String EXAMPLE_HISTORIC_TASK_INST_CASE_EXEC_ID = "aCaseExecutionId";
-
+  public static final String EXAMPLE_HISTORIC_TASK_INST_TASK_INVOLVED_USER = "aUserId";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_TASK_INVOLVED_GROUP = "aGroupId";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_TASK_HAD_CANDIDATE_USER = "cUserId";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_TASK_HAD_CANDIDATE_GROUP = "cGroupId";
   // Incident
   public static final String EXAMPLE_INCIDENT_ID = "anIncidentId";
   public static final String EXAMPLE_INCIDENT_TIMESTAMP = "2014-01-01T00:00:00";
@@ -624,7 +627,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HIST_IDENTITY_LINK_TASK_ID = "aTaskId";
   public static final String EXAMPLE_HIST_IDENTITY_LINK_USER_ID = "aUserId";
   public static final String EXAMPLE_HIST_IDENTITY_LINK_GROUP_ID = "aGroupId";
-  public static final String EXAMPLE_HIST_IDENTITY_LINK_PROC_DEF_ID = "aProcDefId";
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_ID = "aProcDefId";
 
   // case definition
   public static final String EXAMPLE_CASE_DEFINITION_ID = "aCaseDefnitionId";
@@ -1887,6 +1890,7 @@ public abstract class MockProvider {
     when(identityLink.getGroupId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_GROUP_ID);
     when(identityLink.getType()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_TYPE);
     when(identityLink.getOperationType()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_OPERATION_TYPE);
+    when(identityLink.getProcessDefinitionId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_ID);
     when(identityLink.getTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HIST_IDENTITY_LINK_TIME));
     return identityLink;
   }
@@ -2057,7 +2061,6 @@ public abstract class MockProvider {
     when(taskInstance.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_INST_ID);
     when(taskInstance.getCaseExecutionId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_EXEC_ID);
     when(taskInstance.getTenantId()).thenReturn(tenantId);
-
     return taskInstance;
   }
 

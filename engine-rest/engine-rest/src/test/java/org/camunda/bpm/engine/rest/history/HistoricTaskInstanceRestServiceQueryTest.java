@@ -1850,6 +1850,49 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
   }
 
+  @Test
+  public void testQueryTaskInvolvedUser() {
+    String taskInvolvedUser = MockProvider.EXAMPLE_HISTORIC_TASK_INST_TASK_INVOLVED_USER;
+    given()
+      .queryParam("taskInvolvedUser", taskInvolvedUser)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).taskInvolvedUser(taskInvolvedUser);
+  }
+
+  @Test
+  public void testQueryTaskInvolvedGroup() {
+    String taskInvolvedGroup = MockProvider.EXAMPLE_HISTORIC_TASK_INST_TASK_INVOLVED_GROUP;
+    given()
+      .queryParam("taskInvolvedGroup", taskInvolvedGroup)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).taskInvolvedGroup(taskInvolvedGroup);
+  }
+
+  @Test
+  public void testQueryTaskHadCandidateUser() {
+    String taskHadCandidateUser = MockProvider.EXAMPLE_HISTORIC_TASK_INST_TASK_HAD_CANDIDATE_USER;
+    given()
+      .queryParam("taskHadCandidateUser", taskHadCandidateUser)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).taskHadCandidateUser(taskHadCandidateUser);
+  }
+
+  @Test
+  public void testQueryTaskHadCandidateGroup() {
+    String taskHadCandidateGroup = MockProvider.EXAMPLE_HISTORIC_TASK_INST_TASK_HAD_CANDIDATE_GROUP;
+    given()
+      .queryParam("taskHadCandidateGroup", taskHadCandidateGroup)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).taskHadCandidateGroup(taskHadCandidateGroup);
+  }
   private List<HistoricTaskInstance> createMockHistoricTaskInstancesTwoTenants() {
     return Arrays.asList(
         MockProvider.createMockHistoricTaskInstance(MockProvider.EXAMPLE_TENANT_ID),
