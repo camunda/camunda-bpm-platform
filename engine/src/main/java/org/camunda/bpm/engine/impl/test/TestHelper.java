@@ -96,7 +96,7 @@ public abstract class TestHelper {
     boolean onMethod = true;
 
     try {
-      method = testClass.getDeclaredMethod(methodName, (Class<?>[])null);
+      method = getMethod(testClass, methodName);
     } catch (Exception e) {
       if (deploymentAnnotation == null) {
         // we have neither the annotation, nor can look it up from the method
@@ -231,7 +231,7 @@ public abstract class TestHelper {
     Method method = null;
 
     try {
-      method = testClass.getDeclaredMethod(methodName, (Class<?>[]) null);
+      method = getMethod(testClass, methodName);
 
     } catch (Exception e) {
       return null;
@@ -244,6 +244,10 @@ public abstract class TestHelper {
       annotation = testClass.getAnnotation(annotationClass);
     }
     return annotation;
+  }
+
+  protected static Method getMethod(Class<?> clazz, String methodName) throws SecurityException, NoSuchMethodException {
+    return clazz.getMethod(methodName, (Class<?>[]) null);
   }
 
   /**
