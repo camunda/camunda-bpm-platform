@@ -15,10 +15,12 @@ package org.camunda.bpm.engine.test.standalone.history;
 import java.util.Collections;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.variable.Variables;
 
 /**
@@ -98,6 +100,8 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
 
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", Variables.numberValue(null)).count());
   }
+  
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testTaskInvolvedUser() {
     // given
@@ -118,6 +122,8 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskInvolvedUser("invalidUserId").count());
     taskService.deleteTask("newTask",true);
   }
+  
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testTaskInvolvedGroup() {
     // given
@@ -137,6 +143,7 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     taskService.deleteTask("newTask",true);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testTaskHadCandidateUser() {
     // given
@@ -157,6 +164,8 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     // delete test
     taskService.deleteTask("newTask",true);
   }
+  
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testTaskHadCandidateGroup() {
     // given
@@ -172,6 +181,8 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     // delete test
     taskService.deleteTask("newTask",true);
   }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testGroupTaskQuery() {
     // given
