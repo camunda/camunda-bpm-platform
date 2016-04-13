@@ -14,6 +14,9 @@
 package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.CompensateEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.EscalationEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.StartEvent;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormData;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormField;
@@ -98,6 +101,70 @@ public abstract class AbstractStartEventBuilder<B extends AbstractStartEventBuil
     CamundaFormData camundaFormData = getCreateSingleExtensionElement(CamundaFormData.class);
     CamundaFormField camundaFormField = createChild(camundaFormData, CamundaFormField.class);
     return new CamundaStartEventFormFieldBuilder(modelInstance, element, camundaFormField);
+  }
+
+  /**
+   * Sets a catch all error definition.
+   *
+   * @return the builder object
+   */
+  public B error() {
+    ErrorEventDefinition errorEventDefinition = createInstance(ErrorEventDefinition.class);
+    element.getEventDefinitions().add(errorEventDefinition);
+
+    return myself;
+  }
+
+  /**
+   * Sets an error definition for the given error code. If already an error
+   * with this code exists it will be used, otherwise a new error is created.
+   *
+   * @param errorCode the code of the error
+   * @return the builder object
+   */
+  public B error(String errorCode) {
+    ErrorEventDefinition errorEventDefinition = createErrorEventDefinition(errorCode);
+    element.getEventDefinitions().add(errorEventDefinition);
+
+    return myself;
+  }
+
+  /**
+   * Sets a catch all escalation definition.
+   *
+   * @return the builder object
+   */
+  public B escalation() {
+    EscalationEventDefinition escalationEventDefinition = createInstance(EscalationEventDefinition.class);
+    element.getEventDefinitions().add(escalationEventDefinition);
+
+    return myself;
+  }
+
+  /**
+   * Sets an escalation definition for the given escalation code. If already an escalation
+   * with this code exists it will be used, otherwise a new escalation is created.
+   *
+   * @param escalationCode the code of the escalation
+   * @return the builder object
+   */
+  public B escalation(String escalationCode) {
+    EscalationEventDefinition escalationEventDefinition = createEscalationEventDefinition(escalationCode);
+    element.getEventDefinitions().add(escalationEventDefinition);
+
+    return myself;
+  }
+
+  /**
+   * Sets a catch compensation definition.
+   *
+   * @return the builder object
+   */
+  public B compensation() {
+    CompensateEventDefinition compensateEventDefinition = createCompensateEventDefinition();
+    element.getEventDefinitions().add(compensateEventDefinition);
+
+    return myself;
   }
 
 }

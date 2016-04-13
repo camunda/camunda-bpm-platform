@@ -48,6 +48,7 @@ import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
+import org.camunda.bpm.model.bpmn.instance.CompensateEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
 import org.camunda.bpm.model.bpmn.instance.EndEvent;
 import org.camunda.bpm.model.bpmn.instance.Error;
@@ -1565,7 +1566,40 @@ public class ProcessBuilderTest {
     assertThat(boundaryError).isEqualTo(endError);
 
     assertOnlyOneErrorExists("myErrorCode");
+  }
 
+  @Test
+  public void testErrorStartEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .endEvent()
+      .subProcess()
+        .triggerByEvent()
+        .embeddedSubProcess()
+        .startEvent("subProcessStart")
+        .error("myErrorCode")
+        .endEvent()
+      .done();
+
+    assertErrorEventDefinition("subProcessStart", "myErrorCode");
+  }
+
+  @Test
+  public void testCatchAllErrorStartEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .endEvent()
+      .subProcess()
+        .triggerByEvent()
+        .embeddedSubProcess()
+        .startEvent("subProcessStart")
+        .error()
+        .endEvent()
+      .done();
+
+    ErrorEventDefinition errorEventDefinition = assertAndGetSingleEventDefinition("subProcessStart", ErrorEventDefinition.class);
+    assertThat(errorEventDefinition).isNotNull();
+    assertThat(errorEventDefinition.getError()).isNull();
   }
 
   @Test
@@ -1623,6 +1657,40 @@ public class ProcessBuilderTest {
   }
 
   @Test
+  public void testEscalationStartEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .endEvent()
+      .subProcess()
+        .triggerByEvent()
+        .embeddedSubProcess()
+        .startEvent("subProcessStart")
+        .escalation("myEscalationCode")
+        .endEvent()
+      .done();
+
+    assertEscalationEventDefinition("subProcessStart", "myEscalationCode");
+  }
+
+  @Test
+  public void testCatchAllEscalationStartEvent() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+        .endEvent()
+        .subProcess()
+          .triggerByEvent()
+          .embeddedSubProcess()
+          .startEvent("subProcessStart")
+          .escalation()
+          .endEvent()
+        .done();
+
+    EscalationEventDefinition escalationEventDefinition = assertAndGetSingleEventDefinition("subProcessStart", EscalationEventDefinition.class);
+    assertThat(escalationEventDefinition).isNotNull();
+    assertThat(escalationEventDefinition.getEscalation()).isNull();
+  }
+
+  @Test
   public void testIntermediateEscalationThrowEvent() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
@@ -1651,6 +1719,22 @@ public class ProcessBuilderTest {
 
     assertOnlyOneEscalationExists("myEscalationCode");
 
+  }
+
+  @Test
+  public void testCompensationStartEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .endEvent()
+      .subProcess()
+        .triggerByEvent()
+        .embeddedSubProcess()
+        .startEvent("subProcessStart")
+        .compensation()
+        .endEvent()
+      .done();
+
+    assertCompensationEventDefinition("subProcessStart");
   }
 
   @Test
@@ -1781,6 +1865,10 @@ public class ProcessBuilderTest {
   protected void assertOnlyOneEscalationExists(String escalationCode) {
     Collection<Escalation> escalations = modelInstance.getModelElementsByType(Escalation.class);
     assertThat(escalations).extracting("escalationCode").containsOnlyOnce(escalationCode);
+  }
+
+  protected void assertCompensationEventDefinition(String elementId) {
+    assertAndGetSingleEventDefinition(elementId, CompensateEventDefinition.class);
   }
 
   protected void assertCamundaInputOutputParameter(BaseElement element) {

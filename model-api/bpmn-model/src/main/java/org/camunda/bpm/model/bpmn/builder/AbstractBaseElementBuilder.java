@@ -19,6 +19,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
+import org.camunda.bpm.model.bpmn.instance.CompensateEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
 import org.camunda.bpm.model.bpmn.instance.Error;
 import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
@@ -202,6 +203,12 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     escalationEventDefinition.setEscalation(escalation);
     return escalationEventDefinition;
   }
+
+  protected CompensateEventDefinition createCompensateEventDefinition() {
+    CompensateEventDefinition compensateEventDefinition = createInstance(CompensateEventDefinition.class);
+    return compensateEventDefinition;
+  }
+
 
   /**
    * Sets the identifier of the element.
