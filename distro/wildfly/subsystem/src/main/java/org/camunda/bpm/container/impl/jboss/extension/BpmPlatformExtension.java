@@ -15,30 +15,21 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension;
 
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.SUBSYSTEM_NAME;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
-
-import org.camunda.bpm.container.impl.jboss.extension.handler.BpmPlatformSubsystemAdd;
-import org.camunda.bpm.container.impl.jboss.extension.handler.BpmPlatformSubsystemRemove;
-import org.camunda.bpm.container.impl.jboss.extension.handler.JobAcquisitionAdd;
-import org.camunda.bpm.container.impl.jboss.extension.handler.JobAcquisitionRemove;
-import org.camunda.bpm.container.impl.jboss.extension.handler.JobExecutorAdd;
-import org.camunda.bpm.container.impl.jboss.extension.handler.JobExecutorRemove;
-import org.camunda.bpm.container.impl.jboss.extension.handler.ProcessEngineAdd;
-import org.camunda.bpm.container.impl.jboss.extension.handler.ProcessEngineRemove;
+import org.camunda.bpm.container.impl.jboss.extension.resource.BpmPlatformRootDefinition;
 import org.jboss.as.controller.Extension;
 import org.jboss.as.controller.ExtensionContext;
 import org.jboss.as.controller.PathElement;
-import org.jboss.as.controller.ResourceBuilder;
-import org.jboss.as.controller.ResourceDefinition;
 import org.jboss.as.controller.SubsystemRegistration;
 import org.jboss.as.controller.descriptions.StandardResourceDescriptionResolver;
 import org.jboss.as.controller.parsing.ExtensionParsingContext;
 
+import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.SUBSYSTEM_NAME;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
+
 
 
 /**
- * Defines the bpm-platform subsystem for jboss application server
+ * Defines the bpm-platform subsystem for Wildfly 8+ application server
  *
  * @author Daniel Meyer
  */
@@ -48,51 +39,39 @@ public class BpmPlatformExtension implements Extension {
   public static final int BPM_PLATFORM_SUBSYSTEM_MINOR_VERSION = 1;
 
   /** The parser used for parsing our subsystem */
-  private final BpmPlatformParser parser = new BpmPlatformParser();
+  private final BpmPlatformParser1_1.BpmPlatformSubsystemParser parser = BpmPlatformParser1_1.BpmPlatformSubsystemParser.INSTANCE;
 
   public static final String RESOURCE_NAME = BpmPlatformExtension.class.getPackage().getName() + ".LocalDescriptions";
 
-  private static final PathElement SUBSYSTEM_PATH = PathElement.pathElement(SUBSYSTEM, SUBSYSTEM_NAME);
-  private static final PathElement PROCESS_ENGINES_PATH = PathElement.pathElement(ModelConstants.PROCESS_ENGINES);
-  private static final PathElement JOB_EXECUTOR_PATH = PathElement.pathElement(ModelConstants.JOB_EXECUTOR);
-  private static final PathElement JOB_ACQUISTIONS_PATH = PathElement.pathElement(ModelConstants.JOB_ACQUISITIONS);
+  /**
+   * Path elements for the resources this subsystem offers.
+   */
+  public static final PathElement SUBSYSTEM_PATH = PathElement.pathElement(SUBSYSTEM, SUBSYSTEM_NAME);
+  public static final PathElement PROCESS_ENGINES_PATH = PathElement.pathElement(ModelConstants.PROCESS_ENGINES);
+  public static final PathElement JOB_EXECUTOR_PATH = PathElement.pathElement(ModelConstants.JOB_EXECUTOR);
+  public static final PathElement JOB_ACQUISTIONS_PATH = PathElement.pathElement(ModelConstants.JOB_ACQUISITIONS);
 
-
+  @Override
   public void initialize(ExtensionContext context) {
-    // Register the subsystem and operation handlers
     SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, BPM_PLATFORM_SUBSYSTEM_MAJOR_VERSION, BPM_PLATFORM_SUBSYSTEM_MINOR_VERSION);
+    subsystem.registerSubsystemModel(BpmPlatformRootDefinition.INSTANCE);
     subsystem.registerXMLElementWriter(parser);
-
-    // build resource definitions
-
-    ResourceBuilder processEnginesResource = ResourceBuilder.Factory.create(PROCESS_ENGINES_PATH, getResourceDescriptionResolver(ModelConstants.PROCESS_ENGINES))
-      .setAddOperation(ProcessEngineAdd.INSTANCE)
-      .setRemoveOperation(ProcessEngineRemove.INSTANCE);
-
-    ResourceBuilder jobAcquisitionResource = ResourceBuilder.Factory.create(JOB_ACQUISTIONS_PATH, getResourceDescriptionResolver(ModelConstants.JOB_ACQUISITIONS))
-        .setAddOperation(JobAcquisitionAdd.INSTANCE)
-        .setRemoveOperation(JobAcquisitionRemove.INSTANCE);
-
-    ResourceBuilder jobExecutorResource = ResourceBuilder.Factory.create(JOB_EXECUTOR_PATH, getResourceDescriptionResolver(ModelConstants.JOB_EXECUTOR))
-      .setAddOperation(JobExecutorAdd.INSTANCE)
-      .setRemoveOperation(JobExecutorRemove.INSTANCE)
-      .pushChild(jobAcquisitionResource).pop();
-
-    ResourceDefinition subsystemResource = ResourceBuilder.Factory.createSubsystemRoot(SUBSYSTEM_PATH, getResourceDescriptionResolver(SUBSYSTEM_NAME), BpmPlatformSubsystemAdd.INSTANCE, BpmPlatformSubsystemRemove.INSTANCE)
-      .pushChild(processEnginesResource).pop()
-      .pushChild(jobExecutorResource).pop()
-      .build();
-
-    subsystem.registerSubsystemModel(subsystemResource);
-
   }
 
+  @Override
   public void initializeParsers(ExtensionParsingContext context) {
     context.setSubsystemXmlMapping(ModelConstants.SUBSYSTEM_NAME, Namespace.CAMUNDA_BPM_PLATFORM_1_1.getUriString(), parser);
   }
 
-  public static StandardResourceDescriptionResolver getResourceDescriptionResolver(String keyPrefix) {
-    return new StandardResourceDescriptionResolver(keyPrefix, RESOURCE_NAME, BpmPlatformExtension.class.getClassLoader(), true, true);
+  /**
+   * Resolve the descriptions of the resources from the 'LocalDescriptions.properties' file.
+   */
+  public static StandardResourceDescriptionResolver getResourceDescriptionResolver(final String... keyPrefix) {
+    StringBuilder prefix = new StringBuilder(SUBSYSTEM_NAME);
+    for (String kp : keyPrefix) {
+      prefix.append('.').append(kp);
+    }
+    return new StandardResourceDescriptionResolver(prefix.toString(), RESOURCE_NAME, BpmPlatformExtension.class.getClassLoader(), true, false);
   }
 
 }

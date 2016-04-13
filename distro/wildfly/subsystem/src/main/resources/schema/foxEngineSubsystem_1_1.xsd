@@ -47,7 +47,7 @@
   
   <xs:complexType name="job-acquisitionType">
     <xs:sequence>
-      <xs:element name="acquisition-strategy" minOccurs="1" maxOccurs="1" />
+      <xs:element name="acquisition-strategy" minOccurs="0" maxOccurs="1" />
       <xs:element name="properties" type="propertiesType" minOccurs="0" maxOccurs="1" />
     </xs:sequence>
     <xs:attribute name="name" use="required" />

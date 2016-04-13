@@ -22,7 +22,6 @@ import org.jboss.msc.service.ServiceName;
 /**
  * @author Daniel Meyer
  * @author Christian Lipphardt
- *
  */
 public class JobExecutorRemove extends AbstractRemoveStepHandler {
 

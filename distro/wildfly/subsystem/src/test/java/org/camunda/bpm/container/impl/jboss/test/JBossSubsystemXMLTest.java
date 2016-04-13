@@ -15,15 +15,6 @@
  */
 package org.camunda.bpm.container.impl.jboss.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
 import org.camunda.bpm.container.impl.jboss.extension.Attribute;
 import org.camunda.bpm.container.impl.jboss.extension.BpmPlatformExtension;
@@ -33,7 +24,6 @@ import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessEngineContr
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
 import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
@@ -45,7 +35,15 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
+import org.junit.Assert;
 import org.junit.Test;
+
+import javax.xml.stream.XMLStreamException;
+import java.util.List;
+import java.util.Map;
+
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
+import static org.junit.Assert.*;
 
 
 /**
@@ -65,6 +63,8 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   public static final String SUBSYSTEM_WITH_PROCESS_ENGINES_AND_JOB_EXECUTOR = "subsystemWithProcessEnginesAndJobExecutor.xml";
   public static final String SUBSYSTEM_WITH_JOB_EXECUTOR_AND_PROPERTIES = "subsystemWithJobExecutorAndProperties.xml";
   public static final String SUBSYSTEM_WITH_JOB_EXECUTOR_WITHOUT_ACQUISITION_STRATEGY = "subsystemWithJobExecutorAndWithoutAcquisitionStrategy.xml";
+  public static final String SUBSYSTEM_WITH_EVERY_AVAILABLE_OPTION_USED = "subsystemWithEveryAvailableOptionUsed.xml";
+  public static final String SUBSYSTEM_WITH_MINIMAL_OPTIONS_USED = "subsystemWithMinimumOptionsUsed.xml";
 
   public static final String LOCK_TIME_IN_MILLIS = "lockTimeInMillis";
   public static final String WAIT_TIME_IN_MILLIS = "waitTimeInMillis";
@@ -89,6 +89,14 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     List<ModelNode> operations = parse(subsystemXml);
 
     assertEquals(1, operations.size());
+    //The add subsystem operation will happen first
+    ModelNode addSubsystem = operations.get(0);
+    Assert.assertEquals(ADD, addSubsystem.get(OP).asString());
+    PathAddress addr = PathAddress.pathAddress(addSubsystem.get(OP_ADDR));
+    Assert.assertEquals(1, addr.size());
+    PathElement element = addr.getElement(0);
+    Assert.assertEquals(SUBSYSTEM, element.getKey());
+    Assert.assertEquals(ModelConstants.SUBSYSTEM_NAME, element.getValue());
   }
 
   @Test
@@ -96,7 +104,6 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_ENGINES);
 
     List<ModelNode> operations = parse(subsystemXml);
-
     assertEquals(3, operations.size());
   }
 
@@ -105,7 +112,6 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_ENGINES_AND_PROPERTIES);
 
     List<ModelNode> operations = parse(subsystemXml);
-
     assertEquals(5, operations.size());
   }
 
@@ -114,7 +120,6 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_ENGINES_PROPERTIES_PLUGINS);
 
     List<ModelNode> operations = parse(subsystemXml);
-
     assertEquals(3, operations.size());
   }
 
@@ -270,8 +275,8 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
           .setSubsystemXml(subsystemXml)
           .build();
 
-    } catch (ProcessEngineException fpe) {
-      assertTrue("Duplicate process engine detected!", fpe.getMessage().contains("A process engine with name '__test' already exists."));
+    } catch (XMLStreamException fpe) {
+      assertTrue("Duplicate process engine detected!", fpe.getNestedException().getMessage().contains("A process engine with name '__test' already exists."));
     }
   }
 
@@ -318,8 +323,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     ModelNode jobAcquisition = operations.get(2);
     assertEquals("default", jobAcquisition.get(Attribute.NAME.getLocalName()).asString());
     assertEquals("SEQUENTIAL", jobAcquisition.get(Element.ACQUISITION_STRATEGY.getLocalName()).asString());
-    assertTrue(jobAcquisition.has(Element.PROPERTIES.getLocalName()));
-    assertFalse(jobAcquisition.hasDefined(Element.PROPERTIES.getLocalName()));
+    assertFalse(jobAcquisition.has(Element.PROPERTIES.getLocalName()));
 
     jobAcquisition = operations.get(3);
     assertEquals("anders", jobAcquisition.get(Attribute.NAME.getLocalName()).asString());
@@ -353,8 +357,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     // "default" job acquisition ///////////////////////////////////////////////////////////
     ModelNode jobAcquisition = operations.get(2);
     assertEquals("default", jobAcquisition.get(Attribute.NAME.getLocalName()).asString());
-    assertTrue(jobAcquisition.has(Element.PROPERTIES.getLocalName()));
-    assertFalse(jobAcquisition.hasDefined(Element.PROPERTIES.getLocalName()));
+    assertFalse(jobAcquisition.has(Element.PROPERTIES.getLocalName()));
 
     // "anders" job acquisition ////////////////////////////////////////////////////////////
     jobAcquisition = operations.get(3);
@@ -473,9 +476,10 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   @Test
   public void testParseSubsystemXmlWithEnginesAndJobExecutor() throws Exception {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_PROCESS_ENGINES_AND_JOB_EXECUTOR);
-//    System.out.println(normalizeXML(subsystemXml));
+    System.out.println(normalizeXML(subsystemXml));
 
     List<ModelNode> operations = parse(subsystemXml);
+    System.out.println(operations);
     assertEquals(6, operations.size());
   }
 
@@ -500,6 +504,40 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     String persistedSubsystemXml = services.getPersistedSubsystemXml();
 //    System.out.println(persistedSubsystemXml);
     compareXml(null, subsystemXml, persistedSubsystemXml);
+  }
+
+  @Test
+  public void testParseAndMarshalModelWithEveryAvailableOptionUsed() throws Exception {
+    //Parse the subsystem xml and install into the first controller
+    String subsystemXml = FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_EVERY_AVAILABLE_OPTION_USED);
+    KernelServices servicesA = super.createKernelServicesBuilder(null).setSubsystemXml(subsystemXml).build();
+    // Get the model and the persisted xml from the first controller
+    ModelNode modelA = servicesA.readWholeModel();
+    String marshalled = servicesA.getPersistedSubsystemXml();
+
+    //Install the persisted xml from the first controller into a second controller
+    KernelServices servicesB = super.createKernelServicesBuilder(null).setSubsystemXml(marshalled).build();
+    ModelNode modelB = servicesB.readWholeModel();
+
+    //Make sure the models from the two controllers are identical
+    super.compare(modelA, modelB);
+  }
+
+  @Test
+  public void testParseAndMarshalModelWithMinimalOptionsUsed() throws Exception {
+    //Parse the subsystem xml and install into the first controller
+    String subsystemXml = FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_MINIMAL_OPTIONS_USED);
+    KernelServices servicesA = super.createKernelServicesBuilder(null).setSubsystemXml(subsystemXml).build();
+    // Get the model and the persisted xml from the first controller
+    ModelNode modelA = servicesA.readWholeModel();
+    String marshalled = servicesA.getPersistedSubsystemXml();
+
+    //Install the persisted xml from the first controller into a second controller
+    KernelServices servicesB = super.createKernelServicesBuilder(null).setSubsystemXml(marshalled).build();
+    ModelNode modelB = servicesB.readWholeModel();
+
+    //Make sure the models from the two controllers are identical
+    super.compare(modelA, modelB);
   }
 
 }

@@ -1497,13 +1497,13 @@
         </profile>
     </profiles>
     <!--
-      ~ 
+      ~
       ~          Named interfaces that can be referenced elsewhere in the configuration. The configuration
       ~          for how to associate these logical names with an actual network interface can either
       ~          be specified here or can be declared on a per-host basis in the equivalent element in host.xml.
-      ~ 
+      ~
       ~          These default configurations require the binding specification to be done in host.xml.
-      ~     
+      ~
       -->
     <interfaces>
         <interface name="management"/>
