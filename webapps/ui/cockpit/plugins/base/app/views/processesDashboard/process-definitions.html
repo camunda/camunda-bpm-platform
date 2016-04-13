@@ -1,10 +1,10 @@
 <!-- # CE - ui/cockpit/plugins/base/app/views/processesDashboard/process-definitions.html -->
 <div class="deployed-processes">
-  <h3 ng-if="statistics && statistics.length">
-    {{ statistics.length }} process {{ (statistics.length > 1 ? 'definitions' : 'definition') }} deployed
+  <h3 ng-if="processDefinitionData && processDefinitionData.length">
+    {{ processDefinitionData.length }} process {{ (processDefinitionData.length > 1 ? 'definitions' : 'definition') }} deployed
   </h3>
 
-  <tabset ng-if="statistics && statistics.length">
+  <tabset ng-if="processDefinitionData && processDefinitionData.length">
     <tab heading="List"
          select="selectTab('list')">
       <table class="process-definitions-list cam-table">
@@ -22,36 +22,41 @@
         </thead>
 
         <tbody>
-          <tr ng-repeat="statistic in statistics | orderBy:orderByPredicate:orderByReverse">
+          <tr ng-repeat="pd in processDefinitionData | orderBy:orderByPredicate:orderByReverse">
             <td class="state">
-              <div state-circle
-                   incidents="statistic.incidents"></div>
+              <div ng-if="pd.incidents.length > -1" state-circle incidents="pd.incidents"></div>
+              <div ng-if="pd.incidents == undefined">
+                <span class="glyphicon glyphicon-refresh animate-spin"></span>
+              </div>
             </td>
 
-            <td class="instances">
-              {{ statistic.instances }}
+            <td ng-if="pd.instances >= 0" class="instances">
+              {{ pd.instances }}
+            </td>
+            <td ng-if="pd.instances == undefined">
+              <span class="glyphicon glyphicon-refresh animate-spin"></span>
             </td>
 
             <td class="name">
-              <a href="#/process-definition/{{ statistic.definition.id }}">
-                {{ statistic.definition.name }}
+              <a href="#/process-definition/{{ pd.id }}">
+                {{ pd.name || pd.key }}
               </a>
             </td>
 
             <td class="tenant-id">
-              {{ statistic.definition.tenantId }}
+              {{ pd.tenantId }}
             </td>
 
             <td ng-if="hasHistoryPlugin"
                 class="history-link">
-              <a href="#/process-definition/{{ statistic.definition.id }}/history">
+              <a href="#/process-definition/{{ pd.id }}/history">
                 History view
               </a>
             </td>
 
             <td ng-if="hasReportPlugin"
                 class="report-link">
-              <a href="#/reports/?processDefinitionKey={{ statistic.definition.key }}">
+              <a href="#/reports/?processDefinitionKey={{ pd.key }}">
                 <span class="glyphicon glyphicon-signal"></span>
               </a>
             </td>
@@ -63,29 +68,33 @@
     <tab heading="Previews"
          select="selectTab('previews')">
       <div class="tile-grid">
-        <div ng-repeat="statistic in statistics | orderBy:orderByPredicate:orderByReverse"
+        <div ng-repeat="pd in processDefinitionData | orderBy:orderByPredicate:orderByReverse"
              class="tile">
-          <a href="#/process-definition/{{ statistic.definition.id }}">
+          <a href="#/process-definition/{{ pd.id }}">
             <h4 class="tile-header">
-              {{ statistic.definition.name }}
+              {{ pd.name || pd.key }}
             </h4>
 
             <span class="tile-body">
               <span ng-if="selected === 'previews'"
                     process-diagram-preview
-                    process-definition-id="statistic.definition.id"></span>
+                    process-definition-id="pd.id"></span>
             </span>
 
             <span class="tile-footer">
-              <span class="instances">
-                {{ (statistic.instances < 1 ? 'No' : statistic.instances) }}
+              <span ng-if="pd.instances >= 0" class="instances">
+                {{ (pd.instances < 1 ? 'No' : pd.instances) }}
                 running
-                {{ ((statistic.instances === 1 || statistic.instances === '1') ? 'instance' : 'instances') }}
+                {{ ((pd.instances === 1 || pd.instances === '1') ? 'instance' : 'instances') }}
+              </span>
+              <span ng-if="pd.instances == undefined" class="instances">
+                <span class="glyphicon glyphicon-refresh animate-spin"></span>
               </span>
 
-              <span state-circle
-                    incidents="statistic.incidents"
+              <span ng-if="pd.incidents.length > -1" state-circle
+                    incidents="pd.incidents"
                     class="circle-tiles"></span>
+              <span ng-if="pd.incidents == undefined" class="circle-tiles"></span>
             </span>
           </a>
         </div>
@@ -93,7 +102,7 @@
     </tab><!-- grid tab -->
   </tabset>
 
-  <h3 ng-if="!statistics || !statistics.length">
+  <h3 ng-if="!processDefinitionData || !processDefinitionData.length">
     No process definitions deployed
   </h3>
 

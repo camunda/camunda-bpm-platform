@@ -27,7 +27,7 @@ module.exports = Base.extend({
   },
 
   runningInstances: function(item) {
-    return this.processesList().get(item).element(by.binding('{{ statistic.instances }}')).getText();
+    return this.processesList().get(item).element(by.binding('{{ pd.instances }}')).getText();
   },
 
   tenantId: function(item) {

@@ -11,11 +11,11 @@ module.exports = Base.extend({
   },
 
   processesPreviews: function() {
-    return this.previewsObject().all(by.repeater('statistic in statistics'));
+    return this.previewsObject().all(by.repeater('pd in processDefinitionData'));
   },
 
   selectProcess: function(item) {
-    return this.processesList().get(item).element(by.binding('{{ statistic.definition.name }}')).click();
+    return this.processesList().get(item).element(by.binding('{{ pd.name }}')).click();
   }
 
 });

@@ -25,10 +25,12 @@ function (
       '$scope',
       'Data',
       'dataDepend',
+      'camAPI',
     function(
       $scope,
       Data,
-      dataDepend
+      dataDepend,
+      camAPI
     ) {
       var processData = $scope.processData = dataDepend.create($scope);
 
@@ -39,28 +41,24 @@ function (
 
       var procStats = $scope.procDefStats = {
         definitions: {
-          value: 0,
           label: [
             'process definition',
             'process definitions'
           ]
         },
         instances: {
-          value: 0,
           label: [
             'running instance',
             'running instances'
           ]
         },
         incidents: {
-          value: 0,
           label: [
             'incident',
             'incidents'
           ]
         },
         failedJobs: {
-          value: 0,
           label: [
             'failed job',
             'failed jobs'
@@ -78,13 +76,25 @@ function (
       // should I mention how much I love AngularJS?
       $scope.procDefStatsKeys = Object.keys($scope.procDefStats);
 
+      var processDefinitionService = camAPI.resource('process-definition');
+      processDefinitionService.list({
+        latest: true
+      }, function(err, data) {
+        $scope.processDefinitionData = data.items;
+
+        procStats.definitions.value = data.items.length;
+      });      
+      
       processData.observe('processDefinitionStatistics', function (defStats) {
         $scope.loadingState = 'LOADED';
+
+        procStats.incidents.value = 0;
+        procStats.instances.value = 0;
+        procStats.failedJobs.value = 0;
 
         each(defStats, function (stats) {
           procStats.instances.value += stats.instances || 0;
           procStats.failedJobs.value += stats.failedJobs || 0;
-          procStats.definitions.value++;
           procStats.incidents.value += stats.incidents.length;
         });
       });
