@@ -17,6 +17,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +75,6 @@ public class MultiTenancyCaseDefinitionQueryTest extends PluggableProcessEngineT
     CaseDefinitionQuery query = repositoryService
         .createCaseDefinitionQuery()
         .withoutTenantId();
-    System.out.println("----------------------");
     assertThat(query.count(), is(1L));
   }
 
@@ -269,6 +269,43 @@ public class MultiTenancyCaseDefinitionQueryTest extends PluggableProcessEngineT
     assertThat(caseDefinitions.size(), is(2));
     assertThat(caseDefinitions.get(0).getTenantId(), is(TENANT_TWO));
     assertThat(caseDefinitions.get(1).getTenantId(), is(TENANT_ONE));
+  }
+
+  public void testQueryNoAuthenticatedTenants() {
+    identityService.setAuthenticatedTenantIds(null);
+
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+    assertThat(query.count(), is(1L));
+  }
+
+  public void testQueryAuthenticatedTenant() {
+    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE));
+
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    assertThat(query.count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeCaseDefinitionsWithoutTenantId().count(), is(2L));
+  }
+
+  public void testQueryAuthenticatedTenants() {
+    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE, TENANT_TWO));
+
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+
+    assertThat(query.count(), is(3L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.withoutTenantId().count(), is(1L));
+  }
+
+  public void testQueryDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthenticatedTenantIds(null);
+
+    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
+    assertThat(query.count(), is(3L));
   }
 
   protected Map<String, CaseDefinition> getCaseDefinitionsForTenant(List<CaseDefinition> definitions) {

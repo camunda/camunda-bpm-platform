@@ -57,6 +57,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 
@@ -212,6 +213,10 @@ public abstract class AbstractManager implements Session {
 
   protected HistoricBatchManager getHistoricBatchManager() {
     return getSession(HistoricBatchManager.class);
+  }
+
+  protected TenantManager getTenantManager() {
+    return getSession(TenantManager.class);
   }
 
   public void close() {

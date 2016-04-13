@@ -107,15 +107,21 @@ public class CaseDefinitionManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<CaseDefinition> findCaseDefinitionsByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery, Page page) {
+    configureCaseDefinitionQuery(caseDefinitionQuery);
     return getDbEntityManager().selectList("selectCaseDefinitionsByQueryCriteria", caseDefinitionQuery, page);
   }
 
   public long findCaseDefinitionCountByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery) {
+    configureCaseDefinitionQuery(caseDefinitionQuery);
     return (Long) getDbEntityManager().selectOne("selectCaseDefinitionCountByQueryCriteria", caseDefinitionQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<CaseDefinition> findCaseDefinitionByDeploymentId(String deploymentId) {
     return getDbEntityManager().selectList("selectCaseDefinitionByDeploymentId", deploymentId);
+  }
+
+  protected void configureCaseDefinitionQuery(CaseDefinitionQueryImpl query) {
+    getTenantManager().configureQuery(query);
   }
 }

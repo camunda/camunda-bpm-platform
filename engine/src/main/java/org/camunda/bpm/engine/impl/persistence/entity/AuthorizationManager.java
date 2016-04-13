@@ -83,7 +83,6 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
-import org.camunda.bpm.engine.impl.db.TenantCheck;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
@@ -294,16 +293,7 @@ public class AuthorizationManager extends AbstractManager {
     }
 
     // TODO separate tenant check from authorization - CAM-5739
-    TenantCheck tenantCheck = query.getTenantCheck();
-
-    if (Context.getProcessEngineConfiguration().isTenantCheckEnabled() && currentAuthentication != null) {
-      tenantCheck.setTenantCheckEnabled(true);
-      tenantCheck.setAuthTenantIds(currentAuthentication.getTenantIds());
-
-    } else {
-      tenantCheck.setTenantCheckEnabled(false);
-      tenantCheck.setAuthTenantIds(null);
-    }
+    getTenantManager().configureQuery(query);
   }
 
   @Override

@@ -17,6 +17,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -271,6 +272,43 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(decisionDefinitions.size(), is(2));
     assertThat(decisionDefinitions.get(0).getTenantId(), is(TENANT_TWO));
     assertThat(decisionDefinitions.get(1).getTenantId(), is(TENANT_ONE));
+  }
+
+  public void testQueryNoAuthenticatedTenants() {
+    identityService.setAuthenticatedTenantIds(null);
+
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
+    assertThat(query.count(), is(1L));
+  }
+
+  public void testQueryAuthenticatedTenant() {
+    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE));
+
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
+
+    assertThat(query.count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeDecisionDefinitionsWithoutTenantId().count(), is(2L));
+  }
+
+  public void testQueryAuthenticatedTenants() {
+    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE, TENANT_TWO));
+
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
+
+    assertThat(query.count(), is(3L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.withoutTenantId().count(), is(1L));
+  }
+
+  public void testQueryDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthenticatedTenantIds(null);
+
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
+    assertThat(query.count(), is(3L));
   }
 
   protected Map<String, DecisionDefinition> getDecisionDefinitionsForTenant(List<DecisionDefinition> decisionDefinitions) {
