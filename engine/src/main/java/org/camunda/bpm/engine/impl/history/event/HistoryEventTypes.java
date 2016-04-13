@@ -128,11 +128,15 @@ public enum HistoryEventTypes implements HistoryEventType {
 
   /**
    * fired when an identity link is added
+   * 
+   * @since 7.5
    */
   IDENTITY_LINK_ADD("identity-link-add", "add-identity-link"),
 
   /**
    * fired when an identity link is removed
+   * 
+   * @since 7.5
    */
   IDENTITY_LINK_DELETE("identity-link-delete", "delete-identity-link");
 

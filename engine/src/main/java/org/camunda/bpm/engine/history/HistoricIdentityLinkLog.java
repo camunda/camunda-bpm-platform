@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.identity.UserQuery;
  * For every log, an operation type (add/delete) is added to the database
  * based on the identity link operation
  */
-public interface HistoricIdentityLink {
+public interface HistoricIdentityLinkLog {
   
   /**
    * Returns the id of historic identity link (Candidate or Assignee or Owner).

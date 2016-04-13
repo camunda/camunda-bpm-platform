@@ -58,7 +58,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormField;
-import org.camunda.bpm.engine.history.HistoricIdentityLink;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -1894,8 +1894,8 @@ public abstract class MockProvider {
   }
 
   // Historic identity link
-  public static HistoricIdentityLink createMockHistoricIdentityLink() {
-    HistoricIdentityLink identityLink = mock(HistoricIdentityLink.class);
+  public static HistoricIdentityLinkLog createMockHistoricIdentityLink() {
+    HistoricIdentityLinkLog identityLink = mock(HistoricIdentityLinkLog.class);
 
     when(identityLink.getAssignerId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_ASSIGNER_ID);
     when(identityLink.getGroupId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_GROUP_ID);
@@ -1909,8 +1909,8 @@ public abstract class MockProvider {
     return identityLink;
   }
 
-  public static List<HistoricIdentityLink> createMockHistoricIdentityLinks() {
-    List<HistoricIdentityLink> entries = new ArrayList<HistoricIdentityLink>();
+  public static List<HistoricIdentityLinkLog> createMockHistoricIdentityLinks() {
+    List<HistoricIdentityLinkLog> entries = new ArrayList<HistoricIdentityLinkLog>();
     entries.add(createMockHistoricIdentityLink());
     return entries;
   }

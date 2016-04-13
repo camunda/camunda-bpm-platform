@@ -8,7 +8,7 @@ import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.history.HistoricIdentityLinkQuery;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Deivarayan Azhagappan
  *
  */
-public class HistoricIdentityLinkQueryDto extends AbstractQueryDto<HistoricIdentityLinkQuery> {
+public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricIdentityLinkLogQuery> {
 
   private static final String SORT_BY_TIME = "time";
   private static final String SORT_BY_TYPE = "type";
@@ -54,10 +54,10 @@ public class HistoricIdentityLinkQueryDto extends AbstractQueryDto<HistoricIdent
   protected String operationType;
   protected String assignerId;
 
-  public HistoricIdentityLinkQueryDto() {
+  public HistoricIdentityLinkLogQueryDto() {
   }
 
-  public HistoricIdentityLinkQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
+  public HistoricIdentityLinkLogQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
   }
 
@@ -67,8 +67,8 @@ public class HistoricIdentityLinkQueryDto extends AbstractQueryDto<HistoricIdent
   }
 
   @Override
-  protected HistoricIdentityLinkQuery createNewQuery(ProcessEngine engine) {
-    return engine.getHistoryService().createHistoricIdentityLinkQuery();
+  protected HistoricIdentityLinkLogQuery createNewQuery(ProcessEngine engine) {
+    return engine.getHistoryService().createHistoricIdentityLinkLogQuery();
   }
 
   @CamundaQueryParam("type")
@@ -117,7 +117,7 @@ public class HistoricIdentityLinkQueryDto extends AbstractQueryDto<HistoricIdent
   }
 
   @Override
-  protected void applyFilters(HistoricIdentityLinkQuery query) {
+  protected void applyFilters(HistoricIdentityLinkLogQuery query) {
     if (dateBefore != null) {
       query.dateBefore(dateBefore);
     }
@@ -148,7 +148,7 @@ public class HistoricIdentityLinkQueryDto extends AbstractQueryDto<HistoricIdent
   }
 
   @Override
-  protected void applySortBy(HistoricIdentityLinkQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+  protected void applySortBy(HistoricIdentityLinkLogQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
     if (sortBy.equals(SORT_BY_TIME)) {
       query.orderByTime();
     } else if (sortBy.equals(SORT_BY_TYPE)) {

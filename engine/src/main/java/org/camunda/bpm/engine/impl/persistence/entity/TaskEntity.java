@@ -806,8 +806,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       return;
     }
 
-    identityLinkChanges.add(new PropertyChange(IdentityLinkType.ASSIGNEE, oldAssignee, assignee));
-    
+    addIdentityLinkChanges(IdentityLinkType.ASSIGNEE, oldAssignee, assignee);
     propertyChanged(ASSIGNEE, oldAssignee, assignee);
     this.assignee = assignee;
 
@@ -838,7 +837,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       return;
     }
 
-    identityLinkChanges.add(new PropertyChange(IdentityLinkType.OWNER, oldOwner, owner));
+    addIdentityLinkChanges(IdentityLinkType.OWNER, oldOwner, owner);
     propertyChanged(OWNER, oldOwner, owner);
     this.owner = owner;
 
@@ -1404,5 +1403,9 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
+  public void addIdentityLinkChanges(String type, String oldProperty, String newProperty)
+  {
+    identityLinkChanges.add(new PropertyChange(type, oldProperty, newProperty));
+  }
 
 }

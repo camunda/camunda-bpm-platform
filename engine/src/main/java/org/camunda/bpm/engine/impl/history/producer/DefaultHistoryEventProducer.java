@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
@@ -674,17 +674,17 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected HistoryEvent createHistoricIdentityLinkEvt(IdentityLink identityLink, HistoryEventTypes eventType) {
     // create historic identity link event
-    HistoricIdentityLinkEventEntity evt = newIdentityLinkEventEntity();
+    HistoricIdentityLinkLogEventEntity evt = newIdentityLinkEventEntity();
     // Mapping all the values of identity link to HistoricIdentityLinkEvent
     initHistoricIdentityLinkEvent(evt, identityLink, eventType);
     return evt;
   }
 
-  protected HistoricIdentityLinkEventEntity newIdentityLinkEventEntity() {
-    return new HistoricIdentityLinkEventEntity();
+  protected HistoricIdentityLinkLogEventEntity newIdentityLinkEventEntity() {
+    return new HistoricIdentityLinkLogEventEntity();
   }
 
-  protected void initHistoricIdentityLinkEvent(HistoricIdentityLinkEventEntity evt, IdentityLink identityLink, HistoryEventType eventType) {
+  protected void initHistoricIdentityLinkEvent(HistoricIdentityLinkLogEventEntity evt, IdentityLink identityLink, HistoryEventType eventType) {
     evt.setTime(ClockUtil.getCurrentTime());
     evt.setType(identityLink.getType());
     evt.setUserId(identityLink.getUserId());

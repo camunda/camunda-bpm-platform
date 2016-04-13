@@ -5,8 +5,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.camunda.bpm.engine.history.HistoricIdentityLink;
-import org.camunda.bpm.engine.history.HistoricIdentityLinkQuery;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Deivarayan Azhagappan
  *
  */
-public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCase {
+public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTestCase {
   private static final String A_USER_ID = "aUserId";
   private static final String A_GROUP_ID = "aGroupId";
   private static final int numberOfUsers = 3;
@@ -42,7 +42,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testQueryAddTaskCandidateforAddIdentityLink() {
 
-    List<HistoricIdentityLink> historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given
@@ -54,7 +54,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
     taskService.addCandidateUser(taskId, A_USER_ID);
 
     // Query test
-    HistoricIdentityLink historicIdentityLink = historyService.createHistoricIdentityLinkQuery().singleResult();
+    HistoricIdentityLinkLog historicIdentityLink = historyService.createHistoricIdentityLinkLogQuery().singleResult();
     assertEquals(historicIdentityLink.getUserId(), A_USER_ID);
     assertEquals(historicIdentityLink.getTaskId(), taskId);
     assertEquals(historicIdentityLink.getType(), IdentityLinkType.CANDIDATE);
@@ -66,7 +66,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testGroupQueryTaskCandidateForAddAndDeleteIdentityLink() {
 
-    List<HistoricIdentityLink> historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given
@@ -78,7 +78,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
     taskService.addCandidateGroup(taskId, A_GROUP_ID);
 
     // Query test
-    HistoricIdentityLink historicIdentityLink = historyService.createHistoricIdentityLinkQuery().singleResult();
+    HistoricIdentityLinkLog historicIdentityLink = historyService.createHistoricIdentityLinkLogQuery().singleResult();
     assertEquals(historicIdentityLink.getUserId(), null);
     assertEquals(historicIdentityLink.getTaskId(), taskId);
     assertEquals(historicIdentityLink.getType(), IdentityLinkType.CANDIDATE);
@@ -90,7 +90,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testValidIndividualQueryTaskCandidateForAddAndDeleteIdentityLink() {
 
-    List<HistoricIdentityLink> historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given
@@ -103,22 +103,22 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
     taskService.deleteCandidateUser(taskId, A_USER_ID);
 
     // Valid Individual Query test
-    HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.taskId(taskId).count(), 2);
 
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.type(IdentityLinkType.CANDIDATE).count(), 2);
 
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.userId(A_USER_ID).count(), 2);
 
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.assignerId(A_ASSIGNER_ID).count(), 2);
 
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 1);
 
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.operationType(IDENTITY_LINK_ADD).count(), 1);
 
   }
@@ -126,7 +126,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testValidGroupQueryTaskCandidateForAddAndDeleteIdentityLink() {
 
-    List<HistoricIdentityLink> historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given
@@ -139,7 +139,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
     taskService.deleteCandidateUser(taskId, A_USER_ID);
 
     // Valid group query test
-    HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.taskId(taskId).count(), 2);
     assertEquals(query.type(IdentityLinkType.CANDIDATE).count(), 2);
     assertEquals(query.userId(A_USER_ID).count(), 2);
@@ -151,7 +151,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testInvalidIndividualQueryTaskCandidateForAddAndDeleteIdentityLink() {
 
-    List<HistoricIdentityLink> historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given
@@ -164,22 +164,22 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
     taskService.deleteCandidateUser(taskId, A_USER_ID);
 
     // Invalid Individual Query test
-    HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.taskId(INVALID_TASK_ID).count(), 0);
 
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.type(INVALID_IDENTITY_LINK_TYPE).count(), 0);
 
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.userId(INVALID_USER_ID).count(), 0);
 
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.groupId(INVALID_GROUP_ID).count(), 0);
 
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.assignerId(INVALID_ASSIGNER_ID).count(), 0);
 
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.operationType(INVALID_HISTORY_EVENT_TYPE).count(), 0);
 
   }
@@ -187,7 +187,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testInvalidGroupQueryTaskCandidateForAddAndDeleteIdentityLink() {
 
-    List<HistoricIdentityLink> historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given
@@ -200,7 +200,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
     taskService.deleteCandidateUser(taskId, A_USER_ID);
 
     // Invalid Individual Query test
-    HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.taskId(INVALID_TASK_ID).count(), 0);
     assertEquals(query.type(INVALID_IDENTITY_LINK_TYPE).count(), 0);
     assertEquals(query.userId(INVALID_USER_ID).count(), 0);
@@ -224,7 +224,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testShouldAddTaskOwnerForAddandDeleteIdentityLinkByTimeStamp() {
 
-    List<HistoricIdentityLink> historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given
@@ -248,20 +248,20 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
     deleteUserIdentityLinks(taskId);
 
     // Query records with time before 12:20
-    HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.dateBefore(newYearNoon(20)).count(), 6);
     assertEquals(query.operationType(IDENTITY_LINK_ADD).count(), 3);
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 3);
 
     // Query records with time between 00:01 and 12:00
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.dateBefore(newYearNoon(0)).count(), 6);
     assertEquals(query.dateAfter(newYearMorning(1)).count(), 1);
     assertEquals(query.operationType(IDENTITY_LINK_ADD).count(), 0);
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 1);
 
     // Query records with time after 12:45
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.dateAfter(newYearNoon(45)).count(), 1);
     assertEquals(query.operationType(IDENTITY_LINK_ADD).count(), 0);
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 1);
@@ -280,10 +280,10 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
 
     // Add candiate group with process definition
     repositoryService.addCandidateStarterGroup(latestProcessDef.getId(), GROUP_1);
-    List<HistoricIdentityLink> historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 1);
     // Query test
-    HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.processDefinitionId(latestProcessDef.getId()).count(), 1);
     assertEquals(query.operationType(IDENTITY_LINK_ADD).count(), 1);
     assertEquals(query.groupId(GROUP_1).count(), 1);
@@ -291,7 +291,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
     // Add candidate user for process definition
     repositoryService.addCandidateStarterUser(latestProcessDef.getId(), USER_1);
     // Query test
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.processDefinitionId(latestProcessDef.getId()).count(), 2);
     assertEquals(query.operationType(IDENTITY_LINK_ADD).count(), 2);
     assertEquals(query.userId(USER_1).count(), 1);
@@ -299,7 +299,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
     // Delete candiate group with process definition
     repositoryService.deleteCandidateStarterGroup(latestProcessDef.getId(), GROUP_1);
     // Query test
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.processDefinitionId(latestProcessDef.getId()).count(), 3);
     assertEquals(query.groupId(GROUP_1).count(), 2);
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 1);
@@ -307,10 +307,10 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
     // Delete candidate user for process definition
     repositoryService.deleteCandidateStarterUser(latestProcessDef.getId(), USER_1);
     // Query test
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.processDefinitionId(latestProcessDef.getId()).count(), 4);
     assertEquals(query.userId(USER_1).count(), 2);
-    query = historyService.createHistoricIdentityLinkQuery();
+    query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 2);
   }
 
@@ -318,7 +318,7 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
   public void testHistoricIdentityLinkQueryPaging() {
     startProcessInstance(PROCESS_DEFINITION_KEY_MULTIPLE_CANDIDATE_USER);
 
-    HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
 
     assertEquals(4, query.listPage(0, 4).size());
     assertEquals(1, query.listPage(2, 1).size());
@@ -330,31 +330,31 @@ public class HistoricIdentityLinkQueryTest extends PluggableProcessEngineTestCas
   public void testHistoricIdentityLinkQuerySorting() {
     
     // Pre test - Historical identity link is added as part of deployment
-    List<HistoricIdentityLink> historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 0);
     startProcessInstance(PROCESS_DEFINITION_KEY_MULTIPLE_CANDIDATE_USER);
 
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByAssignerId().asc().list().size());
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByTime().asc().list().size());
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByGroupId().asc().list().size());
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByType().asc().list().size());
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByOperationType().asc().list().size());
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByProcessDefinitionId().asc().list().size());
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByTaskId().asc().list().size());
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByUserId().asc().list().size());
-    assertEquals("aUser", historyService.createHistoricIdentityLinkQuery().orderByUserId().asc().list().get(0).getUserId());
-    assertEquals("dUser", historyService.createHistoricIdentityLinkQuery().orderByUserId().asc().list().get(3).getUserId());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByAssignerId().asc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByTime().asc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByGroupId().asc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByType().asc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByOperationType().asc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByProcessDefinitionId().asc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByTaskId().asc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByUserId().asc().list().size());
+    assertEquals("aUser", historyService.createHistoricIdentityLinkLogQuery().orderByUserId().asc().list().get(0).getUserId());
+    assertEquals("dUser", historyService.createHistoricIdentityLinkLogQuery().orderByUserId().asc().list().get(3).getUserId());
     
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByAssignerId().desc().list().size());
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByTime().desc().list().size());
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByGroupId().desc().list().size());
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByType().desc().list().size());
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByOperationType().desc().list().size());
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByProcessDefinitionId().desc().list().size());
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByTaskId().desc().list().size());
-    assertEquals(4, historyService.createHistoricIdentityLinkQuery().orderByUserId().desc().list().size());
-    assertEquals("dUser", historyService.createHistoricIdentityLinkQuery().orderByUserId().desc().list().get(0).getUserId());
-    assertEquals("aUser", historyService.createHistoricIdentityLinkQuery().orderByUserId().desc().list().get(3).getUserId());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByAssignerId().desc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByTime().desc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByGroupId().desc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByType().desc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByOperationType().desc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByProcessDefinitionId().desc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByTaskId().desc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByUserId().desc().list().size());
+    assertEquals("dUser", historyService.createHistoricIdentityLinkLogQuery().orderByUserId().desc().list().get(0).getUserId());
+    assertEquals("aUser", historyService.createHistoricIdentityLinkLogQuery().orderByUserId().desc().list().get(3).getUserId());
   }
   public void addUserIdentityLinks(String taskId) {
     for (int userIndex = 1; userIndex <= numberOfUsers; userIndex++)

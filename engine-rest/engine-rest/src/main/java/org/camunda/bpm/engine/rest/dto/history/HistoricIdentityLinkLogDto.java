@@ -2,9 +2,9 @@ package org.camunda.bpm.engine.rest.dto.history;
 
 import java.util.Date;
 
-import org.camunda.bpm.engine.history.HistoricIdentityLink;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
 
-public class HistoricIdentityLinkDto {
+public class HistoricIdentityLinkLogDto {
   protected String id;
   protected Date time;
   protected String type;
@@ -51,8 +51,8 @@ public class HistoricIdentityLinkDto {
     return assignerId;
   }
 
-  public static HistoricIdentityLinkDto fromHistoricIdentityLink(HistoricIdentityLink historicIdentityLink) {
-    HistoricIdentityLinkDto dto = new HistoricIdentityLinkDto();
+  public static HistoricIdentityLinkLogDto fromHistoricIdentityLink(HistoricIdentityLinkLog historicIdentityLink) {
+    HistoricIdentityLinkLogDto dto = new HistoricIdentityLinkLogDto();
     dto.id = historicIdentityLink.getId();
     dto.assignerId = historicIdentityLink.getAssignerId();
     dto.groupId = historicIdentityLink.getGroupId();

@@ -8,57 +8,57 @@ import org.camunda.bpm.engine.query.Query;
  * @author Deivarayan Azhagappan
  *
  */
-public interface HistoricIdentityLinkQuery extends Query<HistoricIdentityLinkQuery, HistoricIdentityLink>{
+public interface HistoricIdentityLinkLogQuery extends Query<HistoricIdentityLinkLogQuery, HistoricIdentityLinkLog>{
   
   /** Only select historic identity links which have the date before the give date. **/
-	HistoricIdentityLinkQuery dateBefore(Date dateBefore);
+	HistoricIdentityLinkLogQuery dateBefore(Date dateBefore);
 
 	/** Only select historic identity links which have the date after the give date. **/
-	HistoricIdentityLinkQuery dateAfter(Date dateAfter);
+	HistoricIdentityLinkLogQuery dateAfter(Date dateAfter);
 	
 	/** Only select historic identity links which have the given identity link type. **/
-	HistoricIdentityLinkQuery type(String type);
+	HistoricIdentityLinkLogQuery type(String type);
 	
 	/** Only select historic identity links which have the given user id. **/
-	HistoricIdentityLinkQuery userId(String userId);
+	HistoricIdentityLinkLogQuery userId(String userId);
 	
 	/** Only select historic identity links which have the given group id. **/
-	HistoricIdentityLinkQuery groupId(String groupId);
+	HistoricIdentityLinkLogQuery groupId(String groupId);
 	
 	/** Only select historic identity links which have the given task id. **/
-	HistoricIdentityLinkQuery taskId(String taskId);
+	HistoricIdentityLinkLogQuery taskId(String taskId);
 	
 	/** Only select historic identity links which have the given process definition id. **/
-	HistoricIdentityLinkQuery processDefinitionId(String processDefinitionId);
+	HistoricIdentityLinkLogQuery processDefinitionId(String processDefinitionId);
 	
 	/** Only select historic identity links which have the given operation type (add/delete). **/
-	HistoricIdentityLinkQuery operationType(String operationType);
+	HistoricIdentityLinkLogQuery operationType(String operationType);
 	
 	/** Only select historic identity links which have the given assigner id. **/
-	HistoricIdentityLinkQuery assignerId(String assignerId);
+	HistoricIdentityLinkLogQuery assignerId(String assignerId);
 	
 	/** Order by time (needs to be followed by {@link #asc()} or {@link #desc()}). */
-  HistoricIdentityLinkQuery orderByTime();
+  HistoricIdentityLinkLogQuery orderByTime();
   
 	/** Order by type (needs to be followed by {@link #asc()} or {@link #desc()}). */
-	HistoricIdentityLinkQuery orderByType();
+	HistoricIdentityLinkLogQuery orderByType();
 	
 	/** Order by userId (needs to be followed by {@link #asc()} or {@link #desc()}). */
-	HistoricIdentityLinkQuery orderByUserId();
+	HistoricIdentityLinkLogQuery orderByUserId();
 	
 	/** Order by groupId (needs to be followed by {@link #asc()} or {@link #desc()}). */
-	HistoricIdentityLinkQuery orderByGroupId();
+	HistoricIdentityLinkLogQuery orderByGroupId();
 	
 	/** Order by taskId (needs to be followed by {@link #asc()} or {@link #desc()}). */
-	HistoricIdentityLinkQuery orderByTaskId();
+	HistoricIdentityLinkLogQuery orderByTaskId();
 	
 	/** Order by processDefId (needs to be followed by {@link #asc()} or {@link #desc()}). */
-	HistoricIdentityLinkQuery orderByProcessDefinitionId();
+	HistoricIdentityLinkLogQuery orderByProcessDefinitionId();
 	
 	/** Order by operationType (needs to be followed by {@link #asc()} or {@link #desc()}). */
-	HistoricIdentityLinkQuery orderByOperationType();
+	HistoricIdentityLinkLogQuery orderByOperationType();
 	
 	/** Order by assignerId (needs to be followed by {@link #asc()} or {@link #desc()}). */
-	HistoricIdentityLinkQuery orderByAssignerId();
+	HistoricIdentityLinkLogQuery orderByAssignerId();
 	
 }

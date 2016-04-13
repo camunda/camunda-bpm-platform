@@ -5,8 +5,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.Date;
 import java.util.List;
 
-import org.camunda.bpm.engine.history.HistoricIdentityLink;
-import org.camunda.bpm.engine.history.HistoricIdentityLinkQuery;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
@@ -14,8 +14,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
  * @author Deivarayan Azhagappan
  *
  */
-public class HistoricIdentityLinkQueryImpl extends AbstractVariableQueryImpl<HistoricIdentityLinkQuery, HistoricIdentityLink>
-    implements HistoricIdentityLinkQuery {
+public class HistoricIdentityLinkLogQueryImpl extends AbstractVariableQueryImpl<HistoricIdentityLinkLogQuery, HistoricIdentityLinkLog>
+    implements HistoricIdentityLinkLogQuery {
 
   private static final long serialVersionUID = 1L;
   protected Date dateBefore;
@@ -28,10 +28,10 @@ public class HistoricIdentityLinkQueryImpl extends AbstractVariableQueryImpl<His
   protected String operationType;
   protected String assignerId;
 
-  public HistoricIdentityLinkQueryImpl() {
+  public HistoricIdentityLinkLogQueryImpl() {
   }
 
-  public HistoricIdentityLinkQueryImpl(CommandExecutor commandExecutor) {
+  public HistoricIdentityLinkLogQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
   
@@ -72,111 +72,113 @@ public class HistoricIdentityLinkQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   @Override
-  public HistoricIdentityLinkQuery type(String type) {
+  public HistoricIdentityLinkLogQuery type(String type) {
     ensureNotNull("type", type);
     this.type = type;
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery dateBefore(Date dateBefore) {
+  public HistoricIdentityLinkLogQuery dateBefore(Date dateBefore) {
+    ensureNotNull("dateBefore", dateBefore);
     this.dateBefore = dateBefore;
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery dateAfter(Date dateAfter) {
+  public HistoricIdentityLinkLogQuery dateAfter(Date dateAfter) {
+    ensureNotNull("dateAfter", dateAfter);
     this.dateAfter = dateAfter;
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery userId(String userId) {
+  public HistoricIdentityLinkLogQuery userId(String userId) {
     ensureNotNull("userId", userId);
     this.userId = userId;
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery groupId(String groupId) {
+  public HistoricIdentityLinkLogQuery groupId(String groupId) {
     ensureNotNull("groupId", groupId);
     this.groupId = groupId;
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery taskId(String taskId) {
+  public HistoricIdentityLinkLogQuery taskId(String taskId) {
     ensureNotNull("taskId", taskId);
     this.taskId = taskId;
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery processDefinitionId(String processDefinitionId) {
-    ensureNotNull("processDefId", processDefinitionId);
+  public HistoricIdentityLinkLogQuery processDefinitionId(String processDefinitionId) {
+    ensureNotNull("processDefinitionId", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery operationType(String operationType) {
+  public HistoricIdentityLinkLogQuery operationType(String operationType) {
     ensureNotNull("operationType", operationType);
     this.operationType = operationType;
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery assignerId(String assignerId) {
+  public HistoricIdentityLinkLogQuery assignerId(String assignerId) {
     ensureNotNull("assignerId", assignerId);
     this.assignerId = assignerId;
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery orderByTime() {
-    orderBy(HistoricIdentityLinkQueryProperty.TIME);
+  public HistoricIdentityLinkLogQuery orderByTime() {
+    orderBy(HistoricIdentityLinkLogQueryProperty.TIME);
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery orderByType() {
-    orderBy(HistoricIdentityLinkQueryProperty.TYPE);
+  public HistoricIdentityLinkLogQuery orderByType() {
+    orderBy(HistoricIdentityLinkLogQueryProperty.TYPE);
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery orderByUserId() {
-    orderBy(HistoricIdentityLinkQueryProperty.USER_ID);
+  public HistoricIdentityLinkLogQuery orderByUserId() {
+    orderBy(HistoricIdentityLinkLogQueryProperty.USER_ID);
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery orderByGroupId() {
-    orderBy(HistoricIdentityLinkQueryProperty.GROUP_ID);
+  public HistoricIdentityLinkLogQuery orderByGroupId() {
+    orderBy(HistoricIdentityLinkLogQueryProperty.GROUP_ID);
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery orderByTaskId() {
-    orderBy(HistoricIdentityLinkQueryProperty.TASK_ID);
+  public HistoricIdentityLinkLogQuery orderByTaskId() {
+    orderBy(HistoricIdentityLinkLogQueryProperty.TASK_ID);
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery orderByProcessDefinitionId() {
-    orderBy(HistoricIdentityLinkQueryProperty.PROC_DEFINITION_ID);
+  public HistoricIdentityLinkLogQuery orderByProcessDefinitionId() {
+    orderBy(HistoricIdentityLinkLogQueryProperty.PROC_DEFINITION_ID);
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery orderByOperationType() {
-    orderBy(HistoricIdentityLinkQueryProperty.OPERATION_TYPE);
+  public HistoricIdentityLinkLogQuery orderByOperationType() {
+    orderBy(HistoricIdentityLinkLogQueryProperty.OPERATION_TYPE);
     return this;
   }
 
   @Override
-  public HistoricIdentityLinkQuery orderByAssignerId() {
-    orderBy(HistoricIdentityLinkQueryProperty.ASSIGNER_ID);
+  public HistoricIdentityLinkLogQuery orderByAssignerId() {
+    orderBy(HistoricIdentityLinkLogQueryProperty.ASSIGNER_ID);
     return this;
   }
 
@@ -185,14 +187,14 @@ public class HistoricIdentityLinkQueryImpl extends AbstractVariableQueryImpl<His
     checkQueryOk();
     return commandContext
       .getHistoricIdentityLinkManager()
-      .findHistoricIdentityLinkCountByQueryCriteria(this);
+      .findHistoricIdentityLinkLogCountByQueryCriteria(this);
   }
 
   @Override
-  public List<HistoricIdentityLink> executeList(CommandContext commandContext, Page page) {
+  public List<HistoricIdentityLinkLog> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext
       .getHistoricIdentityLinkManager()
-      .findHistoricIdentityLinkByQueryCriteria(this, page);
+      .findHistoricIdentityLinkLogByQueryCriteria(this, page);
   }
 }

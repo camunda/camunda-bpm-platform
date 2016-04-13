@@ -6,11 +6,9 @@ import java.util.Date;
  * @author Deivarayan Azhagappan
  *
  */
-public class HistoricIdentityLinkEventEntity extends HistoryEvent {
+public class HistoricIdentityLinkLogEventEntity extends HistoryEvent {
 
   private static final long serialVersionUID = 1L;
-
-  protected String id;
 
   protected Date time;
 
@@ -22,19 +20,9 @@ public class HistoricIdentityLinkEventEntity extends HistoryEvent {
 
   protected String taskId;
 
-  protected String processDefinitionId;
-
   protected String operationType;
 
   protected String assignerId;
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
 
   public Date getTime() {
     return time;
@@ -74,14 +62,6 @@ public class HistoricIdentityLinkEventEntity extends HistoryEvent {
 
   public void setTaskId(String taskId) {
     this.taskId = taskId;
-  }
-
-  public String getProcessDefinitionId() {
-    return processDefinitionId;
-  }
-
-  public void setProcessDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
   }
 
   public String getOperationType() {

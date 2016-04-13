@@ -1,15 +1,15 @@
 package org.camunda.bpm.engine.test.history;
 
 import java.util.List;
-import org.camunda.bpm.engine.history.HistoricIdentityLink;
-import org.camunda.bpm.engine.history.HistoricIdentityLinkQuery;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.task.IdentityLink;
 
-public class HistoricIdentityLinkTestByXml extends PluggableProcessEngineTestCase{
+public class HistoricIdentityLinkLogTestByXml extends PluggableProcessEngineTestCase{
   
   private static String PROCESS_DEFINITION_KEY_CANDIDATE_USER = "oneTaskProcessForHistoricIdentityLinkWithCanidateUser";
   private static String PROCESS_DEFINITION_KEY_CANDIDATE_GROUP = "oneTaskProcessForHistoricIdentityLinkWithCanidateGroup";
@@ -24,16 +24,16 @@ public class HistoricIdentityLinkTestByXml extends PluggableProcessEngineTestCas
   public void testShouldAddTaskCandidateforAddIdentityLinkUsingXml() {
 
     // Pre test
-    List<HistoricIdentityLink> historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given
     startProcessInstance(PROCESS_DEFINITION_KEY_CANDIDATE_USER);
-    historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 1);
 
     // query Test
-    HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.userId(XML_USER).count(), 1);
   }
 
@@ -41,16 +41,16 @@ public class HistoricIdentityLinkTestByXml extends PluggableProcessEngineTestCas
   public void testShouldAddTaskAssigneeforAddIdentityLinkUsingXml() {
 
     // Pre test
-    List<HistoricIdentityLink> historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given
     startProcessInstance(PROCESS_DEFINITION_KEY_ASSIGNEE);
-    historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 1);
 
     // query Test
-    HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.userId(XML_ASSIGNEE).count(), 1);
    
     
@@ -60,16 +60,16 @@ public class HistoricIdentityLinkTestByXml extends PluggableProcessEngineTestCas
   public void testShouldAddTaskCandidateGroupforAddIdentityLinkUsingXml() {
 
     // Pre test
-    List<HistoricIdentityLink> historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given
     startProcessInstance(PROCESS_DEFINITION_KEY_CANDIDATE_GROUP);
-    historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 1);
 
     // query Test
-    HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.groupId(XML_GROUP).count(), 1);
   }
 
@@ -77,7 +77,7 @@ public class HistoricIdentityLinkTestByXml extends PluggableProcessEngineTestCas
   public void testShouldAddProcessCandidateStarterUserforAddIdentityLinkUsingXml() {
 
     // Pre test - Historical identity link is added as part of deployment
-    List<HistoricIdentityLink> historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 1);
 
     // given
@@ -88,18 +88,18 @@ public class HistoricIdentityLinkTestByXml extends PluggableProcessEngineTestCas
     List<IdentityLink> links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
     assertEquals(1, links.size());
 
-    historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 1);
 
     // query Test
-    HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.userId(XML_USER).count(), 1);
   }
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/OneTaskProcessWithCandidateStarterGroups.bpmn20.xml" })
   public void testShouldAddProcessCandidateStarterGroupforAddIdentityLinkUsingXml() {
 
     // Pre test - Historical identity link is added as part of deployment
-    List<HistoricIdentityLink> historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 1);
 
     // given
@@ -110,11 +110,11 @@ public class HistoricIdentityLinkTestByXml extends PluggableProcessEngineTestCas
     List<IdentityLink> links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
     assertEquals(1, links.size());
 
-    historicIdentityLinks = historyService.createHistoricIdentityLinkQuery().list();
+    historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 1);
 
     // query Test
-    HistoricIdentityLinkQuery query = historyService.createHistoricIdentityLinkQuery();
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.groupId(XML_GROUP).count(), 1);
   }
   protected ProcessInstance startProcessInstance(String key) {

@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response.Status;
-import org.camunda.bpm.engine.history.HistoricIdentityLink;
-import org.camunda.bpm.engine.history.HistoricIdentityLinkQuery;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -38,27 +38,27 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
  * @author Deivarayan Azhagappan
  *
  */
-public class HistoricIdentityLinkRestServiceQueryTest extends AbstractRestServiceTest {
+public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestServiceTest {
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
-  protected static final String HISTORY_IDENTITY_LINK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/history/identity-links";
+  protected static final String HISTORY_IDENTITY_LINK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/history/identity-links-log";
   protected static final String HISTORY_IDENTITY_LINK_COUNT_QUERY_URL = HISTORY_IDENTITY_LINK_QUERY_URL + "/count";
 
-  private HistoricIdentityLinkQuery mockedQuery;
+  private HistoricIdentityLinkLogQuery mockedQuery;
 
   @Before
   public void setUpRuntimeData() {
     mockedQuery = setUpMockHistoricIdentityLinkQuery(MockProvider.createMockHistoricIdentityLinks());
   }
 
-  private HistoricIdentityLinkQuery setUpMockHistoricIdentityLinkQuery(List<HistoricIdentityLink> mockedHistoricIdentityLinks) {
+  private HistoricIdentityLinkLogQuery setUpMockHistoricIdentityLinkQuery(List<HistoricIdentityLinkLog> mockedHistoricIdentityLinks) {
 
-    HistoricIdentityLinkQuery mockedHistoricIdentityLinkQuery = mock(HistoricIdentityLinkQuery.class);
+    HistoricIdentityLinkLogQuery mockedHistoricIdentityLinkQuery = mock(HistoricIdentityLinkLogQuery.class);
     when(mockedHistoricIdentityLinkQuery.list()).thenReturn(mockedHistoricIdentityLinks);
     when(mockedHistoricIdentityLinkQuery.count()).thenReturn((long) mockedHistoricIdentityLinks.size());
 
-    when(processEngine.getHistoryService().createHistoricIdentityLinkQuery()).thenReturn(mockedHistoricIdentityLinkQuery);
+    when(processEngine.getHistoryService().createHistoricIdentityLinkLogQuery()).thenReturn(mockedHistoricIdentityLinkQuery);
 
     return mockedHistoricIdentityLinkQuery;
   }

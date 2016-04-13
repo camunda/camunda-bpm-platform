@@ -10,20 +10,20 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.history.HistoricIdentityLinkDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricIdentityLinkLogDto;
 
 /**
  * @author Deivarayan Azhagappan
  *
  */
-@Path(HistoricIdentityLinkRestService.PATH)
+@Path(HistoricIdentityLinkLogRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
-public interface HistoricIdentityLinkRestService {
+public interface HistoricIdentityLinkLogRestService {
 
-  public static final String PATH = "/identity-links";
+  public static final String PATH = "/identity-links-log";
 
   /**
-   * Exposes the {@link HistoricIdentityLinkQuery} interface as a REST service.
+   * Exposes the {@link HistoricIdentityLinkLogQuery} interface as a REST service.
    *
    * @param query
    * @param firstResult
@@ -32,7 +32,7 @@ public interface HistoricIdentityLinkRestService {
    */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  List<HistoricIdentityLinkDto> getHistoricIdentityLinks(@Context UriInfo uriInfo, @QueryParam("firstResult") Integer firstResult,
+  List<HistoricIdentityLinkLogDto> getHistoricIdentityLinks(@Context UriInfo uriInfo, @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults);
 
   @GET

@@ -2,7 +2,7 @@ package org.camunda.bpm.engine.impl;
 
 import org.camunda.bpm.engine.query.QueryProperty;
 
-public interface HistoricIdentityLinkQueryProperty {
+public interface HistoricIdentityLinkLogQueryProperty {
 
   public static final QueryProperty ID = new QueryPropertyImpl("ID_");
   public static final QueryProperty TIME = new QueryPropertyImpl("TIMESTAMP_");

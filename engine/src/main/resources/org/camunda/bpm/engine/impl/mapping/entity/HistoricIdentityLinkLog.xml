@@ -2,11 +2,11 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
 
-<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkEntity">
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogEntity">
 
   <!-- INSERT HISTORIC IDENTITY LINK -->
   
-  <insert id="insertHistoricIdentityLinkEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkEventEntity">
+  <insert id="insertHistoricIdentityLinkLogEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEntity">
     insert into ${prefix}ACT_HI_IDENTITYLINK (
     		ID_,
     		TIMESTAMP_,
@@ -31,7 +31,7 @@
   
   <!-- HISTORIC IDENTITY LINK DELETE -->
 
-  <delete id="deleteHistoricIdentityLink" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkEntity">
+  <delete id="deleteHistoricIdentityLink" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogEntity">
     delete from ${prefix}ACT_HI_IDENTITYLINK where ID_ = #{id}
   </delete>
 
@@ -45,7 +45,7 @@
   
   <!-- HISTORIC IDENTITY LINK RESULTMAP -->
 
-  <resultMap id="historicIdentityLinkResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkEntity">
+  <resultMap id="historicIdentityLinkResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="type" column="TYPE_" jdbcType="VARCHAR" />
     <result property="time" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
@@ -57,7 +57,7 @@
     <result property="assignerId" column="ASSIGNER_ID_" jdbcType="VARCHAR" />
   </resultMap>
   
-  <select id="selectHistoricIdentityLinkByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIdentityLinkQueryImpl" resultMap="historicIdentityLinkResultMap">
+  <select id="selectHistoricIdentityLinkByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIdentityLinkLogQueryImpl" resultMap="historicIdentityLinkResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select RES.* 
@@ -67,7 +67,7 @@
     ${limitAfter}
   </select>
 
-  <select id="selectHistoricIdentityLinkCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIdentityLinkQueryImpl" resultType="long">
+  <select id="selectHistoricIdentityLinkCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIdentityLinkLogQueryImpl" resultType="long">
     select count(*)
     <include refid="selectHistoricIdentityLinkByQueryCriteriaSql"/>
   </select>
