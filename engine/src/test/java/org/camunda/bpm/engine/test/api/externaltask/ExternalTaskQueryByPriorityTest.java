@@ -21,7 +21,6 @@ import java.util.Set;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.externalTaskByPriority;
