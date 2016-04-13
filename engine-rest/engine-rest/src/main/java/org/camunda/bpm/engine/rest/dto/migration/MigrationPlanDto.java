@@ -58,9 +58,11 @@ public class MigrationPlanDto {
     dto.setTargetProcessDefinitionId(migrationPlan.getTargetProcessDefinitionId());
 
     ArrayList<MigrationInstructionDto> instructionDtos = new ArrayList<MigrationInstructionDto>();
-    for (MigrationInstruction migrationInstruction : migrationPlan.getInstructions()) {
-      MigrationInstructionDto migrationInstructionDto = MigrationInstructionDto.from(migrationInstruction);
-      instructionDtos.add(migrationInstructionDto);
+    if (migrationPlan.getInstructions() != null) {
+      for (MigrationInstruction migrationInstruction : migrationPlan.getInstructions()) {
+        MigrationInstructionDto migrationInstructionDto = MigrationInstructionDto.from(migrationInstruction);
+        instructionDtos.add(migrationInstructionDto);
+      }
     }
     dto.setInstructions(instructionDtos);
 
