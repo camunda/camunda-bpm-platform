@@ -42,7 +42,7 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
   public static final String SORT_BY_PROCESS_DEFINITION_ID = "processDefinitionId";
   public static final String SORT_BY_PROCESS_DEFINITION_KEY = "processDefinitionKey";
   public static final String SORT_BY_TENANT_ID = "tenantId";
-  public static final String SORT_BY_PRIORITY = "priority";
+  public static final String SORT_BY_PRIORITY = "taskPriority";
 
   public static final List<String> VALID_SORT_BY_VALUES;
   static {

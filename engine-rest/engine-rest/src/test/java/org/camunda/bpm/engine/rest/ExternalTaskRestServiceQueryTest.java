@@ -56,6 +56,8 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String EXTERNAL_TASK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/external-task";
   protected static final String EXTERNAL_TASK_COUNT_QUERY_URL = EXTERNAL_TASK_QUERY_URL + "/count";
+  public static final long EXTERNAL_TASK_LOW_BOUND_PRIORITY = 3L;
+  public static final long EXTERNAL_TASK_HIGH_BOUND_PRIORITY = 4L;
 
   protected ExternalTaskQuery mockQuery;
 
@@ -132,6 +134,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     String topicName = from(content).getString("[0].topicName");
     String workerId = from(content).getString("[0].workerId");
     String tenantId = from(content).getString("[0].tenantId");
+    long priority = from(content).getLong("[0].priority");
 
     Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_ID, activityId);
     Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_INSTANCE_ID, activityInstanceId);
@@ -147,6 +150,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXTERNAL_TASK_TOPIC_NAME, topicName);
     Assert.assertEquals(MockProvider.EXTERNAL_TASK_WORKER_ID, workerId);
     Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, tenantId);
+    Assert.assertEquals(MockProvider.EXTERNAL_TASK_PRIORITY, priority);
   }
 
   @Test
@@ -168,6 +172,8 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("withRetriesLeft", "true");
     parameters.put("noRetriesLeft", "true");
     parameters.put("workerId", "someWorkerId");
+    parameters.put("priorityHigherThanOrEquals", "3");
+    parameters.put("priorityLowerThanOrEquals", "4");
 
     given()
       .queryParams(parameters)
@@ -190,6 +196,8 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).withRetriesLeft();
     verify(mockQuery).noRetriesLeft();
     verify(mockQuery).workerId("someWorkerId");
+    verify(mockQuery).priorityHigherThanOrEquals(3);
+    verify(mockQuery).priorityLowerThanOrEquals(4);
   }
 
   @Test
@@ -211,6 +219,8 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("withRetriesLeft", "true");
     parameters.put("noRetriesLeft", "true");
     parameters.put("workerId", "someWorkerId");
+    parameters.put("priorityHigherThanOrEquals", "3");
+    parameters.put("priorityLowerThanOrEquals", "4");
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -234,6 +244,8 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).withRetriesLeft();
     verify(mockQuery).noRetriesLeft();
     verify(mockQuery).workerId("someWorkerId");
+    verify(mockQuery).priorityHigherThanOrEquals(3);
+    verify(mockQuery).priorityLowerThanOrEquals(4);
   }
 
   @Test
@@ -269,6 +281,10 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder.verify(mockQuery).orderByTenantId();
     inOrder.verify(mockQuery).desc();
 
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifyGETSorting("taskPriority", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByPriority();
+    inOrder.verify(mockQuery).desc();
     // asc
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifyGETSorting("id", "asc", Status.OK);
@@ -298,6 +314,11 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifyGETSorting("tenantId", "asc", Status.OK);
     inOrder.verify(mockQuery).orderByTenantId();
+    inOrder.verify(mockQuery).asc();
+    
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifyGETSorting("taskPriority", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByPriority();
     inOrder.verify(mockQuery).asc();
   }
 
@@ -440,8 +461,75 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   private List<ExternalTask> createMockExternalTasksTwoTenants() {
     return Arrays.asList(
-        MockProvider.mockExternalTask().tenantId(MockProvider.EXAMPLE_TENANT_ID).buildExternalTask(),
+        MockProvider.mockExternalTask().buildExternalTask(),
         MockProvider.mockExternalTask().tenantId(MockProvider.ANOTHER_EXAMPLE_TENANT_ID).buildExternalTask());
   }
+  
+  @Test
+  public void testQueryByPriorityListGet() {
+    mockQuery = setUpMockExternalTaskQuery(createMockedExternalTasksWithPriorities());
 
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("priorityHigherThanOrEquals", "3");
+    queryParameters.put("priorityLowerThanOrEquals", "4");
+    
+    Response response = given()
+        .queryParameters(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(EXTERNAL_TASK_QUERY_URL);
+
+    verify(mockQuery).priorityHigherThanOrEquals(EXTERNAL_TASK_LOW_BOUND_PRIORITY);
+    verify(mockQuery).priorityLowerThanOrEquals(EXTERNAL_TASK_HIGH_BOUND_PRIORITY);
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> executions = from(content).getList("");
+    assertThat(executions).hasSize(2);
+
+    long prio1 = from(content).getLong("[0].priority");
+    long prio2 = from(content).getLong("[1].priority");
+
+    assertThat(prio1).isEqualTo(EXTERNAL_TASK_LOW_BOUND_PRIORITY);
+    assertThat(prio2).isEqualTo(EXTERNAL_TASK_HIGH_BOUND_PRIORITY);
+  }
+
+  @Test
+  public void testQueryByPriorityListPost() {
+    mockQuery = setUpMockExternalTaskQuery(createMockedExternalTasksWithPriorities());
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("priorityHigherThanOrEquals", "3");
+    queryParameters.put("priorityLowerThanOrEquals", "4");
+    
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(EXTERNAL_TASK_QUERY_URL);
+
+    verify(mockQuery).priorityHigherThanOrEquals(EXTERNAL_TASK_LOW_BOUND_PRIORITY);
+    verify(mockQuery).priorityLowerThanOrEquals(EXTERNAL_TASK_HIGH_BOUND_PRIORITY);
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> executions = from(content).getList("");
+    assertThat(executions).hasSize(2);
+
+    long prio1 = from(content).getLong("[0].priority");
+    long prio2 = from(content).getLong("[1].priority");
+
+    assertThat(prio1).isEqualTo(EXTERNAL_TASK_LOW_BOUND_PRIORITY);
+    assertThat(prio2).isEqualTo(EXTERNAL_TASK_HIGH_BOUND_PRIORITY);
+  }  
+  
+  
+  private List<ExternalTask> createMockedExternalTasksWithPriorities() {
+    return Arrays.asList(
+        MockProvider.mockExternalTask().priority(EXTERNAL_TASK_LOW_BOUND_PRIORITY).buildExternalTask(),
+        MockProvider.mockExternalTask().priority(EXTERNAL_TASK_HIGH_BOUND_PRIORITY).buildExternalTask());
+  }
 }

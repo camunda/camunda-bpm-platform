@@ -753,7 +753,7 @@ public abstract class MockProvider {
   public static final boolean EXTERNAL_TASK_SUSPENDED = true;
   public static final String EXTERNAL_TASK_TOPIC_NAME = "aTopic";
   public static final String EXTERNAL_TASK_WORKER_ID = "aWorkerId";
-  public static final int EXTERNAL_TASK_PRIORITY = 0;
+  public static final long EXTERNAL_TASK_PRIORITY = Integer.MAX_VALUE + 466L;
 
   // batch
   public static final String EXAMPLE_BATCH_ID = "aBatchId";
@@ -2533,17 +2533,19 @@ public abstract class MockProvider {
       .retries(EXTERNAL_TASK_RETRIES)
       .suspended(EXTERNAL_TASK_SUSPENDED)
       .topicName(EXTERNAL_TASK_TOPIC_NAME)
-      .workerId(EXTERNAL_TASK_WORKER_ID);
+      .workerId(EXTERNAL_TASK_WORKER_ID)
+      .tenantId(EXAMPLE_TENANT_ID)
+      .priority(EXTERNAL_TASK_PRIORITY);
+    
   }
 
   public static ExternalTask createMockExternalTask() {
-    return mockExternalTask().tenantId(EXAMPLE_TENANT_ID).buildExternalTask();
+    return mockExternalTask().buildExternalTask();
   }
 
   public static LockedExternalTask createMockLockedExternalTask() {
     return mockExternalTask()
       .variable(EXAMPLE_VARIABLE_INSTANCE_NAME, EXAMPLE_PRIMITIVE_VARIABLE_VALUE)
-      .tenantId(EXAMPLE_TENANT_ID)
       .buildLockedExternalTask();
   }
 
