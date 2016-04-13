@@ -19,31 +19,35 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.DefaultPriorityProvider;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
  * Represents the default priority provider for external tasks.
- * 
+ *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public class DefaultExternalTaskPriorityProvider extends DefaultPriorityProvider<ExternalTaskActivityBehavior> {
 
   public static final ExternalTaskLogger LOG = ProcessEngineLogger.EXTERNAL_TASK_LOGGER;
-  
+
   @Override
   protected void logNotDeterminingPriority(ExecutionEntity execution, Object value, ProcessEngineException e) {
     LOG.couldNotDeterminePriority(execution, value, e);
   }
 
   @Override
-  public long determinePriority(ExecutionEntity execution, ExternalTaskActivityBehavior param) {
-    if (param != null && execution != null) {
-      ParameterValueProvider priorityProvider = param.getPriorityValueProvider();
-      if (priorityProvider != null) {
-        return evaluateValueProvider(priorityProvider, execution, "");
-      }
+  public Long getSpecificPriority(ExecutionEntity execution, ExternalTaskActivityBehavior param) {
+    ParameterValueProvider priorityProvider = param.getPriorityValueProvider();
+    if (priorityProvider != null) {
+      return evaluateValueProvider(priorityProvider, execution, "");
     }
-    return getDefaultPriority();
+    return null;
+  }
+
+  @Override
+  protected Long getProcessDefinitionPriority(ExecutionEntity execution, ExternalTaskActivityBehavior param) {
+    return getProcessDefinedPriority(execution.getProcessDefinition(), BpmnParse.PROPERTYNAME_TASK_PRIORITY, execution, "");
   }
 }

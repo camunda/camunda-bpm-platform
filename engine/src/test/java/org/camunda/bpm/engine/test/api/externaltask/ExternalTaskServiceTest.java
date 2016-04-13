@@ -139,6 +139,42 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(WORKER_ID, task.getWorkerId());
   }
   
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityProcess.bpmn20.xml")
+  public void testFetchProcessWithPriority() {
+    // given
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess");
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(2, WORKER_ID, true)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+    assertEquals(2, externalTasks.size());
+
+    // then
+    //task with no prio gets prio defined by process
+    assertEquals(9, externalTasks.get(0).getPriority());
+    //task with own prio overrides prio defined by process
+    assertEquals(7, externalTasks.get(1).getPriority());
+  }
+  
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityExpressionProcess.bpmn20.xml")
+  public void testFetchProcessWithPriorityExpression() {
+    // given
+    runtimeService.startProcessInstanceByKey("twoExternalTaskWithPriorityProcess",
+                                             Variables.createVariables().putValue("priority", 18));
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(2, WORKER_ID, true)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+    assertEquals(2, externalTasks.size());
+
+    // then
+    //task with no prio gets prio defined by process
+    assertEquals(18, externalTasks.get(0).getPriority());
+    //task with own prio overrides prio defined by process
+    assertEquals(7, externalTasks.get(1).getPriority());
+  }
   
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityExpression.bpmn20.xml")
   public void testFetchWithPriorityExpression() {

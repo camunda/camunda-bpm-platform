@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 
 /**
  * Represents a default priority provider, which contains some functionality to evaluate the priority.
@@ -99,7 +100,64 @@ public abstract class DefaultPriorityProvider<T> implements PriorityProvider<T> 
       }
     }
   }
+
+  @Override
+  public long determinePriority(ExecutionEntity execution, T param) {        
+    if (param != null || execution != null) {
+      Long specificPriority = getSpecificPriority(execution, param);
+      if (specificPriority != null) {
+        return specificPriority;
+      }
+
+      Long processDefinitionPriority = getProcessDefinitionPriority(execution, param);
+      if (processDefinitionPriority != null) {
+        return processDefinitionPriority;
+      }
+    }
+    return getDefaultPriority();
+  }
   
+  /**
+   * Returns the priority defined in the specific entity. Like a job definition priority or
+   * an activity priority. The result can also be null in that case the process 
+   * priority will be used.
+   * 
+   * @param execution the current execution
+   * @param param the generic param
+   * @return the specific priority
+   */
+  protected abstract Long getSpecificPriority(ExecutionEntity execution, T param);
+  
+  /**
+   * Returns the priority defined in the process definition. Can also be null
+   * in that case the fallback is the default priority.
+   * 
+   * @param execution the current execution
+   * @param param the generic param
+   * @return the priority defined in the process definition
+   */
+  protected abstract Long getProcessDefinitionPriority(ExecutionEntity execution, T param);
+  
+  /**
+   * Returns the priority which is defined in the given process definition.
+   * The priority value is identified with the given propertyKey. 
+   * Returns null if the process definition is null or no priority was defined.
+   * 
+   * @param processDefinition the process definition that should contains the priority
+   * @param propertyKey the key which identifies the property
+   * @param execution the current execution
+   * @param errorMsgHead the error message header which is used if the evaluation fails
+   * @return the priority defined in the given process
+   */
+  protected Long getProcessDefinedPriority(ProcessDefinitionImpl processDefinition, String propertyKey, ExecutionEntity execution, String errorMsgHead) {
+    if (processDefinition != null) {
+      ParameterValueProvider priorityProvider = (ParameterValueProvider) processDefinition.getProperty(propertyKey);
+      if (priorityProvider != null) {
+        return evaluateValueProvider(priorityProvider, execution, errorMsgHead);
+      }
+    }
+    return null;    
+  }
   /**
    * Logs the exception which was thrown if the priority can not be determined.
    * 

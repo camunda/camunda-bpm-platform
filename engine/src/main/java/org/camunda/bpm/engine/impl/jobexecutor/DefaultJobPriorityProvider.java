@@ -22,67 +22,42 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 
-
 /**
  * @author Thorben Lindhauer
- *
+ * @author Christopher Zell
  */
 public class DefaultJobPriorityProvider extends DefaultPriorityProvider<JobDeclaration<?, ?>> {
 
   private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   @Override
-  public long determinePriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
-
-    Long jobDefinitionPriority = getJobDefinitionPriority(execution, jobDeclaration);
-    if (jobDefinitionPriority != null) {
-      return jobDefinitionPriority;
-    }
-
-    Long activityPriority = getActivityPriority(execution, jobDeclaration);
-    if (activityPriority != null) {
-      return activityPriority;
-    }
-
-    Long processDefinitionPriority = getProcessDefinitionPriority(execution, jobDeclaration);
-    if (processDefinitionPriority != null) {
-      return processDefinitionPriority;
-    }
-
-    return getDefaultPriority();
-  }
-
-  protected Long getJobDefinitionPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
-    JobDefinitionEntity jobDefinition = getJobDefinitionFor(jobDeclaration);
-
-    if (jobDefinition != null) {
-      return jobDefinition.getOverridingJobPriority();
-    }
-
-    return null;
-  }
-
-  protected Long getProcessDefinitionPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
-    ProcessDefinitionImpl processDefinition = jobDeclaration.getProcessDefinition();
-
-    if (processDefinition != null) {
-      ParameterValueProvider priorityProvider = (ParameterValueProvider) processDefinition.getProperty(BpmnParse.PROPERTYNAME_JOB_PRIORITY);
-
+  protected Long getSpecificPriority(ExecutionEntity execution, JobDeclaration<?, ?> param) {
+    Long specificPriority = null;
+    JobDefinitionEntity jobDefinition = getJobDefinitionFor(param);
+    if (jobDefinition != null) 
+      specificPriority = jobDefinition.getOverridingJobPriority();
+    
+    if (specificPriority == null) {
+      ParameterValueProvider priorityProvider = param.getJobPriorityProvider();
       if (priorityProvider != null) {
-        return evaluateValueProvider(priorityProvider, execution, describeContext(jobDeclaration, execution));
+        specificPriority = evaluateValueProvider(priorityProvider, execution, describeContext(param, execution));
       }
     }
+    return specificPriority;
+  }
 
-    return null;
+  @Override
+  protected Long getProcessDefinitionPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
+    ProcessDefinitionImpl processDefinition = jobDeclaration.getProcessDefinition();
+    return getProcessDefinedPriority(processDefinition, BpmnParse.PROPERTYNAME_JOB_PRIORITY, execution, describeContext(jobDeclaration, execution));
   }
 
   protected JobDefinitionEntity getJobDefinitionFor(JobDeclaration<?, ?> jobDeclaration) {
     if (jobDeclaration.getJobDefinitionId() != null) {
       return Context.getCommandContext()
-          .getJobDefinitionManager()
-          .findById(jobDeclaration.getJobDefinitionId());
-    }
-    else {
+        .getJobDefinitionManager()
+        .findById(jobDeclaration.getJobDefinitionId());
+    } else {
       return null;
     }
   }
@@ -94,7 +69,6 @@ public class DefaultJobPriorityProvider extends DefaultPriorityProvider<JobDecla
         return evaluateValueProvider(priorityProvider, execution, describeContext(jobDeclaration, execution));
       }
     }
-
     return null;
   }
 
@@ -102,10 +76,10 @@ public class DefaultJobPriorityProvider extends DefaultPriorityProvider<JobDecla
   protected void logNotDeterminingPriority(ExecutionEntity execution, Object value, ProcessEngineException e) {
     LOG.couldNotDeterminePriority(execution, value, e);
   }
-  
+
   protected String describeContext(JobDeclaration<?, ?> jobDeclaration, ExecutionEntity executionEntity) {
     return "Job " + jobDeclaration.getActivityId()
-            + "/" + jobDeclaration.getJobHandlerType() + " instantiated "
-            + "in context of " + executionEntity;
+      + "/" + jobDeclaration.getJobHandlerType() + " instantiated "
+      + "in context of " + executionEntity;
   }
 }

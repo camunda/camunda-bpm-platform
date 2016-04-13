@@ -43,6 +43,7 @@ public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior {
     PriorityProvider<ExternalTaskActivityBehavior> provider = Context.getProcessEngineConfiguration().getExternalTaskPriorityProvider();
     long priority = provider.determinePriority(executionEntity, this);
     ExternalTaskEntity.createAndInsert(executionEntity, topicName, priority);
+    
   }
 
   @Override
