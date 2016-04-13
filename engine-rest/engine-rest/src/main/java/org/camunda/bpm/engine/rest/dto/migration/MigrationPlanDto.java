@@ -70,8 +70,10 @@ public class MigrationPlanDto {
   public static MigrationPlan toMigrationPlan(ProcessEngine processEngine, MigrationPlanDto migrationPlanDto) {
     MigrationPlanBuilder migrationPlanBuilder = processEngine.getRuntimeService().createMigrationPlan(migrationPlanDto.getSourceProcessDefinitionId(), migrationPlanDto.getTargetProcessDefinitionId());
 
-    for (MigrationInstructionDto migrationInstructionDto : migrationPlanDto.getInstructions()) {
-      migrationPlanBuilder.mapActivities(migrationInstructionDto.getSourceActivityIds().get(0), migrationInstructionDto.getTargetActivityIds().get(0));
+    if (migrationPlanDto.getInstructions() != null) {
+      for (MigrationInstructionDto migrationInstructionDto : migrationPlanDto.getInstructions()) {
+        migrationPlanBuilder.mapActivities(migrationInstructionDto.getSourceActivityIds().get(0), migrationInstructionDto.getTargetActivityIds().get(0));
+      }
     }
 
     return migrationPlanBuilder.build();

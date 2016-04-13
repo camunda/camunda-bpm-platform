@@ -33,6 +33,7 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.fest.assertions.MapAssert.entry;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Matchers.any;
@@ -280,6 +281,72 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
     verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution);
     verifyMigrationPlanExecutionInteraction(migrationExecution);
+  }
+
+  @Test
+  public void executeMigrationPlanWithNullInstructions() {
+    MigrationInstructionValidationReport instructionReport = mock(MigrationInstructionValidationReport.class);
+    when(instructionReport.getMigrationInstruction()).thenReturn(null);
+    when(instructionReport.getFailures()).thenReturn(Collections.singletonList("failure"));
+
+    MigrationPlanValidationReport validationReport = mock(MigrationPlanValidationReport.class);
+    when(validationReport.getInstructionReports()).thenReturn(Collections.singletonList(instructionReport));
+
+    when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(MigrationPlanValidationException.class.getSimpleName()))
+      .body("message", is("fooo"))
+      .body("validationReport.instructionReports", hasSize(1))
+      .body("validationReport.instructionReports[0].instruction", nullValue())
+      .body("validationReport.instructionReports[0].failures", hasSize(1))
+      .body("validationReport.instructionReports[0].failures[0]", is("failure"))
+    .when()
+      .post(EXECUTE_MIGRATION_URL);
+  }
+
+  @Test
+  public void executeMigrationPlanWithEmptyInstructions() {
+    MigrationInstructionValidationReport instructionReport = mock(MigrationInstructionValidationReport.class);
+    when(instructionReport.getMigrationInstruction()).thenReturn(null);
+    when(instructionReport.getFailures()).thenReturn(Collections.singletonList("failure"));
+
+    MigrationPlanValidationReport validationReport = mock(MigrationPlanValidationReport.class);
+    when(validationReport.getInstructionReports()).thenReturn(Collections.singletonList(instructionReport));
+
+    when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    migrationExecution.getMigrationPlan().setInstructions(Collections.<MigrationInstructionDto>emptyList());
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(MigrationPlanValidationException.class.getSimpleName()))
+      .body("message", is("fooo"))
+      .body("validationReport.instructionReports", hasSize(1))
+      .body("validationReport.instructionReports[0].instruction", nullValue())
+      .body("validationReport.instructionReports[0].failures", hasSize(1))
+      .body("validationReport.instructionReports[0].failures[0]", is("failure"))
+    .when()
+      .post(EXECUTE_MIGRATION_URL);
   }
 
   @Test
@@ -625,6 +692,72 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   }
 
   @Test
+  public void executeMigrationPlanAsyncWithNullInstructions() {
+    MigrationInstructionValidationReport instructionReport = mock(MigrationInstructionValidationReport.class);
+    when(instructionReport.getMigrationInstruction()).thenReturn(null);
+    when(instructionReport.getFailures()).thenReturn(Collections.singletonList("failure"));
+
+    MigrationPlanValidationReport validationReport = mock(MigrationPlanValidationReport.class);
+    when(validationReport.getInstructionReports()).thenReturn(Collections.singletonList(instructionReport));
+
+    when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(MigrationPlanValidationException.class.getSimpleName()))
+      .body("message", is("fooo"))
+      .body("validationReport.instructionReports", hasSize(1))
+      .body("validationReport.instructionReports[0].instruction", nullValue())
+      .body("validationReport.instructionReports[0].failures", hasSize(1))
+      .body("validationReport.instructionReports[0].failures[0]", is("failure"))
+    .when()
+      .post(EXECUTE_MIGRATION_ASYNC_URL);
+  }
+
+  @Test
+  public void executeMigrationPlanAsyncWithEmptyInstructions() {
+    MigrationInstructionValidationReport instructionReport = mock(MigrationInstructionValidationReport.class);
+    when(instructionReport.getMigrationInstruction()).thenReturn(null);
+    when(instructionReport.getFailures()).thenReturn(Collections.singletonList("failure"));
+
+    MigrationPlanValidationReport validationReport = mock(MigrationPlanValidationReport.class);
+    when(validationReport.getInstructionReports()).thenReturn(Collections.singletonList(instructionReport));
+
+    when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    migrationExecution.getMigrationPlan().setInstructions(Collections.<MigrationInstructionDto>emptyList());
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(MigrationPlanValidationException.class.getSimpleName()))
+      .body("message", is("fooo"))
+      .body("validationReport.instructionReports", hasSize(1))
+      .body("validationReport.instructionReports[0].instruction", nullValue())
+      .body("validationReport.instructionReports[0].failures", hasSize(1))
+      .body("validationReport.instructionReports[0].failures[0]", is("failure"))
+    .when()
+      .post(EXECUTE_MIGRATION_ASYNC_URL);
+  }
+
+  @Test
   public void executeMigrationPlanAsyncWithNullSourceProcessInstanceId() {
     String message = "source process definition id is null";
     when(runtimeServiceMock.createMigrationPlan(isNull(String.class), anyString()))
@@ -899,8 +1032,10 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     // the map equal activities method should not be called
     verify(migrationPlanBuilderMock, never()).mapEqualActivities();
     // all instructions are added
-    for (MigrationInstructionDto migrationInstructionDto : migrationPlan.getInstructions()) {
-      verify(migrationPlanBuilderMock).mapActivities(eq(migrationInstructionDto.getSourceActivityIds().get(0)), eq(migrationInstructionDto.getTargetActivityIds().get(0)));
+    if (migrationPlan.getInstructions() != null) {
+      for (MigrationInstructionDto migrationInstructionDto : migrationPlan.getInstructions()) {
+        verify(migrationPlanBuilderMock).mapActivities(eq(migrationInstructionDto.getSourceActivityIds().get(0)), eq(migrationInstructionDto.getTargetActivityIds().get(0)));
+      }
     }
   }
 

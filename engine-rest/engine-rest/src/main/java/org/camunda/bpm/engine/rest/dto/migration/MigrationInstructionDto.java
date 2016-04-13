@@ -40,12 +40,17 @@ public class MigrationInstructionDto {
   }
 
   public static MigrationInstructionDto from(MigrationInstruction migrationInstruction) {
-    MigrationInstructionDto dto = new MigrationInstructionDto();
+    if (migrationInstruction != null) {
+      MigrationInstructionDto dto = new MigrationInstructionDto();
 
-    dto.setSourceActivityIds(Collections.singletonList(migrationInstruction.getSourceActivityId()));
-    dto.setTargetActivityIds(Collections.singletonList(migrationInstruction.getTargetActivityId()));
+      dto.setSourceActivityIds(Collections.singletonList(migrationInstruction.getSourceActivityId()));
+      dto.setTargetActivityIds(Collections.singletonList(migrationInstruction.getTargetActivityId()));
 
-    return dto;
+      return dto;
+    }
+    else {
+      return null;
+    }
   }
 
 }
