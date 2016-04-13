@@ -146,6 +146,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
       .body("[0].tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
       .body("[0].retries", equalTo(MockProvider.EXTERNAL_TASK_RETRIES))
       .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
+      .body("[0].priority", equalTo(MockProvider.EXTERNAL_TASK_PRIORITY))
       .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME,
           notNullValue())
       .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".value",
