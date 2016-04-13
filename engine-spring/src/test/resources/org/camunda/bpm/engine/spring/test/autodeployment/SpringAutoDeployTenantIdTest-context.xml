@@ -32,7 +32,7 @@
         <value>classpath*:/org/camunda/bpm/engine/spring/test/autodeployment/autodeploy.*.bpmn20.xml</value>
       </array>
     </property>
-    <property name="tenantId" value="tenant1" />
+    <property name="deploymentTenantId" value="tenant1" />
   </bean>
   
   <bean id="processEngine" class="org.camunda.bpm.engine.spring.ProcessEngineFactoryBean">

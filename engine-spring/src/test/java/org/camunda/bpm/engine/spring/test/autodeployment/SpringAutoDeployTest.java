@@ -154,27 +154,17 @@ public class SpringAutoDeployTest extends PvmTestCase {
   public void testAutoDeployTenantId() {
     createAppContext(CTX_TENANT_ID_PATH);
 
-    CaseDefinitionQuery caseDefinitionQuery = repositoryService.createCaseDefinitionQuery();
-    ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
+    DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
 
-    assertEquals(1, caseDefinitionQuery.count());
-    assertEquals(3, processDefinitionQuery.count());
-
-    assertEquals(1, caseDefinitionQuery.tenantIdIn("tenant1").count());
-    assertEquals(3, processDefinitionQuery.tenantIdIn("tenant1").count());
+    assertEquals(1, deploymentQuery.tenantIdIn("tenant1").count());
   }
 
   public void testAutoDeployWithoutTenantId() {
     createAppContext(CTX_CMMN_BPMN_TOGETHER_PATH);
 
-    CaseDefinitionQuery caseDefinitionQuery = repositoryService.createCaseDefinitionQuery();
-    ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
+    DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
 
-    assertEquals(1, caseDefinitionQuery.count());
-    assertEquals(3, processDefinitionQuery.count());
-
-    assertEquals(1, caseDefinitionQuery.withoutTenantId().count());
-    assertEquals(3, processDefinitionQuery.withoutTenantId().count());
+    assertEquals(1, deploymentQuery.withoutTenantId().count());
   }
 
   // --Helper methods ----------------------------------------------------------
