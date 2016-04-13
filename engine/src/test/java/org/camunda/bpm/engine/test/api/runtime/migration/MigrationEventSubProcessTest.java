@@ -16,12 +16,22 @@ package org.camunda.bpm.engine.test.api.runtime.migration;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.camunda.bpm.engine.test.util.MigrationPlanValidationReportAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
+import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -29,7 +39,6 @@ import org.junit.rules.RuleChain;
 public class MigrationEventSubProcessTest {
 
   public static final String IN_EVENT_SUB_PROCESS_TASK = "inEventSubProcessTask";
-  public static final String MESSAGE_NAME = "Message";
   public static final String SIGNAL_NAME = "Signal";
   public static final String TIMER_DATE = "2016-02-11T12:13:14Z";
 
@@ -41,18 +50,9 @@ public class MigrationEventSubProcessTest {
 
   @Test
   public void testMapUserTaskSiblingOfMessageEventSubProcess() {
-    BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSubProcessTo("subProcess")
-      .triggerByEvent()
-      .embeddedSubProcess()
-      .startEvent("eventStart").message(MESSAGE_NAME)
-      .userTask(IN_EVENT_SUB_PROCESS_TASK)
-      .endEvent()
-      .subProcessDone()
-      .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -76,8 +76,8 @@ public class MigrationEventSubProcessTest {
           .activity("userTask", testHelper.getSingleActivityInstanceBeforeMigration("userTask").getId())
         .done());
 
-    testHelper.assertEventSubscriptionRemoved("eventStart", MESSAGE_NAME);
-    testHelper.assertEventSubscriptionCreated("eventStart", MESSAGE_NAME);
+    testHelper.assertEventSubscriptionRemoved("eventSubProcessStart", EventSubProcessModels.MESSAGE_NAME);
+    testHelper.assertEventSubscriptionCreated("eventSubProcessStart", EventSubProcessModels.MESSAGE_NAME);
 
     // and it is possible to successfully complete the migrated instance
     testHelper.completeTask("userTask");
@@ -86,18 +86,8 @@ public class MigrationEventSubProcessTest {
 
   @Test
   public void testMapUserTaskSiblingOfMessageEventSubProcessAndTriggerMessage() {
-    BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSubProcessTo("subProcess")
-      .triggerByEvent()
-      .embeddedSubProcess()
-      .startEvent("eventStart").message(MESSAGE_NAME)
-      .userTask(IN_EVENT_SUB_PROCESS_TASK)
-      .endEvent()
-      .subProcessDone()
-      .done();
-
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -108,8 +98,8 @@ public class MigrationEventSubProcessTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to correlate the message and successfully complete the migrated instance
-    testHelper.correlateMessage(MESSAGE_NAME);
-    testHelper.completeTask(IN_EVENT_SUB_PROCESS_TASK);
+    testHelper.correlateMessage(EventSubProcessModels.MESSAGE_NAME);
+    testHelper.completeTask("eventSubProcessTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
@@ -259,6 +249,501 @@ public class MigrationEventSubProcessTest {
     testHelper.triggerTimer();
     testHelper.completeTask(IN_EVENT_SUB_PROCESS_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
+  }
+
+  @Test
+  public void testMigrateActiveEventSubProcess() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+
+    ProcessInstance processInstance = rule.getRuntimeService()
+      .createProcessInstanceById(sourceProcessDefinition.getId())
+      .startBeforeActivity("eventSubProcessTask")
+      .execute();
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("eventSubProcess", "eventSubProcess")
+        .mapActivities("eventSubProcessTask", "eventSubProcessTask")
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    testHelper.assertExecutionTreeAfterMigration()
+    .hasProcessDefinitionId(targetProcessDefinition.getId())
+    .matches(
+      describeExecutionTree(null).scope().id(processInstance.getId())
+        .child("eventSubProcessTask").scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("eventSubProcess"))
+        .done());
+
+    testHelper.assertActivityTreeAfterMigration().hasStructure(
+      describeActivityInstanceTree(targetProcessDefinition.getId())
+        .beginScope("eventSubProcess", testHelper.getSingleActivityInstanceBeforeMigration("eventSubProcess").getId())
+          .activity("eventSubProcessTask", testHelper.getSingleActivityInstanceBeforeMigration("eventSubProcessTask").getId())
+        .done());
+
+    testHelper.assertEventSubscriptionRemoved("eventSubProcessStart", EventSubProcessModels.MESSAGE_NAME);
+    testHelper.assertEventSubscriptionCreated("eventSubProcessStart", EventSubProcessModels.MESSAGE_NAME);
+
+    // and it is possible to complete the process instance
+    testHelper.completeTask("eventSubProcessTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateActiveEventSubProcessPreserveEventSubscription() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+
+    ProcessInstance processInstance = rule.getRuntimeService()
+      .createProcessInstanceById(sourceProcessDefinition.getId())
+      .startBeforeActivity("eventSubProcessTask")
+      .execute();
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("eventSubProcess", "eventSubProcess")
+        .mapActivities("eventSubProcessTask", "eventSubProcessTask")
+        .mapActivities("eventSubProcessStart", "eventSubProcessStart")
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    testHelper.assertEventSubscriptionMigrated("eventSubProcessStart", "eventSubProcessStart", EventSubProcessModels.MESSAGE_NAME);
+  }
+
+  @Test
+  public void testMigrateActiveEventSubProcessToEmbeddedSubProcess() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
+
+    ProcessInstance processInstance = rule.getRuntimeService()
+      .createProcessInstanceById(sourceProcessDefinition.getId())
+      .startBeforeActivity("eventSubProcessTask")
+      .execute();
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("eventSubProcess", "subProcess")
+        .mapActivities("eventSubProcessTask", "userTask")
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    testHelper.assertExecutionTreeAfterMigration()
+    .hasProcessDefinitionId(targetProcessDefinition.getId())
+    .matches(
+      describeExecutionTree(null).scope().id(processInstance.getId())
+        .child("userTask").scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("eventSubProcess"))
+        .done());
+
+    testHelper.assertActivityTreeAfterMigration().hasStructure(
+      describeActivityInstanceTree(targetProcessDefinition.getId())
+        .beginScope("subProcess", testHelper.getSingleActivityInstanceBeforeMigration("eventSubProcess").getId())
+          .activity("userTask", testHelper.getSingleActivityInstanceBeforeMigration("eventSubProcessTask").getId())
+        .done());
+
+    testHelper.assertEventSubscriptionRemoved("eventSubProcessStart", EventSubProcessModels.MESSAGE_NAME);
+    Assert.assertEquals(0, testHelper.snapshotAfterMigration.getEventSubscriptions().size());
+
+    // and it is possible to complete the process instance
+    testHelper.completeTask("eventSubProcessTask"); // the task definition key is not migrated, there is still eventSubProcessTask
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateActiveEmbeddedSubProcessToEventSubProcess() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "eventSubProcess")
+        .mapActivities("userTask", "eventSubProcessTask")
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    testHelper.assertExecutionTreeAfterMigration()
+    .hasProcessDefinitionId(targetProcessDefinition.getId())
+    .matches(
+      describeExecutionTree(null).scope().id(processInstance.getId())
+        .child("eventSubProcessTask").scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("subProcess"))
+        .done());
+
+    testHelper.assertActivityTreeAfterMigration().hasStructure(
+      describeActivityInstanceTree(targetProcessDefinition.getId())
+        .beginScope("eventSubProcess", testHelper.getSingleActivityInstanceBeforeMigration("subProcess").getId())
+          .activity("eventSubProcessTask", testHelper.getSingleActivityInstanceBeforeMigration("userTask").getId())
+        .done());
+
+    testHelper.assertEventSubscriptionCreated("eventSubProcessStart", EventSubProcessModels.MESSAGE_NAME);
+
+    // and it is possible to complete the process instance
+    testHelper.completeTask("userTask"); // the task definition key is not migrated, there is still userTask
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateActiveSignalEventSubProcess() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
+
+    ProcessInstance processInstance = rule.getRuntimeService()
+      .createProcessInstanceById(sourceProcessDefinition.getId())
+      .startBeforeActivity("eventSubProcessTask")
+      .execute();
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("eventSubProcess", "eventSubProcess")
+        .mapActivities("eventSubProcessStart", "eventSubProcessStart")
+        .mapActivities("eventSubProcessTask", "eventSubProcessTask")
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    testHelper.assertEventSubscriptionMigrated("eventSubProcessStart", "eventSubProcessStart", EventSubProcessModels.SIGNAL_NAME);
+
+    // and it is possible to complete the process instance
+    testHelper.completeTask("eventSubProcessTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateActiveTimerEventSubProcess() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+
+    ProcessInstance processInstance = rule.getRuntimeService()
+      .createProcessInstanceById(sourceProcessDefinition.getId())
+      .startBeforeActivity("eventSubProcessTask")
+      .execute();
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("eventSubProcess", "eventSubProcess")
+        .mapActivities("eventSubProcessStart", "eventSubProcessStart")
+        .mapActivities("eventSubProcessTask", "eventSubProcessTask")
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    testHelper.assertJobMigrated("eventSubProcessStart", "eventSubProcessStart", TimerStartEventSubprocessJobHandler.TYPE);
+
+    // and it is possible to complete the process instance
+    testHelper.completeTask("eventSubProcessTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateActiveErrorEventSubProcess() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.ERROR_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.ERROR_EVENT_SUBPROCESS_PROCESS);
+
+    ProcessInstance processInstance = rule.getRuntimeService()
+      .createProcessInstanceById(sourceProcessDefinition.getId())
+      .startBeforeActivity("eventSubProcessTask")
+      .execute();
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("eventSubProcess", "eventSubProcess")
+        .mapActivities("eventSubProcessTask", "eventSubProcessTask")
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then it is possible to complete the process instance
+    testHelper.completeTask("eventSubProcessTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateActiveCompensationEventSubProcess() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.COMPENSATE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.COMPENSATE_EVENT_SUBPROCESS_PROCESS);
+
+    ProcessInstance processInstance = rule.getRuntimeService()
+      .createProcessInstanceById(sourceProcessDefinition.getId())
+      .startBeforeActivity("eventSubProcessTask")
+      .execute();
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("eventSubProcess", "eventSubProcess")
+        .mapActivities("eventSubProcessTask", "eventSubProcessTask")
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then it is possible to complete the process instance
+    testHelper.completeTask("eventSubProcessTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateActiveEscalationEventSubProcess() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.ESCALATION_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.ESCALATION_EVENT_SUBPROCESS_PROCESS);
+
+    ProcessInstance processInstance = rule.getRuntimeService()
+      .createProcessInstanceById(sourceProcessDefinition.getId())
+      .startBeforeActivity("eventSubProcessTask")
+      .execute();
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("eventSubProcess", "eventSubProcess")
+        .mapActivities("eventSubProcessTask", "eventSubProcessTask")
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then it is possible to complete the process instance
+    testHelper.completeTask("eventSubProcessTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateTaskAddEventSubProcess() {
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "eventSubProcessTask")
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    testHelper.assertExecutionTreeAfterMigration()
+    .hasProcessDefinitionId(targetProcessDefinition.getId())
+    .matches(
+      describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
+        .child("eventSubProcessTask").scope()
+        .done());
+
+    testHelper.assertActivityTreeAfterMigration().hasStructure(
+      describeActivityInstanceTree(targetProcessDefinition.getId())
+        .beginScope("eventSubProcess")
+          .activity("eventSubProcessTask", testHelper.getSingleActivityInstanceBeforeMigration("userTask").getId())
+        .done());
+
+    testHelper.assertEventSubscriptionCreated("eventSubProcessStart", EventSubProcessModels.MESSAGE_NAME);
+
+    // and it is possible to complete the process instance
+    testHelper.completeTask("userTask"); // the task definition key is not migrated, there is still userTask
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateEventSubprocessMessageTrigger() {
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .mapActivities("eventSubProcessStart", "eventSubProcessStart")
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    testHelper.assertEventSubscriptionMigrated("eventSubProcessStart", "eventSubProcessStart", EventSubProcessModels.MESSAGE_NAME);
+
+    // and it is possible to trigger the event subprocess
+    rule.getRuntimeService().correlateMessage(EventSubProcessModels.MESSAGE_NAME);
+    Assert.assertEquals(1, rule.getTaskService().createTaskQuery().count());
+
+    // and complete the process instance
+    testHelper.completeTask("eventSubProcessTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateEventSubprocessTimerTrigger() {
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .mapActivities("eventSubProcessStart", "eventSubProcessStart")
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    testHelper.assertJobMigrated("eventSubProcessStart", "eventSubProcessStart", TimerStartEventSubprocessJobHandler.TYPE);
+
+    // and it is possible to trigger the event subprocess
+    Job timerJob = testHelper.snapshotAfterMigration.getJobs().get(0);
+    rule.getManagementService().executeJob(timerJob.getId());
+    Assert.assertEquals(1, rule.getTaskService().createTaskQuery().count());
+
+    // and complete the process instance
+    testHelper.completeTask("eventSubProcessTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateEventSubprocessSignalTrigger() {
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .mapActivities("eventSubProcessStart", "eventSubProcessStart")
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    testHelper.assertEventSubscriptionMigrated("eventSubProcessStart", "eventSubProcessStart", EventSubProcessModels.SIGNAL_NAME);
+
+    // and it is possible to trigger the event subprocess
+    rule.getRuntimeService().signalEventReceived(EventSubProcessModels.SIGNAL_NAME);
+    Assert.assertEquals(1, rule.getTaskService().createTaskQuery().count());
+
+    // and complete the process instance
+    testHelper.completeTask("eventSubProcessTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateEventSubprocessChangeStartEventType() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+
+    try {
+      // when
+      rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .mapActivities("eventSubProcessStart", "eventSubProcessStart")
+        .build();
+      Assert.fail("exception expected");
+    } catch (MigrationPlanValidationException e) {
+      // then
+      assertThat(e.getValidationReport())
+      .hasInstructionFailures("eventSubProcessStart",
+        "Activities are of different type"
+      );
+    }
+  }
+
+  @Test
+  public void testMigrateEventSubprocessTimerIncident() {
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .mapActivities("eventSubProcessStart", "eventSubProcessStart")
+        .build();
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    Job timerTriggerJob = rule.getManagementService().createJobQuery().singleResult();
+    // create an incident
+    rule.getManagementService().setJobRetries(timerTriggerJob.getId(), 0);
+    Incident incidentBeforeMigration = rule.getRuntimeService().createIncidentQuery().singleResult();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    Incident incidentAfterMigration = rule.getRuntimeService().createIncidentQuery().singleResult();
+    assertNotNull(incidentAfterMigration);
+
+    assertEquals(incidentBeforeMigration.getId(), incidentAfterMigration.getId());
+    assertEquals(timerTriggerJob.getId(), incidentAfterMigration.getConfiguration());
+
+    assertEquals("eventSubProcessStart", incidentAfterMigration.getActivityId());
+    assertEquals(targetProcessDefinition.getId(), incidentAfterMigration.getProcessDefinitionId());
+
+    // and it is possible to complete the process
+    rule.getManagementService().executeJob(timerTriggerJob.getId());
+    testHelper.completeTask("eventSubProcessTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateNonInterruptingEventSubprocessMessageTrigger() {
+    BpmnModelInstance nonInterruptingModel = modify(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS)
+      .startEventBuilder("eventSubProcessStart")
+      .interrupting(false)
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(nonInterruptingModel);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(nonInterruptingModel);
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .mapActivities("eventSubProcessStart", "eventSubProcessStart")
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    testHelper.assertEventSubscriptionMigrated("eventSubProcessStart", "eventSubProcessStart", EventSubProcessModels.MESSAGE_NAME);
+
+    // and it is possible to trigger the event subprocess
+    rule.getRuntimeService().correlateMessage(EventSubProcessModels.MESSAGE_NAME);
+    Assert.assertEquals(2, rule.getTaskService().createTaskQuery().count());
+
+    // and complete the process instance
+    testHelper.completeTask("eventSubProcessTask");
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
   }
 
 }

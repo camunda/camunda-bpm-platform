@@ -13,11 +13,14 @@
 package org.camunda.bpm.engine.impl.migration.instance.parser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.MigrationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -86,10 +89,9 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
   }
 
   public void parseDependentInstances(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance) {
-    parseContext.handleDependentActivityInstanceJobs(migratingInstance, migratingInstance.resolveRepresentativeExecution().getJobs());
-    parseContext.handleDependentEventSubscriptions(migratingInstance, migratingInstance.resolveRepresentativeExecution().getEventSubscriptions());
-    parseContext.handleDependentTasks(migratingInstance, migratingInstance.resolveRepresentativeExecution().getTasks());
     parseContext.handleDependentVariables(migratingInstance, collectActivityInstanceVariables(migratingInstance));
+    parseContext.handleDependentActivityInstanceJobs(migratingInstance, collectActivityInstanceJobs(migratingInstance));
+    parseContext.handleDependentEventSubscriptions(migratingInstance, collectActivityInstanceEventSubscriptions(migratingInstance));
   }
 
   protected List<VariableInstanceEntity> collectActivityInstanceVariables(MigratingActivityInstance instance) {
@@ -122,6 +124,25 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
     }
 
     return variables;
+  }
+
+  protected List<EventSubscriptionEntity> collectActivityInstanceEventSubscriptions(MigratingActivityInstance migratingInstance) {
+
+    if (migratingInstance.getSourceScope().isScope()) {
+      return migratingInstance.resolveRepresentativeExecution().getEventSubscriptions();
+    }
+    else {
+      return Collections.emptyList();
+    }
+  }
+
+  protected List<JobEntity> collectActivityInstanceJobs(MigratingActivityInstance migratingInstance) {
+    if (migratingInstance.getSourceScope().isScope()) {
+      return migratingInstance.resolveRepresentativeExecution().getJobs();
+    }
+    else {
+      return Collections.emptyList();
+    }
   }
 
   public static List<VariableInstanceEntity> getConcurrentLocalVariables(ExecutionEntity execution) {

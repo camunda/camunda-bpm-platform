@@ -20,6 +20,8 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CaseCallActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelMultiInstanceActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
@@ -52,6 +54,8 @@ public class SupportedActivityValidator implements MigrationActivityValidator {
     SUPPORTED_ACTIVITY_BEHAVIORS.add(CaseCallActivityBehavior.class);
     SUPPORTED_ACTIVITY_BEHAVIORS.add(IntermediateCatchEventActivityBehavior.class);
     SUPPORTED_ACTIVITY_BEHAVIORS.add(EventBasedGatewayActivityBehavior.class);
+    SUPPORTED_ACTIVITY_BEHAVIORS.add(EventSubProcessActivityBehavior.class);
+    SUPPORTED_ACTIVITY_BEHAVIORS.add(EventSubProcessStartEventActivityBehavior.class);
   }
 
   public boolean valid(ActivityImpl activity) {

@@ -33,14 +33,16 @@ public class EventSubscriptionInstanceHandler implements MigratingDependentInsta
     List<String> migratedEventSubscriptionTargetActivityIds = new ArrayList<String>();
 
     for (EventSubscriptionEntity eventSubscription : elements) {
-      MigrationInstruction eventSubscriptionMigrationInstruction = parseContext.findSingleMigrationInstruction(eventSubscription.getActivityId());
-      if (eventSubscriptionMigrationInstruction != null) {
-        // the event subscription is migrated
-        ActivityImpl eventSubscriptionTargetActivity = parseContext.getTargetProcessDefinition().findActivity(eventSubscriptionMigrationInstruction.getTargetActivityId());
-        migratedEventSubscriptionTargetActivityIds.add(eventSubscriptionTargetActivity.getId());
-        owningInstance.addMigratingDependentInstance(new MigratingEventSubscriptionInstance(eventSubscription, eventSubscriptionTargetActivity));
+      MigrationInstruction migrationInstruction = parseContext.findSingleMigrationInstruction(eventSubscription.getActivityId());
+      ActivityImpl targetActivity = parseContext.getTargetActivity(migrationInstruction);
 
-      } else {
+      if (targetActivity != null && owningInstance.migratesTo(targetActivity.getEventScope())) {
+        // the event subscription is migrated
+        migratedEventSubscriptionTargetActivityIds.add(targetActivity.getId());
+        owningInstance.addMigratingDependentInstance(new MigratingEventSubscriptionInstance(eventSubscription, targetActivity));
+
+      }
+      else {
         // the event subscription will be removed
         owningInstance.addRemovingDependentInstance(new MigratingEventSubscriptionInstance(eventSubscription));
 
@@ -49,14 +51,18 @@ public class EventSubscriptionInstanceHandler implements MigratingDependentInsta
       parseContext.consume(eventSubscription);
     }
 
-    if (owningInstance.getTargetScope() != null) {
-      for (EventSubscriptionDeclaration eventSubscriptionDeclaration : EventSubscriptionDeclaration.getDeclarationsForScope(owningInstance.getTargetScope())) {
-        if (!migratedEventSubscriptionTargetActivityIds.contains(eventSubscriptionDeclaration.getActivityId())) {
-          // the event subscription will be created
-          owningInstance.addEmergingDependentInstance(new MigratingEventSubscriptionInstance(eventSubscriptionDeclaration));
-        }
-      }
+    if (owningInstance.migrates()) {
+      addEmergingEventSubscriptions(owningInstance, migratedEventSubscriptionTargetActivityIds);
     }
 
+  }
+
+  protected void addEmergingEventSubscriptions(MigratingActivityInstance owningInstance, List<String> migratingEventSubscriptionActivityIds) {
+    for (EventSubscriptionDeclaration eventSubscriptionDeclaration : EventSubscriptionDeclaration.getDeclarationsForScope(owningInstance.getTargetScope())) {
+      if (!migratingEventSubscriptionActivityIds.contains(eventSubscriptionDeclaration.getActivityId())) {
+        // the event subscription will be created
+        owningInstance.addEmergingDependentInstance(new MigratingEventSubscriptionInstance(eventSubscriptionDeclaration));
+      }
+    }
   }
 }

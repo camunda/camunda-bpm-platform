@@ -194,11 +194,9 @@ import org.camunda.bpm.engine.impl.migration.DefaultMigrationInstructionGenerato
 import org.camunda.bpm.engine.impl.migration.MigrationActivityMatcher;
 import org.camunda.bpm.engine.impl.migration.MigrationInstructionGenerator;
 import org.camunda.bpm.engine.impl.migration.batch.MigrationBatchJobHandler;
-import org.camunda.bpm.engine.impl.migration.validation.activity.HasNoEventSubProcessChildActivityValidator;
-import org.camunda.bpm.engine.impl.migration.validation.activity.HasNoEventSubProcessParentActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.MigrationActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedActivityValidator;
-import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedBoundaryEventActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedPassiveEventTriggerActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.AdditionalFlowScopeActivityInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.AsyncAfterMigrationValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.AsyncMigrationValidator;
@@ -214,9 +212,7 @@ import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotRemove
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MultiInstanceTypeValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.OnlyOnceMappedActivityInstructionValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.SameEventScopeInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.SameTypeInstructionValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.SupportedActivitiesInstructionValidator;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
@@ -235,8 +231,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricBatchManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricStatisticsManager;
@@ -294,7 +290,6 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -375,6 +370,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected JobExecutor jobExecutor;
 
   protected PriorityProvider<JobDeclaration<?, ?>> jobPriorityProvider;
+
   // EXTERNAL TASK /////////////////////////////////////////////////////////////
   protected PriorityProvider<ExternalTaskActivityBehavior> externalTaskPriorityProvider;
 
@@ -1391,13 +1387,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       jobPriorityProvider = new DefaultJobPriorityProvider();
     }
   }
-  // external task /////////////////////////////////////////////////////////////
+
+  //external task /////////////////////////////////////////////////////////////
 
   protected void initExternalTaskPriorityProvider() {
     if (producePrioritizedExternalTasks && externalTaskPriorityProvider == null) {
       externalTaskPriorityProvider = new DefaultExternalTaskPriorityProvider();
     }
   }
+
   // history //////////////////////////////////////////////////////////////////
 
   public void initHistoryLevel() {
@@ -2033,6 +2031,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setJobPriorityProvider(PriorityProvider<JobDeclaration<?, ?>> jobPriorityProvider) {
     this.jobPriorityProvider = jobPriorityProvider;
+  }
+
+  public PriorityProvider<ExternalTaskActivityBehavior> getExternalTaskPriorityProvider() {
+    return externalTaskPriorityProvider;
+  }
+
+  public void setExternalTaskPriorityProvider(PriorityProvider<ExternalTaskActivityBehavior> externalTaskPriorityProvider) {
+    this.externalTaskPriorityProvider = externalTaskPriorityProvider;
   }
 
   public IdGenerator getIdGenerator() {
@@ -3144,9 +3150,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public List<MigrationActivityValidator> getDefaultMigrationActivityValidators() {
     List<MigrationActivityValidator> migrationActivityValidators = new ArrayList<MigrationActivityValidator>();
     migrationActivityValidators.add(SupportedActivityValidator.INSTANCE);
-    migrationActivityValidators.add(SupportedBoundaryEventActivityValidator.INSTANCE);
-    migrationActivityValidators.add(HasNoEventSubProcessParentActivityValidator.INSTANCE);
-    migrationActivityValidators.add(HasNoEventSubProcessChildActivityValidator.INSTANCE);
+    migrationActivityValidators.add(SupportedPassiveEventTriggerActivityValidator.INSTANCE);
     return migrationActivityValidators;
   }
 
@@ -3183,19 +3187,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   }
 
-  public PriorityProvider<ExternalTaskActivityBehavior> getExternalTaskPriorityProvider() {
-    return externalTaskPriorityProvider;
-  }
-
-  public void setExternalTaskPriorityProvider(PriorityProvider<ExternalTaskActivityBehavior> externalTaskPriorityProvider) {
-    this.externalTaskPriorityProvider = externalTaskPriorityProvider;
-  }
-  
   public List<MigrationInstructionValidator> getDefaultMigrationInstructionValidators() {
     List<MigrationInstructionValidator> migrationInstructionValidators  = new ArrayList<MigrationInstructionValidator>();
-    migrationInstructionValidators.add(new SupportedActivitiesInstructionValidator());
     migrationInstructionValidators.add(new SameTypeInstructionValidator());
-    migrationInstructionValidators.add(new SameEventScopeInstructionValidator());
     migrationInstructionValidators.add(new OnlyOnceMappedActivityInstructionValidator());
     migrationInstructionValidators.add(new CannotAddMultiInstanceBodyValidator());
     migrationInstructionValidators.add(new CannotAddMultiInstanceInnerActivityValidator());

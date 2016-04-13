@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
@@ -153,6 +154,15 @@ public class MigratingInstanceParseContext {
     return targetProcessDefinition;
   }
 
+  public ActivityImpl getTargetActivity(MigrationInstruction instruction) {
+    if (instruction != null) {
+      return targetProcessDefinition.findActivity(instruction.getTargetActivityId());
+    }
+    else {
+      return null;
+    }
+  }
+
   public JobDefinitionEntity getTargetJobDefinition(String activityId, String jobHandlerType) {
     List<JobDefinitionEntity> jobDefinitionsForActivity = targetJobDefinitions.get(activityId);
 
@@ -224,10 +234,6 @@ public class MigratingInstanceParseContext {
 
   public void handleDependentEventSubscriptions(MigratingActivityInstance migratingInstance, List<EventSubscriptionEntity> eventSubscriptions) {
     parser.getDependentEventSubscriptionHandler().handle(this, migratingInstance, eventSubscriptions);
-  }
-
-  public void handleDependentTasks(MigratingActivityInstance migratingInstance, List<TaskEntity> tasks) {
-    parser.getDependentTaskHandler().handle(this, migratingInstance, tasks);
   }
 
   public void handleDependentVariables(MigratingProcessElementInstance migratingInstance, List<VariableInstanceEntity> variables) {

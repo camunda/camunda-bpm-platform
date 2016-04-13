@@ -2103,7 +2103,7 @@ public class BpmnParse extends Parse {
       addJobDeclarationToProcessDefinition(messageJobDeclaration, activity.getProcessDefinition());
     }
   }
-    
+
   protected ParameterValueProvider parsePriority(Element element, String priorityAttribute) {
     String priorityAttributeValue = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, priorityAttribute);
 
@@ -2203,8 +2203,8 @@ public class BpmnParse extends Parse {
     if (topicName == null) {
       addError("External tasks must specify a 'topic' attribute in the camunda namespace", serviceTaskElement);
     }
-    
-    ParameterValueProvider provider = parsePriority(serviceTaskElement, PROPERTYNAME_TASK_PRIORITY);    
+
+    ParameterValueProvider provider = parsePriority(serviceTaskElement, PROPERTYNAME_TASK_PRIORITY);
     activity.setActivityBehavior(new ExternalTaskActivityBehavior(topicName, provider));
   }
 
@@ -2396,6 +2396,7 @@ public class BpmnParse extends Parse {
 
     if (receiveTaskElement.attribute("messageRef") != null) {
       activity.setScope(true);
+      activity.setEventScope(activity);
       EventSubscriptionDeclaration declaration = parseMessageEventDefinition(receiveTaskElement);
       declaration.setActivityId(activity.getActivityId());
       declaration.setEventScopeActivityId(activity.getActivityId());

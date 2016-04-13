@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
 import org.camunda.bpm.engine.impl.migration.instance.EmergingJobInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingJobInstance;
@@ -25,7 +24,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 
 /**
@@ -45,16 +43,16 @@ public class ActivityInstanceJobHandler implements MigratingDependentInstancePar
         continue;
       }
 
-      MigrationInstruction timerJobMigrationInstruction = parseContext.getInstructionFor(job.getActivityId());
+      MigrationInstruction migrationInstruction = parseContext.findSingleMigrationInstruction(job.getActivityId());
+      ActivityImpl targetActivity = parseContext.getTargetActivity(migrationInstruction);
 
-      if (timerJobMigrationInstruction != null) {
+      if (targetActivity != null && activityInstance.migratesTo(targetActivity.getEventScope())) {
         // the timer job is migrated
-        ActivityImpl timerJobTargetActivity = parseContext.getTargetProcessDefinition().findActivity(timerJobMigrationInstruction.getTargetActivityId());
-        migratingActivityIds.add(timerJobTargetActivity.getId());
-        JobDefinitionEntity targetJobDefinitionEntity = parseContext.getTargetJobDefinition(timerJobTargetActivity.getActivityId(), job.getJobHandlerType());
+        migratingActivityIds.add(targetActivity.getId());
+        JobDefinitionEntity targetJobDefinitionEntity = parseContext.getTargetJobDefinition(targetActivity.getActivityId(), job.getJobHandlerType());
 
         MigratingJobInstance migratingTimerJobInstance =
-            new MigratingTimerJobInstance(job, targetJobDefinitionEntity, timerJobTargetActivity);
+            new MigratingTimerJobInstance(job, targetJobDefinitionEntity, targetActivity);
         activityInstance.addMigratingDependentInstance(migratingTimerJobInstance);
         parseContext.submit(migratingTimerJobInstance);
 
@@ -70,23 +68,21 @@ public class ActivityInstanceJobHandler implements MigratingDependentInstancePar
       parseContext.consume(job);
     }
 
-    List<TimerDeclarationImpl> emergingTimerDeclarations = new ArrayList<TimerDeclarationImpl>();
-
-    if (activityInstance.getTargetScope() != null) {
-      for (TimerDeclarationImpl timerDeclaration : TimerDeclarationImpl.getDeclarationsForScope(activityInstance.getTargetScope())) {
-        if (!migratingActivityIds.contains(timerDeclaration.getActivityId())) {
-          emergingTimerDeclarations.add(timerDeclaration);
-        }
-      }
-    }
-
-    for (TimerDeclarationImpl emergingDeclaration : emergingTimerDeclarations) {
-      activityInstance.addEmergingDependentInstance(new EmergingJobInstance(emergingDeclaration));
+    if (activityInstance.migrates()) {
+      addEmergingTimerJobs(activityInstance, migratingActivityIds);
     }
   }
 
   protected static boolean isTimerJob(JobEntity job) {
     return job != null && job.getType().equals(TimerEntity.TYPE);
+  }
+
+  protected void addEmergingTimerJobs(MigratingActivityInstance owningInstance, List<String> migratingTimerJobActivityIds) {
+    for (TimerDeclarationImpl timerDeclaration : TimerDeclarationImpl.getDeclarationsForScope(owningInstance.getTargetScope())) {
+      if (!migratingTimerJobActivityIds.contains(timerDeclaration.getActivityId())) {
+        owningInstance.addEmergingDependentInstance(new EmergingJobInstance(timerDeclaration));
+      }
+    }
   }
 
 }

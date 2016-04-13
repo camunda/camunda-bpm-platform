@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.migration.instance.parser;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingIncident;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingJobInstance;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
-import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 /**
  * @author Thorben Lindhauer

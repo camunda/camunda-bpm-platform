@@ -51,6 +51,10 @@ public abstract class MigratingProcessElementInstance implements MigratingInstan
     return parentInstance;
   }
 
+  public boolean migratesTo(ScopeImpl other) {
+    return other == targetScope;
+  }
+
   public abstract void setParent(MigratingActivityInstance parentInstance);
 
   public abstract void addMigratingDependentInstance(MigratingInstance migratingInstance);

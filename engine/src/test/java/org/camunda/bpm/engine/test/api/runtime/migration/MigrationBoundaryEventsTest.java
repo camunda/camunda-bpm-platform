@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
@@ -28,6 +29,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -1653,6 +1655,105 @@ public class MigrationBoundaryEventsTest {
     // and the activity and process definition references were updated
     assertEquals("newBoundary", incidentAfterMigration.getActivityId());
     assertEquals(targetProcessDefinition.getId(), incidentAfterMigration.getProcessDefinitionId());
+  }
+
+  @Test
+  public void testMigrateBoundaryEventRemoveMessageEventSubscriptionOnEventScopeChange() {
+    BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
+
+    BpmnModelInstance targetProcess = modify(sourceProcess)
+      .removeFlowNode("endEvent")
+      .activityBuilder("userTask")
+        .userTask("userTask2")
+        .endEvent("endEvent")
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask2")
+      .mapActivities("boundary", "boundary")
+      .build();
+
+    // when
+    testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    testHelper.assertEventSubscriptionRemoved("boundary", MESSAGE_NAME);
+    Assert.assertEquals(0, testHelper.snapshotAfterMigration.getEventSubscriptions().size());
+  }
+
+  @Test
+  public void testMigrateBoundaryEventRemoveEventSignalSubscriptionOnEventScopeChange() {
+    BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
+
+    BpmnModelInstance targetProcess = modify(sourceProcess)
+      .removeFlowNode("endEvent")
+      .activityBuilder("userTask")
+        .userTask("userTask2")
+        .endEvent("endEvent")
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask2")
+      .mapActivities("boundary", "boundary")
+      .build();
+
+    // when
+    testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    testHelper.assertEventSubscriptionRemoved("boundary", SIGNAL_NAME);
+    Assert.assertEquals(0, testHelper.snapshotAfterMigration.getEventSubscriptions().size());
+  }
+
+  @Test
+  public void testMigrateBoundaryEventRemoveTimerJobOnEventScopeChange() {
+    BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDuration("PT10M")
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
+
+    BpmnModelInstance targetProcess = modify(sourceProcess)
+      .removeFlowNode("endEvent")
+      .activityBuilder("userTask")
+        .userTask("userTask2")
+        .endEvent("endEvent")
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask2")
+      .mapActivities("boundary", "boundary")
+      .build();
+
+    // when
+    testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    testHelper.assertJobRemoved("boundary", TimerExecuteNestedActivityJobHandler.TYPE);
+    Assert.assertEquals(0, testHelper.snapshotAfterMigration.getJobs().size());
   }
 
   protected void executeJob(Job job) {

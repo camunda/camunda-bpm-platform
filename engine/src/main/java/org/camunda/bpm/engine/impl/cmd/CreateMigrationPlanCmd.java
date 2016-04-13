@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -24,6 +25,7 @@ import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanBuilderImpl;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanImpl;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationPlanValidationReportImpl;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.SameEventScopeInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidationReportImpl;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstruction;
@@ -97,6 +99,8 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
 
     // filter only valid instructions
     List<MigrationInstructionValidator> migrationInstructionValidators = new ArrayList<MigrationInstructionValidator>(processEngineConfiguration.getMigrationInstructionValidators());
+    migrationInstructionValidators.addAll(getAdditionalValidatorsForGeneration());
+
     List<MigrationInstruction> validInstructions = new ArrayList<MigrationInstruction>();
     for (ValidatingMigrationInstruction generatedInstruction : generatedInstructions.getInstructions()) {
       if (isValidInstruction(generatedInstruction, generatedInstructions, migrationInstructionValidators)) {
@@ -105,6 +109,10 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
     }
 
     return validInstructions;
+  }
+
+  protected List<MigrationInstructionValidator> getAdditionalValidatorsForGeneration() {
+    return Collections.<MigrationInstructionValidator>singletonList(new SameEventScopeInstructionValidator());
   }
 
   protected boolean isValidInstruction(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, List<MigrationInstructionValidator> migrationInstructionValidators) {

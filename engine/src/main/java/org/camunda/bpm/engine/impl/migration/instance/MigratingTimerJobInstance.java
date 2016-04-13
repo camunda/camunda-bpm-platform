@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.migration.instance;
 
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -23,6 +24,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
  */
 public class MigratingTimerJobInstance extends MigratingJobInstance {
 
+  protected ScopeImpl timerTriggerTargetScope;
+
   public MigratingTimerJobInstance(JobEntity jobEntity) {
     super(jobEntity);
   }
@@ -30,12 +33,24 @@ public class MigratingTimerJobInstance extends MigratingJobInstance {
   public MigratingTimerJobInstance(JobEntity jobEntity, JobDefinitionEntity jobDefinitionEntity,
       ScopeImpl targetScope) {
     super(jobEntity, jobDefinitionEntity, targetScope);
+    timerTriggerTargetScope = determineTimerTriggerTargetScope(jobEntity, targetScope);
+  }
+
+  protected ScopeImpl determineTimerTriggerTargetScope(JobEntity jobEntity, ScopeImpl targetScope) {
+    if (TimerStartEventSubprocessJobHandler.TYPE.equals(jobEntity.getJobHandlerType())) {
+      // for event subprocess start jobs, the job handler configuration references the subprocess while
+      // the job references the start event
+      return targetScope.getFlowScope();
+    }
+    else {
+      return targetScope;
+    }
   }
 
   @Override
   protected void migrateJobHandlerConfiguration() {
     TimerJobConfiguration configuration = (TimerJobConfiguration) jobEntity.getJobHandlerConfiguration();
-    configuration.setTimerElementKey(targetScope.getId());
+    configuration.setTimerElementKey(timerTriggerTargetScope.getId());
     jobEntity.setJobHandlerConfiguration(configuration);
   }
 

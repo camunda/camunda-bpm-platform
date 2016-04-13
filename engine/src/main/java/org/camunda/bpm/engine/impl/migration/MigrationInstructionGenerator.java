@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.migration;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.migration.validation.activity.MigrationActivityValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstruction;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstructions;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 

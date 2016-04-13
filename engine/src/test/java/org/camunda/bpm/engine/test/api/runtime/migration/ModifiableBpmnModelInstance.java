@@ -22,6 +22,7 @@ import org.camunda.bpm.model.bpmn.builder.AbstractFlowNodeBuilder;
 import org.camunda.bpm.model.bpmn.builder.CallActivityBuilder;
 import org.camunda.bpm.model.bpmn.builder.EndEventBuilder;
 import org.camunda.bpm.model.bpmn.builder.IntermediateCatchEventBuilder;
+import org.camunda.bpm.model.bpmn.builder.StartEventBuilder;
 import org.camunda.bpm.model.bpmn.builder.SubProcessBuilder;
 import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
 import org.camunda.bpm.model.bpmn.instance.Activity;
@@ -122,6 +123,10 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
 
   public IntermediateCatchEventBuilder intermediateCatchEventBuilder(String eventId) {
     return getBuilderForElementById(eventId, IntermediateCatchEventBuilder.class);
+  }
+
+  public StartEventBuilder startEventBuilder(String eventId) {
+    return getBuilderForElementById(eventId, StartEventBuilder.class);
   }
 
   public EndEventBuilder endEventBuilder(String eventId) {

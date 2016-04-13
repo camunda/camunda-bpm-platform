@@ -56,8 +56,6 @@ public class MigratingInstanceParser {
       new TransitionInstanceJobHandler();
   protected MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<EventSubscriptionEntity>> dependentEventSubscriptionHandler =
       new EventSubscriptionInstanceHandler();
-  protected MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<TaskEntity>> dependentTaskHandler =
-      new TaskInstanceHandler();
   protected MigratingDependentInstanceParseHandler<MigratingProcessElementInstance, List<VariableInstanceEntity>> dependentVariableHandler =
       new VariableInstanceHandler();
   protected MigratingInstanceParseHandler<IncidentEntity> incidentHandler =
@@ -134,10 +132,6 @@ public class MigratingInstanceParser {
 
   public MigratingDependentInstanceParseHandler<MigratingTransitionInstance, List<JobEntity>> getDependentTransitionInstanceJobHandler() {
     return dependentTransitionInstanceJobHandler;
-  }
-
-  public MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<TaskEntity>> getDependentTaskHandler() {
-    return dependentTaskHandler;
   }
 
   public MigratingInstanceParseHandler<IncidentEntity> getIncidentHandler() {

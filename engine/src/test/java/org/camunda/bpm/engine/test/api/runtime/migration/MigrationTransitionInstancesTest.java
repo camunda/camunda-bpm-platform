@@ -33,11 +33,13 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.AsyncProcessModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -984,6 +986,68 @@ public class MigrationTransitionInstancesTest {
 
     // then
     testHelper.assertJobMigrated("userTask", "userTask", AsyncContinuationJobHandler.TYPE);
+  }
+
+  @Test
+  public void testMigrateAsyncAfterCompensateEventSubProcessStartEvent() {
+    // given
+    BpmnModelInstance model = modify(EventSubProcessModels.COMPENSATE_EVENT_SUBPROCESS_PROCESS)
+        .flowNodeBuilder("eventSubProcessStart")
+        .camundaAsyncAfter()
+        .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(model);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(model);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("subProcess", "subProcess")
+      .mapActivities("eventSubProcess", "eventSubProcess")
+      .mapActivities("eventSubProcessStart", "eventSubProcessStart")
+      .build();
+
+    ProcessInstance processInstance = rule.getRuntimeService().createProcessInstanceById(sourceProcessDefinition.getId())
+      .startBeforeActivity("eventSubProcess")
+      .execute();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    testHelper.assertJobMigrated("eventSubProcessStart", "eventSubProcessStart", AsyncContinuationJobHandler.TYPE);
+  }
+
+  /**
+   * Does not apply since asyncAfter cannot be used with boundary events
+   */
+  @Ignore
+  @Test
+  public void testMigrateAsyncAfterBoundaryEventWithChangedEventScope() {
+    BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
+      .activityBuilder("userTask1")
+        .boundaryEvent("boundary").message("Message").camundaAsyncAfter()
+        .userTask("afterBoundaryTask")
+        .endEvent()
+      .done();
+    BpmnModelInstance targetProcess = modify(sourceProcess).swapElementIds("userTask1", "userTask2");
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("boundary", "boundary")
+        .mapActivities("userTask1", "userTask1")
+        .mapActivities("userTask2", "userTask2")
+        .build();
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    testHelper.assertJobMigrated("boundary", "boundary", AsyncContinuationJobHandler.TYPE);
   }
 
 
