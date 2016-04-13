@@ -5,7 +5,7 @@ var promised = require('chai-as-promised');
 chai.use(promised);
 global.expect   = chai.expect;
 
-var bail = typeof process.env.TEST_BAIL !== undefined;
+var bail = typeof process.env.TEST_BAIL !== 'undefined';
 var tested = process.env.TESTED || '*';
 var testedApp = process.env.TESTED_APP || 'admin,tasklist,cockpit';
 testedApp = testedApp.indexOf(',') > -1 ? ('{' + testedApp + '}') : testedApp;
