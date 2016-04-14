@@ -17,6 +17,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       'ngResource',
       commons.name,
       require('./repository/main').name,
+      require('./batches/main').name,
       require('./reports/main').name,
       require('./directives/main').name,
       require('./filters/main').name,

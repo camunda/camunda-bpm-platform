@@ -10,6 +10,7 @@ var angular = require('angular'),
     dashboardDecisions = require('./dashboard/decisions'),
     dashboardDeployments = require('./dashboard/deployments'),
     dashboardReports = require('./dashboard/reports'),
+    dashboardBatches = require('./dashboard/batches'),
 
     // processes dashboard
     processDefinitions = require('./processesDashboard/process-definitions'),
@@ -45,6 +46,7 @@ var angular = require('angular'),
   ngModule.config(dashboardDecisions);
   ngModule.config(dashboardDeployments);
   ngModule.config(dashboardReports);
+  ngModule.config(dashboardBatches);
 
   ngModule.config(processDefinitions);
 
