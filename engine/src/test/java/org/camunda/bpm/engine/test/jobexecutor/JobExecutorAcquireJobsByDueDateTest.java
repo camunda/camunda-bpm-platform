@@ -1,32 +1,36 @@
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import static org.camunda.bpm.engine.test.util.ClockTestUtil.incrementClock;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Before;
+import org.junit.Test;
 
 public class JobExecutorAcquireJobsByDueDateTest extends AbstractJobExecutorAcquireJobsTest {
 
-  protected boolean isJobExecutorPreferTimerJobs() {
-    return false;
+  @Before
+  public void prepareProcessEngineConfiguration() {
+    configuration.setJobExecutorAcquireByDueDate(true);
   }
 
-  protected boolean isJobExecutorPreferOldJobs() {
-    return true;
-  }
-
+  @Test
   public void testProcessEngineConfiguration() {
-    ProcessEngineConfigurationImpl configuration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
     assertFalse(configuration.isJobExecutorPreferTimerJobs());
     assertTrue(configuration.isJobExecutorAcquireByDueDate());
     assertFalse(configuration.isJobExecutorAcquireByPriority());
   }
 
+  @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")
   public void testMessageJobHasDueDateSet() {
     runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
@@ -36,6 +40,7 @@ public class JobExecutorAcquireJobsByDueDateTest extends AbstractJobExecutorAcqu
     assertEquals(ClockUtil.getCurrentTime(), job.getDuedate());
   }
 
+  @Test
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/jobexecutor/processWithTimerCatch.bpmn20.xml"

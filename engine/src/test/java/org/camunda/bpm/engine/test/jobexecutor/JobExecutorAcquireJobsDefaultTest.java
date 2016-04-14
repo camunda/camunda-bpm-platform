@@ -1,18 +1,21 @@
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Test;
 
 public class JobExecutorAcquireJobsDefaultTest extends AbstractJobExecutorAcquireJobsTest {
 
+  @Test
   public void testProcessEngineConfiguration() {
-    ProcessEngineConfigurationImpl configuration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
     assertFalse(configuration.isJobExecutorPreferTimerJobs());
     assertFalse(configuration.isJobExecutorAcquireByDueDate());
   }
 
+  @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")
   public void testMessageJobHasNoDueDateSet() {
     runtimeService.startProcessInstanceByKey("simpleAsyncProcess");

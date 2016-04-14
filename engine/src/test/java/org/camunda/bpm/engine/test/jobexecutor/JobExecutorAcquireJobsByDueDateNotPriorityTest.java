@@ -1,20 +1,23 @@
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import static org.camunda.bpm.engine.test.util.ClockTestUtil.incrementClock;
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Before;
+import org.junit.Test;
 
 public class JobExecutorAcquireJobsByDueDateNotPriorityTest extends AbstractJobExecutorAcquireJobsTest {
 
-  protected boolean isJobExecutorPreferTimerJobs() {
-    return false;
+  @Before
+  public void prepareProcessEngineConfiguration() {
+    configuration.setJobExecutorAcquireByDueDate(true);
   }
 
-  protected boolean isJobExecutorPreferOldJobs() {
-    return true;
-  }
-
+  @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/jobPrioProcess.bpmn20.xml")
   public void testJobPriorityIsNotConsidered() {
     // prio 5
