@@ -47,6 +47,7 @@ public class SendTaskImpl extends TaskImpl implements SendTask {
   protected static Attribute<String> camundaResultVariableAttribute;
   protected static Attribute<String> camundaTopicAttribute;
   protected static Attribute<String> camundaTypeAttribute;
+  protected static Attribute<String> camundaTaskPriorityAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(SendTask.class, BPMN_ELEMENT_SEND_TASK)
@@ -93,6 +94,10 @@ public class SendTaskImpl extends TaskImpl implements SendTask {
         .build();
 
     camundaTypeAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TYPE)
+      .namespace(CAMUNDA_NS)
+      .build();
+    
+    camundaTaskPriorityAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TASK_PRIORITY)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -179,5 +184,15 @@ public class SendTaskImpl extends TaskImpl implements SendTask {
 
   public void setCamundaType(String camundaType) {
     camundaTypeAttribute.setValue(this, camundaType);
+  }
+
+  @Override
+  public String getCamundaTaskPriority() {
+    return camundaTaskPriorityAttribute.getValue(this);    
+  }
+
+  @Override
+  public void setCamundaTaskPriority(String taskPriority) {
+    camundaTaskPriorityAttribute.setValue(this, taskPriority);
   }
 }

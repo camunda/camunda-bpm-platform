@@ -57,4 +57,8 @@ public interface ServiceTask extends Task {
   String getCamundaTopic();
 
   void setCamundaTopic(String camundaTopic);
+  
+  String getCamundaTaskPriority();
+  
+  void setCamundaTaskPriority(String taskPriority);
 }

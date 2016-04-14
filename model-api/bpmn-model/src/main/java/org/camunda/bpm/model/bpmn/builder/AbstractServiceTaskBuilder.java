@@ -104,5 +104,17 @@ public abstract class AbstractServiceTaskBuilder<B extends AbstractServiceTaskBu
     element.setCamundaType(camundaType);
     return myself;
   }
-
+  
+  /**
+   * Sets the camunda task priority attribute. This is only meaningful when
+   * the {@link #camundaType(String)} attribute has the value <code>external</code>.
+   * 
+   * 
+   * @param taskPriority the priority for the external task
+   * @return the builder object
+   */
+  public B camundaTaskPriority(String taskPriority) {
+    element.setCamundaTaskPriority(taskPriority);
+    return myself;
+  }
 }

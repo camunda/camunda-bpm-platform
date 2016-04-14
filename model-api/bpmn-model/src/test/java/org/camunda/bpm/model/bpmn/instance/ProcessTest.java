@@ -18,6 +18,7 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
 import java.util.Arrays;
 import java.util.Collection;
+import org.camunda.bpm.model.bpmn.BpmnTestConstants;
 
 import org.camunda.bpm.model.bpmn.ProcessType;
 import org.camunda.bpm.model.bpmn.impl.instance.Supports;
@@ -55,7 +56,8 @@ public class ProcessTest extends BpmnModelElementInstanceTest {
       /** camunda extensions */
       new AttributeAssumption(CAMUNDA_NS, "candidateStarterGroups"),
       new AttributeAssumption(CAMUNDA_NS, "candidateStarterUsers"),
-      new AttributeAssumption(CAMUNDA_NS, "jobPriority")
+      new AttributeAssumption(CAMUNDA_NS, "jobPriority"),
+      new AttributeAssumption(CAMUNDA_NS, "taskPriority")
     );
   }
 
@@ -67,5 +69,16 @@ public class ProcessTest extends BpmnModelElementInstanceTest {
     process.setCamundaJobPriority("15");
 
     assertThat(process.getCamundaJobPriority()).isEqualTo("15");
+  }
+  
+  @Test
+  public void testCamundaTaskPriority() {
+    //given
+    Process proc = modelInstance.newInstance(Process.class);
+    assertThat(proc.getCamundaTaskPriority()).isNull();
+    //when
+    proc.setCamundaTaskPriority(BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY);
+    //then
+    assertThat(proc.getCamundaTaskPriority()).isEqualTo(BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY);    
   }
 }

@@ -73,5 +73,9 @@ public interface BusinessRuleTask extends Task {
   String getCamundaMapDecisionResult();
 
   void setCamundaMapDecisionResult(String camundaMapDecisionResult);
+  
+  String getCamundaTaskPriority();
+  
+  void setCamundaTaskPriority(String taskPriority);
 
 }

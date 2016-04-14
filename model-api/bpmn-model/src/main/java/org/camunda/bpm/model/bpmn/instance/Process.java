@@ -86,4 +86,8 @@ public interface Process extends CallableElement {
   String getCamundaJobPriority();
 
   void setCamundaJobPriority(String jobPriority);
+  
+  String getCamundaTaskPriority();
+  
+  void setCamundaTaskPriority(String taskPriority);
 }

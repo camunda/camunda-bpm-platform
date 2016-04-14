@@ -63,6 +63,7 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
   protected static Attribute<String> camundaDecisionRefVersionAttribute;
   protected static Attribute<String> camundaDecisionRefTenantIdAttribute;
   protected static Attribute<String> camundaMapDecisionResultAttribute;
+  protected static Attribute<String> camundaTaskPriorityAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(BusinessRuleTask.class, BPMN_ELEMENT_BUSINESS_RULE_TASK)
@@ -123,6 +124,10 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
     camundaMapDecisionResultAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_MAP_DECISION_RESULT)
         .namespace(CAMUNDA_NS)
         .build();
+    
+    camundaTaskPriorityAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TASK_PRIORITY)
+      .namespace(CAMUNDA_NS)
+      .build();
 
     typeBuilder.build();
   }
@@ -236,6 +241,13 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
     camundaDecisionRefTenantIdAttribute.setValue(this, tenantId);
   }
 
+  @Override
+  public String getCamundaTaskPriority() {
+    return camundaTaskPriorityAttribute.getValue(this);    
+  }
 
-
+  @Override
+  public void setCamundaTaskPriority(String taskPriority) {
+    camundaTaskPriorityAttribute.setValue(this, taskPriority);
+  }
 }

@@ -42,6 +42,8 @@ import java.util.List;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_SERVICE_TASK_PRIORITY;
 import org.camunda.bpm.model.bpmn.GatewayDirection;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
@@ -61,6 +63,7 @@ import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Gateway;
 import org.camunda.bpm.model.bpmn.instance.InclusiveGateway;
+import org.camunda.bpm.model.bpmn.instance.IntermediateThrowEvent;
 import org.camunda.bpm.model.bpmn.instance.Message;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
@@ -457,12 +460,14 @@ public class ProcessBuilderTest {
   public void testProcessCamundaExtensions() {
     modelInstance = Bpmn.createProcess(PROCESS_ID)
       .camundaJobPriority("${somePriority}")
+      .camundaTaskPriority(TEST_PROCESS_TASK_PRIORITY)
       .startEvent()
       .endEvent()
       .done();
 
     Process process = modelInstance.getModelElementById(PROCESS_ID);
     assertThat(process.getCamundaJobPriority()).isEqualTo("${somePriority}");
+    assertThat(process.getCamundaTaskPriority()).isEqualTo(TEST_PROCESS_TASK_PRIORITY);
   }
 
   @Test
@@ -473,6 +478,7 @@ public class ProcessBuilderTest {
         .camundaAsyncBefore()
         .notCamundaExclusive()
         .camundaJobPriority("${somePriority}")
+        .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
       .endEvent()
       .done();
 
@@ -480,6 +486,7 @@ public class ProcessBuilderTest {
     assertThat(serviceTask.isCamundaAsyncBefore()).isTrue();
     assertThat(serviceTask.isCamundaExclusive()).isFalse();
     assertThat(serviceTask.getCamundaJobPriority()).isEqualTo("${somePriority}");
+    assertThat(serviceTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
   }
 
   @Test
@@ -493,6 +500,7 @@ public class ProcessBuilderTest {
         .camundaResultVariable(TEST_STRING_API)
         .camundaTopic(TEST_STRING_API)
         .camundaType(TEST_STRING_API)
+        .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
       .done();
 
     ServiceTask serviceTask = modelInstance.getModelElementById(TASK_ID);
@@ -502,6 +510,7 @@ public class ProcessBuilderTest {
     assertThat(serviceTask.getCamundaResultVariable()).isEqualTo(TEST_STRING_API);
     assertThat(serviceTask.getCamundaTopic()).isEqualTo(TEST_STRING_API);
     assertThat(serviceTask.getCamundaType()).isEqualTo(TEST_STRING_API);
+    assertThat(serviceTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
   }
 
   @Test
@@ -515,6 +524,7 @@ public class ProcessBuilderTest {
         .camundaResultVariable(TEST_STRING_API)
         .camundaTopic(TEST_STRING_API)
         .camundaType(TEST_STRING_API)
+        .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
       .endEvent()
       .done();
 
@@ -525,6 +535,7 @@ public class ProcessBuilderTest {
     assertThat(sendTask.getCamundaResultVariable()).isEqualTo(TEST_STRING_API);
     assertThat(sendTask.getCamundaTopic()).isEqualTo(TEST_STRING_API);
     assertThat(sendTask.getCamundaType()).isEqualTo(TEST_STRING_API);
+    assertThat(sendTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
   }
 
   @Test
@@ -572,6 +583,7 @@ public class ProcessBuilderTest {
         .camundaDecisionRefVersion("7")
         .camundaDecisionRefTenantId("tenantId")
         .camundaMapDecisionResult("singleEntry")
+        .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
       .endEvent()
       .done();
 
@@ -587,6 +599,7 @@ public class ProcessBuilderTest {
     assertThat(businessRuleTask.getCamundaDecisionRefVersion()).isEqualTo("7");
     assertThat(businessRuleTask.getCamundaDecisionRefTenantId()).isEqualTo("tenantId");
     assertThat(businessRuleTask.getCamundaMapDecisionResult()).isEqualTo("singleEntry");
+    assertThat(businessRuleTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
   }
 
   @Test
@@ -879,6 +892,18 @@ public class ProcessBuilderTest {
 
     assertMessageEventDefinition("end", "message");
   }
+  
+  
+  @Test
+  public void testPriorityEndEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .endEvent("end").camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
+      .done();
+
+    EndEvent end = modelInstance.getModelElementById("end");
+    assertThat(end.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
+  }
 
   @Test
   public void testMessageEndEventWithExistingMessage() {
@@ -913,6 +938,7 @@ public class ProcessBuilderTest {
     modelInstance = Bpmn.createProcess()
       .startEvent()
       .intermediateThrowEvent("throw1").message("message")
+      .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
       .intermediateThrowEvent("throw2").message("message")
       .done();
 
@@ -920,8 +946,18 @@ public class ProcessBuilderTest {
     Message message2 = assertMessageEventDefinition("throw2", "message");
 
     assertThat(message1).isEqualTo(message2);
-
     assertOnlyOneMessageExists("message");
+  }
+  
+  public void testIntermediateMessageThrowEventWithTaskPriority() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateThrowEvent("throw1").message("message")
+      .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
+      .done();
+    
+    IntermediateThrowEvent event = modelInstance.getModelElementById("throw1");
+    assertThat(event.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
   }
 
   @Test

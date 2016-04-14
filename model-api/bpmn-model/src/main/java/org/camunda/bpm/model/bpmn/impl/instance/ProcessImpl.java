@@ -60,6 +60,7 @@ public class ProcessImpl extends CallableElementImpl implements Process {
   protected static Attribute<String> camundaCandidateStarterGroupsAttribute;
   protected static Attribute<String> camundaCandidateStarterUsersAttribute;
   protected static Attribute<String> camundaJobPriorityAttribute;
+  protected static Attribute<String> camundaTaskPriorityAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Process.class, BPMN_ELEMENT_PROCESS)
@@ -125,6 +126,10 @@ public class ProcessImpl extends CallableElementImpl implements Process {
       .build();
 
     camundaJobPriorityAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_JOB_PRIORITY)
+      .namespace(CAMUNDA_NS)
+      .build();
+    
+    camundaTaskPriorityAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TASK_PRIORITY)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -252,5 +257,15 @@ public class ProcessImpl extends CallableElementImpl implements Process {
 
   public void setCamundaJobPriority(String jobPriority) {
     camundaJobPriorityAttribute.setValue(this, jobPriority);
+  }
+
+  @Override
+  public String getCamundaTaskPriority() {
+    return camundaTaskPriorityAttribute.getValue(this);    
+  }
+
+  @Override
+  public void setCamundaTaskPriority(String taskPriority) {
+    camundaTaskPriorityAttribute.setValue(this, taskPriority);
   }
 }

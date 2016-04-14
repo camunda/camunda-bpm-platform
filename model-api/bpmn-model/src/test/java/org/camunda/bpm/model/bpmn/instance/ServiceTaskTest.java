@@ -15,8 +15,12 @@ package org.camunda.bpm.model.bpmn.instance;
 
 import java.util.Arrays;
 import java.util.Collection;
+import static org.assertj.core.api.Assertions.assertThat;
+import org.camunda.bpm.model.bpmn.BpmnTestConstants;
 
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+import static org.camunda.bpm.model.xml.test.AbstractModelElementInstanceTest.modelInstance;
+import org.junit.Test;
 
 /**
  * @author Sebastian Menski
@@ -41,7 +45,20 @@ public class ServiceTaskTest extends BpmnModelElementInstanceTest {
       new AttributeAssumption(CAMUNDA_NS, "expression"),
       new AttributeAssumption(CAMUNDA_NS, "resultVariable"),
       new AttributeAssumption(CAMUNDA_NS, "topic"),
-      new AttributeAssumption(CAMUNDA_NS, "type")
+      new AttributeAssumption(CAMUNDA_NS, "type"),
+      new AttributeAssumption(CAMUNDA_NS, "taskPriority")
     );
+  }
+  
+  
+  @Test
+  public void testCamundaTaskPriority() {
+    //given
+    ServiceTask service = modelInstance.newInstance(ServiceTask.class);    
+    assertThat(service.getCamundaTaskPriority()).isNull();
+    //when
+    service.setCamundaTaskPriority(BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY);
+    //then
+    assertThat(service.getCamundaTaskPriority()).isEqualTo(BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY);    
   }
 }

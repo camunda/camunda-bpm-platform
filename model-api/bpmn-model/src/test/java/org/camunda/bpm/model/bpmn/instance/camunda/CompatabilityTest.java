@@ -58,7 +58,9 @@ public class CompatabilityTest {
     ProcessImpl process = modelInstance.getModelElementById(PROCESS_ID);
     String priority = "9000";
     process.setCamundaJobPriority(priority);
+    process.setCamundaTaskPriority(priority);
     assertThat(process.getAttributeValueNs(BpmnModelConstants.ACTIVITI_NS, "jobPriority"), is(priority));
+    assertThat(process.getAttributeValueNs(BpmnModelConstants.ACTIVITI_NS, "taskPriority"), is(priority));
   }
 
 }

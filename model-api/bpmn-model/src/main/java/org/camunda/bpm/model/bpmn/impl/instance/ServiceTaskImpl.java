@@ -45,6 +45,7 @@ public class ServiceTaskImpl extends TaskImpl implements ServiceTask {
   protected static Attribute<String> camundaResultVariableAttribute;
   protected static Attribute<String> camundaTopicAttribute;
   protected static Attribute<String> camundaTypeAttribute;
+  protected static Attribute<String> camundaTaskPriorityAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ServiceTask.class, BPMN_ELEMENT_SERVICE_TASK)
@@ -87,6 +88,10 @@ public class ServiceTaskImpl extends TaskImpl implements ServiceTask {
         .build();
 
     camundaTypeAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TYPE)
+      .namespace(CAMUNDA_NS)
+      .build();
+    
+    camundaTaskPriorityAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TASK_PRIORITY)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -168,4 +173,13 @@ public class ServiceTaskImpl extends TaskImpl implements ServiceTask {
     camundaTypeAttribute.setValue(this, camundaType);
   }
 
+  @Override
+  public String getCamundaTaskPriority() {
+    return camundaTaskPriorityAttribute.getValue(this);    
+  }
+
+  @Override
+  public void setCamundaTaskPriority(String taskPriority) {
+    camundaTaskPriorityAttribute.setValue(this, taskPriority);
+  }
 }

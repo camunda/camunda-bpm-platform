@@ -62,4 +62,17 @@ public abstract class AbstractProcessBuilder<B extends AbstractProcessBuilder<B>
     return myself;
   }
 
+  /**
+   * Set the camunda task priority attribute.
+   * The priority is only used for service tasks which have as type value
+   * <code>external</code>
+   * 
+   * @param taskPriority the task priority which should used for the external tasks
+   * @return the builder object
+   */
+  public B camundaTaskPriority(String taskPriority) {
+    element.setCamundaTaskPriority(taskPriority);
+    return myself;
+  }
+
 }
