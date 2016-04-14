@@ -43,6 +43,14 @@
             </archive>
           </configuration>
         </plugin>
+        <!-- set version for spring-boot-maven-plugin because we use the spring-boot-parent only in dependencyManagement section,
+          not as parent.
+        -->
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${spring-boot.version}</version>
+        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -60,6 +68,25 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <configuration>
+          <rules>
+            <requireJavaVersion>
+              <version>[1.7,)</version>
+            </requireJavaVersion>
+          </rules>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+          </execution>
+        </executions>
+    </plugin>
     </plugins>
   </build>
 
