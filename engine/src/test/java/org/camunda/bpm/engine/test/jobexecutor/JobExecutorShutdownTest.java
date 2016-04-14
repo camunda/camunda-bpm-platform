@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -64,7 +65,7 @@ public class JobExecutorShutdownTest {
       ((ProcessEngineConfigurationImpl) ProcessEngineConfiguration
           .createProcessEngineConfigurationFromResource("camunda.cfg.xml"))
           .setJobExecutor(buildControllableJobExecutor())
-          .buildProcessEngine()
+          .buildProcessEngine(), true, true
       );
 
   protected ControllableJobExecutor jobExecutor;
@@ -85,6 +86,11 @@ public class JobExecutorShutdownTest {
     jobExecutor.setMaxJobsPerAcquisition(2);
     acquisitionThread = jobExecutor.getAcquisitionThreadControl();
     executionThread = jobExecutor.getExecutionThreadControl();
+  }
+
+  @After
+  public void shutdownJobExecutor() {
+    jobExecutor.shutdown();
   }
 
   @Test

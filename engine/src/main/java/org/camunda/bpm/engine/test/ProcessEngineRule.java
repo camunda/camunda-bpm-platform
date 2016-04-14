@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
+import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -97,6 +98,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   protected List<String> additionalDeployments = new ArrayList<String>();
 
   protected boolean ensureCleanAfterTest = false;
+  protected boolean shutdownProcessEngineAfterTest = false;
 
   protected ProcessEngine processEngine;
   protected RepositoryService repositoryService;
@@ -125,8 +127,13 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   }
 
   public ProcessEngineRule(String configurationResource, boolean ensureCleanAfterTest) {
+    this(configurationResource, ensureCleanAfterTest, false);
+  }
+
+  public ProcessEngineRule(String configurationResource, boolean ensureCleanAfterTest, boolean shutdownProcessEngineAfterTest) {
     this.configurationResource = configurationResource;
     this.ensureCleanAfterTest = ensureCleanAfterTest;
+    this.shutdownProcessEngineAfterTest = shutdownProcessEngineAfterTest;
   }
 
   public ProcessEngineRule(ProcessEngine processEngine) {
@@ -134,8 +141,13 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   }
 
   public ProcessEngineRule(ProcessEngine processEngine, boolean ensureCleanAfterTest) {
+    this(processEngine, ensureCleanAfterTest, false);
+  }
+
+  public ProcessEngineRule(ProcessEngine processEngine, boolean ensureCleanAfterTest, boolean shutdownProcessEngineAfterTest) {
     this.processEngine = processEngine;
     this.ensureCleanAfterTest = ensureCleanAfterTest;
+    this.shutdownProcessEngineAfterTest = shutdownProcessEngineAfterTest;
   }
 
   @Override
@@ -220,6 +232,12 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
     ClockUtil.reset();
 
     clearServiceReferences();
+
+    if (shutdownProcessEngineAfterTest && processEngine != null) {
+      processEngine.close();
+      ProcessEngines.unregister(processEngine);
+      processEngine = null;
+    }
   }
 
   public void setCurrentTime(Date currentTime) {

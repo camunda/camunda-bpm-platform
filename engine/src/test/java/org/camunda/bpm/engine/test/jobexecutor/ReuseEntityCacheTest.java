@@ -46,8 +46,7 @@ public class ReuseEntityCacheTest {
       ((ProcessEngineConfigurationImpl) ProcessEngineConfiguration
           .createProcessEngineConfigurationFromResource("camunda.cfg.xml"))
           .setJobExecutor(new ControllableJobExecutor())
-          .buildProcessEngine(),
-      true
+          .buildProcessEngine(), true, true
       );
 
   protected boolean defaultSetting;
@@ -82,8 +81,13 @@ public class ReuseEntityCacheTest {
   }
 
   @After
-  public void tearDown() {
+  public void resetEngineConfiguration() {
     getEngineConfig().setDbEntityCacheReuseEnabled(defaultSetting);
+  }
+
+  @After
+  public void shutdownJobExecutor() {
+    jobExecutor.shutdown();
   }
 
   @Test

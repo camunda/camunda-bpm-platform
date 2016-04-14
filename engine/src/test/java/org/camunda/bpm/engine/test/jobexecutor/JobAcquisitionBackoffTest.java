@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.test.jobexecutor;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -45,7 +46,7 @@ public class JobAcquisitionBackoffTest {
       ((ProcessEngineConfigurationImpl) ProcessEngineConfiguration
           .createProcessEngineConfigurationFromResource("camunda.cfg.xml"))
           .setJobExecutor(new ControllableJobExecutor())
-          .buildProcessEngine()
+          .buildProcessEngine(), true, true
       );
 
   protected ControllableJobExecutor jobExecutor1;

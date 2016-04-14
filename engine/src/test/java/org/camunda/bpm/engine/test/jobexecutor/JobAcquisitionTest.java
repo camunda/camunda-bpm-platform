@@ -46,7 +46,7 @@ public class JobAcquisitionTest {
       ((ProcessEngineConfigurationImpl) ProcessEngineConfiguration
           .createProcessEngineConfigurationFromResource("camunda.cfg.xml"))
           .setJobExecutor(new ControllableJobExecutor())
-          .buildProcessEngine()
+          .buildProcessEngine(), true, true
       );
 
 

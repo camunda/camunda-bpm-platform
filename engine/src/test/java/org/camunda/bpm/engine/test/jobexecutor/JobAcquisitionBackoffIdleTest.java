@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.jobexecutor;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
@@ -52,8 +53,10 @@ public class JobAcquisitionBackoffIdleTest extends AbstractProcessEngineTestCase
 
   @Override
   protected void closeDownProcessEngine() {
+    jobExecutor.shutdown();
     super.closeDownProcessEngine();
     processEngine.close();
+    ProcessEngines.unregister(processEngine);
     processEngine = null;
   }
 
