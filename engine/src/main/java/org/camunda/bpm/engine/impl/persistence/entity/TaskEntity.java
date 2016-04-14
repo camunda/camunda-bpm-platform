@@ -145,7 +145,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
    * contains all changed properties of this entity
    */
   protected transient Map<String, PropertyChange> propertyChanges = new HashMap<String, PropertyChange>();
-  
+
   protected transient List<PropertyChange> identityLinkChanges = new ArrayList<PropertyChange>();
 
   // name references of tracked properties
@@ -636,16 +636,16 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     IdentityLinkEntity identityLink = newIdentityLink(userId, groupId, type);
     identityLink.insert();
     getIdentityLinks().add(identityLink);
-    
+
     fireAddIdentityLinkAuthorizationProvider(type, userId, groupId);
     return identityLink;
   }
-  
+
   public void fireIdentityLinkHistoryEvents(String userId, String groupId, String type, HistoryEventTypes historyEventType) {
     IdentityLinkEntity identityLinkEntity = newIdentityLink(userId, groupId, type);
     identityLinkEntity.fireHistoricIdentityLinkEvent(historyEventType);
   }
-  
+
   public IdentityLinkEntity newIdentityLink(String userId, String groupId, String type) {
     IdentityLinkEntity identityLinkEntity = new IdentityLinkEntity();
     identityLinkEntity.setTask(this);
@@ -1364,7 +1364,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
     identityLinkChanges.clear();
   }
-  
+
   @Override
   public ProcessEngineServices getProcessEngineServices() {
     return Context.getProcessEngineConfiguration()
@@ -1403,8 +1403,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
-  public void addIdentityLinkChanges(String type, String oldProperty, String newProperty)
-  {
+  public void addIdentityLinkChanges(String type, String oldProperty, String newProperty) {
     identityLinkChanges.add(new PropertyChange(type, oldProperty, newProperty));
   }
 

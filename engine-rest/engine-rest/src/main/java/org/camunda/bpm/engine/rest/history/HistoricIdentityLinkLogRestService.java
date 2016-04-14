@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricIdentityLinkLogDto;
 @Produces(MediaType.APPLICATION_JSON)
 public interface HistoricIdentityLinkLogRestService {
 
-  public static final String PATH = "/identity-links-log";
+  public static final String PATH = "/identity-link-log";
 
   /**
    * Exposes the {@link HistoricIdentityLinkLogQuery} interface as a REST service.

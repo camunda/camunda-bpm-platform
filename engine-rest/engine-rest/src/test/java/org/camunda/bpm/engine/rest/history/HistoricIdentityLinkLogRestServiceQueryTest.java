@@ -42,7 +42,7 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
-  protected static final String HISTORY_IDENTITY_LINK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/history/identity-links-log";
+  protected static final String HISTORY_IDENTITY_LINK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/history/identity-link-log";
   protected static final String HISTORY_IDENTITY_LINK_COUNT_QUERY_URL = HISTORY_IDENTITY_LINK_QUERY_URL + "/count";
 
   private HistoricIdentityLinkLogQuery mockedQuery;
