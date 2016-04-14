@@ -19,6 +19,7 @@ import static org.junit.Assert.assertThat;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineRule;
 import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,7 +28,7 @@ import org.junit.Test;
 public class ProcessEngineRuleRequiredHistoryLevelClassTest {
 
   @Rule
-  public final ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  public final ProcessEngineRule engineRule = new PluggableProcessEngineRule();
 
   @Test
   public void requiredHistoryLevelOnClass() {

@@ -16,17 +16,19 @@
 package org.camunda.bpm.engine.test.api.authorization.externaltask;
 
 import java.util.Collection;
+
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
-import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineRule;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,7 +45,7 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class SetExternalTaskPriorityAuthorizationTest  {
 
-  public ProcessEngineRule engineRule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine(), true);
+  public ProcessEngineRule engineRule = new PluggableProcessEngineRule();
   public AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
 
   @Rule

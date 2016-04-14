@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineRule;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,7 +48,7 @@ public class MigrationMultiInstanceTest {
   public static final String NUMBER_OF_COMPLETED_INSTANCES = "nrOfCompletedInstances";
   public static final String LOOP_COUNTER = "loopCounter";
 
-  protected ProcessEngineRule rule = new ProcessEngineRule(true);
+  protected ProcessEngineRule rule = new PluggableProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule

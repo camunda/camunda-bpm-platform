@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateEvent;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateExecutionListener;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineRule;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -41,7 +42,7 @@ import org.junit.rules.RuleChain;
  */
 public class MigrationRemoveSubprocessTest {
 
-  protected ProcessEngineRule rule = new ProcessEngineRule(true);
+  protected ProcessEngineRule rule = new PluggableProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule
