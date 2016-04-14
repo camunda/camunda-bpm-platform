@@ -51,7 +51,7 @@ public class BatchResourceImpl implements BatchResource {
         .deleteBatch(batchId, cascade);
     }
     catch (BadUserRequestException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Unable to delete batch with id '" + batchId + "'");
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Unable to delete batch with id '" + batchId + "'");
     }
   }
 

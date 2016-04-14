@@ -51,7 +51,7 @@ public class HistoricBatchResourceImpl implements HistoricBatchResource {
         .deleteHistoricBatch(batchId);
     }
     catch (BadUserRequestException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Unable to delete historic batch with id '" + batchId + "'");
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Unable to delete historic batch with id '" + batchId + "'");
     }
   }
 
