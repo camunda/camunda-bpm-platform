@@ -21,11 +21,13 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
 import org.camunda.bpm.engine.test.jobexecutor.RecordingAcquireJobsRunnable.RecordedWaitEvent;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 /**
  * @author Thorben Lindhauer
@@ -41,14 +43,15 @@ public class JobAcquisitionTest {
   protected ThreadControl acquisitionThread1;
   protected ThreadControl acquisitionThread2;
 
+  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(engineRule) {
+    @Override
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      return configuration.setJobExecutor(new ControllableJobExecutor());
+    }
+  };
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule(
-      ((ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-          .createProcessEngineConfigurationFromResource("camunda.cfg.xml"))
-          .setJobExecutor(new ControllableJobExecutor())
-          .buildProcessEngine(), true, true
-      );
-
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule);
 
   @Before
   public void setUp() throws Exception {

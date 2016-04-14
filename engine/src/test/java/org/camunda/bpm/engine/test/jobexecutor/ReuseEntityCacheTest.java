@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
@@ -31,6 +32,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 /**
  * @author Thorben Lindhauer
@@ -41,13 +43,15 @@ public class ReuseEntityCacheTest {
   public static final String ENTITY_ID1 = "Execution1";
   public static final String ENTITY_ID2 = "Execution2";
 
+  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(engineRule) {
+    @Override
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      return configuration.setJobExecutor(new ControllableJobExecutor());
+    }
+  };
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule(
-      ((ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-          .createProcessEngineConfigurationFromResource("camunda.cfg.xml"))
-          .setJobExecutor(new ControllableJobExecutor())
-          .buildProcessEngine(), true, true
-      );
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule);
 
   protected boolean defaultSetting;
 
