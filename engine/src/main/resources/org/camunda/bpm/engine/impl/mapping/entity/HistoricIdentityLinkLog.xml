@@ -16,7 +16,8 @@
     		TASK_ID_, 
     		PROC_DEF_ID_, 
     		OPERATION_TYPE_,
-    		ASSIGNER_ID_)
+            ASSIGNER_ID_,
+            PROC_DEF_KEY_)
     values (#{id, jdbcType=VARCHAR},
             #{time, jdbcType=TIMESTAMP},  
             #{type, jdbcType=VARCHAR},
@@ -25,7 +26,8 @@
             #{taskId, jdbcType=VARCHAR},
             #{processDefinitionId, jdbcType=VARCHAR},
             #{operationType, jdbcType=VARCHAR},
-            #{assignerId, jdbcType=VARCHAR}
+            #{assignerId, jdbcType=VARCHAR},
+            #{processDefinitionKey, jdbcType=VARCHAR}
            )
   </insert>
   
@@ -52,9 +54,10 @@
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
     <result property="groupId" column="GROUP_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
-    <result property="processDefinitionId" column="PROCESS_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="operationType" column="OPERATION_TYPE_" jdbcType="VARCHAR"/>
     <result property="assignerId" column="ASSIGNER_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
   </resultMap>
   
   <select id="selectHistoricIdentityLinkByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIdentityLinkLogQueryImpl" resultMap="historicIdentityLinkResultMap">
@@ -74,6 +77,19 @@
 
   <sql id="selectHistoricIdentityLinkByQueryCriteriaSql">
     from ${prefix}ACT_HI_IDENTITYLINK RES
+    
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      LEFT JOIN (
+        SELECT
+            DISTINCT SELF.PROC_DEF_KEY_ AS KEY_
+        FROM
+            ${prefix}ACT_HI_IDENTITYLINK SELF
+        WHERE
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
+      ) AUTH
+      ON AUTH.KEY_ = RES.PROC_DEF_KEY_
+    </if>
+    
     <where>
       <if test="type != null">
         and RES.TYPE_ = #{type}
@@ -101,6 +117,13 @@
       </if>
       <if test="dateAfter != null">
         and RES.TIMESTAMP_ &gt;= #{dateAfter}
+      </if>
+      <if test="processDefinitionKey != null">
+        and RES.PROC_DEF_KEY_ = #{processDefinitionKey}
+      </if>
+      
+      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+        and ((RES.PROC_DEF_KEY_ is not null and AUTH.KEY_ is not null) or RES.PROC_DEF_KEY_ is null)
       </if>
     </where>
   </sql>

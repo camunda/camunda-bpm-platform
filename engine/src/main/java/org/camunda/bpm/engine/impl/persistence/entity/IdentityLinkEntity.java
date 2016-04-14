@@ -52,6 +52,8 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
   protected TaskEntity task;
   
   protected ProcessDefinitionEntity processDef;
+  
+  protected String processDefinitionKey;
 
   public Object getPersistentState() {
     return this.type;
@@ -76,14 +78,15 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
     fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_ADD);
   }
 
-  public void delete() {
+  public void delete(String processDefinitionKey) {
+    setProcessDefinitionKey(processDefinitionKey);
     Context
       .getCommandContext()
       .getDbEntityManager()
       .delete(this);
     fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_DELETE);
   }
-
+  
   public boolean isUser() {
     return userId != null;
   }
@@ -176,6 +179,14 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
     this.processDefId = processDef.getId();
   }
   
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+  }
+
   public void fireHistoricIdentityLinkEvent(HistoryEventType eventType) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
 

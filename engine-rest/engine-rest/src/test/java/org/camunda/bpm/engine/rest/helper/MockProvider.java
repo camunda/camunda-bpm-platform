@@ -630,6 +630,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HIST_IDENTITY_LINK_USER_ID = "aUserId";
   public static final String EXAMPLE_HIST_IDENTITY_LINK_GROUP_ID = "aGroupId";
   public static final String EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_ID = "aProcDefId";
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_KEY = "aProcDefKey";
 
   // case definition
   public static final String EXAMPLE_CASE_DEFINITION_ID = "aCaseDefnitionId";
@@ -1905,6 +1906,7 @@ public abstract class MockProvider {
     when(identityLink.getType()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_TYPE);
     when(identityLink.getOperationType()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_OPERATION_TYPE);
     when(identityLink.getProcessDefinitionId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_ID);
+    when(identityLink.getProcessDefinitionKey()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_KEY);
     when(identityLink.getTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HIST_IDENTITY_LINK_TIME));
     return identityLink;
   }

@@ -32,6 +32,8 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
   private static final String INVALID_ASSIGNER_ID = "InvalidAssignerId";
   private static final String INVALID_HISTORY_EVENT_TYPE = "InvalidEventType";
   private static final String INVALID_IDENTITY_LINK_TYPE = "InvalidIdentityLinkType";
+  private static final String INVALID_PROCESS_DEFINITION_ID = "InvalidProcessDefinitionId";
+  private static final String INVALID_PROCESS_DEFINITION_KEY = "InvalidProcessDefinitionKey";
   private static final String GROUP_1 = "Group1";
   private static final String USER_1 = "User1";
   private static String PROCESS_DEFINITION_KEY = "oneTaskProcess";
@@ -46,7 +48,7 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given
-    startProcessInstance(PROCESS_DEFINITION_KEY);
+    ProcessInstance processInstance = startProcessInstance(PROCESS_DEFINITION_KEY);
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
     // if
@@ -61,6 +63,8 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     assertEquals(historicIdentityLink.getAssignerId(), A_ASSIGNER_ID);
     assertEquals(historicIdentityLink.getGroupId(), null);
     assertEquals(historicIdentityLink.getOperationType(), IDENTITY_LINK_ADD);
+    assertEquals(historicIdentityLink.getProcessDefinitionId(), processInstance.getProcessDefinitionId());
+    assertEquals(historicIdentityLink.getProcessDefinitionKey(), PROCESS_DEFINITION_KEY);
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -70,7 +74,7 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given
-    startProcessInstance(PROCESS_DEFINITION_KEY);
+    ProcessInstance processInstance = startProcessInstance(PROCESS_DEFINITION_KEY);
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
     // if
@@ -85,6 +89,8 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     assertEquals(historicIdentityLink.getAssignerId(), A_ASSIGNER_ID);
     assertEquals(historicIdentityLink.getGroupId(), A_GROUP_ID);
     assertEquals(historicIdentityLink.getOperationType(), IDENTITY_LINK_ADD);
+    assertEquals(historicIdentityLink.getProcessDefinitionId(), processInstance.getProcessDefinitionId());
+    assertEquals(historicIdentityLink.getProcessDefinitionKey(), PROCESS_DEFINITION_KEY);
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -94,7 +100,7 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given
-    startProcessInstance(PROCESS_DEFINITION_KEY);
+    ProcessInstance processInstance = startProcessInstance(PROCESS_DEFINITION_KEY);
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
     // if
@@ -120,6 +126,12 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
 
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.operationType(IDENTITY_LINK_ADD).count(), 1);
+   
+    query = historyService.createHistoricIdentityLinkLogQuery();
+    assertEquals(query.processDefinitionId(processInstance.getProcessDefinitionId()).count(), 2);
+    
+    query = historyService.createHistoricIdentityLinkLogQuery();
+    assertEquals(query.processDefinitionKey(PROCESS_DEFINITION_KEY).count(), 2);
 
   }
 
@@ -130,7 +142,7 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given
-    startProcessInstance(PROCESS_DEFINITION_KEY);
+    ProcessInstance processInstance = startProcessInstance(PROCESS_DEFINITION_KEY);
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
     // if
@@ -144,6 +156,8 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     assertEquals(query.type(IdentityLinkType.CANDIDATE).count(), 2);
     assertEquals(query.userId(A_USER_ID).count(), 2);
     assertEquals(query.assignerId(A_ASSIGNER_ID).count(), 2);
+    assertEquals(query.processDefinitionId(processInstance.getProcessDefinitionId()).count(), 2);
+    assertEquals(query.processDefinitionKey(PROCESS_DEFINITION_KEY).count(), 2);
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 1);
     assertEquals(query.operationType(IDENTITY_LINK_ADD).count(), 1);
   }
@@ -207,7 +221,8 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     assertEquals(query.groupId(INVALID_GROUP_ID).count(), 0);
     assertEquals(query.assignerId(INVALID_ASSIGNER_ID).count(), 0);
     assertEquals(query.operationType(INVALID_HISTORY_EVENT_TYPE).count(), 0);
-
+    assertEquals(query.processDefinitionId(INVALID_PROCESS_DEFINITION_ID).count(), 0);
+    assertEquals(query.processDefinitionKey(INVALID_PROCESS_DEFINITION_KEY).count(), 0);
   }
 
   /**
@@ -293,6 +308,7 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     // Query test
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.processDefinitionId(latestProcessDef.getId()).count(), 2);
+    assertEquals(query.processDefinitionKey(latestProcessDef.getKey()).count(), 2);
     assertEquals(query.operationType(IDENTITY_LINK_ADD).count(), 2);
     assertEquals(query.userId(USER_1).count(), 1);
 
@@ -301,6 +317,7 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     // Query test
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.processDefinitionId(latestProcessDef.getId()).count(), 3);
+    assertEquals(query.processDefinitionKey(latestProcessDef.getKey()).count(), 3);
     assertEquals(query.groupId(GROUP_1).count(), 2);
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 1);
 
@@ -309,6 +326,7 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     // Query test
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.processDefinitionId(latestProcessDef.getId()).count(), 4);
+    assertEquals(query.processDefinitionKey(latestProcessDef.getKey()).count(), 4);
     assertEquals(query.userId(USER_1).count(), 2);
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 2);
@@ -340,6 +358,7 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByType().asc().list().size());
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByOperationType().asc().list().size());
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByProcessDefinitionId().asc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByProcessDefinitionKey().asc().list().size());
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByTaskId().asc().list().size());
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByUserId().asc().list().size());
     assertEquals("aUser", historyService.createHistoricIdentityLinkLogQuery().orderByUserId().asc().list().get(0).getUserId());
@@ -351,6 +370,7 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByType().desc().list().size());
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByOperationType().desc().list().size());
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByProcessDefinitionId().desc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByProcessDefinitionKey().desc().list().size());
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByTaskId().desc().list().size());
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByUserId().desc().list().size());
     assertEquals("dUser", historyService.createHistoricIdentityLinkLogQuery().orderByUserId().desc().list().get(0).getUserId());
@@ -408,5 +428,4 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
   protected ProcessInstance startProcessInstance(String key) {
     return runtimeService.startProcessInstanceByKey(key);
   }
-
 }

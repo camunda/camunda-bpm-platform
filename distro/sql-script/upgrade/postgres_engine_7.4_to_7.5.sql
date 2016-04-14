@@ -212,6 +212,7 @@ create table ACT_HI_IDENTITYLINK (
     PROC_DEF_ID_ varchar(64),
     OPERATION_TYPE_ varchar(64),
     ASSIGNER_ID_ varchar(64),
+    PROC_DEF_KEY_ varchar(255),
     primary key (ID_)
 );
 

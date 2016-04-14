@@ -343,6 +343,41 @@ public class HistoricIdentityLinkLogTest extends PluggableProcessEngineTestCase 
     taskService.deleteTask(taskOwnerId,true);
     taskService.deleteTask(taskEmpty.getId(), true);
   }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testShouldAddIdentityLinkByProcessDefinitionAndStandalone() {
+
+    String taskAssigneeId = "Assigneee";
+    // Pre test
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
+    assertEquals(historicIdentityLinks.size(), 0);
+
+    ProcessInstance processInstance = startProcessInstance(PROCESS_DEFINITION_KEY);
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // given
+    Task taskAssignee = taskService.newTask(taskAssigneeId);
+    taskAssignee.setAssignee(USER_1);
+    taskService.saveTask(taskAssignee);
+
+    // if
+    addAndDeleteUserWithAssigner(taskId, IdentityLinkType.ASSIGNEE);
+
+    // then
+    historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
+    assertEquals(historicIdentityLinks.size(), 3);
+
+    // Basic Query test
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
+    assertEquals(query.type(IdentityLinkType.ASSIGNEE).count(), 3);
+
+    query = historyService.createHistoricIdentityLinkLogQuery();
+    assertEquals(query.processDefinitionId(processInstance.getProcessDefinitionId()).count(), 2);
+    assertEquals(query.processDefinitionKey(PROCESS_DEFINITION_KEY).count(), 2);
+
+    taskService.deleteTask(taskAssigneeId, true);
+  }
+  
   public void addAndDeleteUserWithAssigner(String taskId, String identityLinkType) {
     identityService.setAuthenticatedUserId(A_ASSIGNER_ID);
     taskService.addUserIdentityLink(taskId, A_USER_ID, identityLinkType);

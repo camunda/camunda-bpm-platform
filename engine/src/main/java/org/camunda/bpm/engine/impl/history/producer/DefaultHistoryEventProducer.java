@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -685,13 +686,14 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   }
 
   protected void initHistoricIdentityLinkEvent(HistoricIdentityLinkLogEventEntity evt, IdentityLink identityLink, HistoryEventType eventType) {
+    IdentityLinkEntity entity = (IdentityLinkEntity) identityLink;
     evt.setTime(ClockUtil.getCurrentTime());
     evt.setType(identityLink.getType());
     evt.setUserId(identityLink.getUserId());
     evt.setGroupId(identityLink.getGroupId());
     evt.setTaskId(identityLink.getTaskId());
     evt.setProcessDefinitionId(identityLink.getProcessDefId());
-
+    evt.setProcessDefinitionKey(entity.getProcessDefinitionKey());
     // There is a conflict in HistoryEventTypes for 'delete' keyword,
     // So HistoryEventTypes.IDENTITY_LINK_ADD /
     // HistoryEventTypes.IDENTITY_LINK_DELETE is provided with the event name

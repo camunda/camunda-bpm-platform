@@ -25,6 +25,7 @@ public class HistoricIdentityLinkLogQueryImpl extends AbstractVariableQueryImpl<
   protected String groupId;
   protected String taskId;
   protected String processDefinitionId;
+  protected String processDefinitionKey;
   protected String operationType;
   protected String assignerId;
 
@@ -53,6 +54,10 @@ public class HistoricIdentityLinkLogQueryImpl extends AbstractVariableQueryImpl<
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
+  }
+
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
   }
 
   public String getOperationType() {
@@ -121,6 +126,13 @@ public class HistoricIdentityLinkLogQueryImpl extends AbstractVariableQueryImpl<
   }
 
   @Override
+  public HistoricIdentityLinkLogQuery processDefinitionKey(String processDefinitionKey) {
+    ensureNotNull("processDefinitionKey", processDefinitionKey);
+    this.processDefinitionKey = processDefinitionKey;
+    return this;
+  }
+
+  @Override
   public HistoricIdentityLinkLogQuery operationType(String operationType) {
     ensureNotNull("operationType", operationType);
     this.operationType = operationType;
@@ -167,6 +179,12 @@ public class HistoricIdentityLinkLogQueryImpl extends AbstractVariableQueryImpl<
   @Override
   public HistoricIdentityLinkLogQuery orderByProcessDefinitionId() {
     orderBy(HistoricIdentityLinkLogQueryProperty.PROC_DEFINITION_ID);
+    return this;
+  }
+
+  @Override
+  public HistoricIdentityLinkLogQuery orderByProcessDefinitionKey() {
+    orderBy(HistoricIdentityLinkLogQueryProperty.PROC_DEFINITION_KEY);
     return this;
   }
 

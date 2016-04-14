@@ -166,6 +166,17 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
     inOrder.verify(mockedQuery).orderByProcessDefinitionId();
     inOrder.verify(mockedQuery).desc();
 
+    // processDefinitionKey
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("processDefinitionKey", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByProcessDefinitionKey();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("processDefinitionKey", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByProcessDefinitionKey();
+    inOrder.verify(mockedQuery).desc();
+
     // type
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("type", "asc", Status.OK);
@@ -196,6 +207,7 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
     String returnedTaskId = from(content).getString("[0].taskId");
     String returnedType = from(content).getString("[0].type");
     String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
+    String returnedProcessDefinitionKey = from(content).getString("[0].processDefinitionKey");
     String returnedOperationType = from(content).getString("[0].operationType");
     Date loggedDate = DateTimeUtil.parseDate(from(content).getString("[0].time"));
 
@@ -205,6 +217,7 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_GROUP_ID, returnedGroupId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TASK_ID, returnedTaskId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_ID, returnedProcessDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_KEY, returnedProcessDefinitionKey);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TYPE, returnedType);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_OPERATION_TYPE, returnedOperationType);
   }
@@ -291,6 +304,15 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
   }
 
   @Test
+  public void testQueryByProcessDefinitionKey() {
+    String processDefinitionKey = MockProvider.EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_KEY;
+
+    given().queryParam("processDefinitionKey", processDefinitionKey).then().expect().statusCode(Status.OK.getStatusCode()).when().get(HISTORY_IDENTITY_LINK_QUERY_URL);
+
+    verify(mockedQuery).processDefinitionKey(processDefinitionKey);
+  }
+  
+  @Test
   public void testQueryByType() {
     String type = MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TYPE;
 
@@ -347,6 +369,7 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
     parameters.put("groupId", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_GROUP_ID);
     parameters.put("taskId", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TASK_ID);
     parameters.put("processDefinitionId", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_ID);
+    parameters.put("processDefinitionKey", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_KEY);
     parameters.put("operationType", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_OPERATION_TYPE);
     parameters.put("type", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TYPE);
     return parameters;
@@ -362,6 +385,7 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
     verify(mockedQuery).type(stringQueryParameters.get("type"));
     verify(mockedQuery).operationType(stringQueryParameters.get("operationType"));
     verify(mockedQuery).processDefinitionId(stringQueryParameters.get("processDefinitionId"));
+    verify(mockedQuery).processDefinitionKey(stringQueryParameters.get("processDefinitionKey"));
     verify(mockedQuery).list();
   }
 }

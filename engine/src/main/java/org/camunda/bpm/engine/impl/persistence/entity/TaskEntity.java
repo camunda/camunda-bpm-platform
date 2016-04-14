@@ -652,6 +652,9 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     identityLinkEntity.setUserId(userId);
     identityLinkEntity.setGroupId(groupId);
     identityLinkEntity.setType(type);
+    identityLinkEntity.setProcessDefId(getProcessDefinitionId());
+    if(getProcessDefinition() != null)
+      identityLinkEntity.setProcessDefinitionKey(getProcessDefinition().getKey());
     return identityLinkEntity;
   }
 
@@ -665,7 +668,10 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
     for (IdentityLinkEntity identityLink: identityLinks) {
       fireDeleteIdentityLinkAuthorizationProvider(type, userId, groupId);
-      identityLink.delete();
+      String processDefinitionKey = null;
+      if(getProcessDefinition() != null)
+        processDefinitionKey = getProcessDefinition().getKey(); 
+      identityLink.delete(processDefinitionKey);
     }
   }
 

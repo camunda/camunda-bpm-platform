@@ -31,6 +31,9 @@ public interface HistoricIdentityLinkLogQuery extends Query<HistoricIdentityLink
 	/** Only select historic identity links which have the given process definition id. **/
 	HistoricIdentityLinkLogQuery processDefinitionId(String processDefinitionId);
 	
+	/** Only select historic identity links which have the given process definition key. **/
+  HistoricIdentityLinkLogQuery processDefinitionKey(String processDefinitionKey);
+
 	/** Only select historic identity links which have the given operation type (add/delete). **/
 	HistoricIdentityLinkLogQuery operationType(String operationType);
 	
@@ -52,9 +55,12 @@ public interface HistoricIdentityLinkLogQuery extends Query<HistoricIdentityLink
 	/** Order by taskId (needs to be followed by {@link #asc()} or {@link #desc()}). */
 	HistoricIdentityLinkLogQuery orderByTaskId();
 	
-	/** Order by processDefId (needs to be followed by {@link #asc()} or {@link #desc()}). */
+	/** Order by processDefinitionId (needs to be followed by {@link #asc()} or {@link #desc()}). */
 	HistoricIdentityLinkLogQuery orderByProcessDefinitionId();
 	
+	/** Order by processDefinitionKey (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricIdentityLinkLogQuery orderByProcessDefinitionKey();
+
 	/** Order by operationType (needs to be followed by {@link #asc()} or {@link #desc()}). */
 	HistoricIdentityLinkLogQuery orderByOperationType();
 	

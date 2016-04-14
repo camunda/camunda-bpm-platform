@@ -214,6 +214,7 @@ create table ACT_HI_IDENTITYLINK (
     PROC_DEF_ID_ varchar(64),
     OPERATION_TYPE_ varchar(64),
     ASSIGNER_ID_ varchar(64),
+    PROC_DEF_KEY_ varchar(255),
     primary key (ID_)
 );
 create index ACT_IDX_HI_IDENT_LNK_USER on ACT_HI_IDENTITYLINK(USER_ID_);

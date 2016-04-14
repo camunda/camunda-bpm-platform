@@ -28,6 +28,7 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
   private static final String SORT_BY_GROUP_ID = "groupId";
   private static final String SORT_BY_TASK_ID = "taskId";
   private static final String SORT_BY_PROCESS_DEFINITION_ID = "processDefinitionId";
+  private static final String SORT_BY_PROCESS_DEFINITION_KEY = "processDefinitionKey";
   private static final String SORT_BY_OPERATION_TYPE = "operationType";
   private static final String SORT_BY_ASSIGNER_ID = "assignerId";
 
@@ -40,6 +41,7 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
     VALID_SORT_BY_VALUES.add(SORT_BY_GROUP_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_TASK_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_ID);
+    VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_KEY);
     VALID_SORT_BY_VALUES.add(SORT_BY_OPERATION_TYPE);
     VALID_SORT_BY_VALUES.add(SORT_BY_ASSIGNER_ID);
   }
@@ -51,6 +53,7 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
   protected String groupId;
   protected String taskId;
   protected String processDefinitionId;
+  protected String processDefinitionKey;
   protected String operationType;
   protected String assignerId;
 
@@ -106,6 +109,11 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
     this.processDefinitionId = processDefinitionId;
   }
 
+  @CamundaQueryParam("processDefinitionKey")
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+  }
+  
   @CamundaQueryParam("operationType")
   public void setOperationType(String operationType) {
     this.operationType = operationType;
@@ -139,6 +147,9 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);
     }
+    if (processDefinitionKey != null) {
+      query.processDefinitionKey(processDefinitionKey);
+    }
     if (operationType != null) {
       query.operationType(operationType);
     }
@@ -165,6 +176,8 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
       query.orderByAssignerId();
     } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_ID)) {
       query.orderByProcessDefinitionId();
+    } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_KEY)) {
+      query.orderByProcessDefinitionKey();
     }
   }
 }

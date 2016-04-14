@@ -132,6 +132,7 @@ create table ACT_HI_IDENTITYLINK (
     PROC_DEF_ID_ nvarchar(64),
     OPERATION_TYPE_ nvarchar(64),
     ASSIGNER_ID_ nvarchar(64),
+    PROC_DEF_KEY_ nvarchar(255),
     primary key (ID_)
 );
 create table ACT_HI_COMMENT (

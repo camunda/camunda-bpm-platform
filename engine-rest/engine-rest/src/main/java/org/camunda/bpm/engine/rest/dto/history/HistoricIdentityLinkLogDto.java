@@ -12,6 +12,7 @@ public class HistoricIdentityLinkLogDto {
   protected String groupId;
   protected String taskId;
   protected String processDefinitionId;
+  protected String processDefinitionKey;
   protected String operationType;
   protected String assignerId;
 
@@ -43,6 +44,10 @@ public class HistoricIdentityLinkLogDto {
     return processDefinitionId;
   }
 
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+  
   public String getOperationType() {
     return operationType;
   }
@@ -61,6 +66,7 @@ public class HistoricIdentityLinkLogDto {
     dto.time = historicIdentityLink.getTime();
     dto.type = historicIdentityLink.getType();
     dto.processDefinitionId = historicIdentityLink.getProcessDefinitionId();
+    dto.processDefinitionKey = historicIdentityLink.getProcessDefinitionKey();
     dto.userId = historicIdentityLink.getUserId();
     return dto;
   }

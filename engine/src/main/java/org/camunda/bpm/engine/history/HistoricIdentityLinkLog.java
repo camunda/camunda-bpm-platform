@@ -80,4 +80,9 @@ public interface HistoricIdentityLinkLog {
    * Returns the id of the related process definition 
    */
   String getProcessDefinitionId();
+  
+  /**
+   * Returns the key of the related process definition 
+   */
+  String getProcessDefinitionKey();
 }
