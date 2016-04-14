@@ -39,7 +39,7 @@ var template = fs.readFileSync(__dirname + '/breadcrumbs.html', 'utf8');
               label = choice.label;
             }
           });
-          return label || 'Sooooo fucking screwed';
+          return label || 'Options';
         };
       },
 
