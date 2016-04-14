@@ -32,6 +32,11 @@ var template = fs.readFileSync(__dirname + '/breadcrumbs.html', 'utf8');
           return routeUtil.redirectTo(crumb.href, $location.search(), crumb.keepSearchParams);
         };
 
+        scope.selectChoice = function(evt, choice) {
+          evt.preventDefault();
+          $location.path(choice.href.substr(1));
+        }
+
         scope.getActiveChoice = function (choices) {
           var label;
           choices.forEach(function (choice) {
