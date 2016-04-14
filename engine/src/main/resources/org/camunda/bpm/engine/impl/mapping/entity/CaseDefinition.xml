@@ -83,7 +83,7 @@
     from ${prefix}ACT_RE_CASE_DEF c1
       inner join
           (select KEY_, TENANT_ID_, max(VERSION_) as MAX_VERSION
-          from ${prefix}ACT_RE_CASE_DEF
+          from ${prefix}ACT_RE_CASE_DEF RES
           where KEY_ = #{parameter}
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
           group by TENANT_ID_, KEY_) c2
@@ -105,7 +105,7 @@
   
   <select id="selectLatestCaseDefinitionByKeyAndTenantId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="caseDefinitionResultMap">
     select *
-    from ${prefix}ACT_RE_CASE_DEF 
+    from ${prefix}ACT_RE_CASE_DEF RES
     where KEY_ = #{parameter.caseDefinitionKey}
           and TENANT_ID_ = #{parameter.tenantId}
           and VERSION_ = (

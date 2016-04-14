@@ -287,7 +287,7 @@
     from ${prefix}ACT_RE_PROCDEF p1
         inner join
           (select KEY_, TENANT_ID_, max(VERSION_) as MAX_VERSION
-          from ${prefix}ACT_RE_PROCDEF
+          from ${prefix}ACT_RE_PROCDEF RES
           where KEY_ = #{parameter}
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
           group by TENANT_ID_, KEY_) p2
@@ -298,7 +298,7 @@
   
   <select id="selectLatestProcessDefinitionByKeyWithoutTenantId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="processDefinitionResultMap">
     select *
-    from ${prefix}ACT_RE_PROCDEF 
+    from ${prefix}ACT_RE_PROCDEF RES
     where KEY_ = #{parameter.processDefinitionKey}
           and TENANT_ID_ is null
           and VERSION_ = (
