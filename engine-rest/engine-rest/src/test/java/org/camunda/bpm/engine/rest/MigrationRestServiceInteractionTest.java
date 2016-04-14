@@ -758,7 +758,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   }
 
   @Test
-  public void executeMigrationPlanAsyncWithNullSourceProcessInstanceId() {
+  public void executeMigrationPlanAsyncWithNullSourceProcessDefinitionId() {
     String message = "source process definition id is null";
     when(runtimeServiceMock.createMigrationPlan(isNull(String.class), anyString()))
       .thenThrow(new BadUserRequestException(message));
@@ -782,7 +782,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   }
 
   @Test
-  public void executeMigrationPlanAsyncWithNonExistingSourceProcessInstanceId() {
+  public void executeMigrationPlanAsyncWithNonExistingSourceProcessDefinitionId() {
     String message = "source process definition with id " + NON_EXISTING_PROCESS_DEFINITION_ID + " does not exist";
     when(runtimeServiceMock.createMigrationPlan(eq(NON_EXISTING_PROCESS_DEFINITION_ID), anyString()))
       .thenThrow(new BadUserRequestException(message));
@@ -806,7 +806,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   }
 
   @Test
-  public void executeMigrationPlanAsyncWithNullTargetProcessInstanceId() {
+  public void executeMigrationPlanAsyncWithNullTargetProcessDefinitionId() {
     String message = "target process definition id is null";
     when(runtimeServiceMock.createMigrationPlan(anyString(), isNull(String.class)))
       .thenThrow(new BadUserRequestException(message));
@@ -830,7 +830,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   }
 
   @Test
-  public void executeMigrationPlanAsyncWithNonExistingTargetProcessInstanceId() {
+  public void executeMigrationPlanAsyncWithNonExistingTargetProcessDefinitionId() {
     String message = "target process definition with id " + NON_EXISTING_PROCESS_DEFINITION_ID + " does not exist";
     when(runtimeServiceMock.createMigrationPlan(anyString(), eq(NON_EXISTING_PROCESS_DEFINITION_ID)))
       .thenThrow(new BadUserRequestException(message));
