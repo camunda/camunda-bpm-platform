@@ -71,7 +71,7 @@ public class PrimitiveTypeValueSerializationTest {
   private String deploymentId;
 
   @Rule
-  public ProcessEngineRule rule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine());
+  public ProcessEngineRule rule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine(), true);
 
   @Before
   public void setup() {

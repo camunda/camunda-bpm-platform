@@ -71,7 +71,7 @@ public class EscalationEventParseInvalidProcessTest {
   public String expectedErrorMessage;
 
   @Rule
-  public ProcessEngineRule rule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine());
+  public ProcessEngineRule rule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine(), true);
 
   protected RepositoryService repositoryService;
 
