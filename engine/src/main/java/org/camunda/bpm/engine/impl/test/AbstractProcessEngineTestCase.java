@@ -123,10 +123,10 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     }
     finally {
 
-      deleteDeployments();
-
       identityService.clearAuthentication();
       processEngineConfiguration.setTenantCheckEnabled(true);
+
+      deleteDeployments();
 
       // only fail if no test failure was recorded
       TestHelper.assertAndEnsureCleanDbAndCache(processEngine, exception == null);
