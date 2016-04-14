@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.TenantCheck;
@@ -24,12 +26,12 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
  */
 public class TenantManager extends AbstractManager {
 
-  public void configureQuery(ListQueryParameterObject query) {
-    final Authentication currentAuthentication = getCurrentAuthentication();
-
+  public ListQueryParameterObject configureQuery(ListQueryParameterObject query) {
     TenantCheck tenantCheck = query.getTenantCheck();
 
-    if (Context.getProcessEngineConfiguration().isTenantCheckEnabled() && currentAuthentication != null) {
+    if (isTenantCheckEnabled()) {
+      Authentication currentAuthentication = getCurrentAuthentication();
+
       tenantCheck.setTenantCheckEnabled(true);
       tenantCheck.setAuthTenantIds(currentAuthentication.getTenantIds());
 
@@ -37,6 +39,34 @@ public class TenantManager extends AbstractManager {
       tenantCheck.setTenantCheckEnabled(false);
       tenantCheck.setAuthTenantIds(null);
     }
+    return query;
+  }
+
+  public ListQueryParameterObject configureQuery(Object parameters) {
+    ListQueryParameterObject queryObject = new ListQueryParameterObject();
+    queryObject.setParameter(parameters);
+
+    return configureQuery(queryObject);
+  }
+
+  public boolean isAuthenticatedTenant(String tenantId) {
+    if (tenantId != null && isTenantCheckEnabled()) {
+
+      Authentication currentAuthentication = getCurrentAuthentication();
+      List<String> authenticatedTenantIds = currentAuthentication.getTenantIds();
+      if (authenticatedTenantIds != null) {
+        return authenticatedTenantIds.contains(tenantId);
+
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
+  }
+
+  protected boolean isTenantCheckEnabled() {
+    return Context.getProcessEngineConfiguration().isTenantCheckEnabled() && getCurrentAuthentication() != null;
   }
 
 }

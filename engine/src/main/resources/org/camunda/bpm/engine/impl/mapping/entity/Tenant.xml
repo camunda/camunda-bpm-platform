@@ -7,9 +7,9 @@
   <sql id="queryTenantCheck">
     <if test="tenantCheck.isTenantCheckEnabled">
     
-      and (RES.TENANT_ID_ is null
+      and (TENANT_ID_ is null
       <if test="tenantCheck.authTenantIds != null &amp;&amp; !tenantCheck.authTenantIds.isEmpty">
-          or RES.TENANT_ID_ in 
+          or TENANT_ID_ in 
           <foreach item="tenantId" index="index" collection="tenantCheck.authTenantIds"
                    open="(" separator="," close=")">
             #{tenantId}

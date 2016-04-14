@@ -18,6 +18,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -121,6 +123,127 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
         .create();
 
     assertThat(caseService.createCaseInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
+  public void testCreateCaseInstanceByKeyWithoutTenantIdNoAuthenticatedTenants() {
+    identityService.setAuthenticatedTenantIds(null);
+
+    deployment(CMMN_FILE);
+
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+      .caseDefinitionWithoutTenantId()
+      .create();
+
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery();
+    assertThat(query.count(), is(1L));
+  }
+
+  public void testFailToCreateCaseInstanceByKeyNoAuthenticatedTenants() {
+    identityService.setAuthenticatedTenantIds(null);
+
+    deploymentForTenant(TENANT_ONE, CMMN_FILE);
+
+    try {
+      caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("no case definition deployed with key 'oneTaskCase'"));
+    }
+  }
+
+  public void testFailToCreateCaseInstanceByKeyWithTenantIdNoAuthenticatedTenants() {
+    identityService.setAuthenticatedTenantIds(null);
+
+    deploymentForTenant(TENANT_ONE, CMMN_FILE);
+
+    try {
+      caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+        .caseDefinitionTenantId(TENANT_ONE)
+        .create();
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("no case definition deployed with key 'oneTaskCase'"));
+    }
+  }
+
+  public void testFailToCreateCaseInstanceByIdNoAuthenticatedTenants() {
+    deploymentForTenant(TENANT_ONE, CMMN_FILE);
+
+    CaseDefinition caseDefinition = repositoryService
+      .createCaseDefinitionQuery()
+      .singleResult();
+
+    identityService.setAuthenticatedTenantIds(null);
+
+    try {
+      caseService.withCaseDefinition(caseDefinition.getId()).create();
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("no deployed case definition found with id"));
+    }
+  }
+
+  public void testCreateCaseInstanceByKeyWithTenantIdAuthenticatedTenant() {
+    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE));
+
+    deploymentForTenant(TENANT_ONE, CMMN_FILE);
+    deploymentForTenant(TENANT_TWO, CMMN_FILE);
+
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+      .caseDefinitionTenantId(TENANT_ONE)
+      .create();
+
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery();
+    assertThat(query.count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
+  public void testCreateCaseInstanceByIdAuthenticatedTenant() {
+    deploymentForTenant(TENANT_ONE, CMMN_FILE);
+
+    CaseDefinition caseDefinition = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult();
+
+    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE));
+
+    caseService.withCaseDefinition(caseDefinition.getId()).create();
+
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery();
+    assertThat(query.count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
+  public void testCreateCaseInstanceByKeyWithAuthenticatedTenant() {
+    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE));
+
+    deploymentForTenant(TENANT_ONE, CMMN_FILE);
+    deploymentForTenant(TENANT_TWO, CMMN_FILE);
+
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
+
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery();
+    assertThat(query.count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
+  public void testCreateCaseInstanceByKeyWithTenantIdDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthenticatedTenantIds(null);
+
+    deploymentForTenant(TENANT_ONE, CMMN_FILE);
+
+    caseService
+      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+      .caseDefinitionTenantId(TENANT_ONE)
+      .create();
+
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery();
+    assertThat(query.count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
 }

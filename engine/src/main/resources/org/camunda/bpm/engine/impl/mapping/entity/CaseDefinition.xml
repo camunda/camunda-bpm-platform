@@ -78,39 +78,43 @@
       and KEY_ = #{caseDefinitionKey}
   </select>
 
-  <select id="selectLatestCaseDefinitionByKey" parameterType="string" resultMap="caseDefinitionResultMap">
+  <select id="selectLatestCaseDefinitionByKey" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="caseDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_CASE_DEF c1
       inner join
           (select KEY_, TENANT_ID_, max(VERSION_) as MAX_VERSION
           from ${prefix}ACT_RE_CASE_DEF
           where KEY_ = #{parameter}
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
           group by TENANT_ID_, KEY_) c2
         on c1.KEY_ = c2.KEY_
     where c1.VERSION_ = c2.MAX_VERSION and 
           (c1.TENANT_ID_ = c2.TENANT_ID_ or (c1.TENANT_ID_ is null and c2.TENANT_ID_ is null))
   </select>
   
-  <select id="selectLatestCaseDefinitionByKeyWithoutTenantId" parameterType="map" resultMap="caseDefinitionResultMap">
+  <select id="selectLatestCaseDefinitionByKeyWithoutTenantId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="caseDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_CASE_DEF 
-    where KEY_ = #{caseDefinitionKey}
+    where KEY_ = #{parameter.caseDefinitionKey}
           and TENANT_ID_ is null
           and VERSION_ = (
               select max(VERSION_) 
               from ${prefix}ACT_RE_CASE_DEF 
-              where KEY_ = #{caseDefinitionKey} and TENANT_ID_ is null)
+              where KEY_ = #{parameter.caseDefinitionKey} and TENANT_ID_ is null)
   </select>
   
-  <select id="selectLatestCaseDefinitionByKeyAndTenantId" parameterType="map" resultMap="caseDefinitionResultMap">
+  <select id="selectLatestCaseDefinitionByKeyAndTenantId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="caseDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_CASE_DEF 
-    where KEY_ = #{caseDefinitionKey}
-          and TENANT_ID_ = #{tenantId}
+    where KEY_ = #{parameter.caseDefinitionKey}
+          and TENANT_ID_ = #{parameter.tenantId}
           and VERSION_ = (
               select max(VERSION_) 
               from ${prefix}ACT_RE_CASE_DEF 
-              where KEY_ = #{caseDefinitionKey} and TENANT_ID_ = #{tenantId})
+              where KEY_ = #{parameter.caseDefinitionKey} and TENANT_ID_ = #{parameter.tenantId})
+              
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+          
   </select>
 
   <select id="selectCaseDefinitionByKeyVersionAndTenantId" parameterType="map" resultMap="caseDefinitionResultMap">

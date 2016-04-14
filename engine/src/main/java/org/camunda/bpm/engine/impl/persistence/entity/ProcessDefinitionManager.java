@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
@@ -54,7 +55,7 @@ public class ProcessDefinitionManager extends AbstractManager {
    */
   public ProcessDefinitionEntity findLatestProcessDefinitionByKey(String processDefinitionKey) {
     @SuppressWarnings("unchecked")
-    List<ProcessDefinitionEntity> processDefinitions = getDbEntityManager().selectList("selectLatestProcessDefinitionByKey", processDefinitionKey);
+    List<ProcessDefinitionEntity> processDefinitions = getDbEntityManager().selectList("selectLatestProcessDefinitionByKey", configureQuery(processDefinitionKey));
 
     if (processDefinitions.isEmpty()) {
       return null;
@@ -78,9 +79,9 @@ public class ProcessDefinitionManager extends AbstractManager {
     parameters.put("tenantId", tenantId);
 
     if (tenantId == null) {
-      return (ProcessDefinitionEntity) getDbEntityManager().selectOne("selectLatestProcessDefinitionByKeyWithoutTenantId", parameters);
+      return (ProcessDefinitionEntity) getDbEntityManager().selectOne("selectLatestProcessDefinitionByKeyWithoutTenantId", configureQuery(parameters));
     } else {
-      return (ProcessDefinitionEntity) getDbEntityManager().selectOne("selectLatestProcessDefinitionByKeyAndTenantId", parameters);
+      return (ProcessDefinitionEntity) getDbEntityManager().selectOne("selectLatestProcessDefinitionByKeyAndTenantId", configureQuery(parameters));
     }
   }
 
@@ -195,4 +196,9 @@ public class ProcessDefinitionManager extends AbstractManager {
   protected void configureProcessDefinitionQuery(ProcessDefinitionQueryImpl query) {
     getAuthorizationManager().configureProcessDefinitionQuery(query);
   }
+
+  protected ListQueryParameterObject configureQuery(Object parameter) {
+    return getTenantManager().configureQuery(parameter);
+  }
+
 }

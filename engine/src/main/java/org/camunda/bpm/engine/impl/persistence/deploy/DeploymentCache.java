@@ -89,6 +89,11 @@ public class DeploymentCache {
         .getProcessDefinitionManager()
         .findLatestProcessDefinitionById(processDefinitionId);
     }
+
+    if (processDefinition != null && !commandContext.getTenantManager().isAuthenticatedTenant(processDefinition.getTenantId())) {
+      processDefinition = null;
+    }
+
     ensureNotNull("no deployed process definition found with id '" + processDefinitionId + "'", "processDefinition", processDefinition);
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;
@@ -242,6 +247,10 @@ public class DeploymentCache {
         .getCaseDefinitionManager()
         .findCaseDefinitionById(caseDefinitionId);
 
+    }
+
+    if (caseDefinition != null && !commandContext.getTenantManager().isAuthenticatedTenant(caseDefinition.getTenantId())) {
+      caseDefinition = null;
     }
 
     ensureNotNull(CaseDefinitionNotFoundException.class, "no deployed case definition found with id '" + caseDefinitionId + "'", "caseDefinition", caseDefinition);

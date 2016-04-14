@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 
@@ -52,7 +53,7 @@ public class CaseDefinitionManager extends AbstractManager {
    */
   public CaseDefinitionEntity findLatestCaseDefinitionByKey(String caseDefinitionKey) {
     @SuppressWarnings("unchecked")
-    List<CaseDefinitionEntity> caseDefinitions = getDbEntityManager().selectList("selectLatestCaseDefinitionByKey", caseDefinitionKey);
+    List<CaseDefinitionEntity> caseDefinitions = getDbEntityManager().selectList("selectLatestCaseDefinitionByKey", configureQuery(caseDefinitionKey));
 
     if (caseDefinitions.isEmpty()) {
       return null;
@@ -76,9 +77,9 @@ public class CaseDefinitionManager extends AbstractManager {
     parameters.put("tenantId", tenantId);
 
     if (tenantId == null) {
-      return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectLatestCaseDefinitionByKeyWithoutTenantId", parameters);
+      return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectLatestCaseDefinitionByKeyWithoutTenantId", configureQuery(parameters));
     } else {
-      return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectLatestCaseDefinitionByKeyAndTenantId", parameters);
+      return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectLatestCaseDefinitionByKeyAndTenantId", configureQuery(parameters));
     }
   }
 
@@ -124,4 +125,9 @@ public class CaseDefinitionManager extends AbstractManager {
   protected void configureCaseDefinitionQuery(CaseDefinitionQueryImpl query) {
     getTenantManager().configureQuery(query);
   }
+
+  protected ListQueryParameterObject configureQuery(Object parameter) {
+    return getTenantManager().configureQuery(parameter);
+  }
+
 }

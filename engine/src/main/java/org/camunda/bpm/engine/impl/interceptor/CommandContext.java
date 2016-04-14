@@ -84,6 +84,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
@@ -427,7 +428,7 @@ public class CommandContext {
   public HistoricIdentityLinkLogManager getHistoricIdentityLinkManager() {
     return getSession(HistoricIdentityLinkLogManager.class);
   }
-  
+
   public JobManager getJobManager() {
     return getSession(JobManager.class);
   }
@@ -502,6 +503,10 @@ public class CommandContext {
 
   public WritableIdentityProvider getWritableIdentityProvider() {
     return getSession(WritableIdentityProvider.class);
+  }
+
+  public TenantManager getTenantManager() {
+    return getSession(TenantManager.class);
   }
 
   // CMMN /////////////////////////////////////////////////////////////////////
