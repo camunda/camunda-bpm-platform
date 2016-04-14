@@ -1,0 +1,14 @@
+{{countCompleted}}
+
+<ul>
+  <li ng-if="countRunning == undefined"><span class="glyphicon glyphicon-refresh animate-spin"></span> running batches</li>
+  <li ng-if="countRunning == 0">No running batches</li>
+  <li ng-if="countRunning == 1">1 running batch</li>
+  <li ng-if="countRunning > 1 || isString(countRunning)">{{ countRunning }} running batches</li>
+</ul>
+<ul>
+  <li ng-if="countAll == undefined"><span class="glyphicon glyphicon-refresh animate-spin"></span> batches total</li>
+  <li ng-if="countAll == 0">No completed batches</li>
+  <li ng-if="countAll == 1">1 batch total</li>
+  <li ng-if="countAll > 1 || isString(countAll)">{{ countAll }} batches total</li>
+</ul>
