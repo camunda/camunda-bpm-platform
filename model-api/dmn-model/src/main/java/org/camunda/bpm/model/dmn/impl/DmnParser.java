@@ -28,6 +28,8 @@ import org.camunda.bpm.model.xml.instance.DomDocument;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.validation.SchemaFactory;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_ALTERNATIVE_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_11_ALTERNATIVE_SCHEMA_LOCATION;
 
 public class DmnParser extends AbstractModelParser {
 
@@ -39,12 +41,16 @@ public class DmnParser extends AbstractModelParser {
   public DmnParser() {
     this.schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA);
     addSchema(DMN11_NS, createSchema(DMN_11_SCHEMA_LOCATION, DmnParser.class.getClassLoader()));
+    addSchema(DMN11_ALTERNATIVE_NS, createSchema(DMN_11_ALTERNATIVE_SCHEMA_LOCATION, DmnParser.class.getClassLoader()));
   }
 
   @Override
   protected void configureFactory(DocumentBuilderFactory dbf) {
     dbf.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
-    dbf.setAttribute(JAXP_SCHEMA_SOURCE, ReflectUtil.getResource(DMN_11_SCHEMA_LOCATION, DmnParser.class.getClassLoader()).toString());
+    dbf.setAttribute(JAXP_SCHEMA_SOURCE, new String[] {
+      ReflectUtil.getResource(DMN_11_SCHEMA_LOCATION, DmnParser.class.getClassLoader()).toString(),
+      ReflectUtil.getResource(DMN_11_ALTERNATIVE_SCHEMA_LOCATION, DmnParser.class.getClassLoader()).toString()
+    });
     super.configureFactory(dbf);
   }
 

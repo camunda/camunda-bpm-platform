@@ -16,10 +16,19 @@ package org.camunda.bpm.model.dmn.impl;
 public final class DmnModelConstants {
 
   /** The DMN 1.1 namespace */
-  public static final String DMN11_NS = "http://www.omg.org/spec/DMN/20151101/dmn11.xsd";
+  public static final String DMN11_NS = "http://www.omg.org/spec/DMN/20151101/dmn.xsd";
+  
+  /**
+   * The old (alternative) dmn namespace.
+   */
+  public static final String DMN11_ALTERNATIVE_NS = "http://www.omg.org/spec/DMN/20151101/dmn11.xsd";
 
   /** The location of the DMN 1.1 XML schema. */
   public static final String DMN_11_SCHEMA_LOCATION = "DMN11.xsd";
+  /**
+   * 
+   */
+  public static final String DMN_11_ALTERNATIVE_SCHEMA_LOCATION = "DMN11_Alternative.xsd";
 
   /** The FEEL namespace */
   public static final String FEEL_NS = "http://www.omg.org/spec/FEEL/20140401";
