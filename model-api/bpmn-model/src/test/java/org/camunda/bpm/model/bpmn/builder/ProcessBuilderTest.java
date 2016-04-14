@@ -1770,6 +1770,44 @@ public class ProcessBuilderTest {
   }
 
   @Test
+  public void testInterruptingStartEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .endEvent()
+      .subProcess()
+        .triggerByEvent()
+        .embeddedSubProcess()
+        .startEvent("subProcessStart")
+          .interrupting(true)
+          .error()
+        .endEvent()
+      .done();
+
+    StartEvent startEvent = modelInstance.getModelElementById("subProcessStart");
+    assertThat(startEvent).isNotNull();
+    assertThat(startEvent.isInterrupting()).isTrue();
+  }
+
+  @Test
+  public void testNonInterruptingStartEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .endEvent()
+      .subProcess()
+        .triggerByEvent()
+        .embeddedSubProcess()
+        .startEvent("subProcessStart")
+          .interrupting(false)
+          .error()
+        .endEvent()
+      .done();
+
+    StartEvent startEvent = modelInstance.getModelElementById("subProcessStart");
+    assertThat(startEvent).isNotNull();
+    assertThat(startEvent.isInterrupting()).isFalse();
+  }
+
+  @Test
   public void testUserTaskCamundaFormField() {
     modelInstance = Bpmn.createProcess()
       .startEvent()

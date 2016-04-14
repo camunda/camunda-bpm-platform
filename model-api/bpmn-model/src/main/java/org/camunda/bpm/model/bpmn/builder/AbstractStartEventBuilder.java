@@ -167,4 +167,13 @@ public abstract class AbstractStartEventBuilder<B extends AbstractStartEventBuil
     return myself;
   }
 
+  /**
+   * Sets whether the start event is interrupting or not.
+   */
+  public B interrupting(boolean interrupting) {
+    element.setInterrupting(interrupting);
+
+    return myself;
+  }
+
 }
