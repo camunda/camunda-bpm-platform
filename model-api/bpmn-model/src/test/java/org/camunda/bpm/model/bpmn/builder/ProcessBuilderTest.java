@@ -1507,7 +1507,6 @@ public class ProcessBuilderTest {
       .done();
 
     ErrorEventDefinition errorEventDefinition = assertAndGetSingleEventDefinition("boundary", ErrorEventDefinition.class);
-    assertThat(errorEventDefinition).isNotNull();
     assertThat(errorEventDefinition.getError()).isNull();
   }
 
@@ -1598,7 +1597,6 @@ public class ProcessBuilderTest {
       .done();
 
     ErrorEventDefinition errorEventDefinition = assertAndGetSingleEventDefinition("subProcessStart", ErrorEventDefinition.class);
-    assertThat(errorEventDefinition).isNotNull();
     assertThat(errorEventDefinition.getError()).isNull();
   }
 
@@ -1614,7 +1612,6 @@ public class ProcessBuilderTest {
       .done();
 
     EscalationEventDefinition escalationEventDefinition = assertAndGetSingleEventDefinition("boundary", EscalationEventDefinition.class);
-    assertThat(escalationEventDefinition).isNotNull();
     assertThat(escalationEventDefinition.getEscalation()).isNull();
   }
 
@@ -1686,7 +1683,6 @@ public class ProcessBuilderTest {
         .done();
 
     EscalationEventDefinition escalationEventDefinition = assertAndGetSingleEventDefinition("subProcessStart", EscalationEventDefinition.class);
-    assertThat(escalationEventDefinition).isNotNull();
     assertThat(escalationEventDefinition.getEscalation()).isNull();
   }
 
@@ -1922,11 +1918,14 @@ public class ProcessBuilderTest {
   @SuppressWarnings("unchecked")
   protected <T extends EventDefinition> T assertAndGetSingleEventDefinition(String elementId, Class<T> eventDefinitionType) {
     BpmnModelElementInstance element = modelInstance.getModelElementById(elementId);
+    assertThat(element).isNotNull();
     Collection<EventDefinition> eventDefinitions = element.getChildElementsByType(EventDefinition.class);
     assertThat(eventDefinitions).hasSize(1);
 
     EventDefinition eventDefinition = eventDefinitions.iterator().next();
-    assertThat(eventDefinition).isInstanceOf(eventDefinitionType);
+    assertThat(eventDefinition)
+      .isNotNull()
+      .isInstanceOf(eventDefinitionType);
     return (T) eventDefinition;
   }
 
