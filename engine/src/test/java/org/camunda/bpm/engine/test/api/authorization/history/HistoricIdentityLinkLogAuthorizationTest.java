@@ -17,7 +17,7 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
   protected String deploymentId;
 
   public void setUp() throws Exception {
-    deploymentId = createDeployment(null, "org/camunda/bpm/engine/test/api/authorization/OneTaskProcess.bpmn20.xml",
+    deploymentId = createDeployment(null, "org/camunda/bpm/engine/test/api/authorization/oneTaskProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn").getId();
     super.setUp();
   }
