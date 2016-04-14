@@ -9,6 +9,7 @@
     <properties>
       <property name="authorizationEnabled">true</property>
       <property name="history">full</property>
+      <property name="tenantCheckEnabled">false</property>
     </properties>
 
     <plugins>
@@ -26,6 +27,7 @@
     <properties>
       <property name="jdbcUrl">jdbc:h2:mem:activiti2;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
       <property name="authorizationEnabled">true</property>
+      <property name="tenantCheckEnabled">false</property>
     </properties>
 
     <plugins>
@@ -43,6 +45,7 @@
     <properties>
       <property name="jdbcUrl">jdbc:h2:mem:activiti3;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
       <property name="authorizationEnabled">true</property>
+      <property name="tenantCheckEnabled">false</property>
     </properties>
 
     <plugins>
@@ -86,10 +89,10 @@
   </process-archive>
 
   <process-archive name="deployed-form-test-process">
-  	<resource>pa4/process-with-deployment-form.bpmn</resource>
-  	<resource>pa4/process-with-http-form.bpmn</resource>
-  	<resource>pa4/process-with-invalid-form.bpmn</resource>
-  	<resource>pa4/deployed-form.html</resource>
+    <resource>pa4/process-with-deployment-form.bpmn</resource>
+    <resource>pa4/process-with-http-form.bpmn</resource>
+    <resource>pa4/process-with-invalid-form.bpmn</resource>
+    <resource>pa4/deployed-form.html</resource>
   </process-archive>
 
 </process-application>
