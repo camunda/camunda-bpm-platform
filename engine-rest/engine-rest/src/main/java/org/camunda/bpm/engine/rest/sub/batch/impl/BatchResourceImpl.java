@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.rest.sub.batch.impl;
 
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -46,8 +45,7 @@ public class BatchResourceImpl implements BatchResource {
     return BatchDto.fromBatch(batch);
   }
 
-  public void deleteBatch(UriInfo uriInfo) {
-    boolean cascade = isCascade(uriInfo);
+  public void deleteBatch(boolean cascade) {
     try {
       processEngine.getManagementService()
         .deleteBatch(batchId, cascade);
@@ -55,11 +53,6 @@ public class BatchResourceImpl implements BatchResource {
     catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "Unable to delete batch with id '" + batchId + "'");
     }
-  }
-
-  protected boolean isCascade(UriInfo uriInfo) {
-    String cascade = uriInfo.getQueryParameters().getFirst("cascade");
-    return Boolean.valueOf(cascade);
   }
 
 }

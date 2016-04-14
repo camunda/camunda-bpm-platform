@@ -16,9 +16,8 @@ package org.camunda.bpm.engine.rest.sub.batch;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 
@@ -29,6 +28,6 @@ public interface BatchResource {
   BatchDto getBatch();
 
   @DELETE
-  void deleteBatch(@Context UriInfo uriInfo);
+  void deleteBatch(@QueryParam("cascade") boolean cascade);
 
 }
