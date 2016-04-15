@@ -22,14 +22,14 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
  * @author Thorben Lindhauer
  *
  */
-public class MigratingTaskInstance implements MigratingInstance {
+public class MigratingUserTaskInstance implements MigratingInstance {
 
   public static final MigrationLogger MIGRATION_LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
   protected TaskEntity userTask;
   protected MigratingActivityInstance migratingActivityInstance;
 
-  public MigratingTaskInstance(TaskEntity userTask, MigratingActivityInstance migratingActivityInstance) {
+  public MigratingUserTaskInstance(TaskEntity userTask, MigratingActivityInstance migratingActivityInstance) {
     this.userTask = userTask;
     this.migratingActivityInstance = migratingActivityInstance;
   }

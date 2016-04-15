@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.migration.instance.parser;
 
+import org.camunda.bpm.engine.impl.migration.instance.MigratingExternalTaskInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingIncident;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingJobInstance;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
@@ -32,7 +33,17 @@ public class IncidentInstanceHandler implements MigratingInstanceParseHandler<In
         owningInstance.addMigratingDependentInstance(migratingIncident);
       }
     }
+    else if (IncidentEntity.EXTERNAL_TASK_HANDLER_TYPE.equals(incident.getIncidentType())) {
+      MigratingExternalTaskInstance owningInstance = parseContext.getMigratingExternalTaskInstanceById(incident.getConfiguration());
+      parseContext.consume(incident);
+      if (owningInstance != null) {
+        MigratingIncident migratingIncident = new MigratingIncident(incident, owningInstance.getTargetScope());
+        owningInstance.addMigratingDependentInstance(migratingIncident);
+      }
+    }
 
   }
+
+
 
 }

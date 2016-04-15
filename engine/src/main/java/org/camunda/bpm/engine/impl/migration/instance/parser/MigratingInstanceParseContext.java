@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingExternalTaskInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingJobInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessElementInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.impl.migration.instance.MigratingTransitionInstanc
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingProcessInstanceValidationReportImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -52,11 +54,13 @@ public class MigratingInstanceParseContext {
 
   protected Map<String, MigratingActivityInstance> activityInstances = new HashMap<String, MigratingActivityInstance>();
   protected Map<String, MigratingJobInstance> migratingJobs = new HashMap<String, MigratingJobInstance>();
+  protected Map<String, MigratingExternalTaskInstance> migratingExternalTasks = new HashMap<String, MigratingExternalTaskInstance>();
 
   protected Collection<EventSubscriptionEntity> eventSubscriptions;
   protected Collection<IncidentEntity> incidents;
   protected Collection<JobEntity> jobs;
   protected Collection<TaskEntity> tasks;
+  protected Collection<ExternalTaskEntity> externalTasks;
   protected Collection<VariableInstanceEntity> variables;
 
   protected ProcessDefinitionImpl sourceProcessDefinition;
@@ -95,6 +99,11 @@ public class MigratingInstanceParseContext {
     return this;
   }
 
+  public MigratingInstanceParseContext externalTasks(Collection<ExternalTaskEntity> externalTasks) {
+    this.externalTasks = new HashSet<ExternalTaskEntity>(externalTasks);
+    return this;
+  }
+
   public MigratingInstanceParseContext eventSubscriptions(Collection<EventSubscriptionEntity> eventSubscriptions) {
     this.eventSubscriptions = new HashSet<EventSubscriptionEntity>(eventSubscriptions);
     return this;
@@ -122,8 +131,16 @@ public class MigratingInstanceParseContext {
     migratingJobs.put(job.getJobEntity().getId(), job);
   }
 
+  public void submit(MigratingExternalTaskInstance externalTask) {
+    migratingExternalTasks.put(externalTask.getId(), externalTask);
+  }
+
   public void consume(TaskEntity task) {
     tasks.remove(task);
+  }
+
+  public void consume(ExternalTaskEntity externalTask) {
+    externalTasks.remove(externalTask);
   }
 
   public void consume(IncidentEntity incident) {
@@ -202,6 +219,10 @@ public class MigratingInstanceParseContext {
     return migratingJobs.get(jobId);
   }
 
+  public MigratingExternalTaskInstance getMigratingExternalTaskInstanceById(String externalTaskId) {
+    return migratingExternalTasks.get(externalTaskId);
+  }
+
   public MigrationInstruction findSingleMigrationInstruction(String sourceScopeId) {
     List<MigrationInstruction> instructions = instructionsBySourceScope.get(sourceScopeId);
 
@@ -248,6 +269,7 @@ public class MigratingInstanceParseContext {
     processInstanceReport.setProcessInstanceId(migratingProcessInstance.getProcessInstanceId());
 
     ensureNoEntitiesAreLeft("tasks", tasks, processInstanceReport);
+    ensureNoEntitiesAreLeft("externalTask", externalTasks, processInstanceReport);
     ensureNoEntitiesAreLeft("incidents", incidents, processInstanceReport);
     ensureNoEntitiesAreLeft("jobs", jobs, processInstanceReport);
     ensureNoEntitiesAreLeft("event subscriptions", eventSubscriptions, processInstanceReport);

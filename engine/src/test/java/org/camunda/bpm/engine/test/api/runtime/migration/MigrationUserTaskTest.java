@@ -36,7 +36,7 @@ import org.junit.rules.RuleChain;
  * @author Thorben Lindhauer
  *
  */
-public class MigrationSameScopesTest {
+public class MigrationUserTaskTest {
 
   protected ProcessEngineRule rule = new PluggableProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);

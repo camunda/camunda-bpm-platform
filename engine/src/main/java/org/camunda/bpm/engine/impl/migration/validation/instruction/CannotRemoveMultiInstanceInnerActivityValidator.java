@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
  *
  * @author Thorben Lindhauer
  */
-public class CannotRemoveMultiInstanceInnerActivityValidator  implements MigrationInstructionValidator {
+public class CannotRemoveMultiInstanceInnerActivityValidator implements MigrationInstructionValidator {
 
   @Override
   public void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions,

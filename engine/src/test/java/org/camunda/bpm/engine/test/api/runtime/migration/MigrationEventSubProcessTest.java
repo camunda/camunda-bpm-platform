@@ -671,7 +671,7 @@ public class MigrationEventSubProcessTest {
       // then
       assertThat(e.getValidationReport())
       .hasInstructionFailures("eventSubProcessStart",
-        "Activities are of different type"
+        "Events are not of the same type (signalStartEvent != startTimerEvent)"
       );
     }
   }

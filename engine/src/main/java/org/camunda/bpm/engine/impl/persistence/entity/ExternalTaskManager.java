@@ -48,8 +48,14 @@ public class ExternalTaskManager extends AbstractManager {
     getDbEntityManager().delete(externalTask);
   }
 
+  @SuppressWarnings("unchecked")
   public List<ExternalTaskEntity> findExternalTasksByExecutionId(String id) {
     return getDbEntityManager().selectList("selectExternalTasksByExecutionId", id);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<ExternalTaskEntity> findExternalTasksByProcessInstanceId(String processInstanceId) {
+    return getDbEntityManager().selectList("selectExternalTasksByExecutionId", processInstanceId);
   }
 
   public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<String> topics, int maxResults, boolean usePriority) {
@@ -121,4 +127,5 @@ public class ExternalTaskManager extends AbstractManager {
   protected void configureAuthorizationCheck(ListQueryParameterObject parameter) {
     getAuthorizationManager().configureExternalTaskFetch(parameter);
   }
+
 }

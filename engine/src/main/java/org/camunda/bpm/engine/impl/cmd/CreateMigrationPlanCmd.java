@@ -101,22 +101,13 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
     List<MigrationInstructionValidator> migrationInstructionValidators = new ArrayList<MigrationInstructionValidator>(processEngineConfiguration.getMigrationInstructionValidators());
     migrationInstructionValidators.addAll(getAdditionalValidatorsForGeneration());
 
-    List<MigrationInstruction> validInstructions = new ArrayList<MigrationInstruction>();
-    for (ValidatingMigrationInstruction generatedInstruction : generatedInstructions.getInstructions()) {
-      if (isValidInstruction(generatedInstruction, generatedInstructions, migrationInstructionValidators)) {
-        validInstructions.add(generatedInstruction.toMigrationInstruction());
-      }
-    }
+    generatedInstructions.filterWith(migrationInstructionValidators);
 
-    return validInstructions;
+    return generatedInstructions.asMigrationInstructions();
   }
 
   protected List<MigrationInstructionValidator> getAdditionalValidatorsForGeneration() {
     return Collections.<MigrationInstructionValidator>singletonList(new SameEventScopeInstructionValidator());
-  }
-
-  protected boolean isValidInstruction(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, List<MigrationInstructionValidator> migrationInstructionValidators) {
-    return !validateInstruction(instruction, instructions, migrationInstructionValidators).hasFailures();
   }
 
   protected void validateMigrationPlan(CommandContext commandContext, MigrationPlanImpl migrationPlan, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {

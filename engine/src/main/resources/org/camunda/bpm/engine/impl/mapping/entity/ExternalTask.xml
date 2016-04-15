@@ -129,6 +129,10 @@
     select * from ${prefix}ACT_RU_EXT_TASK where EXECUTION_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
   
+  <select id="selectExternalTasksByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="externalTaskResultMap">
+    select * from ${prefix}ACT_RU_EXT_TASK where PROC_INST_ID_ = #{parameter, jdbcType=VARCHAR}
+  </select>
+  
   <select id="selectExternalTasksForTopics" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="externalTaskResultMap">
     <bind name="orderingProperties" value="parameter.orderingProperties" />
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>

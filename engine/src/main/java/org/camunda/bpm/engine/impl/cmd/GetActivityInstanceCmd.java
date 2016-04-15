@@ -363,7 +363,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
 
     // initialize parent/child sets
     if (processInstance != null) {
-      processInstance.restoreProcessInstance(executions, null, null, null, null, null);
+      processInstance.restoreProcessInstance(executions, null, null, null, null, null, null);
     }
 
     return executions;

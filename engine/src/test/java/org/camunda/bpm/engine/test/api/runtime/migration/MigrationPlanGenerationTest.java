@@ -22,9 +22,11 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.CallActivityModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.EventBasedGatewayModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ExternalTaskModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MessageReceiveModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ServiceTaskModels;
 import org.camunda.bpm.engine.test.util.MigrationPlanAssert;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -711,6 +713,44 @@ public class MigrationPlanGenerationTest {
       .hasInstructions(
         migrate("subProcess").to("subProcess"));
   }
+
+  @Test
+  public void testMapExternalServiceTask() {
+    BpmnModelInstance sourceModel = ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS;
+    BpmnModelInstance targetModel = ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS;
+
+    assertGeneratedMigrationPlan(sourceModel, targetModel)
+      .hasInstructions(
+        migrate("externalTask").to("externalTask"));
+  }
+
+  @Test
+  public void testMapExternalServiceToDifferentType() {
+    BpmnModelInstance sourceModel = ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS;
+    BpmnModelInstance targetModel = ProcessModels.newModel()
+      .startEvent()
+      .sendTask("externalTask")
+        .camundaType("external")
+        .camundaTopic("foo")
+      .endEvent()
+      .done();
+
+    assertGeneratedMigrationPlan(sourceModel, targetModel)
+      .hasInstructions(
+        migrate("externalTask").to("externalTask"));
+  }
+
+  @Test
+  public void testNotMapExternalToClassDelegateServiceTask() {
+    BpmnModelInstance sourceModel = ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS;
+    BpmnModelInstance targetModel = modify(ServiceTaskModels.oneClassDelegateServiceTask("foo.Bar"))
+      .changeElementId("serviceTask", "externalTask");
+
+    assertGeneratedMigrationPlan(sourceModel, targetModel)
+      .hasEmptyInstructions();
+  }
+
+  // TODO: test mit allen service-task-like tasks, die das hier unterstützen
 
   // helper
 

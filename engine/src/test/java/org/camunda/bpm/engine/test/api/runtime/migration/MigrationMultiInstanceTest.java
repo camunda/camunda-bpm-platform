@@ -406,7 +406,8 @@ public class MigrationMultiInstanceTest {
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasInstructionFailures(miBodyOf("userTask"),
-          "Source and target activity must be of the same multi-instance type (sequential or parallel)"
+          "Activities have incompatible behavior for migration (ParallelMultiInstanceActivityBehavior is not "
+          + "compatible with SequentialMultiInstanceActivityBehavior)"
         );
     }
   }

@@ -210,9 +210,9 @@ import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMul
 import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMultiInstanceInnerActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotRemoveMultiInstanceInnerActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.MultiInstanceTypeValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.OnlyOnceMappedActivityInstructionValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.SameTypeInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.SameBehaviorInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.SameEventTypeValidator;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
@@ -641,9 +641,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initDeploymentRegistration();
     initResourceAuthorizationProvider();
     initMetrics();
+    initMigrationInstructionValidators();
     initMigrationActivityMatcher();
     initMigrationInstructionGenerator();
-    initMigrationInstructionValidators();
     initMigratingActivityInstanceValidators();
     initMigratingTransitionInstanceValidators();
 
@@ -1118,7 +1118,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (customPostMigrationActivityValidators != null) {
       migrationActivityValidators.addAll(customPostMigrationActivityValidators);
     }
-    migrationInstructionGenerator.migrationActivityValidators(migrationActivityValidators);
+    migrationInstructionGenerator = migrationInstructionGenerator
+        .migrationActivityValidators(migrationActivityValidators)
+        .migrationInstructionValidators(migrationInstructionValidators);
   }
 
   protected void initMigrationInstructionValidators() {
@@ -3189,12 +3191,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public List<MigrationInstructionValidator> getDefaultMigrationInstructionValidators() {
     List<MigrationInstructionValidator> migrationInstructionValidators  = new ArrayList<MigrationInstructionValidator>();
-    migrationInstructionValidators.add(new SameTypeInstructionValidator());
+    migrationInstructionValidators.add(new SameBehaviorInstructionValidator());
+    migrationInstructionValidators.add(new SameEventTypeValidator());
     migrationInstructionValidators.add(new OnlyOnceMappedActivityInstructionValidator());
     migrationInstructionValidators.add(new CannotAddMultiInstanceBodyValidator());
     migrationInstructionValidators.add(new CannotAddMultiInstanceInnerActivityValidator());
     migrationInstructionValidators.add(new CannotRemoveMultiInstanceInnerActivityValidator());
-    migrationInstructionValidators.add(new MultiInstanceTypeValidator());
     return migrationInstructionValidators;
   }
 

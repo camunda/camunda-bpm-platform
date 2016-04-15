@@ -239,7 +239,7 @@ public class MigrationPlanCreationTest {
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasInstructionFailures("userTask",
-          "Activities are of different type which is not supported by the migration (userTask != receiveTask)"
+          "Activities have incompatible behavior for migration (UserTaskActivityBehavior is not compatible with ReceiveTaskActivityBehavior)"
         );
     }
   }
@@ -259,7 +259,8 @@ public class MigrationPlanCreationTest {
       fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasInstructionFailures("userTask", "Activities are of different type which is not supported by the migration (userTask != subProcess)");
+        .hasInstructionFailures("userTask", "Activities have incompatible behavior for migration (UserTaskActivityBehavior is not "
+            + "compatible with SubProcessActivityBehavior)");
     }
   }
 
@@ -285,7 +286,7 @@ public class MigrationPlanCreationTest {
       fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasInstructionFailures("boundary", "Activities are of different type which is not supported by the migration (boundaryMessage != boundarySignal)");
+        .hasInstructionFailures("boundary", "Events are not of the same type (boundaryMessage != boundarySignal)");
     }
   }
 

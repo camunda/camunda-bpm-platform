@@ -16,6 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.migration.validation.activity.MigrationActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMultiInstanceInnerActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotRemoveMultiInstanceInnerActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstruction;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstructionImpl;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstructions;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -28,6 +32,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 public class DefaultMigrationInstructionGenerator implements MigrationInstructionGenerator {
 
   protected List<MigrationActivityValidator> migrationActivityValidators = new ArrayList<MigrationActivityValidator>();
+  protected List<MigrationInstructionValidator> migrationInstructionValidators = new ArrayList<MigrationInstructionValidator>();
   protected MigrationActivityMatcher migrationActivityMatcher;
 
   public DefaultMigrationInstructionGenerator(MigrationActivityMatcher migrationActivityMatcher) {
@@ -36,6 +41,21 @@ public class DefaultMigrationInstructionGenerator implements MigrationInstructio
 
   public MigrationInstructionGenerator migrationActivityValidators(List<MigrationActivityValidator> migrationActivityValidators) {
     this.migrationActivityValidators = migrationActivityValidators;
+    return this;
+  }
+
+  public MigrationInstructionGenerator migrationInstructionValidators(List<MigrationInstructionValidator> migrationInstructionValidators) {
+
+    this.migrationInstructionValidators = new ArrayList<MigrationInstructionValidator>();
+    for (MigrationInstructionValidator validator : migrationInstructionValidators) {
+      // ignore the following two validators during generation. Enables multi-instance bodies to be mapped.
+      // this procedure is fine because these validators are again applied after all instructions have been generated
+      if (!(validator instanceof CannotAddMultiInstanceInnerActivityValidator
+          || validator instanceof CannotRemoveMultiInstanceInnerActivityValidator)) {
+        this.migrationInstructionValidators.add(validator);
+      }
+    }
+
     return this;
   }
 
@@ -49,13 +69,30 @@ public class DefaultMigrationInstructionGenerator implements MigrationInstructio
       ScopeImpl targetScope,
       ProcessDefinitionImpl sourceProcessDefinition,
       ProcessDefinitionImpl targetProcessDefinition,
-      ValidatingMigrationInstructions migrationInstructions) {
+      ValidatingMigrationInstructions existingInstructions) {
+
+    List<ValidatingMigrationInstruction> generatedInstructions = new ArrayList<ValidatingMigrationInstruction>();
+
     for (ActivityImpl sourceActivity : sourceScope.getActivities()) {
       for (ActivityImpl targetActivity : targetScope.getActivities()) {
         if (isValidActivity(sourceActivity) && isValidActivity(targetActivity) && migrationActivityMatcher.matchActivities(sourceActivity, targetActivity)) {
-          migrationInstructions.addInstruction(new ValidatingMigrationInstructionImpl(sourceActivity, targetActivity));
-          generate(sourceActivity, targetActivity, sourceProcessDefinition, targetProcessDefinition, migrationInstructions);
+          ValidatingMigrationInstruction generatedInstruction = new ValidatingMigrationInstructionImpl(sourceActivity, targetActivity);
+          generatedInstructions.add(generatedInstruction);
+          existingInstructions.addInstruction(generatedInstruction);
         }
+      }
+    }
+
+    existingInstructions.filterWith(migrationInstructionValidators);
+
+    for (ValidatingMigrationInstruction generatedInstruction : generatedInstructions) {
+      if (existingInstructions.contains(generatedInstruction)) {
+        generate(
+            generatedInstruction.getSourceActivity(),
+            generatedInstruction.getTargetActivity(),
+            sourceProcessDefinition,
+            targetProcessDefinition,
+            existingInstructions);
       }
     }
   }

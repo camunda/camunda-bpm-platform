@@ -1251,7 +1251,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       }
     }
 
-    processInstance.restoreProcessInstance(executions, null, null, null, null, null);
+    processInstance.restoreProcessInstance(executions, null, null, null, null, null, null);
   }
 
   /**
@@ -1275,7 +1275,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       Collection<VariableInstanceEntity> variables,
       Collection<TaskEntity> tasks,
       Collection<JobEntity> jobs,
-      Collection<IncidentEntity> incidents) {
+      Collection<IncidentEntity> incidents,
+      Collection<ExternalTaskEntity> externalTasks) {
 
     if(!isProcessInstanceExecution()) {
       throw LOG.restoreProcessInstanceException(this);
@@ -1357,6 +1358,14 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       for (IncidentEntity incident : incidents) {
         ExecutionEntity execution = executionsMap.get(incident.getExecutionId());
         incident.setExecution(execution);
+      }
+    }
+
+    if (externalTasks != null) {
+      for (ExternalTaskEntity externalTask : externalTasks) {
+        ExecutionEntity execution = executionsMap.get(externalTask.getExecutionId());
+        externalTask.setExecution(execution);
+        execution.addExternalTask(externalTask);
       }
     }
   }

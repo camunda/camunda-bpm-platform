@@ -18,7 +18,7 @@ import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
-import org.camunda.bpm.engine.impl.migration.instance.MigratingTaskInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingUserTaskInstance;
 import org.camunda.bpm.engine.impl.migration.instance.parser.MigratingInstanceParseContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -75,7 +75,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Mi
     ExecutionEntity execution = migratingInstance.resolveRepresentativeExecution();
 
     for (TaskEntity task : execution.getTasks()) {
-      migratingInstance.addMigratingDependentInstance(new MigratingTaskInstance(task, migratingInstance));
+      migratingInstance.addMigratingDependentInstance(new MigratingUserTaskInstance(task, migratingInstance));
       parseContext.consume(task);
 
       Collection<VariableInstanceEntity> variables = task.getVariablesInternal();
