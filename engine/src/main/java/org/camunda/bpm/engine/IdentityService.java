@@ -186,16 +186,6 @@ public interface IdentityService {
   void setAuthentication(String userId, List<String> groups, List<String> tenantIds);
 
   /**
-   * Sets the given tenant ids to the current authentication for this thread.
-   * All service method (from any service) invocations done by the same
-   * thread will have access to this authentication. Should be followed by
-   * a call to {@link #clearAuthentication()} once the interaction is terminated.
-   *
-   *  @param tenantIds the tenants of the current user.
-   */
-  void setAuthenticatedTenantIds(List<String> tenantIds);
-
-  /**
    * @param currentAuthentication
    */
   public void setAuthentication(Authentication currentAuthentication);

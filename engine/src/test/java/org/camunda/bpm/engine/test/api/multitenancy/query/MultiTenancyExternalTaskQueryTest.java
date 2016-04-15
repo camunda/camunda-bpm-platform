@@ -118,14 +118,14 @@ public class MultiTenancyExternalTaskQueryTest extends PluggableProcessEngineTes
   }
 
   public void testQueryNoAuthenticatedTenants() {
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
     assertThat(query.count(), is(0L));
   }
 
   public void testQueryAuthenticatedTenant() {
-    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
 
@@ -136,7 +136,7 @@ public class MultiTenancyExternalTaskQueryTest extends PluggableProcessEngineTes
   }
 
   public void testQueryAuthenticatedTenants() {
-    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE, TENANT_TWO));
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
     ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
 
@@ -147,7 +147,7 @@ public class MultiTenancyExternalTaskQueryTest extends PluggableProcessEngineTes
 
   public void testQueryDisabledTenantCheck() {
     processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
     assertThat(query.count(), is(2L));

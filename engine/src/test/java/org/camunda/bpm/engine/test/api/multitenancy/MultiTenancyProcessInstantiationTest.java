@@ -233,7 +233,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
   }
 
   public void testStartProcessInstanceByKeyWithoutTenantIdNoAuthenticatedTenants() {
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     deployment(PROCESS);
 
@@ -246,7 +246,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
   }
 
   public void testFailToStartProcessInstanceByKeyNoAuthenticatedTenants() {
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     deploymentForTenant(TENANT_ONE, PROCESS);
 
@@ -261,7 +261,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
   }
 
   public void testFailToStartProcessInstanceByKeyWithTenantIdNoAuthenticatedTenants() {
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     deploymentForTenant(TENANT_ONE, PROCESS);
 
@@ -283,7 +283,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
       .createProcessDefinitionQuery()
       .singleResult();
 
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     try {
       runtimeService.createProcessInstanceById(processDefinition.getId())
@@ -296,7 +296,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
   }
 
   public void testStartProcessInstanceByKeyWithTenantIdAuthenticatedTenant() {
-    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     deploymentForTenant(TENANT_ONE, PROCESS);
     deploymentForTenant(TENANT_TWO, PROCESS);
@@ -317,7 +317,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
         .createProcessDefinitionQuery()
         .singleResult();
 
-    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     runtimeService.createProcessInstanceById(processDefinition.getId())
       .execute();
@@ -328,7 +328,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
   }
 
   public void testStartProcessInstanceByKeyWithAuthenticatedTenant() {
-    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     deploymentForTenant(TENANT_ONE, PROCESS);
     deploymentForTenant(TENANT_TWO, PROCESS);
@@ -342,7 +342,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
   public void testStartProcessInstanceByKeyWithTenantIdDisabledTenantCheck() {
     processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     deploymentForTenant(TENANT_ONE, PROCESS);
 

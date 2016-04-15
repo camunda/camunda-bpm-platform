@@ -146,16 +146,6 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
     setAuthentication(new Authentication(userId, groups, tenantIds));
   }
 
-  public void setAuthenticatedTenantIds(List<String> tenantIds) {
-    Authentication currentAuthentication = getCurrentAuthentication();
-    if (currentAuthentication == null) {
-      currentAuthentication = new Authentication();
-    }
-
-    Authentication newAuthentication = new Authentication(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), tenantIds);
-    setAuthentication(newAuthentication);
-  }
-
   public void clearAuthentication() {
     currentAuthentication.remove();
   }

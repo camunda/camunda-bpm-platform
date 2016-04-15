@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.test.api.multitenancy.query.cmmn.history;
+package org.camunda.bpm.engine.test.api.multitenancy.cmmn.query.history;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -19,12 +19,12 @@ import static org.junit.Assert.assertThat;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.history.HistoricCaseInstance;
-import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
+import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseInstanceBuilder;
 
-public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyHistoricCaseActivityInstanceQueryTest extends PluggableProcessEngineTestCase {
 
   protected final static String CMMN_FILE = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
 
@@ -40,38 +40,38 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
     createCaseInstance(TENANT_TWO);
   }
 
-  public void testQueryNoTenantIdSet() {
-    HistoricCaseInstanceQuery query = historyService
-        .createHistoricCaseInstanceQuery();
+  public void testQueryWithoutTenantId() {
+    HistoricCaseActivityInstanceQuery query = historyService.
+        createHistoricCaseActivityInstanceQuery();
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantId() {
-    HistoricCaseInstanceQuery query = historyService
-        .createHistoricCaseInstanceQuery()
+    HistoricCaseActivityInstanceQuery query = historyService
+        .createHistoricCaseActivityInstanceQuery()
         .tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
     query = historyService
-        .createHistoricCaseInstanceQuery()
+        .createHistoricCaseActivityInstanceQuery()
         .tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    HistoricCaseInstanceQuery query = historyService
-        .createHistoricCaseInstanceQuery()
+    HistoricCaseActivityInstanceQuery query = historyService
+        .createHistoricCaseActivityInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    HistoricCaseInstanceQuery query = historyService
-        .createHistoricCaseInstanceQuery()
+    HistoricCaseActivityInstanceQuery query = historyService
+        .createHistoricCaseActivityInstanceQuery()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -79,7 +79,7 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
 
   public void testFailQueryByTenantIdNull() {
     try {
-      historyService.createHistoricCaseInstanceQuery()
+      historyService.createHistoricCaseActivityInstanceQuery()
         .tenantIdIn((String) null);
 
       fail("expected exception");
@@ -88,29 +88,25 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
   }
 
   public void testQuerySortingAsc() {
-    // exclude historic case instances without tenant id because of database-specific ordering
-    List<HistoricCaseInstance> historicCaseInstances = historyService.createHistoricCaseInstanceQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
+    List<HistoricCaseActivityInstance> historicCaseActivityInstances = historyService.createHistoricCaseActivityInstanceQuery()
         .orderByTenantId()
         .asc()
         .list();
 
-    assertThat(historicCaseInstances.size(), is(2));
-    assertThat(historicCaseInstances.get(0).getTenantId(), is(TENANT_ONE));
-    assertThat(historicCaseInstances.get(1).getTenantId(), is(TENANT_TWO));
+    assertThat(historicCaseActivityInstances.size(), is(2));
+    assertThat(historicCaseActivityInstances.get(0).getTenantId(), is(TENANT_ONE));
+    assertThat(historicCaseActivityInstances.get(1).getTenantId(), is(TENANT_TWO));
   }
 
   public void testQuerySortingDesc() {
-    // exclude historic case instances without tenant id because of database-specific ordering
-    List<HistoricCaseInstance> historicCaseInstances = historyService.createHistoricCaseInstanceQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
+    List<HistoricCaseActivityInstance> historicCaseActivityInstances = historyService.createHistoricCaseActivityInstanceQuery()
         .orderByTenantId()
         .desc()
         .list();
 
-    assertThat(historicCaseInstances.size(), is(2));
-    assertThat(historicCaseInstances.get(0).getTenantId(), is(TENANT_TWO));
-    assertThat(historicCaseInstances.get(1).getTenantId(), is(TENANT_ONE));
+    assertThat(historicCaseActivityInstances.size(), is(2));
+    assertThat(historicCaseActivityInstances.get(0).getTenantId(), is(TENANT_TWO));
+    assertThat(historicCaseActivityInstances.get(1).getTenantId(), is(TENANT_ONE));
   }
 
   protected void createCaseInstance(String tenantId) {

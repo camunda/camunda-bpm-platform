@@ -126,7 +126,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
   }
 
   public void testCreateCaseInstanceByKeyWithoutTenantIdNoAuthenticatedTenants() {
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     deployment(CMMN_FILE);
 
@@ -139,7 +139,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
   }
 
   public void testFailToCreateCaseInstanceByKeyNoAuthenticatedTenants() {
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     deploymentForTenant(TENANT_ONE, CMMN_FILE);
 
@@ -153,7 +153,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
   }
 
   public void testFailToCreateCaseInstanceByKeyWithTenantIdNoAuthenticatedTenants() {
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     deploymentForTenant(TENANT_ONE, CMMN_FILE);
 
@@ -175,7 +175,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
       .createCaseDefinitionQuery()
       .singleResult();
 
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     try {
       caseService.withCaseDefinition(caseDefinition.getId()).create();
@@ -187,7 +187,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
   }
 
   public void testCreateCaseInstanceByKeyWithTenantIdAuthenticatedTenant() {
-    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     deploymentForTenant(TENANT_ONE, CMMN_FILE);
     deploymentForTenant(TENANT_TWO, CMMN_FILE);
@@ -208,7 +208,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
         .createCaseDefinitionQuery()
         .singleResult();
 
-    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     caseService.withCaseDefinition(caseDefinition.getId()).create();
 
@@ -218,7 +218,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
   }
 
   public void testCreateCaseInstanceByKeyWithAuthenticatedTenant() {
-    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     deploymentForTenant(TENANT_ONE, CMMN_FILE);
     deploymentForTenant(TENANT_TWO, CMMN_FILE);
@@ -232,7 +232,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
 
   public void testCreateCaseInstanceByKeyWithTenantIdDisabledTenantCheck() {
     processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     deploymentForTenant(TENANT_ONE, CMMN_FILE);
 

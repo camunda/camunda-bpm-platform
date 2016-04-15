@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.test.api.multitenancy.query.cmmn;
+package org.camunda.bpm.engine.test.api.multitenancy.cmmn.query;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -128,14 +128,14 @@ public class MultiTenancyCaseExecutionQueryTest extends PluggableProcessEngineTe
   }
 
   public void testQueryNoAuthenticatedTenants() {
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     CaseExecutionQuery query = caseService.createCaseExecutionQuery();
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryAuthenticatedTenant() {
-    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     CaseExecutionQuery query = caseService.createCaseExecutionQuery();
 
@@ -146,7 +146,7 @@ public class MultiTenancyCaseExecutionQueryTest extends PluggableProcessEngineTe
   }
 
   public void testQueryAuthenticatedTenants() {
-    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE, TENANT_TWO));
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
     CaseExecutionQuery query = caseService.createCaseExecutionQuery();
 
@@ -158,7 +158,7 @@ public class MultiTenancyCaseExecutionQueryTest extends PluggableProcessEngineTe
 
   public void testQueryDisabledTenantCheck() {
     processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     CaseExecutionQuery query = caseService.createCaseExecutionQuery();
     assertThat(query.count(), is(6L));

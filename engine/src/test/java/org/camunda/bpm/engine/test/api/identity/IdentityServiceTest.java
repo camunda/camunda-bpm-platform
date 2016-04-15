@@ -567,7 +567,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
 
   public void testSetAuthenticatedTenantIdToGenericId() {
     try {
-      identityService.setAuthenticatedTenantIds(Arrays.asList("*"));
+      identityService.setAuthentication(null, null, Arrays.asList("*"));
 
       fail("exception expected");
     } catch (ProcessEngineException e) {
@@ -612,33 +612,6 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("john", currentAuthentication.getUserId());
     assertEquals(groups, currentAuthentication.getGroupIds());
     assertEquals(tenants, currentAuthentication.getTenantIds());
-  }
-
-  public void testSetAuthenticatedTenants() {
-    List<String> tenants = Arrays.asList("tenant1", "tenant2");
-
-    identityService.setAuthenticatedTenantIds(tenants);
-
-    Authentication currentAuthentication = identityService.getCurrentAuthentication();
-
-    assertNotNull(currentAuthentication);
-    assertEquals(tenants, currentAuthentication.getTenantIds());
-    assertNull(currentAuthentication.getUserId());
-    assertNull(currentAuthentication.getGroupIds());
-  }
-
-  public void testSetAuthenticatedTenantsToUser() {
-    List<String> tenants = Arrays.asList("tenant1", "tenant2");
-
-    identityService.setAuthenticatedUserId("john");
-    identityService.setAuthenticatedTenantIds(tenants);
-
-    Authentication currentAuthentication = identityService.getCurrentAuthentication();
-
-    assertNotNull(currentAuthentication);
-    assertEquals("john", currentAuthentication.getUserId());
-    assertEquals(tenants, currentAuthentication.getTenantIds());
-    assertNull(currentAuthentication.getGroupIds());
   }
 
   public void testAuthentication() {

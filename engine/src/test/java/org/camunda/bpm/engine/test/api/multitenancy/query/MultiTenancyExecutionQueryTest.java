@@ -130,14 +130,14 @@ public class MultiTenancyExecutionQueryTest extends PluggableProcessEngineTestCa
   }
 
   public void testQueryNoAuthenticatedTenants() {
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     ExecutionQuery query = runtimeService.createExecutionQuery();
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryAuthenticatedTenant() {
-    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     ExecutionQuery query = runtimeService.createExecutionQuery();
 
@@ -148,7 +148,7 @@ public class MultiTenancyExecutionQueryTest extends PluggableProcessEngineTestCa
   }
 
   public void testQueryAuthenticatedTenants() {
-    identityService.setAuthenticatedTenantIds(Arrays.asList(TENANT_ONE, TENANT_TWO));
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
     ExecutionQuery query = runtimeService.createExecutionQuery();
 
@@ -160,7 +160,7 @@ public class MultiTenancyExecutionQueryTest extends PluggableProcessEngineTestCa
 
   public void testQueryDisabledTenantCheck() {
     processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthenticatedTenantIds(null);
+    identityService.setAuthentication("user", null, null);
 
     ExecutionQuery query = runtimeService.createExecutionQuery();
     assertThat(query.count(), is(3L));
