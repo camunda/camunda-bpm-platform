@@ -237,7 +237,7 @@ public class MigrationCallActivityTest {
   }
 
   @Test
-  public void testCallCmmnProcessParallelMultiInstance() {
+  public void testCallCmmnCaseParallelMultiInstance() {
     // given
     BpmnModelInstance model = modify(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"))
       .activityBuilder("callActivity")
@@ -355,7 +355,7 @@ public class MigrationCallActivityTest {
   }
 
   @Test
-  public void testCallCmmnProcessParallelMultiInstanceRemoveMiBody() {
+  public void testCallCmmnCaseParallelMultiInstanceRemoveMiBody() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(
         modify(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"))
@@ -364,7 +364,7 @@ public class MigrationCallActivityTest {
           .parallel()
           .cardinality("1")
           .done());
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"));
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -471,7 +471,7 @@ public class MigrationCallActivityTest {
   }
 
   @Test
-  public void testCallCmmnProcessSequentialMultiInstanceRemoveMiBody() {
+  public void testCallCmmnCaseSequentialMultiInstanceRemoveMiBody() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(
         modify(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"))
@@ -480,7 +480,7 @@ public class MigrationCallActivityTest {
           .sequential()
           .cardinality("1")
           .done());
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"));
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
