@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.webapp.plugin.resource.AbstractAppPluginResource;
 
 /**
- * Base class for implementing a pluigin REST resource.
+ * Base class for implementing a plugin REST resource.
  *
  * @author Daniel Meyer
  *
@@ -61,7 +61,7 @@ public class AbstractCockpitPluginResource extends AbstractAppPluginResource<Coc
   // authorization //////////////////////////////////////////////////////////////
 
   /**
-   * Return <code>true</code> iff authorization is enabled.
+   * Return <code>true</code> if authorization is enabled.
    */
   protected boolean isAuthorizationEnabled() {
     return getProcessEngine().getProcessEngineConfiguration().isAuthorizationEnabled();
