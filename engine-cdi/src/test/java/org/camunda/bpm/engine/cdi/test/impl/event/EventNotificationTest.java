@@ -16,8 +16,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.camunda.bpm.engine.cdi.BusinessProcessEvent;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -140,6 +143,31 @@ public class EventNotificationTest extends CdiProcessEngineTestCase {
     // 2: user task (start + task create event)
     // = 19
     assertThat(listenerBean.getEventsReceived().size(), is(19));
+  }
+
+  @Test
+  @Deployment
+  public void testMultiInstanceEventsAfterExternalTrigger() {
+
+    runtimeService.startProcessInstanceByKey("process");
+
+    TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
+    listenerBean.reset();
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertEquals(3, tasks.size());
+
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    // 6: three user task instances (complete + end)
+    // 1: one mi body instance (end)
+    // 1: one sequence flow instance (take)
+    // 2: one end event instance (start + end)
+    // = 5
+    Set<BusinessProcessEvent> eventsReceived = listenerBean.getEventsReceived();
+    assertThat(eventsReceived.size(), is(10));
   }
 
 }
