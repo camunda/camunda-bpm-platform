@@ -17,6 +17,8 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
@@ -139,10 +141,7 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     deploymentForTenant(TENANT_ONE, DMN_FILE);
     deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
 
-    CaseInstance caseInstance = caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("status", "gold").create();
-
-    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(DECISION_TASK_ID).singleResult();
-    caseService.withCaseExecution(caseExecution.getId()).manualStart();
+    CaseInstance caseInstance = createCaseInstance(CASE_DEFINITION_KEY);
 
     assertThat((String)caseService.getVariable(caseInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
   }
@@ -152,10 +151,7 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     deployment(DMN_FILE);
     deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
 
-    CaseInstance caseInstance = caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("status", "gold").create();
-
-    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(DECISION_TASK_ID).singleResult();
-    caseService.withCaseExecution(caseExecution.getId()).manualStart();
+    CaseInstance caseInstance = createCaseInstance(CASE_DEFINITION_KEY);
 
     assertThat((String)caseService.getVariable(caseInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
   }
@@ -165,10 +161,48 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     deploymentForTenant(TENANT_ONE, DMN_FILE);
     deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
 
-    CaseInstance caseInstance = caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("status", "gold").create();
+    CaseInstance caseInstance = createCaseInstance(CASE_DEFINITION_KEY);
 
-    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(DECISION_TASK_ID).singleResult();
-    caseService.withCaseExecution(caseExecution.getId()).manualStart();
+    assertThat((String)caseService.getVariable(caseInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+  }
+
+  public void testFailToEvaluateDecisionNoAuthenticatedTenants() {
+
+    deployment(CMMN_CONST);
+    deploymentForTenant(TENANT_ONE, DMN_FILE);
+
+    identityService.setAuthentication("user", null, null);
+
+    try {
+      createCaseInstance(CASE_DEFINITION_KEY);
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("no decision definition deployed with key 'decision'"));
+    }
+  }
+
+  public void testEvaluateDecisionWithAuthenticatedTenant() {
+
+    deployment(CMMN_CONST);
+    deploymentForTenant(TENANT_ONE, DMN_FILE);
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    CaseInstance caseInstance = createCaseInstance(CASE_DEFINITION_KEY);
+
+    assertThat((String)caseService.getVariable(caseInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+  }
+
+  public void testEvaluateDecisionDisabledTenantCheck() {
+
+    deployment(CMMN_CONST);
+    deploymentForTenant(TENANT_ONE, DMN_FILE);
+
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    CaseInstance caseInstance = createCaseInstance(CASE_DEFINITION_KEY);
 
     assertThat((String)caseService.getVariable(caseInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
   }
@@ -177,6 +211,14 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     CaseInstance caseInstance = caseService.withCaseDefinitionByKey(caseDefinitionKey).caseDefinitionTenantId(tenantId).create();
 
     CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(DECISION_TASK_ID).tenantIdIn(tenantId).singleResult();
+    caseService.withCaseExecution(caseExecution.getId()).setVariable("status", "gold").manualStart();
+    return caseInstance;
+  }
+
+  protected CaseInstance createCaseInstance(String caseDefinitionKey) {
+    CaseInstance caseInstance = caseService.withCaseDefinitionByKey(caseDefinitionKey).create();
+
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(DECISION_TASK_ID).singleResult();
     caseService.withCaseExecution(caseExecution.getId()).setVariable("status", "gold").manualStart();
     return caseInstance;
   }

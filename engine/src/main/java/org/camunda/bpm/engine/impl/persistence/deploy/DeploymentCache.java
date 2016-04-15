@@ -432,6 +432,10 @@ public class DeploymentCache {
 
     }
 
+    if (decisionDefinition != null && !commandContext.getTenantManager().isAuthenticatedTenant(decisionDefinition.getTenantId())) {
+      decisionDefinition = null;
+    }
+
     ensureNotNull(DecisionDefinitionNotFoundException.class, "no deployed decision definition found with id '" + decisionDefinitionId + "'", "decisionDefinition", decisionDefinition);
 
     decisionDefinition = resolveDecisionDefinition(decisionDefinition);

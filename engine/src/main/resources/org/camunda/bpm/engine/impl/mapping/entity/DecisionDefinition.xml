@@ -78,62 +78,66 @@
       and KEY_ = #{decisionDefinitionKey}
   </select>
 
-  <select id="selectLatestDecisionDefinitionByKey" parameterType="string" resultMap="decisionDefinitionResultMap">
+  <select id="selectLatestDecisionDefinitionByKey" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="decisionDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_DECISION_DEF d1
       inner join
           (select KEY_, TENANT_ID_, max(VERSION_) as MAX_VERSION
-          from ${prefix}ACT_RE_DECISION_DEF
+          from ${prefix}ACT_RE_DECISION_DEF RES
           where KEY_ = #{parameter}
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
           group by TENANT_ID_, KEY_) d2
         on d1.KEY_ = d2.KEY_
     where d1.VERSION_ = d2.MAX_VERSION and 
           (d1.TENANT_ID_ = d2.TENANT_ID_ or (d1.TENANT_ID_ is null and d2.TENANT_ID_ is null))
   </select>
   
-  <select id="selectLatestDecisionDefinitionByKeyWithoutTenantId" parameterType="map" resultMap="decisionDefinitionResultMap">
+  <select id="selectLatestDecisionDefinitionByKeyWithoutTenantId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="decisionDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_DECISION_DEF 
-    where KEY_ = #{decisionDefinitionKey}
+    where KEY_ = #{parameter.decisionDefinitionKey}
           and TENANT_ID_ is null
           and VERSION_ = (
               select max(VERSION_) 
               from ${prefix}ACT_RE_DECISION_DEF 
-              where KEY_ = #{decisionDefinitionKey} and TENANT_ID_ is null)
+              where KEY_ = #{parameter.decisionDefinitionKey} and TENANT_ID_ is null)
   </select>
   
-  <select id="selectLatestDecisionDefinitionByKeyAndTenantId" parameterType="map" resultMap="decisionDefinitionResultMap">
+  <select id="selectLatestDecisionDefinitionByKeyAndTenantId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="decisionDefinitionResultMap">
     select *
-    from ${prefix}ACT_RE_DECISION_DEF 
-    where KEY_ = #{decisionDefinitionKey}
-          and TENANT_ID_ = #{tenantId}
+    from ${prefix}ACT_RE_DECISION_DEF RES
+    where KEY_ = #{parameter.decisionDefinitionKey}
+          and TENANT_ID_ = #{parameter.tenantId}
           and VERSION_ = (
               select max(VERSION_) 
               from ${prefix}ACT_RE_DECISION_DEF 
-              where KEY_ = #{decisionDefinitionKey} and TENANT_ID_ = #{tenantId})
+              where KEY_ = #{parameter.decisionDefinitionKey} and TENANT_ID_ = #{parameter.tenantId})
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
   </select>
 
-  <select id="selectDecisionDefinitionByKeyAndVersion" parameterType="map" resultMap="decisionDefinitionResultMap">
+  <select id="selectDecisionDefinitionByKeyAndVersion" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="decisionDefinitionResultMap">
     select *
-    from ${prefix}ACT_RE_DECISION_DEF
-    where KEY_ = #{decisionDefinitionKey}
-      and VERSION_ = #{decisionDefinitionVersion}
+    from ${prefix}ACT_RE_DECISION_DEF RES
+    where KEY_ = #{parameter.decisionDefinitionKey}
+      and VERSION_ = #{parameter.decisionDefinitionVersion}
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
   </select>
 
-  <select id="selectDecisionDefinitionByKeyVersionWithoutTenantId" parameterType="map" resultMap="decisionDefinitionResultMap">
+  <select id="selectDecisionDefinitionByKeyVersionWithoutTenantId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="decisionDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_DECISION_DEF
-    where KEY_ = #{decisionDefinitionKey}
-          and VERSION_ = #{decisionDefinitionVersion}
+    where KEY_ = #{parameter.decisionDefinitionKey}
+          and VERSION_ = #{parameter.decisionDefinitionVersion}
           and TENANT_ID_ is null
   </select>
 
-  <select id="selectDecisionDefinitionByKeyVersionAndTenantId" parameterType="map" resultMap="decisionDefinitionResultMap">
+  <select id="selectDecisionDefinitionByKeyVersionAndTenantId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="decisionDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_DECISION_DEF
-    where KEY_ = #{decisionDefinitionKey}
-          and VERSION_ = #{decisionDefinitionVersion}
-          and TENANT_ID_ = #{tenantId}
+    where KEY_ = #{parameter.decisionDefinitionKey}
+          and VERSION_ = #{parameter.decisionDefinitionVersion}
+          and TENANT_ID_ = #{parameter.tenantId}
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
   </select>
 
 

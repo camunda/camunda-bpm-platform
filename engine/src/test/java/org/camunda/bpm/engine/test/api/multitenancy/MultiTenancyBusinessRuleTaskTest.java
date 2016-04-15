@@ -17,6 +17,8 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -300,6 +302,89 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
       .setVariable("status", "gold").execute();
 
     assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+  }
+
+  public void testFailToEvaluateDecisionNoAuthenticatedTenants() {
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .businessRuleTask()
+          .camundaDecisionRef("decision")
+          .camundaDecisionRefBinding("latest")
+          .camundaDecisionRefTenantId(TENANT_ONE)
+          .camundaMapDecisionResult("singleEntry")
+          .camundaResultVariable("decisionVar")
+          .camundaAsyncAfter()
+        .endEvent()
+      .done();
+
+    deployment(process);
+    deploymentForTenant(TENANT_ONE, DMN_FILE);
+
+    identityService.setAuthentication("user", null, null);
+
+    try {
+      runtimeService.createProcessInstanceByKey("process")
+        .setVariable("status", "gold")
+        .execute();
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("no decision definition deployed with key 'decision'"));
+    }
+  }
+
+  public void testEvaluateDecisionWithAuthenticatedTenant() {
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .businessRuleTask()
+          .camundaDecisionRef("decision")
+          .camundaDecisionRefBinding("latest")
+          .camundaDecisionRefTenantId(TENANT_ONE)
+          .camundaMapDecisionResult("singleEntry")
+          .camundaResultVariable("decisionVar")
+          .camundaAsyncAfter()
+        .endEvent()
+      .done();
+
+    deployment(process);
+    deploymentForTenant(TENANT_ONE, DMN_FILE);
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("process")
+        .setVariable("status", "gold")
+        .execute();
+
+    assertThat((String)runtimeService.getVariable(processInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+  }
+
+  public void testEvaluateDecisionDisabledTenantCheck() {
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .businessRuleTask()
+          .camundaDecisionRef("decision")
+          .camundaDecisionRefBinding("latest")
+          .camundaDecisionRefTenantId(TENANT_ONE)
+          .camundaMapDecisionResult("singleEntry")
+          .camundaResultVariable("decisionVar")
+          .camundaAsyncAfter()
+        .endEvent()
+      .done();
+
+    deployment(process);
+    deploymentForTenant(TENANT_ONE, DMN_FILE);
+
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("process")
+        .setVariable("status", "gold")
+        .execute();
+
+    assertThat((String)runtimeService.getVariable(processInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
   }
 
 }
