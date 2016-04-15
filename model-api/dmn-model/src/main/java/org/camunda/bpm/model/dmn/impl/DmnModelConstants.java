@@ -26,7 +26,7 @@ public final class DmnModelConstants {
   /** The location of the DMN 1.1 XML schema. */
   public static final String DMN_11_SCHEMA_LOCATION = "DMN11.xsd";
   /**
-   * 
+   * The location of the old (alternative) DMN 1.1 XML schema.
    */
   public static final String DMN_11_ALTERNATIVE_SCHEMA_LOCATION = "DMN11_Alternative.xsd";
 

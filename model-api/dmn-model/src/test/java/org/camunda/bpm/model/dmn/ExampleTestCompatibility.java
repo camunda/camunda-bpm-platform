@@ -53,9 +53,9 @@ public class ExampleTestCompatibility extends DmnModelTest {
    @Parameterized.Parameters(name="Namespace: {0}")
    public static Collection<Object[]> parameters(){
      return Arrays.asList(new Object[][]{
-         {Dmn.readModelFromStream(CamundaExtensionsTest.class.getResourceAsStream("Example.dmn"))},
+         {Dmn.readModelFromStream(ExampleTestCompatibility.class.getResourceAsStream("Example.dmn"))},
          //for compatability reasons we gotta check the old namespace, too
-         {Dmn.readModelFromStream(CamundaExtensionsTest.class.getResourceAsStream("CamundaExtensionsCompatibilityTest.dmn"))}
+         {Dmn.readModelFromStream(ExampleTestCompatibility.class.getResourceAsStream("ExampleCompatibility.dmn"))}
      });
    }
 
