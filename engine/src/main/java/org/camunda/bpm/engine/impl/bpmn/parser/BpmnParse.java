@@ -653,7 +653,7 @@ public class BpmnParse extends Parse {
     activityElements.removeAll(intermediateCatchEvents.values());
     Map<String, Element> compensationHandlers = filterCompensationHandlers(activityElements);
     activityElements.removeAll(compensationHandlers.values());
-
+    
     parseStartEvents(scopeElement, parentScope);
     parseActivities(activityElements, scopeElement, parentScope);
     parseIntermediateCatchEvents(scopeElement, parentScope, intermediateCatchEvents);
