@@ -53,7 +53,6 @@
     }
 
     > div {
-      // width: 100%;
       .form-control {
         width: 100%;
       }
@@ -63,8 +62,13 @@
 
 
 // yes we can
-.dmn-table thead th[data-element-id="cell_annotations_ioLabel"] .dmn-js-logo {
-  display: none;
+.dmn-table > .tjs-container {
+  > .dmn-js-logo {
+    display: none;
+  }
+  > .tjs-controls {
+    right: 0;
+  }
 }
 
 
