@@ -102,10 +102,17 @@ module.exports = function(config, copyConf) {
           ],
           dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
         },
-        // open sans and dmn fonts
+        // open sans
         {
           expand: true,
           cwd: '<%= pkg.gruntConfig.commonsUiDir %>/vendor/fonts',
+          src: ['*.{eot,svg,ttf,woff,woff2}'],
+          dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
+        },
+        // dmn
+        {
+          expand: true,
+          cwd: '<%= pkg.gruntConfig.commonsUiDir %>/node_modules/dmn-js/fonts',
           src: ['*.{eot,svg,ttf,woff,woff2}'],
           dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
         },
