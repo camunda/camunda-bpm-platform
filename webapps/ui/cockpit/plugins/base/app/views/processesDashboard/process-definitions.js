@@ -21,7 +21,7 @@ var template = fs.readFileSync(__dirname + '/process-definitions.html', 'utf8');
 
         var processData = $scope.processData.newChild($scope);
 
-        $scope.orderByPredicate = 'definition.name';
+        $scope.orderByPredicate = 'name || key';
         $scope.orderByReverse = false;
 
         $scope.hasReportPlugin = Views.getProviders({ component: 'cockpit.report' }).length > 0;
