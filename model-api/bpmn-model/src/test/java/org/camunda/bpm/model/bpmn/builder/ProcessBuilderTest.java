@@ -893,18 +893,18 @@ public class ProcessBuilderTest {
     assertMessageEventDefinition("end", "message");
   }
   
-  
   @Test
-  public void testPriorityEndEvent() {
+  public void testMessageEventDefintionEndEvent() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
-      .endEvent("end").camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
+      .endEvent("end")
+      .messageEventDefinition()
+        .message("message")
       .done();
 
-    EndEvent end = modelInstance.getModelElementById("end");
-    assertThat(end.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
+    assertMessageEventDefinition("end", "message");
   }
-
+  
   @Test
   public void testMessageEndEventWithExistingMessage() {
     modelInstance = Bpmn.createProcess()
@@ -913,6 +913,29 @@ public class ProcessBuilderTest {
       .endEvent("end1").message("message")
       .moveToLastGateway()
       .endEvent("end2").message("message")
+      .done();
+
+    Message message1 = assertMessageEventDefinition("end1", "message");
+    Message message2 = assertMessageEventDefinition("end2", "message");
+
+    assertThat(message1).isEqualTo(message2);
+
+    assertOnlyOneMessageExists("message");
+  }
+  
+  @Test
+  public void testMessageEventDefinitionEndEventWithExistingMessage() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .parallelGateway()
+      .endEvent("end1")
+      .messageEventDefinition()
+        .message("message")
+        .messageEventDefinitionDone()
+      .moveToLastGateway()
+      .endEvent("end2")
+      .messageEventDefinition()
+        .message("message")
       .done();
 
     Message message1 = assertMessageEventDefinition("end1", "message");
@@ -931,6 +954,18 @@ public class ProcessBuilderTest {
       .done();
 
     assertMessageEventDefinition("throw", "message");
+  } 
+  
+  @Test  
+  public void testIntermediateMessageEventDefintionThrowEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateThrowEvent("throw")
+      .messageEventDefinition()
+        .message("message")
+      .done();
+
+    assertMessageEventDefinition("throw", "message");
   }
 
   @Test
@@ -938,7 +973,6 @@ public class ProcessBuilderTest {
     modelInstance = Bpmn.createProcess()
       .startEvent()
       .intermediateThrowEvent("throw1").message("message")
-      .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
       .intermediateThrowEvent("throw2").message("message")
       .done();
 
@@ -949,17 +983,115 @@ public class ProcessBuilderTest {
     assertOnlyOneMessageExists("message");
   }
   
+  
+  @Test
+  public void testIntermediateMessageEventDefintionThrowEventWithExistingMessage() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateThrowEvent("throw1")
+      .messageEventDefinition()
+        .message("message")
+        .messageEventDefinitionDone()
+      .intermediateThrowEvent("throw2")
+      .messageEventDefinition()
+        .message("message")
+        .messageEventDefinitionDone()
+      .done();
+
+    Message message1 = assertMessageEventDefinition("throw1", "message");
+    Message message2 = assertMessageEventDefinition("throw2", "message");
+
+    assertThat(message1).isEqualTo(message2);
+    assertOnlyOneMessageExists("message");
+  }
+  
+  @Test
+  public void testIntermediateMessageThrowEventWithMessageDefinition() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateThrowEvent("throw1")      
+      .messageEventDefinition()
+        .id("messageEventDefinition")
+        .message("message")
+        .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
+        .camundaType("external")
+        .camundaTopic("TOPIC")
+      .done();
+    
+    MessageEventDefinition event = modelInstance.getModelElementById("messageEventDefinition");
+    assertThat(event.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
+    assertThat(event.getCamundaTopic()).isEqualTo("TOPIC");
+    assertThat(event.getCamundaType()).isEqualTo("external");
+    assertThat(event.getMessage().getName()).isEqualTo("message");
+  }
+  
+  @Test
   public void testIntermediateMessageThrowEventWithTaskPriority() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
-      .intermediateThrowEvent("throw1").message("message")
-      .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
+      .intermediateThrowEvent("throw1")      
+      .messageEventDefinition("messageEventDefinition")
+        .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
       .done();
     
-    IntermediateThrowEvent event = modelInstance.getModelElementById("throw1");
+    MessageEventDefinition event = modelInstance.getModelElementById("messageEventDefinition");
     assertThat(event.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
   }
 
+  @Test
+  public void testEndEventWithTaskPriority() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .endEvent("end")      
+      .messageEventDefinition("messageEventDefinition")
+        .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
+      .done();
+    
+    MessageEventDefinition event = modelInstance.getModelElementById("messageEventDefinition");
+    assertThat(event.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
+  }
+  
+  @Test
+  public void testMessageEventDefinitionWithID() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateThrowEvent("throw1")      
+      .messageEventDefinition("messageEventDefinition")
+      .done();
+    
+    MessageEventDefinition event = modelInstance.getModelElementById("messageEventDefinition");
+    assertThat(event).isNotNull();
+    
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateThrowEvent("throw2")      
+      .messageEventDefinition().id("messageEventDefinition1")
+      .done();
+    
+    //========================================
+    //==============end event=================
+    //========================================
+    event = modelInstance.getModelElementById("messageEventDefinition1");
+    assertThat(event).isNotNull();
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .endEvent("end1")      
+      .messageEventDefinition("messageEventDefinition")
+      .done();
+    
+    event = modelInstance.getModelElementById("messageEventDefinition");
+    assertThat(event).isNotNull();
+    
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .endEvent("end2")      
+      .messageEventDefinition().id("messageEventDefinition1")
+      .done();
+    
+    event = modelInstance.getModelElementById("messageEventDefinition1");
+    assertThat(event).isNotNull();
+  }
+  
   @Test
   public void testReceiveTaskMessage() {
     modelInstance = Bpmn.createProcess()

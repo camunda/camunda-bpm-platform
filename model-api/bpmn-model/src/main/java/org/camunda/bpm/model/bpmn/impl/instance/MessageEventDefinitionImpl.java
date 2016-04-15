@@ -44,6 +44,7 @@ public class MessageEventDefinitionImpl extends EventDefinitionImpl implements M
   protected static Attribute<String> camundaResultVariableAttribute;
   protected static Attribute<String> camundaTopicAttribute;
   protected static Attribute<String> camundaTypeAttribute;
+  protected static Attribute<String> camundaTaskPriorityAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(MessageEventDefinition.class, BPMN_ELEMENT_MESSAGE_EVENT_DEFINITION)
@@ -90,6 +91,10 @@ public class MessageEventDefinitionImpl extends EventDefinitionImpl implements M
     camundaTypeAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TYPE)
         .namespace(CAMUNDA_NS)
         .build();
+        
+    camundaTaskPriorityAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TASK_PRIORITY)
+      .namespace(CAMUNDA_NS)
+      .build();
 
     typeBuilder.build();
   }
@@ -163,5 +168,14 @@ public class MessageEventDefinitionImpl extends EventDefinitionImpl implements M
   public void setCamundaType(String camundaType) {
     camundaTypeAttribute.setValue(this, camundaType);
   }
+  
+  @Override
+  public String getCamundaTaskPriority() {
+    return camundaTaskPriorityAttribute.getValue(this);    
+  }
 
+  @Override
+  public void setCamundaTaskPriority(String taskPriority) {
+    camundaTaskPriorityAttribute.setValue(this, taskPriority);
+  }
 }

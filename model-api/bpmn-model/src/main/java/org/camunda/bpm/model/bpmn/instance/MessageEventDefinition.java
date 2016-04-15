@@ -54,5 +54,9 @@ public interface MessageEventDefinition extends EventDefinition {
   String getCamundaType();
 
   void setCamundaType(String camundaType);
+  
+  String getCamundaTaskPriority();
+  
+  void setCamundaTaskPriority(String taskPriority);
 
 }

@@ -24,10 +24,4 @@ public interface EndEvent extends ThrowEvent {
 
   EndEventBuilder builder();
 
-  /** camunda extensions */
-
-  
-  String getCamundaTaskPriority();
-  
-  void setCamundaTaskPriority(String taskPriority);
 }

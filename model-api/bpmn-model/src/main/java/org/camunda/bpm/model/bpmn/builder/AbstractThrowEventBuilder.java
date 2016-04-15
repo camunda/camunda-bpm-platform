@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -43,6 +42,31 @@ public abstract class AbstractThrowEventBuilder<B extends AbstractThrowEventBuil
   }
 
   /**
+   * Creates an empty message event definition with an unique id
+   * and returns a builder for the message event definition.
+   *
+   * @return the message event definition builder object
+   */
+  public AbstractMessageEventDefinitionBuilder messageEventDefinition() {
+    return messageEventDefinition(null);
+  }
+  
+  /**
+   * Creates an empty message event definition with the given id 
+   * and returns a builder for the message event definition.
+   * 
+   * @param id the id of the message event definition
+   * @return the message event definition builder object
+   */
+  public AbstractMessageEventDefinitionBuilder messageEventDefinition(String id) {
+    MessageEventDefinition messageEventDefinition = createEmptyMessageEventDefinition();
+    if (id != null)
+      messageEventDefinition.setId(id);
+    element.getEventDefinitions().add(messageEventDefinition);
+    return new MessageEventDefinitionBuilder(modelInstance, messageEventDefinition);
+  }
+
+  /**
    * Sets an event definition for the given signal name. If already a signal
    * with this name exists it will be used, otherwise a new signal is created.
    *
@@ -57,8 +81,9 @@ public abstract class AbstractThrowEventBuilder<B extends AbstractThrowEventBuil
   }
 
   /**
-   * Sets an escalation definition for the given escalation code. If already an escalation
-   * with this code exists it will be used, otherwise a new escalation is created.
+   * Sets an escalation definition for the given escalation code. If already an
+   * escalation with this code exists it will be used, otherwise a new
+   * escalation is created.
    *
    * @param escalationCode the code of the escalation
    * @return the builder object
@@ -69,5 +94,4 @@ public abstract class AbstractThrowEventBuilder<B extends AbstractThrowEventBuil
 
     return myself;
   }
-
 }

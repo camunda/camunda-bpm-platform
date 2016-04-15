@@ -133,6 +133,10 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     messageEventDefinition.setMessage(message);
     return messageEventDefinition;
   }
+  
+  protected MessageEventDefinition createEmptyMessageEventDefinition() {
+    return createInstance(MessageEventDefinition.class);
+  }
 
   protected Signal findSignalForName(String signalName) {
     Collection<Signal> signals = modelInstance.getModelElementsByType(Signal.class);

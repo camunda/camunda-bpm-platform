@@ -13,9 +13,7 @@
 
 package org.camunda.bpm.model.bpmn.instance;
 
-import java.util.Arrays;
 import java.util.Collection;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
 /**
  * @author Sebastian Menski
@@ -31,8 +29,6 @@ public class IntermediateThrowEventTest extends BpmnModelElementInstanceTest {
   }
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
-    return Arrays.asList(
-      new AttributeAssumption(CAMUNDA_NS, "taskPriority")
-    );
+    return null;
   }
 }

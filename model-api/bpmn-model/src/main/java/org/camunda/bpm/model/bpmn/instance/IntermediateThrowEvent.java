@@ -23,10 +23,4 @@ import org.camunda.bpm.model.bpmn.builder.IntermediateThrowEventBuilder;
 public interface IntermediateThrowEvent extends ThrowEvent {
 
   IntermediateThrowEventBuilder builder();
-
-  /** camunda extensions */
-  
-  String getCamundaTaskPriority();
-  
-  void setCamundaTaskPriority(String taskPriority);
 }

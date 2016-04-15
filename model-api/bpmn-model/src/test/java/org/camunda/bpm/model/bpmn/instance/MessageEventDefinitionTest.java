@@ -42,7 +42,8 @@ public class MessageEventDefinitionTest extends AbstractEventDefinitionTest {
       new AttributeAssumption(CAMUNDA_NS, "expression"),
       new AttributeAssumption(CAMUNDA_NS, "resultVariable"),
       new AttributeAssumption(CAMUNDA_NS, "topic"),
-      new AttributeAssumption(CAMUNDA_NS, "type")
+      new AttributeAssumption(CAMUNDA_NS, "type"),
+      new AttributeAssumption(CAMUNDA_NS, "taskPriority")
     );
   }
 
@@ -52,6 +53,7 @@ public class MessageEventDefinitionTest extends AbstractEventDefinitionTest {
     assertThat(eventDefinition).isNotNull();
     assertThat(eventDefinition.getMessage().getId()).isEqualTo("message");
     assertThat(eventDefinition.getOperation()).isNull();
+    assertThat(eventDefinition.getCamundaTaskPriority()).isEqualTo("5");
   }
 
 }
