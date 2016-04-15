@@ -14,16 +14,20 @@
 package org.camunda.bpm.engine.test.api.multitenancy.query;
 
 import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.DeploymentStatistics;
+import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
+import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
@@ -61,6 +65,102 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
     assertThat(processDefinitionStatistics.size(), is(3));
 
     Set<String> tenantIds = collectDefinitionTenantIds(processDefinitionStatistics);
+    assertThat(tenantIds, hasItems(null, TENANT_ONE, TENANT_TWO));
+  }
+
+  public void testQueryNoAuthenticatedTenantsForDeploymentStatistics() {
+    identityService.setAuthentication("user", null, null);
+
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery();
+    assertThat(query.count(), is(1L));
+
+    Set<String> tenantIds = collectDeploymentTenantIds(query.list());
+    assertThat(tenantIds.size(), is(1));
+    assertThat(tenantIds.iterator().next(), is(nullValue()));
+  }
+
+  public void testQueryAuthenticatedTenantForDeploymentStatistics() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery();
+
+    assertThat(query.count(), is(2L));
+
+    Set<String> tenantIds = collectDeploymentTenantIds(query.list());
+    assertThat(tenantIds.size(), is(2));
+    assertThat(tenantIds, hasItems(null, TENANT_ONE));
+  }
+
+  public void testQueryAuthenticatedTenantsForDeploymentStatistics() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
+
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery();
+
+    assertThat(query.count(), is(3L));
+
+    Set<String> tenantIds = collectDeploymentTenantIds(query.list());
+    assertThat(tenantIds.size(), is(3));
+    assertThat(tenantIds, hasItems(null, TENANT_ONE, TENANT_TWO));
+  }
+
+  public void testQueryDisabledTenantCheckForDeploymentStatistics() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery();
+
+    assertThat(query.count(), is(3L));
+
+    Set<String> tenantIds = collectDeploymentTenantIds(query.list());
+    assertThat(tenantIds.size(), is(3));
+    assertThat(tenantIds, hasItems(null, TENANT_ONE, TENANT_TWO));
+  }
+
+  public void testQueryNoAuthenticatedTenantsForProcessDefinitionStatistics() {
+    identityService.setAuthentication("user", null, null);
+
+    ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
+    assertThat(query.count(), is(1L));
+
+    Set<String> tenantIds = collectDefinitionTenantIds(query.list());
+    assertThat(tenantIds.size(), is(1));
+    assertThat(tenantIds.iterator().next(), is(nullValue()));
+  }
+
+  public void testQueryAuthenticatedTenantForProcessDefinitionStatistics() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
+
+    assertThat(query.count(), is(2L));
+
+    Set<String> tenantIds = collectDefinitionTenantIds(query.list());
+    assertThat(tenantIds.size(), is(2));
+    assertThat(tenantIds, hasItems(null, TENANT_ONE));
+  }
+
+  public void testQueryAuthenticatedTenantsForProcessDefinitionStatistics() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
+
+    ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
+
+    assertThat(query.count(), is(3L));
+
+    Set<String> tenantIds = collectDefinitionTenantIds(query.list());
+    assertThat(tenantIds.size(), is(3));
+    assertThat(tenantIds, hasItems(null, TENANT_ONE, TENANT_TWO));
+  }
+
+  public void testQueryDisabledTenantCheckForProcessDefinitionStatistics() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
+
+    assertThat(query.count(), is(3L));
+
+    Set<String> tenantIds = collectDefinitionTenantIds(query.list());
+    assertThat(tenantIds.size(), is(3));
     assertThat(tenantIds, hasItems(null, TENANT_ONE, TENANT_TWO));
   }
 
