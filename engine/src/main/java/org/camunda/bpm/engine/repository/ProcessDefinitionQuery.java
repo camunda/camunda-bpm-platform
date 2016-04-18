@@ -139,11 +139,11 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery incidentMessageLike(String incidentMessageLike);
 
   /**
-   * Only selects process definitions with a specific semantic version
+   * Only selects process definitions with a specific version tag
    */
-  ProcessDefinitionQuery semanticVersion(String semanticVersion);
+  ProcessDefinitionQuery versionTag(String versionTag);
 
-  ProcessDefinitionQuery semanticVersionLike(String semanticVersionLike);
+  ProcessDefinitionQuery versionTagLike(String versionTagLike);
 
   // Support for event subscriptions /////////////////////////////////////
 
@@ -196,12 +196,12 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery orderByTenantId();
 
   /**
-   * Order by semantic version (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Order by version tag (needs to be followed by {@link #asc()} or {@link #desc()}).
    *
-   * <strong>Note:</strong> sorting by semanticVersion is a string based sort.
+   * <strong>Note:</strong> sorting by versionTag is a string based sort.
    * There is no interpretation of the version which can lead to a sorting like:
    * v0.1.0 v0.10.0 v0.2.0.
    */
-  ProcessDefinitionQuery orderBySemanticVersion();
+  ProcessDefinitionQuery orderByVersionTag();
 
 }

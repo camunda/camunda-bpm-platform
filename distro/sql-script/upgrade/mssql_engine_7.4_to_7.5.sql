@@ -7,9 +7,9 @@ alter table ACT_RU_EXECUTION
 -- semantic version --
 
 ALTER TABLE ACT_RE_PROCDEF
-  ADD SEMANTIC_VERSION_ nvarchar(64);
+  ADD VERSION_TAG_ nvarchar(64);
 
-create index ACT_IDX_PROCDEF_SEM_VER on ACT_RE_PROCDEF(SEMANTIC_VERSION_);
+create index ACT_IDX_PROCDEF_VER_TAG on ACT_RE_PROCDEF(VERSION_TAG_);
 
 -- tenant id --
 

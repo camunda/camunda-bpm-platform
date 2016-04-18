@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.Deployment;
@@ -20,27 +19,27 @@ import org.camunda.bpm.engine.test.Deployment;
 /**
  * @author Stefan Hentschel.
  */
-public class SemanticVersionTest extends PluggableProcessEngineTestCase {
+public class VersionTagTest extends PluggableProcessEngineTestCase {
 
   @Deployment
-  public void testParsingSemanticVersion() {
+  public void testParsingVersionTag() {
     ProcessDefinition process = repositoryService
       .createProcessDefinitionQuery()
       .orderByProcessDefinitionId()
       .asc()
       .singleResult();
 
-    assertEquals("sem-ver-1", process.getSemanticVersion());
+    assertEquals("ver-tag-1", process.getVersionTag());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml"})
-  public void testParsingNullSemanticVersion() {
+  public void testParsingNullVersionTag() {
     ProcessDefinition process = repositoryService
       .createProcessDefinitionQuery()
       .orderByProcessDefinitionId()
       .asc()
       .singleResult();
 
-    assertEquals(null, process.getSemanticVersion());
+    assertEquals(null, process.getVersionTag());
   }
 }

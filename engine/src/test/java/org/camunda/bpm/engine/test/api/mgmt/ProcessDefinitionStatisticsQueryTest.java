@@ -617,7 +617,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     assertEquals("Examples", processDefinitionStatistics.getCategory());
     assertEquals(null, processDefinitionStatistics.getDescription()); // it is not parsed for the statistics query
     assertEquals("tenant1", processDefinitionStatistics.getTenantId());
-    assertEquals("v0.1.0", processDefinitionStatistics.getSemanticVersion());
+    assertEquals("v0.1.0", processDefinitionStatistics.getVersionTag());
     assertEquals(deploymentId, processDefinitionStatistics.getDeploymentId());
     assertEquals(resourceName, processDefinitionStatistics.getResourceName());
     assertEquals(null, processDefinitionStatistics.getDiagramResourceName());

@@ -75,8 +75,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   protected String[] tenantIds;
   protected boolean includeDefinitionsWithoutTenantId = false;
 
-  protected String semanticVersion;
-  protected String semanticVersionLike;
+  protected String versionTag;
+  protected String versionTagLike;
 
   public ProcessDefinitionQueryImpl() {
   }
@@ -239,16 +239,16 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return this;
   }
 
-  public ProcessDefinitionQuery semanticVersion(String semanticVersion) {
-    ensureNotNull("semanticVersion", semanticVersion);
-    this.semanticVersion = semanticVersion;
+  public ProcessDefinitionQuery versionTag(String versionTag) {
+    ensureNotNull("versionTag", versionTag);
+    this.versionTag = versionTag;
 
     return this;
   }
 
-  public ProcessDefinitionQuery semanticVersionLike(String semanticVersionLike) {
-    ensureNotNull("semanticVersionLike", semanticVersionLike);
-    this.semanticVersionLike = semanticVersionLike;
+  public ProcessDefinitionQuery versionTagLike(String versionTagLike) {
+    ensureNotNull("versionTagLike", versionTagLike);
+    this.versionTagLike = versionTagLike;
 
     return this;
   }
@@ -283,8 +283,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return orderBy(ProcessDefinitionQueryProperty.TENANT_ID);
   }
 
-  public ProcessDefinitionQuery orderBySemanticVersion() {
-    return orderBy(ProcessDefinitionQueryProperty.SEMANTIC_VERSION);
+  public ProcessDefinitionQuery orderByVersionTag() {
+    return orderBy(ProcessDefinitionQueryProperty.VERSION_TAG);
   }
 
   //results ////////////////////////////////////////////
@@ -400,8 +400,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return incidentMessageLike;
   }
 
-  public String getSemanticVersion() {
-    return semanticVersion;
+  public String getVersionTag() {
+    return versionTag;
   }
 
   public ProcessDefinitionQueryImpl startableByUser(String userId) {

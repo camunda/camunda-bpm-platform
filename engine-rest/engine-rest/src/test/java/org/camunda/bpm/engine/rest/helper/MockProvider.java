@@ -125,9 +125,9 @@ public abstract class MockProvider {
   public static final String ANOTHER_EXAMPLE_TENANT_ID = "anotherTenantId";
   public static final String EXAMPLE_TENANT_ID_LIST = EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID;
 
-  // semantic Versions
-  public static final String EXAMPLE_SEMANTIC_VERSION = "aSemanticVersion";
-  public static final String ANOTHER_EXAMPLE_SEMANTIC_VERSION = "anotherSemanticVersion";
+  // version tag
+  public static final String EXAMPLE_VERSION_TAG = "aVersionTag";
+  public static final String ANOTHER_EXAMPLE_VERSION_TAG = "anotherVersionTag";
 
   // engine
   public static final String EXAMPLE_PROCESS_ENGINE_NAME = "default";
@@ -1008,7 +1008,7 @@ public abstract class MockProvider {
     when(statistics.getName()).thenReturn(EXAMPLE_PROCESS_DEFINITION_NAME);
     when(statistics.getKey()).thenReturn(EXAMPLE_PROCESS_DEFINITION_KEY);
     when(statistics.getTenantId()).thenReturn(EXAMPLE_TENANT_ID);
-    when(statistics.getSemanticVersion()).thenReturn(EXAMPLE_SEMANTIC_VERSION);
+    when(statistics.getVersionTag()).thenReturn(EXAMPLE_VERSION_TAG);
     when(statistics.getCategory()).thenReturn(EXAMPLE_PROCESS_DEFINITION_CATEGORY);
     when(statistics.getDeploymentId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
     when(statistics.getDiagramResourceName()).thenReturn(EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME);
@@ -1031,7 +1031,7 @@ public abstract class MockProvider {
     when(anotherStatistics.getName()).thenReturn(EXAMPLE_PROCESS_DEFINITION_NAME);
     when(anotherStatistics.getKey()).thenReturn(EXAMPLE_PROCESS_DEFINITION_KEY);
     when(anotherStatistics.getTenantId()).thenReturn(ANOTHER_EXAMPLE_TENANT_ID);
-    when(anotherStatistics.getSemanticVersion()).thenReturn(ANOTHER_EXAMPLE_SEMANTIC_VERSION);
+    when(anotherStatistics.getVersionTag()).thenReturn(ANOTHER_EXAMPLE_VERSION_TAG);
 
     IncidentStatistics anotherIncidentStaticits = mock(IncidentStatistics.class);
     when(anotherIncidentStaticits.getIncidentType()).thenReturn(ANOTHER_EXAMPLE_INCIDENT_TYPE);

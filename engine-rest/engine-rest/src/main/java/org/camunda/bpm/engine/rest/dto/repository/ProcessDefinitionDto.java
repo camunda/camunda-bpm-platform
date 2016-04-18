@@ -27,7 +27,7 @@ public class ProcessDefinitionDto {
   protected String diagram;
   protected boolean suspended;
   protected String tenantId;
-  protected String semanticVersion;
+  protected String versionTag;
 
   public String getId() {
     return id;
@@ -73,8 +73,8 @@ public class ProcessDefinitionDto {
     return tenantId;
   }
 
-  public String getSemanticVersion() {
-    return semanticVersion;
+  public String getVersionTag() {
+    return versionTag;
   }
 
   public static ProcessDefinitionDto fromProcessDefinition(ProcessDefinition definition) {
@@ -90,7 +90,7 @@ public class ProcessDefinitionDto {
     dto.diagram = definition.getDiagramResourceName();
     dto.suspended = definition.isSuspended();
     dto.tenantId = definition.getTenantId();
-    dto.semanticVersion = definition.getSemanticVersion();
+    dto.versionTag = definition.getVersionTag();
 
     return dto;
   }

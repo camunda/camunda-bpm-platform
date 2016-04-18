@@ -128,7 +128,7 @@ drop index ACT_IDX_BATCH_SEED_JOB_DEF;
 drop index ACT_IDX_BATCH_MONITOR_JOB_DEF;
 drop index ACT_IDX_BATCH_JOB_DEF;
 
-drop index ACT_IDX_PROCDEF_SEM_VER;
+drop index ACT_IDX_PROCDEF_VER_TAG;
 
 drop table ACT_GE_PROPERTY if exists;
 drop table ACT_GE_BYTEARRAY if exists;

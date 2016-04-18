@@ -119,7 +119,7 @@ drop index ACT_IDX_BATCH_SEED_JOB_DEF on ACT_RU_BATCH;
 drop index ACT_IDX_BATCH_MONITOR_JOB_DEF on ACT_RU_BATCH;
 drop index ACT_IDX_BATCH_JOB_DEF on ACT_RU_BATCH;
 
-drop index ACT_IDX_PROCDEF_SEM_VER on ACT_RE_PROCDEF;
+drop index ACT_IDX_PROCDEF_VER_TAG on ACT_RE_PROCDEF;
 
 drop table if exists ACT_GE_PROPERTY;
 drop table if exists ACT_RU_VARIABLE;

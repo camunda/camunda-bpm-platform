@@ -45,6 +45,6 @@ public interface ProcessDefinition extends ResourceDefinition {
   /**
    * Semantic version of the process definition. Returns null when no semantic version is set.
    */
-  String getSemanticVersion();
+  String getVersionTag();
 
 }

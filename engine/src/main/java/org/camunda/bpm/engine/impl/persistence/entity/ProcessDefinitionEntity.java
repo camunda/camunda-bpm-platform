@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
-import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -63,7 +62,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   protected boolean hasStartFormKey;
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
   protected String tenantId;
-  protected String semanticVersion;
+  protected String versionTag;
   protected boolean isIdentityLinksInitialized = false;
   protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
   protected Set<Expression> candidateStarterUserIdExpressions = new HashSet<Expression>();
@@ -440,11 +439,11 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     this.tenantId = tenantId;
   }
 
-  public String getSemanticVersion() {
-    return semanticVersion;
+  public String getVersionTag() {
+    return versionTag;
   }
 
-  public void setSemanticVersion(String semanticVersion) {
-    this.semanticVersion = semanticVersion;
+  public void setVersionTag(String versionTag) {
+    this.versionTag = versionTag;
   }
 }
