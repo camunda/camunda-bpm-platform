@@ -118,8 +118,8 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
     return getBuilderForElementById(userTaskId, UserTaskBuilder.class);
   }
 
-  public ServiceTaskBuilder serviceTaskBuilder(String userTaskId) {
-    return getBuilderForElementById(userTaskId, ServiceTaskBuilder.class);
+  public ServiceTaskBuilder serviceTaskBuilder(String serviceTaskId) {
+    return getBuilderForElementById(serviceTaskId, ServiceTaskBuilder.class);
   }
 
   public CallActivityBuilder callActivityBuilder(String callActivityId) {

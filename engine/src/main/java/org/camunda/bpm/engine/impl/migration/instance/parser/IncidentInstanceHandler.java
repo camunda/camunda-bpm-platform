@@ -25,25 +25,38 @@ public class IncidentInstanceHandler implements MigratingInstanceParseHandler<In
 
   @Override
   public void handle(MigratingInstanceParseContext parseContext, IncidentEntity incident) {
-    if (IncidentEntity.FAILED_JOB_HANDLER_TYPE.equals(incident.getIncidentType())) {
-      MigratingJobInstance owningInstance = parseContext.getMigratingJobInstanceById(incident.getConfiguration());
-      parseContext.consume(incident);
-      if (owningInstance != null && owningInstance.migrates()) {
-        MigratingIncident migratingIncident = new MigratingIncident(incident, owningInstance.getTargetScope());
-        owningInstance.addMigratingDependentInstance(migratingIncident);
-      }
+    if (isFailedJobIncident(incident)) {
+      handleFailedJobIncident(parseContext, incident);
     }
-    else if (IncidentEntity.EXTERNAL_TASK_HANDLER_TYPE.equals(incident.getIncidentType())) {
-      MigratingExternalTaskInstance owningInstance = parseContext.getMigratingExternalTaskInstanceById(incident.getConfiguration());
-      parseContext.consume(incident);
-      if (owningInstance != null) {
-        MigratingIncident migratingIncident = new MigratingIncident(incident, owningInstance.getTargetScope());
-        owningInstance.addMigratingDependentInstance(migratingIncident);
-      }
+    else if (isExternalTaskIncident(incident)) {
+      handleExternalTaskIncident(parseContext, incident);
     }
-
   }
 
+  protected boolean isFailedJobIncident(IncidentEntity incident) {
+    return IncidentEntity.FAILED_JOB_HANDLER_TYPE.equals(incident.getIncidentType());
+  }
 
+  protected void handleFailedJobIncident(MigratingInstanceParseContext parseContext, IncidentEntity incident) {
+    MigratingJobInstance owningInstance = parseContext.getMigratingJobInstanceById(incident.getConfiguration());
+    parseContext.consume(incident);
+    if (owningInstance != null && owningInstance.migrates()) {
+      MigratingIncident migratingIncident = new MigratingIncident(incident, owningInstance.getTargetScope());
+      owningInstance.addMigratingDependentInstance(migratingIncident);
+    }
+  }
+
+  protected boolean isExternalTaskIncident(IncidentEntity incident) {
+    return IncidentEntity.EXTERNAL_TASK_HANDLER_TYPE.equals(incident.getIncidentType());
+  }
+
+  protected void handleExternalTaskIncident(MigratingInstanceParseContext parseContext, IncidentEntity incident) {
+    MigratingExternalTaskInstance owningInstance = parseContext.getMigratingExternalTaskInstanceById(incident.getConfiguration());
+    parseContext.consume(incident);
+    if (owningInstance != null) {
+      MigratingIncident migratingIncident = new MigratingIncident(incident, owningInstance.getTargetScope());
+      owningInstance.addMigratingDependentInstance(migratingIncident);
+    }
+  }
 
 }
