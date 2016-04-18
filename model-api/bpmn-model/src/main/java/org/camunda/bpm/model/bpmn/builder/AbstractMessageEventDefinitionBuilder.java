@@ -25,24 +25,24 @@ import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
  */
 
 public abstract class AbstractMessageEventDefinitionBuilder<B extends AbstractMessageEventDefinitionBuilder<B>> extends AbstractRootElementBuilder<B, MessageEventDefinition>{
-  
+
   public AbstractMessageEventDefinitionBuilder(BpmnModelInstance modelInstance, MessageEventDefinition element, Class<?> selfType) {
     super(modelInstance, element, selfType);
-  } 
+  }
 
   @Override
   public B id(String identifier) {
     return super.id(identifier);
   }
-  
+
   /**
-   * Sets the message attribute. 
-   * 
+   * Sets the message attribute.
+   *
    * @param message the message for the message event definition
    * @return the builder object
    */
   public B message(String message) {
-    element.setMessage(findMessageForName(message));    
+    element.setMessage(findMessageForName(message));
     return myself;
   }
 
@@ -68,12 +68,12 @@ public abstract class AbstractMessageEventDefinitionBuilder<B extends AbstractMe
     element.setCamundaType(camundaType);
     return myself;
   }
-  
+
   /**
    * Sets the camunda task priority attribute. This is only meaningful when
    * the {@link #camundaType(String)} attribute has the value <code>external</code>.
-   * 
-   * 
+   *
+   *
    * @param taskPriority the priority for the external task
    * @return the builder object
    */
@@ -81,10 +81,7 @@ public abstract class AbstractMessageEventDefinitionBuilder<B extends AbstractMe
     element.setCamundaTaskPriority(taskPriority);
     return myself;
   }
-  
-  
-  
-  
+
   /**
    * Finishes the building of a message event definition.
    *

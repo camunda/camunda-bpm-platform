@@ -47,21 +47,23 @@ public abstract class AbstractThrowEventBuilder<B extends AbstractThrowEventBuil
    *
    * @return the message event definition builder object
    */
-  public AbstractMessageEventDefinitionBuilder messageEventDefinition() {
+  public MessageEventDefinitionBuilder messageEventDefinition() {
     return messageEventDefinition(null);
   }
-  
+
   /**
-   * Creates an empty message event definition with the given id 
+   * Creates an empty message event definition with the given id
    * and returns a builder for the message event definition.
-   * 
+   *
    * @param id the id of the message event definition
    * @return the message event definition builder object
    */
-  public AbstractMessageEventDefinitionBuilder messageEventDefinition(String id) {
+  public MessageEventDefinitionBuilder messageEventDefinition(String id) {
     MessageEventDefinition messageEventDefinition = createEmptyMessageEventDefinition();
-    if (id != null)
+    if (id != null) {
       messageEventDefinition.setId(id);
+    }
+
     element.getEventDefinitions().add(messageEventDefinition);
     return new MessageEventDefinitionBuilder(modelInstance, messageEventDefinition);
   }
