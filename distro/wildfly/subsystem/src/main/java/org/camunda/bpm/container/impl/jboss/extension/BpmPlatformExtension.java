@@ -44,7 +44,7 @@ public class BpmPlatformExtension implements Extension {
   public static final String RESOURCE_NAME = BpmPlatformExtension.class.getPackage().getName() + ".LocalDescriptions";
 
   /**
-   * Path elements for the resources this subsystem offers.
+   * Path elements for the resources offered by the subsystem.
    */
   public static final PathElement SUBSYSTEM_PATH = PathElement.pathElement(SUBSYSTEM, SUBSYSTEM_NAME);
   public static final PathElement PROCESS_ENGINES_PATH = PathElement.pathElement(ModelConstants.PROCESS_ENGINES);

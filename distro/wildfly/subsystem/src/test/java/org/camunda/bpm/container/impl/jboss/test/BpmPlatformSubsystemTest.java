@@ -34,7 +34,7 @@ public class BpmPlatformSubsystemTest extends AbstractSubsystemBaseTest {
   @Override
   protected String getSubsystemXml() throws IOException {
     try {
-      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_EVERY_AVAILABLE_OPTION_USED);
+      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_ALL_OPTIONS);
     } catch (Exception e) {
       e.printStackTrace();
     }

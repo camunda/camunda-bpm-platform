@@ -84,6 +84,10 @@
   </process-engines>
   <job-executor>
     <thread-pool-name>job-executor-tp</thread-pool-name>
+    <core-threads>5</core-threads>
+    <max-threads>15</max-threads>
+    <queue-length>15</queue-length>
+    <keepalive-time>10</keepalive-time>
     <job-acquisitions>
       <job-acquisition name="default">
         <acquisition-strategy>SEQUENTIAL</acquisition-strategy>

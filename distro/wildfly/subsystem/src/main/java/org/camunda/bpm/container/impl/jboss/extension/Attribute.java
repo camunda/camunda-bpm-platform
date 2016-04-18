@@ -31,8 +31,8 @@ public enum Attribute {
    */
   UNKNOWN((String) null),
 
-  NAME(Constants.NAME),
-  DEFAULT(Constants.DEFAULT);
+  NAME(SubsystemAttributeDefinitons.NAME),
+  DEFAULT(SubsystemAttributeDefinitons.DEFAULT);
 
   private final String name;
   private final AttributeDefinition definition;

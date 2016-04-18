@@ -16,10 +16,7 @@
 package org.camunda.bpm.container.impl.jboss.test;
 
 import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
-import org.camunda.bpm.container.impl.jboss.extension.Attribute;
-import org.camunda.bpm.container.impl.jboss.extension.BpmPlatformExtension;
-import org.camunda.bpm.container.impl.jboss.extension.Element;
-import org.camunda.bpm.container.impl.jboss.extension.ModelConstants;
+import org.camunda.bpm.container.impl.jboss.extension.*;
 import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessEngineController;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
@@ -31,16 +28,20 @@ import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.as.subsystem.test.AbstractSubsystemTest;
 import org.jboss.as.subsystem.test.KernelServices;
+import org.jboss.as.threads.ManagedQueueExecutorService;
+import org.jboss.as.threads.ThreadFactoryService;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
-import org.junit.Assert;
 import org.junit.Test;
 
 import javax.xml.stream.XMLStreamException;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
 import static org.junit.Assert.*;
@@ -63,8 +64,9 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   public static final String SUBSYSTEM_WITH_PROCESS_ENGINES_AND_JOB_EXECUTOR = "subsystemWithProcessEnginesAndJobExecutor.xml";
   public static final String SUBSYSTEM_WITH_JOB_EXECUTOR_AND_PROPERTIES = "subsystemWithJobExecutorAndProperties.xml";
   public static final String SUBSYSTEM_WITH_JOB_EXECUTOR_WITHOUT_ACQUISITION_STRATEGY = "subsystemWithJobExecutorAndWithoutAcquisitionStrategy.xml";
-  public static final String SUBSYSTEM_WITH_EVERY_AVAILABLE_OPTION_USED = "subsystemWithEveryAvailableOptionUsed.xml";
-  public static final String SUBSYSTEM_WITH_MINIMAL_OPTIONS_USED = "subsystemWithMinimumOptionsUsed.xml";
+  public static final String SUBSYSTEM_WITH_ALL_OPTIONS = "subsystemWithAllOptions.xml";
+  public static final String SUBSYSTEM_WITH_REQUIRED_OPTIONS = "subsystemWithRequiredOptions.xml";
+  public static final String SUBSYSTEM_WITH_NO_OPTIONS = "subsystemWithNoOptions.xml";
 
   public static final String LOCK_TIME_IN_MILLIS = "lockTimeInMillis";
   public static final String WAIT_TIME_IN_MILLIS = "waitTimeInMillis";
@@ -72,14 +74,17 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
 
   public static final ServiceName PLATFORM_SERVICE_NAME = ServiceNames.forMscRuntimeContainerDelegate();
   public static final ServiceName PLATFORM_JOBEXECUTOR_SERVICE_NAME = ServiceNames.forMscExecutorService();
+  public static final ServiceName PLATFORM_BPM_PLATFORM_PLUGINS_SERVICE_NAME = ServiceNames.forBpmPlatformPlugins();
+  public static final ServiceName PLATFORM_JOBEXECUTOR_MANAGED_THREAD_POOL_SERVICE_NAME =
+      ServiceNames.forManagedThreadPool(SubsystemAttributeDefinitons.THREAD_POOL_NAME.getDefaultValue().asString());
 
-  public static final ServiceName processEngineServiceBindingServiceName = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME
+  public static final ServiceName PROCESS_ENGINE_SERVICE_BINDING_SERVICE_NAME = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME
     .append("camunda-bpm-platform")
     .append("process-engine")
     .append("ProcessEngineService!org.camunda.bpm.ProcessEngineService");
 
   public JBossSubsystemXMLTest() {
-    super(ModelConstants.SUBSYSTEM_NAME, new BpmPlatformExtension());
+    super(ModelConstants.SUBSYSTEM_NAME, new BpmPlatformExtension(), getSubsystemRemoveOrderComparator());
   }
 
   @Test
@@ -91,12 +96,12 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     assertEquals(1, operations.size());
     //The add subsystem operation will happen first
     ModelNode addSubsystem = operations.get(0);
-    Assert.assertEquals(ADD, addSubsystem.get(OP).asString());
+    assertEquals(ADD, addSubsystem.get(OP).asString());
     PathAddress addr = PathAddress.pathAddress(addSubsystem.get(OP_ADDR));
-    Assert.assertEquals(1, addr.size());
+    assertEquals(1, addr.size());
     PathElement element = addr.getElement(0);
-    Assert.assertEquals(SUBSYSTEM, element.getKey());
-    Assert.assertEquals(ModelConstants.SUBSYSTEM_NAME, element.getValue());
+    assertEquals(SUBSYSTEM, element.getKey());
+    assertEquals(ModelConstants.SUBSYSTEM_NAME, element.getValue());
   }
 
   @Test
@@ -134,7 +139,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     ServiceContainer container = services.getContainer();
 
     assertNotNull("platform service should be installed", container.getRequiredService(PLATFORM_SERVICE_NAME));
-    assertNotNull("process engine service should be bound in JNDI", container.getRequiredService(processEngineServiceBindingServiceName));
+    assertNotNull("process engine service should be bound in JNDI", container.getRequiredService(PROCESS_ENGINE_SERVICE_BINDING_SERVICE_NAME));
 
     ServiceController<?> defaultEngineService = container.getService(ServiceNames.forManagedProcessEngine("__default"));
 
@@ -196,9 +201,10 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
         .build();
 
     ServiceContainer container = services.getContainer();
-    assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
-    assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
 
+    assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
+    assertNotNull("process engine service should be bound in JNDI", container.getService(PROCESS_ENGINE_SERVICE_BINDING_SERVICE_NAME));
+    assertNull(container.getService(PLATFORM_JOBEXECUTOR_SERVICE_NAME));
   }
 
   @Test
@@ -210,7 +216,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
         .build();
 
     ServiceContainer container = services.getContainer();
-    ServiceController<BpmPlatformPlugins> serviceController = (ServiceController<BpmPlatformPlugins>) container.getService(ServiceNames.forBpmPlatformPlugins());
+    ServiceController<BpmPlatformPlugins> serviceController = (ServiceController<BpmPlatformPlugins>) container.getService(PLATFORM_BPM_PLATFORM_PLUGINS_SERVICE_NAME);
     assertNotNull(serviceController);
     BpmPlatformPlugins platformPlugins = serviceController.getValue();
     assertNotNull(platformPlugins);
@@ -229,7 +235,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
 
     ServiceContainer container = services.getContainer();
     assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
-    assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
+    assertNotNull("process engine service should be bound in JNDI", container.getService(PROCESS_ENGINE_SERVICE_BINDING_SERVICE_NAME));
 
     assertNotNull("process engine controller for engine __default is installed ", container.getService(ServiceNames.forManagedProcessEngine("__default")));
     assertNotNull("process engine controller for engine __test is installed ", container.getService(ServiceNames.forManagedProcessEngine("__test")));
@@ -246,7 +252,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
 
 
     assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
-    assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
+    assertNotNull("process engine service should be bound in JNDI", container.getService(PROCESS_ENGINE_SERVICE_BINDING_SERVICE_NAME));
 
     ServiceController<?> defaultEngineService = container.getService(ServiceNames.forManagedProcessEngine("__default"));
 
@@ -290,7 +296,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     ServiceContainer container = services.getContainer();
 
     assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
-    assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
+    assertNotNull("process engine service should be bound in JNDI", container.getService(PROCESS_ENGINE_SERVICE_BINDING_SERVICE_NAME));
 
     assertNotNull("process engine controller for engine __default is installed ", container.getService(ServiceNames.forManagedProcessEngine("__default")));
 
@@ -333,18 +339,12 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   @Test
   public void testInstallSubsystemWithJobExecutorXml() throws Exception {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_JOB_EXECUTOR);
-//    System.out.println(normalizeXML(subsystemXml));
     KernelServices services = createKernelServicesBuilder(null)
         .setSubsystemXml(subsystemXml)
         .build();
     ServiceContainer container = services.getContainer();
-//    container.dumpServices();
 
-    assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
-    assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
-
-    assertNotNull("platform jobexecutor service should be installed", container.getService(PLATFORM_JOBEXECUTOR_SERVICE_NAME));
-
+    commonSubsystemServicesAreInstalled(container);
   }
 
   @Test
@@ -409,10 +409,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
         .build();
     ServiceContainer container = services.getContainer();
 
-    assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
-    assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
-
-    assertNotNull("platform jobexecutor service should be installed", container.getService(PLATFORM_JOBEXECUTOR_SERVICE_NAME));
+    commonSubsystemServicesAreInstalled(container);
 
     // "default" job acquisition ///////////////////////////////////////////////////////////
     ServiceController<?> defaultJobAcquisitionService = container.getService(ServiceNames.forMscRuntimeContainerJobExecutorService("default"));
@@ -426,6 +423,20 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     assertEquals(300000, defaultJobExecutor.getLockTimeInMillis());
     assertEquals(5000, defaultJobExecutor.getWaitTimeInMillis());
     assertEquals(3, defaultJobExecutor.getMaxJobsPerAcquisition());
+
+    // ServiceName: 'org.camunda.bpm.platform.job-executor.job-executor-tp'
+    ServiceController<ManagedQueueExecutorService> managedQueueExecutorServiceController = (ServiceController<ManagedQueueExecutorService>) container.getService(ServiceNames.forManagedThreadPool(SubsystemAttributeDefinitons.DEFAULT_JOB_EXECUTOR_THREADPOOL_NAME));
+    assertNotNull(managedQueueExecutorServiceController);
+    ManagedQueueExecutorService managedQueueExecutorService = managedQueueExecutorServiceController.getValue();
+    assertNotNull(managedQueueExecutorService);
+    assertEquals("Number of core threads is wrong", SubsystemAttributeDefinitons.DEFAULT_CORE_THREADS, managedQueueExecutorService.getCoreThreads());
+    assertEquals("Number of max threads is wrong", SubsystemAttributeDefinitons.DEFAULT_MAX_THREADS, managedQueueExecutorService.getMaxThreads());
+    assertEquals(SubsystemAttributeDefinitons.DEFAULT_KEEPALIVE_TIME, TimeUnit.NANOSECONDS.toSeconds(managedQueueExecutorService.getKeepAlive()));
+    assertEquals(false, managedQueueExecutorService.isBlocking());
+    assertEquals(SubsystemAttributeDefinitons.DEFAULT_ALLOW_CORE_TIMEOUT, managedQueueExecutorService.isAllowCoreTimeout());
+
+    ServiceController<ThreadFactoryService> threadFactoryService = (ServiceController<ThreadFactoryService>) container.getService(ServiceNames.forThreadFactoryService(SubsystemAttributeDefinitons.DEFAULT_JOB_EXECUTOR_THREADPOOL_NAME));
+    assertNotNull(threadFactoryService);
 
     // "anders" job acquisition /////////////////////////////////////////////////////////
     ServiceController<?> andersJobAcquisitionService = container.getService(ServiceNames.forMscRuntimeContainerJobExecutorService("anders"));
@@ -459,24 +470,17 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   @Test
   public void testJobAcquisitionStrategyOptional() throws Exception {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_JOB_EXECUTOR_WITHOUT_ACQUISITION_STRATEGY);
-//    System.out.println(normalizeXML(subsystemXml));
     KernelServices services = createKernelServicesBuilder(null)
         .setSubsystemXml(subsystemXml)
         .build();
     ServiceContainer container = services.getContainer();
-//    container.dumpServices();
 
-    assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
-    assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
-
-    assertNotNull("platform jobexecutor service should be installed", container.getService(PLATFORM_JOBEXECUTOR_SERVICE_NAME));
+    commonSubsystemServicesAreInstalled(container);
   }
-
 
   @Test
   public void testParseSubsystemXmlWithEnginesAndJobExecutor() throws Exception {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_PROCESS_ENGINES_AND_JOB_EXECUTOR);
-    System.out.println(normalizeXML(subsystemXml));
 
     List<ModelNode> operations = parse(subsystemXml);
     System.out.println(operations);
@@ -486,58 +490,105 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   @Test
   public void testInstallSubsystemXmlWithEnginesAndJobExecutor() throws Exception {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_PROCESS_ENGINES_AND_JOB_EXECUTOR);
-//    System.out.println(normalizeXML(subsystemXml));
+
     KernelServices services = createKernelServicesBuilder(null)
         .setSubsystemXml(subsystemXml)
         .build();
     ServiceContainer container = services.getContainer();
-//    container.dumpServices();
 
-    assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
-    assertNotNull("platform jobexecutor service should be installed", container.getService(PLATFORM_JOBEXECUTOR_SERVICE_NAME));
-    assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
-
+    commonSubsystemServicesAreInstalled(container);
     assertNotNull("process engine controller for engine __default is installed ", container.getService(ServiceNames.forManagedProcessEngine("__default")));
     assertNotNull("process engine controller for engine __test is installed ", container.getService(ServiceNames.forManagedProcessEngine("__test")));
 
-
     String persistedSubsystemXml = services.getPersistedSubsystemXml();
-//    System.out.println(persistedSubsystemXml);
     compareXml(null, subsystemXml, persistedSubsystemXml);
   }
 
   @Test
-  public void testParseAndMarshalModelWithEveryAvailableOptionUsed() throws Exception {
-    //Parse the subsystem xml and install into the first controller
-    String subsystemXml = FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_EVERY_AVAILABLE_OPTION_USED);
-    KernelServices servicesA = super.createKernelServicesBuilder(null).setSubsystemXml(subsystemXml).build();
-    // Get the model and the persisted xml from the first controller
-    ModelNode modelA = servicesA.readWholeModel();
-    String marshalled = servicesA.getPersistedSubsystemXml();
-
-    //Install the persisted xml from the first controller into a second controller
-    KernelServices servicesB = super.createKernelServicesBuilder(null).setSubsystemXml(marshalled).build();
-    ModelNode modelB = servicesB.readWholeModel();
-
-    //Make sure the models from the two controllers are identical
-    super.compare(modelA, modelB);
+  public void testParseAndMarshalModelWithAllAvailableOptions() throws Exception {
+    parseAndMarshalSubsystemModelFromFile(SUBSYSTEM_WITH_ALL_OPTIONS);
   }
 
   @Test
-  public void testParseAndMarshalModelWithMinimalOptionsUsed() throws Exception {
-    //Parse the subsystem xml and install into the first controller
-    String subsystemXml = FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_MINIMAL_OPTIONS_USED);
-    KernelServices servicesA = super.createKernelServicesBuilder(null).setSubsystemXml(subsystemXml).build();
+  public void testParseAndMarshalModelWithRequiredOptionsOnly() throws Exception {
+    parseAndMarshalSubsystemModelFromFile(SUBSYSTEM_WITH_REQUIRED_OPTIONS);
+  }
+
+  // HELPERS
+
+  /**
+   *  Parses and marshall the given subsystemXmlFile into one controller, then reads the model into second one.
+   *  Compares the models afterwards.
+   * @param subsystemXmlFile the name of the subsystem xml file
+   * @throws Exception
+   */
+  protected void parseAndMarshalSubsystemModelFromFile(String subsystemXmlFile) throws Exception {
+    String subsystemXml = FileUtils.readFile(subsystemXmlFile);
+    // Parse the subsystem xml and install into the first controller
+    KernelServices servicesA = createKernelServicesBuilder(null).setSubsystemXml(subsystemXml).build();
     // Get the model and the persisted xml from the first controller
     ModelNode modelA = servicesA.readWholeModel();
     String marshalled = servicesA.getPersistedSubsystemXml();
 
-    //Install the persisted xml from the first controller into a second controller
-    KernelServices servicesB = super.createKernelServicesBuilder(null).setSubsystemXml(marshalled).build();
+    // Make sure the xml is the same
+    compareXml(null, subsystemXml, marshalled);
+
+    // Install the persisted xml from the first controller into a second controller
+    KernelServices servicesB = createKernelServicesBuilder(null).setSubsystemXml(marshalled).build();
     ModelNode modelB = servicesB.readWholeModel();
 
-    //Make sure the models from the two controllers are identical
-    super.compare(modelA, modelB);
+    // Make sure the models from the two controllers are identical
+    compare(modelA, modelB);
   }
 
+  protected void commonSubsystemServicesAreInstalled(ServiceContainer container) {
+    assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
+    assertNotNull("process engine service should be bound in JNDI", container.getService(PROCESS_ENGINE_SERVICE_BINDING_SERVICE_NAME));
+    assertNotNull("platform jobexecutor service should be installed", container.getService(PLATFORM_JOBEXECUTOR_SERVICE_NAME));
+    assertNotNull("platform jobexecutor managed threadpool service should be installed", container.getService(PLATFORM_JOBEXECUTOR_MANAGED_THREAD_POOL_SERVICE_NAME));
+    assertNotNull("bpm platform plugins service should be installed", container.getService(PLATFORM_BPM_PLATFORM_PLUGINS_SERVICE_NAME));
+  }
+
+  protected static Comparator<PathAddress> getSubsystemRemoveOrderComparator() {
+    final List<PathAddress> REMOVE_ORDER_OF_SUBSYSTEM = Arrays.asList(
+        PathAddress.pathAddress(BpmPlatformExtension.SUBSYSTEM_PATH),
+        PathAddress.pathAddress(BpmPlatformExtension.JOB_EXECUTOR_PATH),
+        PathAddress.pathAddress(BpmPlatformExtension.JOB_ACQUISTIONS_PATH),
+        PathAddress.pathAddress(BpmPlatformExtension.PROCESS_ENGINES_PATH)
+    );
+
+    return new Comparator<PathAddress>() {
+      protected PathAddress normalizePathAddress(PathAddress pathAddress) {
+        if (pathAddress.size() == 1 && pathAddress.equals(REMOVE_ORDER_OF_SUBSYSTEM.get(0))) {
+          return pathAddress;
+        } else {
+          // strip subsystem parentAddress
+          return pathAddress.subAddress(1, pathAddress.size());
+        }
+      }
+
+      protected int getOrder(PathAddress pathAddress) {
+        for (PathAddress orderedAddress : REMOVE_ORDER_OF_SUBSYSTEM) {
+          if (orderedAddress.getLastElement().getKey().equals(pathAddress.getLastElement().getKey())) {
+            return REMOVE_ORDER_OF_SUBSYSTEM.indexOf(orderedAddress);
+          }
+        }
+        throw new IllegalArgumentException("Unable to find a match for path address: " + pathAddress);
+      }
+
+      @Override
+      public int compare(PathAddress o1, PathAddress o2) {
+        int orderO1 = getOrder(normalizePathAddress(o1));
+        int orderO2 = getOrder(normalizePathAddress(o2));
+
+        if (orderO1 < orderO2) {
+          return -1;
+        } else if (orderO1 > orderO2) {
+          return 1;
+        } else {
+          return 0;
+        }
+      }
+    };
+  }
 }

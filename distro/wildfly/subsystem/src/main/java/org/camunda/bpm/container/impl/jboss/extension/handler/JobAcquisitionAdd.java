@@ -15,7 +15,7 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
-import org.camunda.bpm.container.impl.jboss.extension.Constants;
+import org.camunda.bpm.container.impl.jboss.extension.SubsystemAttributeDefinitons;
 import org.camunda.bpm.container.impl.jboss.service.MscRuntimeContainerJobExecutor;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
@@ -40,7 +40,7 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler {
   public static final JobAcquisitionAdd INSTANCE = new JobAcquisitionAdd();
 
   private JobAcquisitionAdd() {
-    super(Constants.JOB_ACQUISITION_ATTRIBUTES);
+    super(SubsystemAttributeDefinitons.JOB_ACQUISITION_ATTRIBUTES);
   }
 
   @Override
@@ -52,8 +52,8 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler {
 
     MscRuntimeContainerJobExecutor mscRuntimeContainerJobExecutor = new MscRuntimeContainerJobExecutor();
 
-    if (model.hasDefined(Constants.PROPERTIES.getName())) {
-      List<Property> properties = Constants.PROPERTIES.resolveModelAttribute(context, model).asPropertyList();
+    if (model.hasDefined(SubsystemAttributeDefinitons.PROPERTIES.getName())) {
+      List<Property> properties = SubsystemAttributeDefinitons.PROPERTIES.resolveModelAttribute(context, model).asPropertyList();
       for (Property property : properties) {
         PropertyHelper.applyProperty(mscRuntimeContainerJobExecutor, property.getName(), property.getValue().asString());
       }

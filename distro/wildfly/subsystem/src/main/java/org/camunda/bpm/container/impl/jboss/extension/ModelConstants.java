@@ -41,13 +41,18 @@ public interface ModelConstants {
   String PLUGINS = "plugins";
   String PLUGIN = "plugin";
   String PLUGIN_CLASS = "class";
-  
+
   // attributes
   String DEFAULT = "default";
   String NAME = "name";
+  @Deprecated
   String THREAD_POOL_NAME = "thread-pool-name";
+  String MAX_THREADS = "max-threads";
+  String CORE_THREADS = "core-threads";
+  String QUEUE_LENGTH = "queue-length";
+  String ALLOW_CORE_TIMEOUT = "allow-core-timeout";
+  String KEEPALIVE_TIME = "keepalive-time";
 
   /** The name of our subsystem within the model. */
   String SUBSYSTEM_NAME = "camunda-bpm-platform";
-  
 }

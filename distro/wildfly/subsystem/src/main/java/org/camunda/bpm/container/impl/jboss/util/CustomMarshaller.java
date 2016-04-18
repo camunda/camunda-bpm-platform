@@ -51,6 +51,9 @@ public class CustomMarshaller {
     }
   }
 
+  /**
+   * Marshall the attribute as an element where attribute name is the element and value is the text content.
+   */
   private static class AttributeAsElementMarshaller extends DefaultAttributeMarshaller {
 
     @Override
@@ -60,13 +63,16 @@ public class CustomMarshaller {
 
   }
 
+  /**
+   * Marshall the plugin object.
+   */
   private static class PluginObjectTypeMarshaller extends DefaultAttributeMarshaller {
 
     @Override
     public void marshallAsElement(AttributeDefinition attribute, ModelNode resourceModel, boolean marshallDefault, XMLStreamWriter writer) throws XMLStreamException {
       assert attribute instanceof ObjectTypeAttributeDefinition;
 
-      AttributeDefinition[] valueTypes = null;
+      AttributeDefinition[] valueTypes;
       valueTypes = CustomMarshaller.getValueTypes(attribute, ObjectTypeAttributeDefinition.class);
 
       writer.writeStartElement(attribute.getXmlName());
@@ -82,7 +88,9 @@ public class CustomMarshaller {
     }
   }
 
-
+  /**
+   * Marshall a list of objects.
+   */
   private static class ObjectListMarshaller extends AttributeMarshaller {
     private ObjectListMarshaller() {}
 

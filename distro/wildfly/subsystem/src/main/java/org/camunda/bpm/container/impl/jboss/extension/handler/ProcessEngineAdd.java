@@ -16,7 +16,7 @@
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
 import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
-import org.camunda.bpm.container.impl.jboss.extension.Constants;
+import org.camunda.bpm.container.impl.jboss.extension.SubsystemAttributeDefinitons;
 import org.camunda.bpm.container.impl.jboss.extension.Element;
 import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessEngineController;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
@@ -47,7 +47,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
   public static final ProcessEngineAdd INSTANCE = new ProcessEngineAdd();
 
   private ProcessEngineAdd() {
-    super(Constants.PROCESS_ENGINE_ATTRIBUTES);
+    super(SubsystemAttributeDefinitons.PROCESS_ENGINE_ATTRIBUTES);
   }
 
   @Override
@@ -80,13 +80,13 @@ public class ProcessEngineAdd extends AbstractAddStepHandler {
 
   protected ManagedProcessEngineMetadata transformConfiguration(final OperationContext context, String engineName, final ModelNode model) throws OperationFailedException {
     return new ManagedProcessEngineMetadata(
-      Constants.DEFAULT.resolveModelAttribute(context, model).asBoolean(),
+      SubsystemAttributeDefinitons.DEFAULT.resolveModelAttribute(context, model).asBoolean(),
       engineName,
-      Constants.DATASOURCE.resolveModelAttribute(context, model).asString(),
-      Constants.HISTORY_LEVEL.resolveModelAttribute(context, model).asString(),
-      Constants.CONFIGURATION.resolveModelAttribute(context, model).asString(),
-      getProperties(Constants.PROPERTIES.resolveModelAttribute(context, model)),
-      getPlugins(Constants.PLUGINS.resolveModelAttribute(context, model))
+      SubsystemAttributeDefinitons.DATASOURCE.resolveModelAttribute(context, model).asString(),
+      SubsystemAttributeDefinitons.HISTORY_LEVEL.resolveModelAttribute(context, model).asString(),
+      SubsystemAttributeDefinitons.CONFIGURATION.resolveModelAttribute(context, model).asString(),
+      getProperties(SubsystemAttributeDefinitons.PROPERTIES.resolveModelAttribute(context, model)),
+      getPlugins(SubsystemAttributeDefinitons.PLUGINS.resolveModelAttribute(context, model))
     );
   }
 

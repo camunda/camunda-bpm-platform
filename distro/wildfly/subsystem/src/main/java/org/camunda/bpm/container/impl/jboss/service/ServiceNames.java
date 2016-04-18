@@ -13,6 +13,7 @@
 package org.camunda.bpm.container.impl.jboss.service;
 
 import org.jboss.as.threads.CommonAttributes;
+import org.jboss.as.threads.ThreadsServices;
 import org.jboss.msc.service.ServiceName;
 
 /**
@@ -143,11 +144,18 @@ public class ServiceNames {
     return PROCESS_APPLICATION_MODULE.append(moduleName).append("STOP");
   }
 
-  public static ServiceName forMscThreadFactoryService(String threadPoolName) {
-    return JOB_EXECUTOR.append(CommonAttributes.THREAD_FACTORY).append(threadPoolName);
-  }
-
+  /**
+   * @return the {@link ServiceName} of the {@link org.jboss.as.threads.BoundedQueueThreadPoolService}
+   */
   public static ServiceName forManagedThreadPool(String threadPoolName) {
     return JOB_EXECUTOR.append(threadPoolName);
   }
+
+  /**
+   * @return the {@link ServiceName} of the {@link org.jboss.as.threads.ThreadFactoryService}
+   */
+  public static ServiceName forThreadFactoryService(String threadFactoryName) {
+    return ThreadsServices.threadFactoryName(threadFactoryName);
+  }
+
 }

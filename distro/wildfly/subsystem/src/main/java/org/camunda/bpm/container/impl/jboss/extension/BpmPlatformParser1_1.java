@@ -29,9 +29,6 @@ import static org.jboss.as.controller.parsing.ParseUtils.*;
 
 public class BpmPlatformParser1_1 extends AbstractParser {
 
-  public static final boolean REQUIRED = true;
-  public static final boolean NOT_REQUIRED = false;
-
   public void parse(final XMLExtendedStreamReader reader, final List<ModelNode> operations, ModelNode subsystemAddress) throws Exception {
     while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
       final Element element = Element.forName(reader.getLocalName());
@@ -81,7 +78,7 @@ public class BpmPlatformParser1_1 extends AbstractParser {
         case NAME: {
           engineName = rawAttributeText(reader, NAME.getLocalName());
           if (engineName != null && !engineName.equals("null")) {
-            Constants.NAME.parseAndSetParameter(engineName, addProcessEngineOp, reader);
+            SubsystemAttributeDefinitons.NAME.parseAndSetParameter(engineName, addProcessEngineOp, reader);
           } else {
             throw missingRequiredElement(reader, Collections.singleton(NAME.getLocalName()));
           }
@@ -90,7 +87,7 @@ public class BpmPlatformParser1_1 extends AbstractParser {
         case DEFAULT: {
           final String value = rawAttributeText(reader, DEFAULT.getLocalName());
           if (value != null) {
-            Constants.DEFAULT.parseAndSetParameter(value, addProcessEngineOp, reader);
+            SubsystemAttributeDefinitons.DEFAULT.parseAndSetParameter(value, addProcessEngineOp, reader);
           }
           break;
         }
@@ -120,15 +117,15 @@ public class BpmPlatformParser1_1 extends AbstractParser {
       final Element element = Element.forName(reader.getLocalName());
       switch (element) {
         case DATASOURCE: {
-          parseElement(Constants.DATASOURCE, addProcessEngineOp, reader);
+          parseElement(SubsystemAttributeDefinitons.DATASOURCE, addProcessEngineOp, reader);
           break;
         }
         case HISTORY_LEVEL: {
-          parseElement(Constants.HISTORY_LEVEL, addProcessEngineOp, reader);
+          parseElement(SubsystemAttributeDefinitons.HISTORY_LEVEL, addProcessEngineOp, reader);
           break;
         }
         case CONFIGURATION: {
-          parseElement(Constants.CONFIGURATION, addProcessEngineOp, reader);
+          parseElement(SubsystemAttributeDefinitons.CONFIGURATION, addProcessEngineOp, reader);
           break;
         }
         case PROPERTIES: {
@@ -175,12 +172,10 @@ public class BpmPlatformParser1_1 extends AbstractParser {
       final Element element = Element.forName(reader.getLocalName());
       switch (element) {
         case PLUGIN_CLASS: {
-//          Constants.PLUGIN.parseAndSetParameter();
-          parseElement(Element.PLUGIN_CLASS, reader, plugin, REQUIRED);
+          parseElement(SubsystemAttributeDefinitons.PLUGIN_CLASS, plugin, reader);
           break;
         }
         case PROPERTIES: {
-//          Constants.PLUGIN.parseAndSetParameter();
           parseProperties(reader, operations, plugin);
           break;
         }
@@ -203,7 +198,7 @@ public class BpmPlatformParser1_1 extends AbstractParser {
           String name = reader.getAttributeValue(0);
           String value = rawElementText(reader);
 
-          Constants.PROPERTIES.parseAndAddParameterElement(name, value, parentAddress, reader);
+          SubsystemAttributeDefinitons.PROPERTIES.parseAndAddParameterElement(name, value, parentAddress, reader);
           break;
         }
         default: {
@@ -239,7 +234,23 @@ public class BpmPlatformParser1_1 extends AbstractParser {
               break;
             }
             case THREAD_POOL_NAME: {
-              parseElement(Constants.THREAD_POOL_NAME, addJobExecutorOp, reader);
+              parseElement(SubsystemAttributeDefinitons.THREAD_POOL_NAME, addJobExecutorOp, reader);
+              break;
+            }
+            case CORE_THREADS: {
+              parseElement(SubsystemAttributeDefinitons.CORE_THREADS, addJobExecutorOp, reader);
+              break;
+            }
+            case MAX_THREADS: {
+              parseElement(SubsystemAttributeDefinitons.MAX_THREADS, addJobExecutorOp, reader);
+              break;
+            }
+            case QUEUE_LENGTH: {
+              parseElement(SubsystemAttributeDefinitons.QUEUE_LENGTH, addJobExecutorOp, reader);
+              break;
+            }
+            case KEEPALIVE_TIME: {
+              parseElement(SubsystemAttributeDefinitons.KEEPALIVE_TIME, addJobExecutorOp, reader);
               break;
             }
             default: {
@@ -290,7 +301,7 @@ public class BpmPlatformParser1_1 extends AbstractParser {
         case NAME: {
           acquisitionName = rawAttributeText(reader, NAME.getLocalName());
           if (acquisitionName != null && !acquisitionName.equals("null")) {
-            Constants.NAME.parseAndSetParameter(acquisitionName, addJobAcquisitionOp, reader);
+            SubsystemAttributeDefinitons.NAME.parseAndSetParameter(acquisitionName, addJobAcquisitionOp, reader);
           } else {
             throw missingRequiredElement(reader, Collections.singleton(NAME.getLocalName()));
           }
@@ -323,7 +334,7 @@ public class BpmPlatformParser1_1 extends AbstractParser {
               break;
             }
             case ACQUISITION_STRATEGY: {
-              parseElement(Constants.ACQUISITION_STRATEGY, addJobAcquisitionOp, reader);
+              parseElement(SubsystemAttributeDefinitons.ACQUISITION_STRATEGY, addJobAcquisitionOp, reader);
               break;
             }
             default: {
@@ -340,25 +351,6 @@ public class BpmPlatformParser1_1 extends AbstractParser {
     String value = rawElementText(reader);
     ((SimpleAttributeDefinition) attributeDefinition).parseAndSetParameter(value, operation, reader);
   }
-
-  protected void parseElement(Element element, XMLExtendedStreamReader reader, ModelNode parentAddress, boolean required) throws XMLStreamException {
-    if (!element.equals(Element.forName(reader.getLocalName()))) {
-      throw unexpectedElement(reader);
-    }
-
-    String elementName = reader.getLocalName();
-    String elementValue = rawElementText(reader);
-
-
-
-    if (elementValue == null && required) {
-      throw missingRequiredElement(reader, Collections.singleton(element.getLocalName()));
-    }
-
-    parentAddress.get(elementName).set(elementValue);
-  }
-
-
 
 
 
@@ -422,8 +414,8 @@ public class BpmPlatformParser1_1 extends AbstractParser {
           writer.writeStartElement(Element.PROCESS_ENGINE.getLocalName());
 
           ModelNode propertyValue = property.getValue();
-          for (AttributeDefinition processEngineAttribute : Constants.PROCESS_ENGINE_ATTRIBUTES) {
-            if (processEngineAttribute.equals(Constants.NAME) || processEngineAttribute.equals(Constants.DEFAULT)) {
+          for (AttributeDefinition processEngineAttribute : SubsystemAttributeDefinitons.PROCESS_ENGINE_ATTRIBUTES) {
+            if (processEngineAttribute.equals(SubsystemAttributeDefinitons.NAME) || processEngineAttribute.equals(SubsystemAttributeDefinitons.DEFAULT)) {
               ((SimpleAttributeDefinition) processEngineAttribute).marshallAsAttribute(propertyValue, writer);
             } else {
               processEngineAttribute.marshallAsElement(propertyValue, writer);
@@ -448,8 +440,8 @@ public class BpmPlatformParser1_1 extends AbstractParser {
         for (Property property : jobExecutorNode.asPropertyList()) {
           ModelNode propertyValue = property.getValue();
 
-          for (AttributeDefinition jobExecutorAttribute : Constants.JOB_EXECUTOR_ATTRIBUTES) {
-            if (jobExecutorAttribute.equals(Constants.NAME)) {
+          for (AttributeDefinition jobExecutorAttribute : SubsystemAttributeDefinitons.JOB_EXECUTOR_ATTRIBUTES) {
+            if (jobExecutorAttribute.equals(SubsystemAttributeDefinitons.NAME)) {
               ((SimpleAttributeDefinition) jobExecutorAttribute).marshallAsAttribute(propertyValue, writer);
             } else {
               jobExecutorAttribute.marshallAsElement(propertyValue, writer);
@@ -474,8 +466,8 @@ public class BpmPlatformParser1_1 extends AbstractParser {
           // write each child element to xml
           writer.writeStartElement(Element.JOB_AQUISITION.getLocalName());
 
-          for (AttributeDefinition jobAcquisitionAttribute : Constants.JOB_ACQUISITION_ATTRIBUTES) {
-            if (jobAcquisitionAttribute.equals(Constants.NAME)) {
+          for (AttributeDefinition jobAcquisitionAttribute : SubsystemAttributeDefinitons.JOB_ACQUISITION_ATTRIBUTES) {
+            if (jobAcquisitionAttribute.equals(SubsystemAttributeDefinitons.NAME)) {
               ((SimpleAttributeDefinition) jobAcquisitionAttribute).marshallAsAttribute(property.getValue(), writer);
             } else {
               jobAcquisitionAttribute.marshallAsElement(property.getValue(), writer);

@@ -15,15 +15,17 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
-import org.camunda.bpm.container.impl.jboss.extension.Constants;
+import org.camunda.bpm.container.impl.jboss.extension.SubsystemAttributeDefinitons;
 import org.camunda.bpm.container.impl.jboss.service.MscExecutorService;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.ServiceVerificationHandler;
-import org.jboss.as.threads.*;
+import org.jboss.as.threads.BoundedQueueThreadPoolService;
+import org.jboss.as.threads.ManagedQueueExecutorService;
+import org.jboss.as.threads.ThreadFactoryService;
+import org.jboss.as.threads.TimeSpec;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
@@ -35,8 +37,6 @@ import java.util.List;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.THREAD_POOL_NAME;
-
 
 /**
  * Installs the JobExecutor service into the container.
@@ -45,10 +45,12 @@ import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.THRE
  */
 public class JobExecutorAdd extends AbstractAddStepHandler {
 
+  public static final String THREAD_POOL_GRP_NAME = "Camunda BPM ";
+
   public static final JobExecutorAdd INSTANCE = new JobExecutorAdd();
 
   private JobExecutorAdd() {
-    super(Constants.JOB_EXECUTOR_ATTRIBUTES);
+    super(SubsystemAttributeDefinitons.JOB_EXECUTOR_ATTRIBUTES);
   }
 
   @Override
@@ -56,14 +58,10 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
           ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers)
           throws OperationFailedException {
 
-    if (!model.hasDefined(THREAD_POOL_NAME)) {
-      throw new ProcessEngineException("Unable to configure threadpool for ContainerJobExecutorService, missing element '" + THREAD_POOL_NAME + "' in JobExecutor configuration.");
-    }
-
-    String jobExecutorThreadPoolName = Constants.THREAD_POOL_NAME.resolveModelAttribute(context, model).asString();
+    String jobExecutorThreadPoolName = SubsystemAttributeDefinitons.THREAD_POOL_NAME.resolveModelAttribute(context, model).asString();
     ServiceName jobExecutorThreadPoolServiceName = ServiceNames.forManagedThreadPool(jobExecutorThreadPoolName);
 
-    performRuntimeThreadPool(context, jobExecutorThreadPoolName, jobExecutorThreadPoolServiceName, verificationHandler, newControllers);
+    performRuntimeThreadPool(context, model, jobExecutorThreadPoolName, jobExecutorThreadPoolServiceName, verificationHandler, newControllers);
 
     MscExecutorService service = new MscExecutorService();
     ServiceController<MscExecutorService> serviceController = context.getServiceTarget().addService(ServiceNames.forMscExecutorService(), service)
@@ -76,16 +74,16 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
 
   }
 
-  private void performRuntimeThreadPool(OperationContext context, String name, ServiceName jobExecutorThreadPoolServiceName,
+  protected void performRuntimeThreadPool(OperationContext context, ModelNode model, String name, ServiceName jobExecutorThreadPoolServiceName,
       ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers)
       throws OperationFailedException {
 
     ServiceTarget serviceTarget = context.getServiceTarget();
 
     ThreadFactoryService threadFactory = new ThreadFactoryService();
-    threadFactory.setThreadGroupName("Camunda BPM " + name);
+    threadFactory.setThreadGroupName(THREAD_POOL_GRP_NAME + name);
 
-    final ServiceName threadFactoryServiceName = ThreadsServices.threadFactoryName(name);
+    ServiceName threadFactoryServiceName = ServiceNames.forThreadFactoryService(name);
 
     ServiceBuilder<ThreadFactory> factoryBuilder = serviceTarget.addService(threadFactoryServiceName, threadFactory);
     if (verificationHandler != null) {
@@ -97,10 +95,17 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
       factoryBuilder.install();
     }
 
-    final BoundedQueueThreadPoolService service = new BoundedQueueThreadPoolService(3, 19, 3, false, new TimeSpec(TimeUnit.SECONDS, 10), true);
+    final BoundedQueueThreadPoolService threadPoolService = new BoundedQueueThreadPoolService(
+        SubsystemAttributeDefinitons.CORE_THREADS.resolveModelAttribute(context, model).asInt(),
+        SubsystemAttributeDefinitons.MAX_THREADS.resolveModelAttribute(context, model).asInt(),
+        SubsystemAttributeDefinitons.QUEUE_LENGTH.resolveModelAttribute(context, model).asInt(),
+        false,
+        new TimeSpec(TimeUnit.SECONDS, SubsystemAttributeDefinitons.KEEPALIVE_TIME.resolveModelAttribute(context,model).asInt()),
+        SubsystemAttributeDefinitons.ALLOW_CORE_TIMEOUT.resolveModelAttribute(context, model).asBoolean()
+    );
 
-    ServiceBuilder<ManagedQueueExecutorService> builder = serviceTarget.addService(jobExecutorThreadPoolServiceName, service)
-        .addDependency(threadFactoryServiceName, ThreadFactory.class, service.getThreadFactoryInjector())
+    ServiceBuilder<ManagedQueueExecutorService> builder = serviceTarget.addService(jobExecutorThreadPoolServiceName, threadPoolService)
+        .addDependency(threadFactoryServiceName, ThreadFactory.class, threadPoolService.getThreadFactoryInjector())
         .setInitialMode(ServiceController.Mode.ACTIVE);
     if (verificationHandler != null) {
       builder.addListener(verificationHandler);
@@ -111,4 +116,5 @@ public class JobExecutorAdd extends AbstractAddStepHandler {
       builder.install();
     }
   }
+
 }

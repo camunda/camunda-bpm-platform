@@ -1,7 +1,7 @@
 package org.camunda.bpm.container.impl.jboss.extension.resource;
 
 import org.camunda.bpm.container.impl.jboss.extension.BpmPlatformExtension;
-import org.camunda.bpm.container.impl.jboss.extension.Constants;
+import org.camunda.bpm.container.impl.jboss.extension.SubsystemAttributeDefinitons;
 import org.camunda.bpm.container.impl.jboss.extension.ModelConstants;
 import org.camunda.bpm.container.impl.jboss.extension.handler.JobExecutorAdd;
 import org.camunda.bpm.container.impl.jboss.extension.handler.JobExecutorRemove;
@@ -23,7 +23,7 @@ public class JobExecutorDefinition extends PersistentResourceDefinition {
 
   @Override
   public Collection<AttributeDefinition> getAttributes() {
-    return Arrays.asList(Constants.JOB_EXECUTOR_ATTRIBUTES);
+    return Arrays.asList(SubsystemAttributeDefinitons.JOB_EXECUTOR_ATTRIBUTES);
   }
 
   @Override
