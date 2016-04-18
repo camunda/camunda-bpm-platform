@@ -38,7 +38,7 @@ You can contribute code that fixes bugs and/or implements features.
 Best practices for writing test cases:
 
 * write JUnit4-style tests, not JUnit3
-* If you need a process engine object, use the JUnit rule `org.camunda.bpm.engine.test.util.CachedProcessEngineRule`. It ensures that the process engine object is reused across test cases and that certain integrity checks are performed after every test. For example:
+* Project `camunda-engine`: If you need a process engine object, use the JUnit rule `org.camunda.bpm.engine.test.util.CachedProcessEngineRule`. It ensures that the process engine object is reused across test cases and that certain integrity checks are performed after every test. For example:
   ```
   public ProcessEngineRule engineRule = new CachedProcessEngineRule();
 
@@ -49,7 +49,7 @@ Best practices for writing test cases:
     ...
   }
   ```
-* If you need a process engine with custom configuration, use the JUnit rule `org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule` and chain it with `org.camunda.bpm.engine.test.ProcessEngineRule` like so:
+* Project `camunda-engine`: If you need a process engine with custom configuration, use the JUnit rule `org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule` and chain it with `org.camunda.bpm.engine.test.ProcessEngineRule` like so:
   ```
   protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(engineRule) {
