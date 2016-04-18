@@ -33,8 +33,6 @@ module.exports = [ 'ViewsProvider', function (ViewsProvider) {
         }
         $scope.countAll = count.count || 0;
       });
-
-
     }],
 
     priority: 0
