@@ -152,7 +152,6 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     IdentityLinkEntity identityLinkEntity = IdentityLinkEntity.newIdentityLink();
     getIdentityLinks().add(identityLinkEntity);
     identityLinkEntity.setProcessDef(this);
-    identityLinkEntity.setProcessDefinitionKey(getKey());
     identityLinkEntity.setUserId(userId);
     identityLinkEntity.setGroupId(groupId);
     identityLinkEntity.setType(IdentityLinkType.CANDIDATE);
@@ -167,7 +166,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
       .findIdentityLinkByProcessDefinitionUserAndGroup(id, userId, groupId);
 
     for (IdentityLinkEntity identityLink: identityLinks) {
-      identityLink.delete(getKey());
+      identityLink.delete();
     }
   }
 

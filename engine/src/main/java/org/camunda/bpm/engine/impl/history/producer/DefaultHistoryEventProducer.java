@@ -686,14 +686,30 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   }
 
   protected void initHistoricIdentityLinkEvent(HistoricIdentityLinkLogEventEntity evt, IdentityLink identityLink, HistoryEventType eventType) {
-    IdentityLinkEntity entity = (IdentityLinkEntity) identityLink;
+
+    if (identityLink.getTaskId() != null) {
+      TaskEntity task = Context.getCommandContext().getTaskManager().findTaskById(identityLink.getTaskId());
+
+      evt.setProcessDefinitionId(task.getProcessDefinitionId());
+
+      if (task.getProcessDefinition() != null) {
+        evt.setProcessDefinitionKey(task.getProcessDefinition().getKey());
+      }
+    }
+
+    if (identityLink.getProcessDefId() != null) {
+      evt.setProcessDefinitionId(identityLink.getProcessDefId());
+
+      ProcessDefinitionEntity definition = Context.getProcessEngineConfiguration().getDeploymentCache()
+      .findProcessDefinitionFromCache(identityLink.getProcessDefId());
+      evt.setProcessDefinitionKey(definition.getKey());
+    }
+
     evt.setTime(ClockUtil.getCurrentTime());
     evt.setType(identityLink.getType());
     evt.setUserId(identityLink.getUserId());
     evt.setGroupId(identityLink.getGroupId());
     evt.setTaskId(identityLink.getTaskId());
-    evt.setProcessDefinitionId(identityLink.getProcessDefId());
-    evt.setProcessDefinitionKey(entity.getProcessDefinitionKey());
     // There is a conflict in HistoryEventTypes for 'delete' keyword,
     // So HistoryEventTypes.IDENTITY_LINK_ADD /
     // HistoryEventTypes.IDENTITY_LINK_DELETE is provided with the event name
