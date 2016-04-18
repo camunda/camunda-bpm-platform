@@ -70,7 +70,7 @@ create table ACT_RU_JOB (
     EXECUTION_ID_ nvarchar(64),
     PROCESS_INSTANCE_ID_ nvarchar(64),
     PROCESS_DEF_ID_ nvarchar(64),
-    PROCESS_DEF_KEY_ nvarchar(64),
+    PROCESS_DEF_KEY_ nvarchar(255),
     RETRIES_ int,
     EXCEPTION_STACK_ID_ nvarchar(64),
     EXCEPTION_MSG_ nvarchar(4000),

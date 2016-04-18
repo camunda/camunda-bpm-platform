@@ -5,6 +5,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.test.Deployment;
 
 /**
  *
@@ -69,6 +71,17 @@ public class JobEntityTest extends PluggableProcessEngineTestCase {
     }
 
     return sb.toString();
+  }
+
+  
+   @Deployment
+  public void testLongProcessDefinitionKey() {
+    String key = "myrealrealrealrealrealrealrealrealrealrealreallongprocessdefinitionkeyawesome";
+    String processInstanceId = runtimeService.startProcessInstanceByKey(key).getId();
+
+    Job job = managementService.createJobQuery().processInstanceId(processInstanceId).singleResult();
+
+    assertEquals(key, job.getProcessDefinitionKey());
   }
 
 }
