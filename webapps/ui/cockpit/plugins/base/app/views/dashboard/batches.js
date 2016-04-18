@@ -23,7 +23,7 @@ module.exports = [ 'ViewsProvider', function (ViewsProvider) {
           $scope.countRunning = 'unknown';
           throw err;
         }
-        $scope.countRunning = count.count || 0;
+        $scope.countRunning = count || 0;
       });
       var historyService = camAPI.resource('history');
       historyService.batchCount(function (err, count) {

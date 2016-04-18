@@ -93,6 +93,7 @@ Batch.prototype.load = function() {
 };
 
 Batch.prototype.loadDetails = function(id, type) {
+  var eventBus = this._eventBus;
   var obj = this._batches.selection;
   obj.state = 'LOADING';
   obj.type = type;
@@ -104,6 +105,7 @@ Batch.prototype.loadDetails = function(id, type) {
     } else {
       obj.data = data;
       obj.state = 'LOADED';
+      eventBus.emit('load:details:completed');
       if(type === 'runtime') {
         this._loadFailedJobs(data);
       }
@@ -119,6 +121,7 @@ Batch.prototype.loadDetails = function(id, type) {
 };
 
 Batch.prototype._loadFailedJobs = function(data) {
+  var eventBus = this._eventBus;
   var jobId = data.batchJobDefinitionId;
   var obj = this._jobs;
 
@@ -137,15 +140,17 @@ Batch.prototype._loadFailedJobs = function(data) {
       obj.state = 'ERROR';
     } else {
       obj.data = data;
-      obj.state = data.length ? 'LOADED' : 'EMPTY';
       this._sdk.resource('job').count(params, function(err, data) {
+        obj.state = data ? 'LOADED' : 'EMPTY';
         obj.count = data;
+        eventBus.emit('load:jobs:completed');
       });
     }
   }).bind(this));
 };
 
 Batch.prototype._load = function(type) {
+  var eventBus = this._eventBus;
   var obj = this._batches[type];
   obj.state = 'LOADING';
 
@@ -155,12 +160,15 @@ Batch.prototype._load = function(type) {
   };
   var cb = function(err, data) {
     obj.data = data.items || data;
-    obj.state = obj.data.length ? 'LOADED' : 'EMPTY';
     if(typeof data.count !== 'undefined') {
+      obj.state = data.count ? 'LOADED' : 'EMPTY';
       obj.count = data.count;
+      eventBus.emit('load:'+type+':completed');
     } else {
       this._sdk.resource('history').batchCount(params, function(err, data) {
+        obj.state = data.count ? 'LOADED' : 'EMPTY';
         obj.count = data.count;
+        eventBus.emit('load:'+type+':completed');
       });
     }
   }.bind(this);
