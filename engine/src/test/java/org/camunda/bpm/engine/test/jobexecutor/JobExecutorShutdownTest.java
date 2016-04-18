@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineRule;
+import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -63,7 +63,7 @@ public class JobExecutorShutdownTest {
       .endEvent()
       .done();
 
-  protected ProcessEngineRule engineRule = new PluggableProcessEngineRule();
+  protected ProcessEngineRule engineRule = new CachedProcessEngineRule();
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(engineRule) {
     @Override
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {

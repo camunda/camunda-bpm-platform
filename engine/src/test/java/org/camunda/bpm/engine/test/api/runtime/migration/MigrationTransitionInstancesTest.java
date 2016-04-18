@@ -36,7 +36,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.AsyncProcessMode
 import org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineRule;
+import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Assert;
@@ -51,7 +51,7 @@ import org.junit.rules.RuleChain;
  */
 public class MigrationTransitionInstancesTest {
 
-  protected ProcessEngineRule rule = new PluggableProcessEngineRule();
+  protected ProcessEngineRule rule = new CachedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule

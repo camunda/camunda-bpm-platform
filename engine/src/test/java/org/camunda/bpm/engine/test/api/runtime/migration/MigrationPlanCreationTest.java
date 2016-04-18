@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineRule;
+import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
 import org.hamcrest.CoreMatchers;
@@ -47,7 +47,7 @@ public class MigrationPlanCreationTest {
   public static final String ERROR_CODE = "Error";
   public static final String ESCALATION_CODE = "Escalation";
 
-  protected ProcessEngineRule rule = new PluggableProcessEngineRule();
+  protected ProcessEngineRule rule = new CachedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule

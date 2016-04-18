@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateEvent;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateExecutionListener;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineRule;
+import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.builder.ParallelGatewayBuilder;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
@@ -46,7 +46,7 @@ import org.junit.rules.RuleChain;
  */
 public class MigrationAddSubprocessTest {
 
-  protected ProcessEngineRule rule = new PluggableProcessEngineRule();
+  protected ProcessEngineRule rule = new CachedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule

@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineRule;
+import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -43,7 +43,7 @@ public class MigrationBoundaryEventsTest {
   public static final String TIMER_DATE = "2016-02-11T12:13:14Z";
   public static final String NEW_TIMER_DATE = "2018-02-11T12:13:14Z";
 
-  protected ProcessEngineRule rule = new PluggableProcessEngineRule();
+  protected ProcessEngineRule rule = new CachedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule

@@ -3,7 +3,7 @@ package org.camunda.bpm.engine.test.standalone.testing;
 
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineRule;
+import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 public class ProcessEngineRuleClassDeploymentTest {
 
   @Rule
-  public final ProcessEngineRule processEngineRule = new PluggableProcessEngineRule();
+  public final ProcessEngineRule processEngineRule = new CachedProcessEngineRule();
 
   @Test
   public void testDeploymentOnClassLevel() {

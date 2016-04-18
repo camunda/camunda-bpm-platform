@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
 import org.camunda.bpm.engine.test.jobexecutor.RecordingAcquireJobsRunnable.RecordedAcquisitionEvent;
 import org.camunda.bpm.engine.test.jobexecutor.RecordingAcquireJobsRunnable.RecordedWaitEvent;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineRule;
+import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.junit.After;
 import org.junit.Assert;
@@ -44,7 +44,7 @@ public class JobAcquisitionBackoffTest {
   protected static final int BACKOFF_DECREASE_THRESHOLD = 2;
   protected static final int DEFAULT_NUM_JOBS_TO_ACQUIRE = 3;
 
-  protected ProcessEngineRule engineRule = new PluggableProcessEngineRule();
+  protected ProcessEngineRule engineRule = new CachedProcessEngineRule();
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(engineRule) {
     @Override
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {

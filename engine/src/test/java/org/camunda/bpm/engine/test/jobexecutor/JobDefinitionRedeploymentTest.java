@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineRule;
+import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -66,7 +66,7 @@ public class JobDefinitionRedeploymentTest {
   public String processDefinitionResource;
 
   @Rule
-  public ProcessEngineRule rule = new PluggableProcessEngineRule();
+  public ProcessEngineRule rule = new CachedProcessEngineRule();
 
   protected ManagementService managementService;
   protected RepositoryService repositoryService;

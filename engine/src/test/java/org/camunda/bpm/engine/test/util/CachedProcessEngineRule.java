@@ -16,9 +16,9 @@ package org.camunda.bpm.engine.test.util;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 
-public class PluggableProcessEngineRule extends ProcessEngineRule {
+public class CachedProcessEngineRule extends ProcessEngineRule {
 
-  public PluggableProcessEngineRule() {
+  public CachedProcessEngineRule() {
     super(PluggableProcessEngineTestCase.getProcessEngine(), true);
   }
 

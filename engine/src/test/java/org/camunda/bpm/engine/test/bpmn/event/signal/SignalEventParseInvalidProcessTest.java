@@ -21,7 +21,7 @@ import static org.junit.Assert.fail;
 import junit.framework.AssertionFailedError;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineRule;
+import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,7 +59,7 @@ public class SignalEventParseInvalidProcessTest {
   public String expectedErrorMessage;
 
   @Rule
-  public ProcessEngineRule rule = new PluggableProcessEngineRule();
+  public ProcessEngineRule rule = new CachedProcessEngineRule();
 
   protected RepositoryService repositoryService;
 

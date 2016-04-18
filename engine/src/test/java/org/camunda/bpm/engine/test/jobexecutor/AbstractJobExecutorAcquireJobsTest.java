@@ -12,7 +12,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ClockTestUtil;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineRule;
+import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -20,7 +20,7 @@ import org.junit.Rule;
 public abstract class AbstractJobExecutorAcquireJobsTest {
 
   @Rule
-  public ProcessEngineRule rule = new PluggableProcessEngineRule();
+  public ProcessEngineRule rule = new CachedProcessEngineRule();
 
   protected ManagementService managementService;
   protected RuntimeService runtimeService;
