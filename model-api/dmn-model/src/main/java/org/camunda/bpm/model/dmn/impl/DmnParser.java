@@ -13,7 +13,9 @@
 
 package org.camunda.bpm.model.dmn.impl;
 
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_ALTERNATIVE_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_11_ALTERNATIVE_SCHEMA_LOCATION;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_11_SCHEMA_LOCATION;
 
 import java.io.InputStream;
@@ -28,8 +30,6 @@ import org.camunda.bpm.model.xml.instance.DomDocument;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.validation.SchemaFactory;
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_ALTERNATIVE_NS;
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_11_ALTERNATIVE_SCHEMA_LOCATION;
 
 public class DmnParser extends AbstractModelParser {
 

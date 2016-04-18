@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import org.camunda.bpm.model.dmn.impl.DmnModelInstanceImpl;
 
 import org.camunda.bpm.model.dmn.instance.BusinessContextElement;
 import org.camunda.bpm.model.dmn.instance.Decision;
@@ -54,7 +53,7 @@ public class ExampleTestCompatibility extends DmnModelTest {
    public static Collection<Object[]> parameters(){
      return Arrays.asList(new Object[][]{
          {Dmn.readModelFromStream(ExampleTestCompatibility.class.getResourceAsStream("Example.dmn"))},
-         //for compatability reasons we gotta check the old namespace, too
+         // for compatibility reasons we gotta check the old namespace, too
          {Dmn.readModelFromStream(ExampleTestCompatibility.class.getResourceAsStream("ExampleCompatibility.dmn"))}
      });
    }
@@ -65,7 +64,7 @@ public class ExampleTestCompatibility extends DmnModelTest {
   
   @Before
   public void parseModel() {  
-    modelInstance = ((DmnModelInstanceImpl)originalModelInstance).clone();
+    modelInstance = originalModelInstance.clone();
   }
   
   @Test

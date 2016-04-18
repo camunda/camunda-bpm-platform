@@ -13,10 +13,10 @@
 
 package org.camunda.bpm.model.dmn;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Arrays;
 import java.util.Collection;
-import static org.assertj.core.api.Assertions.assertThat;
-import org.camunda.bpm.model.dmn.impl.DmnModelInstanceImpl;
 
 import org.camunda.bpm.model.dmn.instance.Input;
 import org.junit.After;
@@ -38,7 +38,7 @@ public class CamundaExtensionsTest {
    public static Collection<Object[]> parameters(){
      return Arrays.asList(new Object[][]{
          {Dmn.readModelFromStream(CamundaExtensionsTest.class.getResourceAsStream("CamundaExtensionsTest.dmn"))},
-         //for compatability reasons we gotta check the old namespace, too
+         // for compatibility reasons we gotta check the old namespace, too
          {Dmn.readModelFromStream(CamundaExtensionsTest.class.getResourceAsStream("CamundaExtensionsCompatibilityTest.dmn"))}
      });
    }
@@ -49,7 +49,7 @@ public class CamundaExtensionsTest {
 
   @Before
   public void parseModel() {  
-    modelInstance = ((DmnModelInstanceImpl)originalModelInstance).clone();
+    modelInstance = originalModelInstance.clone();
     input = modelInstance.getModelElementById("input");
   }
 

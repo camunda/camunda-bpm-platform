@@ -13,14 +13,15 @@
 
 package org.camunda.bpm.model.dmn;
 
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_ALTERNATIVE_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_ALTERNATIVE_NS;
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 
 import org.camunda.bpm.model.dmn.impl.DmnParser;
 import org.camunda.bpm.model.dmn.impl.instance.AllowedAnswersImpl;
