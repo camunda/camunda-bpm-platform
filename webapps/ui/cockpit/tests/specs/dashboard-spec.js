@@ -14,11 +14,9 @@ describe('Cockpit Dashboard Spec', function() {
     });
   });
 
-  it('should display the sections on the page', function () {
-    expect(dashboardPage.pluginList().count()).to.eventually.eql(4);
-  });
-
-  it('should display the sections in the header navigation', function () {
-    expect(dashboardPage.navbarItems().count()).to.eventually.eql(4);
+  it('should display all sections of the page in the header', function() {
+    dashboardPage.pluginList().count().then(function(count) {
+      expect(dashboardPage.navbarItems().count()).to.eventually.eql(count);
+    })
   });
 });
