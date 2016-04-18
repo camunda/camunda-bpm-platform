@@ -221,6 +221,9 @@
         </if>
         )
       </foreach>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+
     </where>
   </sql>
 

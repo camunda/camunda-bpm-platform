@@ -17,6 +17,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NullValueException;
@@ -118,6 +119,42 @@ public class MultiTenancyHistoricTaskInstanceQueryTest extends PluggableProcessE
     assertThat(historicTaskInstances.size(), is(2));
     assertThat(historicTaskInstances.get(0).getTenantId(), is(TENANT_TWO));
     assertThat(historicTaskInstances.get(1).getTenantId(), is(TENANT_ONE));
+  }
+
+  public void testQueryNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+    assertThat(query.count(), is(0L));
+  }
+
+  public void testQueryAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    assertThat(query.count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count(), is(1L));
+  }
+
+  public void testQueryAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
+
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    assertThat(query.count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+  }
+
+  public void testQueryDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+    assertThat(query.count(), is(2L));
   }
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant) {

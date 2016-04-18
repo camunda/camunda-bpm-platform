@@ -258,6 +258,8 @@
         and ((RES.PROCESS_DEF_KEY_ is not null and AUTH.KEY_ is not null) or RES.PROCESS_DEF_KEY_ is null)
       </if>
 
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+
     </where>
   </sql>
 

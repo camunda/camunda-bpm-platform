@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NullValueException;
@@ -116,6 +117,42 @@ public class MultiTenancyHistoricActivityInstanceQueryTest extends PluggableProc
     assertThat(historicActivityInstances.get(1).getTenantId(), is(TENANT_TWO));
     assertThat(historicActivityInstances.get(2).getTenantId(), is(TENANT_ONE));
     assertThat(historicActivityInstances.get(3).getTenantId(), is(TENANT_ONE));
+  }
+
+  public void testQueryNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+    assertThat(query.count(), is(0L));
+  }
+
+  public void testQueryAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    assertThat(query.count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count(), is(2L));
+  }
+
+  public void testQueryAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    assertThat(query.count(), is(4L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(2L));
+  }
+
+  public void testQueryDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+    assertThat(query.count(), is(4L));
   }
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant) {
