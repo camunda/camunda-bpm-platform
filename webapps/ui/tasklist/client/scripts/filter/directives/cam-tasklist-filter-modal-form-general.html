@@ -113,16 +113,8 @@
   </div>
 
   <div class="row">
-    <div class="col-xs-8">
-    </div>
-
-    <div class="col-xs-4">
-      <label for="filter-form-refresh"
-             class="col-xs-6 control-label">
-        {{ 'FILTER_REFRESH_LABEL' | translate }}
-      </label>
-
-      <div class="col-xs-6">
+    <div class="col-xs-offset-2 col-md-offset-10 col-xs-4 col-md-2 checkbox">
+      <label>
         <input class="form-control"
                name="filterRefresh"
                ng-model="filter.properties.refresh"
@@ -130,7 +122,8 @@
                tooltip-append-to-body="false"
                tooltip="{{ 'FILTER_REFRESH_TOOLTIP' | translate }}"
                ng-disabled="filter.id && !accesses.update" />
-      </div>
+        {{ 'FILTER_REFRESH_LABEL' | translate }}
+      </label>
     </div>
   </div>
 
