@@ -20,6 +20,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
@@ -129,7 +131,7 @@ public class BatchMigrationTest {
       fail("Should not succeed");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("process instance ids is null"));
+      assertThat(e.getMessage(), containsString("process instance ids is empty"));
     }
   }
 
@@ -150,17 +152,47 @@ public class BatchMigrationTest {
   }
 
   @Test
+  public void testNullProcessInstanceQuery() {
+    ProcessDefinition testProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    try {
+      runtimeService.newMigration(migrationPlan).processInstanceQuery(null).executeAsync();
+      fail("Should not succeed");
+    }
+    catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("process instance ids is empty"));
+    }
+  }
+
+  @Test
+  public void testEmptyProcessInstanceQuery() {
+    ProcessDefinition testProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    ProcessInstanceQuery emptyProcessInstanceQuery = runtimeService.createProcessInstanceQuery();
+    assertEquals(0, emptyProcessInstanceQuery.count());
+
+    try {
+      runtimeService.newMigration(migrationPlan).processInstanceQuery(emptyProcessInstanceQuery).executeAsync();
+      fail("Should not succeed");
+    }
+    catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("process instance ids is empty"));
+    }
+  }
+
+  @Test
   public void testBatchCreation() {
     // when
     Batch batch = helper.migrateProcessInstancesAsync(15);
 
     // then a batch is created
-    assertNotNull(batch);
-    assertNotNull(batch.getId());
-    assertEquals("instance-migration", batch.getType());
-    assertEquals(15, batch.getSize());
-    assertEquals(10, batch.getBatchJobsPerSeed());
-    assertEquals(1, batch.getInvocationsPerBatchJob());
+    assertBatchCreated(batch, 15);
   }
 
   @Test
@@ -414,6 +446,77 @@ public class BatchMigrationTest {
     assertEquals(2, failedJob.getRetries());
     assertThat(failedJob.getExceptionMessage(), startsWith("ENGINE-23003"));
     assertThat(failedJob.getExceptionMessage(), containsString("Process instance '" + deletedProcessInstanceId + "' cannot be migrated"));
+  }
+
+  @Test
+  public void testBatchCreationWithProcessInstanceQuery() {
+    RuntimeService runtimeService = engineRule.getRuntimeService();
+    int processInstanceCount = 15;
+
+    ProcessDefinition sourceProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+
+    for (int i = 0; i < processInstanceCount; i++) {
+      runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    }
+
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(sourceProcessDefinition.getId());
+    assertEquals(processInstanceCount, sourceProcessInstanceQuery.count());
+
+    // when
+    Batch batch = runtimeService.newMigration(migrationPlan)
+      .processInstanceQuery(sourceProcessInstanceQuery)
+      .executeAsync();
+
+    // then a batch is created
+    assertBatchCreated(batch, processInstanceCount);
+  }
+
+  @Test
+  public void testBatchCreationWithOverlappingProcessInstanceIdsAndQuery() {
+    RuntimeService runtimeService = engineRule.getRuntimeService();
+    int processInstanceCount = 15;
+
+    ProcessDefinition sourceProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+
+    List<String> processInstanceIds = new ArrayList<String>();
+    for (int i = 0; i < processInstanceCount; i++) {
+      processInstanceIds.add(
+        runtimeService.startProcessInstanceById(sourceProcessDefinition.getId()).getId()
+      );
+    }
+
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(sourceProcessDefinition.getId());
+    assertEquals(processInstanceCount, sourceProcessInstanceQuery.count());
+
+    // when
+    Batch batch = runtimeService.newMigration(migrationPlan)
+      .processInstanceIds(processInstanceIds)
+      .processInstanceQuery(sourceProcessInstanceQuery)
+      .executeAsync();
+
+    // then a batch is created
+    assertBatchCreated(batch, processInstanceCount);
+  }
+
+  protected void assertBatchCreated(Batch batch, int processInstanceCount) {
+    assertNotNull(batch);
+    assertNotNull(batch.getId());
+    assertEquals("instance-migration", batch.getType());
+    assertEquals(processInstanceCount, batch.getSize());
+    assertEquals(10, batch.getBatchJobsPerSeed());
+    assertEquals(1, batch.getInvocationsPerBatchJob());
   }
 
 }

@@ -12,8 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.migration;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -74,10 +77,10 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
 
   public Void execute(CommandContext commandContext) {
     MigrationPlan migrationPlan = migrationPlanExecutionBuilder.getMigrationPlan();
-    List<String> processInstanceIds = migrationPlanExecutionBuilder.getProcessInstanceIds();
+    Collection<String> processInstanceIds = collectProcessInstanceIds();
 
     ensureNotNull(BadUserRequestException.class, "Migration plan cannot be null", "migration plan", migrationPlan);
-    ensureNotNull(BadUserRequestException.class, "Process instance ids cannot be null", "process instance ids", processInstanceIds);
+    ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be null or empty", "process instance ids", processInstanceIds);
 
     ProcessDefinitionEntity targetProcessDefinition = commandContext.getProcessEngineConfiguration()
       .getDeploymentCache().findDeployedProcessDefinitionById(migrationPlan.getTargetProcessDefinitionId());
@@ -87,6 +90,22 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
     }
 
     return null;
+  }
+
+  protected Collection<String> collectProcessInstanceIds() {
+    Set<String> collectedProcessInstanceIds = new HashSet<String>();
+
+    List<String> processInstanceIds = migrationPlanExecutionBuilder.getProcessInstanceIds();
+    if (processInstanceIds != null) {
+      collectedProcessInstanceIds.addAll(processInstanceIds);
+    }
+
+    ProcessInstanceQueryImpl processInstanceQuery = (ProcessInstanceQueryImpl) migrationPlanExecutionBuilder.getProcessInstanceQuery();
+    if (processInstanceQuery != null) {
+      collectedProcessInstanceIds.addAll(processInstanceQuery.listIds());
+    }
+
+    return collectedProcessInstanceIds;
   }
 
   public Void migrateProcessInstance(CommandContext commandContext, String processInstanceId, MigrationPlan migrationPlan, ProcessDefinitionEntity targetProcessDefinition) {

@@ -20,12 +20,14 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.migration.batch.MigrateProcessInstanceBatchCmd;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 public class MigrationPlanExecutionBuilderImpl implements MigrationPlanExecutionBuilder {
 
   protected CommandExecutor commandExecutor;
   protected MigrationPlan migrationPlan;
   protected List<String> processInstanceIds;
+  protected ProcessInstanceQuery processInstanceQuery;
 
   public MigrationPlanExecutionBuilderImpl(CommandExecutor commandExecutor, MigrationPlan migrationPlan) {
     this.commandExecutor = commandExecutor;
@@ -43,6 +45,15 @@ public class MigrationPlanExecutionBuilderImpl implements MigrationPlanExecution
 
   public List<String> getProcessInstanceIds() {
     return processInstanceIds;
+  }
+
+  public MigrationPlanExecutionBuilder processInstanceQuery(ProcessInstanceQuery processInstanceQuery) {
+    this.processInstanceQuery = processInstanceQuery;
+    return this;
+  }
+
+  public ProcessInstanceQuery getProcessInstanceQuery() {
+    return processInstanceQuery;
   }
 
   public void execute() {

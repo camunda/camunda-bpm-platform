@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.migration;
 import java.util.List;
 
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 /**
  * Builder to execute a migration.
@@ -26,6 +27,11 @@ public interface MigrationPlanExecutionBuilder {
    * @param processInstanceIds the process instance ids to migrate
    */
   MigrationPlanExecutionBuilder processInstanceIds(List<String> processInstanceIds);
+
+  /**
+   * @param processInstanceQuery a query which selects the process instances to migrate
+   */
+  MigrationPlanExecutionBuilder processInstanceQuery(ProcessInstanceQuery processInstanceQuery);
 
   /**
    * Execute the migration synchronously.
@@ -42,5 +48,4 @@ public interface MigrationPlanExecutionBuilder {
    * @return the batch which executes the migration asynchronously.
    */
   Batch executeAsync();
-
 }

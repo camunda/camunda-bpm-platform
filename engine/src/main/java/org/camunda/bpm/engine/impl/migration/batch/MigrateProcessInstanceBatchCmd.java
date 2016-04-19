@@ -16,11 +16,16 @@ package org.camunda.bpm.engine.impl.migration.batch;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -74,15 +79,31 @@ public class MigrateProcessInstanceBatchCmd implements Command<Batch> {
 
   protected MigrationBatchConfiguration createConfiguration() {
     MigrationPlan migrationPlan = migrationPlanExecutionBuilder.getMigrationPlan();
-    List<String> processInstanceIds = migrationPlanExecutionBuilder.getProcessInstanceIds();
+    Collection<String> processInstanceIds = collectProcessInstanceIds();
 
     ensureNotNull(BadUserRequestException.class, "Migration plan cannot be null", "migration plan", migrationPlan);
     ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be null or empty", "process instance ids", processInstanceIds);
 
     MigrationBatchConfiguration configuration = new MigrationBatchConfiguration();
     configuration.setMigrationPlan(migrationPlan);
-    configuration.setProcessInstanceIds(processInstanceIds);
+    configuration.setProcessInstanceIds(new ArrayList<String>(processInstanceIds));
     return configuration;
+  }
+
+  protected Collection<String> collectProcessInstanceIds() {
+    Set<String> collectedProcessInstanceIds = new HashSet<String>();
+
+    List<String> processInstanceIds = migrationPlanExecutionBuilder.getProcessInstanceIds();
+    if (processInstanceIds != null) {
+      collectedProcessInstanceIds.addAll(processInstanceIds);
+    }
+
+    ProcessInstanceQueryImpl processInstanceQuery = (ProcessInstanceQueryImpl) migrationPlanExecutionBuilder.getProcessInstanceQuery();
+    if (processInstanceQuery != null) {
+      collectedProcessInstanceIds.addAll(processInstanceQuery.listIds());
+    }
+
+    return collectedProcessInstanceIds;
   }
 
   @SuppressWarnings("unchecked")

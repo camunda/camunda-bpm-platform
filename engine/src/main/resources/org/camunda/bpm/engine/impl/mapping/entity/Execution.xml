@@ -188,7 +188,12 @@
     select count(*)
     <include refid="selectExecutionsByQueryCriteriaSql"/>
   </select>
-  
+
+  <select id="selectProcessInstanceIdsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultType="string">
+    select RES.ID_
+    <include refid="selectExecutionsByQueryCriteriaSql"/>
+  </select>
+
   <sql id="selectExecutionsByQueryCriteriaSql">
     from ${prefix}ACT_RU_EXECUTION RES
     <if test="businessKey != null">

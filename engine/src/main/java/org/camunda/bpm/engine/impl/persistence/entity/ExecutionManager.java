@@ -129,6 +129,12 @@ public class ExecutionManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
+  public List<String> findProcessInstanceIdsByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
+    configureAuthorizationCheck(processInstanceQuery);
+    return getDbEntityManager().selectList("selectProcessInstanceIdsByQueryCriteria", processInstanceQuery);
+  }
+
+  @SuppressWarnings("unchecked")
   public List<ExecutionEntity> findEventScopeExecutionsByActivityId(String activityRef, String parentExecutionId) {
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("activityId", activityRef);
@@ -194,5 +200,4 @@ public class ExecutionManager extends AbstractManager {
   protected void configureAuthorizationCheck(AbstractQuery<?, ?> query) {
     getAuthorizationManager().configureExecutionQuery(query);
   }
-
 }
