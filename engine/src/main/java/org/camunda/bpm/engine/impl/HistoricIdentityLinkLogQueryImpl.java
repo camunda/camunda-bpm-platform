@@ -28,7 +28,8 @@ public class HistoricIdentityLinkLogQueryImpl extends AbstractVariableQueryImpl<
   protected String processDefinitionKey;
   protected String operationType;
   protected String assignerId;
-
+  protected String tenantId;
+  
   public HistoricIdentityLinkLogQueryImpl() {
   }
 
@@ -66,6 +67,10 @@ public class HistoricIdentityLinkLogQueryImpl extends AbstractVariableQueryImpl<
 
   public String getAssignerId() {
     return assignerId;
+  }
+
+  public String getTenantId() {
+    return tenantId;
   }
 
   public Date getDateBefore() {
@@ -147,6 +152,13 @@ public class HistoricIdentityLinkLogQueryImpl extends AbstractVariableQueryImpl<
   }
 
   @Override
+  public HistoricIdentityLinkLogQuery tenantId(String tenantId) {
+    ensureNotNull("tenantId", tenantId);
+    this.tenantId = tenantId;
+    return this;
+  }
+
+  @Override
   public HistoricIdentityLinkLogQuery orderByTime() {
     orderBy(HistoricIdentityLinkLogQueryProperty.TIME);
     return this;
@@ -197,6 +209,12 @@ public class HistoricIdentityLinkLogQueryImpl extends AbstractVariableQueryImpl<
   @Override
   public HistoricIdentityLinkLogQuery orderByAssignerId() {
     orderBy(HistoricIdentityLinkLogQueryProperty.ASSIGNER_ID);
+    return this;
+  }
+
+  @Override
+  public HistoricIdentityLinkLogQuery orderByTenantId() {
+    orderBy(HistoricIdentityLinkLogQueryProperty.TENANT_ID);
     return this;
   }
 

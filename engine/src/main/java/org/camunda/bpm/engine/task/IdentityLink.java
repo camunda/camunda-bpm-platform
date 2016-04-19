@@ -59,5 +59,10 @@ public interface IdentityLink {
    * Get the process definition id
    */
   public String getProcessDefId();
+  
+  /**
+   * Get the tenand id
+   */
+  public String getTenantId();
  
 }

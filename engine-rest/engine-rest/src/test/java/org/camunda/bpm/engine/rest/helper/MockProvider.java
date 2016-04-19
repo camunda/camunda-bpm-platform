@@ -627,6 +627,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HIST_IDENTITY_LINK_DATE_BEFORE = "2014-01-01T00:00:00";
   public static final String EXAMPLE_HIST_IDENTITY_LINK_DATE_AFTER = "2014-01-06T00:00:00";
   public static final String EXAMPLE_HIST_IDENTITY_LINK_ASSIGNER_ID = "aAssignerId";
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_TENANT_ID = "aTenantId";
   public static final String EXAMPLE_HIST_IDENTITY_LINK_TASK_ID = "aTaskId";
   public static final String EXAMPLE_HIST_IDENTITY_LINK_USER_ID = "aUserId";
   public static final String EXAMPLE_HIST_IDENTITY_LINK_GROUP_ID = "aGroupId";
@@ -1900,6 +1901,7 @@ public abstract class MockProvider {
     HistoricIdentityLinkLog identityLink = mock(HistoricIdentityLinkLog.class);
 
     when(identityLink.getAssignerId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_ASSIGNER_ID);
+    when(identityLink.getTenantId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_TENANT_ID);
     when(identityLink.getGroupId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_GROUP_ID);
     when(identityLink.getTaskId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_TASK_ID);
     when(identityLink.getUserId()).thenReturn(EXAMPLE_HIST_IDENTITY_LINK_USER_ID);

@@ -155,6 +155,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     identityLinkEntity.setUserId(userId);
     identityLinkEntity.setGroupId(groupId);
     identityLinkEntity.setType(IdentityLinkType.CANDIDATE);
+    identityLinkEntity.setTenantId(getTenantId());
     identityLinkEntity.insert();
     return identityLinkEntity;
   }

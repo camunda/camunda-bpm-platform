@@ -652,6 +652,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     identityLinkEntity.setUserId(userId);
     identityLinkEntity.setGroupId(groupId);
     identityLinkEntity.setType(type);
+    identityLinkEntity.setTenantId(getTenantId());
     return identityLinkEntity;
   }
 

@@ -49,6 +49,8 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
   
   protected String processDefId;
   
+  protected String tenantId;
+  
   protected TaskEntity task;
   
   protected ProcessDefinitionEntity processDef;
@@ -146,6 +148,14 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
     this.processDefId = processDefId;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+  
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+  
   public TaskEntity getTask() {
     if ( (task==null) && (taskId!=null) ) {
       this.task = Context
@@ -208,6 +218,7 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
            + ", processDefId=" + processDefId
            + ", task=" + task
            + ", processDef=" + processDef
+           + ", tenantId=" + tenantId
            + "]";
   }
 }

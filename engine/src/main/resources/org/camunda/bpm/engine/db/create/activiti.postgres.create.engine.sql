@@ -151,6 +151,7 @@ create table ACT_RU_IDENTITYLINK (
     USER_ID_ varchar(255),
     TASK_ID_ varchar(64),
     PROC_DEF_ID_ varchar (64),
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 

@@ -24,6 +24,8 @@ public class HistoricIdentityLinkLogEventEntity extends HistoryEvent {
 
   protected String assignerId;
 
+  protected String tenantId;
+
   public Date getTime() {
     return time;
   }
@@ -78,5 +80,13 @@ public class HistoricIdentityLinkLogEventEntity extends HistoryEvent {
 
   public void setAssignerId(String assignerId) {
     this.assignerId = assignerId;
+  }
+  
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 }

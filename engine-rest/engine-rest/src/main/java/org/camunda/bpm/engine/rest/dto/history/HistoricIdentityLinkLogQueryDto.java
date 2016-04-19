@@ -31,6 +31,7 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
   private static final String SORT_BY_PROCESS_DEFINITION_KEY = "processDefinitionKey";
   private static final String SORT_BY_OPERATION_TYPE = "operationType";
   private static final String SORT_BY_ASSIGNER_ID = "assignerId";
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -44,6 +45,7 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_KEY);
     VALID_SORT_BY_VALUES.add(SORT_BY_OPERATION_TYPE);
     VALID_SORT_BY_VALUES.add(SORT_BY_ASSIGNER_ID);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   protected Date dateBefore;
@@ -56,6 +58,7 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
   protected String processDefinitionKey;
   protected String operationType;
   protected String assignerId;
+  protected String tenantId;
 
   public HistoricIdentityLinkLogQueryDto() {
   }
@@ -124,6 +127,11 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
     this.assignerId = assignerId;
   }
 
+  @CamundaQueryParam("tenantId")
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   @Override
   protected void applyFilters(HistoricIdentityLinkLogQuery query) {
     if (dateBefore != null) {
@@ -156,6 +164,9 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
     if (assignerId != null) {
       query.assignerId(assignerId);
     }
+    if (tenantId != null) {
+      query.tenantId(tenantId);
+    }
   }
 
   @Override
@@ -178,6 +189,8 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
       query.orderByProcessDefinitionId();
     } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_KEY)) {
       query.orderByProcessDefinitionKey();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 }

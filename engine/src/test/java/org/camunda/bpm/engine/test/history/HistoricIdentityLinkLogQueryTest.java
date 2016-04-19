@@ -1,5 +1,6 @@
 package org.camunda.bpm.engine.test.history;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -14,6 +15,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  *
@@ -36,6 +39,8 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
   private static final String INVALID_PROCESS_DEFINITION_KEY = "InvalidProcessDefinitionKey";
   private static final String GROUP_1 = "Group1";
   private static final String USER_1 = "User1";
+  private static final String TENANT_1 = "tenant1";
+  private static final String TENANT_2 = "tenant2";
   private static String PROCESS_DEFINITION_KEY = "oneTaskProcess";
   private static String PROCESS_DEFINITION_KEY_MULTIPLE_CANDIDATE_USER = "oneTaskProcessForHistoricIdentityLinkWithMultipleCanidateUser";
   private static final String IDENTITY_LINK_ADD="add";
@@ -361,6 +366,7 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByProcessDefinitionKey().asc().list().size());
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByTaskId().asc().list().size());
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByUserId().asc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByTenantId().asc().list().size());
     assertEquals("aUser", historyService.createHistoricIdentityLinkLogQuery().orderByUserId().asc().list().get(0).getUserId());
     assertEquals("dUser", historyService.createHistoricIdentityLinkLogQuery().orderByUserId().asc().list().get(3).getUserId());
     
@@ -373,9 +379,96 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByProcessDefinitionKey().desc().list().size());
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByTaskId().desc().list().size());
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByUserId().desc().list().size());
+    assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByTenantId().desc().list().size());
     assertEquals("dUser", historyService.createHistoricIdentityLinkLogQuery().orderByUserId().desc().list().get(0).getUserId());
     assertEquals("aUser", historyService.createHistoricIdentityLinkLogQuery().orderByUserId().desc().list().get(3).getUserId());
   }
+
+  public void testAddHistoricIdentityLinkForSingleTenant() {
+
+    // given
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
+    .startEvent()
+    .userTask("task").camundaCandidateUsers(A_USER_ID)
+    .endEvent()
+    .done();
+    deploymentForTenant(TENANT_1, oneTaskProcess);
+    startProcessInstanceForTenant(TENANT_1);
+    
+    // Query test
+    HistoricIdentityLinkLog historicIdentityLink = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+    assertEquals(historicIdentityLink.getUserId(), A_USER_ID);
+    assertEquals(historicIdentityLink.getType(), IdentityLinkType.CANDIDATE);
+    assertEquals(historicIdentityLink.getTenantId(), TENANT_1);
+    assertEquals(historicIdentityLink.getOperationType(), IDENTITY_LINK_ADD);
+    
+    taskService.deleteCandidateUser(historicIdentityLink.getTaskId(), A_USER_ID);
+  }
+
+  public void testAddandDeleteHistoricIdentityLinkForSingleTenant() {
+
+    // given
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
+    .startEvent()
+    .userTask("task").camundaCandidateUsers(A_USER_ID)
+    .endEvent()
+    .done();
+    deploymentForTenant(TENANT_1, oneTaskProcess);
+    startProcessInstanceForTenant(TENANT_1);
+    
+    HistoricIdentityLinkLog historicIdentityLink = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+    taskService.deleteCandidateUser(historicIdentityLink.getTaskId(), A_USER_ID);
+    
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
+    assertEquals(query.tenantId(TENANT_1).count(), 2);
+    assertEquals(query.userId(A_USER_ID).count(), 2);
+    assertEquals(query.operationType(IDENTITY_LINK_ADD).count(), 1);
+    
+    query = historyService.createHistoricIdentityLinkLogQuery();
+    assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 1);
+  }
+
+  public void testHistoricIdentityLinkForMultipleTenant() {
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
+    .startEvent()
+    .userTask("task").camundaAssignee(A_USER_ID)
+    .endEvent()
+    .done();
+
+    deploymentForTenant(TENANT_1, oneTaskProcess);
+    deploymentForTenant(TENANT_2, oneTaskProcess);
+
+    startProcessInstanceForTenant(TENANT_1);
+    
+    // Query test
+    HistoricIdentityLinkLog historicIdentityLink = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+    assertEquals(historicIdentityLink.getUserId(), A_USER_ID);
+    assertEquals(historicIdentityLink.getType(), IdentityLinkType.ASSIGNEE);
+    assertEquals(historicIdentityLink.getTenantId(), TENANT_1);
+    assertEquals(historicIdentityLink.getOperationType(), IDENTITY_LINK_ADD);
+    
+    // start process instance for another tenant
+    startProcessInstanceForTenant(TENANT_2);
+    
+    // Query test
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
+    assertEquals(query.tenantId(TENANT_1).count(), 1);
+    
+    query = historyService.createHistoricIdentityLinkLogQuery();
+    assertEquals(query.userId(A_USER_ID).count(), 2);
+    assertEquals(query.operationType(IDENTITY_LINK_ADD).count(), 2);
+    assertEquals(query.type(IdentityLinkType.ASSIGNEE).count(), 2);
+    
+    query = historyService.createHistoricIdentityLinkLogQuery();
+    assertEquals(query.tenantId(TENANT_2).count(), 1);
+  }
+
+  protected ProcessInstance startProcessInstanceForTenant(String tenant) {
+    return runtimeService.createProcessInstanceByKey("testProcess")
+        .processDefinitionTenantId(tenant)
+        .execute();
+  }
+
   public void addUserIdentityLinks(String taskId) {
     for (int userIndex = 1; userIndex <= numberOfUsers; userIndex++)
       taskService.addUserIdentityLink(taskId, A_USER_ID + userIndex, IdentityLinkType.ASSIGNEE);

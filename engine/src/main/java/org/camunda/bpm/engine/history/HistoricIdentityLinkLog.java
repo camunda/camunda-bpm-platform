@@ -85,4 +85,9 @@ public interface HistoricIdentityLinkLog {
    * Returns the key of the related process definition 
    */
   String getProcessDefinitionKey();
+  
+  /**
+   * Returns the id of the related tenant 
+   */
+  String getTenantId();
 }

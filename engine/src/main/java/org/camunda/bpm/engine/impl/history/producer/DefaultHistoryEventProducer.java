@@ -713,7 +713,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setUserId(identityLink.getUserId());
     evt.setGroupId(identityLink.getGroupId());
     evt.setTaskId(identityLink.getTaskId());
-
+    evt.setTenantId(identityLink.getTenantId());
     // There is a conflict in HistoryEventTypes for 'delete' keyword,
     // So HistoryEventTypes.IDENTITY_LINK_ADD /
     // HistoryEventTypes.IDENTITY_LINK_DELETE is provided with the event name
