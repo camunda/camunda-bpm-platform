@@ -6,11 +6,11 @@
     No reports available.
   </div>
 
-  <ul class="list-inline"
-      ng-if="plugins && plugins.length > 1">
+  <h3 ng-if="plugins && plugins.length > 1">Available reports</h3>
+  <ul ng-if="plugins && plugins.length > 1">
     <li ng-repeat="provider in plugins">
       <a ng-class="{active: selection.type === provider.id}"
-         ng-click="selectReport(provider.id)">{{ provider.label }}</a>
+         ng-href="#/reports/{{ provider.id }}">{{ provider.label }}</a>
     </li>
   </ul>
 </div>

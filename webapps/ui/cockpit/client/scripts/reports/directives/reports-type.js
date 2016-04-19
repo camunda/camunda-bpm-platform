@@ -19,19 +19,12 @@ module.exports = [function() {
 
     controller: [
       '$scope',
-      'search',
-      'Views',
+      '$route',
     function (
       $scope,
-      search,
-      Views
+      $route
     ) {
-
       var getPluginProviders = $scope.getPluginProviders();
-
-      var updateSilently = function (params) {
-        search.updateSilently(params);
-      };
 
       var reportsTypeData = $scope.reportsTypeData = $scope.reportData.newChild($scope);
 
@@ -46,16 +39,11 @@ module.exports = [function() {
         $scope.plugins = plugins;
       });
 
-      $scope.selectReport = function(reportId) {
-        var plugin = reportId ? (getPluginProviders({ id: reportId }) || [])[0] : null;
-        search.updateSilently({
-          report: (plugin || {}).id
-        });
+      if ($route.current.params.reportType) {
+        var plugin = (getPluginProviders({ id: $route.current.params.reportType }) || [])[0];
         reportsTypeData.set('plugin', plugin);
-      };
-
+      }
     }]
-
   };
 
 }];
