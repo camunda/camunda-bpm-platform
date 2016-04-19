@@ -7,19 +7,18 @@ var extend = angular.extend;
 
 var Controller = [
   '$scope',
-  'search',
+  '$route',
   'page',
   'dataDepend',
-  'camAPI',
   'Views',
 function(
   $scope,
-  search,
+  $route,
   page,
   dataDepend,
-  camAPI,
   Views
 ) {
+  $scope.selectedReportId = (($route.current || {}).params || {}).reportType || null;
 
   // utilities ///////////////////////////////////////////////////////////////////
 
@@ -28,34 +27,16 @@ function(
     return Views.getProviders(_options);
   }
 
-  var updateSilently = function (params) {
-    search.updateSilently(params);
-  };
-
-  var getPropertyFromLocation = function (property) {
-    var _search = search() || {};
-    return _search[property] || null;
-  };
-
   var getDefaultReport = function(reports) {
-    if (!reports || !reports.length) {
+    if (!reports) {
       return;
     }
 
-    var selectedReport = getPropertyFromLocation('report');
-
-    if (selectedReport) {
-      var _plugin = (getPluginProviders({ id: selectedReport }) || [])[0];
-      if (_plugin && reports.indexOf(_plugin) != -1) {
-        return _plugin;
-      }
+    if ($scope.selectedReportId) {
+      return (getPluginProviders({ id: $scope.selectedReportId }) || [])[0];
     }
 
-    search.updateSilently({
-      report: null
-    });
-
-    return reports[0];
+    return reports.length === 1 ? reports[0] : null;
   };
 
   // breadcrumb //////////////////////////////////////////////////////////////
@@ -64,11 +45,31 @@ function(
 
   page.breadcrumbsClear();
 
-  page.breadcrumbsAdd({
-    label: 'Reports'
-  });
+  if ($scope.selectedReportId && getPluginProviders().length > 1) {
+    var reportTypePlugin = getPluginProviders({ id: $scope.selectedReportId });
 
-  page.titleSet('Reports');
+    if (reportTypePlugin.length) {
+      page.breadcrumbsAdd([
+        {
+          label: 'Reports',
+          href: '#/reports'
+        },
+        {
+          label: reportTypePlugin[0].label
+        }
+      ]);
+
+      page.titleSet(reportTypePlugin[0].label + ' report');
+    }
+  }
+  else {
+    page.breadcrumbsAdd({
+      label: 'Reports'
+    });
+
+    page.titleSet('Reports');
+  }
+
 
 
   // provide data ///////////////////////////////////////////////////////////
@@ -92,7 +93,7 @@ function(
 }];
 
 var RouteConfig = [ '$routeProvider', function($routeProvider) {
-  $routeProvider.when('/reports', {
+  $routeProvider.when('/reports/:reportType?', {
     template: template,
     controller: Controller,
     authentication: 'required',
