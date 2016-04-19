@@ -39,6 +39,7 @@
       <xs:element name="max-threads" minOccurs="1" maxOccurs="1" />
       <xs:element name="queue-length" minOccurs="1" maxOccurs="1" />
       <xs:element name="keepalive-time" minOccurs="0" maxOccurs="1" />
+      <xs:element name="allow-core-timeout" minOccurs="0" maxOccurs="1" />
       <xs:element name="job-acquisitions" type="job-acquisitionsType" minOccurs="1" maxOccurs="1" />
     </xs:sequence>
   </xs:complexType>

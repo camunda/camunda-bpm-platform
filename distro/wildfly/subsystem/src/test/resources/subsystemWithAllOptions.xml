@@ -88,6 +88,7 @@
     <max-threads>15</max-threads>
     <queue-length>15</queue-length>
     <keepalive-time>10</keepalive-time>
+    <allow-core-timeout>false</allow-core-timeout>
     <job-acquisitions>
       <job-acquisition name="default">
         <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
