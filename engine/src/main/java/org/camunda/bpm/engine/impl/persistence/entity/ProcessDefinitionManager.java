@@ -55,7 +55,7 @@ public class ProcessDefinitionManager extends AbstractManager {
    */
   public ProcessDefinitionEntity findLatestProcessDefinitionByKey(String processDefinitionKey) {
     @SuppressWarnings("unchecked")
-    List<ProcessDefinitionEntity> processDefinitions = getDbEntityManager().selectList("selectLatestProcessDefinitionByKey", configureQuery(processDefinitionKey));
+    List<ProcessDefinitionEntity> processDefinitions = getDbEntityManager().selectList("selectLatestProcessDefinitionByKey", configureParameterizedQuery(processDefinitionKey));
 
     if (processDefinitions.isEmpty()) {
       return null;
@@ -79,9 +79,9 @@ public class ProcessDefinitionManager extends AbstractManager {
     parameters.put("tenantId", tenantId);
 
     if (tenantId == null) {
-      return (ProcessDefinitionEntity) getDbEntityManager().selectOne("selectLatestProcessDefinitionByKeyWithoutTenantId", configureQuery(parameters));
+      return (ProcessDefinitionEntity) getDbEntityManager().selectOne("selectLatestProcessDefinitionByKeyWithoutTenantId", parameters);
     } else {
-      return (ProcessDefinitionEntity) getDbEntityManager().selectOne("selectLatestProcessDefinitionByKeyAndTenantId", configureQuery(parameters));
+      return (ProcessDefinitionEntity) getDbEntityManager().selectOne("selectLatestProcessDefinitionByKeyAndTenantId", parameters);
     }
   }
 
@@ -197,7 +197,7 @@ public class ProcessDefinitionManager extends AbstractManager {
     getAuthorizationManager().configureProcessDefinitionQuery(query);
   }
 
-  protected ListQueryParameterObject configureQuery(Object parameter) {
+  protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
     return getTenantManager().configureQuery(parameter);
   }
 

@@ -90,10 +90,6 @@ public class DeploymentCache {
         .findLatestProcessDefinitionById(processDefinitionId);
     }
 
-    if (processDefinition != null && !commandContext.getTenantManager().isAuthenticatedTenant(processDefinition.getTenantId())) {
-      processDefinition = null;
-    }
-
     ensureNotNull("no deployed process definition found with id '" + processDefinitionId + "'", "processDefinition", processDefinition);
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;
@@ -247,10 +243,6 @@ public class DeploymentCache {
         .getCaseDefinitionManager()
         .findCaseDefinitionById(caseDefinitionId);
 
-    }
-
-    if (caseDefinition != null && !commandContext.getTenantManager().isAuthenticatedTenant(caseDefinition.getTenantId())) {
-      caseDefinition = null;
     }
 
     ensureNotNull(CaseDefinitionNotFoundException.class, "no deployed case definition found with id '" + caseDefinitionId + "'", "caseDefinition", caseDefinition);
@@ -430,10 +422,6 @@ public class DeploymentCache {
         .getDecisionDefinitionManager()
         .findDecisionDefinitionById(decisionDefinitionId);
 
-    }
-
-    if (decisionDefinition != null && !commandContext.getTenantManager().isAuthenticatedTenant(decisionDefinition.getTenantId())) {
-      decisionDefinition = null;
     }
 
     ensureNotNull(DecisionDefinitionNotFoundException.class, "no deployed decision definition found with id '" + decisionDefinitionId + "'", "decisionDefinition", decisionDefinition);

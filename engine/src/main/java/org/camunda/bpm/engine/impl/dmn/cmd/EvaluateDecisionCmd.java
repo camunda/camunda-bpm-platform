@@ -18,21 +18,21 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.dmn.DecisionEvaluationBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * Evaluates the decision with the given key or id.
- * 
+ *
  * If the decision definition key given then specify the version and tenant-id.
  * If no version is provided then the latest version is taken.
- * 
+ *
  * @author Kristin Polenz
  */
 public class EvaluateDecisionCmd implements Command<DmnDecisionTableResult> {
@@ -59,9 +59,9 @@ public class EvaluateDecisionCmd implements Command<DmnDecisionTableResult> {
 
     DecisionDefinition decisionDefinition = getDecisionDefinition(commandContext);
 
-    // check authorization
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkEvaluateDecision(decisionDefinition.getKey());
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkEvaluateDecision(decisionDefinition);
+    }
 
     return doEvaluateDecision(decisionDefinition, variables);
 
@@ -78,7 +78,7 @@ public class EvaluateDecisionCmd implements Command<DmnDecisionTableResult> {
 
   protected DecisionDefinition getDecisionDefinition(CommandContext commandContext) {
     DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentCache();
-    
+
     if (decisionDefinitionId != null) {
       return findById(deploymentCache);
     } else {

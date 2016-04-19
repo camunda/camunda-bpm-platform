@@ -15,9 +15,9 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.impl.ProcessInstantiationBuilderImpl;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -40,9 +40,9 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
 
     ProcessDefinitionEntity processDefinition = new GetDeployedProcessDefinitionCmd(instantiationBuilder, false).execute(commandContext);
 
-    // check authorization
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkCreateProcessInstance(processDefinition);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkCreateProcessInstance(processDefinition);
+    }
 
     // Start the process instance
     ExecutionEntity processInstance = processDefinition.createProcessInstance(instantiationBuilder.getBusinessKey(),

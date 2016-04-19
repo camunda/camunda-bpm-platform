@@ -53,7 +53,7 @@ public class CaseDefinitionManager extends AbstractManager {
    */
   public CaseDefinitionEntity findLatestCaseDefinitionByKey(String caseDefinitionKey) {
     @SuppressWarnings("unchecked")
-    List<CaseDefinitionEntity> caseDefinitions = getDbEntityManager().selectList("selectLatestCaseDefinitionByKey", configureQuery(caseDefinitionKey));
+    List<CaseDefinitionEntity> caseDefinitions = getDbEntityManager().selectList("selectLatestCaseDefinitionByKey", configureParameterizedQuery(caseDefinitionKey));
 
     if (caseDefinitions.isEmpty()) {
       return null;
@@ -77,9 +77,9 @@ public class CaseDefinitionManager extends AbstractManager {
     parameters.put("tenantId", tenantId);
 
     if (tenantId == null) {
-      return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectLatestCaseDefinitionByKeyWithoutTenantId", configureQuery(parameters));
+      return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectLatestCaseDefinitionByKeyWithoutTenantId", parameters);
     } else {
-      return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectLatestCaseDefinitionByKeyAndTenantId", configureQuery(parameters));
+      return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectLatestCaseDefinitionByKeyAndTenantId", parameters);
     }
   }
 
@@ -126,7 +126,7 @@ public class CaseDefinitionManager extends AbstractManager {
     getTenantManager().configureQuery(query);
   }
 
-  protected ListQueryParameterObject configureQuery(Object parameter) {
+  protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
     return getTenantManager().configureQuery(parameter);
   }
 

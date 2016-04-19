@@ -52,7 +52,7 @@ public class DecisionDefinitionManager extends AbstractManager {
    */
   public DecisionDefinitionEntity findLatestDecisionDefinitionByKey(String decisionDefinitionKey) {
     @SuppressWarnings("unchecked")
-    List<DecisionDefinitionEntity> decisionDefinitions = getDbEntityManager().selectList("selectLatestDecisionDefinitionByKey", configureQuery(decisionDefinitionKey));
+    List<DecisionDefinitionEntity> decisionDefinitions = getDbEntityManager().selectList("selectLatestDecisionDefinitionByKey", configureParameterizedQuery(decisionDefinitionKey));
 
     if (decisionDefinitions.isEmpty()) {
       return null;
@@ -76,9 +76,9 @@ public class DecisionDefinitionManager extends AbstractManager {
     parameters.put("tenantId", tenantId);
 
     if (tenantId == null) {
-      return (DecisionDefinitionEntity) getDbEntityManager().selectOne("selectLatestDecisionDefinitionByKeyWithoutTenantId", configureQuery(parameters));
+      return (DecisionDefinitionEntity) getDbEntityManager().selectOne("selectLatestDecisionDefinitionByKeyWithoutTenantId", parameters);
     } else {
-      return (DecisionDefinitionEntity) getDbEntityManager().selectOne("selectLatestDecisionDefinitionByKeyAndTenantId", configureQuery(parameters));
+      return (DecisionDefinitionEntity) getDbEntityManager().selectOne("selectLatestDecisionDefinitionByKeyAndTenantId", parameters);
     }
   }
 
@@ -86,7 +86,7 @@ public class DecisionDefinitionManager extends AbstractManager {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("decisionDefinitionVersion", decisionDefinitionVersion);
     parameters.put("decisionDefinitionKey", decisionDefinitionKey);
-    return (DecisionDefinitionEntity) getDbEntityManager().selectOne("selectDecisionDefinitionByKeyAndVersion", configureQuery(parameters));
+    return (DecisionDefinitionEntity) getDbEntityManager().selectOne("selectDecisionDefinitionByKeyAndVersion", configureParameterizedQuery(parameters));
   }
 
   public DecisionDefinitionEntity findDecisionDefinitionByKeyVersionAndTenantId(String decisionDefinitionKey, Integer decisionDefinitionVersion, String tenantId) {
@@ -95,9 +95,9 @@ public class DecisionDefinitionManager extends AbstractManager {
     parameters.put("decisionDefinitionKey", decisionDefinitionKey);
     parameters.put("tenantId", tenantId);
     if (tenantId == null) {
-      return (DecisionDefinitionEntity) getDbEntityManager().selectOne("selectDecisionDefinitionByKeyVersionWithoutTenantId", configureQuery(parameters));
+      return (DecisionDefinitionEntity) getDbEntityManager().selectOne("selectDecisionDefinitionByKeyVersionWithoutTenantId", parameters);
     } else {
-      return (DecisionDefinitionEntity) getDbEntityManager().selectOne("selectDecisionDefinitionByKeyVersionAndTenantId", configureQuery(parameters));
+      return (DecisionDefinitionEntity) getDbEntityManager().selectOne("selectDecisionDefinitionByKeyVersionAndTenantId", parameters);
     }
   }
 
@@ -144,7 +144,7 @@ public class DecisionDefinitionManager extends AbstractManager {
     getAuthorizationManager().configureDecisionDefinitionQuery(query);
   }
 
-  protected ListQueryParameterObject configureQuery(Object parameter) {
+  protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
     return getTenantManager().configureQuery(parameter);
   }
 

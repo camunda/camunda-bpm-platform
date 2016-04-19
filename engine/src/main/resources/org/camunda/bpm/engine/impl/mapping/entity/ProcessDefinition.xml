@@ -296,28 +296,26 @@
           (p1.TENANT_ID_ = p2.TENANT_ID_ or (p1.TENANT_ID_ is null and p2.TENANT_ID_ is null))           
   </select>
   
-  <select id="selectLatestProcessDefinitionByKeyWithoutTenantId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="processDefinitionResultMap">
+  <select id="selectLatestProcessDefinitionByKeyWithoutTenantId" parameterType="map" resultMap="processDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_PROCDEF RES
-    where KEY_ = #{parameter.processDefinitionKey}
+    where KEY_ = #{processDefinitionKey}
           and TENANT_ID_ is null
           and VERSION_ = (
               select max(VERSION_) 
               from ${prefix}ACT_RE_PROCDEF 
-              where KEY_ = #{parameter.processDefinitionKey} and TENANT_ID_ is null)
+              where KEY_ = #{processDefinitionKey} and TENANT_ID_ is null)
   </select>
   
-  <select id="selectLatestProcessDefinitionByKeyAndTenantId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="processDefinitionResultMap">
+  <select id="selectLatestProcessDefinitionByKeyAndTenantId" parameterType="map" resultMap="processDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_PROCDEF RES
-    where KEY_ = #{parameter.processDefinitionKey}
-          and TENANT_ID_ = #{parameter.tenantId}
+    where KEY_ = #{processDefinitionKey}
+          and TENANT_ID_ = #{tenantId}
           and VERSION_ = (
               select max(VERSION_) 
               from ${prefix}ACT_RE_PROCDEF 
-              where KEY_ = #{parameter.processDefinitionKey} and TENANT_ID_ = #{parameter.tenantId})
-              
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+              where KEY_ = #{processDefinitionKey} and TENANT_ID_ = #{tenantId})
   </select>
   
   <!-- mysql specific sql -->

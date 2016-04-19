@@ -272,7 +272,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no processes deployed with key 'testProcess'"));
+      assertThat(e.getMessage(), containsString("Cannot create an instance of the process definition"));
     }
   }
 
@@ -291,7 +291,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no deployed process definition found with id"));
+      assertThat(e.getMessage(), containsString("Cannot create an instance of the process definition"));
     }
   }
 

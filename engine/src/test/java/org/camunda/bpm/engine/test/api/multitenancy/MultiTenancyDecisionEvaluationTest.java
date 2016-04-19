@@ -205,7 +205,7 @@ public class MultiTenancyDecisionEvaluationTest extends PluggableProcessEngineTe
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no decision definition deployed with key 'decision'"));
+      assertThat(e.getMessage(), containsString("Cannot evaluate the decision"));
     }
   }
 
@@ -225,7 +225,7 @@ public class MultiTenancyDecisionEvaluationTest extends PluggableProcessEngineTe
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no deployed decision definition found with id"));
+      assertThat(e.getMessage(), containsString("Cannot evaluate the decision"));
     }
   }
 

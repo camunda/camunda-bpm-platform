@@ -204,6 +204,17 @@ public class CommandLogger extends ProcessEngineLogger {
   }
 
   public ProcessEngineException exceptionBpmnErrorPropagationFailed(String errorCode, Throwable cause) {
-    return new ProcessEngineException(exceptionMessage("032", "Propagation of bpmn error {} failed. ", errorCode), cause);
+    return new ProcessEngineException(exceptionMessage(
+        "033",
+        "Propagation of bpmn error {} failed. ",
+        errorCode), cause);
+  }
+
+  public ProcessEngineException exceptionCommandWithUnauthorizedTenant(String command, Object entity) {
+    return new ProcessEngineException(exceptionMessage(
+        "034",
+        "Cannot {} because it belongs to no authenticated tenant: {}",
+        command, entity
+        ));
   }
 }

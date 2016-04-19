@@ -164,7 +164,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no case definition deployed with key 'oneTaskCase'"));
+      assertThat(e.getMessage(), containsString("Cannot create an instance of the case definition"));
     }
   }
 
@@ -182,7 +182,7 @@ public class MultiTenancyCreateCaseInstanceTest extends PluggableProcessEngineTe
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no deployed case definition found with id"));
+      assertThat(e.getMessage(), containsString("Cannot create an instance of the case definition"));
     }
   }
 

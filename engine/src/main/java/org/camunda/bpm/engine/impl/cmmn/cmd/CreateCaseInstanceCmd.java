@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmmn.CaseInstanceBuilderImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
@@ -55,6 +56,10 @@ public class CreateCaseInstanceCmd implements Command<CaseInstance>, Serializabl
     ensureAtLeastOneNotNull("caseDefinitionId and caseDefinitionKey are null", caseDefinitionId, caseDefinitionKey);
 
     CaseDefinitionEntity caseDefinition = find(commandContext);
+
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkCreateCaseInstance(caseDefinition);
+    }
 
     // Start the case instance
     CaseExecutionEntity caseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance(businessKey);

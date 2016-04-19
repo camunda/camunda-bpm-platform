@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.SignalEventReceivedBuilderImpl;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -76,7 +77,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     checkAuthorizationOfCatchSignals(authorizationManager, catchSignalEventSubscription);
-    checkAuthorizationOfStartSignals(authorizationManager, startSignalEventSubscriptions, processDefinitions);
+    checkAuthorizationOfStartSignals(commandContext, startSignalEventSubscriptions, processDefinitions);
 
     notifyExecutions(catchSignalEventSubscription);
     startProcessInstances(startSignalEventSubscriptions, processDefinitions);
@@ -135,13 +136,17 @@ public class SignalEventReceivedCmd implements Command<Void> {
     }
   }
 
-  private void checkAuthorizationOfStartSignals(final AuthorizationManager authorizationManager,
+  private void checkAuthorizationOfStartSignals(final CommandContext commandContext,
       List<SignalEventSubscriptionEntity> startSignalEventSubscriptions, Map<String, ProcessDefinitionEntity> processDefinitions) {
     // check authorization for process definition
     for (SignalEventSubscriptionEntity signalStartEventSubscription : startSignalEventSubscriptions) {
       ProcessDefinitionEntity processDefinition = processDefinitions.get(signalStartEventSubscription.getId());
       if (processDefinition != null) {
-        authorizationManager.checkCreateProcessInstance(processDefinition);
+
+        for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+          checker.checkCreateProcessInstance(processDefinition);
+        }
+
       }
     }
   }

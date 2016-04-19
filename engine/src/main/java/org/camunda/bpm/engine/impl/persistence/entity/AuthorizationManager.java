@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
-import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_INSTANCE;
@@ -416,17 +415,6 @@ public class AuthorizationManager extends AbstractManager {
 
   /* PROCESS INSTANCE */
 
-  // create permission ///////////////////////////////////////////////////
-
-  public void checkCreateProcessInstance(ProcessDefinitionEntity definition) {
-    // necessary permissions:
-    // - CREATE on PROCESS_INSTANCE
-    // AND
-    // - CREATE_INSTANCE on PROCESS_DEFINITION
-    checkAuthorization(CREATE, PROCESS_INSTANCE);
-    checkAuthorization(CREATE_INSTANCE, PROCESS_DEFINITION, definition.getKey());
-  }
-
   // read permission ////////////////////////////////////////////////////
 
   public void checkReadProcessInstance(String processInstanceId) {
@@ -762,10 +750,6 @@ public class AuthorizationManager extends AbstractManager {
 
   public void checkDeleteHistoricDecisionInstance(String decisionDefinitionKey) {
     checkAuthorization(DELETE_HISTORY, DECISION_DEFINITION, decisionDefinitionKey);
-  }
-
-  public void checkEvaluateDecision(String decisionDefinitionKey) {
-    checkAuthorization(CREATE_INSTANCE, DECISION_DEFINITION, decisionDefinitionKey);
   }
 
   /* QUERIES */

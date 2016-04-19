@@ -91,8 +91,10 @@ import org.camunda.bpm.engine.impl.calendar.CycleBusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.DueDateBusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.DurationBusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.MapBusinessCalendarManager;
+import org.camunda.bpm.engine.impl.cfg.auth.AuthorizationCommandChecker;
 import org.camunda.bpm.engine.impl.cfg.auth.DefaultAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantCommandChecker;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
 import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneTransactionContextFactory;
 import org.camunda.bpm.engine.impl.cmmn.CaseServiceImpl;
@@ -567,6 +569,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected TenantIdProvider tenantIdProvider = null;
 
+  protected List<CommandChecker> commandCheckers = null;
+
   // Migration
   protected MigrationActivityMatcher migrationActivityMatcher;
 
@@ -646,6 +650,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initMigrationInstructionGenerator();
     initMigratingActivityInstanceValidators();
     initMigratingTransitionInstanceValidators();
+    initCommandCheckers();
 
     invokePostInit();
   }
@@ -1696,6 +1701,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       for (EventHandler eventHandler : customEventHandlers) {
         eventHandlers.put(eventHandler.getEventHandlerType(), eventHandler);
       }
+    }
+  }
+
+  protected void initCommandCheckers() {
+    if (commandCheckers == null) {
+      commandCheckers = new ArrayList<CommandChecker>();
+
+      // add the default command checkers
+      commandCheckers.add(new TenantCommandChecker());
+      commandCheckers.add(new AuthorizationCommandChecker());
     }
   }
 
@@ -3248,6 +3263,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     migratingTransitionInstanceValidators.add(new AsyncMigrationValidator());
 
     return migratingTransitionInstanceValidators;
+  }
+
+  public List<CommandChecker> getCommandCheckers() {
+    return commandCheckers;
+  }
+
+  public void setCommandCheckers(List<CommandChecker> commandCheckers) {
+    this.commandCheckers = commandCheckers;
   }
 
 }
