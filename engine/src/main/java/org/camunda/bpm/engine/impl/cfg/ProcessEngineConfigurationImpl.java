@@ -211,6 +211,7 @@ import org.camunda.bpm.engine.impl.migration.validation.instance.VariableConflic
 import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMultiInstanceBodyValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMultiInstanceInnerActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotRemoveMultiInstanceInnerActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.GatewayMappingValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.OnlyOnceMappedActivityInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.SameBehaviorInstructionValidator;
@@ -3212,6 +3213,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     migrationInstructionValidators.add(new CannotAddMultiInstanceBodyValidator());
     migrationInstructionValidators.add(new CannotAddMultiInstanceInnerActivityValidator());
     migrationInstructionValidators.add(new CannotRemoveMultiInstanceInnerActivityValidator());
+    migrationInstructionValidators.add(new GatewayMappingValidator());
     return migrationInstructionValidators;
   }
 

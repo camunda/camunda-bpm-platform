@@ -36,6 +36,7 @@ public class MigratingTransitionInstance extends MigratingProcessElementInstance
   protected TransitionInstance transitionInstance;
   protected MigratingAsyncJobInstance jobInstance;
   protected List<MigratingInstance> migratingDependentInstances = new ArrayList<MigratingInstance>();
+  protected boolean activeState;
 
 
   public MigratingTransitionInstance(
@@ -50,6 +51,7 @@ public class MigratingTransitionInstance extends MigratingProcessElementInstance
     this.targetScope = targetScope;
     this.currentScope = sourceScope;
     this.representativeExecution = asyncExecution;
+    this.activeState = representativeExecution.isActive();
   }
 
   @Override
@@ -65,7 +67,9 @@ public class MigratingTransitionInstance extends MigratingProcessElementInstance
       dependentInstance.detachState();
     }
 
-    parentInstance.destroyAttachableExecution(resolveRepresentativeExecution());
+    ExecutionEntity execution = resolveRepresentativeExecution();
+    execution.setActive(false);
+    parentInstance.destroyAttachableExecution(execution);
 
     setParent(null);
   }
@@ -76,6 +80,7 @@ public class MigratingTransitionInstance extends MigratingProcessElementInstance
 
     representativeExecution = targetActivityInstance.createAttachableExecution();
     representativeExecution.setActivityInstanceId(null);
+    representativeExecution.setActive(activeState);
 
     jobInstance.attachState(this);
 

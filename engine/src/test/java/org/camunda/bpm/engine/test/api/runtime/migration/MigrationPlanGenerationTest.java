@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.CallActivityMode
 import org.camunda.bpm.engine.test.api.runtime.migration.models.EventBasedGatewayModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ExternalTaskModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.GatewayModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MessageReceiveModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
@@ -127,7 +128,8 @@ public class MigrationPlanGenerationTest {
     assertGeneratedMigrationPlan(sourceProcess, targetProcess)
       .hasInstructions(
         migrate("subProcess1").to("subProcess1"),
-        migrate("subProcess2").to("subProcess2")
+        migrate("subProcess2").to("subProcess2"),
+        migrate("fork").to("fork")
       );
   }
 
@@ -142,7 +144,8 @@ public class MigrationPlanGenerationTest {
         migrate("subProcess1").to("subProcess1"),
         migrate("nestedSubProcess1").to("nestedSubProcess1"),
         migrate("subProcess2").to("subProcess2"),
-        migrate("nestedSubProcess2").to("nestedSubProcess2")
+        migrate("nestedSubProcess2").to("nestedSubProcess2"),
+        migrate("fork").to("fork")
       );
   }
 
@@ -370,7 +373,8 @@ public class MigrationPlanGenerationTest {
     assertGeneratedMigrationPlan(sourceProcess, targetProcess)
       .hasInstructions(
         migrate("userTask1").to("userTask1"),
-        migrate("userTask2").to("userTask2")
+        migrate("userTask2").to("userTask2"),
+        migrate("fork").to("fork")
       );
   }
 
@@ -750,7 +754,44 @@ public class MigrationPlanGenerationTest {
       .hasEmptyInstructions();
   }
 
-  // TODO: test mit allen service-task-like tasks, die das hier unterstützen
+  @Test
+  public void testMapParallelGateways() {
+    BpmnModelInstance model = GatewayModels.PARALLEL_GW;
+
+    assertGeneratedMigrationPlan(model, model)
+      .hasInstructions(
+        migrate("fork").to("fork"),
+        migrate("join").to("join"),
+        migrate("parallel1").to("parallel1"),
+        migrate("parallel2").to("parallel2"),
+        migrate("afterJoin").to("afterJoin")
+      );
+  }
+
+  @Test
+  public void testMapInclusiveGateways() {
+    BpmnModelInstance model = GatewayModels.INCLUSIVE_GW;
+
+    assertGeneratedMigrationPlan(model, model)
+      .hasInstructions(
+        migrate("fork").to("fork"),
+        migrate("join").to("join"),
+        migrate("parallel1").to("parallel1"),
+        migrate("parallel2").to("parallel2"),
+        migrate("afterJoin").to("afterJoin")
+      );
+  }
+
+  @Test
+  public void testNotMapParallelToInclusiveGateway() {
+
+    assertGeneratedMigrationPlan(GatewayModels.PARALLEL_GW, GatewayModels.INCLUSIVE_GW)
+      .hasInstructions(
+        migrate("parallel1").to("parallel1"),
+        migrate("parallel2").to("parallel2"),
+        migrate("afterJoin").to("afterJoin")
+      );
+  }
 
   // helper
 

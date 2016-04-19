@@ -381,6 +381,7 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
     for (ScopeImpl scope : scopesToInstantiate) {
       ExecutionEntity createdExecution = (ExecutionEntity) createdExecutions.get(scope);
       createdExecution.setActivity(null);
+      createdExecution.setActive(false);
       executionBranch.visited(new MigratingActivityInstance(scope, createdExecution));
     }
   }

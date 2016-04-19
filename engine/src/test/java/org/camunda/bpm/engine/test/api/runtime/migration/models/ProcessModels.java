@@ -167,7 +167,7 @@ public class ProcessModels {
   public static final BpmnModelInstance PARALLEL_DOUBLE_SUBPROCESS_PROCESS =
     newModel()
       .startEvent()
-      .parallelGateway()
+      .parallelGateway("fork")
       .subProcess("subProcess1")
         .embeddedSubProcess()
           .startEvent()

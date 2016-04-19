@@ -40,6 +40,8 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
   // scope execution for actual scopes,
   // concurrent execution in case of non-scope activity with expanded tree
   protected ExecutionEntity representativeExecution;
+  protected boolean migrateActiveState;
+  protected boolean activeState;
 
   protected List<RemovingInstance> removingDependentInstances = new ArrayList<RemovingInstance>();
   protected List<MigratingInstance> migratingDependentInstances = new ArrayList<MigratingInstance>();
@@ -67,6 +69,13 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
     this.targetScope = targetScope;
     this.representativeExecution = scopeExecution;
     this.instanceBehavior = determineBehavior(sourceScope);
+
+    if (activityInstance.getChildActivityInstances().length == 0
+      && activityInstance.getChildTransitionInstances().length == 0) {
+      // TODO: braucht man das erste Feld überhaupt, wenn man das eh nur bei non-scope-Instanzen anpasst?
+      migrateActiveState = true;
+      activeState = representativeExecution.isActive();
+    }
   }
 
   /**
@@ -291,6 +300,7 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
 
       currentExecution.setActivity(null);
       currentExecution.leaveActivityInstance();
+      currentExecution.setActive(false);
 
       parentInstance.destroyAttachableExecution(currentExecution);
     }
@@ -302,6 +312,7 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
 
       representativeExecution.setActivity((PvmActivity) sourceScope);
       representativeExecution.setActivityInstanceId(activityInstance.getId());
+      representativeExecution.setActive(activeState);
 
     }
 
@@ -492,6 +503,7 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
       else {
         if (!scopeExecution.getNonEventScopeExecutions().isEmpty() || scopeExecution.getActivity() != null) {
           attachableExecution = (ExecutionEntity) scopeExecution.createConcurrentExecution();
+          attachableExecution.setActive(false);
           scopeExecution.forceUpdate();
         }
       }
