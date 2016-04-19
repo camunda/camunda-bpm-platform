@@ -433,7 +433,7 @@
                 <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceAuthorizationTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricDetailVariableUpdateQueryTest.java</exclude>
+                <exclude>**/MultiTenancyHistoricDetail*QueryTest.java</exclude>
                 <exclude>**/MultiTenancyHistoricIncidentQueryTest.java</exclude>
                 <exclude>**/MultiTenancyHistoricJobLogQueryTest.java</exclude>
                 <exclude>**/MultiTenancyHistoricDecisionInstanceQueryTest.java</exclude>
