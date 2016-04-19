@@ -426,21 +426,21 @@ public class MigrationPlanCreationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .mapActivities("boundary", "boundary")
-      .build();
-
-    assertThat(migrationPlan)
-      .hasSourceProcessDefinition(sourceProcessDefinition)
-      .hasTargetProcessDefinition(targetProcessDefinition)
-      .hasInstructions(
-        migrate("boundary").to("boundary"),
-        migrate("userTask1").to("userTask1"),
-        migrate("userTask2").to("userTask2")
-      );
+    try {
+      runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1")
+        .mapActivities("userTask2", "userTask2")
+        .mapActivities("boundary", "boundary")
+        .build();
+      fail("Should not succeed");
+    }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("boundary",
+          "The source activity's event scope (userTask1) must be mapped to the target activity's event scope (userTask2)"
+        );
+    }
   }
 
   @Test
@@ -515,21 +515,21 @@ public class MigrationPlanCreationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask", "userTask")
-      .mapActivities("boundary", "boundary")
-      .build();
-
-    assertThat(migrationPlan)
-      .hasSourceProcessDefinition(sourceProcessDefinition)
-      .hasTargetProcessDefinition(targetProcessDefinition)
-      .hasInstructions(
-        migrate("subProcess").to("subProcess"),
-        migrate("userTask").to("userTask"),
-        migrate("boundary").to("boundary")
-      );
+    try {
+      runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess")
+        .mapActivities("userTask", "userTask")
+        .mapActivities("boundary", "boundary")
+        .build();
+      fail("Should not succeed");
+    }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("boundary",
+          "The source activity's event scope (subProcess) must be mapped to the target activity's event scope (userTask)"
+        );
+    }
   }
 
   @Test
@@ -546,21 +546,21 @@ public class MigrationPlanCreationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
 
-    MigrationPlan migrationPlan = runtimeService
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask", "userTask")
-      .mapActivities("boundary", "boundary")
-      .build();
-
-    assertThat(migrationPlan)
-      .hasSourceProcessDefinition(sourceProcessDefinition)
-      .hasTargetProcessDefinition(targetProcessDefinition)
-      .hasInstructions(
-        migrate("subProcess").to("subProcess"),
-        migrate("userTask").to("userTask"),
-        migrate("boundary").to("boundary")
-      );
+    try {
+      runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess")
+        .mapActivities("userTask", "userTask")
+        .mapActivities("boundary", "boundary")
+        .build();
+      fail("Should not succeed");
+    }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("boundary",
+          "The source activity's event scope (userTask) must be mapped to the target activity's event scope (subProcess)"
+        );
+    }
   }
 
   @Test

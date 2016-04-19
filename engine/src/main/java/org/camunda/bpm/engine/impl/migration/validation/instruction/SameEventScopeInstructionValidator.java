@@ -34,12 +34,14 @@ public class SameEventScopeInstructionValidator implements MigrationInstructionV
     }
 
     if (targetEventScope == null) {
-      addFailure(instruction, report);
+      report.addFailure("The source activity's event scope (" + sourceEventScope.getId() + ") must be mapped but the "
+          + "target activity has no event scope");
     }
     else {
       ScopeImpl mappedSourceEventScope = findMappedEventScope(sourceEventScope, instruction, instructions);
       if (mappedSourceEventScope == null || !mappedSourceEventScope.getId().equals(targetEventScope.getId())) {
-        addFailure(instruction, report);
+        report.addFailure("The source activity's event scope (" + sourceEventScope.getId() + ") "
+            + "must be mapped to the target activity's event scope (" + targetEventScope.getId() + ")");
       }
     }
   }
@@ -59,8 +61,10 @@ public class SameEventScopeInstructionValidator implements MigrationInstructionV
     return null;
   }
 
-  protected void addFailure(ValidatingMigrationInstruction instruction, MigrationInstructionValidationReportImpl report) {
-    report.addFailure("Event scope of the activity has changed and wasn't migrated");
+  protected void addFailure(ValidatingMigrationInstruction instruction,
+      MigrationInstructionValidationReportImpl report, String sourceScopeId, String targetScopeId) {
+    report.addFailure("The source activity's event scope (" + sourceScopeId + ") "
+        + "must be mapped to the target activity's event scope (" + targetScopeId + ")");
   }
 
 }

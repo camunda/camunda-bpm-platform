@@ -215,6 +215,7 @@ import org.camunda.bpm.engine.impl.migration.validation.instruction.GatewayMappi
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.OnlyOnceMappedActivityInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.SameBehaviorInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.SameEventScopeInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.SameEventTypeValidator;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
@@ -3214,6 +3215,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     migrationInstructionValidators.add(new CannotAddMultiInstanceInnerActivityValidator());
     migrationInstructionValidators.add(new CannotRemoveMultiInstanceInnerActivityValidator());
     migrationInstructionValidators.add(new GatewayMappingValidator());
+    migrationInstructionValidators.add(new SameEventScopeInstructionValidator());
     return migrationInstructionValidators;
   }
 
