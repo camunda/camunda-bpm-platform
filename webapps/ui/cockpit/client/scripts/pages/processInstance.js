@@ -15,6 +15,10 @@ var angular = require('camunda-commons-ui/vendor/angular'),
           '$scope', '$filter', '$rootScope', '$location', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Data', 'Transform', 'processInstance', 'dataDepend', 'page', 'breadcrumbTrails',
   function($scope,   $filter,   $rootScope,   $location,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   IncidentResource,   Views,   Data,   Transform,   processInstance,   dataDepend,   page,   breadcrumbTrails) {
 
+    $scope.hasMigrationPlugin = Views.getProviders({ component: 'cockpit.processes.dashboard' }).filter(function(plugin) {
+      return plugin.id === 'migration';
+    }).length > 0;
+
     $scope.processInstance = processInstance;
 
     var filter;
@@ -351,6 +355,22 @@ var angular = require('camunda-commons-ui/vendor/angular'),
       return processDiagram;
     }]);
 
+    processData.provide('latestDefinition', ['processDefinition', function(definition) {
+      var queryParams = {
+        'key' : definition.key,
+        'sortBy': 'version',
+        'sortOrder': 'desc',
+        'latestVersion': true };
+
+      if(definition.tenantId) {
+        queryParams.tenantIdIn = [ definition.tenantId ];
+      } else {
+        queryParams.withoutTenantId = true;
+      }
+
+      return ProcessDefinitionResource.query(queryParams).$promise;
+    }]);
+
     // /////// End definition of process data
 
 
@@ -361,6 +381,38 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     $scope.processDefinition = processData.observe('processDefinition', function (processDefinition) {
       $scope.processDefinition = processDefinition;
     });
+
+    $scope.latestProcessDefinition = processData.observe('latestDefinition', function (processDefinition) {
+      $scope.latestProcessDefinition = processDefinition[0];
+    });
+
+    $scope.isLatestVersion = function() {
+      return $scope.processDefinition.version === $scope.latestProcessDefinition.version;
+    };
+
+    $scope.getMigrationUrl = function() {
+      var path = '#/migration';
+
+      var searches = {
+        sourceKey: $scope.processDefinition.key,
+        targetKey: $scope.latestProcessDefinition.key,
+        sourceVersion: $scope.processDefinition.version,
+        targetVersion: $scope.latestProcessDefinition.version,
+        searchQuery: JSON.stringify([{
+          type     : 'processInstanceIds',
+          operator : 'eq',
+          value    : $scope.processInstance.id
+        }])
+      };
+
+      return routeUtil.redirectTo(path, searches, [
+        'sourceKey',
+        'targetKey',
+        'sourceVersion',
+        'targetVersion',
+        'searchQuery'
+      ]);
+    };
 
     $scope.getDeploymentUrl = function() {
       var path = '#/repository';

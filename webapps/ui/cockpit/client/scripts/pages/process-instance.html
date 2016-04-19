@@ -55,7 +55,15 @@
                     class="business-key"><span class="null-value">null</span></dd>
 
                 <dt>Definition Version:</dt>
-                <dd class="definition-version">{{ processDefinition.version }}</dd>
+                <dd class="definition-version">
+                  {{ processDefinition.version }}
+                  <a ng-href="{{ getMigrationUrl() }}"
+                     class="instance-upgrade-link"
+                     ng-if="hasMigrationPlugin && !isLatestVersion()">
+                    <span class="glyphicon glyphicon-arrow-up"
+                          tooltip="Migrate this instance to latest version"></span>
+                  </a>
+                </dd>
 
                 <dt>Definition ID:</dt>
                 <dd class="definition-id">
