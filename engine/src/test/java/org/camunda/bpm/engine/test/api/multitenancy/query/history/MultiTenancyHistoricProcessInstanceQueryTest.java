@@ -19,14 +19,17 @@ import static org.junit.Assert.assertThat;
 import java.util.Arrays;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
 
   protected final static String TENANT_ONE = "tenant1";

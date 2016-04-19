@@ -22,15 +22,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class MultiTenancyHistoricDetailVariableUpdateQueryTest extends PluggableProcessEngineTestCase {
 
   protected final static String TENANT_ONE = "tenant1";

@@ -19,13 +19,16 @@ import static org.junit.Assert.assertThat;
 import java.util.Arrays;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class MultiTenancyHistoricIncidentQueryTest extends PluggableProcessEngineTestCase {
 
   protected static final String BPMN = "org/camunda/bpm/engine/test/api/multitenancy/failingTask.bpmn";

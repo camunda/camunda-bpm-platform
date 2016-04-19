@@ -433,12 +433,7 @@
                 <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceAuthorizationTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricDetail*QueryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricIncidentQueryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricJobLogQueryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricDecisionInstanceQueryTest.java</exclude>
                 <exclude>**/BatchMigrationHistoryTest.java</exclude>
-                <exclude>**/TenantIdProviderTest.java</exclude>
                 <exclude>**/MigrationHistoryVariablesTest.java</exclude>
                 <exclude>**/HistoricBatchQueryTest.java</exclude>
                 <exclude>**/HistoricIdentityLink*Test*.java</exclude>
@@ -484,13 +479,7 @@
                 <exclude>**/CompensateEventHistoryTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceAuthorizationTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricVariableInstanceQueryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricDetail*QueryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricIncidentQueryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricJobLogQueryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricDecisionInstanceQueryTest.java</exclude>
                 <exclude>**/BatchMigrationHistoryTest.java</exclude>
-                <exclude>**/TenantIdProviderTest.java</exclude>
                 <exclude>**/MigrationHistoryVariablesTest.java</exclude>
                 <exclude>**/HistoricBatchQueryTest.java</exclude>
                 <exclude>**/HistoricIdentityLink*Test*.java</exclude>
@@ -535,9 +524,7 @@
                 <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompensateEventHistoryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoric*QueryTest.java</exclude>
                 <exclude>**/BatchMigrationHistoryTest.java</exclude>
-                <exclude>**/TenantIdProviderTest.java</exclude>
                 <exclude>**/MigrationHistoryVariablesTest.java</exclude>
                 <exclude>**/HistoricBatchQueryTest.java</exclude>
                 <exclude>**/HistoricIdentityLink*Test*.java</exclude>
