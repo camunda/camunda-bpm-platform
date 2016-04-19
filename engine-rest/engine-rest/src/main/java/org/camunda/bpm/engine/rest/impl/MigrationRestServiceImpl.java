@@ -21,12 +21,15 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.rest.MigrationRestService;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -55,20 +58,28 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
 
   public void executeMigrationPlan(MigrationExecutionDto migrationExecution) {
-    MigrationPlan migrationPlan = createMigrationPlan(migrationExecution);
-    List<String> processInstanceIds = migrationExecution.getProcessInstanceIds();
-
-    processEngine.getRuntimeService()
-      .newMigration(migrationPlan).processInstanceIds(processInstanceIds).execute();
+    createMigrationPlanExecutionBuilder(migrationExecution).execute();
   }
 
   public BatchDto executeMigrationPlanAsync(MigrationExecutionDto migrationExecution) {
+    Batch batch = createMigrationPlanExecutionBuilder(migrationExecution).executeAsync();
+    return BatchDto.fromBatch(batch);
+  }
+
+  protected MigrationPlanExecutionBuilder createMigrationPlanExecutionBuilder(MigrationExecutionDto migrationExecution) {
     MigrationPlan migrationPlan = createMigrationPlan(migrationExecution);
     List<String> processInstanceIds = migrationExecution.getProcessInstanceIds();
 
-    Batch batch = processEngine.getRuntimeService()
-      .newMigration(migrationPlan).processInstanceIds(processInstanceIds).executeAsync();
-    return BatchDto.fromBatch(batch);
+    MigrationPlanExecutionBuilder executionBuilder = processEngine.getRuntimeService()
+      .newMigration(migrationPlan).processInstanceIds(processInstanceIds);
+
+    ProcessInstanceQueryDto processInstanceQueryDto = migrationExecution.getProcessInstanceQuery();
+    if (processInstanceQueryDto != null) {
+      ProcessInstanceQuery processInstanceQuery = processInstanceQueryDto.toQuery(getProcessEngine());
+      executionBuilder.processInstanceQuery(processInstanceQuery);
+    }
+
+    return executionBuilder;
   }
 
   protected MigrationPlan createMigrationPlan(MigrationExecutionDto migrationExecution) {

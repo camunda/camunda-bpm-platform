@@ -58,6 +58,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.migration.MigratingActivityInstanceValidationReport;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationReport;
@@ -72,13 +73,16 @@ import org.camunda.bpm.engine.migration.MigrationPlanValidationReport;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationInstructionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.helper.MockMigrationPlanBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.rest.util.migration.MigrationExecutionDtoBuilder;
 import org.camunda.bpm.engine.rest.util.migration.MigrationPlanDtoBuilder;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 
 import com.jayway.restassured.response.Response;
@@ -281,6 +285,34 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
         .done()
       .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(EXECUTE_MIGRATION_URL);
+
+    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution);
+    verifyMigrationPlanExecutionInteraction(migrationExecution);
+  }
+
+  @Test
+  public void executeMigrationPlanWithProcessInstanceQuery() {
+    when(runtimeServiceMock.createProcessInstanceQuery())
+      .thenReturn(new ProcessInstanceQueryImpl());
+
+    ProcessInstanceQueryDto processInstanceQuery = new ProcessInstanceQueryDto();
+    processInstanceQuery.setProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+        .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstanceQuery(processInstanceQuery)
       .build();
 
     given()
@@ -712,6 +744,46 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   }
 
   @Test
+  public void executeMigrationPlanAsyncWithProcessInstanceQuery() {
+    when(runtimeServiceMock.createProcessInstanceQuery())
+      .thenReturn(new ProcessInstanceQueryImpl());
+
+    ProcessInstanceQueryDto processInstanceQuery = new ProcessInstanceQueryDto();
+    processInstanceQuery.setProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
+
+    Batch batchMock = createMockBatch();
+    when(migrationPlanExecutionBuilderMock.executeAsync()).thenReturn(batchMock);
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+        .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstanceQuery(processInstanceQuery)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("id", is(EXAMPLE_BATCH_ID))
+      .body("type", is(EXAMPLE_BATCH_TYPE))
+      .body("size", is(EXAMPLE_BATCH_SIZE))
+      .body("batchJobsPerSeed", is(EXAMPLE_BATCH_JOBS_PER_SEED))
+      .body("invocationsPerBatchJob", is(EXAMPLE_INVOCATIONS_PER_BATCH_JOB))
+      .body("seedJobDefinitionId", is(EXAMPLE_SEED_JOB_DEFINITION_ID))
+      .body("monitorJobDefinitionId", is(EXAMPLE_MONITOR_JOB_DEFINITION_ID))
+      .body("batchJobDefinitionId", is(EXAMPLE_BATCH_JOB_DEFINITION_ID))
+      .body("tenantId", is(EXAMPLE_TENANT_ID))
+    .when()
+      .post(EXECUTE_MIGRATION_ASYNC_URL);
+
+    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution);
+    verifyMigrationPlanAsyncExecutionInteraction(migrationExecution);
+  }
+
+  @Test
   public void executeMigrationPlanAsyncWithNullInstructions() {
     MigrationInstructionValidationReport instructionReport = mock(MigrationInstructionValidationReport.class);
     when(instructionReport.getMigrationInstruction()).thenReturn(null);
@@ -1071,6 +1143,9 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     InOrder inOrder = inOrder(runtimeServiceMock, migrationPlanExecutionBuilderMock);
     inOrder.verify(runtimeServiceMock).newMigration(any(MigrationPlan.class));
     inOrder.verify(migrationPlanExecutionBuilderMock).processInstanceIds(eq(migrationExecution.getProcessInstanceIds()));
+    if (migrationExecution.getProcessInstanceQuery() != null) {
+      verifyMigrationPlanExecutionProcessInstanceQuery(inOrder);
+    }
     inOrder.verify(migrationPlanExecutionBuilderMock).execute();
     inOrder.verifyNoMoreInteractions();
   }
@@ -1079,8 +1154,20 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     InOrder inOrder = inOrder(runtimeServiceMock, migrationPlanExecutionBuilderMock);
     inOrder.verify(runtimeServiceMock).newMigration(any(MigrationPlan.class));
     inOrder.verify(migrationPlanExecutionBuilderMock).processInstanceIds(eq(migrationExecution.getProcessInstanceIds()));
+    if (migrationExecution.getProcessInstanceQuery() != null) {
+      verifyMigrationPlanExecutionProcessInstanceQuery(inOrder);
+    }
     inOrder.verify(migrationPlanExecutionBuilderMock).executeAsync();
     inOrder.verifyNoMoreInteractions();
+  }
+
+  protected void verifyMigrationPlanExecutionProcessInstanceQuery(InOrder inOrder) {
+    ArgumentCaptor<ProcessInstanceQuery> queryCapture = ArgumentCaptor.forClass(ProcessInstanceQuery.class);
+    inOrder.verify(migrationPlanExecutionBuilderMock).processInstanceQuery(queryCapture.capture());
+
+    ProcessInstanceQueryImpl actualQuery = (ProcessInstanceQueryImpl) queryCapture.getValue();
+    assertThat(actualQuery).isNotNull();
+    assertThat(actualQuery.getProcessDefinitionId()).isEqualTo(EXAMPLE_PROCESS_DEFINITION_ID);
   }
 
 }

@@ -15,10 +15,13 @@ package org.camunda.bpm.engine.rest.dto.migration;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
+
 public class MigrationExecutionDto {
 
   protected MigrationPlanDto migrationPlan;
   protected List<String> processInstanceIds;
+  protected ProcessInstanceQueryDto processInstanceQuery;
 
   public MigrationPlanDto getMigrationPlan() {
     return migrationPlan;
@@ -35,4 +38,13 @@ public class MigrationExecutionDto {
   public void setProcessInstanceIds(List<String> processInstanceIds) {
     this.processInstanceIds = processInstanceIds;
   }
+
+  public ProcessInstanceQueryDto getProcessInstanceQuery() {
+    return processInstanceQuery;
+  }
+
+  public void setProcessInstanceQuery(ProcessInstanceQueryDto processInstanceQuery) {
+    this.processInstanceQuery = processInstanceQuery;
+  }
+
 }
