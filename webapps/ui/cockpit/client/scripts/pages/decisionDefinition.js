@@ -16,6 +16,8 @@ var angular = require('camunda-commons-ui/vendor/angular'),
   function($scope,   $rootScope,   $q,   dataDepend,   page,   camAPI,   decisionDefinition,   Views,   search
   ) {
 
+    $scope.control = {};
+
     var decisionData = $scope.decisionData = dataDepend.create($scope);
 
     // utilities ///////////////////////
@@ -111,6 +113,22 @@ var angular = require('camunda-commons-ui/vendor/angular'),
       $scope.tableXml = tableXml;
     });
 
+    $scope.initializeTablePlugins = function() {
+      var tablePlugins = Views.getProviders({ component: 'cockpit.decisionDefinition.table' });
+
+      var initData = {
+        decisionDefinition : decisionDefinition,
+        decisionData       : decisionData,
+        tableControl       : $scope.control
+      };
+
+      for(var i = 0; i < tablePlugins.length; i++) {
+        if(typeof tablePlugins[i].initialize === 'function') {
+           tablePlugins[i].initialize(initData);
+        }
+      }
+    };
+
     $scope.decisionDefinitionVars = { read: [ 'decisionDefinition', 'decisionData' ] };
     $scope.decisionDefinitionTabs = Views.getProviders({ component: 'cockpit.decisionDefinition.tab' });
     $scope.decisionDefinitionActions = Views.getProviders({ component: 'cockpit.decisionDefinition.action' });
@@ -124,7 +142,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     );
 
     var initData = {
-      decisionDefinition : $scope.decisionDefinitionService,
+      decisionDefinition : decisionDefinition,
       decisionData       : decisionData
     };
 
