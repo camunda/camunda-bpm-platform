@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionS
 import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.batch.Batch;
@@ -48,7 +47,6 @@ import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -688,7 +686,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   protected void initHistoricIdentityLinkEvent(HistoricIdentityLinkLogEventEntity evt, IdentityLink identityLink, HistoryEventType eventType) {
 
     if (identityLink.getTaskId() != null) {
-      TaskEntity task = Context.getCommandContext().getTaskManager().findTaskById(identityLink.getTaskId());
+      TaskEntity task = Context
+          .getCommandContext()
+          .getTaskManager()
+          .findTaskById(identityLink.getTaskId());
 
       evt.setProcessDefinitionId(task.getProcessDefinitionId());
 
@@ -700,8 +701,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     if (identityLink.getProcessDefId() != null) {
       evt.setProcessDefinitionId(identityLink.getProcessDefId());
 
-      ProcessDefinitionEntity definition = Context.getProcessEngineConfiguration().getDeploymentCache()
-      .findProcessDefinitionFromCache(identityLink.getProcessDefId());
+      ProcessDefinitionEntity definition = Context
+          .getProcessEngineConfiguration()
+          .getDeploymentCache()
+          .findProcessDefinitionFromCache(identityLink.getProcessDefId());
       evt.setProcessDefinitionKey(definition.getKey());
     }
 
@@ -710,6 +713,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setUserId(identityLink.getUserId());
     evt.setGroupId(identityLink.getGroupId());
     evt.setTaskId(identityLink.getTaskId());
+
     // There is a conflict in HistoryEventTypes for 'delete' keyword,
     // So HistoryEventTypes.IDENTITY_LINK_ADD /
     // HistoryEventTypes.IDENTITY_LINK_DELETE is provided with the event name

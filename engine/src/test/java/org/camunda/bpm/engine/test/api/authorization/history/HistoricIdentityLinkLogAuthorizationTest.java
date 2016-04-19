@@ -2,16 +2,13 @@ package org.camunda.bpm.engine.test.api.authorization.history;
 
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
-import java.util.concurrent.Callable;
+
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
-import org.camunda.bpm.engine.impl.identity.Authentication;
-import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.DeploymentBuilder;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
 
 public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest {
+
   protected static final String ONE_PROCESS_KEY = "demoAssigneeProcess";
   protected static final String CASE_KEY = "oneTaskCase";
   protected String deploymentId;
@@ -29,7 +26,7 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
 
   // historic identity link query (standalone task) - Authorization
 
-  public void testQueryForStandaloneTaskHistoricIdentityLinkWithAuthrorization() {
+  public void testQueryForStandaloneTaskHistoricIdentityLinkWithoutAuthrorization() {
     // given
     disableAuthorization();
 
@@ -53,7 +50,7 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
   public void testQueryForTaskHistoricIdentityLinkWithoutUserPermission() {
     // given
     disableAuthorization();
-    startProcessInstance(ONE_PROCESS_KEY);
+    startProcessInstanceByKey(ONE_PROCESS_KEY);
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
     // if
@@ -94,6 +91,7 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
     identityService.setAuthenticatedUserId("aAssignerId");
     taskService.addCandidateUser(taskId, "aUserId");
     enableAuthorization();
+
     // when
     HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
 
@@ -124,6 +122,7 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
 
     // when
     HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
+
     // then
     verifyQueryResults(query, 7);
 
@@ -137,6 +136,7 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
     createGrantAuthorization(PROCESS_DEFINITION, ONE_PROCESS_KEY, userId, READ_HISTORY);
     enableAuthorization();
     query = historyService.createHistoricIdentityLinkLogQuery();
+
     // then
     verifyQueryResults(query, 10);
 
@@ -153,40 +153,4 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
     taskService.saveTask(task);
   }
 
-  protected Deployment createDeployment(final String name, final String... resources) {
-    return runWithoutAuthorization(new Callable<Deployment>() {
-      public Deployment call() throws Exception {
-        DeploymentBuilder builder = repositoryService.createDeployment();
-        for (String resource : resources) {
-          builder.addClasspathResource(resource);
-        }
-        return builder.deploy();
-      }
-    });
-  }
-
-  protected void deleteDeployment(String deploymentId) {
-    deleteDeployment(deploymentId, true);
-  }
-
-  protected void deleteDeployment(final String deploymentId, final boolean cascade) {
-    Authentication authentication = identityService.getCurrentAuthentication();
-    try {
-      identityService.clearAuthentication();
-      runWithoutAuthorization(new Callable<Void>() {
-        public Void call() throws Exception {
-          repositoryService.deleteDeployment(deploymentId, cascade);
-          return null;
-        }
-      });
-    } finally {
-      if (authentication != null) {
-        identityService.setAuthentication(authentication);
-      }
-    }
-  }
-
-  protected ProcessInstance startProcessInstance(String key) {
-    return runtimeService.startProcessInstanceByKey(key);
-  }
 }
