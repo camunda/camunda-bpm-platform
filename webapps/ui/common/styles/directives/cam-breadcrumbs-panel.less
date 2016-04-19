@@ -11,7 +11,7 @@
 .cam-breadcrumb {
   background-color: transparent;
   margin: 0;
-  padding: 3px 10px 0 10px;
+  padding: 7px 10px 0 10px;
   height: @breadcrumb-height;
   overflow: visible;
   white-space: nowrap;
@@ -32,14 +32,6 @@
       display: inline-block;
     }
 
-    // > a {
-    //   color: @navbar-default-link-color;
-    //   &:hover,
-    //   &:focus {
-    //     color: @navbar-default-link-hover-color;
-    //   }
-    // }
-
     > .divider {
       margin-left: 4px;
       margin-right: 4px;
@@ -55,26 +47,16 @@
       }
     }
 
-    // // not sure about that, could help visualizing the change but also disturb
-    // > .text {
-    //   transition: font-size 0.218s linear;
-    // }
-
     &.active {
       > .text {
         color: @gray-darker;
         max-width: 500px;
         font-size: 18px;
         line-height: 22px;
-        // transition: max-width 0.218s linear;
         @media screen and (max-width: (@grid-float-breakpoint - 1)) {
           max-width: 250px;
         }
       }
-
-      // > .text:hover {
-      //   max-width: 50vw;
-      // }
     }
   }
 }
