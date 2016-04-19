@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.findCamundaExtensionElement;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseCamundaScript;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseInputOutput;
-import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -163,6 +162,7 @@ import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDele
  * @author Saeid Mirzaei
  * @author Nico Rehwaldt
  * @author Ronny Bräunlich
+ * @author Christopher Zell
  */
 public class BpmnParse extends Parse {
 
@@ -589,7 +589,12 @@ public class BpmnParse extends Parse {
 
     // now we have parsed anything we can validate some stuff
     validateActivities(processDefinition.getActivities());
-
+    
+    //unregister delegates
+    for (ActivityImpl activity : processDefinition.getActivities()) {
+      activity.setDelegateAsyncAfterUpdate(null);
+      activity.setDelegateAsyncBeforeUpdate(null);
+    }
     return processDefinition;
   }
 
@@ -1607,6 +1612,7 @@ public class BpmnParse extends Parse {
 
       id = getIdForMiBody(id);
       ActivityImpl miBodyScope = scope.createActivity(id);
+      setActivityAsyncDelegates(miBodyScope);
       miBodyScope.setProperty(PROPERTYNAME_TYPE, ActivityTypes.MULTI_INSTANCE_BODY);
       miBodyScope.setScope(true);
 
@@ -1711,7 +1717,7 @@ public class BpmnParse extends Parse {
     activity.setProperty("default", activityElement.attribute("default"));
     activity.getProperties().set(BpmnProperties.TYPE, activityElement.getTagName());
     activity.setProperty("line", activityElement.getLine());
-
+    setActivityAsyncDelegates(activity);
     activity.setProperty(PROPERTYNAME_JOB_PRIORITY, parsePriority(activityElement, PROPERTYNAME_JOB_PRIORITY));
 
     if (isCompensationHandler(activityElement)) {
@@ -1720,7 +1726,108 @@ public class BpmnParse extends Parse {
 
     return activity;
   }
+  
+  /**
+   * Sets the delegates for the activity, which will be called
+   * if the attribute asyncAfter or asyncBefore was changed.
+   * 
+   * @param activity the activity which gets the delegates
+   */
+  private void setActivityAsyncDelegates(final ActivityImpl activity) {
+    activity.setDelegateAsyncAfterUpdate(new ActivityImpl.AsyncAfterUpdate() {
+      @Override
+      public void updateAsyncAfter(boolean asyncAfter, boolean exclusive) {
+        if (asyncAfter) {          
+          addMessageJobDeclaration(new AsyncAfterMessageJobDeclaration(), activity, exclusive);
+        } else {          
+          removeMessageJobDeclarationWithJobConfiguration(activity, MessageJobDeclaration.ASYNC_AFTER);
+        }
+      }
+    });
+    
+    activity.setDelegateAsyncBeforeUpdate(new ActivityImpl.AsyncBeforeUpdate() {
+      @Override
+      public void updateAsyncBefore(boolean asyncBefore, boolean exclusive) {
+        if (asyncBefore) {          
+          addMessageJobDeclaration(new AsyncBeforeMessageJobDeclaration(), activity, exclusive);
+        } else {
+          removeMessageJobDeclarationWithJobConfiguration(activity, MessageJobDeclaration.ASYNC_BEFORE);
+        }        
+      }
+    });    
+  }
 
+  /**
+   * Adds the new message job declaration to existing declarations.
+   * There will be executed an existing check before the adding is executed.
+   * 
+   * @param messageJobDeclaration the new message job declaration
+   * @param activity the corresponding activity
+   * @param exclusive the flag which indicates if the async should be exclusive
+   */
+  private void addMessageJobDeclaration(MessageJobDeclaration messageJobDeclaration, ActivityImpl activity, boolean exclusive) {
+    ProcessDefinition procDef = (ProcessDefinition) activity.getProcessDefinition();
+    if (!exists(messageJobDeclaration, procDef.getKey(), activity.getActivityId())) {
+      messageJobDeclaration.setExclusive(exclusive);
+      messageJobDeclaration.setActivity(activity);
+      messageJobDeclaration.setJobPriorityProvider((ParameterValueProvider) activity.getProperty(PROPERTYNAME_JOB_PRIORITY));
+
+      addMessageJobDeclarationToActivity(messageJobDeclaration, activity);
+      addJobDeclarationToProcessDefinition(messageJobDeclaration, procDef);   
+    } 
+  }
+  
+  /**
+   * Checks whether the message declaration already exists.
+   * 
+   * @param msgJobdecl the message job declaration which is searched
+   * @param procDefKey the corresponding process definition key
+   * @param activityId the corresponding activity id
+   * @return true if the message job declaration exists, false otherwise
+   */
+  private boolean exists(MessageJobDeclaration msgJobdecl, String procDefKey, String activityId) {
+    boolean exist = false;
+    List<JobDeclaration<?, ?>> declarations = jobDeclarations.get(procDefKey);
+    if (declarations != null) {
+      for (int i = 0; i < declarations.size() && !exist; i++) {
+        JobDeclaration<?, ?> decl = declarations.get(i);
+        if (decl.getActivityId().equals(activityId) && 
+            decl.getJobConfiguration().equalsIgnoreCase(msgJobdecl.getJobConfiguration()))
+          exist = true;
+      }      
+    }
+    return exist;
+  }
+  
+  /**
+   * Removes a job declaration which belongs to the given activity and has the given job configuration.
+   * 
+   * @param activity the activity of the job declaration
+   * @param jobConfiguration  the job configuration of the declaration
+   */
+  private void removeMessageJobDeclarationWithJobConfiguration(ActivityImpl activity, String jobConfiguration) {
+    List<MessageJobDeclaration> messageJobDeclarations = (List<MessageJobDeclaration>) activity.getProperty(PROPERTYNAME_MESSAGE_JOB_DECLARATION);
+    if (messageJobDeclarations != null) {
+      for (int i = messageJobDeclarations.size() -1; i >= 0; i--) {
+        if (messageJobDeclarations.get(i).getJobConfiguration().equalsIgnoreCase(jobConfiguration) 
+          && messageJobDeclarations.get(i).getActivityId().equalsIgnoreCase(activity.getActivityId())) {
+          messageJobDeclarations.remove(i);
+        }
+      }
+    }   
+    
+    ProcessDefinition procDef = (ProcessDefinition) activity.getProcessDefinition();
+    List<JobDeclaration<?, ?>> declarations = jobDeclarations.get(procDef.getKey());
+    if (declarations != null) {        
+      for (int i = declarations.size() -1; i >= 0; i--) {
+        if (declarations.get(i).getJobConfiguration().equalsIgnoreCase(jobConfiguration)
+            && declarations.get(i).getActivityId().equalsIgnoreCase(activity.getActivityId())) {
+          declarations.remove(i);
+        }
+      }      
+    }
+  }
+    
   public String parseDocumentation(Element element) {
     List<Element> docElements = element.elements("documentation");
     List<String> docStrings = new ArrayList<String>();
@@ -2078,32 +2185,10 @@ public class BpmnParse extends Parse {
     boolean exclusive = isExclusive(element);
 
     // set properties on activity
-    activity.setAsyncBefore(isAsyncBefore);
-    activity.setAsyncAfter(isAsyncAfter);
-
-    if (isAsyncBefore) {
-
-      MessageJobDeclaration messageJobDeclaration = new AsyncBeforeMessageJobDeclaration();
-      messageJobDeclaration.setExclusive(exclusive);
-      messageJobDeclaration.setActivity(activity);
-      messageJobDeclaration.setJobPriorityProvider((ParameterValueProvider) activity.getProperty(PROPERTYNAME_JOB_PRIORITY));
-
-      addMessageJobDeclarationToActivity(messageJobDeclaration, activity);
-      addJobDeclarationToProcessDefinition(messageJobDeclaration, activity.getProcessDefinition());
-    }
-
-    if (isAsyncAfter) {
-
-      MessageJobDeclaration messageJobDeclaration = new AsyncAfterMessageJobDeclaration();
-      messageJobDeclaration.setExclusive(exclusive);
-      messageJobDeclaration.setActivity(activity);
-      messageJobDeclaration.setJobPriorityProvider((ParameterValueProvider) activity.getProperty(PROPERTYNAME_JOB_PRIORITY));
-
-      addMessageJobDeclarationToActivity(messageJobDeclaration, activity);
-      addJobDeclarationToProcessDefinition(messageJobDeclaration, activity.getProcessDefinition());
-    }
+    activity.setAsyncBefore(isAsyncBefore, exclusive);
+    activity.setAsyncAfter(isAsyncAfter, exclusive);
   }
-
+  
   protected ParameterValueProvider parsePriority(Element element, String priorityAttribute) {
     String priorityAttributeValue = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, priorityAttribute);
 
@@ -2136,9 +2221,8 @@ public class BpmnParse extends Parse {
     messageJobDeclarations.add(messageJobDeclaration);
   }
 
-  protected void addJobDeclarationToProcessDefinition(JobDeclaration<?, ?> jobDeclaration, ProcessDefinitionImpl processDefinition) {
-    ProcessDefinition definition = (ProcessDefinition) processDefinition;
-    String key = definition.getKey();
+  protected void addJobDeclarationToProcessDefinition(JobDeclaration<?, ?> jobDeclaration, ProcessDefinition processDefinition) {
+    String key = processDefinition.getKey();
 
     List<JobDeclaration<?, ?>> containingJobDeclarations = jobDeclarations.get(key);
     if (containingJobDeclarations == null) {
@@ -2363,6 +2447,7 @@ public class BpmnParse extends Parse {
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseTask(taskElement, scope, activity);
     }
+//    createMessageJobDeclForAsyncActivity(activity, true);
     return activity;
   }
 
@@ -3118,7 +3203,7 @@ public class BpmnParse extends Parse {
     }
     timerDeclaration.setActivity(timerActivity);
     timerDeclaration.setJobConfiguration(type.toString() + ": " + expression.getExpressionText());
-    addJobDeclarationToProcessDefinition(timerDeclaration, timerActivity.getProcessDefinition());
+    addJobDeclarationToProcessDefinition(timerDeclaration, (ProcessDefinition) timerActivity.getProcessDefinition());
 
     timerDeclaration.setJobPriorityProvider((ParameterValueProvider) timerActivity.getProperty(PROPERTYNAME_JOB_PRIORITY));
 

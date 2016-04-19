@@ -79,5 +79,5 @@ public class MessageJobDeclaration extends JobDeclaration<AtomicOperationInvocat
 
     return configuration;
   }
-
+  
 }
