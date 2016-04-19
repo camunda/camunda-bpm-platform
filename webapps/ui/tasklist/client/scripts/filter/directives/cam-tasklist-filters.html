@@ -35,7 +35,7 @@
 
         {{ filter.name }}
 
-        <span ng-style="{visibility: isFocused(filter) ? 'visible' : 'hidden'}"
+        <span ng-show="isFocused(filter)"
               class="counter">{{ filterCount }}</span>
       </a>
     </h4>
