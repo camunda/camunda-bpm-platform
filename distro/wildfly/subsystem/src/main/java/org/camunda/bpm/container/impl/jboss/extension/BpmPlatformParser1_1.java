@@ -253,6 +253,10 @@ public class BpmPlatformParser1_1 extends AbstractParser {
               parseElement(SubsystemAttributeDefinitons.KEEPALIVE_TIME, addJobExecutorOp, reader);
               break;
             }
+            case ALLOW_CORE_TIMEOUT: {
+              parseElement(SubsystemAttributeDefinitons.ALLOW_CORE_TIMEOUT, addJobExecutorOp, reader);
+              break;
+            }
             default: {
               throw unexpectedElement(reader);
             }
