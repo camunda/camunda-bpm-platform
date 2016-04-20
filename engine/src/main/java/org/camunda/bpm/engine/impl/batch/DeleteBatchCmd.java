@@ -41,6 +41,7 @@ public class DeleteBatchCmd implements Command<Void> {
 
     // TODO: check authorizations
 
+
     batchEntity.delete(cascadeToHistory);
 
     return null;
