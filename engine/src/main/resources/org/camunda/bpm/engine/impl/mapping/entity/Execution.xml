@@ -190,7 +190,7 @@
   </select>
 
   <select id="selectProcessInstanceIdsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultType="string">
-    select RES.ID_
+    select distinct RES.ID_
     <include refid="selectExecutionsByQueryCriteriaSql"/>
   </select>
 
