@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.jobexecutor;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
@@ -26,6 +27,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -34,6 +36,8 @@ import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
 
 /**
  * Represents a test class, which uses parse listeners 
@@ -44,7 +48,7 @@ import org.junit.rules.RuleChain;
  * 
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class JobDefinitionCreationWithParseListener {
+public class JobDefinitionCreationWithParseListenerTest {
 
   /**
    * The engine rule.
@@ -81,28 +85,34 @@ public class JobDefinitionCreationWithParseListener {
   public void testCreateJobDefinitionWithParseListener() {
     //given
     String modelFileName = "jobCreationWithinParseListener.bpmn20.xml";
-    InputStream in = JobDefinitionCreationWithParseListener.class.getResourceAsStream(modelFileName);
+    InputStream in = JobDefinitionCreationWithParseListenerTest.class.getResourceAsStream(modelFileName);
     DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment().addInputStream(modelFileName, in);
     //when the asyncBefore is set in the parse listener 
     Deployment deployment = builder.deploy();
     engineRule.manageDeployment(deployment);  
     //then there exists a new job definition
     JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
-    assertNotNull(query.singleResult());
+    JobDefinition jobDef = query.singleResult();
+    assertNotNull(jobDef);
+    assertEquals(jobDef.getProcessDefinitionKey(), "oneTaskProcess");
+    assertEquals(jobDef.getActivityId(), "servicetask1");    
   }
   
   
   @Test
   public void testCreateJobDefinitionWithParseListenerAndAsyncInXml() {
     //given the asyncBefore is set in the xml
-    String modelFileName = "simpleAsyncProcess.bpmn20.xml";
-    InputStream in = JobDefinitionCreationWithParseListener.class.getResourceAsStream(modelFileName);
+    String modelFileName = "jobAsyncBeforeCreationWithinParseListener.bpmn20.xml";
+    InputStream in = JobDefinitionCreationWithParseListenerTest.class.getResourceAsStream(modelFileName);
     DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment().addInputStream(modelFileName, in);
     //when the asyncBefore is set in the parse listener 
     Deployment deployment = builder.deploy();
     engineRule.manageDeployment(deployment);  
     //then there exists only one job definition
     JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
-    assertNotNull(query.singleResult());
+    JobDefinition jobDef = query.singleResult();
+    assertNotNull(jobDef);
+    assertEquals(jobDef.getProcessDefinitionKey(), "oneTaskProcess");
+    assertEquals(jobDef.getActivityId(), "servicetask1");
   }
 }
