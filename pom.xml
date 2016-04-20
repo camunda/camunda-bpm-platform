@@ -180,6 +180,8 @@
 
         <module>engine-plugins</module>
 
+        <module>distro/webjar</module>
+
         <module>database</module>
         <module>parent</module>
         <module>bom</module>
