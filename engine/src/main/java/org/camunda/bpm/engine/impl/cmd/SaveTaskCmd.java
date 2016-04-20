@@ -59,7 +59,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
 
 
     } else {
-      authorizationManager.checkUpdateTask(task);
+      authorizationManager.checkTaskAssign(task);
       task.update();
       operation = UserOperationLogEntry.OPERATION_TYPE_UPDATE;
     }

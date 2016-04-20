@@ -77,7 +77,7 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
     EnsureUtil.ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateTask(task);
+    authorizationManager.checkTaskAssign(task);
     
     if (IdentityLinkType.ASSIGNEE.equals(type)) {
       task.setAssignee(userId);

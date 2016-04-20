@@ -47,7 +47,7 @@ public class SetTaskPriorityCmd implements Command<Void>, Serializable {
     ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateTask(task);
+    authorizationManager.checkTaskAssign(task);
 
     task.setPriority(priority);
 

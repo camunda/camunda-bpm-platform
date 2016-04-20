@@ -31,7 +31,7 @@ public class RemoveTaskVariablesCmd extends AbstractRemoveVariableCmd {
     ensureNotNull("Cannot find task with id " + entityId, "task", task);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateTask(task);
+    authorizationManager.checkTaskAssign(task);
 
     return task;
   }

@@ -48,7 +48,7 @@ public class ClaimTaskCmd implements Command<Void>, Serializable {
     ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateTask(task);
+    authorizationManager.checkTaskWork(task);
 
     if (userId != null) {
       if (task.getAssignee() != null) {

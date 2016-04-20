@@ -48,7 +48,7 @@ public class DelegateTaskCmd implements Command<Object>, Serializable {
     ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateTask(task);
+    authorizationManager.checkTaskAssign(task);
 
     task.delegate(userId);
     

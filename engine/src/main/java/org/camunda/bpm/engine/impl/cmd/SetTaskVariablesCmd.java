@@ -45,7 +45,7 @@ public class SetTaskVariablesCmd extends AbstractSetVariableCmd {
     ensureNotNull("task " + entityId + " doesn't exist", "task", task);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateTask(task);
+    authorizationManager.checkTaskAssign(task);
 
     return task;
   }
