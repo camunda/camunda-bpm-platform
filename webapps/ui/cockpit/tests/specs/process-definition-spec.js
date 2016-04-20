@@ -237,10 +237,10 @@ describe('Cockpit Process Definition Spec', function() {
 
   });
 
-  describe('semantic versioning', function() {
+  describe('version tagging', function() {
 
     before(function() {
-      return testHelper(setupFile.semanticVersionSetup, function() {
+      return testHelper(setupFile.versionTagSetup, function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
@@ -248,7 +248,7 @@ describe('Cockpit Process Definition Spec', function() {
       });
     });
 
-    describe('process definition with a semantic version', function() {
+    describe('process definition with a version tag', function() {
       before(function() {
         dashboardPage.navigateToWebapp('Cockpit');
         // second process definition is deployed without tenant id
@@ -256,16 +256,16 @@ describe('Cockpit Process Definition Spec', function() {
         processesPage.deployedProcessesList.selectProcess(0);
       });
 
-      it('should display definition semantic version', function() {
+      it('should display definition version tag', function() {
         // when
         definitionPage.sidebarTabClick('Information');
 
         // then
-        expect(definitionPage.information.semanticVersion()).to.eventually.contain('1.0.0');
+        expect(definitionPage.information.versionTag()).to.eventually.contain('1.0.0');
       });
     });
 
-    describe('process definition without a semantic version', function() {
+    describe('process definition without a version tag', function() {
       before(function() {
         dashboardPage.navigateToWebapp('Cockpit');
         // second process definition is deployed without tenant id
@@ -273,12 +273,12 @@ describe('Cockpit Process Definition Spec', function() {
         processesPage.deployedProcessesList.selectProcess(1);
       });
 
-      it('should display null on missing definition semantic version', function() {
+      it('should display null on missing definition version tag', function() {
         // when
         definitionPage.sidebarTabClick('Information');
 
         // then
-        expect(definitionPage.information.semanticVersion()).to.eventually.contain('null');
+        expect(definitionPage.information.versionTag()).to.eventually.contain('null');
       });
     });
   })
