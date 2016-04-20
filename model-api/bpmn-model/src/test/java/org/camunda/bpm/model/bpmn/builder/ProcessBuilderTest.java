@@ -29,9 +29,12 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_FOLLOW_UP_DATE_A
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_LIST_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PRIORITY_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_SERVICE_TASK_PRIORITY;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_STRING_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TRANSACTION_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
 
 import java.io.IOException;
@@ -42,9 +45,8 @@ import java.util.List;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_SERVICE_TASK_PRIORITY;
 import org.camunda.bpm.model.bpmn.GatewayDirection;
+import org.camunda.bpm.model.bpmn.TransactionMethod;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
@@ -63,7 +65,6 @@ import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Gateway;
 import org.camunda.bpm.model.bpmn.instance.InclusiveGateway;
-import org.camunda.bpm.model.bpmn.instance.IntermediateThrowEvent;
 import org.camunda.bpm.model.bpmn.instance.Message;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
@@ -82,6 +83,7 @@ import org.camunda.bpm.model.bpmn.instance.TimeCycle;
 import org.camunda.bpm.model.bpmn.instance.TimeDate;
 import org.camunda.bpm.model.bpmn.instance.TimeDuration;
 import org.camunda.bpm.model.bpmn.instance.TimerEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.Transaction;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormData;
@@ -789,6 +791,60 @@ public class ProcessBuilderTest {
   }
 
   @Test
+  public void testTransactionBuilder() {
+    BpmnModelInstance modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .transaction(TRANSACTION_ID)
+        .camundaAsyncBefore()
+        .method(TransactionMethod.Image)
+        .embeddedSubProcess()
+          .startEvent()
+          .userTask()
+          .endEvent()
+        .transactionDone()
+      .serviceTask(SERVICE_TASK_ID)
+      .endEvent()
+      .done();
+
+    Transaction transaction = modelInstance.getModelElementById(TRANSACTION_ID);
+    ServiceTask serviceTask = modelInstance.getModelElementById(SERVICE_TASK_ID);
+    assertThat(transaction.isCamundaAsyncBefore()).isTrue();
+    assertThat(transaction.isCamundaExclusive()).isTrue();
+    assertThat(transaction.getMethod()).isEqualTo(TransactionMethod.Image);
+    assertThat(transaction.getChildElementsByType(Event.class)).hasSize(2);
+    assertThat(transaction.getChildElementsByType(Task.class)).hasSize(1);
+    assertThat(transaction.getFlowElements()).hasSize(5);
+    assertThat(transaction.getSucceedingNodes().singleResult()).isEqualTo(serviceTask);
+  }
+
+  @Test
+  public void testTransactionBuilderDetached() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .transaction(TRANSACTION_ID)
+      .serviceTask(SERVICE_TASK_ID)
+      .endEvent()
+      .done();
+
+    Transaction transaction = modelInstance.getModelElementById(TRANSACTION_ID);
+
+    transaction.builder()
+      .camundaAsyncBefore()
+      .embeddedSubProcess()
+        .startEvent()
+        .userTask()
+        .endEvent();
+
+    ServiceTask serviceTask = modelInstance.getModelElementById(SERVICE_TASK_ID);
+    assertThat(transaction.isCamundaAsyncBefore()).isTrue();
+    assertThat(transaction.isCamundaExclusive()).isTrue();
+    assertThat(transaction.getChildElementsByType(Event.class)).hasSize(2);
+    assertThat(transaction.getChildElementsByType(Task.class)).hasSize(1);
+    assertThat(transaction.getFlowElements()).hasSize(5);
+    assertThat(transaction.getSucceedingNodes().singleResult()).isEqualTo(serviceTask);
+  }
+
+  @Test
   public void testScriptText() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
@@ -892,7 +948,7 @@ public class ProcessBuilderTest {
 
     assertMessageEventDefinition("end", "message");
   }
-  
+
   @Test
   public void testMessageEventDefintionEndEvent() {
     modelInstance = Bpmn.createProcess()
@@ -904,7 +960,7 @@ public class ProcessBuilderTest {
 
     assertMessageEventDefinition("end", "message");
   }
-  
+
   @Test
   public void testMessageEndEventWithExistingMessage() {
     modelInstance = Bpmn.createProcess()
@@ -922,7 +978,7 @@ public class ProcessBuilderTest {
 
     assertOnlyOneMessageExists("message");
   }
-  
+
   @Test
   public void testMessageEventDefinitionEndEventWithExistingMessage() {
     modelInstance = Bpmn.createProcess()
@@ -954,9 +1010,9 @@ public class ProcessBuilderTest {
       .done();
 
     assertMessageEventDefinition("throw", "message");
-  } 
-  
-  @Test  
+  }
+
+  @Test
   public void testIntermediateMessageEventDefintionThrowEvent() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
@@ -982,8 +1038,8 @@ public class ProcessBuilderTest {
     assertThat(message1).isEqualTo(message2);
     assertOnlyOneMessageExists("message");
   }
-  
-  
+
+
   @Test
   public void testIntermediateMessageEventDefintionThrowEventWithExistingMessage() {
     modelInstance = Bpmn.createProcess()
@@ -1004,12 +1060,12 @@ public class ProcessBuilderTest {
     assertThat(message1).isEqualTo(message2);
     assertOnlyOneMessageExists("message");
   }
-  
+
   @Test
   public void testIntermediateMessageThrowEventWithMessageDefinition() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
-      .intermediateThrowEvent("throw1")      
+      .intermediateThrowEvent("throw1")
       .messageEventDefinition()
         .id("messageEventDefinition")
         .message("message")
@@ -1017,23 +1073,23 @@ public class ProcessBuilderTest {
         .camundaType("external")
         .camundaTopic("TOPIC")
       .done();
-    
+
     MessageEventDefinition event = modelInstance.getModelElementById("messageEventDefinition");
     assertThat(event.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
     assertThat(event.getCamundaTopic()).isEqualTo("TOPIC");
     assertThat(event.getCamundaType()).isEqualTo("external");
     assertThat(event.getMessage().getName()).isEqualTo("message");
   }
-  
+
   @Test
   public void testIntermediateMessageThrowEventWithTaskPriority() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
-      .intermediateThrowEvent("throw1")      
+      .intermediateThrowEvent("throw1")
       .messageEventDefinition("messageEventDefinition")
         .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
       .done();
-    
+
     MessageEventDefinition event = modelInstance.getModelElementById("messageEventDefinition");
     assertThat(event.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
   }
@@ -1042,32 +1098,32 @@ public class ProcessBuilderTest {
   public void testEndEventWithTaskPriority() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
-      .endEvent("end")      
+      .endEvent("end")
       .messageEventDefinition("messageEventDefinition")
         .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
       .done();
-    
+
     MessageEventDefinition event = modelInstance.getModelElementById("messageEventDefinition");
     assertThat(event.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
   }
-  
+
   @Test
   public void testMessageEventDefinitionWithID() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
-      .intermediateThrowEvent("throw1")      
+      .intermediateThrowEvent("throw1")
       .messageEventDefinition("messageEventDefinition")
       .done();
-    
+
     MessageEventDefinition event = modelInstance.getModelElementById("messageEventDefinition");
     assertThat(event).isNotNull();
-    
+
     modelInstance = Bpmn.createProcess()
       .startEvent()
-      .intermediateThrowEvent("throw2")      
+      .intermediateThrowEvent("throw2")
       .messageEventDefinition().id("messageEventDefinition1")
       .done();
-    
+
     //========================================
     //==============end event=================
     //========================================
@@ -1075,23 +1131,23 @@ public class ProcessBuilderTest {
     assertThat(event).isNotNull();
     modelInstance = Bpmn.createProcess()
       .startEvent()
-      .endEvent("end1")      
+      .endEvent("end1")
       .messageEventDefinition("messageEventDefinition")
       .done();
-    
+
     event = modelInstance.getModelElementById("messageEventDefinition");
     assertThat(event).isNotNull();
-    
+
     modelInstance = Bpmn.createProcess()
       .startEvent()
-      .endEvent("end2")      
+      .endEvent("end2")
       .messageEventDefinition().id("messageEventDefinition1")
       .done();
-    
+
     event = modelInstance.getModelElementById("messageEventDefinition1");
     assertThat(event).isNotNull();
   }
-  
+
   @Test
   public void testReceiveTaskMessage() {
     modelInstance = Bpmn.createProcess()

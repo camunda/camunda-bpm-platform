@@ -39,6 +39,7 @@ public final class BpmnTestConstants {
   public static final String END_EVENT_ID = "endEvent";
   public static final String EXCLUSIVE_GATEWAY = "exclusiveGateway";
   public static final String SUB_PROCESS_ID = "subProcess";
+  public static final String TRANSACTION_ID = "transaction";
 
   public static final String TEST_STRING_XML = "test";
   public static final String TEST_STRING_API = "api";

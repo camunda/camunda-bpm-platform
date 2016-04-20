@@ -433,6 +433,7 @@ public class Bpmn {
     TimeDurationImpl.registerType(bpmnModelBuilder);
     TimerEventDefinitionImpl.registerType(bpmnModelBuilder);
     To.registerType(bpmnModelBuilder);
+    TransactionImpl.registerType(bpmnModelBuilder);
     Transformation.registerType(bpmnModelBuilder);
     UserTaskImpl.registerType(bpmnModelBuilder);
     WhileExecutingInputRefs.registerType(bpmnModelBuilder);

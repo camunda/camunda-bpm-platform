@@ -20,6 +20,7 @@ import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
 import org.camunda.bpm.model.bpmn.instance.ConditionExpression;
 import org.camunda.bpm.model.bpmn.instance.EndEvent;
+import org.camunda.bpm.model.bpmn.instance.EventBasedGateway;
 import org.camunda.bpm.model.bpmn.instance.ExclusiveGateway;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Gateway;
@@ -34,9 +35,9 @@ import org.camunda.bpm.model.bpmn.instance.SendTask;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.ServiceTask;
 import org.camunda.bpm.model.bpmn.instance.SubProcess;
+import org.camunda.bpm.model.bpmn.instance.Transaction;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
-import org.camunda.bpm.model.bpmn.instance.EventBasedGateway;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
@@ -213,6 +214,16 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
 
   public SubProcessBuilder subProcess(String id) {
     return createTarget(SubProcess.class, id).builder();
+  }
+
+  public TransactionBuilder transaction() {
+    Transaction transaction = createTarget(Transaction.class);
+    return new TransactionBuilder(modelInstance, transaction);
+  }
+
+  public TransactionBuilder transaction(String id) {
+    Transaction transaction = createTarget(Transaction.class, id);
+    return new TransactionBuilder(modelInstance, transaction);
   }
 
   public Gateway findLastGateway() {

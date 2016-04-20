@@ -17,6 +17,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.SubProcess;
+import org.camunda.bpm.model.bpmn.instance.Transaction;
 
 /**
  * @author Sebastian Menski
@@ -59,4 +60,13 @@ public abstract class AbstractBpmnModelElementBuilder<B extends AbstractBpmnMode
     }
   }
 
+  public TransactionBuilder transactionDone() {
+    BpmnModelElementInstance lastTransaction = element.getScope();
+    if (lastTransaction != null && lastTransaction instanceof Transaction) {
+      return new TransactionBuilder(modelInstance, (Transaction) lastTransaction);
+    }
+    else {
+      throw new BpmnModelException("Unable to find a parent transaction.");
+    }
+  }
 }

@@ -173,6 +173,7 @@ public final class BpmnModelConstants {
   public static final String BPMN_ELEMENT_RENDERING = "rendering";
   public static final String BPMN_ELEMENT_BOUNDARY_EVENT = "boundaryEvent";
   public static final String BPMN_ELEMENT_SUB_PROCESS = "subProcess";
+  public static final String BPMN_ELEMENT_TRANSACTION = "transaction";
   public static final String BPMN_ELEMENT_GATEWAY = "gateway";
   public static final String BPMN_ELEMENT_PARALLEL_GATEWAY = "parallelGateway";
   public static final String BPMN_ELEMENT_EXCLUSIVE_GATEWAY = "exclusiveGateway";
@@ -362,6 +363,7 @@ public final class BpmnModelConstants {
   public static final String BPMN_ATTRIBUTE_ESCALATION_REF = "escalationRef";
   public static final String BPMN_ATTRIBUTE_EVENT_GATEWAY_TYPE = "eventGatewayType";
   public static final String BPMN_ATTRIBUTE_DATA_OBJECT_REF = "dataObjectRef";
+  public static final String BPMN_ATTRIBUTE_METHOD = "method";
 
   /** DC */
 
