@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineException;
+
 /**
  * Properties that maps property keys to values. The properties cannot contain
  * duplicate property names; each property name can map to at most one value.
@@ -177,6 +179,11 @@ public class Properties {
    */
   public <K, V> void putMapEntry(PropertyMapKey<K, V> property, K key, V value) {
     Map<K, V> map = get(property);
+
+    if (!property.allowsOverwrite() && map.containsKey(key)) {
+      throw new ProcessEngineException("Cannot overwrite property key " + key + ". Key already exists");
+    }
+
     map.put(key, value);
 
     if (!contains(property)) {

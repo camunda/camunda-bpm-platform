@@ -721,6 +721,65 @@ public class MigrationPlanCreationTest {
     }
   }
 
+  @Test
+  public void testCannotUpdateEventTriggerForNonEvent() {
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    try {
+      runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask").updateEventTrigger()
+        .build();
+      fail("Should not succeed");
+    }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("userTask",
+          "Cannot update event trigger because the activity does not define a persistent event trigger"
+        );
+    }
+  }
+
+  @Test
+  public void testCannotUpdateEventTriggerForEventSubProcess() {
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+
+    try {
+      runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("eventSubProcess", "eventSubProcess").updateEventTrigger()
+        .build();
+      fail("Should not succeed");
+    }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("eventSubProcess",
+          "Cannot update event trigger because the activity does not define a persistent event trigger"
+        );
+    }
+  }
+
+  @Test
+  public void testCanUpdateEventTriggerForEventSubProcessStartEvent() {
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+
+    MigrationPlan migrationPlan = runtimeService
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("eventSubProcessStart", "eventSubProcessStart").updateEventTrigger()
+      .build();
+
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasInstructions(
+        migrate("eventSubProcessStart").to("eventSubProcessStart").updateEventTrigger(true)
+      );
+  }
+
   protected void assertExceptionMessage(Exception e, String message) {
     assertThat(e.getMessage(), CoreMatchers.containsString(message));
   }

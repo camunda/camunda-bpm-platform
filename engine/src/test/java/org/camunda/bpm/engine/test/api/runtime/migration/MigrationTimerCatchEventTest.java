@@ -16,6 +16,9 @@ import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnMo
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 
+import java.util.Date;
+
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -24,6 +27,8 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.TimerCatchModels;
 import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
+import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -129,6 +134,44 @@ public class MigrationTimerCatchEventTest {
     testHelper.assertJobMigrated(       // this also asserts that the due has not changed
         testHelper.snapshotBeforeMigration.getJobs().get(0),
         "timerCatch");
+
+    // and it is possible to trigger the event
+    Job jobAfterMigration = testHelper.snapshotAfterMigration.getJobs().get(0);
+    rule.getManagementService().executeJob(jobAfterMigration.getId());
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateJobUpdateTimerConfiguration() {
+    // given
+    ClockTestUtil.setClockToDateWithoutMilliseconds();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.newModel()
+      .startEvent()
+      .intermediateCatchEvent("timerCatch")
+        .timerWithDuration("PT50M")
+      .userTask("userTask")
+      .endEvent()
+      .done());
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("timerCatch", "timerCatch")
+        .updateEventTrigger()
+      .build();
+
+    // when
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    Date newDueDate = new DateTime(ClockUtil.getCurrentTime()).plusMinutes(50).toDate();
+    testHelper.assertJobMigrated(
+        testHelper.snapshotBeforeMigration.getJobs().get(0),
+        "timerCatch",
+        newDueDate);
 
     // and it is possible to trigger the event
     Job jobAfterMigration = testHelper.snapshotAfterMigration.getJobs().get(0);

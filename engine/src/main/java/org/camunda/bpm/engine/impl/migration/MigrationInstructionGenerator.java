@@ -55,6 +55,7 @@ public interface MigrationInstructionGenerator {
    * @return the list of generated instructions
    */
   ValidatingMigrationInstructions generate(ProcessDefinitionImpl sourceProcessDefinition,
-                                           ProcessDefinitionImpl targetProcessDefinition);
+                                           ProcessDefinitionImpl targetProcessDefinition,
+                                           boolean updateEventTriggers);
 
 }

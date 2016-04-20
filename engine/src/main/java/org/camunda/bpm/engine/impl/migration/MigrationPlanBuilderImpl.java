@@ -18,20 +18,24 @@ import java.util.List;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.impl.cmd.CreateMigrationPlanCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.migration.MigrationInstructionBuilder;
+import org.camunda.bpm.engine.migration.MigrationInstructionsBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class MigrationPlanBuilderImpl implements MigrationPlanBuilder {
+public class MigrationPlanBuilderImpl implements MigrationInstructionBuilder, MigrationInstructionsBuilder {
 
   protected CommandExecutor commandExecutor;
 
   protected String sourceProcessDefinitionId;
   protected String targetProcessDefinitionId;
-  protected boolean mapEqualActivities = false;
   protected List<MigrationInstructionImpl> explicitMigrationInstructions;
+
+  protected boolean mapEqualActivities = false;
+  protected boolean updateEventTriggersForGeneratedInstructions = false;
 
   public MigrationPlanBuilderImpl(CommandExecutor commandExecutor, String sourceProcessDefinitionId,
       String targetProcessDefinitionId) {
@@ -41,16 +45,28 @@ public class MigrationPlanBuilderImpl implements MigrationPlanBuilder {
     this.explicitMigrationInstructions = new ArrayList<MigrationInstructionImpl>();
   }
 
-  public MigrationPlanBuilder mapEqualActivities() {
+  public MigrationInstructionsBuilder mapEqualActivities() {
     this.mapEqualActivities = true;
     return this;
   }
 
-  public MigrationPlanBuilder mapActivities(String sourceActivityId, String targetActivityId) {
+  public MigrationInstructionBuilder mapActivities(String sourceActivityId, String targetActivityId) {
     this.explicitMigrationInstructions.add(
       new MigrationInstructionImpl(sourceActivityId, targetActivityId)
     );
     return this;
+  }
+
+  public MigrationInstructionBuilder updateEventTrigger() {
+    explicitMigrationInstructions
+      .get(explicitMigrationInstructions.size() - 1)
+      .setUpdateEventTrigger(true);
+    return this;
+  }
+
+  public MigrationInstructionsBuilder updateEventTriggers() {
+    this.updateEventTriggersForGeneratedInstructions = true;
+    return null;
   }
 
   public String getSourceProcessDefinitionId() {
@@ -63,6 +79,10 @@ public class MigrationPlanBuilderImpl implements MigrationPlanBuilder {
 
   public boolean isMapEqualActivities() {
     return mapEqualActivities;
+  }
+
+  public boolean isUpdateEventTriggersForGeneratedInstructions() {
+    return updateEventTriggersForGeneratedInstructions;
   }
 
   public List<MigrationInstructionImpl> getExplicitMigrationInstructions() {

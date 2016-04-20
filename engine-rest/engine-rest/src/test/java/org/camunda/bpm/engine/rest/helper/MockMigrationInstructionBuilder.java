@@ -25,6 +25,7 @@ public class MockMigrationInstructionBuilder {
 
   protected List<String> sourceActivityIds;
   protected List<String> targetActivityIds;
+  protected boolean updateEventTrigger = false;
 
   public MockMigrationInstructionBuilder sourceActivityIds(List<String> sourceActivityIds) {
     this.sourceActivityIds = sourceActivityIds;
@@ -46,10 +47,16 @@ public class MockMigrationInstructionBuilder {
     return this;
   }
 
+  public MockMigrationInstructionBuilder updateEventTrigger() {
+    this.updateEventTrigger = true;
+    return this;
+  }
+
   public MigrationInstruction build() {
     MigrationInstruction migrationInstructionMock = mock(MigrationInstruction.class);
     when(migrationInstructionMock.getSourceActivityId()).thenReturn(sourceActivityIds.get(0));
     when(migrationInstructionMock.getTargetActivityId()).thenReturn(targetActivityIds.get(0));
+    when(migrationInstructionMock.isUpdateEventTrigger()).thenReturn(updateEventTrigger);
     return migrationInstructionMock;
   }
 

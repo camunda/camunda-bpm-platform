@@ -15,12 +15,14 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.findCamundaExtensionElement;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseCamundaScript;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseInputOutput;
+import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -143,7 +145,6 @@ import org.camunda.bpm.engine.impl.util.xml.Namespace;
 import org.camunda.bpm.engine.impl.util.xml.Parse;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 /**
  * Specific parsing of one BPMN 2.0 XML file, created by the {@link BpmnParser}.
@@ -181,7 +182,6 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_START_TIMER = "timerStart";
   public static final String PROPERTYNAME_COMPENSATION_HANDLER_ID = "compensationHandler";
   public static final String PROPERTYNAME_IS_FOR_COMPENSATION = "isForCompensation";
-  public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION = "eventDefinitions";
   public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_JOB_DECLARATION = "eventJobDeclarations";
   public static final String PROPERTYNAME_TRIGGERED_BY_EVENT = "triggeredByEvent";
   public static final String PROPERTYNAME_THROWS_COMPENSATION = "throwsCompensation";
@@ -1136,36 +1136,32 @@ public class BpmnParse extends Parse {
       addError("Cannot have a message event subscription with an empty or missing name", element);
     }
 
-    List<EventSubscriptionDeclaration> eventDefinitions = (List<EventSubscriptionDeclaration>) scope.getProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
-    if (eventDefinitions == null) {
-      eventDefinitions = new ArrayList<EventSubscriptionDeclaration>();
-      scope.setProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION, eventDefinitions);
-    } else {
+    Map<String, EventSubscriptionDeclaration> eventDefinitions = scope.getProperties().get(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS);
 
-      // if this is a message event, validate that it is the only one with the provided name for this scope
-      if(hasMultipleMessageEventDefinitionsWithSameName(subscription, eventDefinitions)){
-        addError("Cannot have more than one message event subscription with name '" + subscription.getEventName() + "' for scope '" + scope.getId() + "'",
-            element);
-      }
-
-      // if this is a signal event, validate that it is the only one with the provided name for this scope
-      if(hasMultipleSignalEventDefinitionsWithSameName(subscription, eventDefinitions)){
-        addError("Cannot have more than one signal event subscription with name '" + subscription.getEventName() + "' for scope '" + scope.getId() + "'",
-            element);
-      }
+    // if this is a message event, validate that it is the only one with the provided name for this scope
+    if(hasMultipleMessageEventDefinitionsWithSameName(subscription, eventDefinitions.values())){
+      addError("Cannot have more than one message event subscription with name '" + subscription.getEventName() + "' for scope '" + scope.getId() + "'",
+          element);
     }
-    eventDefinitions.add(subscription);
+
+    // if this is a signal event, validate that it is the only one with the provided name for this scope
+    if(hasMultipleSignalEventDefinitionsWithSameName(subscription, eventDefinitions.values())){
+      addError("Cannot have more than one signal event subscription with name '" + subscription.getEventName() + "' for scope '" + scope.getId() + "'",
+          element);
+    }
+
+    scope.getProperties().putMapEntry(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS, subscription.getActivityId(), subscription);
   }
 
-  protected boolean hasMultipleMessageEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, List<EventSubscriptionDeclaration> eventDefinitions) {
+  protected boolean hasMultipleMessageEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, Collection<EventSubscriptionDeclaration> eventDefinitions) {
     return hasMultipleEventDefinitionsWithSameName(subscription, eventDefinitions, "message");
   }
 
-  protected boolean hasMultipleSignalEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, List<EventSubscriptionDeclaration> eventDefinitions) {
+  protected boolean hasMultipleSignalEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, Collection<EventSubscriptionDeclaration> eventDefinitions) {
     return hasMultipleEventDefinitionsWithSameName(subscription, eventDefinitions, "signal");
   }
 
-  protected boolean hasMultipleEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, List<EventSubscriptionDeclaration> eventDefinitions, String eventType) {
+  protected boolean hasMultipleEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, Collection<EventSubscriptionDeclaration> eventDefinitions, String eventType) {
     if (subscription.getEventType().equals(eventType)) {
       for (EventSubscriptionDeclaration eventDefinition : eventDefinitions) {
         if (eventDefinition.getEventType().equals(eventType) && eventDefinition.getEventName().equals(subscription.getEventName())
@@ -3332,11 +3328,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void addTimerDeclaration(ScopeImpl scope, TimerDeclarationImpl timerDeclaration) {
-    if (!scope.getProperties().contains(BpmnProperties.TIMER_DECLARATIONS)) {
-      scope.getProperties().set(BpmnProperties.TIMER_DECLARATIONS, new ArrayList<TimerDeclarationImpl>());
-    }
-    List<TimerDeclarationImpl> timerDeclarations = scope.getProperties().get(BpmnProperties.TIMER_DECLARATIONS);
-    timerDeclarations.add(timerDeclaration);
+    scope.getProperties().putMapEntry(BpmnProperties.TIMER_DECLARATIONS, timerDeclaration.getActivityId(), timerDeclaration);
   }
 
   @SuppressWarnings("unchecked")

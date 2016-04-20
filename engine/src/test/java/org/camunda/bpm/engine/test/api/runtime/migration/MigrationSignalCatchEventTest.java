@@ -131,6 +131,39 @@ public class MigrationSignalCatchEventTest {
   }
 
   @Test
+  public void testMigrateEventSubscriptionUpdateSignalName() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.newModel()
+        .startEvent()
+        .intermediateCatchEvent("signalCatch")
+          .signal("new" + SignalCatchModels.SIGNAL_NAME)
+        .userTask("userTask")
+        .endEvent()
+        .done());
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("signalCatch", "signalCatch")
+          .updateEventTrigger()
+        .build();
+
+    // when
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then the message event subscription's event name has not changed
+    testHelper.assertEventSubscriptionMigrated(
+        "signalCatch", SignalCatchModels.SIGNAL_NAME,
+        "signalCatch", "new" + SignalCatchModels.SIGNAL_NAME);
+
+    // and it is possible to trigger the event
+    rule.getRuntimeService().signalEventReceived("new" + SignalCatchModels.SIGNAL_NAME);
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
   public void testMigrateJobAddParentScope() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS);

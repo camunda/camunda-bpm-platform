@@ -138,6 +138,7 @@ public abstract class EventSubscriptionEntity implements EventSubscription, DbEn
     persistentState.put("executionId", executionId);
     persistentState.put("configuration", configuration);
     persistentState.put("activityId", activityId);
+    persistentState.put("eventName", eventName);
     return persistentState;
   }
 
@@ -269,6 +270,7 @@ public abstract class EventSubscriptionEntity implements EventSubscription, DbEn
 
   public void setActivityId(String activityId) {
     this.activityId = activityId;
+    this.activity = null;
   }
 
   public Date getCreated() {

@@ -15,9 +15,11 @@ package org.camunda.bpm.engine.impl.bpmn.helper;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.ErrorEventDefinition;
 import org.camunda.bpm.engine.impl.bpmn.parser.EscalationEventDefinition;
+import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.core.model.PropertyKey;
 import org.camunda.bpm.engine.impl.core.model.PropertyListKey;
+import org.camunda.bpm.engine.impl.core.model.PropertyMapKey;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 
 /**
@@ -36,5 +38,16 @@ public class BpmnProperties {
 
   public static final PropertyListKey<ErrorEventDefinition> ERROR_EVENT_DEFINITIONS = new PropertyListKey<ErrorEventDefinition>("errorEventDefinitions");
 
-  public static final PropertyListKey<TimerDeclarationImpl> TIMER_DECLARATIONS = new PropertyListKey<TimerDeclarationImpl>("timerDeclarations");
+  /**
+   * Declaration indexed by activity that is triggered by the event; assumes that there is at most one such declaration per activity.
+   * There is code that relies on this assumption (e.g. when determining which declaration matches a job in the migration logic).
+   */
+  public static final PropertyMapKey<String, TimerDeclarationImpl> TIMER_DECLARATIONS = new PropertyMapKey<String, TimerDeclarationImpl>("timerDeclarations", false);
+
+  /**
+   * Declaration indexed by activity that is triggered by the event; assumes that there is at most one such declaration per activity.
+   * There is code that relies on this assumption (e.g. when determining which declaration matches a job in the migration logic).
+   */
+  public static final PropertyMapKey<String, EventSubscriptionDeclaration> EVENT_SUBSCRIPTION_DECLARATIONS = new PropertyMapKey<String, EventSubscriptionDeclaration>("eventDefinitions", false);
+
 }

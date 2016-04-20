@@ -203,7 +203,7 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
   }
 
   protected String findStartActivityIdByMessage(ProcessDefinitionEntity processDefinition, String messageName) {
-    for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(processDefinition)) {
+    for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(processDefinition).values()) {
       if (isMessageStartEventWithName(declaration, messageName)) {
         return declaration.getActivityId();
       }

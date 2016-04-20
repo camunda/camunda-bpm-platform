@@ -77,6 +77,10 @@ public class MigrationPlanAssert {
           notExpected.remove(instruction);
           assertEquals("Target activity ids do not match for instruction " + instruction,
             instructionAssert.targetActivityId, instruction.getTargetActivityId());
+          if (instructionAssert.updateEventTrigger != null) {
+            assertEquals("Expected instruction to update event trigger: " + instructionAssert.updateEventTrigger + " but is: " + instruction.isUpdateEventTrigger(),
+              instructionAssert.updateEventTrigger, instruction.isUpdateEventTrigger());
+          }
         }
       }
     }
@@ -116,6 +120,7 @@ public class MigrationPlanAssert {
   public static class MigrationInstructionAssert {
     protected String sourceActivityId;
     protected String targetActivityId;
+    protected Boolean updateEventTrigger;
 
     public MigrationInstructionAssert from(String sourceActivityId) {
       this.sourceActivityId = sourceActivityId;
@@ -124,6 +129,11 @@ public class MigrationPlanAssert {
 
     public MigrationInstructionAssert to(String targetActivityId) {
       this.targetActivityId = targetActivityId;
+      return this;
+    }
+
+    public MigrationInstructionAssert updateEventTrigger(boolean updateEventTrigger) {
+      this.updateEventTrigger = updateEventTrigger;
       return this;
     }
 

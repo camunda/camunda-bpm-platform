@@ -19,6 +19,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
+import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanGenerationDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
 
@@ -29,7 +30,7 @@ public interface MigrationRestService {
   @POST
   @Path("/generate")
   @Produces(MediaType.APPLICATION_JSON)
-  MigrationPlanDto generateMigrationPlan(MigrationPlanDto initialMigrationPlan);
+  MigrationPlanDto generateMigrationPlan(MigrationPlanGenerationDto generationDto);
 
   @POST
   @Path("/execute")

@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngine;
@@ -167,6 +168,13 @@ public class MigrationTestRule extends ProcessEngineTestRule {
     assertEventSubscriptionMigrated(eventSubscriptionBefore, activityIdAfter, eventName);
   }
 
+  public void assertEventSubscriptionMigrated(String activityIdBefore, String eventNameBefore, String activityIdAfter, String eventNameAfter) {
+    EventSubscription eventSubscriptionBefore = snapshotBeforeMigration.getEventSubscriptionForActivityIdAndEventName(activityIdBefore, eventNameBefore);
+    assertNotNull("Expected that an event subscription for activity '" + activityIdBefore + "' exists before migration", eventSubscriptionBefore);
+
+    assertEventSubscriptionMigrated(eventSubscriptionBefore, activityIdAfter, eventNameAfter);
+  }
+
   public void assertEventSubscriptionRemoved(String activityId, String eventName) {
     EventSubscription eventSubscriptionBefore = snapshotBeforeMigration.getEventSubscriptionForActivityIdAndEventName(activityId, eventName);
     assertNotNull("Expected an event subscription for activity '" + activityId + "' before the migration", eventSubscriptionBefore);
@@ -240,10 +248,14 @@ public class MigrationTestRule extends ProcessEngineTestRule {
     Job jobBefore = snapshotBeforeMigration.getJobForDefinitionId(jobDefinitionBefore.getId());
     assertNotNull("Expected that a timer job for activity '" + activityIdBefore + "' exists before migration", jobBefore);
 
-    assertJobMigrated(jobBefore, activityIdAfter);
+    assertJobMigrated(jobBefore, activityIdAfter, jobBefore.getDuedate());
   }
 
   public void assertJobMigrated(Job jobBefore, String activityIdAfter) {
+    assertJobMigrated(jobBefore, activityIdAfter, jobBefore.getDuedate());
+  }
+
+  public void assertJobMigrated(Job jobBefore, String activityIdAfter, Date dueDateAfter) {
 
     Job jobAfter = snapshotAfterMigration.getJobById(jobBefore.getId());
     assertNotNull("Expected that a job with id '" + jobBefore.getId() + "' exists after migration", jobAfter);
@@ -254,7 +266,7 @@ public class MigrationTestRule extends ProcessEngineTestRule {
     assertEquals(jobBefore.getId(), jobAfter.getId());
     assertEquals("Expected that job is assigned to job definition '" + jobDefinitionAfter.getId() + "' after migration",
         jobDefinitionAfter.getId(), jobAfter.getJobDefinitionId());
-    assertEquals(jobBefore.getDuedate(), jobAfter.getDuedate());
+    assertEquals(dueDateAfter, jobAfter.getDuedate());
     assertEquals(((JobEntity) jobBefore).getType(), ((JobEntity) jobAfter).getType());
     assertEquals(jobBefore.getPriority(), jobAfter.getPriority());
     assertEquals(jobDefinitionAfter.getProcessDefinitionId(), jobAfter.getProcessDefinitionId());

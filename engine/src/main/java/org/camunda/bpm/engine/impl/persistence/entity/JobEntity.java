@@ -246,7 +246,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.executionId = executionId;
   }
 
-  protected ExecutionEntity getExecution() {
+  public ExecutionEntity getExecution() {
     ensureExecutionInitialized();
     return execution;
   }

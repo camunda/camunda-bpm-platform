@@ -22,6 +22,8 @@ public interface ValidatingMigrationInstruction {
 
   ActivityImpl getTargetActivity();
 
+  boolean isUpdateEventTrigger();
+
   MigrationInstruction toMigrationInstruction();
 
 }

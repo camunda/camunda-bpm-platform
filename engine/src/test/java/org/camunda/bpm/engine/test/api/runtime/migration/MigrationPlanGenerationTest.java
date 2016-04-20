@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnMo
 import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.migrate;
 
+import org.camunda.bpm.engine.migration.MigrationInstructionsBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -833,15 +834,47 @@ public class MigrationPlanGenerationTest {
       );
   }
 
+  @Test
+  public void testMapNoUpdateEventTriggers() {
+    BpmnModelInstance model = MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS;
+
+    assertGeneratedMigrationPlan(model, model, false)
+      .hasInstructions(
+        migrate("userTask").to("userTask").updateEventTrigger(false),
+        migrate("messageCatch").to("messageCatch").updateEventTrigger(false)
+      );
+  }
+
+  @Test
+  public void testMapUpdateEventTriggers() {
+    BpmnModelInstance model = MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS;
+
+    assertGeneratedMigrationPlan(model, model, true)
+      .hasInstructions(
+        migrate("userTask").to("userTask").updateEventTrigger(false),
+        migrate("messageCatch").to("messageCatch").updateEventTrigger(true)
+      );
+  }
+
   // helper
 
   protected MigrationPlanAssert assertGeneratedMigrationPlan(BpmnModelInstance sourceProcess, BpmnModelInstance targetProcess) {
+    return assertGeneratedMigrationPlan(sourceProcess, targetProcess, false);
+  }
+
+  protected MigrationPlanAssert assertGeneratedMigrationPlan(BpmnModelInstance sourceProcess, BpmnModelInstance targetProcess, boolean updateEventTriggers) {
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
+    MigrationInstructionsBuilder migrationInstructionsBuilder = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
+      .mapEqualActivities();
+
+    if (updateEventTriggers) {
+      migrationInstructionsBuilder.updateEventTriggers();
+    }
+
+    MigrationPlan migrationPlan = migrationInstructionsBuilder
       .build();
 
     assertThat(migrationPlan)

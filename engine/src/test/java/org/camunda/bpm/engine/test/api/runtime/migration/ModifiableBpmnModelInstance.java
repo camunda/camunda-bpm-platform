@@ -31,8 +31,10 @@ import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
+import org.camunda.bpm.model.bpmn.instance.Message;
 import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
+import org.camunda.bpm.model.bpmn.instance.Signal;
 import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.instance.DomDocument;
@@ -141,6 +143,41 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
   public ModifiableBpmnModelInstance changeElementId(String oldId, String newId) {
     BaseElement element = getModelElementById(oldId);
     element.setId(newId);
+    return this;
+  }
+
+  public ModifiableBpmnModelInstance removeChildren(String elementId) {
+    BaseElement element = getModelElementById(elementId);
+
+    Collection<BaseElement> children = element.getChildElementsByType(BaseElement.class);
+    for (BaseElement child : children) {
+      element.removeChildElement(child);
+    }
+
+    return this;
+  }
+
+  public ModifiableBpmnModelInstance renameMessage(String oldMessageName, String newMessageName) {
+    Collection<Message> messages = modelInstance.getModelElementsByType(Message.class);
+
+    for (Message message : messages) {
+      if (message.getName().equals(oldMessageName)) {
+        message.setName(newMessageName);
+      }
+    }
+
+    return this;
+  }
+
+  public ModifiableBpmnModelInstance renameSignal(String oldSignalName, String newSignalName) {
+    Collection<Signal> signals = modelInstance.getModelElementsByType(Signal.class);
+
+    for (Signal signal : signals) {
+      if (signal.getName().equals(oldSignalName)) {
+        signal.setName(newSignalName);
+      }
+    }
+
     return this;
   }
 

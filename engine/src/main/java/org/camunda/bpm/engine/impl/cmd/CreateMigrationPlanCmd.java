@@ -79,7 +79,7 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
     List<MigrationInstruction> instructions = new ArrayList<MigrationInstruction>();
 
     if (migrationBuilder.isMapEqualActivities()) {
-      instructions.addAll(generateInstructions(commandContext, sourceProcessDefinition, targetProcessDefinition));
+      instructions.addAll(generateInstructions(commandContext, sourceProcessDefinition, targetProcessDefinition, migrationBuilder.isUpdateEventTriggersForGeneratedInstructions()));
     }
 
     instructions.addAll(migrationBuilder.getExplicitMigrationInstructions());
@@ -90,12 +90,15 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
     return migrationPlan;
   }
 
-  protected List<MigrationInstruction> generateInstructions(CommandContext commandContext, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
+  protected List<MigrationInstruction> generateInstructions(CommandContext commandContext,
+      ProcessDefinitionImpl sourceProcessDefinition,
+      ProcessDefinitionImpl targetProcessDefinition,
+      boolean updateEventTriggers) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
 
     // generate instructions
     MigrationInstructionGenerator migrationInstructionGenerator = processEngineConfiguration.getMigrationInstructionGenerator();
-    ValidatingMigrationInstructions generatedInstructions = migrationInstructionGenerator.generate(sourceProcessDefinition, targetProcessDefinition);
+    ValidatingMigrationInstructions generatedInstructions = migrationInstructionGenerator.generate(sourceProcessDefinition, targetProcessDefinition, updateEventTriggers);
 
     // filter only valid instructions
     generatedInstructions.filterWith(processEngineConfiguration.getMigrationInstructionValidators());
@@ -142,7 +145,7 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
         ActivityImpl targetActivity = targetProcessDefinition.findActivity(migrationInstruction.getTargetActivityId());
 
         if (sourceActivity != null && targetActivity != null) {
-          validatingMigrationInstructions.addInstruction(new ValidatingMigrationInstructionImpl(sourceActivity, targetActivity));
+          validatingMigrationInstructions.addInstruction(new ValidatingMigrationInstructionImpl(sourceActivity, targetActivity, migrationInstruction.isUpdateEventTrigger()));
         }
         else {
           if (sourceActivity == null) {

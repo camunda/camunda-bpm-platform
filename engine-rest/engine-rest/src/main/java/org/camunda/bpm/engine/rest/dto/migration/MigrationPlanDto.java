@@ -19,6 +19,7 @@ import java.util.List;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
+import org.camunda.bpm.engine.migration.MigrationInstructionBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 
 public class MigrationPlanDto {
@@ -74,7 +75,12 @@ public class MigrationPlanDto {
 
     if (migrationPlanDto.getInstructions() != null) {
       for (MigrationInstructionDto migrationInstructionDto : migrationPlanDto.getInstructions()) {
-        migrationPlanBuilder.mapActivities(migrationInstructionDto.getSourceActivityIds().get(0), migrationInstructionDto.getTargetActivityIds().get(0));
+        MigrationInstructionBuilder migrationInstructionBuilder = migrationPlanBuilder.mapActivities(migrationInstructionDto.getSourceActivityIds().get(0), migrationInstructionDto.getTargetActivityIds().get(0));
+        if (Boolean.TRUE.equals(migrationInstructionDto.isUpdateEventTrigger())) {
+          migrationInstructionBuilder = migrationInstructionBuilder.updateEventTrigger();
+        }
+
+        migrationPlanBuilder = migrationInstructionBuilder;
       }
     }
 

@@ -68,6 +68,12 @@ public class MigrationExecutionDtoBuilder {
     }
 
     @Override
+    public MigrationPlanExecutionDtoBuilder instruction(String sourceActivityId, String targetActivityId, Boolean updateEventTrigger) {
+      super.instruction(sourceActivityId, targetActivityId, updateEventTrigger);
+      return this;
+    }
+
+    @Override
     public MigrationPlanExecutionDtoBuilder instructions(List<MigrationInstructionDto> instructions) {
       super.instructions(instructions);
       return this;

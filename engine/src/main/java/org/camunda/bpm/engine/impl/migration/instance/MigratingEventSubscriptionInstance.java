@@ -27,16 +27,23 @@ public class MigratingEventSubscriptionInstance implements MigratingInstance, Re
 
   protected EventSubscriptionEntity eventSubscriptionEntity;
   protected ScopeImpl targetScope;
+  protected boolean updateEvent;
+  protected EventSubscriptionDeclaration targetDeclaration;
 
   protected EventSubscriptionDeclaration eventSubscriptionDeclaration;
 
-  public MigratingEventSubscriptionInstance(EventSubscriptionEntity eventSubscriptionEntity, ScopeImpl targetScope) {
+  public MigratingEventSubscriptionInstance(EventSubscriptionEntity eventSubscriptionEntity,
+      ScopeImpl targetScope,
+      boolean updateEvent,
+      EventSubscriptionDeclaration targetDeclaration) {
     this.eventSubscriptionEntity = eventSubscriptionEntity;
     this.targetScope = targetScope;
+    this.updateEvent = updateEvent;
+    this.targetDeclaration = targetDeclaration;
   }
 
   public MigratingEventSubscriptionInstance(EventSubscriptionEntity eventSubscriptionEntity) {
-    this(eventSubscriptionEntity, null);
+    this(eventSubscriptionEntity, null, false, null);
   }
 
   public MigratingEventSubscriptionInstance(EventSubscriptionDeclaration eventSubscriptionDeclaration) {
@@ -62,6 +69,9 @@ public class MigratingEventSubscriptionInstance implements MigratingInstance, Re
   }
 
   public void migrateState() {
+    if (updateEvent) {
+      targetDeclaration.updateSubscription(eventSubscriptionEntity);
+    }
     eventSubscriptionEntity.setActivity((ActivityImpl) targetScope);
   }
 

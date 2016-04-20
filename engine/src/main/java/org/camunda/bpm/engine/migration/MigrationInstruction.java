@@ -12,14 +12,34 @@
  */
 package org.camunda.bpm.engine.migration;
 
+import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationInstructionBuilder;
+
 /**
- * @author Thorben Lindhauer
+ * Represents an instruction to migrate instances of one activity to another activity.
+ * Migration instructions are always contained in a {@link MigrationPlan}.
  *
+ * @author Thorben Lindhauer
  */
 public interface MigrationInstruction {
 
+  /**
+   * @return the id of the activity of the source process definition that this
+   * instruction maps instances from
+   */
   String getSourceActivityId();
 
+  /**
+   * @return the id of the activity of the target process definition that this
+   * instruction maps instances to
+   */
   String getTargetActivityId();
+
+  /**
+   * @return whether this flow node's event trigger is going to be updated during
+   *   migration. Can only be true for flow nodes that define a persistent event trigger.
+   *   See {@link MigrationInstructionBuilder#updateEventTrigger()} for details
+   */
+  boolean isUpdateEventTrigger();
 
 }

@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
@@ -87,14 +87,17 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
     this.rawJobHandlerConfiguration = rawJobHandlerConfiguration;
   }
 
-  protected void postInitialize(ExecutionEntity context, TimerEntity job) {
+  public void updateJob(TimerEntity timer) {
+    initializeConfiguration(timer.getExecution(), timer);
+  }
+
+  protected void initializeConfiguration(ExecutionEntity context, TimerEntity job) {
     BusinessCalendar businessCalendar = Context
         .getProcessEngineConfiguration()
         .getBusinessCalendarManager()
         .getBusinessCalendar(type.calendarName);
 
     if (description==null) {
-      // Prevent NPE from happening in the next line
       throw new ProcessEngineException("Timer '"+context.getActivityId()+"' was not configured with a valid duration/time");
     }
 
@@ -133,6 +136,10 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
         job.setRepeat(prepared);
       }
     }
+  }
+
+  protected void postInitialize(ExecutionEntity execution, TimerEntity timer) {
+    initializeConfiguration(execution, timer);
   }
 
   protected String prepareRepeat(String dueDate) {
@@ -180,13 +187,17 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
     return resolveJobHandler().newConfiguration(rawJobHandlerConfiguration);
   }
 
-  public static List<TimerDeclarationImpl> getDeclarationsForScope(PvmScope scope) {
-    List<TimerDeclarationImpl> result = scope.getProperties().get(BpmnProperties.TIMER_DECLARATIONS);
+  public static Map<String, TimerDeclarationImpl> getDeclarationsForScope(PvmScope scope) {
+    if (scope == null) {
+      return Collections.emptyMap();
+    }
+
+    Map<String, TimerDeclarationImpl> result = scope.getProperties().get(BpmnProperties.TIMER_DECLARATIONS);
     if (result != null) {
       return result;
     }
     else {
-      return Collections.emptyList();
+      return Collections.emptyMap();
     }
   }
 

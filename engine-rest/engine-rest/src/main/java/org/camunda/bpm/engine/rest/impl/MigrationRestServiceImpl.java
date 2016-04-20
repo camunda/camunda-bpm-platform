@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.migration.MigrationInstructionsBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
@@ -27,6 +28,7 @@ import org.camunda.bpm.engine.rest.MigrationRestService;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
+import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanGenerationDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -39,16 +41,21 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
     super(engineName, objectMapper);
   }
 
-  public MigrationPlanDto generateMigrationPlan(MigrationPlanDto initialMigrationPlan) {
+  public MigrationPlanDto generateMigrationPlan(MigrationPlanGenerationDto generationDto) {
     RuntimeService runtimeService = processEngine.getRuntimeService();
 
-    String sourceProcessDefinitionId = initialMigrationPlan.getSourceProcessDefinitionId();
-    String targetProcessDefinitionId = initialMigrationPlan.getTargetProcessDefinitionId();
+    String sourceProcessDefinitionId = generationDto.getSourceProcessDefinitionId();
+    String targetProcessDefinitionId = generationDto.getTargetProcessDefinitionId();
 
     try {
-      MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinitionId, targetProcessDefinitionId)
-        .mapEqualActivities()
-        .build();
+      MigrationInstructionsBuilder instructionsBuilder = runtimeService.createMigrationPlan(sourceProcessDefinitionId, targetProcessDefinitionId)
+        .mapEqualActivities();
+
+      if (generationDto.isUpdateEventTriggers()) {
+        instructionsBuilder = instructionsBuilder.updateEventTriggers();
+      }
+
+      MigrationPlan migrationPlan = instructionsBuilder.build();
 
       return MigrationPlanDto.from(migrationPlan);
     }

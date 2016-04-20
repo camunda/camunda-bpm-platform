@@ -12,10 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.migration.instance;
 
+import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 /**
@@ -25,15 +27,22 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 public class MigratingTimerJobInstance extends MigratingJobInstance {
 
   protected ScopeImpl timerTriggerTargetScope;
+  protected TimerDeclarationImpl targetJobDeclaration;
+  protected boolean updateEvent;
 
   public MigratingTimerJobInstance(JobEntity jobEntity) {
     super(jobEntity);
   }
 
-  public MigratingTimerJobInstance(JobEntity jobEntity, JobDefinitionEntity jobDefinitionEntity,
-      ScopeImpl targetScope) {
+  public MigratingTimerJobInstance(JobEntity jobEntity,
+      JobDefinitionEntity jobDefinitionEntity,
+      ScopeImpl targetScope,
+      boolean updateEvent,
+      TimerDeclarationImpl targetTimerDeclaration) {
     super(jobEntity, jobDefinitionEntity, targetScope);
     timerTriggerTargetScope = determineTimerTriggerTargetScope(jobEntity, targetScope);
+    this.updateEvent = updateEvent;
+    this.targetJobDeclaration = targetTimerDeclaration;
   }
 
   protected ScopeImpl determineTimerTriggerTargetScope(JobEntity jobEntity, ScopeImpl targetScope) {
@@ -52,6 +61,10 @@ public class MigratingTimerJobInstance extends MigratingJobInstance {
     TimerJobConfiguration configuration = (TimerJobConfiguration) jobEntity.getJobHandlerConfiguration();
     configuration.setTimerElementKey(timerTriggerTargetScope.getId());
     jobEntity.setJobHandlerConfiguration(configuration);
+
+    if (updateEvent) {
+      targetJobDeclaration.updateJob((TimerEntity) jobEntity);
+    }
   }
 
 }
