@@ -124,7 +124,7 @@ module.exports = {
         key: 'sevenFailingServiceTasks'
       }])
     ),
-    
+
     multiTenancySetup:
 
         combine(
@@ -136,7 +136,7 @@ module.exports = {
                 content: readResource('user-tasks.bpmn')
               }]
             }]),
-            
+
             operation('deployment', 'create', [{
               deploymentName:  'user-tasks',
               files: [{
@@ -162,8 +162,8 @@ module.exports = {
                   type: 'Long'
                 }
               }
-            }]),	
-            
+            }]),
+
             operation('process-definition', 'start', [{
               key: 'user-tasks',
               variables: {
@@ -182,8 +182,8 @@ module.exports = {
               }
             }])
         ),
-  
-    semanticVersionSetup: 
+
+    versionTagSetup:
         combine(
           operation('deployment', 'create', [{
             deploymentName:  'user-tasks',
