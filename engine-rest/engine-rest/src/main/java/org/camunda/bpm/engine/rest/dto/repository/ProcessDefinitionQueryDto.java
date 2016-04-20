@@ -337,7 +337,7 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
       query.orderByTenantId();
     } else if (sortBy.equals(SORT_BY_VERSION_TAG)) {
-      query.orderBySemanticVersion();
+      query.orderByVersionTag();
     }
   }
 }
