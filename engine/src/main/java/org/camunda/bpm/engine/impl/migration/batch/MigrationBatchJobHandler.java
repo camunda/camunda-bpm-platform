@@ -90,6 +90,7 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
     // view of process instances to process
     List<String> processInstancesToProcess = processInstanceIds.subList(0, numberOfInstancesToProcess);
 
+    int createdJobs = 0;
     while (!processInstancesToProcess.isEmpty()) {
       int lastIdIndex = Math.min(invocationsPerBatchJob, processInstancesToProcess.size());
       // view of process instances for this job
@@ -102,7 +103,11 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
       jobManager.insertJob(job);
 
       idsForJob.clear();
+      createdJobs++;
     }
+
+    // update created jobs for batch
+    batch.setJobsCreated(batch.getJobsCreated() + createdJobs);
 
     // update batch configuration
     batch.setConfigurationBytes(writeConfiguration(configuration));

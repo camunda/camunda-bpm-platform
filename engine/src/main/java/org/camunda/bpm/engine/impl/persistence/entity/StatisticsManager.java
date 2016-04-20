@@ -17,10 +17,12 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.batch.BatchStatistics;
 import org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl;
+import org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.management.ActivityStatistics;
@@ -62,6 +64,17 @@ public class StatisticsManager extends AbstractManager {
   public long getStatisticsCountGroupedByDeployment(DeploymentStatisticsQueryImpl query) {
     getAuthorizationManager().configureDeploymentStatisticsQuery(query);
     return (Long) getDbEntityManager().selectOne("selectDeploymentStatisticsCount", query);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<BatchStatistics> getStatisticsGroupedByBatch(BatchStatisticsQueryImpl query, Page page) {
+    // TODO: authorizations
+    return getDbEntityManager().selectList("selectBatchStatistics", query, page);
+  }
+
+  public long getStatisticsCountGroupedByBatch(BatchStatisticsQueryImpl query) {
+    // TODO: authorizations
+    return (Long) getDbEntityManager().selectOne("selectBatchStatisticsCount", query);
   }
 
   protected void checkReadProcessDefinition(ActivityStatisticsQueryImpl query) {

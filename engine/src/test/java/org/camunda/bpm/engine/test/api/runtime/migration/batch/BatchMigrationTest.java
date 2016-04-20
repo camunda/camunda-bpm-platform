@@ -94,7 +94,7 @@ public class BatchMigrationTest {
   @Before
   public void storeEngineSettings() {
     ProcessEngineConfigurationImpl configuration =
-        (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
+      (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
     defaultBatchJobsPerSeed = configuration.getBatchJobsPerSeed();
     defaultInvocationsPerBatchJob = configuration.getInvocationsPerBatchJob();
   }
@@ -102,7 +102,7 @@ public class BatchMigrationTest {
   @After
   public void restoreEngineSettings() {
     ProcessEngineConfigurationImpl configuration =
-        (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
+      (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
     configuration.setBatchJobsPerSeed(defaultBatchJobsPerSeed);
     configuration.setInvocationsPerBatchJob(defaultInvocationsPerBatchJob);
   }
@@ -113,8 +113,7 @@ public class BatchMigrationTest {
     try {
       runtimeService.newMigration(null).processInstanceIds(Collections.singletonList("process")).executeAsync();
       fail("Should not succeed");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("migration plan is null"));
     }
   }
@@ -129,8 +128,7 @@ public class BatchMigrationTest {
     try {
       runtimeService.newMigration(migrationPlan).processInstanceIds(null).executeAsync();
       fail("Should not succeed");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("process instance ids is empty"));
     }
   }
@@ -145,8 +143,7 @@ public class BatchMigrationTest {
     try {
       runtimeService.newMigration(migrationPlan).processInstanceIds(Collections.<String>emptyList()).executeAsync();
       fail("Should not succeed");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("process instance ids is empty"));
     }
   }
@@ -161,8 +158,7 @@ public class BatchMigrationTest {
     try {
       runtimeService.newMigration(migrationPlan).processInstanceQuery(null).executeAsync();
       fail("Should not succeed");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("process instance ids is empty"));
     }
   }
@@ -180,8 +176,7 @@ public class BatchMigrationTest {
     try {
       runtimeService.newMigration(migrationPlan).processInstanceQuery(emptyProcessInstanceQuery).executeAsync();
       fail("Should not succeed");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("process instance ids is empty"));
     }
   }
@@ -338,6 +333,9 @@ public class BatchMigrationTest {
     // then the configuration was saved in the batch job
     assertEquals(2, batch.getBatchJobsPerSeed());
     assertEquals(5, batch.getInvocationsPerBatchJob());
+
+    // and the size was correctly calculated
+    assertEquals(4, batch.getSize());
 
     // when the seed job is executed
     helper.executeSeedJob(batch);

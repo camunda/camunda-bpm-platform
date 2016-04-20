@@ -22,7 +22,9 @@ import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.batch.BatchQuery;
+import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.impl.batch.BatchQueryImpl;
+import org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.batch.DeleteBatchCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteJobCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteMetricsCmd;
@@ -432,5 +434,8 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     commandExecutor.execute(new DeleteBatchCmd(batchId, cascade));
   }
 
+  public BatchStatisticsQuery createBatchStatisticsQuery() {
+    return new BatchStatisticsQueryImpl(commandExecutor);
+  }
 
 }

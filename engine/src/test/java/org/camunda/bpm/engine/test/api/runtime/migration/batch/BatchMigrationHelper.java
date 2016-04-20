@@ -14,18 +14,20 @@
 package org.camunda.bpm.engine.test.api.runtime.migration.batch;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
-import org.camunda.bpm.engine.impl.migration.batch.MigrationBatchJobHandler;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -47,6 +49,11 @@ public class BatchMigrationHelper {
   public BatchMigrationHelper(ProcessEngineRule engineRule, MigrationTestRule migrationRule) {
     this.engineRule = engineRule;
     this.migrationRule = migrationRule;
+  }
+
+  public Batch createMigrationBatchWithSize(int batchSize) {
+    int invocationsPerBatchJob = ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration()).getInvocationsPerBatchJob();
+    return migrateProcessInstancesAsync(invocationsPerBatchJob * batchSize);
   }
 
   public Batch migrateProcessInstancesAsync(int numberOfProcessInstances) {
@@ -135,6 +142,48 @@ public class BatchMigrationHelper {
     }
   }
 
+  public void completeBatch(Batch batch) {
+    completeSeedJobs(batch);
+    completeMigrationJobs(batch);
+    completeMonitorJobs(batch);
+  }
+
+  public void completeSeedJobs(Batch batch) {
+    while (getSeedJob(batch) != null) {
+      executeSeedJob(batch);
+    }
+  }
+
+  public void completeMigrationJobs(Batch batch) {
+    while (!getMigrationJobs(batch).isEmpty()) {
+      executeMigrationJobs(batch);
+    }
+  }
+
+  public void completeMigrationJobs(Batch batch, int count) {
+    List<Job> migrationJobs = getMigrationJobs(batch);
+    assertTrue(migrationJobs.size() >= count);
+    for (int i = 0; i < count; i++) {
+      executeJob(migrationJobs.get(i));
+    }
+  }
+
+  public void failMigrationJobs(Batch batch, int count) {
+    List<Job> migrationJobs = getMigrationJobs(batch);
+    assertTrue(migrationJobs.size() >= count);
+
+    ManagementService managementService = engineRule.getManagementService();
+    for (int i = 0; i < count; i++) {
+      managementService.setJobRetries(migrationJobs.get(i).getId(), 0);
+    }
+  }
+
+  public void completeMonitorJobs(Batch batch) {
+    while (getMonitorJob(batch) != null) {
+      executeMonitorJob(batch);
+    }
+  }
+
   public HistoricBatch getHistoricBatch(Batch batch) {
     return engineRule.getHistoryService()
       .createHistoricBatchQuery()
@@ -188,5 +237,4 @@ public class BatchMigrationHelper {
     ClockUtil.setCurrentTime(newDate);
     return newDate;
   }
-
 }

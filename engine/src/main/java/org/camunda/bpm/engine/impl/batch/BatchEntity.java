@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.batch;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -39,6 +40,7 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
   protected String type;
 
   protected int size;
+  protected int jobsCreated;
   protected int batchJobsPerSeed;
   protected int invocationsPerBatchJob;
 
@@ -85,6 +87,14 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
 
   public void setSize(int size) {
     this.size = size;
+  }
+
+  public int getJobsCreated() {
+    return jobsCreated;
+  }
+
+  public void setJobsCreated(int jobsCreated) {
+    this.jobsCreated = jobsCreated;
   }
 
   public int getBatchJobsPerSeed() {
@@ -201,8 +211,7 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
   @Override
   public Object getPersistentState() {
     HashMap<String, Object> persistentState = new HashMap<String, Object>();
-
-
+    persistentState.put("jobsCreated", jobsCreated);
     return persistentState;
   }
 
@@ -333,6 +342,7 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
       ", id='" + id + '\'' +
       ", type='" + type + '\'' +
       ", size=" + size +
+      ", jobCreated=" + jobsCreated +
       ", batchJobsPerSeed=" + batchJobsPerSeed +
       ", invocationsPerBatchJob=" + invocationsPerBatchJob +
       ", seedJobDefinitionId='" + seedJobDefinitionId + '\'' +

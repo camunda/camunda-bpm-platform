@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.BatchQuery;
+import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
@@ -87,7 +88,6 @@ public interface ManagementService {
    *          the Id of the deployment to deactivate
    * @param removeProcessDefinitionsFromCache
    *          indicates whether the process definitions should be removed from the deployment cache
-   * @return true if the registration was cleared
    *
    * @throws AuthorizationException
    *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
@@ -103,7 +103,6 @@ public interface ManagementService {
    *          the Ids of the deployments to deactivate
    * @param removeProcessDefinitionsFromCache
    *          indicates whether the process definitions should be removed from the deployment cache
-   * @return true if the registration was cleared
    *
    * @throws AuthorizationException
    *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
@@ -825,7 +824,7 @@ public interface ManagementService {
    * the corresponding incident will be resolved.
    * </p>
    *
-   * @param jobdefinitionId id of the job definition, cannot be null.
+   * @param jobDefinitionId id of the job definition, cannot be null.
    * @param retries number of retries.
    *
    * @throws AuthorizationException
@@ -1080,5 +1079,10 @@ public interface ManagementService {
    * @since 7.5
    */
   void deleteBatch(String batchId, boolean cascade);
+
+  /**
+   * Query for the statistics of the batch execution jobs of a batch.
+   */
+  BatchStatisticsQuery createBatchStatisticsQuery();
 
 }

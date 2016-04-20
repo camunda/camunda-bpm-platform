@@ -68,13 +68,20 @@ public class MigrateProcessInstanceBatchCmd implements Command<Batch> {
 
     BatchEntity batch = new BatchEntity();
     batch.setType(batchJobHandler.getType());
-    batch.setSize(configuration.getProcessInstanceIds().size());
+    batch.setSize(calculateSize(processEngineConfiguration, configuration));
     batch.setBatchJobsPerSeed(processEngineConfiguration.getBatchJobsPerSeed());
     batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
     batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
     commandContext.getBatchManager().insert(batch);
 
     return batch;
+  }
+
+  private int calculateSize(ProcessEngineConfigurationImpl engineConfiguration, MigrationBatchConfiguration batchConfiguration) {
+    int invocationsPerBatchJob = engineConfiguration.getInvocationsPerBatchJob();
+    int processInstanceCount = batchConfiguration.getProcessInstanceIds().size();
+
+    return (int) Math.ceil(processInstanceCount / invocationsPerBatchJob);
   }
 
   protected MigrationBatchConfiguration createConfiguration() {
