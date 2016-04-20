@@ -12,26 +12,29 @@
  */
 package org.camunda.bpm.engine.test.cmmn.handler;
 
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_DESCRIPTION;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.behavior.EventListenerActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.TimerEventListenerActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.handler.TimerEventListenerItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
-import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationType;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventListenerJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventListenerJobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerJobDeclaration;
 import org.camunda.bpm.model.cmmn.Cmmn;
-import org.camunda.bpm.model.cmmn.PlanItemTransition;
-import org.camunda.bpm.model.cmmn.instance.*;
+import org.camunda.bpm.model.cmmn.instance.PlanItem;
+import org.camunda.bpm.model.cmmn.instance.TimerEventListener;
+import org.camunda.bpm.model.cmmn.instance.TimerExpression;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_DESCRIPTION;
-import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
-import static org.junit.Assert.*;
 
 /**
  *  @author Roman Smirnov
@@ -165,10 +168,10 @@ public class TimerEventListenerHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity newActivity = timerEventListenerItemHandler.handleElement(planItem, context);
 
     //then
-    Object jobDeclr=newActivity.getProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION);
+    Object jobDeclr = newActivity.getProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION);
     assertNotNull(jobDeclr);
     assertTrue(jobDeclr instanceof TimerEventListenerJobDeclaration);
-    JobDeclaration timerEventListenerJobDeclaration=(JobDeclaration)jobDeclr;
+    TimerEventListenerJobDeclaration timerEventListenerJobDeclaration = (TimerEventListenerJobDeclaration)jobDeclr;
     assertEquals(TimerEventListenerJobHandler.TYPE ,timerEventListenerJobDeclaration.getJobHandlerType());
   }
 
@@ -184,11 +187,11 @@ public class TimerEventListenerHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity newActivity = timerEventListenerItemHandler.handleElement(planItem, context);
 
     //then
-    Object jobDeclr=newActivity.getProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION);
+    Object jobDeclr = newActivity.getProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION);
     assertNotNull(jobDeclr);
     assertTrue(jobDeclr instanceof TimerEventListenerJobDeclaration);
-    TimerEventListenerJobDeclaration timerEventListenerJobDeclaration=(TimerEventListenerJobDeclaration)jobDeclr;
-    assertTrue("CYCLE".equals(timerEventListenerJobDeclaration.getTimerDeclarationType()));
+    TimerEventListenerJobDeclaration timerEventListenerJobDeclaration = (TimerEventListenerJobDeclaration)jobDeclr;
+    assertEquals(TimerDeclarationType.CYCLE, timerEventListenerJobDeclaration.getTimerDeclarationType());
   }
 
   @Test
@@ -203,11 +206,11 @@ public class TimerEventListenerHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity newActivity = timerEventListenerItemHandler.handleElement(planItem, context);
 
     //then
-    Object jobDeclr=newActivity.getProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION);
+    Object jobDeclr = newActivity.getProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION);
     assertNotNull(jobDeclr);
     assertTrue(jobDeclr instanceof TimerEventListenerJobDeclaration);
-    TimerEventListenerJobDeclaration timerEventListenerJobDeclaration=(TimerEventListenerJobDeclaration)jobDeclr;
-    assertTrue("DURATION".equals(timerEventListenerJobDeclaration.getTimerDeclarationType()));
+    TimerEventListenerJobDeclaration timerEventListenerJobDeclaration = (TimerEventListenerJobDeclaration)jobDeclr;
+    assertEquals(TimerDeclarationType.DURATION, timerEventListenerJobDeclaration.getTimerDeclarationType());
   }
 
   @Test
@@ -222,13 +225,11 @@ public class TimerEventListenerHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity newActivity = timerEventListenerItemHandler.handleElement(planItem, context);
 
     //then
-    Object jobDeclr=newActivity.getProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION);
+    Object jobDeclr = newActivity.getProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION);
     assertNotNull(jobDeclr);
     assertTrue(jobDeclr instanceof TimerEventListenerJobDeclaration);
-    TimerEventListenerJobDeclaration timerEventListenerJobDeclaration=(TimerEventListenerJobDeclaration)jobDeclr;
-    assertTrue("DATE".equals(timerEventListenerJobDeclaration.getTimerDeclarationType()));
+    TimerEventListenerJobDeclaration timerEventListenerJobDeclaration = (TimerEventListenerJobDeclaration)jobDeclr;
+    assertEquals(TimerDeclarationType.DATE, timerEventListenerJobDeclaration.getTimerDeclarationType());
   }
-
-
 
 }

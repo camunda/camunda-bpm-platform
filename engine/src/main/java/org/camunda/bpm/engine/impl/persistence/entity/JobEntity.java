@@ -256,8 +256,8 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     if (caseExecution != null) {
       caseExecutionId = caseExecution.getId();
       caseInstanceId = caseExecution.getCaseInstanceId();
-      caseDefinitionId=caseExecution.getCaseDefinitionId();
-      caseDefinitionKey=((CaseDefinitionEntity)caseExecution.getCaseDefinition()).getKey();
+      caseDefinitionId = caseExecution.getCaseDefinitionId();
+      caseDefinitionKey = ((CaseDefinitionEntity) caseExecution.getCaseDefinition()).getKey();
       caseExecution.addJob(this);
     }
     else {

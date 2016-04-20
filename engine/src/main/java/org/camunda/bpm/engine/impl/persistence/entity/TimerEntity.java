@@ -57,10 +57,10 @@ public class TimerEntity extends JobEntity {
     deploymentId = te.deploymentId;
     processDefinitionId = te.processDefinitionId;
     processDefinitionKey = te.processDefinitionKey;
-    caseDefinitionId=te.getCaseDefinitionId();
-    caseDefinitionKey=te.getCaseDefinitionKey();
-    caseInstanceId=te.getCaseInstanceId();
-    caseExecutionId=te.getCaseExecutionId();
+    caseDefinitionId = te.getCaseDefinitionId();
+    caseDefinitionKey = te.getCaseDefinitionKey();
+    caseInstanceId = te.getCaseInstanceId();
+    caseExecutionId = te.getCaseExecutionId();
   }
 
   protected void preExecute(CommandContext commandContext) {

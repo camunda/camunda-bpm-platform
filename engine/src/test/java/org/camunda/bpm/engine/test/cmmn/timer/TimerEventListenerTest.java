@@ -18,10 +18,6 @@ import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Logger;
-
 /**
  * @author smirnov
  *
@@ -30,16 +26,14 @@ public class TimerEventListenerTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/timer/TimerEventListenerTest.testSimple.cmmn"})
   public void testSimple() {
-    String caseKey="case";
-    CaseInstance ci = createCaseInstanceByKey(caseKey);
+    CaseInstance ci = createCaseInstanceByKey("case");
     assertNotNull(ci);
     assertEquals(1, managementService.createJobQuery().count());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/timer/TimerEventListenerTest.testTimerJobData.cmmn"})
   public void testTimerJobData(){
-    String caseKey="case";
-    CaseInstance ci = createCaseInstanceByKey(caseKey);
+    CaseInstance ci = createCaseInstanceByKey("case");
     assertNotNull(ci);
     assertEquals(1, managementService.createJobQuery().count());
     Job job = managementService.createJobQuery().singleResult();
@@ -48,9 +42,8 @@ public class TimerEventListenerTest extends CmmnProcessEngineTestCase {
     assertNotNull(job.getCaseDefinitionKey());
     assertNotNull(job.getCaseExecutionId());
     assertNotNull(job.getCaseInstanceId());
-    assertEquals(caseKey,job.getCaseDefinitionKey());
+    assertEquals("case", job.getCaseDefinitionKey());
     assertTrue((job instanceof TimerEntity));
-
   }
 
 }
