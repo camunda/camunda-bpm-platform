@@ -71,7 +71,6 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.TaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ThrowEscalationEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.TransactionActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.listener.ClassDelegateExecutionListener;
@@ -589,7 +588,7 @@ public class BpmnParse extends Parse {
 
     // now we have parsed anything we can validate some stuff
     validateActivities(processDefinition.getActivities());
-    
+
     //unregister delegates
     for (ActivityImpl activity : processDefinition.getActivities()) {
       activity.setDelegateAsyncAfterUpdate(null);
@@ -658,7 +657,7 @@ public class BpmnParse extends Parse {
     activityElements.removeAll(intermediateCatchEvents.values());
     Map<String, Element> compensationHandlers = filterCompensationHandlers(activityElements);
     activityElements.removeAll(compensationHandlers.values());
-    
+
     parseStartEvents(scopeElement, parentScope);
     parseActivities(activityElements, scopeElement, parentScope);
     parseIntermediateCatchEvents(scopeElement, parentScope, intermediateCatchEvents);
@@ -1726,41 +1725,41 @@ public class BpmnParse extends Parse {
 
     return activity;
   }
-  
+
   /**
    * Sets the delegates for the activity, which will be called
    * if the attribute asyncAfter or asyncBefore was changed.
-   * 
+   *
    * @param activity the activity which gets the delegates
    */
   private void setActivityAsyncDelegates(final ActivityImpl activity) {
     activity.setDelegateAsyncAfterUpdate(new ActivityImpl.AsyncAfterUpdate() {
       @Override
       public void updateAsyncAfter(boolean asyncAfter, boolean exclusive) {
-        if (asyncAfter) {          
+        if (asyncAfter) {
           addMessageJobDeclaration(new AsyncAfterMessageJobDeclaration(), activity, exclusive);
-        } else {          
+        } else {
           removeMessageJobDeclarationWithJobConfiguration(activity, MessageJobDeclaration.ASYNC_AFTER);
         }
       }
     });
-    
+
     activity.setDelegateAsyncBeforeUpdate(new ActivityImpl.AsyncBeforeUpdate() {
       @Override
       public void updateAsyncBefore(boolean asyncBefore, boolean exclusive) {
-        if (asyncBefore) {          
+        if (asyncBefore) {
           addMessageJobDeclaration(new AsyncBeforeMessageJobDeclaration(), activity, exclusive);
         } else {
           removeMessageJobDeclarationWithJobConfiguration(activity, MessageJobDeclaration.ASYNC_BEFORE);
-        }        
+        }
       }
-    });    
+    });
   }
 
   /**
    * Adds the new message job declaration to existing declarations.
    * There will be executed an existing check before the adding is executed.
-   * 
+   *
    * @param messageJobDeclaration the new message job declaration
    * @param activity the corresponding activity
    * @param exclusive the flag which indicates if the async should be exclusive
@@ -1773,13 +1772,13 @@ public class BpmnParse extends Parse {
       messageJobDeclaration.setJobPriorityProvider((ParameterValueProvider) activity.getProperty(PROPERTYNAME_JOB_PRIORITY));
 
       addMessageJobDeclarationToActivity(messageJobDeclaration, activity);
-      addJobDeclarationToProcessDefinition(messageJobDeclaration, procDef);   
-    } 
+      addJobDeclarationToProcessDefinition(messageJobDeclaration, procDef);
+    }
   }
-  
+
   /**
    * Checks whether the message declaration already exists.
-   * 
+   *
    * @param msgJobdecl the message job declaration which is searched
    * @param procDefKey the corresponding process definition key
    * @param activityId the corresponding activity id
@@ -1791,17 +1790,17 @@ public class BpmnParse extends Parse {
     if (declarations != null) {
       for (int i = 0; i < declarations.size() && !exist; i++) {
         JobDeclaration<?, ?> decl = declarations.get(i);
-        if (decl.getActivityId().equals(activityId) && 
+        if (decl.getActivityId().equals(activityId) &&
             decl.getJobConfiguration().equalsIgnoreCase(msgJobdecl.getJobConfiguration()))
           exist = true;
-      }      
+      }
     }
     return exist;
   }
-  
+
   /**
    * Removes a job declaration which belongs to the given activity and has the given job configuration.
-   * 
+   *
    * @param activity the activity of the job declaration
    * @param jobConfiguration  the job configuration of the declaration
    */
@@ -1809,25 +1808,25 @@ public class BpmnParse extends Parse {
     List<MessageJobDeclaration> messageJobDeclarations = (List<MessageJobDeclaration>) activity.getProperty(PROPERTYNAME_MESSAGE_JOB_DECLARATION);
     if (messageJobDeclarations != null) {
       for (int i = messageJobDeclarations.size() -1; i >= 0; i--) {
-        if (messageJobDeclarations.get(i).getJobConfiguration().equalsIgnoreCase(jobConfiguration) 
+        if (messageJobDeclarations.get(i).getJobConfiguration().equalsIgnoreCase(jobConfiguration)
           && messageJobDeclarations.get(i).getActivityId().equalsIgnoreCase(activity.getActivityId())) {
           messageJobDeclarations.remove(i);
         }
       }
-    }   
-    
+    }
+
     ProcessDefinition procDef = (ProcessDefinition) activity.getProcessDefinition();
     List<JobDeclaration<?, ?>> declarations = jobDeclarations.get(procDef.getKey());
-    if (declarations != null) {        
+    if (declarations != null) {
       for (int i = declarations.size() -1; i >= 0; i--) {
         if (declarations.get(i).getJobConfiguration().equalsIgnoreCase(jobConfiguration)
             && declarations.get(i).getActivityId().equalsIgnoreCase(activity.getActivityId())) {
           declarations.remove(i);
         }
-      }      
+      }
     }
   }
-    
+
   public String parseDocumentation(Element element) {
     List<Element> docElements = element.elements("documentation");
     List<String> docStrings = new ArrayList<String>();
@@ -2188,7 +2187,7 @@ public class BpmnParse extends Parse {
     activity.setAsyncBefore(isAsyncBefore, exclusive);
     activity.setAsyncAfter(isAsyncAfter, exclusive);
   }
-  
+
   protected ParameterValueProvider parsePriority(Element element, String priorityAttribute) {
     String priorityAttributeValue = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, priorityAttribute);
 
@@ -3391,7 +3390,7 @@ public class BpmnParse extends Parse {
 
     activity.setScope(true);
     activity.setSubProcessScope(true);
-    activity.setActivityBehavior(new TransactionActivityBehavior());
+    activity.setActivityBehavior(new SubProcessActivityBehavior());
     activity.setProperty(PROPERTYNAME_TRIGGERED_BY_EVENT, false);
     parseScope(transactionElement, activity);
 

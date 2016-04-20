@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.MessageReceiveMo
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ServiceTaskModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.TransactionModels;
 import org.camunda.bpm.engine.test.util.MigrationPlanAssert;
 import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -790,6 +791,45 @@ public class MigrationPlanGenerationTest {
         migrate("parallel1").to("parallel1"),
         migrate("parallel2").to("parallel2"),
         migrate("afterJoin").to("afterJoin")
+      );
+  }
+
+  @Test
+  public void testMapTransaction() {
+
+    assertGeneratedMigrationPlan(TransactionModels.ONE_TASK_TRANSACTION, TransactionModels.ONE_TASK_TRANSACTION)
+      .hasInstructions(
+        migrate("transaction").to("transaction"),
+        migrate("userTask").to("userTask")
+      );
+  }
+
+  @Test
+  public void testMapEmbeddedSubProcessToTransaction() {
+    BpmnModelInstance sourceProcess = ProcessModels.SUBPROCESS_PROCESS;
+    BpmnModelInstance targetProcess = modify(TransactionModels.ONE_TASK_TRANSACTION)
+        .changeElementId("transaction", "subProcess");
+
+    assertGeneratedMigrationPlan(sourceProcess, targetProcess)
+      .hasInstructions(
+        migrate("subProcess").to("subProcess"),
+        migrate("userTask").to("userTask")
+      );
+  }
+
+  @Test
+  public void testMapTransactionToEventSubProcess() {
+
+    BpmnModelInstance sourceProcess = TransactionModels.ONE_TASK_TRANSACTION;
+    BpmnModelInstance targetProcess = modify(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS)
+      .changeElementId("eventSubProcess", "transaction")
+      .changeElementId("userTask", "foo")
+      .changeElementId("eventSubProcessTask", "userTask");
+
+    assertGeneratedMigrationPlan(sourceProcess, targetProcess)
+      .hasInstructions(
+        migrate("transaction").to("transaction"),
+        migrate("userTask").to("userTask")
       );
   }
 

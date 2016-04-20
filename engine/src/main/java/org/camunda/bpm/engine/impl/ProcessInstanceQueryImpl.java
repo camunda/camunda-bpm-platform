@@ -230,7 +230,6 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
       .findProcessInstanceByQueryCriteria(this, page);
   }
 
-  @SuppressWarnings("unchecked")
   public List<String> listIds() {
     this.resultType = ResultType.LIST;
     return evaluateExpressionsAndExecuteIdsList(Context.getCommandContext());
