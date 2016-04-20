@@ -40,7 +40,6 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
   // scope execution for actual scopes,
   // concurrent execution in case of non-scope activity with expanded tree
   protected ExecutionEntity representativeExecution;
-  protected boolean migrateActiveState;
   protected boolean activeState;
 
   protected List<RemovingInstance> removingDependentInstances = new ArrayList<RemovingInstance>();
@@ -72,8 +71,8 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
 
     if (activityInstance.getChildActivityInstances().length == 0
       && activityInstance.getChildTransitionInstances().length == 0) {
-      // TODO: braucht man das erste Feld überhaupt, wenn man das eh nur bei non-scope-Instanzen anpasst?
-      migrateActiveState = true;
+      // active state is only relevant for child activity instances;
+      // for all other instances, their respective executions are always inactive
       activeState = representativeExecution.isActive();
     }
   }
