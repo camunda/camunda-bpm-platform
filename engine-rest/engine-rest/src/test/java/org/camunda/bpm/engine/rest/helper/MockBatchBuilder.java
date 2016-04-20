@@ -23,6 +23,7 @@ public class MockBatchBuilder {
   protected String id;
   protected String type;
   protected int size;
+  protected int jobsCreated;
   protected int batchJobsPerSeed;
   protected int invocationsPerBatchJob;
   protected String seedJobDefinitionId;
@@ -42,6 +43,11 @@ public class MockBatchBuilder {
 
   public MockBatchBuilder size(int size) {
     this.size = size;
+    return this;
+  }
+
+  public MockBatchBuilder jobsCreated(int jobsCreated) {
+    this.jobsCreated = jobsCreated;
     return this;
   }
 
@@ -80,6 +86,7 @@ public class MockBatchBuilder {
     when(batch.getId()).thenReturn(id);
     when(batch.getType()).thenReturn(type);
     when(batch.getSize()).thenReturn(size);
+    when(batch.getJobsCreated()).thenReturn(jobsCreated);
     when(batch.getBatchJobsPerSeed()).thenReturn(batchJobsPerSeed);
     when(batch.getInvocationsPerBatchJob()).thenReturn(invocationsPerBatchJob);
     when(batch.getSeedJobDefinitionId()).thenReturn(seedJobDefinitionId);

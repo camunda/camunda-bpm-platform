@@ -21,10 +21,12 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchQuery;
+import org.camunda.bpm.engine.batch.BatchStatistics;
 import org.camunda.bpm.engine.rest.BatchRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchQueryDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchStatisticsDto;
 import org.camunda.bpm.engine.rest.sub.batch.BatchResource;
 import org.camunda.bpm.engine.rest.sub.batch.impl.BatchResourceImpl;
 
@@ -68,6 +70,35 @@ public class BatchRestServiceImpl extends AbstractRestProcessEngineAware impleme
     return new CountResultDto(count);
   }
 
+  public List<BatchStatisticsDto> getStatistics(Integer firstResult, Integer maxResults) {
+    List<BatchStatistics> batchStatisticsList;
+
+    if (firstResult != null || maxResults != null) {
+      batchStatisticsList = executePaginatedStatisticsQuery(firstResult, maxResults);
+    }
+    else {
+      batchStatisticsList = getProcessEngine().getManagementService()
+        .createBatchStatisticsQuery()
+        .list();
+    }
+
+    List<BatchStatisticsDto> statisticsResults = new ArrayList<BatchStatisticsDto>();
+    for (BatchStatistics batchStatistics : batchStatisticsList) {
+      statisticsResults.add(BatchStatisticsDto.fromBatchStatistics(batchStatistics));
+    }
+
+    return statisticsResults;
+  }
+
+  public CountResultDto getStatisticsCount() {
+    long count = getProcessEngine()
+      .getManagementService()
+      .createBatchStatisticsQuery()
+      .count();
+
+    return new CountResultDto(count);
+  }
+
   protected List<Batch> executePaginatedQuery(BatchQuery query, Integer firstResult, Integer maxResults) {
     if (firstResult == null) {
       firstResult = 0;
@@ -77,5 +108,19 @@ public class BatchRestServiceImpl extends AbstractRestProcessEngineAware impleme
     }
 
     return query.listPage(firstResult, maxResults);
+  }
+
+  protected List<BatchStatistics> executePaginatedStatisticsQuery(Integer firstResult, Integer maxResults) {
+    if (firstResult == null) {
+      firstResult = 0;
+    }
+    if (maxResults == null) {
+      maxResults = Integer.MAX_VALUE;
+    }
+
+    return getProcessEngine()
+      .getManagementService()
+      .createBatchStatisticsQuery()
+      .listPage(firstResult, maxResults);
   }
 }

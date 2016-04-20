@@ -20,6 +20,7 @@ public class BatchDto {
   protected String id;
   protected String type;
   protected int size;
+  protected int jobsCreated;
   protected int batchJobsPerSeed;
   protected int invocationsPerBatchJob;
   protected String seedJobDefinitionId;
@@ -37,6 +38,10 @@ public class BatchDto {
 
   public int getSize() {
     return size;
+  }
+
+  public int getJobsCreated() {
+    return jobsCreated;
   }
 
   public int getBatchJobsPerSeed() {
@@ -68,6 +73,7 @@ public class BatchDto {
     dto.id = batch.getId();
     dto.type = batch.getType();
     dto.size = batch.getSize();
+    dto.jobsCreated = batch.getJobsCreated();
     dto.batchJobsPerSeed = batch.getBatchJobsPerSeed();
     dto.invocationsPerBatchJob = batch.getInvocationsPerBatchJob();
     dto.seedJobDefinitionId = batch.getSeedJobDefinitionId();

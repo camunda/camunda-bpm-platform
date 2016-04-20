@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.BatchStatistics;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
@@ -84,7 +85,6 @@ import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.Resource;
-import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -187,7 +187,6 @@ public abstract class MockProvider {
   public static final String EXAMPLE_PROCESS_INSTANCE_ID_LIST_WITH_DUP = EXAMPLE_PROCESS_INSTANCE_ID + "," + ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID + "," + EXAMPLE_PROCESS_INSTANCE_ID;
   public static final String EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID = "aNonExistentProcInstId";
   public static final String EXAMPLE_PROCESS_INSTANCE_ID_LIST_WITH_NONEXISTENT_ID = EXAMPLE_PROCESS_INSTANCE_ID + "," + EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID;
-
 
   // variable instance
   public static final String EXAMPLE_VARIABLE_INSTANCE_ID = "aVariableInstanceId";
@@ -762,6 +761,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_BATCH_ID = "aBatchId";
   public static final String EXAMPLE_BATCH_TYPE = "aBatchType";
   public static final int EXAMPLE_BATCH_SIZE = 10;
+  public static final int EXAMPLE_BATCH_JOBS_CREATED = 9;
   public static final int EXAMPLE_BATCH_JOBS_PER_SEED = 11;
   public static final int EXAMPLE_INVOCATIONS_PER_BATCH_JOB = 12;
   public static final String EXAMPLE_SEED_JOB_DEFINITION_ID = "aSeedJobDefinitionId";
@@ -769,6 +769,9 @@ public abstract class MockProvider {
   public static final String EXAMPLE_BATCH_JOB_DEFINITION_ID = "aBatchJobDefinitionId";
   public static final String EXAMPLE_HISTORIC_BATCH_START_TIME = "2016-04-12T15:29:33";
   public static final String EXAMPLE_HISTORIC_BATCH_END_TIME = "2016-04-12T16:23:34";
+  public static final int EXAMPLE_BATCH_REMAINING_JOBS = 21;
+  public static final int EXAMPLE_BATCH_COMPLETED_JOBS = 22;
+  public static final int EXAMPLE_BATCH_FAILED_JOBS = 23;
 
   // tasks
   public static Task createMockTask() {
@@ -2576,6 +2579,7 @@ public abstract class MockProvider {
       .id(EXAMPLE_BATCH_ID)
       .type(EXAMPLE_BATCH_TYPE)
       .size(EXAMPLE_BATCH_SIZE)
+      .jobsCreated(EXAMPLE_BATCH_JOBS_CREATED)
       .batchJobsPerSeed(EXAMPLE_BATCH_JOBS_PER_SEED)
       .invocationsPerBatchJob(EXAMPLE_INVOCATIONS_PER_BATCH_JOB)
       .seedJobDefinitionId(EXAMPLE_SEED_JOB_DEFINITION_ID)
@@ -2616,6 +2620,33 @@ public abstract class MockProvider {
   public static List<HistoricBatch> createMockHistoricBatches() {
     List<HistoricBatch> mockList = new ArrayList<HistoricBatch>();
     mockList.add(createMockHistoricBatch());
+    return mockList;
+  }
+
+  public static MockBatchStatisticsBuilder mockBatchStatistics() {
+    return new MockBatchStatisticsBuilder()
+      .id(EXAMPLE_BATCH_ID)
+      .type(EXAMPLE_BATCH_TYPE)
+      .size(EXAMPLE_BATCH_SIZE)
+      .jobsCreated(EXAMPLE_BATCH_JOBS_CREATED)
+      .batchJobsPerSeed(EXAMPLE_BATCH_JOBS_PER_SEED)
+      .invocationsPerBatchJob(EXAMPLE_INVOCATIONS_PER_BATCH_JOB)
+      .seedJobDefinitionId(EXAMPLE_SEED_JOB_DEFINITION_ID)
+      .monitorJobDefinitionId(EXAMPLE_MONITOR_JOB_DEFINITION_ID)
+      .batchJobDefinitionId(EXAMPLE_BATCH_JOB_DEFINITION_ID)
+      .tenantId(EXAMPLE_TENANT_ID)
+      .remainingJobs(EXAMPLE_BATCH_REMAINING_JOBS)
+      .completedJobs(EXAMPLE_BATCH_COMPLETED_JOBS)
+      .failedJobs(EXAMPLE_BATCH_FAILED_JOBS);
+  }
+
+  public static BatchStatistics createMockBatchStatistics() {
+    return mockBatchStatistics().build();
+  }
+
+  public static List<BatchStatistics> createMockBatchStatisticsList() {
+    ArrayList<BatchStatistics> mockList = new ArrayList<BatchStatistics>();
+    mockList.add(createMockBatchStatistics());
     return mockList;
   }
 

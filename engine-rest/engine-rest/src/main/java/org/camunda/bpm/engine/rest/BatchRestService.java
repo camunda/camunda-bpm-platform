@@ -26,6 +26,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchStatisticsDto;
 import org.camunda.bpm.engine.rest.sub.batch.BatchResource;
 
 public interface BatchRestService {
@@ -45,5 +46,16 @@ public interface BatchRestService {
   @Path("/count")
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getBatchesCount(@Context UriInfo uriInfo);
+
+  @GET
+  @Path("/statistics")
+  @Produces(MediaType.APPLICATION_JSON)
+  List<BatchStatisticsDto> getStatistics(@QueryParam("firstResult") Integer firstResult,
+                                         @QueryParam("maxResults") Integer maxResults);
+
+  @GET
+  @Path("/statistics/count")
+  @Produces(MediaType.APPLICATION_JSON)
+  CountResultDto getStatisticsCount();
 
 }
