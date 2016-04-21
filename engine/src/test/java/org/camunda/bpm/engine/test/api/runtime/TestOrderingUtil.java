@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.BatchStatistics;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.history.HistoricJobLog;
@@ -595,6 +596,18 @@ public class TestOrderingUtil {
       }
 
       public boolean hasNullProperty(HistoricBatch object) {
+        return false;
+      }
+    };
+  }
+
+  public static NullTolerantComparator<BatchStatistics> batchStatisticsById() {
+    return new NullTolerantComparator<BatchStatistics>() {
+      public int compare(BatchStatistics o1, BatchStatistics o2) {
+        return o1.getId().compareTo(o2.getId());
+      }
+
+      public boolean hasNullProperty(BatchStatistics object) {
         return false;
       }
     };

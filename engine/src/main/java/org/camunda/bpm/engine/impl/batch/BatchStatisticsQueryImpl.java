@@ -13,11 +13,14 @@
 
 package org.camunda.bpm.engine.impl.batch;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.batch.BatchStatistics;
 import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
+import org.camunda.bpm.engine.impl.BatchQueryProperty;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -26,8 +29,35 @@ public class BatchStatisticsQueryImpl extends AbstractQuery<BatchStatisticsQuery
 
   protected static final long serialVersionUID = 1L;
 
+  protected String batchId;
+  protected String type;
+
   public BatchStatisticsQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
+  }
+
+  public BatchStatisticsQuery batchId(String batchId) {
+    ensureNotNull("Batch id", batchId);
+    this.batchId = batchId;
+    return this;
+  }
+
+  public String getBatchId() {
+    return batchId;
+  }
+
+  public BatchStatisticsQuery type(String type) {
+    ensureNotNull("Type", type);
+    this.type = type;
+    return this;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public BatchStatisticsQuery orderById() {
+    return orderBy(BatchQueryProperty.ID);
   }
 
   public long executeCount(CommandContext commandContext) {

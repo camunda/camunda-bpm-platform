@@ -13,6 +13,10 @@
 
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.batchById;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.batchStatisticsById;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -22,6 +26,8 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchStatistics;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
+import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -33,7 +39,9 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
 import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
+import org.hamcrest.CoreMatchers;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -137,6 +145,150 @@ public class BatchStatisticsQueryTest {
 
     count = managementService.createBatchStatisticsQuery().count();
     assertEquals(0, count);
+  }
+
+  @Test
+  public void testQueryById() {
+    // given
+    helper.createMigrationBatchWithSize(1);
+    Batch batch = helper.createMigrationBatchWithSize(1);
+
+    // when
+    BatchStatistics statistics = managementService.createBatchStatisticsQuery()
+      .batchId(batch.getId())
+      .singleResult();
+
+    // then
+    assertEquals(batch.getId(), statistics.getId());
+  }
+
+  @Test
+  public void testQueryByNullId() {
+    try {
+      managementService.createBatchStatisticsQuery()
+        .batchId(null)
+        .singleResult();
+      Assert.fail("exception expected");
+    }
+    catch (NullValueException e) {
+      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Batch id is null"));
+    }
+  }
+
+  @Test
+  public void testQueryByUnknownId() {
+    // given
+    helper.createMigrationBatchWithSize(1);
+    helper.createMigrationBatchWithSize(1);
+
+    // when
+    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery()
+      .batchId("unknown")
+      .list();
+
+    // then
+    assertEquals(0, statistics.size());
+  }
+
+  @Test
+  public void testQueryByType() {
+    // given
+    helper.createMigrationBatchWithSize(1);
+    helper.createMigrationBatchWithSize(1);
+
+    // when
+    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery()
+      .type(Batch.TYPE_PROCESS_INSTANCE_MIGRATION)
+      .list();
+
+    // then
+    assertEquals(2, statistics.size());
+  }
+
+  @Test
+  public void testQueryByNullType() {
+    try {
+      managementService.createBatchStatisticsQuery()
+        .type(null)
+        .list();
+      Assert.fail("exception expected");
+    }
+    catch (NullValueException e) {
+      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Type is null"));
+    }
+  }
+
+  @Test
+  public void testQueryByUnknownType() {
+    // given
+    helper.createMigrationBatchWithSize(1);
+    helper.createMigrationBatchWithSize(1);
+
+    // when
+    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery()
+      .type("unknown")
+      .list();
+
+    // then
+    assertEquals(0, statistics.size());
+  }
+
+  @Test
+  public void testQueryOrderByIdAsc() {
+    // given
+    helper.migrateProcessInstancesAsync(1);
+    helper.migrateProcessInstancesAsync(1);
+
+    // when
+    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery()
+      .orderById().asc()
+      .list();
+
+    // then
+    verifySorting(statistics, batchStatisticsById());
+  }
+
+  @Test
+  public void testQueryOrderByIdDec() {
+    // given
+    helper.migrateProcessInstancesAsync(1);
+    helper.migrateProcessInstancesAsync(1);
+
+    // when
+    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery()
+      .orderById().desc()
+      .list();
+
+    // then
+    verifySorting(statistics, inverted(batchStatisticsById()));
+  }
+
+  @Test
+  public void testQueryOrderingPropertyWithoutOrder() {
+    try {
+      managementService.createBatchStatisticsQuery()
+        .orderById()
+        .list();
+      Assert.fail("exception expected");
+    }
+    catch (NotValidException e) {
+      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Invalid query: "
+        + "call asc() or desc() after using orderByXX()"));
+    }
+  }
+
+  @Test
+  public void testQueryOrderWithoutOrderingProperty() {
+    try {
+      managementService.createBatchStatisticsQuery()
+        .asc()
+        .list();
+      Assert.fail("exception expected");
+    }
+    catch (NotValidException e) {
+      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("You should call any of the orderBy methods "
+        + "first before specifying a direction"));
+    }
   }
 
   @Test

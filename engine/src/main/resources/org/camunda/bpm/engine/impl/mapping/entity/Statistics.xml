@@ -624,11 +624,21 @@
 
         group by
           JOB_DEF_ID_
-        ) JOB
-        on
-          BATCH.BATCH_JOB_DEF_ID_ = JOB.JOB_DEF_ID_
+      ) JOB
+      on
+        BATCH.BATCH_JOB_DEF_ID_ = JOB.JOB_DEF_ID_
 
-      ) RES
+      <where>
+        <if test="batchId != null">
+          BATCH.ID_ = #{batchId}
+        </if>
+        <if test="type != null">
+          and BATCH.TYPE_ = #{type}
+        </if>
+      </where>
+
+    ) RES
+
   </sql>
 
 

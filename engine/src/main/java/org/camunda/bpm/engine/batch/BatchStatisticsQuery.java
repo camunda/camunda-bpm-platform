@@ -17,4 +17,19 @@ import org.camunda.bpm.engine.query.Query;
 
 public interface BatchStatisticsQuery extends Query<BatchStatisticsQuery, BatchStatistics> {
 
+  /**
+   * Only select batch statistics for the given batch id.
+   */
+  BatchStatisticsQuery batchId(String batchId);
+
+  /**
+   * Only select batch statistics of the given type.
+   */
+  BatchStatisticsQuery type(String type);
+
+  /**
+   * Returns batch statistics sorted by batch id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   */
+  BatchStatisticsQuery orderById();
+
 }
