@@ -1,6 +1,6 @@
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular');
+var angular = require('angular');
 var each = angular.forEach;
 
 var fs = require('fs');
@@ -83,8 +83,8 @@ function (
         $scope.processDefinitionData = data.items;
 
         procStats.definitions.value = data.items.length;
-      });      
-      
+      });
+
       processData.observe('processDefinitionStatistics', function (defStats) {
         $scope.loadingState = 'LOADED';
 
