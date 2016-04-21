@@ -14,9 +14,17 @@
 package org.camunda.bpm.dmn.feel.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineFactoryImpl;
 import org.camunda.bpm.dmn.feel.impl.juel.el.FeelFunctionMapper;
@@ -170,6 +178,33 @@ public class FeelEngineTest {
 
     variables.put("y", "2015-12-12T22:12:53");
     assertEvaluatesToTrue(dateTime, "date and time(y)");
+  }
+
+  @Test
+  public void testThreadSafetyDateAndTimeParsing() throws ExecutionException, InterruptedException {
+    int threadCount = 2;
+    ExecutorService pool = Executors.newFixedThreadPool(threadCount);
+
+    Set<Future<Date>> futureSet = new HashSet<Future<Date>>();
+    Set<Date> expectedDates = new HashSet<Date>();
+
+    for(int i = 1; i <= threadCount; i++) {
+      expectedDates.add(
+        FeelFunctionMapper.parseDateAndTime("2015-12-12T22:12:5" + i)
+      );
+
+      Future<Date> future = pool.submit(new DateAndTimeParserThreadGenerator("2015-12-12T22:12:5" + i));
+      futureSet.add(future);
+    }
+
+    Set<Date> actualDates = new HashSet<Date>();
+    for( Future<Date> dateFuture : futureSet ) {
+      actualDates.add(dateFuture.get());
+    }
+
+    assertThat(actualDates).hasSameElementsAs(expectedDates);
+
+    pool.shutdown();
   }
 
   @Test
