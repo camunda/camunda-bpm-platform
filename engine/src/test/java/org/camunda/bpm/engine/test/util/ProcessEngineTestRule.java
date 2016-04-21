@@ -91,12 +91,20 @@ public class ProcessEngineTestRule extends TestWatcher {
     return deploy(createDeploymentBuilder(), Collections.<BpmnModelInstance> emptyList(), Arrays.asList(resources));
   }
 
+  public Deployment deploy(BpmnModelInstance bpmnModelInstance, String resource) {
+    return deploy(createDeploymentBuilder(), Collections.singletonList(bpmnModelInstance), Collections.singletonList(resource));
+  }
+
   public Deployment deployForTenant(String tenantId, BpmnModelInstance... bpmnModelInstances) {
     return deploy(createDeploymentBuilder().tenantId(tenantId), Arrays.asList(bpmnModelInstances), Collections.<String> emptyList());
   }
 
   public Deployment deployForTenant(String tenantId, String... resources) {
     return deploy(createDeploymentBuilder().tenantId(tenantId), Collections.<BpmnModelInstance> emptyList(), Arrays.asList(resources));
+  }
+
+  public Deployment deployForTenant(String tenant, BpmnModelInstance bpmnModelInstance, String resource) {
+    return deploy(createDeploymentBuilder().tenantId(tenant), Collections.singletonList(bpmnModelInstance), Collections.singletonList(resource));
   }
 
   protected Deployment deploy(DeploymentBuilder deploymentBuilder, List<BpmnModelInstance> bpmnModelInstances, List<String> resources) {
