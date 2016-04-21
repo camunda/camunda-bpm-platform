@@ -63,8 +63,8 @@ public class MigrationPlanCreationTest {
   @Test
   public void testExplicitInstructionGeneration() {
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = runtimeService
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -81,7 +81,7 @@ public class MigrationPlanCreationTest {
 
   @Test
   public void testMigrateNonExistingSourceDefinition() {
-    ProcessDefinition processDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition processDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     try {
       runtimeService
@@ -96,7 +96,7 @@ public class MigrationPlanCreationTest {
 
   @Test
   public void testMigrateNullSourceDefinition() {
-    ProcessDefinition processDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition processDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     try {
       runtimeService
@@ -111,7 +111,7 @@ public class MigrationPlanCreationTest {
 
   @Test
   public void testMigrateNonExistingTargetDefinition() {
-    ProcessDefinition processDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition processDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     try {
       runtimeService
         .createMigrationPlan(processDefinition.getId(), "aNonExistingProcDefId")
@@ -125,7 +125,7 @@ public class MigrationPlanCreationTest {
 
   @Test
   public void testMigrateNullTargetDefinition() {
-    ProcessDefinition processDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition processDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     try {
       runtimeService
@@ -140,8 +140,8 @@ public class MigrationPlanCreationTest {
 
   @Test
   public void testMigrateNonExistingSourceActivityId() {
-    ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     try {
       runtimeService
@@ -157,8 +157,8 @@ public class MigrationPlanCreationTest {
 
   @Test
   public void testMigrateNullSourceActivityId() {
-    ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     try {
       runtimeService
@@ -174,8 +174,8 @@ public class MigrationPlanCreationTest {
 
   @Test
   public void testMigrateNonExistingTargetActivityId() {
-    ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     try {
       runtimeService
@@ -191,8 +191,8 @@ public class MigrationPlanCreationTest {
 
   @Test
   public void testMigrateNullTargetActivityId() {
-    ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     try {
       runtimeService
@@ -208,8 +208,8 @@ public class MigrationPlanCreationTest {
 
   @Test
   public void testMigrateTaskToHigherScope() {
-    ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = runtimeService
       .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
@@ -227,8 +227,8 @@ public class MigrationPlanCreationTest {
   @Test
   public void testMigrateToUnsupportedActivityType() {
 
-    ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deploy(ProcessModels.ONE_RECEIVE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_RECEIVE_TASK_PROCESS);
 
     try {
       runtimeService
@@ -246,8 +246,8 @@ public class MigrationPlanCreationTest {
 
   @Test
   public void testNotMigrateActivitiesOfDifferentType() {
-    ProcessDefinition sourceDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
       .swapElementIds("userTask", "subProcess")
     );
 
@@ -266,12 +266,12 @@ public class MigrationPlanCreationTest {
 
   @Test
   public void testNotMigrateBoundaryEventsOfDifferentType() {
-    ProcessDefinition sourceDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
       .activityBuilder("userTask")
       .boundaryEvent("boundary").message(MESSAGE_NAME)
       .done()
     );
-    ProcessDefinition targetDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
       .activityBuilder("userTask")
       .boundaryEvent("boundary").signal(SIGNAL_NAME)
       .done()
@@ -292,8 +292,8 @@ public class MigrationPlanCreationTest {
 
   @Test
   public void testMigrateSubProcessToProcessDefinition() {
-    ProcessDefinition sourceDefinition = testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.SUBPROCESS_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     try {
       runtimeService
@@ -313,8 +313,8 @@ public class MigrationPlanCreationTest {
     BpmnModelInstance testProcess = modify(ProcessModels.ONE_TASK_PROCESS)
       .getBuilderForElementById("userTask", UserTaskBuilder.class)
       .multiInstance().parallel().cardinality("3").multiInstanceDone().done();
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
 
     // when
     try {
@@ -340,8 +340,8 @@ public class MigrationPlanCreationTest {
         .boundaryEvent("boundary").message(MESSAGE_NAME)
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
 
     MigrationPlan migrationPlan = runtimeService
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -367,8 +367,8 @@ public class MigrationPlanCreationTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = runtimeService
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -394,8 +394,8 @@ public class MigrationPlanCreationTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("userTask", "newUserTask");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = runtimeService
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -423,8 +423,8 @@ public class MigrationPlanCreationTest {
         .boundaryEvent("boundary").message(MESSAGE_NAME)
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     try {
       runtimeService
@@ -454,8 +454,8 @@ public class MigrationPlanCreationTest {
         .boundaryEvent("boundary").message(MESSAGE_NAME)
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = runtimeService
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -483,8 +483,8 @@ public class MigrationPlanCreationTest {
         .boundaryEvent("boundary").message(MESSAGE_NAME)
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = runtimeService
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -512,8 +512,8 @@ public class MigrationPlanCreationTest {
         .boundaryEvent("boundary").message(MESSAGE_NAME)
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     try {
       runtimeService
@@ -543,8 +543,8 @@ public class MigrationPlanCreationTest {
         .boundaryEvent("boundary").message(MESSAGE_NAME)
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     try {
       runtimeService
@@ -572,8 +572,8 @@ public class MigrationPlanCreationTest {
         .boundaryEvent("escalation").escalation(ESCALATION_CODE)
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
 
     MigrationPlan migrationPlan = runtimeService
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -606,8 +606,8 @@ public class MigrationPlanCreationTest {
       .subProcessDone()
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
 
     MigrationPlan migrationPlan = runtimeService
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -624,8 +624,8 @@ public class MigrationPlanCreationTest {
 
   @Test
   public void testMapSubProcessWithEventSubProcess() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
 
     MigrationPlan migrationPlan = runtimeService
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -653,8 +653,8 @@ public class MigrationPlanCreationTest {
       .subProcessDone()
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
 
     MigrationPlan migrationPlan = runtimeService
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -681,8 +681,8 @@ public class MigrationPlanCreationTest {
       .subProcessDone()
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
 
     MigrationPlan migrationPlan = runtimeService
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -701,8 +701,8 @@ public class MigrationPlanCreationTest {
 
   @Test
   public void testNotMapActivitiesMoreThanOnce() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
 
     try {
       runtimeService

@@ -52,8 +52,8 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMapUserTaskSiblingOfMessageEventSubProcess() {
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -87,8 +87,8 @@ public class MigrationEventSubProcessTest {
 
   @Test
   public void testMapUserTaskSiblingOfMessageEventSubProcessAndTriggerMessage() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.NESTED_EVENT_SUB_PROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -116,8 +116,8 @@ public class MigrationEventSubProcessTest {
       .subProcessDone()
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -161,8 +161,8 @@ public class MigrationEventSubProcessTest {
       .subProcessDone()
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -190,8 +190,8 @@ public class MigrationEventSubProcessTest {
       .subProcessDone()
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -235,8 +235,8 @@ public class MigrationEventSubProcessTest {
       .subProcessDone()
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -255,8 +255,8 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMigrateActiveEventSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
 
     ProcessInstance processInstance = rule.getRuntimeService()
       .createProcessInstanceById(sourceProcessDefinition.getId())
@@ -297,8 +297,8 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMigrateActiveEventSubProcessPreserveEventSubscription() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
 
     ProcessInstance processInstance = rule.getRuntimeService()
       .createProcessInstanceById(sourceProcessDefinition.getId())
@@ -322,8 +322,8 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMigrateActiveEventSubProcessToEmbeddedSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     ProcessInstance processInstance = rule.getRuntimeService()
       .createProcessInstanceById(sourceProcessDefinition.getId())
@@ -364,8 +364,8 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMigrateActiveEmbeddedSubProcessToEventSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
 
     ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
 
@@ -402,8 +402,8 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMigrateActiveSignalEventSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
 
     ProcessInstance processInstance = rule.getRuntimeService()
       .createProcessInstanceById(sourceProcessDefinition.getId())
@@ -431,8 +431,8 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMigrateActiveTimerEventSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
 
     ProcessInstance processInstance = rule.getRuntimeService()
       .createProcessInstanceById(sourceProcessDefinition.getId())
@@ -460,8 +460,8 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMigrateActiveErrorEventSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.ERROR_EVENT_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.ERROR_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.ERROR_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.ERROR_EVENT_SUBPROCESS_PROCESS);
 
     ProcessInstance processInstance = rule.getRuntimeService()
       .createProcessInstanceById(sourceProcessDefinition.getId())
@@ -485,8 +485,8 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMigrateActiveCompensationEventSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.COMPENSATE_EVENT_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.COMPENSATE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.COMPENSATE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.COMPENSATE_EVENT_SUBPROCESS_PROCESS);
 
     ProcessInstance processInstance = rule.getRuntimeService()
       .createProcessInstanceById(sourceProcessDefinition.getId())
@@ -510,8 +510,8 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMigrateActiveEscalationEventSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.ESCALATION_EVENT_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.ESCALATION_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.ESCALATION_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.ESCALATION_EVENT_SUBPROCESS_PROCESS);
 
     ProcessInstance processInstance = rule.getRuntimeService()
       .createProcessInstanceById(sourceProcessDefinition.getId())
@@ -534,8 +534,8 @@ public class MigrationEventSubProcessTest {
 
   @Test
   public void testMigrateTaskAddEventSubProcess() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
 
     ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
 
@@ -570,8 +570,8 @@ public class MigrationEventSubProcessTest {
 
   @Test
   public void testMigrateEventSubprocessMessageTrigger() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
 
     ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
 
@@ -598,8 +598,8 @@ public class MigrationEventSubProcessTest {
 
   @Test
   public void testMigrateEventSubprocessTimerTrigger() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
 
     ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
 
@@ -627,8 +627,8 @@ public class MigrationEventSubProcessTest {
 
   @Test
   public void testMigrateEventSubprocessSignalTrigger() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
 
     ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
 
@@ -656,8 +656,8 @@ public class MigrationEventSubProcessTest {
   @Test
   public void testMigrateEventSubprocessChangeStartEventType() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
 
     try {
       // when
@@ -678,8 +678,8 @@ public class MigrationEventSubProcessTest {
 
   @Test
   public void testMigrateEventSubprocessTimerIncident() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -720,8 +720,8 @@ public class MigrationEventSubProcessTest {
       .interrupting(false)
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(nonInterruptingModel);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(nonInterruptingModel);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(nonInterruptingModel);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(nonInterruptingModel);
 
     ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
 

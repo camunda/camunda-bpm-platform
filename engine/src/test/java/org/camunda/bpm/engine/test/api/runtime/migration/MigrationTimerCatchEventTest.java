@@ -43,8 +43,8 @@ public class MigrationTimerCatchEventTest {
   @Test
   public void testMigrateJob() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -81,8 +81,8 @@ public class MigrationTimerCatchEventTest {
   @Test
   public void testMigrateJobChangeActivityId() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(TimerCatchModels.ONE_TIMER_CATCH_PROCESS)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(TimerCatchModels.ONE_TIMER_CATCH_PROCESS)
         .changeElementId("timerCatch", "newTimerCatch"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -108,8 +108,8 @@ public class MigrationTimerCatchEventTest {
   @Test
   public void testMigrateJobChangeTimerConfiguration() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.newModel()
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.newModel()
       .startEvent()
       .intermediateCatchEvent("timerCatch")
         .timerWithDuration("PT50M")
@@ -141,8 +141,8 @@ public class MigrationTimerCatchEventTest {
   @Test
   public void testMigrateJobChangeProcessKey() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(TimerCatchModels.ONE_TIMER_CATCH_PROCESS)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(TimerCatchModels.ONE_TIMER_CATCH_PROCESS)
         .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -168,8 +168,8 @@ public class MigrationTimerCatchEventTest {
   @Test
   public void testMigrateJobAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(TimerCatchModels.SUBPROCESS_TIMER_CATCH_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.SUBPROCESS_TIMER_CATCH_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())

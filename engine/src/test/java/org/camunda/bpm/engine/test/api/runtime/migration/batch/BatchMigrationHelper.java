@@ -57,8 +57,8 @@ public class BatchMigrationHelper {
   }
 
   public Batch migrateProcessInstancesAsync(int numberOfProcessInstances) {
-    sourceProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
-    targetProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+    sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    targetProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     RuntimeService runtimeService = engineRule.getRuntimeService();
 

@@ -45,7 +45,7 @@ public class MigrationCallActivityTest {
 
   @Before
   public void deployOneTaskProcess() {
-    testHelper.deploy(
+    testHelper.deployAndGetDefinition(
         modify(ProcessModels.ONE_TASK_PROCESS)
           .changeElementId(ProcessModels.PROCESS_KEY, "oneTaskProcess"));
   }
@@ -60,8 +60,8 @@ public class MigrationCallActivityTest {
     // given
     BpmnModelInstance model = CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(model);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(model);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -97,8 +97,8 @@ public class MigrationCallActivityTest {
     // given
     BpmnModelInstance model = CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(model);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(model);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -145,9 +145,9 @@ public class MigrationCallActivityTest {
   @Test
   public void testCallBpmnProcessAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
         CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"));
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(
         CallActivityModels.subProcessBpmnCallActivityProcess("oneTaskProcess"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -191,8 +191,8 @@ public class MigrationCallActivityTest {
       .cardinality("1")
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(model);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(model);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -246,8 +246,8 @@ public class MigrationCallActivityTest {
       .cardinality("1")
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(model);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(model);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -307,14 +307,14 @@ public class MigrationCallActivityTest {
   @Test
   public void testCallBpmnProcessParallelMultiInstanceRemoveMiBody() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
         modify(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"))
           .activityBuilder("callActivity")
           .multiInstance()
           .parallel()
           .cardinality("1")
           .done());
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"));
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -357,14 +357,14 @@ public class MigrationCallActivityTest {
   @Test
   public void testCallCmmnCaseParallelMultiInstanceRemoveMiBody() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
         modify(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"))
           .activityBuilder("callActivity")
           .multiInstance()
           .parallel()
           .cardinality("1")
           .done());
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"));
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -422,14 +422,14 @@ public class MigrationCallActivityTest {
   @Test
   public void testCallBpmnProcessSequentialMultiInstanceRemoveMiBody() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
         modify(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"))
           .activityBuilder("callActivity")
           .multiInstance()
           .sequential()
           .cardinality("1")
           .done());
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"));
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -473,14 +473,14 @@ public class MigrationCallActivityTest {
   @Test
   public void testCallCmmnCaseSequentialMultiInstanceRemoveMiBody() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
         modify(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"))
           .activityBuilder("callActivity")
           .multiInstance()
           .sequential()
           .cardinality("1")
           .done());
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"));
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -539,8 +539,8 @@ public class MigrationCallActivityTest {
     // given
     BpmnModelInstance model = CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(model);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(model).callActivityBuilder("callActivity")
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(model).callActivityBuilder("callActivity")
         .calledElement("foo")
         .done());
 

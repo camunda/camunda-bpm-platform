@@ -43,8 +43,8 @@ public class MigrationTransactionTest {
   @Test
   public void testContinueProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(TransactionModels.ONE_TASK_TRANSACTION);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(TransactionModels.ONE_TASK_TRANSACTION);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TransactionModels.ONE_TASK_TRANSACTION);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(TransactionModels.ONE_TASK_TRANSACTION);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -63,8 +63,8 @@ public class MigrationTransactionTest {
   @Test
   public void testContinueProcessTriggerCancellation() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(TransactionModels.ONE_TASK_TRANSACTION);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(TransactionModels.CANCEL_BOUNDARY_EVENT);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TransactionModels.ONE_TASK_TRANSACTION);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(TransactionModels.CANCEL_BOUNDARY_EVENT);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -84,8 +84,8 @@ public class MigrationTransactionTest {
   @Test
   public void testAssertTrees() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(TransactionModels.ONE_TASK_TRANSACTION);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(TransactionModels.ONE_TASK_TRANSACTION);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TransactionModels.ONE_TASK_TRANSACTION);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(TransactionModels.ONE_TASK_TRANSACTION);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -114,8 +114,8 @@ public class MigrationTransactionTest {
   @Test
   public void testAddTransactionContinueProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(TransactionModels.ONE_TASK_TRANSACTION);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(TransactionModels.ONE_TASK_TRANSACTION);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -133,8 +133,8 @@ public class MigrationTransactionTest {
   @Test
   public void testAddTransactionTriggerCancellation() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(TransactionModels.CANCEL_BOUNDARY_EVENT);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(TransactionModels.CANCEL_BOUNDARY_EVENT);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -153,8 +153,8 @@ public class MigrationTransactionTest {
   @Test
   public void testAddTransactionAssertTrees() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(TransactionModels.ONE_TASK_TRANSACTION);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(TransactionModels.ONE_TASK_TRANSACTION);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -182,8 +182,8 @@ public class MigrationTransactionTest {
   @Test
   public void testRemoveTransactionContinueProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(TransactionModels.ONE_TASK_TRANSACTION);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TransactionModels.ONE_TASK_TRANSACTION);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -201,8 +201,8 @@ public class MigrationTransactionTest {
   @Test
   public void testRemoveTransactionAssertTrees() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(TransactionModels.ONE_TASK_TRANSACTION);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TransactionModels.ONE_TASK_TRANSACTION);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -228,8 +228,8 @@ public class MigrationTransactionTest {
   @Test
   public void testMigrateTransactionToEmbeddedSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(TransactionModels.ONE_TASK_TRANSACTION);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TransactionModels.ONE_TASK_TRANSACTION);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -252,8 +252,8 @@ public class MigrationTransactionTest {
   @Test
   public void testMigrateEventSubProcessToTransaction() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(TransactionModels.ONE_TASK_TRANSACTION);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(TransactionModels.ONE_TASK_TRANSACTION);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())

@@ -16,7 +16,9 @@ package org.camunda.bpm.engine.test.util;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,14 +27,17 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.rules.TestWatcher;
@@ -105,6 +110,15 @@ public class ProcessEngineTestRule extends TestWatcher {
 
   public Deployment deployForTenant(String tenant, BpmnModelInstance bpmnModelInstance, String resource) {
     return deploy(createDeploymentBuilder().tenantId(tenant), Collections.singletonList(bpmnModelInstance), Collections.singletonList(resource));
+  }
+
+  public ProcessDefinition deployAndGetDefinition(BpmnModelInstance bpmnModel) {
+    Deployment deployment = deploy(bpmnModel);
+
+    return processEngineRule.getRepositoryService()
+      .createProcessDefinitionQuery()
+      .deploymentId(deployment.getId())
+      .singleResult();
   }
 
   protected Deployment deploy(DeploymentBuilder deploymentBuilder, List<BpmnModelInstance> bpmnModelInstances, List<String> resources) {
@@ -223,6 +237,28 @@ public class ProcessEngineTestRule extends TestWatcher {
         jobsExecuted, lessThanOrEqualTo(expectedExecutions));
 
     executeAvailableJobs(jobsExecuted, expectedExecutions);
+  }
+
+  public void completeTask(String taskKey) {
+    TaskService taskService = processEngine.getTaskService();
+    Task task = taskService.createTaskQuery().taskDefinitionKey(taskKey).singleResult();
+    assertNotNull("Expected a task with key '" + taskKey + "' to exist", task);
+    taskService.complete(task.getId());
+  }
+
+  public void completeAnyTask(String taskKey) {
+    TaskService taskService = processEngine.getTaskService();
+    List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey(taskKey).list();
+    assertTrue(!tasks.isEmpty());
+    taskService.complete(tasks.get(0).getId());
+  }
+
+  public void correlateMessage(String messageName) {
+    processEngine.getRuntimeService().createMessageCorrelation(messageName).correlate();
+  }
+
+  public void sendSignal(String signalName) {
+    processEngine.getRuntimeService().signalEventReceived(signalName);
   }
 
   protected static class InterruptTask extends TimerTask {

@@ -46,8 +46,8 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayExecutionTree() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -74,8 +74,8 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayWithTimerEvent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -99,8 +99,8 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayWithMessageEvent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -123,8 +123,8 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayWithSignalEvent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -147,8 +147,8 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayWithTimerEventMapEvent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -172,8 +172,8 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayWithMessageEventMapEvent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -196,8 +196,8 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayWithSignalEventMapEvent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -220,8 +220,8 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayAddTimerEvent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS)
         .flowNodeBuilder("eventBasedGateway")
         .intermediateCatchEvent("newTimerCatch")
           .timerWithDuration("PT50M")
@@ -252,8 +252,8 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayAddMessageEvent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS)
       .flowNodeBuilder("eventBasedGateway")
       .intermediateCatchEvent("newMessageCatch")
         .message("new" + EventBasedGatewayModels.MESSAGE_NAME)
@@ -283,8 +283,8 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayAddSignalEvent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS)
         .flowNodeBuilder("eventBasedGateway")
         .intermediateCatchEvent("newSignalCatch")
           .signal("new" + EventBasedGatewayModels.SIGNAL_NAME)
@@ -314,13 +314,13 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayRemoveTimerEvent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS)
         .flowNodeBuilder("eventBasedGateway")
         .intermediateCatchEvent("oldTimerCatch")
           .timerWithDuration("PT50M")
         .endEvent()
         .done());
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -339,13 +339,13 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayRemoveMessageEvent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS)
         .flowNodeBuilder("eventBasedGateway")
         .intermediateCatchEvent("oldMessageCatch")
         .message("old" + EventBasedGatewayModels.MESSAGE_NAME)
         .endEvent()
         .done());
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -364,13 +364,13 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayRemoveSignalEvent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS)
         .flowNodeBuilder("eventBasedGateway")
         .intermediateCatchEvent("oldSignalCatch")
           .signal("old" + EventBasedGatewayModels.SIGNAL_NAME)
         .endEvent()
         .done());
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -389,8 +389,8 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayWithTimerEventChangeId() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS)
         .changeElementId("timerCatch", "newTimerCatch"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -415,8 +415,8 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayWithMessageEventChangeId() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(EventBasedGatewayModels.MESSAGE_EVENT_BASED_GW_PROCESS)
         .changeElementId("messageCatch", "newMessageCatch"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -440,8 +440,8 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayWithSignalEventChangeId() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS)
         .changeElementId("signalCatch", "newSignalCatch"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -465,8 +465,8 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayWithIncident() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -509,8 +509,8 @@ public class MigrationEventBasedGatewayTest {
   @Test
   public void testMigrateGatewayRemoveIncidentOnMigration() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())

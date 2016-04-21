@@ -44,8 +44,8 @@ public class MigrationGatewayTest {
   @Test
   public void testParallelGatewayContinueExecution() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(GatewayModels.PARALLEL_GW);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(GatewayModels.PARALLEL_GW);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.PARALLEL_GW);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.PARALLEL_GW);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -74,8 +74,8 @@ public class MigrationGatewayTest {
   @Test
   public void testParallelGatewayAssertTrees() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(GatewayModels.PARALLEL_GW);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(GatewayModels.PARALLEL_GW);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.PARALLEL_GW);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.PARALLEL_GW);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -111,8 +111,8 @@ public class MigrationGatewayTest {
   @Test
   public void testParallelGatewayAddScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(GatewayModels.PARALLEL_GW);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(GatewayModels.PARALLEL_GW_IN_SUBPROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.PARALLEL_GW);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.PARALLEL_GW_IN_SUBPROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -141,8 +141,8 @@ public class MigrationGatewayTest {
   @Test
   public void testInclusiveGatewayContinueExecution() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(GatewayModels.INCLUSIVE_GW);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(GatewayModels.INCLUSIVE_GW);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.INCLUSIVE_GW);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.INCLUSIVE_GW);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -171,8 +171,8 @@ public class MigrationGatewayTest {
   @Test
   public void testInclusiveGatewayAssertTrees() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(GatewayModels.INCLUSIVE_GW);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(GatewayModels.INCLUSIVE_GW);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.INCLUSIVE_GW);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.INCLUSIVE_GW);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -208,8 +208,8 @@ public class MigrationGatewayTest {
   @Test
   public void testInclusiveGatewayAddScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(GatewayModels.INCLUSIVE_GW);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(GatewayModels.INCLUSIVE_GW_IN_SUBPROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.INCLUSIVE_GW);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.INCLUSIVE_GW_IN_SUBPROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -238,8 +238,8 @@ public class MigrationGatewayTest {
   @Test
   public void testCannotMigrateParallelToInclusiveGateway() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(GatewayModels.PARALLEL_GW);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(GatewayModels.INCLUSIVE_GW);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.PARALLEL_GW);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.INCLUSIVE_GW);
 
     try {
       rule.getRuntimeService()
@@ -260,8 +260,8 @@ public class MigrationGatewayTest {
   @Test
   public void testCannotMigrateInclusiveToParallelGateway() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(GatewayModels.INCLUSIVE_GW);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(GatewayModels.PARALLEL_GW);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.INCLUSIVE_GW);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.PARALLEL_GW);
 
     try {
       rule.getRuntimeService()
@@ -286,8 +286,8 @@ public class MigrationGatewayTest {
   @Test
   public void testCannotRemoveGatewayIncomingSequenceFlow() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(GatewayModels.PARALLEL_GW);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(GatewayModels.PARALLEL_GW)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.PARALLEL_GW);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(GatewayModels.PARALLEL_GW)
         .removeFlowNode("parallel2"));
 
     try {
@@ -312,8 +312,8 @@ public class MigrationGatewayTest {
   @Test
   public void testAddGatewayIncomingSequenceFlow() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(GatewayModels.PARALLEL_GW);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(GatewayModels.PARALLEL_GW)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.PARALLEL_GW);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(GatewayModels.PARALLEL_GW)
         .flowNodeBuilder("fork")
         .userTask("parallel3")
         .connectTo("join")
@@ -355,8 +355,8 @@ public class MigrationGatewayTest {
   @Test
   public void testCannotRemoveParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(GatewayModels.PARALLEL_GW_IN_SUBPROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(GatewayModels.PARALLEL_GW);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.PARALLEL_GW_IN_SUBPROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.PARALLEL_GW);
 
     try {
       rule.getRuntimeService()
@@ -380,8 +380,8 @@ public class MigrationGatewayTest {
   @Test
   public void testCannotMapMultipleGatewaysToOne() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(GatewayModels.PARALLEL_GW);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(GatewayModels.PARALLEL_GW);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.PARALLEL_GW);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(GatewayModels.PARALLEL_GW);
 
     try {
       rule.getRuntimeService()

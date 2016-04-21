@@ -45,8 +45,8 @@ public class MigrationReceiveTaskTest {
   @Test
   public void testCannotMigrateActivityInstance() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -68,8 +68,8 @@ public class MigrationReceiveTaskTest {
   @Test
   public void testMigrateEventSubscriptionProperties() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -93,8 +93,8 @@ public class MigrationReceiveTaskTest {
   @Test
   public void testMigrateEventSubscriptionChangeActivityId() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS)
         .changeElementId("receiveTask", "newReceiveTask"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -117,8 +117,8 @@ public class MigrationReceiveTaskTest {
   @Test
   public void testMigrateEventSubscriptionChangeMessageName() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.newModel()
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.newModel()
         .startEvent()
         .receiveTask("receiveTask")
           .message("new" + MessageReceiveModels.MESSAGE_NAME)
@@ -153,8 +153,8 @@ public class MigrationReceiveTaskTest {
         .cardinality("3")
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(parallelMiReceiveTaskProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(parallelMiReceiveTaskProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(parallelMiReceiveTaskProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(parallelMiReceiveTaskProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -183,8 +183,8 @@ public class MigrationReceiveTaskTest {
         .cardinality("3")
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(parallelMiReceiveTaskProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(parallelMiReceiveTaskProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(parallelMiReceiveTaskProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(parallelMiReceiveTaskProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -209,8 +209,8 @@ public class MigrationReceiveTaskTest {
   @Test
   public void testMigrateEventSubscriptionAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(MessageReceiveModels.SUBPROCESS_RECEIVE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.SUBPROCESS_RECEIVE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())

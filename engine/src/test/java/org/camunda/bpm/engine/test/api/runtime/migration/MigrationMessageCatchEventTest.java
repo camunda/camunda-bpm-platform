@@ -40,8 +40,8 @@ public class MigrationMessageCatchEventTest {
   @Test
   public void testMigrateEventSubscription() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -63,8 +63,8 @@ public class MigrationMessageCatchEventTest {
   @Test
   public void testMigrateEventSubscriptionChangeActivityId() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS)
         .changeElementId("messageCatch", "newMessageCatch"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -87,8 +87,8 @@ public class MigrationMessageCatchEventTest {
   @Test
   public void testMigrateEventSubscriptionChangeMessageName() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.newModel()
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.newModel()
         .startEvent()
         .intermediateCatchEvent("messageCatch")
           .message("new" + MessageReceiveModels.MESSAGE_NAME)

@@ -45,6 +45,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ActivityInstanceAssert.ActivityInstanceAssertThatClause;
 import org.camunda.bpm.engine.test.util.ExecutionAssert;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
 import org.junit.rules.TestWatcher;
@@ -54,91 +55,13 @@ import org.junit.runner.Description;
  * @author Thorben Lindhauer
  *
  */
-public class MigrationTestRule extends TestWatcher {
-
-  public static final String DEFAULT_BPMN_RESOURCE_NAME = "process.bpmn20.xml";
-  public static final String DEFAULT_CMMN_RESOURCE_NAME = "case.cmmn";
-
-  protected ProcessEngineRule processEngineRule;
-  protected ProcessEngine processEngine;
+public class MigrationTestRule extends ProcessEngineTestRule {
 
   public ProcessInstanceSnapshot snapshotBeforeMigration;
   public ProcessInstanceSnapshot snapshotAfterMigration;
 
   public MigrationTestRule(ProcessEngineRule processEngineRule) {
-    this.processEngineRule = processEngineRule;
-  }
-
-  @Override
-  protected void starting(Description description) {
-    this.processEngine = processEngineRule.getProcessEngine();
-  }
-
-  @Override
-  protected void finished(Description description) {
-    this.processEngine = null;
-  }
-
-  public void assertProcessEnded(String processInstanceId) {
-    ProcessInstance processInstance = processEngine
-      .getRuntimeService()
-      .createProcessInstanceQuery()
-      .processInstanceId(processInstanceId)
-      .singleResult();
-
-    if (processInstance != null) {
-      Assert.fail("Process instance with id " + processInstanceId + " is not finished");
-    }
-  }
-
-  public void assertCaseEnded(String caseInstanceId) {
-    CaseInstance caseInstance = processEngine
-      .getCaseService()
-      .createCaseInstanceQuery()
-      .caseInstanceId(caseInstanceId)
-      .singleResult();
-
-    if (caseInstance != null) {
-      Assert.fail("Case instance with id " + caseInstanceId + " is not finished");
-    }
-  }
-
-
-  public ProcessDefinition findProcessDefinition(String key, int version) {
-    return processEngine.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey(key)
-        .processDefinitionVersion(version)
-        .singleResult();
-  }
-
-  public ProcessDefinition deploy(String name, BpmnModelInstance bpmnModel) {
-    Deployment deployment = processEngine.getRepositoryService()
-      .createDeployment()
-      .addModelInstance(name, bpmnModel)
-      .deploy();
-
-    processEngineRule.manageDeployment(deployment);
-
-    return processEngineRule.getRepositoryService()
-      .createProcessDefinitionQuery()
-      .deploymentId(deployment.getId())
-      .singleResult();
-  }
-
-  public void deploy(String classpathResource) {
-    Deployment deployment = processEngine.getRepositoryService()
-      .createDeployment()
-      .addClasspathResource(classpathResource)
-      .deploy();
-
-    processEngineRule.manageDeployment(deployment);
-  }
-
-
-  /**
-   * Deploys a bpmn model instance and returns its corresponding process definition object
-   */
-  public ProcessDefinition deploy(BpmnModelInstance bpmnModel) {
-    return deploy(DEFAULT_BPMN_RESOURCE_NAME, bpmnModel);
+    super(processEngineRule);
   }
 
   public String getSingleExecutionIdForActivity(ActivityInstance activityInstance, String activityId) {
@@ -203,28 +126,6 @@ public class MigrationTestRule extends TestWatcher {
       .newMigration(migrationPlan).processInstanceIds(Collections.singletonList(snapshotBeforeMigration.getProcessInstanceId())).execute();
 
     snapshotAfterMigration = takeFullProcessInstanceSnapshot(processInstance);
-  }
-
-  public void completeTask(String taskKey) {
-    TaskService taskService = processEngine.getTaskService();
-    Task task = taskService.createTaskQuery().taskDefinitionKey(taskKey).singleResult();
-    assertNotNull("Expected a task with key '" + taskKey + "' to exist", task);
-    taskService.complete(task.getId());
-  }
-
-  public void completeAnyTask(String taskKey) {
-    TaskService taskService = processEngine.getTaskService();
-    List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey(taskKey).list();
-    assertTrue(!tasks.isEmpty());
-    taskService.complete(tasks.get(0).getId());
-  }
-
-  public void correlateMessage(String messageName) {
-    processEngine.getRuntimeService().createMessageCorrelation(messageName).correlate();
-  }
-
-  public void sendSignal(String signalName) {
-    processEngine.getRuntimeService().signalEventReceived(signalName);
   }
 
   public void triggerTimer() {

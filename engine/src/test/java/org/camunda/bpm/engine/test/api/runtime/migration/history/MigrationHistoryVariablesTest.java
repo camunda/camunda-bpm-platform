@@ -81,8 +81,8 @@ public class MigrationHistoryVariablesTest {
   @Test
   public void noHistoryUpdateOnSameStructureMigration() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ONE_BOUNDARY_TASK);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ONE_BOUNDARY_TASK);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ONE_BOUNDARY_TASK);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ONE_BOUNDARY_TASK);
 
     MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapEqualActivities()
@@ -110,8 +110,8 @@ public class MigrationHistoryVariablesTest {
   @Test
   public void noHistoryUpdateOnAddScopeMigration() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(CONCURRENT_BOUNDARY_TASKS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(SUBPROCESS_CONCURRENT_BOUNDARY_TASKS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CONCURRENT_BOUNDARY_TASKS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(SUBPROCESS_CONCURRENT_BOUNDARY_TASKS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities("userTask1", "userTask1")

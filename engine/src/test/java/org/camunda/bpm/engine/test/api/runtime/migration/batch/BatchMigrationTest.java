@@ -120,7 +120,7 @@ public class BatchMigrationTest {
 
   @Test
   public void testNullProcessInstanceIds() {
-    ProcessDefinition testProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition testProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -135,7 +135,7 @@ public class BatchMigrationTest {
 
   @Test
   public void testEmptyProcessInstanceIds() {
-    ProcessDefinition testProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition testProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -150,7 +150,7 @@ public class BatchMigrationTest {
 
   @Test
   public void testNullProcessInstanceQuery() {
-    ProcessDefinition testProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition testProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -165,7 +165,7 @@ public class BatchMigrationTest {
 
   @Test
   public void testEmptyProcessInstanceQuery() {
-    ProcessDefinition testProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition testProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -451,8 +451,8 @@ public class BatchMigrationTest {
     RuntimeService runtimeService = engineRule.getRuntimeService();
     int processInstanceCount = 15;
 
-    ProcessDefinition sourceProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     for (int i = 0; i < processInstanceCount; i++) {
       runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
@@ -480,8 +480,8 @@ public class BatchMigrationTest {
     RuntimeService runtimeService = engineRule.getRuntimeService();
     int processInstanceCount = 15;
 
-    ProcessDefinition sourceProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     List<String> processInstanceIds = new ArrayList<String>();
     for (int i = 0; i < processInstanceCount; i++) {

@@ -18,7 +18,6 @@ import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecution
 
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
@@ -43,8 +42,8 @@ public class MigrationSignalCatchEventTest {
   @Test
   public void testMigrateEventSubscription() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -79,8 +78,8 @@ public class MigrationSignalCatchEventTest {
   @Test
   public void testMigrateEventSubscriptionChangeActivityId() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(modify(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS)
         .changeElementId("signalCatch", "newSignalCatch"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -104,8 +103,8 @@ public class MigrationSignalCatchEventTest {
   @Test
   public void testMigrateEventSubscriptionChangeSignalName() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.newModel()
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.newModel()
         .startEvent()
         .intermediateCatchEvent("signalCatch")
           .signal("new" + SignalCatchModels.SIGNAL_NAME)
@@ -134,8 +133,8 @@ public class MigrationSignalCatchEventTest {
   @Test
   public void testMigrateJobAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(SignalCatchModels.SUBPROCESS_SIGNAL_CATCH_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(SignalCatchModels.SUBPROCESS_SIGNAL_CATCH_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
