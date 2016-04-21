@@ -22,6 +22,8 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventListenerJobDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerJobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
@@ -46,10 +48,12 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
 
   protected Map<String, TaskDefinition> taskDefinitions;
 
+  protected Map<String,TimerJobDeclaration<?>> timerJobDeclarationMap;
   // firstVersion is true, when version == 1 or when
   // this definition does not have any previous definitions
   protected boolean firstVersion = false;
   protected String previousCaseDefinitionId;
+
 
   public CaseDefinitionEntity() {
     super(null);
@@ -224,4 +228,11 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
     return "CaseDefinitionEntity["+id+"]";
   }
 
+  public Map<String, TimerJobDeclaration<?>> getTimerJobDeclarationMap() {
+    return timerJobDeclarationMap;
+  }
+
+  public void setTimerJobDeclarationMap(Map<String, TimerJobDeclaration<?>> timerJobDeclarationMap) {
+    this.timerJobDeclarationMap = timerJobDeclarationMap;
+  }
 }
