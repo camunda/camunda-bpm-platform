@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -188,23 +189,29 @@ public class FeelEngineTest {
     Set<Future<Date>> futureSet = new HashSet<Future<Date>>();
     Set<Date> expectedDates = new HashSet<Date>();
 
-    for(int i = 1; i <= threadCount; i++) {
+    for(int i = 1; i <= 3 * threadCount; i++) {
+      final String dateAndTimeString = "2015-12-12T22:12:5" + i;
+
       expectedDates.add(
-        FeelFunctionMapper.parseDateAndTime("2015-12-12T22:12:5" + i)
+        FeelFunctionMapper.parseDateAndTime(dateAndTimeString)
       );
 
-      Future<Date> future = pool.submit(new DateAndTimeParserThreadGenerator("2015-12-12T22:12:5" + i));
-      futureSet.add(future);
+      futureSet.add(pool.submit(new Callable<Date>() {
+        public Date call() throws Exception {
+          return FeelFunctionMapper.parseDateAndTime(dateAndTimeString);
+        }
+      }));
     }
+
+    pool.shutdown();
 
     Set<Date> actualDates = new HashSet<Date>();
     for( Future<Date> dateFuture : futureSet ) {
       actualDates.add(dateFuture.get());
     }
 
-    assertThat(actualDates).hasSameElementsAs(expectedDates);
 
-    pool.shutdown();
+    assertThat(actualDates).hasSameElementsAs(expectedDates);
   }
 
   @Test
