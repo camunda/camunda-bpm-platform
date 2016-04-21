@@ -26,10 +26,10 @@
         </td>
 
         <td class="activity">
-          <a cam-select-activity-instance="calledProcessInstance.instance.id"
+          <a ng-if="!!calledProcessInstance.instance" cam-select-activity-instance="calledProcessInstance.instance.id"
              ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=called-process-instances-tab&activityInstanceIds={{ calledProcessInstance.instance.id }}">
             {{ calledProcessInstance.instance.name }}
-          <a>
+          </a>
         </td>
       </tr>
     </tbody>
