@@ -97,11 +97,20 @@ Batch.prototype.loadDetails = function(id, type) {
   var obj = this._batches.selection;
   obj.state = 'LOADING';
   obj.type = type;
+  var self = this;
 
   var cb = (function(err, data) {
     if(err) {
-      obj.data = err.message;
-      obj.state = 'ERROR';
+      // if the runtime version of the batch was requested,
+      // try again with history (it may have finished in the meantime)
+      if(type === 'runtime') {
+        eventBus.emit('details:switchToHistory');
+        self.loadDetails(id, 'history');
+      } else {
+        eventBus.emit('load:details:failed');
+        obj.data = err.message;
+        obj.state = 'ERROR';
+      }
     } else {
       obj.data = data;
       obj.state = 'LOADED';

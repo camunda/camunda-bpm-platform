@@ -29,6 +29,10 @@ function(
     }
   });
 
+  events.on('details:switchToHistory', function() {
+    $location.search('type', 'history');
+  });
+
   require('../components/breadcrumbs')(page, $scope.$root);
 
   $scope.ctrl = new Ctrl(camAPI, events);
