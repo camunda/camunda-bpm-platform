@@ -228,6 +228,22 @@ var instancesTemplate = fs.readFileSync(__dirname + '/variable-instances-tab.htm
               item.instance = instance;
               variableCopies[item.id] = angular.copy(item);
 
+              // prevents the list to throw an error when the activity instance is missing
+              var activityInstanceLink = '';
+              if(!!instance) {
+                activityInstanceLink = '<a cam-select-activity-instance="\'' +
+                  instance.id +
+                  '\'" ng-href="#/process-instance/' +
+                  processInstance.id +
+                  '?detailsTab=variables-tab&activityInstanceIds=' +
+                  instance.id +
+                  '" title="' +
+                  instance.id +
+                  '">' +
+                  instance.name  +
+                  '</a>'
+              }
+
               return {
                 variable: {
                   id:           item.id,
@@ -240,17 +256,7 @@ var instancesTemplate = fs.readFileSync(__dirname + '/variable-instances-tab.htm
                 original: item,
                 additions: {
                   scope: {
-                    html:  '<a cam-select-activity-instance="\'' +
-                                      instance.id +
-                                      '\'" ng-href="#/process-instance/' +
-                                      processInstance.id +
-                                      '?detailsTab=variables-tab&activityInstanceIds=' +
-                                      instance.id +
-                                      '" title="' +
-                                      instance.id +
-                                      '">' +
-                                        instance.name  +
-                                      '</a>',
+                    html: activityInstanceLink,
                     scopeVariables: {
                       processData: $scope.processData
                     }

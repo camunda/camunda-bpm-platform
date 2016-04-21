@@ -145,7 +145,11 @@ var angular = require('angular');
       }
 
       $scope.getHref = function (userTask) {
-        return '#/process-instance/' + processInstance.id + '?detailsTab=user-tasks-tab&activityInstanceIds=' + userTask.instance.id;
+        if(!!userTask.instance) {
+          return '#/process-instance/' + processInstance.id + '?detailsTab=user-tasks-tab&activityInstanceIds=' + userTask.instance.id;
+        }
+
+        return '';
       };
 
       $scope.submitAssigneeChange = function(editForm, cb) {
