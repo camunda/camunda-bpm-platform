@@ -19,6 +19,7 @@ function(
   var events = new EventEmitter();
   $scope.$on('$destroy', function() {
     events.removeAllListeners();
+    $scope.ctrl.stopLoadingPeriodically();
   });
 
   $scope.$watch(function() {
@@ -36,5 +37,5 @@ function(
   require('../components/breadcrumbs')(page, $scope.$root);
 
   $scope.ctrl = new Ctrl(camAPI, events);
-  $scope.ctrl.load();
+  $scope.ctrl.loadPeriodically(5000);
 }];

@@ -11,13 +11,13 @@ var Batch = function(camAPI, eventBus) {
       state: 'INITIAL',
       currentPage: 1,
       count: 0,
-      data: []
+      data: null
     },
     history: {
       state: 'INITIAL',
       currentPage: 1,
       count: 0,
-      data: []
+      data: null
     },
     selection: {
       state: 'INITIAL',
@@ -92,6 +92,18 @@ Batch.prototype.load = function() {
   this._load('history');
 };
 
+Batch.prototype.loadPeriodically = function(interval) {
+  var self = this;
+  this.load();
+  this.intervalHandle = window.setInterval(function() {
+    self.load();
+  }, interval);
+};
+
+Batch.prototype.stopLoadingPeriodically = function() {
+  window.clearInterval(this.intervalHandle);
+};
+
 Batch.prototype.loadDetails = function(id, type) {
   var eventBus = this._eventBus;
   var obj = this._batches.selection;
@@ -161,7 +173,10 @@ Batch.prototype._loadFailedJobs = function(data) {
 Batch.prototype._load = function(type) {
   var eventBus = this._eventBus;
   var obj = this._batches[type];
-  obj.state = 'LOADING';
+
+  if(!obj.data) {
+    obj.state = 'LOADING';
+  }
 
   var params = {
     firstResult: (obj.currentPage - 1) * PAGE_SIZE,
