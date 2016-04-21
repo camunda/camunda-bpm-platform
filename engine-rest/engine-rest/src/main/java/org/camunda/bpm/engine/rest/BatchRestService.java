@@ -50,12 +50,13 @@ public interface BatchRestService {
   @GET
   @Path("/statistics")
   @Produces(MediaType.APPLICATION_JSON)
-  List<BatchStatisticsDto> getStatistics(@QueryParam("firstResult") Integer firstResult,
+  List<BatchStatisticsDto> getStatistics(@Context UriInfo uriInfo,
+                                         @QueryParam("firstResult") Integer firstResult,
                                          @QueryParam("maxResults") Integer maxResults);
 
   @GET
   @Path("/statistics/count")
   @Produces(MediaType.APPLICATION_JSON)
-  CountResultDto getStatisticsCount();
+  CountResultDto getStatisticsCount(@Context UriInfo uriInfo);
 
 }

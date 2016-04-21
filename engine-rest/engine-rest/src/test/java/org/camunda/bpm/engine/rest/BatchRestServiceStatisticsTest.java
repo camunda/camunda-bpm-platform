@@ -14,28 +14,38 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.camunda.bpm.engine.rest.BatchRestServiceQueryTest.BATCH_QUERY_COUNT_URL;
 import static org.camunda.bpm.engine.rest.util.JsonPathUtil.from;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.batch.BatchStatistics;
 import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.rest.dto.batch.BatchStatisticsDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
 
+import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 
 public class BatchRestServiceStatisticsTest extends AbstractRestServiceTest {
@@ -77,6 +87,55 @@ public class BatchRestServiceStatisticsTest extends AbstractRestServiceTest {
   }
 
   @Test
+  public void testUnknownQueryParameter() {
+    Response response = given()
+        .queryParam("unknown", "unknown")
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(BATCH_STATISTICS_URL);
+
+    verify(queryMock, never()).batchId(anyString());
+    verify(queryMock).list();
+    verifyNoMoreInteractions(queryMock);
+
+    verifyBatchStatisticsListJson(response.asString());
+  }
+
+  @Test
+  public void testBatchQueryByBatchId() {
+    Response response = given()
+        .queryParam("batchId", MockProvider.EXAMPLE_BATCH_ID)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(BATCH_STATISTICS_URL);
+
+    InOrder inOrder = inOrder(queryMock);
+    inOrder.verify(queryMock).batchId(MockProvider.EXAMPLE_BATCH_ID);
+    inOrder.verify(queryMock).list();
+    inOrder.verifyNoMoreInteractions();
+
+    verifyBatchStatisticsListJson(response.asString());
+  }
+
+  @Test
+  public void testFullBatchQuery() {
+    Response response = given()
+        .queryParams(getCompleteQueryParameters())
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(BATCH_STATISTICS_URL);
+
+    verifyQueryParameterInvocations();
+    verify(queryMock).list();
+    verifyNoMoreInteractions(queryMock);
+
+    verifyBatchStatisticsListJson(response.asString());
+  }
+
+  @Test
   public void testQueryCount() {
     given()
     .then().expect()
@@ -88,6 +147,22 @@ public class BatchRestServiceStatisticsTest extends AbstractRestServiceTest {
     verify(queryMock).count();
     verifyNoMoreInteractions(queryMock);
   }
+
+  @Test
+  public void testFullQueryCount() {
+    given()
+      .params(getCompleteQueryParameters())
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(1))
+    .when()
+      .get(BATCH_STATISTICS_COUNT_URL);
+
+    verifyQueryParameterInvocations();
+    verify(queryMock).count();
+    verifyNoMoreInteractions(queryMock);
+  }
+
 
   @Test
   public void testQueryPagination() {
@@ -107,6 +182,73 @@ public class BatchRestServiceStatisticsTest extends AbstractRestServiceTest {
     verifyNoMoreInteractions(queryMock);
 
     verifyBatchStatisticsListJson(response.asString());
+  }
+
+  @Test
+  public void testSortingParameters() {
+    InOrder inOrder = Mockito.inOrder(queryMock);
+    executeAndVerifySorting("batchId", "desc", Status.OK);
+    inOrder.verify(queryMock).orderById();
+    inOrder.verify(queryMock).desc();
+
+    inOrder = Mockito.inOrder(queryMock);
+    executeAndVerifySorting("batchId", "asc", Status.OK);
+    inOrder.verify(queryMock).orderById();
+    inOrder.verify(queryMock).asc();
+  }
+
+  @Test
+  public void testSortByParameterOnly() {
+    given()
+      .queryParam("sortBy", "batchId")
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type",
+        equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message",
+        equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
+    .when()
+      .get(BATCH_STATISTICS_URL);
+  }
+
+  @Test
+  public void testSortOrderParameterOnly() {
+    given()
+      .queryParam("sortOrder", "asc")
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type",
+        equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message",
+        equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
+    .when()
+      .get(BATCH_STATISTICS_URL);
+  }
+
+  protected Map<String, Object> getCompleteQueryParameters() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+
+    parameters.put("batchId", MockProvider.EXAMPLE_BATCH_ID);
+    parameters.put("type", MockProvider.EXAMPLE_BATCH_TYPE);
+
+    return parameters;
+  }
+
+  protected void verifyQueryParameterInvocations() {
+    verify(queryMock).batchId(MockProvider.EXAMPLE_BATCH_ID);
+    verify(queryMock).type(MockProvider.EXAMPLE_BATCH_TYPE);
+  }
+
+  protected void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
+    given()
+      .queryParam("sortBy", sortBy)
+      .queryParam("sortOrder", sortOrder)
+    .then().expect()
+      .statusCode(expectedStatus.getStatusCode())
+    .when()
+      .get(BATCH_STATISTICS_URL);
   }
 
   protected void verifyBatchStatisticsListJson(String batchStatisticsListJson) {
