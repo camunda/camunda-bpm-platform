@@ -139,7 +139,7 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
   public void testSetsTenantId() {
 
     String tenantId = TENANT_ID;
-    SetValueTenantIdProvider tenantIdProvider = new SetValueTenantIdProvider(tenantId);
+    StaticTenantIdTestProvider tenantIdProvider = new StaticTenantIdTestProvider(tenantId);
     TestTenantIdProvider.delegate = tenantIdProvider;
 
     deployment(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().userTask().done());
@@ -155,7 +155,7 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
   public void testSetNullTenantId() {
 
     String tenantId = null;
-    SetValueTenantIdProvider tenantIdProvider = new SetValueTenantIdProvider(tenantId);
+    StaticTenantIdTestProvider tenantIdProvider = new StaticTenantIdTestProvider(tenantId);
     TestTenantIdProvider.delegate = tenantIdProvider;
 
     deployment(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().userTask().done());
@@ -456,7 +456,7 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
   public void testSetsTenantIdForHistoricDecisionInstance() {
 
     String tenantId = TENANT_ID;
-    SetValueTenantIdProvider tenantIdProvider = new SetValueTenantIdProvider(tenantId);
+    StaticTenantIdTestProvider tenantIdProvider = new StaticTenantIdTestProvider(tenantId);
     TestTenantIdProvider.delegate = tenantIdProvider;
 
     deployment(DMN_FILE);
@@ -472,7 +472,7 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
   public void testSetNullTenantIdForHistoricDecisionInstance() {
 
     String tenantId = null;
-    SetValueTenantIdProvider tenantIdProvider = new SetValueTenantIdProvider(tenantId);
+    StaticTenantIdTestProvider tenantIdProvider = new StaticTenantIdTestProvider(tenantId);
     TestTenantIdProvider.delegate = tenantIdProvider;
 
     deployment(DMN_FILE);
@@ -678,7 +678,7 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
   public void testSetsTenantIdForCaseInstance() {
 
     String tenantId = TENANT_ID;
-    SetValueTenantIdProvider tenantIdProvider = new SetValueTenantIdProvider(tenantId);
+    StaticTenantIdTestProvider tenantIdProvider = new StaticTenantIdTestProvider(tenantId);
     TestTenantIdProvider.delegate = tenantIdProvider;
 
     deployment(CMMN_FILE);
@@ -694,7 +694,7 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
   public void testSetNullTenantIdForCaseInstance() {
 
     String tenantId = null;
-    SetValueTenantIdProvider tenantIdProvider = new SetValueTenantIdProvider(tenantId);
+    StaticTenantIdTestProvider tenantIdProvider = new StaticTenantIdTestProvider(tenantId);
     TestTenantIdProvider.delegate = tenantIdProvider;
 
     deployment(CMMN_FILE);
@@ -925,29 +925,6 @@ public class TenantIdProviderTest extends ResourceProcessEngineTestCase {
     public String provideTenantIdForCaseInstance(TenantIdProviderCaseInstanceContext ctx) {
       caseParameters.add(ctx);
       return null;
-    }
-
-  }
-
-  // sets constant tenant ids on process instances, case instances and historic decision instances
-  public static class SetValueTenantIdProvider implements TenantIdProvider {
-
-    private final String tenantIdToSet;
-
-    public SetValueTenantIdProvider(String tenantIdToSet) {
-      this.tenantIdToSet = tenantIdToSet;
-    }
-
-    public String provideTenantIdForProcessInstance(TenantIdProviderProcessInstanceContext ctx) {
-      return tenantIdToSet;
-    }
-
-    public String provideTenantIdForHistoricDecisionInstance(TenantIdProviderHistoricDecisionInstanceContext ctx) {
-      return tenantIdToSet;
-    }
-
-    public String provideTenantIdForCaseInstance(TenantIdProviderCaseInstanceContext ctx) {
-      return tenantIdToSet;
     }
 
   }

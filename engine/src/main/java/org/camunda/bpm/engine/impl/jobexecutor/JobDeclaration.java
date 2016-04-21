@@ -110,6 +110,13 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
       job.setPriority(priority);
     }
 
+    if (contextExecution != null) {
+      // in case of shared process definitions, the job definitions have no tenant id.
+      // To distinguish jobs between tenants and enable the tenant check for the job executor,
+      // use the tenant id from the execution.
+      job.setTenantId(contextExecution.getTenantId());
+    }
+
     postInitialize(context, job);
 
     return job;
