@@ -1967,26 +1967,4 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(caseInstanceId, variableInstance.getCaseInstanceId());
     assertEquals(humanTaskId, variableInstance.getCaseExecutionId());
   }
-
-  public void testGetIdentityLinkWithTenantId() {
-
-    // given
-    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
-    .startEvent()
-    .userTask("task").camundaCandidateUsers("aUserId")
-    .endEvent()
-    .done();
-    
-    deploymentForTenant("tenant", oneTaskProcess);
-    
-    ProcessInstance tenantProcessInstance = runtimeService.createProcessInstanceByKey("testProcess")
-    .processDefinitionTenantId("tenant")
-    .execute();
-    
-    Task tenantTask = taskService.createTaskQuery().processInstanceId(tenantProcessInstance.getId()).singleResult();
-    
-    List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(tenantTask.getId());
-    assertEquals(identityLinks.size(),1);
-    assertEquals(identityLinks.get(0).getTenantId(), "tenant");
-  }
 }

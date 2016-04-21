@@ -2,16 +2,21 @@ package org.camunda.bpm.engine.rest.history;
 
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response.Status;
+
+import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -232,7 +237,34 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_KEY, returnedProcessDefinitionKey);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TYPE, returnedType);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_OPERATION_TYPE, returnedOperationType);
-    Assert.assertEquals(MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TENANT_ID, returnedTenantId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
+  }
+
+  @Test
+  public void testQueryByTenantIds() {
+    mockedQuery = setUpMockHistoricIdentityLinkQuery(Arrays.asList(
+        MockProvider.createMockHistoricIdentityLink(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockHistoricIdentityLink(MockProvider.ANOTHER_EXAMPLE_TENANT_ID)));
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORY_IDENTITY_LINK_QUERY_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> executions = from(content).getList("");
+    assertThat(executions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
   }
 
   @Test
@@ -362,11 +394,11 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
 
   @Test
   public void testQueryByTenantId() {
-    String tenantId = MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TENANT_ID;
+    String tenantId = MockProvider.EXAMPLE_TENANT_ID;
 
-    given().queryParam("tenantId", tenantId).then().expect().statusCode(Status.OK.getStatusCode()).when().get(HISTORY_IDENTITY_LINK_QUERY_URL);
+    given().queryParam("tenantIdIn", tenantId).then().expect().statusCode(Status.OK.getStatusCode()).when().get(HISTORY_IDENTITY_LINK_QUERY_URL);
 
-    verify(mockedQuery).tenantId(tenantId);
+    verify(mockedQuery).tenantIdIn(tenantId);
   }
 
   @Test
@@ -393,7 +425,7 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
     parameters.put("processDefinitionId", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_ID);
     parameters.put("processDefinitionKey", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_PROC_DEFINITION_KEY);
     parameters.put("operationType", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_OPERATION_TYPE);
-    parameters.put("tenantId", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TENANT_ID);
+    parameters.put("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID);
     parameters.put("type", MockProvider.EXAMPLE_HIST_IDENTITY_LINK_TYPE);
     return parameters;
   }
@@ -409,7 +441,7 @@ public class HistoricIdentityLinkLogRestServiceQueryTest extends AbstractRestSer
     verify(mockedQuery).operationType(stringQueryParameters.get("operationType"));
     verify(mockedQuery).processDefinitionId(stringQueryParameters.get("processDefinitionId"));
     verify(mockedQuery).processDefinitionKey(stringQueryParameters.get("processDefinitionKey"));
-    verify(mockedQuery).tenantId(stringQueryParameters.get("tenantId"));
+    verify(mockedQuery).tenantIdIn(stringQueryParameters.get("tenantIdIn"));
     verify(mockedQuery).list();
   }
 }

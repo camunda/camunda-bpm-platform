@@ -124,12 +124,19 @@
       <if test="processDefinitionKey != null">
         and RES.PROC_DEF_KEY_ = #{processDefinitionKey}
       </if>
-      <if test="tenantId != null">
-        and RES.TENANT_ID_ = #{tenantId}
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
       </if>
       <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
         and ((RES.PROC_DEF_KEY_ is not null and AUTH.KEY_ is not null) or RES.PROC_DEF_KEY_ is null)
       </if>
+      
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+      
     </where>
   </sql>
 </mapper>

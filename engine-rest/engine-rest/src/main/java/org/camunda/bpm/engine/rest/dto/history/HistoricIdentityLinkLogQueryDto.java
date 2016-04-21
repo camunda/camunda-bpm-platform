@@ -12,6 +12,7 @@ import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -58,7 +59,7 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
   protected String processDefinitionKey;
   protected String operationType;
   protected String assignerId;
-  protected String tenantId;
+  protected List<String> tenantIds;
 
   public HistoricIdentityLinkLogQueryDto() {
   }
@@ -127,9 +128,9 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
     this.assignerId = assignerId;
   }
 
-  @CamundaQueryParam("tenantId")
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
   }
 
   @Override
@@ -164,8 +165,8 @@ public class HistoricIdentityLinkLogQueryDto extends AbstractQueryDto<HistoricId
     if (assignerId != null) {
       query.assignerId(assignerId);
     }
-    if (tenantId != null) {
-      query.tenantId(tenantId);
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
     }
   }
 

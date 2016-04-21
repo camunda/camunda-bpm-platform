@@ -41,7 +41,7 @@ public interface HistoricIdentityLinkLogQuery extends Query<HistoricIdentityLink
 	HistoricIdentityLinkLogQuery assignerId(String assignerId);
 	
 	/** Only select historic identity links which have the given tenant id. **/
-  HistoricIdentityLinkLogQuery tenantId(String tenantId);
+	HistoricIdentityLinkLogQuery tenantIdIn(String... tenantId);
 	
 	/** Order by time (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricIdentityLinkLogQuery orderByTime();
