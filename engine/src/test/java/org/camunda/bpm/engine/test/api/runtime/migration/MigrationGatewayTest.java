@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 import static org.camunda.bpm.engine.test.util.MigrationPlanValidationReportAssert.assertThat;
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
@@ -280,7 +280,7 @@ public class MigrationGatewayTest {
   }
 
   /**
-   * Ensures that situations are avoided in which more tokens end up at the target gatewa
+   * Ensures that situations are avoided in which more tokens end up at the target gateway
    * than it has incoming flows
    */
   @Test
@@ -306,7 +306,7 @@ public class MigrationGatewayTest {
   }
 
   /**
-   * Ensures that situations are avoided in which more tokens end up at the target gatewa
+   * Ensures that situations are avoided in which more tokens end up at the target gateway
    * than it has incoming flows
    */
   @Test
@@ -349,7 +349,7 @@ public class MigrationGatewayTest {
   }
 
   /**
-   * Ensures that situations are avoided in which more tokens end up at the target gatewa
+   * Ensures that situations are avoided in which more tokens end up at the target gateway
    * than it has incoming flows
    */
   @Test
@@ -374,7 +374,7 @@ public class MigrationGatewayTest {
   }
 
   /**
-   * Ensures that situations are avoided in which more tokens end up at the target gatewa
+   * Ensures that situations are avoided in which more tokens end up at the target gateway
    * than it has incoming flows
    */
   @Test
