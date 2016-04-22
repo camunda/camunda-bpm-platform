@@ -104,9 +104,6 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
-          <excludes>
-            <exclude>**/JsonSerializationTest.java</exclude>
-          </excludes>
         </configuration>
       </plugin>
     </plugins>
