@@ -17,8 +17,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineTestCase;
@@ -41,12 +39,6 @@ public class ProcessEngineTestCaseTest extends ProcessEngineTestCase {
 
     taskService.complete(task.getId());
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-
-    ProcessEngineConfigurationImpl configuration = ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration();
-
-    if (configuration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      assertEquals(1, historyService.createHistoricProcessInstanceQuery().count());
-    }
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
@@ -74,13 +66,6 @@ public class ProcessEngineTestCaseTest extends ProcessEngineTestCase {
 
   protected String currentHistoryLevel() {
     return processEngine.getProcessEngineConfiguration().getHistory();
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-    processEngine.close();
-    processEngine = null;
   }
 
 }
