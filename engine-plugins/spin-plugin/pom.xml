@@ -109,4 +109,25 @@
     </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <id>jdk-8-test-excludes</id>
+      <activation>
+        <jdk>1.8</jdk>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/SpinScriptTaskSupportWithAutoStoreScriptVariablesTest.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>
