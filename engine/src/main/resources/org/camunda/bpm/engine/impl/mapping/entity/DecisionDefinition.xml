@@ -208,6 +208,12 @@
           group by TENANT_ID_, KEY_) VER
         on RES.KEY_ = VER.KEY_
     </if>
+    
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, RES.KEY_, '*'))      
+    </if>
+    
     <where>
       <if test="id != null">
         RES.ID_ = #{id}

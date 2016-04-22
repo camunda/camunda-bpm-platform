@@ -68,12 +68,23 @@
 
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       left join ${prefix}ACT_RU_EXECUTION EXECUTION
-      on RES.EXECUTION_ID_ = EXECUTION.ID_
+      on EXECUTION.ID_ = RES.EXECUTION_ID_ 
+      
+      left join ${prefix}ACT_RE_PROCDEF EXEC_PROCDEF
+      on EXEC_PROCDEF.ID_ = EXECUTION.PROC_DEF_ID_
+      
+      left join ${prefix}ACT_RU_EXECUTION PROC_EXECUTION
+      on PROC_EXECUTION.ID_ = RES.PROC_INST_ID_
 
-      left join ${prefix}ACT_RE_PROCDEF PROCDEF
-      on EXECUTION.PROC_DEF_ID_ = PROCDEF.ID_
+      left join ${prefix}ACT_RE_PROCDEF PROC_PROCDEF
+      on PROC_PROCDEF.ID_ = PROC_EXECUTION.PROC_DEF_ID_
+      
+      <if test="!authCheck.revokeAuthorizationCheckEnabled">    
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+        AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, EXECUTION.ID_, EXEC_PROCDEF.KEY_, PROC_EXECUTION.ID_, PROC_PROCDEF.KEY_, '*'))      
+      </if>
     </if>
-
+    
     <where>
       <if test="eventSubscriptionId != null">
         RES.ID_ = #{eventSubscriptionId}

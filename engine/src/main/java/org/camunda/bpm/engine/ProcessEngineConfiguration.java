@@ -232,6 +232,8 @@ public abstract class ProcessEngineConfiguration {
 
   protected ValueTypeResolver valueTypeResolver;
 
+  protected boolean revokeAuthorizationCheckEnabled;
+
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
   }
@@ -688,5 +690,13 @@ public abstract class ProcessEngineConfiguration {
 
   public void setProducePrioritizedExternalTasks(boolean producePrioritizedExternalTasks) {
     this.producePrioritizedExternalTasks = producePrioritizedExternalTasks;
+  }
+
+  public boolean isRevokeAuthorizationCheckEnabled() {
+    return revokeAuthorizationCheckEnabled;
+  }
+
+  public void setRevokeAuthorizationCheckEnabled(boolean revokeAuthorizationCheckEnabled) {
+    this.revokeAuthorizationCheckEnabled = revokeAuthorizationCheckEnabled;
   }
 }

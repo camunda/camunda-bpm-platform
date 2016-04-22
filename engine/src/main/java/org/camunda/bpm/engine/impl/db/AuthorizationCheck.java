@@ -34,6 +34,12 @@ public class AuthorizationCheck implements Serializable {
    * only under certain circumstances.
    */
   protected boolean isAuthorizationCheckEnabled = false;
+  
+  /**
+   * Indicates if the revoke authorization checks are enabled or not.
+   * The authorization checks without checking revoke permissions are much more faster.
+   */
+  protected boolean isRevokeAuthorizationCheckEnabled = false;
 
   /** the id of the user to check permissions for */
   protected String authUserId;
@@ -47,6 +53,23 @@ public class AuthorizationCheck implements Serializable {
 
   protected CompositePermissionCheck permissionChecks = new CompositePermissionCheck();
 
+  public AuthorizationCheck() {
+  }
+
+  public AuthorizationCheck(String authUserId, List<String> authGroupIds, List<PermissionCheck> permissionChecks, boolean isRevokeAuthorizationCheckEnabled) {
+    this.authUserId = authUserId;
+    this.authGroupIds = authGroupIds;
+    this.permissionChecks.setAtomicChecks(permissionChecks);
+    this.isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled;    
+  }
+  
+  public AuthorizationCheck(String authUserId, List<String> authGroupIds, CompositePermissionCheck permissionCheck, boolean isRevokeAuthorizationCheckEnabled) {
+    this.authUserId = authUserId;
+    this.authGroupIds = authGroupIds;
+    this.permissionChecks = permissionCheck;
+    this.isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled;    
+  }
+  
   // getters / setters /////////////////////////////////////////
 
   public boolean isAuthorizationCheckEnabled() {
@@ -103,4 +126,13 @@ public class AuthorizationCheck implements Serializable {
   public void setPermissionChecks(CompositePermissionCheck permissionChecks) {
     this.permissionChecks = permissionChecks;
   }
+  
+  public boolean isRevokeAuthorizationCheckEnabled() {
+    return isRevokeAuthorizationCheckEnabled;
+  }
+
+  public void setRevokeAuthorizationCheckEnabled(boolean isRevokeAuthorizationCheckEnabled) {
+    this.isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled;
+  }
+
 }

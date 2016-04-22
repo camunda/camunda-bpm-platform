@@ -18,8 +18,6 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
-import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
-import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -52,9 +50,6 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
   protected boolean isByteArrayFetchingEnabled = true;
   protected boolean isCustomObjectDeserializationEnabled = true;
-
-  // its a workaround to check authorization for variable instances associated with a standalone tasks
-  protected CompositePermissionCheck taskPermissionChecks = new CompositePermissionCheck();
 
   public VariableInstanceQueryImpl() { }
 
@@ -254,19 +249,4 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   public String[] getActivityInstanceIds() {
     return activityInstanceIds;
   }
-
-  // getter/setter for authorization check
-
-  public CompositePermissionCheck getTaskPermissionChecks() {
-    return taskPermissionChecks;
-  }
-
-  public void setTaskPermissionChecks(List<PermissionCheck> taskPermissionChecks) {
-    this.taskPermissionChecks.setAtomicChecks(taskPermissionChecks);
-  }
-
-  public void addTaskPermissionCheck(PermissionCheck permissionCheck) {
-    taskPermissionChecks.addAtomicCheck(permissionCheck);
-  }
-
 }

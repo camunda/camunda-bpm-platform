@@ -141,6 +141,29 @@
     ${limitBefore}
     select RES.* ${limitBetween}
     from ${prefix}ACT_RU_EXT_TASK RES
+    
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+      AUTH ON (
+       (AUTH.RESOURCE_TYPE_ = 8 
+        AND AUTH.RESOURCE_ID_ in (RES.PROC_INST_ID_, '*') 
+        AND ${bitand1}AUTH.PERMS_${bitand2}2${bitand3} = 2)
+      OR
+       (AUTH.RESOURCE_TYPE_ = 6 
+        AND AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*') 
+        AND ${bitand1}AUTH.PERMS_${bitand2}512${bitand3} = 512) 
+      )
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+      AUTH1 ON (
+         (AUTH1.RESOURCE_TYPE_ = 8 
+          AND AUTH1.RESOURCE_ID_ in (RES.PROC_INST_ID_, '*') 
+          AND ${bitand1}AUTH1.PERMS_${bitand2}4${bitand3} = 4)         
+      OR
+         (AUTH1.RESOURCE_TYPE_ = 6 
+          AND AUTH1.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*') 
+          AND ${bitand1}AUTH1.PERMS_${bitand2}1024${bitand3} = 1024)
+      )    
+    </if>
     <where>
       (RES.LOCK_EXP_TIME_ is null or RES.LOCK_EXP_TIME_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
       and (RES.SUSPENSION_STATE_ is null or RES.SUSPENSION_STATE_ = 1)
@@ -178,6 +201,19 @@
   
   <sql id="selectExternalTaskByQueryCriteriaSql">
     from ${prefix}ACT_RU_EXT_TASK RES
+    
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+      AUTH ON (
+       (AUTH.RESOURCE_TYPE_ = 8 
+        AND AUTH.RESOURCE_ID_ in (RES.PROC_INST_ID_, '*') 
+        AND ${bitand1}AUTH.PERMS_${bitand2}2${bitand3} = 2)
+      OR
+       (AUTH.RESOURCE_TYPE_ = 6 
+        AND AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*') 
+        AND ${bitand1}AUTH.PERMS_${bitand2}512${bitand3} = 512) 
+      )
+    </if>
     <where>
       <if test="externalTaskId != null">
         and RES.ID_ = #{externalTaskId}

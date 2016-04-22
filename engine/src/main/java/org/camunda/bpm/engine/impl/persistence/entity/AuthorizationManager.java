@@ -12,25 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import static org.camunda.bpm.engine.authorization.Authorization.ANY;
-import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
-import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
-import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
-import static org.camunda.bpm.engine.authorization.Permissions.READ;
-import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
-import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
-import static org.camunda.bpm.engine.authorization.Permissions.READ_TASK;
-import static org.camunda.bpm.engine.authorization.Permissions.TASK_WORK;
-import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
-import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
-import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
-import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
-import static org.camunda.bpm.engine.authorization.Resources.BATCH;
-import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
-import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
-import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
-import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
-import static org.camunda.bpm.engine.authorization.Resources.TASK;
+import static org.camunda.bpm.engine.authorization.Authorization.*;
+import static org.camunda.bpm.engine.authorization.Permissions.*;
+import static org.camunda.bpm.engine.authorization.Resources.*;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
@@ -114,6 +98,14 @@ public class AuthorizationManager extends AbstractManager {
    * if for a given group no authorization exists in the DB, then auth checks are not performed for this group.
    */
   protected Set<String> availableAuthorizedGroupIds = null;
+
+  public PermissionCheck newPermissionCheck() {
+    return new PermissionCheck();
+  }
+
+  public PermissionCheckBuilder newPermissionCheckBuilder() {
+    return new PermissionCheckBuilder();
+  }
 
   public Authorization createNewAuthorization(int type) {
     checkAuthorization(CREATE, AUTHORIZATION, null);
@@ -271,7 +263,7 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   public boolean isAuthorized(String userId, List<String> groupIds, Permission permission, Resource resource, String resourceId) {
-    PermissionCheck permCheck = new PermissionCheck();
+    PermissionCheck permCheck = newPermissionCheck();
     permCheck.setPermission(permission);
     permCheck.setResource(resource);
     permCheck.setResourceId(resourceId);
@@ -289,20 +281,24 @@ public class AuthorizationManager extends AbstractManager {
 
     List<String> filteredGroupIds = filterAuthenticatedGroupIds(groupIds);
 
-    AuthorizationCheck authCheck = new AuthorizationCheck();
-    authCheck.setAuthUserId(userId);
-    authCheck.setAuthGroupIds(filteredGroupIds);
-    authCheck.setAtomicPermissionChecks(permissionChecks);
+    boolean isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled(userId, groupIds);
+    AuthorizationCheck authCheck = new AuthorizationCheck(userId, filteredGroupIds, permissionChecks, isRevokeAuthorizationCheckEnabled);
     return getDbEntityManager().selectBoolean("isUserAuthorizedForResource", authCheck);
+  }
+
+  protected boolean isRevokeAuthorizationCheckEnabled(String userId, List<String> groupIds) {
+    boolean isRevokeAuthorizationCheckEnabled = Context.getProcessEngineConfiguration().isRevokeAuthorizationCheckEnabled();
+    if(!isRevokeAuthorizationCheckEnabled) {
+      isRevokeAuthorizationCheckEnabled = existsRevokeAuthorizations(userId, groupIds);
+    }
+    return isRevokeAuthorizationCheckEnabled;
   }
 
   public boolean isAuthorized(String userId, List<String> groupIds, CompositePermissionCheck compositePermissionCheck) {
     List<String> filteredGroupIds = filterAuthenticatedGroupIds(groupIds);
 
-    AuthorizationCheck authCheck = new AuthorizationCheck();
-    authCheck.setAuthUserId(userId);
-    authCheck.setAuthGroupIds(filteredGroupIds);
-    authCheck.setPermissionChecks(compositePermissionCheck);
+    boolean isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled(userId, groupIds);
+    AuthorizationCheck authCheck = new AuthorizationCheck(userId, filteredGroupIds, compositePermissionCheck, isRevokeAuthorizationCheckEnabled);
     return getDbEntityManager().selectBoolean("isUserAuthorizedForResource", authCheck);
   }
 
@@ -336,6 +332,7 @@ public class AuthorizationManager extends AbstractManager {
 
       authCheck.setAuthUserId(currentUserId);
       authCheck.setAuthGroupIds(currentGroupIds);
+      authCheck.setRevokeAuthorizationCheckEnabled(existsRevokeAuthorizations(currentUserId, currentGroupIds));
     }
     else {
       authCheck.setAuthorizationCheckEnabled(false);
@@ -364,7 +361,7 @@ public class AuthorizationManager extends AbstractManager {
   protected void addPermissionCheck(ListQueryParameterObject query, Resource resource, String queryParam, Permission permission) {
     CommandContext commandContext = getCommandContext();
     if (isAuthorizationEnabled() && getCurrentAuthentication() != null && commandContext.isAuthorizationCheckEnabled()) {
-      PermissionCheck permCheck = new PermissionCheck();
+      PermissionCheck permCheck = newPermissionCheck();
       permCheck.setResource(resource);
       permCheck.setResourceIdQueryParam(queryParam);
       permCheck.setPermission(permission);
@@ -464,7 +461,7 @@ public class AuthorizationManager extends AbstractManager {
     // necessary permissions:
     // - READ on PROCESS_INSTANCE
 
-    PermissionCheck firstCheck = new PermissionCheck();
+    PermissionCheck firstCheck = newPermissionCheck();
     firstCheck.setPermission(READ);
     firstCheck.setResource(PROCESS_INSTANCE);
     firstCheck.setResourceId(job.getProcessInstanceId());
@@ -472,7 +469,7 @@ public class AuthorizationManager extends AbstractManager {
     // ... OR ...
 
     // - READ_INSTANCE on PROCESS_DEFINITION
-    PermissionCheck secondCheck = new PermissionCheck();
+    PermissionCheck secondCheck = newPermissionCheck();
     secondCheck.setPermission(READ_INSTANCE);
     secondCheck.setResource(PROCESS_DEFINITION);
     secondCheck.setResourceId(job.getProcessDefinitionKey());
@@ -492,6 +489,7 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   // update permission //////////////////////////////////////////////////
+
   public void checkUpdateProcessInstance(JobEntity job) {
     if (job.getProcessDefinitionKey() == null) {
       // "standalone" job: nothing to do!
@@ -501,7 +499,7 @@ public class AuthorizationManager extends AbstractManager {
     // necessary permissions:
     // - READ on PROCESS_INSTANCE
 
-    PermissionCheck firstCheck = new PermissionCheck();
+    PermissionCheck firstCheck = newPermissionCheck();
     firstCheck.setPermission(UPDATE);
     firstCheck.setResource(PROCESS_INSTANCE);
     firstCheck.setResourceId(job.getProcessInstanceId());
@@ -509,7 +507,7 @@ public class AuthorizationManager extends AbstractManager {
     // ... OR ...
 
     // - UPDATE_INSTANCE on PROCESS_DEFINITION
-    PermissionCheck secondCheck = new PermissionCheck();
+    PermissionCheck secondCheck = newPermissionCheck();
     secondCheck.setPermission(UPDATE_INSTANCE);
     secondCheck.setResource(PROCESS_DEFINITION);
     secondCheck.setResourceId(job.getProcessDefinitionKey());
@@ -548,12 +546,13 @@ public class AuthorizationManager extends AbstractManager {
       ExecutionEntity execution = task.getExecution();
       ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
 
-      PermissionCheck readPermissionCheck = new PermissionCheck();
+
+      PermissionCheck readPermissionCheck = newPermissionCheck();
       readPermissionCheck.setPermission(READ);
       readPermissionCheck.setResource(TASK);
       readPermissionCheck.setResourceId(taskId);
 
-      PermissionCheck readTaskPermissionCheck = new PermissionCheck();
+      PermissionCheck readTaskPermissionCheck = newPermissionCheck();
       readTaskPermissionCheck.setPermission(READ_TASK);
       readTaskPermissionCheck.setResource(PROCESS_DEFINITION);
       readTaskPermissionCheck.setResourceId(processDefinition.getKey());
@@ -582,6 +581,54 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   // update permission ////////////////////////////////////////////
+
+  public void checkUpdateTask(TaskEntity task) {
+    String taskId = task.getId();
+
+    String executionId = task.getExecutionId();
+    if (executionId != null) {
+
+      // if task exists in context of a process instance
+      // then check the following permissions:
+      // - UPDATE on TASK
+      // - UPDATE_TASK on PROCESS_DEFINITION
+
+      ExecutionEntity execution = task.getExecution();
+      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+
+      PermissionCheck updatePermissionCheck = newPermissionCheck();
+      updatePermissionCheck.setPermission(UPDATE);
+      updatePermissionCheck.setResource(TASK);
+      updatePermissionCheck.setResourceId(taskId);
+
+      PermissionCheck updateTaskPermissionCheck = newPermissionCheck();
+      updateTaskPermissionCheck.setPermission(UPDATE_TASK);
+      updateTaskPermissionCheck.setResource(PROCESS_DEFINITION);
+      updateTaskPermissionCheck.setResourceId(processDefinition.getKey());
+      updateTaskPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+
+      checkAuthorization(updatePermissionCheck, updateTaskPermissionCheck);
+
+    } else {
+
+      // if task does not exist in context of process
+      // instance, then it is either a (a) standalone task
+      // or (b) it exists in context of a case instance.
+
+      // (a) standalone task: check following permission
+      // - READ on TASK
+      // (b) task in context of a case instance, in this
+      // case it is not necessary to check any permission,
+      // because such tasks can always be updated
+
+      String caseExecutionId = task.getCaseExecutionId();
+      if (caseExecutionId == null) {
+        // standalone task
+        checkAuthorization(UPDATE, TASK, taskId);
+      }
+
+    }
+  }
 
   public void checkTaskWork(TaskEntity task) {
 
@@ -620,6 +667,51 @@ public class AuthorizationManager extends AbstractManager {
         CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
             .disjunctive()
             .atomicCheckForResourceId(TASK, taskId, TASK_WORK)
+            .atomicCheckForResourceId(TASK, taskId, UPDATE)
+          .build();
+
+          checkAuthorization(taskWorkPermission);
+      }
+    }
+  }
+
+  public void checkTaskAssign(TaskEntity task) {
+
+    String taskId = task.getId();
+
+    String executionId = task.getExecutionId();
+    if (executionId != null) {
+
+      // Permissions to task actions is based on the order in which PermissioncheckBuilder is built
+      CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
+        .disjunctive()
+          .atomicCheckForResourceId(TASK, taskId, TASK_ASSIGN)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), TASK_ASSIGN)
+          .atomicCheckForResourceId(TASK, taskId, UPDATE)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), UPDATE_TASK)
+        .build();
+
+      checkAuthorization(taskWorkPermission);
+
+    }
+    else {
+
+      // if task does not exist in context of process
+      // instance, then it is either a (a) standalone task
+      // or (b) it exists in context of a case instance.
+
+      // (a) standalone task: check following permission
+      // - TASK_ASSIGN or UPDATE
+      // (b) task in context of a case instance, in this
+      // case it is not necessary to check any permission,
+      // because such tasks can always be updated
+
+      String caseExecutionId = task.getCaseExecutionId();
+      if (caseExecutionId == null) {
+        // standalone task
+        CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
+            .disjunctive()
+            .atomicCheckForResourceId(TASK, taskId, TASK_ASSIGN)
             .atomicCheckForResourceId(TASK, taskId, UPDATE)
           .build();
 
@@ -681,7 +773,6 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureTaskQuery(TaskQueryImpl query) {
     query.getAuthCheck().getPermissionChecks().clear();
-    query.getTaskPermissionChecks().clear();
 
     Authentication currentAuthentication = getCurrentAuthentication();
     CommandContext commandContext = getCommandContext();
@@ -690,18 +781,14 @@ public class AuthorizationManager extends AbstractManager {
       // necessary authorization check when the task is part of
       // a running process instance
       configureQuery(query);
-      addPermissionCheck(query, TASK, "RES.ID_", READ);
-      addPermissionCheck(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_TASK);
 
-      // necessary authorization check when the task is not part
-      // of running process or case instance
-      PermissionCheck standaloneTaskPermissionCheck = new PermissionCheck();
-      standaloneTaskPermissionCheck.setPermission(READ);
-      standaloneTaskPermissionCheck.setResource(TASK);
-      standaloneTaskPermissionCheck.setResourceIdQueryParam("RES.ID_");
-      standaloneTaskPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
-      query.addTaskPermissionCheck(standaloneTaskPermissionCheck);
+      CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+              .disjunctive()
+              .atomicCheck(TASK, "RES.ID_", READ)
+              .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_TASK)
+              .build();
+        addPermissionCheck(query.getAuthCheck(), permissionCheck);
     }
   }
 
@@ -725,27 +812,20 @@ public class AuthorizationManager extends AbstractManager {
 
   protected void configureVariableInstanceQuery(VariableInstanceQueryImpl query) {
     query.getAuthCheck().getPermissionChecks().clear();
-    query.getTaskPermissionChecks().clear();
 
     Authentication currentAuthentication = getCurrentAuthentication();
     CommandContext commandContext = getCommandContext();
     if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
-      // necessary authorization check when the variable instance is part of
-      // a running process instance
       configureQuery(query);
-      addPermissionCheck(query, PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ);
-      addPermissionCheck(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE);
 
-      // necessary authorization check when the variable instance is part
-      // of a standalone task
-      PermissionCheck taskPermissionCheck = new PermissionCheck();
-      taskPermissionCheck.setResource(TASK);
-      taskPermissionCheck.setPermission(READ);
-      taskPermissionCheck.setResourceIdQueryParam("RES.TASK_ID_");
-      taskPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
-
-      query.addTaskPermissionCheck(taskPermissionCheck);
+      CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+              .disjunctive()
+              .atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ)
+              .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE)
+              .atomicCheck(TASK, "RES.TASK_ID_", READ)
+              .build();
+        addPermissionCheck(query.getAuthCheck(), permissionCheck);
     }
   }
 
@@ -843,12 +923,12 @@ public class AuthorizationManager extends AbstractManager {
 
     if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
-      PermissionCheck firstProcessInstancePermissionCheck = new PermissionCheck();
+      PermissionCheck firstProcessInstancePermissionCheck = newPermissionCheck();
       firstProcessInstancePermissionCheck.setResource(PROCESS_INSTANCE);
       firstProcessInstancePermissionCheck.setPermission(READ);
       firstProcessInstancePermissionCheck.setResourceIdQueryParam("EXECUTION.PROC_INST_ID_");
 
-      PermissionCheck secondProcessInstancePermissionCheck = new PermissionCheck();
+      PermissionCheck secondProcessInstancePermissionCheck = newPermissionCheck();
       secondProcessInstancePermissionCheck.setResource(PROCESS_DEFINITION);
       secondProcessInstancePermissionCheck.setPermission(READ_INSTANCE);
       secondProcessInstancePermissionCheck.setResourceIdQueryParam("PROCDEF.KEY_");
@@ -858,12 +938,12 @@ public class AuthorizationManager extends AbstractManager {
       query.addProcessInstancePermissionCheck(secondProcessInstancePermissionCheck);
 
       if (query.isFailedJobsToInclude()) {
-        PermissionCheck firstJobPermissionCheck = new PermissionCheck();
+        PermissionCheck firstJobPermissionCheck = newPermissionCheck();
         firstJobPermissionCheck.setResource(PROCESS_INSTANCE);
         firstJobPermissionCheck.setPermission(READ);
         firstJobPermissionCheck.setResourceIdQueryParam("JOB.PROCESS_INSTANCE_ID_");
 
-        PermissionCheck secondJobPermissionCheck = new PermissionCheck();
+        PermissionCheck secondJobPermissionCheck = newPermissionCheck();
         secondJobPermissionCheck.setResource(PROCESS_DEFINITION);
         secondJobPermissionCheck.setPermission(READ_INSTANCE);
         secondJobPermissionCheck.setResourceIdQueryParam("JOB.PROCESS_DEF_KEY_");
@@ -874,12 +954,12 @@ public class AuthorizationManager extends AbstractManager {
       }
 
       if (query.isIncidentsToInclude()) {
-        PermissionCheck firstIncidentPermissionCheck = new PermissionCheck();
+        PermissionCheck firstIncidentPermissionCheck = newPermissionCheck();
         firstIncidentPermissionCheck.setResource(PROCESS_INSTANCE);
         firstIncidentPermissionCheck.setPermission(READ);
         firstIncidentPermissionCheck.setResourceIdQueryParam("INC.PROC_INST_ID_");
 
-        PermissionCheck secondIncidentPermissionCheck = new PermissionCheck();
+        PermissionCheck secondIncidentPermissionCheck = newPermissionCheck();
         secondIncidentPermissionCheck.setResource(PROCESS_DEFINITION);
         secondIncidentPermissionCheck.setPermission(READ_INSTANCE);
         secondIncidentPermissionCheck.setResourceIdQueryParam("PROCDEF.KEY_");
@@ -908,12 +988,12 @@ public class AuthorizationManager extends AbstractManager {
 
     if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
-      PermissionCheck firstProcessInstancePermissionCheck = new PermissionCheck();
+      PermissionCheck firstProcessInstancePermissionCheck = newPermissionCheck();
       firstProcessInstancePermissionCheck.setResource(PROCESS_INSTANCE);
       firstProcessInstancePermissionCheck.setPermission(READ);
       firstProcessInstancePermissionCheck.setResourceIdQueryParam("E.PROC_INST_ID_");
 
-      PermissionCheck secondProcessInstancePermissionCheck = new PermissionCheck();
+      PermissionCheck secondProcessInstancePermissionCheck = newPermissionCheck();
       secondProcessInstancePermissionCheck.setResource(PROCESS_DEFINITION);
       secondProcessInstancePermissionCheck.setPermission(READ_INSTANCE);
       secondProcessInstancePermissionCheck.setResourceIdQueryParam("P.KEY_");
@@ -923,12 +1003,12 @@ public class AuthorizationManager extends AbstractManager {
       query.addProcessInstancePermissionCheck(secondProcessInstancePermissionCheck);
 
       if (query.isFailedJobsToInclude()) {
-        PermissionCheck firstJobPermissionCheck = new PermissionCheck();
+        PermissionCheck firstJobPermissionCheck = newPermissionCheck();
         firstJobPermissionCheck.setResource(PROCESS_INSTANCE);
         firstJobPermissionCheck.setPermission(READ);
         firstJobPermissionCheck.setResourceIdQueryParam("JOB.PROCESS_INSTANCE_ID_");
 
-        PermissionCheck secondJobPermissionCheck = new PermissionCheck();
+        PermissionCheck secondJobPermissionCheck = newPermissionCheck();
         secondJobPermissionCheck.setResource(PROCESS_DEFINITION);
         secondJobPermissionCheck.setPermission(READ_INSTANCE);
         secondJobPermissionCheck.setResourceIdQueryParam("JOB.PROCESS_DEF_KEY_");
@@ -939,12 +1019,12 @@ public class AuthorizationManager extends AbstractManager {
       }
 
       if (query.isIncidentsToInclude()) {
-        PermissionCheck firstIncidentPermissionCheck = new PermissionCheck();
+        PermissionCheck firstIncidentPermissionCheck = newPermissionCheck();
         firstIncidentPermissionCheck.setResource(PROCESS_INSTANCE);
         firstIncidentPermissionCheck.setPermission(READ);
         firstIncidentPermissionCheck.setResourceIdQueryParam("I.PROC_INST_ID_");
 
-        PermissionCheck secondIncidentPermissionCheck = new PermissionCheck();
+        PermissionCheck secondIncidentPermissionCheck = newPermissionCheck();
         secondIncidentPermissionCheck.setResource(PROCESS_DEFINITION);
         secondIncidentPermissionCheck.setPermission(READ_INSTANCE);
         secondIncidentPermissionCheck.setResourceIdQueryParam("PROCDEF.KEY_");
@@ -966,7 +1046,7 @@ public class AuthorizationManager extends AbstractManager {
   public void configureExternalTaskFetch(ListQueryParameterObject parameter) {
     configureQuery(parameter);
 
-    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+    CompositePermissionCheck permissionCheck = newPermissionCheckBuilder()
       .conjunctive()
       .composite()
         .disjunctive()
@@ -1011,5 +1091,10 @@ public class AuthorizationManager extends AbstractManager {
     }
   }
 
-
+  private boolean existsRevokeAuthorizations(String userId, List<String> authGroupIds) {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("userId", userId);
+    params.put("authGroupIds", authGroupIds);
+    return getDbEntityManager().selectBoolean("selectRevokeAuthorization", params);
+  }
 }

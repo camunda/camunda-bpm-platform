@@ -57,7 +57,7 @@
   <select id="selectUserByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.UserQueryImpl" resultMap="userResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select DISTINCT RES.* 
     ${limitBetween}
     <include refid="selectUserByQueryCriteriaSql" />
     ${orderBy}
@@ -65,7 +65,7 @@
   </select>
   
    <select id="selectUserCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.UserQueryImpl" resultType="long">
-    select count(RES.ID_)
+    select count(DISTINCT RES.ID_)
     <include refid="selectUserByQueryCriteriaSql" />
   </select>
   
@@ -78,6 +78,9 @@
     <if test="tenantId != null">
       inner join ${prefix}ACT_ID_TENANT_MEMBER TM on RES.ID_ = TM.USER_ID_
     </if>
+    
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" /> 
+    
     <where>
       <if test="id != null">
         RES.ID_ = #{id}

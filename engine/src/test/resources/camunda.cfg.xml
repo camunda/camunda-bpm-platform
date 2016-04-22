@@ -39,6 +39,7 @@
 
     <property name="failedJobCommandFactory" ref="foxFailedJobCommandFactory" />
 
+    <property name="revokeAuthorizationCheckEnabled" value="${revokeAuthorizationCheckEnabled}"/>
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 	
   </bean>

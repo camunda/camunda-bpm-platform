@@ -25,8 +25,6 @@ import java.util.Set;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
-import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
@@ -108,9 +106,6 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String caseInstanceBusinessKey;
   protected String caseInstanceBusinessKeyLike;
   protected String caseExecutionId;
-
-  // its a workaround to check authorization for standalone tasks
-  protected CompositePermissionCheck taskPermissionChecks = new CompositePermissionCheck();
 
   public TaskQueryImpl() {
   }
@@ -1764,19 +1759,4 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public boolean isFollowUpNullAccepted() {
     return followUpNullAccepted;
   }
-
-  // getter/setter for authorization check
-
-  public CompositePermissionCheck getTaskPermissionChecks() {
-    return taskPermissionChecks;
-  }
-
-  public void setTaskPermissionChecks(List<PermissionCheck> taskPermissionChecks) {
-    this.taskPermissionChecks.setAtomicChecks(taskPermissionChecks);
-  }
-
-  public void addTaskPermissionCheck(PermissionCheck permissionCheck) {
-    taskPermissionChecks.addAtomicCheck(permissionCheck);
-  }
-
 }

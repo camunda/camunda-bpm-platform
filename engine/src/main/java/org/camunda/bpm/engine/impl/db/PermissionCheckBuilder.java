@@ -18,8 +18,6 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
-import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
-import org.camunda.bpm.engine.impl.db.PermissionCheck;
 
 /**
  * @author Thorben Lindhauer
@@ -34,7 +32,6 @@ public class PermissionCheckBuilder {
   protected PermissionCheckBuilder parent;
 
   public PermissionCheckBuilder() {
-
   }
 
   public PermissionCheckBuilder(PermissionCheckBuilder parent) {

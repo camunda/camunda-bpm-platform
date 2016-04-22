@@ -151,7 +151,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     // then
-    verifyQueryResults(query, 0);
+    verifyQueryResults(query, 1);
   }
 
   public void testProcessLocalTaskVariableQueryWithReadPermissionOnProcessInstance() {

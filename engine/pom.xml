@@ -214,6 +214,7 @@
     <test.excludes>$.</test.excludes>
     <history.level>full</history.level>
     <mail.server.port>5025</mail.server.port>
+    <revokeAuthorizationCheckEnabled>false</revokeAuthorizationCheckEnabled>
 
     <camunda.artifact>
       org.camunda.bpm
@@ -530,6 +531,13 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    
+    <profile>
+      <id>enableRevokeAuthorizationCheck</id>
+      <properties>
+        <revokeAuthorizationCheckEnabled>true</revokeAuthorizationCheckEnabled>
+      </properties>
     </profile>
 
     <profile>

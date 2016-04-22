@@ -166,15 +166,18 @@
               PROCDEF.ID_ = INC.PROC_DEF_ID_
           </if>
 
-          <where>
-            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
-          </where>
+    
 
         ) RES
 
-        <where>
-           <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
-        </where>
+      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+        AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, RES.KEY_, '*'))      
+      </if>
+      <where>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+      </where>
   </sql>
 
   <!-- Deployment statistics -->
@@ -198,6 +201,7 @@
   <sql id="selectDeploymentStatisticsByQueryCriteriaSql">
     <bind name="authUserId" value="authCheck.authUserId" />
     <bind name="authGroupIds" value="authCheck.authGroupIds" />
+    <bind name="revokeAuthorizationCheckEnabled" value="authCheck.revokeAuthorizationCheckEnabled" />
   
     from (
             select
@@ -301,7 +305,7 @@
                       and INC.INCIDENT_TYPE_ = #{includeIncidentsForType}
                       </if>
 
-                    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+                      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
                     and
                         (
                         <foreach item="permCheck" collection="incidentPermissionChecks" separator=",">
@@ -321,14 +325,15 @@
                  DEPLOYMENT.ID_ = INC.DEPLOYMENT_ID_
             </if>
 
-            <where>
-              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
-            </where>
+    
 
           ) RES
 
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" /> 
+    
           <where>
-             <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
           </where>
   </sql>
 
@@ -354,6 +359,7 @@
   <sql id="selectActivityStatisticsByQueryCriteriaSql">
     <bind name="authUserId" value="authCheck.authUserId" />
     <bind name="authGroupIds" value="authCheck.authGroupIds" />
+    <bind name="revokeAuthorizationCheckEnabled" value="authCheck.revokeAuthorizationCheckEnabled" />
     
     from ( select ACTID.ACT_ID_ as ID_,
         INSTANCE.INSTANCE_COUNT_

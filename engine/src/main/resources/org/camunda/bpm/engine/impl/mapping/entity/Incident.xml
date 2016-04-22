@@ -170,6 +170,7 @@
               <bind name="authUserId" value="authCheck.authUserId" />
               <bind name="authGroupIds" value="authCheck.authGroupIds" />
               <bind name="permissionChecks" value="authCheck.permissionChecks" />
+              <bind name="revokeAuthorizationCheckEnabled" value="authCheck.revokeAuthorizationCheckEnabled" />
               <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
 
             ELSE

@@ -68,7 +68,7 @@
   <select id="selectGroupByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.GroupQueryImpl" resultMap="groupResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select DISTINCT RES.* 
     ${limitBetween}
     <include refid="selectGroupByQueryCriteriaSql" />
     ${orderBy}
@@ -76,7 +76,7 @@
   </select>
   
    <select id="selectGroupCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.GroupQueryImpl" resultType="long">
-    select count(RES.ID_)
+    select count(DISTINCT RES.ID_)
     <include refid="selectGroupByQueryCriteriaSql" />
   </select>
   
@@ -89,6 +89,9 @@
     <if test="tenantId != null">
       inner join ${prefix}ACT_ID_TENANT_MEMBER TM on RES.ID_ = TM.GROUP_ID_
     </if>
+
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" /> 
+
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
