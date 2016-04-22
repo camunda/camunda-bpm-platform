@@ -101,6 +101,12 @@
       <if test="type != null">
         and RES.TYPE_ = #{type}
       </if>
+      <if test="completed != null &amp;&amp; completed">
+        and RES.END_TIME_ is not null
+      </if>
+      <if test="completed != null &amp;&amp; !completed">
+        and RES.END_TIME_ is null
+      </if>
     </where>
   </sql>
 

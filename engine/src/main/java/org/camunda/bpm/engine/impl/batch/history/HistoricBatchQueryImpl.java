@@ -30,6 +30,7 @@ public class HistoricBatchQueryImpl extends AbstractQuery<HistoricBatchQuery, Hi
 
   protected String batchId;
   protected String type;
+  protected Boolean completed;
 
   public HistoricBatchQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -51,12 +52,25 @@ public class HistoricBatchQueryImpl extends AbstractQuery<HistoricBatchQuery, Hi
     return this;
   }
 
+  public HistoricBatchQuery completed(boolean completed) {
+    this.completed = completed;
+    return this;
+  }
+
   public String getType() {
     return type;
   }
 
   public HistoricBatchQuery orderById() {
     return orderBy(HistoricBatchQueryProperty.ID);
+  }
+
+  public HistoricBatchQuery orderByStartTime() {
+    return orderBy(HistoricBatchQueryProperty.START_TIME);
+  }
+
+  public HistoricBatchQuery orderByEndTime() {
+    return orderBy(HistoricBatchQueryProperty.END_TIME);
   }
 
   @Override

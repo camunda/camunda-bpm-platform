@@ -147,6 +147,40 @@ public class HistoricBatchRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
+  public void testHistoricBatchQueryByCompleted() {
+    Response response = given()
+      .queryParam("completed", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_BATCH_RESOURCE_URL);
+
+    InOrder inOrder = inOrder(queryMock);
+    inOrder.verify(queryMock).completed(true);
+    inOrder.verify(queryMock).list();
+    inOrder.verifyNoMoreInteractions();
+
+    verifyHistoricBatchListJson(response.asString());
+  }
+
+  @Test
+  public void testHistoricBatchQueryByNotCompleted() {
+    Response response = given()
+      .queryParam("completed", false)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_BATCH_RESOURCE_URL);
+
+    InOrder inOrder = inOrder(queryMock);
+    inOrder.verify(queryMock).completed(false);
+    inOrder.verify(queryMock).list();
+    inOrder.verifyNoMoreInteractions();
+
+    verifyHistoricBatchListJson(response.asString());
+  }
+
+  @Test
   public void testFullHistoricBatchQuery() {
     Response response = given()
         .queryParams(getCompleteQueryParameters())
@@ -200,6 +234,26 @@ public class HistoricBatchRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder = Mockito.inOrder(queryMock);
     executeAndVerifySorting("batchId", "asc", Status.OK);
     inOrder.verify(queryMock).orderById();
+    inOrder.verify(queryMock).asc();
+
+    inOrder = Mockito.inOrder(queryMock);
+    executeAndVerifySorting("startTime", "desc", Status.OK);
+    inOrder.verify(queryMock).orderByStartTime();
+    inOrder.verify(queryMock).desc();
+
+    inOrder = Mockito.inOrder(queryMock);
+    executeAndVerifySorting("startTime", "asc", Status.OK);
+    inOrder.verify(queryMock).orderByStartTime();
+    inOrder.verify(queryMock).asc();
+
+    inOrder = Mockito.inOrder(queryMock);
+    executeAndVerifySorting("endTime", "desc", Status.OK);
+    inOrder.verify(queryMock).orderByEndTime();
+    inOrder.verify(queryMock).desc();
+
+    inOrder = Mockito.inOrder(queryMock);
+    executeAndVerifySorting("endTime", "asc", Status.OK);
+    inOrder.verify(queryMock).orderByEndTime();
     inOrder.verify(queryMock).asc();
   }
 

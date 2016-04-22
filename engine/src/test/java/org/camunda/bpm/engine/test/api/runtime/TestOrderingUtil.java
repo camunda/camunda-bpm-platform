@@ -601,6 +601,30 @@ public class TestOrderingUtil {
     };
   }
 
+  public static NullTolerantComparator<HistoricBatch> historicBatchByStartTime() {
+    return new NullTolerantComparator<HistoricBatch>() {
+      public int compare(HistoricBatch o1, HistoricBatch o2) {
+        return o1.getStartTime().compareTo(o2.getStartTime());
+      }
+
+      public boolean hasNullProperty(HistoricBatch object) {
+        return false;
+      }
+    };
+  }
+
+  public static NullTolerantComparator<HistoricBatch> historicBatchByEndTime() {
+    return new NullTolerantComparator<HistoricBatch>() {
+      public int compare(HistoricBatch o1, HistoricBatch o2) {
+        return o1.getEndTime().compareTo(o2.getEndTime());
+      }
+
+      public boolean hasNullProperty(HistoricBatch object) {
+        return true;
+      }
+    };
+  }
+
   public static NullTolerantComparator<BatchStatistics> batchStatisticsById() {
     return new NullTolerantComparator<BatchStatistics>() {
       public int compare(BatchStatistics o1, BatchStatistics o2) {

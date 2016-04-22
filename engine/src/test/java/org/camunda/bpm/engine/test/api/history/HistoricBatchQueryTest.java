@@ -12,9 +12,13 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicBatchByEndTime;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicBatchById;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicBatchByStartTime;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
+import static org.camunda.bpm.model.cmmn.PlanItemTransition.complete;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,6 +36,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
 import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Assert;
@@ -85,7 +90,7 @@ public class HistoricBatchQueryTest {
     List<HistoricBatch> list = historyService.createHistoricBatchQuery().list();
 
     // then
-    Assert.assertEquals(2, list.size());
+    assertEquals(2, list.size());
 
     List<String> batchIds = new ArrayList<String>();
     for (HistoricBatch resultBatch : list) {
@@ -116,17 +121,17 @@ public class HistoricBatchQueryTest {
     // then
     Assert.assertNotNull(batch);
 
-    Assert.assertEquals(batch.getId(), resultBatch.getId());
-    Assert.assertEquals(batch.getBatchJobDefinitionId(), resultBatch.getBatchJobDefinitionId());
-    Assert.assertEquals(batch.getMonitorJobDefinitionId(), resultBatch.getMonitorJobDefinitionId());
-    Assert.assertEquals(batch.getSeedJobDefinitionId(), resultBatch.getSeedJobDefinitionId());
-    Assert.assertEquals(batch.getTenantId(), resultBatch.getTenantId());
-    Assert.assertEquals(batch.getType(), resultBatch.getType());
-    Assert.assertEquals(batch.getBatchJobsPerSeed(), resultBatch.getBatchJobsPerSeed());
-    Assert.assertEquals(batch.getInvocationsPerBatchJob(), resultBatch.getInvocationsPerBatchJob());
-    Assert.assertEquals(batch.getSize(), resultBatch.getSize());
-    Assert.assertEquals(startDate, resultBatch.getStartTime());
-    Assert.assertEquals(endDate, resultBatch.getEndTime());
+    assertEquals(batch.getId(), resultBatch.getId());
+    assertEquals(batch.getBatchJobDefinitionId(), resultBatch.getBatchJobDefinitionId());
+    assertEquals(batch.getMonitorJobDefinitionId(), resultBatch.getMonitorJobDefinitionId());
+    assertEquals(batch.getSeedJobDefinitionId(), resultBatch.getSeedJobDefinitionId());
+    assertEquals(batch.getTenantId(), resultBatch.getTenantId());
+    assertEquals(batch.getType(), resultBatch.getType());
+    assertEquals(batch.getBatchJobsPerSeed(), resultBatch.getBatchJobsPerSeed());
+    assertEquals(batch.getInvocationsPerBatchJob(), resultBatch.getInvocationsPerBatchJob());
+    assertEquals(batch.getSize(), resultBatch.getSize());
+    assertEquals(startDate, resultBatch.getStartTime());
+    assertEquals(endDate, resultBatch.getEndTime());
   }
 
   @Test
@@ -140,7 +145,7 @@ public class HistoricBatchQueryTest {
 
     // then
     Assert.assertNotNull(resultBatch);
-    Assert.assertEquals(batch1.getId(), resultBatch.getId());
+    assertEquals(batch1.getId(), resultBatch.getId());
   }
 
   @Test
@@ -164,7 +169,7 @@ public class HistoricBatchQueryTest {
     long count = historyService.createHistoricBatchQuery().type(batch1.getType()).count();
 
     // then
-    Assert.assertEquals(2, count);
+    assertEquals(2, count);
   }
 
   @Test
@@ -176,7 +181,32 @@ public class HistoricBatchQueryTest {
     long count = historyService.createHistoricBatchQuery().type("foo").count();
 
     // then
-    Assert.assertEquals(0, count);
+    assertEquals(0, count);
+  }
+
+  @Test
+  public void testBatchByState() {
+    // given
+    Batch batch1 = helper.migrateProcessInstancesAsync(1);
+    Batch batch2 = helper.migrateProcessInstancesAsync(1);
+
+    helper.completeBatch(batch1);
+
+    // when
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery()
+      .completed(true)
+      .singleResult();
+
+    // then
+    assertEquals(batch1.getId(), historicBatch.getId());
+
+    // when
+    historicBatch = historyService.createHistoricBatchQuery()
+      .completed(false)
+      .singleResult();
+
+    // then
+    assertEquals(batch2.getId(), historicBatch.getId());
   }
 
   @Test
@@ -200,7 +230,7 @@ public class HistoricBatchQueryTest {
     long count = historyService.createHistoricBatchQuery().count();
 
     // then
-    Assert.assertEquals(2, count);
+    assertEquals(2, count);
   }
 
   @Test
@@ -227,6 +257,70 @@ public class HistoricBatchQueryTest {
 
     // then
     verifySorting(orderedBatches, inverted(historicBatchById()));
+  }
+
+  @Test
+  public void testBatchQueryOrderByStartTimeAsc() {
+    // given
+    ClockTestUtil.setClockToDateWithoutMilliseconds();
+    helper.migrateProcessInstancesAsync(1);
+    ClockTestUtil.incrementClock(1000);
+    helper.migrateProcessInstancesAsync(1);
+
+    // when
+    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByStartTime().asc().list();
+
+    // then
+    verifySorting(orderedBatches, historicBatchByStartTime());
+  }
+
+  @Test
+  public void testBatchQueryOrderByStartTimeDec() {
+    // given
+    helper.migrateProcessInstancesAsync(1);
+    helper.migrateProcessInstancesAsync(1);
+
+    // when
+    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByStartTime().desc().list();
+
+    // then
+    verifySorting(orderedBatches, inverted(historicBatchByStartTime()));
+  }
+
+  @Test
+  public void testBatchQueryOrderByEndTimeAsc() {
+    // given
+    ClockTestUtil.setClockToDateWithoutMilliseconds();
+    Batch batch1 = helper.migrateProcessInstancesAsync(1);
+    helper.completeBatch(batch1);
+
+    ClockTestUtil.incrementClock(1000);
+    Batch batch2 = helper.migrateProcessInstancesAsync(1);
+    helper.completeBatch(batch2);
+
+    // when
+    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByEndTime().asc().list();
+
+    // then
+    verifySorting(orderedBatches, historicBatchByEndTime());
+  }
+
+  @Test
+  public void testBatchQueryOrderByEndTimeDec() {
+    // given
+    ClockTestUtil.setClockToDateWithoutMilliseconds();
+    Batch batch1 = helper.migrateProcessInstancesAsync(1);
+    helper.completeBatch(batch1);
+
+    ClockTestUtil.incrementClock(1000);
+    Batch batch2 = helper.migrateProcessInstancesAsync(1);
+    helper.completeBatch(batch2);
+
+    // when
+    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByEndTime().desc().list();
+
+    // then
+    verifySorting(orderedBatches, inverted(historicBatchByEndTime()));
   }
 
   @Test

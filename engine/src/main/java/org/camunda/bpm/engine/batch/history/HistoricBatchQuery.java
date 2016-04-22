@@ -30,8 +30,24 @@ public interface HistoricBatchQuery extends Query<HistoricBatchQuery, HistoricBa
   HistoricBatchQuery type(String type);
 
   /**
+   * Only select historic batches which are completed or not.
+   */
+  HistoricBatchQuery completed(boolean completed);
+
+  /**
    * Returns historic batches sorted by id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
    */
   HistoricBatchQuery orderById();
+
+  /**
+   * Returns historic batches sorted by start time; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   */
+  HistoricBatchQuery orderByStartTime();
+
+  /**
+   * Returns historic batches sorted by end time; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   */
+  HistoricBatchQuery orderByEndTime();
+
 
 }

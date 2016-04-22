@@ -23,5 +23,7 @@ import org.camunda.bpm.engine.query.QueryProperty;
 public interface HistoricBatchQueryProperty {
 
   QueryProperty ID = new QueryPropertyImpl("ID_");
+  QueryProperty START_TIME = new QueryPropertyImpl("START_TIME_");
+  QueryProperty END_TIME = new QueryPropertyImpl("END_TIME_");
 
 }
