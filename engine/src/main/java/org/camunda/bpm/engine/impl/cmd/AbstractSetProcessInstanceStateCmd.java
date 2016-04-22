@@ -13,9 +13,9 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
@@ -56,17 +56,19 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
 
   @Override
   protected void checkAuthorization(CommandContext commandContext) {
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    if (processInstanceId != null) {
-      authorizationManager.checkUpdateProcessInstanceById(processInstanceId);
-    } else
 
-    if (processDefinitionId != null) {
-      authorizationManager.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
-    } else
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      if (processInstanceId != null) {
+        checker.checkUpdateProcessInstanceById(processInstanceId);
+      } else
 
-    if (processDefinitionKey != null) {
-      authorizationManager.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
+      if (processDefinitionId != null) {
+        checker.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
+      } else
+
+      if (processDefinitionKey != null) {
+        checker.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
+      }
     }
   }
 

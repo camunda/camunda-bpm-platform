@@ -17,6 +17,8 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -58,8 +60,58 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
+  public void checkUpdateProcessDefinitionById(String processDefinitionId) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
+      if (processDefinition != null && !getTenantManager().isAuthenticatedTenant(processDefinition.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("update the process definition suspension state", processDefinition);
+      }
+    }
+  }
+
+  @Override
+  public void checkUpdateProcessDefinitionByKey(String processDefinitionKey) {
+  }
+
+  @Override
+  public void checkUpdateProcessInstanceByProcessDefinitionId(String processDefinitionId) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
+      if (processDefinition != null && !getTenantManager().isAuthenticatedTenant(processDefinition.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("update the suspension state of an instance of the process definition", processDefinition);
+      }
+    }
+  }
+
+  @Override
+  public void checkUpdateProcessInstanceByProcessDefinitionKey(String processDefinitionKey) {
+  }
+
+  @Override
+  public void checkUpdateProcessInstanceById(String processInstanceId) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      ExecutionEntity execution = findExecutionById(processInstanceId);
+      if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("update the process instance", execution);
+      }
+    }
+  }
+
   protected TenantManager getTenantManager() {
     return Context.getCommandContext().getTenantManager();
+  }
+
+  protected ProcessDefinitionEntity findLatestProcessDefinitionById(String processDefinitionId) {
+    return Context.getCommandContext().getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
+  }
+
+  protected ProcessDefinitionEntity findLatestProcessDefinitionByKey(String processDefinitionKey) {
+    return Context.getCommandContext().getProcessDefinitionManager().findLatestProcessDefinitionByKey(processDefinitionKey);
+  }
+
+  protected ExecutionEntity findExecutionById(String processInstanceId) {
+    return Context.getCommandContext().getExecutionManager().findExecutionById(processInstanceId);
   }
 
 }

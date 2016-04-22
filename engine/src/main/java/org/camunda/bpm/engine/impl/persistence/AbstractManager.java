@@ -243,7 +243,7 @@ public abstract class AbstractManager implements Session {
     getAuthorizationManager().checkAuthorization(permission, resource, resourceId);
   }
 
-  protected boolean isAuthorizationEnabled() {
+  public boolean isAuthorizationEnabled() {
     return Context.getProcessEngineConfiguration().isAuthorizationEnabled();
   }
 

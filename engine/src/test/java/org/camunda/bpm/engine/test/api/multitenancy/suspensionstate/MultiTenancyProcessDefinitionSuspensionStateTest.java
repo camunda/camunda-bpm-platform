@@ -13,13 +13,16 @@
 
 package org.camunda.bpm.engine.test.api.multitenancy.suspensionstate;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderCaseInstanceContext;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderHistoricDecisionInstanceContext;
@@ -615,6 +618,85 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest extends PluggableP
 
     assertThat(query.suspended().count(), is(0L));
     assertThat(query.active().count(), is(3L));
+  }
+
+  public void testSuspendProcessDefinitionNoAuthenticatedTenants() {
+    // given activated process definitions
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+    assertThat(query.active().count(), is(3L));
+    assertThat(query.suspended().count(), is(0L));
+
+    identityService.setAuthentication("user", null, null);
+
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
+      .suspend();
+
+    identityService.clearAuthentication();
+
+    assertThat(query.active().count(), is(2L));
+    assertThat(query.suspended().count(), is(1L));
+    assertThat(query.suspended().withoutTenantId().count(), is(1L));
+  }
+
+  public void testFailToSuspendProcessDefinitionByIdNoAuthenticatedTenants() {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY).tenantIdIn(TENANT_ONE).singleResult();
+
+    identityService.setAuthentication("user", null, null);
+
+    try {
+      repositoryService
+        .updateProcessDefinitionSuspensionState()
+        .byProcessDefinitionId(processDefinition.getId())
+        .suspend();
+
+        fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("Cannot update the process definition suspension state"));
+    }
+  }
+
+  public void testSuspendProcessDefinitionWithAuthenticatedTenant() {
+    // given activated process definitions
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+    assertThat(query.active().count(), is(3L));
+    assertThat(query.suspended().count(), is(0L));
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
+      .suspend();
+
+    identityService.clearAuthentication();
+
+    assertThat(query.active().count(), is(1L));
+    assertThat(query.suspended().count(), is(2L));
+    assertThat(query.active().tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.suspended().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.suspended().withoutTenantId().count(), is(1L));
+  }
+
+  public void testSuspendProcessDefinitionDisabledTenantCheck() {
+    // given activated process definitions
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+    assertThat(query.active().count(), is(3L));
+    assertThat(query.suspended().count(), is(0L));
+
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    repositoryService
+      .updateProcessDefinitionSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
+      .suspend();
+
+    assertThat(query.active().count(), is(0L));
+    assertThat(query.suspended().count(), is(3L));
+    assertThat(query.suspended().tenantIdIn(TENANT_ONE, TENANT_TWO).includeProcessDefinitionsWithoutTenantId().count(), is(3L));
   }
 
   protected Date tomorrow() {

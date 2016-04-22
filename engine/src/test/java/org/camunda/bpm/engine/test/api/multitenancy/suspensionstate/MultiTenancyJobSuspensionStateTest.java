@@ -16,6 +16,8 @@ package org.camunda.bpm.engine.test.api.multitenancy.suspensionstate;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
+
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -147,6 +149,67 @@ public class MultiTenancyJobSuspensionStateTest extends PluggableProcessEngineTe
     assertThat(query.suspended().count(), is(2L));
     assertThat(query.active().count(), is(1L));
     assertThat(query.active().withoutTenantId().count(), is(1L));
+  }
+
+  public void testSuspendJobNoAuthenticatedTenants() {
+    // given activated jobs
+    JobQuery query = managementService.createJobQuery();
+    assertThat(query.active().count(), is(3L));
+    assertThat(query.suspended().count(), is(0L));
+
+    identityService.setAuthentication("user", null, null);
+
+    managementService
+      .updateJobSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
+      .suspend();
+
+    identityService.clearAuthentication();
+
+    assertThat(query.active().count(), is(2L));
+    assertThat(query.suspended().count(), is(1L));
+    assertThat(query.suspended().withoutTenantId().count(), is(1L));
+  }
+
+  public void testSuspendJobWithAuthenticatedTenant() {
+    // given activated jobs
+    JobQuery query = managementService.createJobQuery();
+    assertThat(query.active().count(), is(3L));
+    assertThat(query.suspended().count(), is(0L));
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    managementService
+      .updateJobSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
+      .suspend();
+
+    identityService.clearAuthentication();
+
+    assertThat(query.active().count(), is(1L));
+    assertThat(query.suspended().count(), is(2L));
+    assertThat(query.active().tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.suspended().withoutTenantId().count(), is(1L));
+    assertThat(query.suspended().tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
+  public void testSuspendJobDisabledTenantCheck() {
+    // given activated jobs
+    JobQuery query = managementService.createJobQuery();
+    assertThat(query.active().count(), is(3L));
+    assertThat(query.suspended().count(), is(0L));
+
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    managementService
+      .updateJobSuspensionState()
+      .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
+      .suspend();
+
+    assertThat(query.active().count(), is(0L));
+    assertThat(query.suspended().count(), is(3L));
+    assertThat(query.suspended().tenantIdIn(TENANT_ONE, TENANT_TWO).includeJobsWithoutTenantId().count(), is(3L));
   }
 
 }

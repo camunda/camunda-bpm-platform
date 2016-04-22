@@ -17,7 +17,6 @@ import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -64,16 +63,15 @@ public abstract class AbstractCorrelateMessageCmd {
 
   protected void checkAuthorization(MessageCorrelationResult correlation) {
     CommandContext commandContext = Context.getCommandContext();
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
 
-    if (MessageCorrelationResult.TYPE_EXECUTION.equals(correlation.getResultType())) {
-      ExecutionEntity execution = correlation.getExecutionEntity();
-      authorizationManager.checkUpdateProcessInstanceById(execution.getProcessInstanceId());
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      if (MessageCorrelationResult.TYPE_EXECUTION.equals(correlation.getResultType())) {
+        ExecutionEntity execution = correlation.getExecutionEntity();
+        checker.checkUpdateProcessInstanceById(execution.getProcessInstanceId());
 
-    } else {
-      ProcessDefinitionEntity definition = correlation.getProcessDefinitionEntity();
+      } else {
+        ProcessDefinitionEntity definition = correlation.getProcessDefinitionEntity();
 
-      for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
         checker.checkCreateProcessInstance(definition);
       }
     }

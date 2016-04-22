@@ -15,13 +15,18 @@ package org.camunda.bpm.engine.impl.cfg.auth;
 
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -58,8 +63,70 @@ public class AuthorizationCommandChecker implements CommandChecker {
     // no authorization check for CMMN
   }
 
+  @Override
+  public void checkUpdateProcessDefinitionById(String processDefinitionId) {
+    if (getAuthorizationManager().isAuthorizationEnabled()) {
+      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
+      if (processDefinition != null) {
+        checkUpdateProcessDefinitionByKey(processDefinition.getKey());
+      }
+    }
+  }
+
+  @Override
+  public void checkUpdateProcessDefinitionByKey(String processDefinitionKey) {
+    getAuthorizationManager().checkAuthorization(UPDATE, PROCESS_DEFINITION, processDefinitionKey);
+  }
+
+  @Override
+  public void checkUpdateProcessInstanceByProcessDefinitionId(String processDefinitionId) {
+    if (getAuthorizationManager().isAuthorizationEnabled()) {
+      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
+      if (processDefinition != null) {
+        checkUpdateProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
+      }
+    }
+  }
+
+  @Override
+  public void checkUpdateProcessInstanceByProcessDefinitionKey(String processDefinitionKey) {
+    // necessary permissions:
+    // - UPDATE on ANY PROCESS_INSTANCE
+
+    PermissionCheck firstCheck = new PermissionCheck();
+    firstCheck.setPermission(UPDATE);
+    firstCheck.setResource(PROCESS_INSTANCE);
+
+    // ... OR ...
+
+    // - UPDATE_INSTANCE on PROCESS_DEFINITION
+
+    PermissionCheck secondCheck = new PermissionCheck();
+    secondCheck.setPermission(UPDATE_INSTANCE);
+    secondCheck.setResource(PROCESS_DEFINITION);
+    secondCheck.setResourceId(processDefinitionKey);
+    secondCheck.setAuthorizationNotFoundReturnValue(0l);
+
+    getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);
+  }
+
+  @Override
+  public void checkUpdateProcessInstanceById(String processInstanceId) {
+    ExecutionEntity execution = findExecutionById(processInstanceId);
+    if (execution != null) {
+      getAuthorizationManager().checkUpdateProcessInstance(execution);
+    }
+  }
+
   protected AuthorizationManager getAuthorizationManager() {
     return Context.getCommandContext().getAuthorizationManager();
   }
 
+  protected ProcessDefinitionEntity findLatestProcessDefinitionById(String processDefinitionId) {
+    return Context.getCommandContext().getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
+  }
+
+  protected ExecutionEntity findExecutionById(String processInstanceId) {
+    return Context.getCommandContext().getExecutionManager().findExecutionById(processInstanceId);
+  }
 }

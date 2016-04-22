@@ -16,9 +16,9 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
@@ -50,8 +50,9 @@ public abstract class ExternalTaskCmd implements Command<Void> {
     EnsureUtil.ensureNotNull(NotFoundException.class,
         "Cannot find external task with id " + externalTaskId, "externalTask", externalTask);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateProcessInstanceById(externalTask.getProcessInstanceId());
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkUpdateProcessInstanceById(externalTask.getProcessInstanceId());
+    }
     
     execute(externalTask);
     

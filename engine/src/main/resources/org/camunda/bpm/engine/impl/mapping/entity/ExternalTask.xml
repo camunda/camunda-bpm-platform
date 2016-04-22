@@ -84,35 +84,36 @@
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
   
-  <update id="updateExternalTaskSuspensionStateByParameters" parameterType="map">
-    update ACT_RU_EXT_TASK
+  <update id="updateExternalTaskSuspensionStateByParameters" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    update ACT_RU_EXT_TASK RES
     <set>
-      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
+      SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER}
     </set>
     <where>
-      <if test="processInstanceId != null">
-        PROC_INST_ID_ = #{processInstanceId}
+      <if test="parameter.processInstanceId != null">
+        PROC_INST_ID_ = #{parameter.processInstanceId}
       </if>
-      <if test="processDefinitionId != null">
-        and PROC_DEF_ID_ = #{processDefinitionId}
+      <if test="parameter.processDefinitionId != null">
+        and PROC_DEF_ID_ = #{parameter.processDefinitionId}
       </if>
-      <if test="processDefinitionKey != null">
-        <if test="!isProcessDefinitionTenantIdSet">      
-          and PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
+      <if test="parameter.processDefinitionKey != null">
+        <if test="!parameter.isProcessDefinitionTenantIdSet">
+          and PROC_DEF_KEY_ = #{parameter.processDefinitionKey, jdbcType=VARCHAR}
         </if>
-        <if test="isProcessDefinitionTenantIdSet">
+        <if test="parameter.isProcessDefinitionTenantIdSet">
           and PROC_DEF_ID_ IN (
             SELECT ID_ 
             FROM ${prefix}ACT_RE_PROCDEF PD
-            WHERE PD.KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
-            <if test="processDefinitionTenantId != null">
-              and PD.TENANT_ID_ = #{processDefinitionTenantId, jdbcType=VARCHAR}
+            WHERE PD.KEY_ = #{parameter.processDefinitionKey, jdbcType=VARCHAR}
+            <if test="parameter.processDefinitionTenantId != null">
+              and PD.TENANT_ID_ = #{parameter.processDefinitionTenantId, jdbcType=VARCHAR}
             </if>
-            <if test="processDefinitionTenantId == null">
+            <if test="parameter.processDefinitionTenantId == null">
               and PD.TENANT_ID_ is null
             </if>
           )
-        </if>        
+        </if>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
       </if>
     </where>
   </update>

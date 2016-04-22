@@ -403,16 +403,6 @@ public class AuthorizationManager extends AbstractManager {
 
   // update permission ///////////////////////////////////////////////
 
-  public void checkUpdateProcessDefinitionById(String processDefinitionId) {
-    ProcessDefinitionEntity definition = getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
-    String processDefinitionKey = definition.getKey();
-    checkUpdateProcessDefinitionByKey(processDefinitionKey);
-  }
-
-  public void checkUpdateProcessDefinitionByKey(String processDefinitionKey) {
-    checkAuthorization(UPDATE, PROCESS_DEFINITION, processDefinitionKey);
-  }
-
   /* PROCESS INSTANCE */
 
   // read permission ////////////////////////////////////////////////////
@@ -485,13 +475,6 @@ public class AuthorizationManager extends AbstractManager {
 
   // update permission //////////////////////////////////////////////////
 
-  public void checkUpdateProcessInstanceById(String processInstanceId) {
-    ExecutionEntity execution = getProcessInstanceManager().findExecutionById(processInstanceId);
-    if (execution != null) {
-      checkUpdateProcessInstance(execution);
-    }
-  }
-
   public void checkUpdateProcessInstance(ExecutionEntity execution) {
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
 
@@ -537,35 +520,6 @@ public class AuthorizationManager extends AbstractManager {
     secondCheck.setPermission(UPDATE_INSTANCE);
     secondCheck.setResource(PROCESS_DEFINITION);
     secondCheck.setResourceId(job.getProcessDefinitionKey());
-    secondCheck.setAuthorizationNotFoundReturnValue(0l);
-
-    checkAuthorization(firstCheck, secondCheck);
-  }
-
-  public void checkUpdateProcessInstanceByProcessDefinitionId(String processDefinitionId) {
-    ProcessDefinitionEntity definition = getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
-    if (definition != null) {
-      String processDefinitionKey = definition.getKey();
-      checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
-    }
-  }
-
-  public void checkUpdateProcessInstanceByProcessDefinitionKey(String processDefinitionKey) {
-    // necessary permissions:
-    // - UPDATE on ANY PROCESS_INSTANCE
-
-    PermissionCheck firstCheck = new PermissionCheck();
-    firstCheck.setPermission(UPDATE);
-    firstCheck.setResource(PROCESS_INSTANCE);
-
-    // ... OR ...
-
-    // - UPDATE_INSTANCE on PROCESS_DEFINITION
-
-    PermissionCheck secondCheck = new PermissionCheck();
-    secondCheck.setPermission(UPDATE_INSTANCE);
-    secondCheck.setResource(PROCESS_DEFINITION);
-    secondCheck.setResourceId(processDefinitionKey);
     secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
     checkAuthorization(firstCheck, secondCheck);

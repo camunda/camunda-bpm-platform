@@ -75,31 +75,32 @@
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
   
-  <update id="updateExecutionSuspensionStateByParameters" parameterType="java.util.Map">
-    update ${prefix}ACT_RU_EXECUTION set
+  <update id="updateExecutionSuspensionStateByParameters" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    update ${prefix}ACT_RU_EXECUTION RES set
       REV_ = REV_ + 1,
-      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
+      SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER}
     <where>
-      <if test="processInstanceId != null">
-        PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      <if test="parameter.processInstanceId != null">
+        PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR}
       </if>
-      <if test="processDefinitionId != null">
-        and PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+      <if test="parameter.processDefinitionId != null">
+        and PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=VARCHAR}
       </if>
-      <if test="processDefinitionKey != null">
+      <if test="parameter.processDefinitionKey != null">
         and PROC_DEF_ID_ IN (
           SELECT ID_ 
           FROM ${prefix}ACT_RE_PROCDEF PD
-          WHERE PD.KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
-          <if test="isTenantIdSet">
-            <if test="tenantId != null">
-              and PD.TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+          WHERE PD.KEY_ = #{parameter.processDefinitionKey, jdbcType=VARCHAR}
+          <if test="parameter.isTenantIdSet">
+            <if test="parameter.tenantId != null">
+              and PD.TENANT_ID_ = #{parameter.tenantId, jdbcType=VARCHAR}
             </if>
-            <if test="tenantId == null">
+            <if test="parameter.tenantId == null">
               and PD.TENANT_ID_ is null
             </if>
           </if>
         )
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
       </if>
     </where>
   </update>

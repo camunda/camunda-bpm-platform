@@ -15,12 +15,12 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler.ProcessDefinitionSuspensionStateConfiguration;
 import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
@@ -63,21 +63,23 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
 
   @Override
   protected void checkAuthorization(CommandContext commandContext) {
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    if (processDefinitionId != null) {
-      authorizationManager.checkUpdateProcessDefinitionById(processDefinitionId);
 
-      if (includeSubResources) {
-        authorizationManager.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
-      }
-    } else
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      if (processDefinitionId != null) {
+        checker.checkUpdateProcessDefinitionById(processDefinitionId);
 
-    if (processDefinitionKey != null) {
-      authorizationManager.checkUpdateProcessDefinitionByKey(processDefinitionKey);
+        if (includeSubResources) {
+          checker.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
+        }
+      } else
 
-      if (includeSubResources) {
-        authorizationManager.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
-      }
+        if (processDefinitionKey != null) {
+          checker.checkUpdateProcessDefinitionByKey(processDefinitionKey);
+
+          if (includeSubResources) {
+            checker.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
+          }
+        }
     }
   }
 

@@ -45,4 +45,29 @@ public interface CommandChecker {
    */
   void checkCreateCaseInstance(CaseDefinition caseDefinition);
 
+  /**
+   * Checks if it is allowed to update a process definition of the given process definition id.
+   */
+  void checkUpdateProcessDefinitionById(String processDefinitionId);
+
+  /**
+   * Checks if it is allowed to update a process instance of the given process definition id.
+   */
+  void checkUpdateProcessInstanceByProcessDefinitionId(String processDefinitionId);
+
+  /**
+   * Checks if it is allowed to update a process definition of the given process definition key.
+   */
+  void checkUpdateProcessDefinitionByKey(String processDefinitionKey);
+
+  /**
+   *  Checks if it is allowed to update a process instance of the given process definition key.
+   */
+  void checkUpdateProcessInstanceByProcessDefinitionKey(String processDefinitionKey);
+
+  /**
+   * Checks if it is allowed to update a process instance of the given process instance id.
+   */
+  void checkUpdateProcessInstanceById(String processInstanceId);
+
 }

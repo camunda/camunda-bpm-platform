@@ -15,13 +15,13 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.Date;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeJobDefinitionSuspensionStateJobHandler.JobDefinitionSuspensionStateConfiguration;
 import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
@@ -64,38 +64,39 @@ public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateC
 
   @Override
   protected void checkAuthorization(CommandContext commandContext) {
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
 
-    if (jobDefinitionId != null) {
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      if (jobDefinitionId != null) {
 
-      JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
-      JobDefinitionEntity jobDefinition = jobDefinitionManager.findById(jobDefinitionId);
+        JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
+        JobDefinitionEntity jobDefinition = jobDefinitionManager.findById(jobDefinitionId);
 
-      if (jobDefinition != null) {
-        String processDefinitionKey = jobDefinition.getProcessDefinitionKey();
-        authorizationManager.checkUpdateProcessDefinitionByKey(processDefinitionKey);
+        if (jobDefinition != null) {
+          String processDefinitionKey = jobDefinition.getProcessDefinitionKey();
+          checker.checkUpdateProcessDefinitionByKey(processDefinitionKey);
+
+          if (includeSubResources) {
+            checker.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
+          }
+        }
+
+      } else
+
+      if (processDefinitionId != null) {
+        checker.checkUpdateProcessDefinitionById(processDefinitionId);
 
         if (includeSubResources) {
-          authorizationManager.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
+          checker.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
         }
-      }
 
-    } else
+      } else
 
-    if (processDefinitionId != null) {
-      authorizationManager.checkUpdateProcessDefinitionById(processDefinitionId);
+      if (processDefinitionKey != null) {
+        checker.checkUpdateProcessDefinitionByKey(processDefinitionKey);
 
-      if (includeSubResources) {
-        authorizationManager.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
-      }
-
-    } else
-
-    if (processDefinitionKey != null) {
-      authorizationManager.checkUpdateProcessDefinitionByKey(processDefinitionKey);
-
-      if (includeSubResources) {
-        authorizationManager.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
+        if (includeSubResources) {
+          checker.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
+        }
       }
     }
   }
