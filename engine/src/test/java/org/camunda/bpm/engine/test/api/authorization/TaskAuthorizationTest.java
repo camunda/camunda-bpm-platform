@@ -7954,48 +7954,11 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  public void testStandaloneTaskSetVariableWithTaskAssignPermissionOnTask() {
-    // given
-    String taskId = "myTask";
-    createTask(taskId);
-    createGrantAuthorization(TASK, taskId, userId, TASK_ASSIGN);
-
-    // when
-    taskService.setVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
-
-    deleteTask(taskId, true);
-  }
-
-
   public void testStandaloneTaskSetVariableWithReadPermissionOnAnyTask() {
     // given
     String taskId = "myTask";
     createTask(taskId);
     createGrantAuthorization(TASK, ANY, userId, UPDATE);
-
-    // when
-    taskService.setVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
-
-    deleteTask(taskId, true);
-  }
-
-  public void testStandaloneTaskSetVariableWithTaskAssignPermissionOnAnyTask() {
-    // given
-    String taskId = "myTask";
-    createTask(taskId);
-    createGrantAuthorization(TASK, ANY, userId, TASK_ASSIGN);
 
     // when
     taskService.setVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
@@ -8049,43 +8012,11 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
   }
 
-  public void testProcessTaskSetVariableWithTaskAssignPermissionOnTask() {
-    // given
-    startProcessInstanceByKey(PROCESS_KEY);
-    String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, userId, TASK_ASSIGN);
-
-    // when
-    taskService.setVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
-  }
-
   public void testProcessTaskSetVariableWithReadPermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(TASK, ANY, userId, UPDATE);
-
-    // when
-    taskService.setVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
-  }
-
-  public void testProcessTaskSetVariableWithTaskAssignPermissionOnAnyTask() {
-    // given
-    startProcessInstanceByKey(PROCESS_KEY);
-    String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, ANY, userId, TASK_ASSIGN);
 
     // when
     taskService.setVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
@@ -8113,43 +8044,11 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
   }
 
-  public void testProcessTaskSetVariableWithTaskAssignPermissionOnProcessDefinition() {
-    // given
-    startProcessInstanceByKey(PROCESS_KEY);
-    String taskId = selectSingleTask().getId();
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, TASK_ASSIGN);
-
-    // when
-    taskService.setVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
-  }
-
   public void testProcessTaskSetVariableWithReadTaskPermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_TASK);
-
-    // when
-    taskService.setVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 1);
-    enableAuthorization();
-  }
-
-  public void testProcessTaskSetVariableWithTaskAssignPermissionOnAnyProcessDefinition() {
-    // given
-    startProcessInstanceByKey(PROCESS_KEY);
-    String taskId = selectSingleTask().getId();
-    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, TASK_ASSIGN);
 
     // when
     taskService.setVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
@@ -8711,24 +8610,6 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  public void testStandaloneTaskRemoveVariableWithTaskAssignPermissionOnTask() {
-    // given
-    String taskId = "myTask";
-    createTask(taskId);
-    createGrantAuthorization(TASK, taskId, userId, TASK_ASSIGN);
-
-    // when
-    taskService.removeVariable(taskId, VARIABLE_NAME);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
-
-    deleteTask(taskId, true);
-  }
-
   public void testStandaloneTaskRemoveVariableWithReadPermissionOnAnyTask() {
     // given
     String taskId = "myTask";
@@ -8787,22 +8668,6 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
   }
 
-  public void testProcessTaskRemoveVariableWithTaskAssignPermissionOnTask() {
-    // given
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, taskId, userId, TASK_ASSIGN);
-
-    // when
-    taskService.removeVariable(taskId, VARIABLE_NAME);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
-  }
-
   public void testProcessTaskRemoveVariableWithReadPermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
@@ -8818,23 +8683,6 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
     enableAuthorization();
   }
-
-  public void testProcessTaskRemoveVariableWithTaskAssignPermissionOnAnyTask() {
-    // given
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    String taskId = selectSingleTask().getId();
-    createGrantAuthorization(TASK, ANY, userId, TASK_ASSIGN);
-
-    // when
-    taskService.removeVariable(taskId, VARIABLE_NAME);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
-  }
-
 
   public void testProcessTaskRemoveVariableWithReadInstancePermissionOnProcessDefinition() {
     // given
@@ -8852,43 +8700,11 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
   }
 
-  public void testProcessTaskRemoveVariableWithTaskAssignPermissionOnProcessDefinition() {
-    // given
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    String taskId = selectSingleTask().getId();
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, TASK_ASSIGN);
-
-    // when
-    taskService.removeVariable(taskId, VARIABLE_NAME);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
-  }
-
   public void testProcessTaskRemoveVariableWithReadInstancePermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_TASK);
-
-    // when
-    taskService.removeVariable(taskId, VARIABLE_NAME);
-
-    // then
-    disableAuthorization();
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
-    verifyQueryResults(query, 0);
-    enableAuthorization();
-  }
-
-  public void testProcessTaskRemoveVariableWithTaskAssignPermissionOnAnyProcessDefinition() {
-    // given
-    startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    String taskId = selectSingleTask().getId();
-    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, TASK_ASSIGN);
 
     // when
     taskService.removeVariable(taskId, VARIABLE_NAME);
