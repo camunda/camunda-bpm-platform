@@ -85,7 +85,7 @@
   </update>
   
   <update id="updateExternalTaskSuspensionStateByParameters" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    update ACT_RU_EXT_TASK RES
+    update ACT_RU_EXT_TASK
     <set>
       SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER}
     </set>
@@ -113,7 +113,8 @@
             </if>
           )
         </if>
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+        <bind name="columnPrefix" value="''"/>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
       </if>
     </where>
   </update>

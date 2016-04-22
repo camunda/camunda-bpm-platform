@@ -49,7 +49,7 @@
   </update>
 
   <update id="updateJobDefinitionSuspensionStateByParameters" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    update ${prefix}ACT_RU_JOBDEF RES set
+    update ${prefix}ACT_RU_JOBDEF set
       REV_ = REV_ + 1,
       SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER}
     <where>
@@ -76,7 +76,8 @@
             </if>
           )
         </if>
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+        <bind name="columnPrefix" value="''"/>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
       </if>
     </where>
   </update>

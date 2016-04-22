@@ -5,11 +5,17 @@
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity">
 
   <sql id="queryTenantCheck">
+    <bind name="columnPrefix" value="'RES.'"/>
+
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+  </sql>
+
+  <sql id="queryTenantCheckWithPrefix">
     <if test="tenantCheck.isTenantCheckEnabled">
     
-      and (RES.TENANT_ID_ is null
+      and (${columnPrefix}TENANT_ID_ is null
       <if test="tenantCheck.authTenantIds != null &amp;&amp; !tenantCheck.authTenantIds.isEmpty">
-          or RES.TENANT_ID_ in 
+          or ${columnPrefix}TENANT_ID_ in
           <foreach item="tenantId" index="index" collection="tenantCheck.authTenantIds"
                    open="(" separator="," close=")">
             #{tenantId}
@@ -17,6 +23,6 @@
       </if>
       )
     </if>
+
   </sql>
-  
 </mapper>
