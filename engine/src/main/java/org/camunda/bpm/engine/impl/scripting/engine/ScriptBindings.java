@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.script.Bindings;
+import javax.script.ScriptEngine;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -65,7 +66,9 @@ public class ScriptBindings implements Bindings {
       "S", // Spin Internal Variable
       "XML", // Spin Internal Variable
       "JSON", // Spin Internal Variable
-      "javax.script.argv" // Spin's jRuby tries to deserialize this instead of S, XML and JSON
+      ScriptEngine.ARGV, // jRuby is only setting this variable and execution instead of exporting any other variables
+      "execution",
+      "__doc__" // do not export python doc string
       ));
 
   protected List<Resolver> scriptResolvers;
