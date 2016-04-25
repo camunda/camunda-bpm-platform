@@ -32,7 +32,8 @@ public enum Resources implements Resource {
   TASK(EntityTypes.TASK, 7),
   PROCESS_INSTANCE(EntityTypes.PROCESS_INSTANCE, 8),
   DEPLOYMENT(EntityTypes.DEPLOYMENT, 9),
-  DECISION_DEFINITION(EntityTypes.DECISION_DEFINITION, 10);
+  DECISION_DEFINITION(EntityTypes.DECISION_DEFINITION, 10),
+  TENANT(EntityTypes.TENANT, 11);
 
   String name;
   int id;

@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
 /**
- * <p>Ensures authorizations are propperly
+ * <p>Ensures authorizations are properly
  * enforced by the {@link AuthorizationService}</p>
  *
  * @author Daniel Meyer
@@ -55,7 +55,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
     Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
     basePerms.setResource(AUTHORIZATION);
     basePerms.setResourceId(ANY);
-    basePerms.addPermission(ALL); // add all then remove 'crate'
+    basePerms.addPermission(ALL); // add all then remove 'create'
     basePerms.removePermission(CREATE);
     authorizationService.saveAuthorization(basePerms);
 

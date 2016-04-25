@@ -19,16 +19,21 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.Picture;
+import org.camunda.bpm.engine.identity.Tenant;
+import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.cmd.CheckPassword;
 import org.camunda.bpm.engine.impl.cmd.CreateGroupCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateGroupQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateMembershipCmd;
+import org.camunda.bpm.engine.impl.cmd.CreateTenantCmd;
+import org.camunda.bpm.engine.impl.cmd.CreateTenantQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateUserCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateUserQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteGroupCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteMembershipCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteTenantCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteUserCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteUserInfoCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteUserPictureCmd;
@@ -38,6 +43,7 @@ import org.camunda.bpm.engine.impl.cmd.GetUserInfoKeysCmd;
 import org.camunda.bpm.engine.impl.cmd.GetUserPictureCmd;
 import org.camunda.bpm.engine.impl.cmd.IsIdentityServiceReadOnlyCmd;
 import org.camunda.bpm.engine.impl.cmd.SaveGroupCmd;
+import org.camunda.bpm.engine.impl.cmd.SaveTenantCmd;
 import org.camunda.bpm.engine.impl.cmd.SaveUserCmd;
 import org.camunda.bpm.engine.impl.cmd.SetUserInfoCmd;
 import org.camunda.bpm.engine.impl.cmd.SetUserPictureCmd;
@@ -68,6 +74,10 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
     return commandExecutor.execute(new CreateUserCmd(userId));
   }
 
+  public Tenant newTenant(String tenantId) {
+    return commandExecutor.execute(new CreateTenantCmd(tenantId));
+  }
+
   public void saveGroup(Group group) {
     commandExecutor.execute(new SaveGroupCmd((GroupEntity) group));
   }
@@ -76,12 +86,20 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
     commandExecutor.execute(new SaveUserCmd(user));
   }
 
+  public void saveTenant(Tenant tenant) {
+    commandExecutor.execute(new SaveTenantCmd(tenant));
+  }
+
   public UserQuery createUserQuery() {
     return commandExecutor.execute(new CreateUserQueryCmd());
   }
 
   public GroupQuery createGroupQuery() {
     return commandExecutor.execute(new CreateGroupQueryCmd());
+  }
+
+  public TenantQuery createTenantQuery() {
+    return commandExecutor.execute(new CreateTenantQueryCmd());
   }
 
   public void createMembership(String userId, String groupId) {
@@ -102,6 +120,10 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
 
   public void deleteUser(String userId) {
     commandExecutor.execute(new DeleteUserCmd(userId));
+  }
+
+  public void deleteTenant(String tenantId) {
+    commandExecutor.execute(new DeleteTenantCmd(tenantId));
   }
 
   public void setUserPicture(String userId, Picture picture) {

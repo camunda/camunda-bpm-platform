@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Picture;
+import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.identity.Authentication;
@@ -708,6 +709,28 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("Sales division", group.getName());
 
     identityService.deleteGroup("sales");
+  }
+
+  public void testTenant() {
+    // create
+    Tenant tenant = identityService.newTenant("tenant");
+    tenant.setName("Tenant");
+    identityService.saveTenant(tenant);
+
+    tenant = identityService.createTenantQuery().singleResult();
+    assertNotNull(tenant);
+    assertEquals("tenant", tenant.getId());
+    assertEquals("Tenant", tenant.getName());
+
+    // update
+    tenant.setName("newName");
+    identityService.saveTenant(tenant);
+
+    tenant = identityService.createTenantQuery().singleResult();
+    assertEquals("newName", tenant.getName());
+
+    // delete
+    identityService.deleteTenant("tenant");
   }
 
   public void testMembership() {

@@ -12,11 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import org.camunda.bpm.engine.rest.*;
-import org.camunda.bpm.engine.rest.dto.ProcessEngineDto;
-import org.camunda.bpm.engine.rest.exception.RestException;
-import org.camunda.bpm.engine.rest.history.HistoryRestService;
-import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -26,8 +27,34 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
-import java.net.URI;
-import java.util.*;
+import org.camunda.bpm.engine.rest.AuthorizationRestService;
+import org.camunda.bpm.engine.rest.BatchRestService;
+import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
+import org.camunda.bpm.engine.rest.CaseExecutionRestService;
+import org.camunda.bpm.engine.rest.CaseInstanceRestService;
+import org.camunda.bpm.engine.rest.DecisionDefinitionRestService;
+import org.camunda.bpm.engine.rest.DeploymentRestService;
+import org.camunda.bpm.engine.rest.ExecutionRestService;
+import org.camunda.bpm.engine.rest.ExternalTaskRestService;
+import org.camunda.bpm.engine.rest.FilterRestService;
+import org.camunda.bpm.engine.rest.GroupRestService;
+import org.camunda.bpm.engine.rest.IdentityRestService;
+import org.camunda.bpm.engine.rest.IncidentRestService;
+import org.camunda.bpm.engine.rest.JobDefinitionRestService;
+import org.camunda.bpm.engine.rest.JobRestService;
+import org.camunda.bpm.engine.rest.MessageRestService;
+import org.camunda.bpm.engine.rest.MetricsRestService;
+import org.camunda.bpm.engine.rest.MigrationRestService;
+import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
+import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
+import org.camunda.bpm.engine.rest.TaskRestService;
+import org.camunda.bpm.engine.rest.TenantRestService;
+import org.camunda.bpm.engine.rest.UserRestService;
+import org.camunda.bpm.engine.rest.VariableInstanceRestService;
+import org.camunda.bpm.engine.rest.dto.ProcessEngineDto;
+import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.history.HistoryRestService;
+import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 
 @Path(NamedProcessEngineRestServiceImpl.PATH)
 public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRestServiceImpl {
@@ -160,19 +187,28 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
     return super.getDecisionDefinitionRestService(engineName);
   }
 
+  @Override
   @Path("/{name}" + ExternalTaskRestService.PATH)
   public ExternalTaskRestService getExternalTaskRestService(@PathParam("name") String engineName) {
     return super.getExternalTaskRestService(engineName);
   }
 
+  @Override
   @Path("/{name}" + MigrationRestService.PATH)
   public MigrationRestService getMigrationRestService(@PathParam("name") String engineName) {
     return super.getMigrationRestService(engineName);
   }
 
+  @Override
   @Path("/{name}" + BatchRestService.PATH)
   public BatchRestService getBatchRestService(@PathParam("name") String engineName) {
     return super.getBatchRestService(engineName);
+  }
+
+  @Override
+  @Path("/{name}" + TenantRestService.PATH)
+  public TenantRestService getTenantRestService(@PathParam("name") String engineName) {
+    return super.getTenantRestService(engineName);
   }
 
   @GET

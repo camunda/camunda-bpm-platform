@@ -68,6 +68,7 @@ import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -124,6 +125,8 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TENANT_ID = "aTenantId";
   public static final String ANOTHER_EXAMPLE_TENANT_ID = "anotherTenantId";
   public static final String EXAMPLE_TENANT_ID_LIST = EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID;
+
+  public static final String EXAMPLE_TENANT_NAME = "aTenantName";
 
   // version tag
   public static final String EXAMPLE_VERSION_TAG = "aVersionTag";
@@ -1369,7 +1372,7 @@ public abstract class MockProvider {
     return mockResource;
   }
 
-  // user & groups
+  // user, groups and tenants
 
   public static Group createMockGroup() {
     return mockGroup().build();
@@ -1407,6 +1410,13 @@ public abstract class MockProvider {
       .lastName(EXAMPLE_USER_LAST_NAME)
       .email(EXAMPLE_USER_EMAIL)
       .password(EXAMPLE_USER_PASSWORD);
+  }
+
+  public static Tenant createMockTenant() {
+    Tenant mockTenant = mock(Tenant.class);
+    when(mockTenant.getId()).thenReturn(EXAMPLE_TENANT_ID);
+    when(mockTenant.getName()).thenReturn(EXAMPLE_TENANT_NAME);
+    return mockTenant;
   }
 
   public static Authentication createMockAuthentication() {
@@ -2547,7 +2557,7 @@ public abstract class MockProvider {
       .workerId(EXTERNAL_TASK_WORKER_ID)
       .tenantId(EXAMPLE_TENANT_ID)
       .priority(EXTERNAL_TASK_PRIORITY);
-    
+
   }
 
   public static ExternalTask createMockExternalTask() {

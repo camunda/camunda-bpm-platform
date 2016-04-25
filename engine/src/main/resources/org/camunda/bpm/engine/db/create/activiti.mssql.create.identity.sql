@@ -35,6 +35,13 @@ create table ACT_ID_INFO (
     primary key (ID_)
 );
 
+create table ACT_ID_TENANT (
+    ID_ nvarchar(64),
+    REV_ int,
+    NAME_ nvarchar(255),
+    primary key (ID_)
+);
+
 alter table ACT_ID_MEMBERSHIP 
     add constraint ACT_FK_MEMB_GROUP 
     foreign key (GROUP_ID_) 

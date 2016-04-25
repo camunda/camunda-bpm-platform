@@ -18,11 +18,13 @@ import java.util.Map;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MembershipEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TenantEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 
 /**
@@ -99,6 +101,35 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     }
   }
 
+  // tenants //////////////////////////////////////////////////////
+
+  public Tenant createNewTenant(String tenantId) {
+    checkAuthorization(Permissions.CREATE, Resources.TENANT, null);
+    return new TenantEntity(tenantId);
+  }
+
+  public Tenant saveTenant(Tenant tenant) {
+    TenantEntity tenantEntity = (TenantEntity) tenant;
+    if (tenantEntity.getRevision() == 0) {
+      checkAuthorization(Permissions.CREATE, Resources.TENANT, null);
+      getDbEntityManager().insert(tenantEntity);
+      createDefaultAuthorizations(tenant);
+    } else {
+      checkAuthorization(Permissions.UPDATE, Resources.TENANT, tenant.getId());
+      getDbEntityManager().merge(tenantEntity);
+    }
+    return tenantEntity;
+  }
+
+  public void deleteTenant(String tenantId) {
+    checkAuthorization(Permissions.DELETE, Resources.TENANT, tenantId);
+    TenantEntity tenant = (TenantEntity) findTenantById(tenantId);
+    if (tenant != null) {
+      deleteAuthorizations(Resources.TENANT, tenantId);
+      getDbEntityManager().delete(tenant);
+    }
+  }
+
   // membership //////////////////////////////////////////////////////
 
   public void createMembership(String userId, String groupId) {
@@ -141,6 +172,12 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
   protected void createDefaultAuthorizations(Group group) {
     if(isAuthorizationEnabled()) {
       saveDefaultAuthorizations(getResourceAuthorizationProvider().newGroup(group));
+    }
+  }
+
+  protected void createDefaultAuthorizations(Tenant tenant) {
+    if (isAuthorizationEnabled()) {
+      saveDefaultAuthorizations(getResourceAuthorizationProvider().newTenant(tenant));
     }
   }
 

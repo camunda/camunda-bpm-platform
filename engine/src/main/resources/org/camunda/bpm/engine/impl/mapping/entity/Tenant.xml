@@ -4,6 +4,88 @@
   
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity">
 
+  <!-- INSERT -->
+
+  <insert id="insertTenant" parameterType="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity">
+    insert into ${prefix}ACT_ID_TENANT (ID_, NAME_, REV_)
+    values (
+      #{id ,jdbcType=VARCHAR},
+      #{name ,jdbcType=VARCHAR},
+      1
+    )
+  </insert>
+
+  <!-- UPDATE -->
+  
+  <update id="updateTenant" parameterType="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity">
+    update ${prefix}ACT_ID_TENANT set
+      REV_ = #{revisionNext ,jdbcType=INTEGER},
+      NAME_ = #{name ,jdbcType=VARCHAR}
+    where ID_ = #{id}
+       and REV_ = #{revision}
+  </update>
+  
+  <!-- DELETE -->
+
+  <delete id="deleteTenant" parameterType="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity">
+    delete from ${prefix}ACT_ID_TENANT where ID_ = #{id} and REV_ = #{revision} 
+  </delete>
+
+  <!-- RESULTMAP -->
+
+  <resultMap id="tenantResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <!-- SELECT -->
+
+  <select id="selectTenant" parameterType="string" resultMap="tenantResultMap">
+    select * from ${prefix}ACT_ID_TENANT where ID_ = #{id}
+  </select>
+  
+  <select id="selectTenantByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.TenantQueryImpl" resultMap="tenantResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select RES.* 
+    ${limitBetween}
+    <include refid="selectTenantByQueryCriteriaSql" />
+    ${orderBy}
+    ${limitAfter}
+  </select>
+  
+   <select id="selectTenantCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.TenantQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectTenantByQueryCriteriaSql" />
+  </select>
+  
+  <sql id="selectTenantByQueryCriteriaSql">
+    from ${prefix}ACT_ID_TENANT RES
+   <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="ids != null &amp;&amp; ids.length > 0">
+        and RES.ID_ in
+        <foreach item="item" index="index" collection="ids"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="nameLike != null">
+        and RES.NAME_ like #{nameLike}
+      </if>      
+      
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+    </where>
+  </sql> 
+  
+  <!-- Tenant Check which can be included by other queries -->
+
   <sql id="queryTenantCheck">
     <bind name="columnPrefix" value="'RES.'"/>
 

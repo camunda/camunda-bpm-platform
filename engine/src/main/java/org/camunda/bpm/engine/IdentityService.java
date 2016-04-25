@@ -20,6 +20,8 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.Picture;
+import org.camunda.bpm.engine.identity.Tenant;
+import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.identity.Account;
@@ -44,10 +46,14 @@ public interface IdentityService {
    * <li> {@link #newUser(String)} </li>
    * <li> {@link #saveUser(User)} </li>
    * <li> {@link #deleteUser(String)} </li>
-
+   *
    * <li> {@link #newGroup(String)} </li>
    * <li> {@link #saveGroup(Group)} </li>
    * <li> {@link #deleteGroup(String)} </li>
+   *
+   * <li> {@link #newTenant(String)} </li>
+   * <li> {@link #saveTenant(Tenant)} </li>
+   * <li> {@link #deleteTenant(String)} </li>
    *
    * <li> {@link #createMembership(String, String)} </li>
    * <li> {@link #deleteMembership(String, String)} </li>
@@ -113,7 +119,7 @@ public interface IdentityService {
    * @throws RuntimeException when a group with the same name already exists.
    * @throws UnsupportedOperationException if identity service implementation is read only. See {@link #isReadOnly()}
    * @throws AuthorizationException if the user has no {@link Permissions#UPDATE} permissions on {@link Resources#GROUP} (update existing group)
-   * or if user has no {@link Permissions#CREATE} permissions on {@link Resources#GROUP} (save new user).
+   * or if user has no {@link Permissions#CREATE} permissions on {@link Resources#GROUP} (save new group).
    */
   void saveGroup(Group group);
 
@@ -145,6 +151,61 @@ public interface IdentityService {
    * @throws AuthorizationException if the user has no {@link Permissions#DELETE} permissions on {@link Resources#GROUP_MEMBERSHIP}.
    */
   void deleteMembership(String userId, String groupId);
+
+  /**
+   * Creates a new tenant. The tenant is transient and must be saved using
+   * {@link #saveTenant(Tenant)}.
+   *
+   * @param tenantId
+   *          id for the new tenant, cannot be <code>null</code>.
+   * @throws UnsupportedOperationException
+   *           if identity service implementation is read only. See
+   *           {@link #isReadOnly()}
+   * @throws AuthorizationException
+   *           if the user has no {@link Permissions#CREATE} permissions on
+   *           {@link Resources#TENANT}.
+   */
+  Tenant newTenant(String tenantId);
+
+  /**
+   * Creates a {@link TenantQuery} thats allows to programmatically query the
+   * tenants.
+   */
+  TenantQuery createTenantQuery();
+
+  /**
+   * Saves the tenant. If the tenant already existed, it is updated.
+   *
+   * @param tenant
+   *          the tenant to save. Cannot be <code>null</code>.
+   * @throws RuntimeException
+   *           when a tenant with the same name already exists.
+   * @throws UnsupportedOperationException
+   *           if identity service implementation is read only. See
+   *           {@link #isReadOnly()}
+   * @throws AuthorizationException
+   *           if the user has no {@link Permissions#UPDATE} permissions on
+   *           {@link Resources#TENANT} (update existing tenant) or if user has
+   *           no {@link Permissions#CREATE} permissions on
+   *           {@link Resources#TENANT} (save new tenant).
+   */
+  void saveTenant(Tenant tenant);
+
+  /**
+   * Deletes the tenant. When no tenant exists with the given id, this operation
+   * is ignored.
+   *
+   * @param tenantId
+   *          id of the tenant that should be deleted, cannot be
+   *          <code>null</code>.
+   * @throws UnsupportedOperationException
+   *           if identity service implementation is read only. See
+   *           {@link #isReadOnly()}
+   * @throws AuthorizationException
+   *           if the user has no {@link Permissions#DELETE} permissions on
+   *           {@link Resources#TENANT}.
+   */
+  void deleteTenant(String tenantId);
 
   /**
    * Checks if the password is valid for the given user. Arguments userId

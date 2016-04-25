@@ -35,6 +35,13 @@ create table ACT_ID_INFO (
     primary key (ID_)
 );
 
+create table ACT_ID_TENANT (
+    ID_ varchar(64),
+    REV_ integer,
+    NAME_ varchar(255),
+    primary key (ID_)
+);
+
 create index ACT_IDX_MEMB_GROUP on ACT_ID_MEMBERSHIP(GROUP_ID_);
 alter table ACT_ID_MEMBERSHIP 
     add constraint ACT_FK_MEMB_GROUP

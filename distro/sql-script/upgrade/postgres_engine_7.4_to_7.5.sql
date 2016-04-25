@@ -162,7 +162,16 @@ ALTER TABLE ACT_HI_CASEACTINST
 
 create index ACT_IDX_HI_CAS_A_I_TENANT_ID on ACT_HI_CASEACTINST(TENANT_ID_);
 
-  --- BATCH ---
+-- add tenant table
+
+create table ACT_ID_TENANT (
+    ID_ varchar(64),
+    REV_ integer,
+    NAME_ varchar(255),
+    primary key (ID_)
+);
+
+--- BATCH ---
 
 -- remove not null from job definition table --
 alter table ACT_RU_JOBDEF

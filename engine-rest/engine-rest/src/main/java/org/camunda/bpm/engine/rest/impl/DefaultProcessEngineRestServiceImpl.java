@@ -12,11 +12,35 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import org.camunda.bpm.engine.rest.*;
-import org.camunda.bpm.engine.rest.history.HistoryRestService;
+import java.net.URI;
 
 import javax.ws.rs.Path;
-import java.net.URI;
+
+import org.camunda.bpm.engine.rest.AuthorizationRestService;
+import org.camunda.bpm.engine.rest.BatchRestService;
+import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
+import org.camunda.bpm.engine.rest.CaseExecutionRestService;
+import org.camunda.bpm.engine.rest.CaseInstanceRestService;
+import org.camunda.bpm.engine.rest.DecisionDefinitionRestService;
+import org.camunda.bpm.engine.rest.DeploymentRestService;
+import org.camunda.bpm.engine.rest.ExecutionRestService;
+import org.camunda.bpm.engine.rest.ExternalTaskRestService;
+import org.camunda.bpm.engine.rest.FilterRestService;
+import org.camunda.bpm.engine.rest.GroupRestService;
+import org.camunda.bpm.engine.rest.IdentityRestService;
+import org.camunda.bpm.engine.rest.IncidentRestService;
+import org.camunda.bpm.engine.rest.JobDefinitionRestService;
+import org.camunda.bpm.engine.rest.JobRestService;
+import org.camunda.bpm.engine.rest.MessageRestService;
+import org.camunda.bpm.engine.rest.MetricsRestService;
+import org.camunda.bpm.engine.rest.MigrationRestService;
+import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
+import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
+import org.camunda.bpm.engine.rest.TaskRestService;
+import org.camunda.bpm.engine.rest.TenantRestService;
+import org.camunda.bpm.engine.rest.UserRestService;
+import org.camunda.bpm.engine.rest.VariableInstanceRestService;
+import org.camunda.bpm.engine.rest.history.HistoryRestService;
 
 @Path(DefaultProcessEngineRestServiceImpl.PATH)
 public class DefaultProcessEngineRestServiceImpl extends AbstractProcessEngineRestServiceImpl {
@@ -141,6 +165,11 @@ public class DefaultProcessEngineRestServiceImpl extends AbstractProcessEngineRe
   @Path(BatchRestService.PATH)
   public BatchRestService getBatchRestService() {
     return super.getBatchRestService(null);
+  }
+
+  @Path(TenantRestService.PATH)
+  public TenantRestService getTenantRestService() {
+    return super.getTenantRestService(null);
   }
 
   @Override
