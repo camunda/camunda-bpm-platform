@@ -15,7 +15,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="batch in ctrl.getBatches('runtime')">
+              <tr ng-repeat="batch in ctrl.getBatches('runtime')" ng-class="{selected: ctrl.isSelected(batch)}">
                 <td class="uuid"><a ng-href="#/batch?details={{batch.id}}&type=runtime">{{batch.id}}</a></td>
                 <td>{{batch.type}}</td>
               </tr>
@@ -51,7 +51,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="batch in ctrl.getBatches('history')">
+              <tr ng-repeat="batch in ctrl.getBatches('history')" ng-class="{selected: ctrl.isSelected(batch)}">
                 <td class="uuid"><a ng-href="#/batch?details={{batch.id}}&type=history">{{batch.id}}</a></td>
                 <td>{{batch.type}}</td>
                 <td>{{batch.startTime}}</td>

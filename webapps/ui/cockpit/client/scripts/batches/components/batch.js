@@ -34,6 +34,10 @@ var Batch = function(camAPI, eventBus) {
   };
 };
 
+Batch.prototype.isSelected = function(batch) {
+  return this._batches.selection.data.id === batch.id;
+};
+
 Batch.prototype.getJobs = function() {
   return this._jobs.data;
 };
