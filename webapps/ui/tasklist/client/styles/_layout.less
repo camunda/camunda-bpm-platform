@@ -2,6 +2,11 @@
 
 .three-cols-layout-base();
 
+.tasks-list [cam-tasks] {
+  position: relative;
+  clear: both;
+}
+
 button {
   &.region-toggle {
     height: @column-top-height;
@@ -30,9 +35,6 @@ button {
 
   .columns {
     > .column {
-      &.tasks-list [cam-tasks] {
-        position: relative;
-      }
 
       > .cell.top button {
         &.region-toggle,

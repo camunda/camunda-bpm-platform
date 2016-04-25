@@ -92,7 +92,7 @@ describe('Repository Spec', function() {
       it('should use wrong deployment name and find nothing', function() {
 
         // when
-        deploymentsPage.createSearch('Name', '=', 'xyz');
+        deploymentsPage.createSearch('Name', 'xyz');
 
         //then
         expect(deploymentsPage.deploymentList().count()).to.eventually.eql(0);
@@ -206,7 +206,7 @@ describe('Repository Spec', function() {
       it('should search by invalid deployment source', function() {
 
         // when
-        deploymentsPage.createSearch('Source', '=', 'xyz');
+        deploymentsPage.createSearch('Source', 'xyz');
 
         //then
         expect(deploymentsPage.deploymentList().count()).to.eventually.eql(0);
@@ -570,19 +570,19 @@ describe('Repository Spec', function() {
 
   describe('multi tenancy', function() {
 
-  	before(function() {
+    before(function() {
       return testHelper(setupFile.multiTenancySetup, function() {
 
-      	repositoryPage.navigateToWebapp('Cockpit');
+        repositoryPage.navigateToWebapp('Cockpit');
         repositoryPage.authentication.userLogin('admin', 'admin');
         repositoryPage.navigateTo();
       });
     });
 
-  	it('should search by invalid tenant id', function() {
+    it('should search by invalid tenant id', function() {
 
       // when
-      deploymentsPage.createSearch('Tenant ID', '=', 'nonExisting');
+      deploymentsPage.createSearch('Tenant ID', 'nonExisting');
 
       //then
       expect(deploymentsPage.deploymentList().count()).to.eventually.eql(0);
@@ -601,6 +601,10 @@ describe('Repository Spec', function() {
     it('should search for deployment without tenant id', function() {
 
       // when
+      // prevent tooltip to intercept click
+      browser.actions().
+          mouseDown(element(by.css('body'))).
+          perform();
       deploymentsPage.changeType(0, 'without Tenant ID');
 
       // then

@@ -26,7 +26,7 @@ module.exports = Page.extend({
   deploymentSource: function(idx) {
     return this.deploymentList().get(idx).element(by.css('.source')).getText();
   },
-  
+
   deploymentTenantId: function(idx) {
     return this.deploymentList().get(idx).element(by.css('.tenant-id')).getText();
   },
@@ -131,6 +131,12 @@ module.exports = Page.extend({
   },
 
   createSearch: function(type, operator, value, isDateValue) {
+    var arity = arguments.length;
+    if (arity <= 3) {
+      operator = false;
+      value = arguments[1];
+      isDateValue = arguments[2];
+    }
     this.searchElement().element(by.css('.main-field')).click();
     this.searchTypeDropdown(type).click();
 
