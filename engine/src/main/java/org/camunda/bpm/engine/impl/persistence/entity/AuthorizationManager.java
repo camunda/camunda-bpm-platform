@@ -266,6 +266,10 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   public boolean isAuthorized(String userId, List<String> groupIds, List<PermissionCheck> permissionChecks) {
+    if(!isAuthorizationEnabled()) {
+      return true;
+    }
+
     List<String> filteredGroupIds = filterAuthenticatedGroupIds(groupIds);
 
     AuthorizationCheck authCheck = new AuthorizationCheck();
