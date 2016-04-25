@@ -402,6 +402,8 @@ describe('Admin Authorizations Spec', function() {
           'DELETE_INSTANCE',
           'READ_TASK',
           'UPDATE_TASK',
+          'TASK_ASSIGN',
+          'TASK_WORK',
           'READ_HISTORY',
           'DELETE_HISTORY'
         ];
@@ -557,7 +559,9 @@ describe('Admin Authorizations Spec', function() {
           'CREATE',
           'READ',
           'UPDATE',
-          'DELETE'
+          'DELETE',
+          'TASK_ASSIGN',
+          'TASK_WORK'
         ];
         checkPermissionTypes(permissionsList);
 

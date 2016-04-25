@@ -1,7 +1,6 @@
 'use strict';
 
 var factory = require('../../../common/tests/setup-factory.js'),
-    readResource = factory.readResource,
     combine = factory.combine,
     operation = factory.operation;
 
@@ -20,7 +19,7 @@ var fragment1 = combine(
     lastName:   'Starr',
     email:      'ringo.starr@the-beatles.com'
   }])
-)
+);
 
 
 var authBatch2 = [];
@@ -32,7 +31,7 @@ for (var i = 0; i < 10; i++) {
 
 var fragment2 = combine(
   operation('authorization', 'create', authBatch2)
-)
+);
 
 
 var authBatch3 = [];
@@ -44,7 +43,7 @@ for (var i = 0; i < 45; i++) {
 
 var fragment3 = combine(
   operation('authorization', 'create', authBatch3)
-)
+);
 
 
 module.exports = {
