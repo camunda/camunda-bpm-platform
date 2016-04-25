@@ -66,7 +66,7 @@ public class MigrationPlanBuilderImpl implements MigrationInstructionBuilder, Mi
 
   public MigrationInstructionsBuilder updateEventTriggers() {
     this.updateEventTriggersForGeneratedInstructions = true;
-    return null;
+    return this;
   }
 
   public String getSourceProcessDefinitionId() {
