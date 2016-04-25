@@ -14,13 +14,17 @@ package org.camunda.bpm.engine.impl.migration.instance.parser;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingEventSubscriptionInstance;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
@@ -31,12 +35,23 @@ import org.camunda.bpm.engine.migration.MigrationInstruction;
  */
 public class EventSubscriptionInstanceHandler implements MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<EventSubscriptionEntity>> {
 
+  public static final Set<String> SUPPORTED_EVENT_TYPES = new HashSet<String>();
+  static {
+    SUPPORTED_EVENT_TYPES.add(MessageEventSubscriptionEntity.EVENT_TYPE);
+    SUPPORTED_EVENT_TYPES.add(SignalEventSubscriptionEntity.EVENT_TYPE);
+  }
+
   @Override
   public void handle(MigratingInstanceParseContext parseContext, MigratingActivityInstance owningInstance, List<EventSubscriptionEntity> elements) {
 
     Map<String, EventSubscriptionDeclaration> targetDeclarations = getDeclarationsByTriggeringActivity(owningInstance.getTargetScope());
 
     for (EventSubscriptionEntity eventSubscription : elements) {
+      if (!getSupportedEventTypes().contains(eventSubscription.getEventType())) {
+        // ignore unsupported event subscriptions
+        continue;
+      }
+
       MigrationInstruction migrationInstruction = parseContext.findSingleMigrationInstruction(eventSubscription.getActivityId());
       ActivityImpl targetActivity = parseContext.getTargetActivity(migrationInstruction);
 
@@ -60,6 +75,10 @@ public class EventSubscriptionInstanceHandler implements MigratingDependentInsta
     if (owningInstance.migrates()) {
       addEmergingEventSubscriptions(owningInstance, targetDeclarations.values());
     }
+  }
+
+  protected Set<String> getSupportedEventTypes() {
+    return SUPPORTED_EVENT_TYPES;
   }
 
   protected Map<String, EventSubscriptionDeclaration> getDeclarationsByTriggeringActivity(ScopeImpl eventScope) {

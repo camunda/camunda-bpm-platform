@@ -203,6 +203,7 @@ import org.camunda.bpm.engine.impl.migration.validation.instance.AdditionalFlowS
 import org.camunda.bpm.engine.impl.migration.validation.instance.AsyncAfterMigrationValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.AsyncMigrationValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.AsyncProcessStartMigrationValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instance.CompensateEventSubscriptionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingActivityInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingTransitionInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.NoUnmappedLeafInstanceValidator;
@@ -3256,6 +3257,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     migratingActivityInstanceValidators.add(new NoUnmappedLeafInstanceValidator());
     migratingActivityInstanceValidators.add(new VariableConflictActivityInstanceValidator());
     migratingActivityInstanceValidators.add(new SupportedActivityInstanceValidator());
+    migratingActivityInstanceValidators.add(new CompensateEventSubscriptionValidator());
 
     return migratingActivityInstanceValidators;
   }
