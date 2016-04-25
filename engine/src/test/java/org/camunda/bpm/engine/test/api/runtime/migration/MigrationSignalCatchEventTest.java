@@ -101,7 +101,7 @@ public class MigrationSignalCatchEventTest {
   }
 
   @Test
-  public void testMigrateEventSubscriptionChangeSignalName() {
+  public void testMigrateEventSubscriptionPreserveSignalName() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.newModel()

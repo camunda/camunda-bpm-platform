@@ -114,7 +114,7 @@ public class MigrationReceiveTaskTest {
   }
 
   @Test
-  public void testMigrateEventSubscriptionChangeMessageName() {
+  public void testMigrateEventSubscriptionPreserveMessageName() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS)

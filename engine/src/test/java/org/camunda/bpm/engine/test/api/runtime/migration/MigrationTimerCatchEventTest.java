@@ -111,7 +111,7 @@ public class MigrationTimerCatchEventTest {
   }
 
   @Test
-  public void testMigrateJobChangeTimerConfiguration() {
+  public void testMigrateJobPreserveTimerConfiguration() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.newModel()
