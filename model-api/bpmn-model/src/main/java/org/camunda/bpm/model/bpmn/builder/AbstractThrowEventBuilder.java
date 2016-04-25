@@ -13,6 +13,7 @@
 package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.CompensateEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.EscalationEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
@@ -95,5 +96,19 @@ public abstract class AbstractThrowEventBuilder<B extends AbstractThrowEventBuil
     element.getEventDefinitions().add(escalationEventDefinition);
 
     return myself;
+  }
+
+  public CompensateEventDefinitionBuilder compensateEventDefinition() {
+    return compensateEventDefinition(null);
+  }
+
+  public CompensateEventDefinitionBuilder compensateEventDefinition(String id) {
+    CompensateEventDefinition eventDefinition = createInstance(CompensateEventDefinition.class);
+    if (id != null) {
+      eventDefinition.setId(id);
+    }
+
+    element.getEventDefinitions().add(eventDefinition);
+    return new CompensateEventDefinitionBuilder(modelInstance, eventDefinition);
   }
 }

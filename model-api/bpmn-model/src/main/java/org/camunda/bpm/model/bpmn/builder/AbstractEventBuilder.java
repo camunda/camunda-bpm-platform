@@ -24,5 +24,4 @@ public abstract class AbstractEventBuilder<B extends  AbstractEventBuilder<B, E>
   protected AbstractEventBuilder(BpmnModelInstance modelInstance, E element, Class<?> selfType) {
     super(modelInstance, element, selfType);
   }
-
 }

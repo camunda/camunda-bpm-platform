@@ -47,6 +47,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.GatewayDirection;
 import org.camunda.bpm.model.bpmn.TransactionMethod;
+import org.camunda.bpm.model.bpmn.instance.Activity;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
@@ -2067,6 +2068,164 @@ public class ProcessBuilderTest {
 
     StartEvent startEvent = modelInstance.getModelElementById(START_EVENT_ID);
     assertCamundaFormField(startEvent);
+  }
+
+  @Test
+  public void testCompensateEventDefintionCatchStartEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent("start")
+        .compensateEventDefinition()
+        .waitForCompletion(false)
+        .compensateEventDefinitionDone()
+      .userTask("userTask")
+      .endEvent("end")
+      .done();
+
+    CompensateEventDefinition eventDefinition = assertAndGetSingleEventDefinition("start", CompensateEventDefinition.class);
+    Activity activity = eventDefinition.getActivity();
+    assertThat(activity).isNull();
+    assertThat(eventDefinition.isWaitForCompletion()).isFalse();
+  }
+
+
+  @Test
+  public void testCompensateEventDefintionCatchBoundaryEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("userTask")
+      .boundaryEvent("catch")
+        .compensateEventDefinition()
+        .waitForCompletion(false)
+        .compensateEventDefinitionDone()
+      .endEvent("end")
+      .done();
+
+    CompensateEventDefinition eventDefinition = assertAndGetSingleEventDefinition("catch", CompensateEventDefinition.class);
+    Activity activity = eventDefinition.getActivity();
+    assertThat(activity).isNull();
+    assertThat(eventDefinition.isWaitForCompletion()).isFalse();
+  }
+
+  @Test
+  public void testCompensateEventDefintionCatchBoundaryEventWithId() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("userTask")
+      .boundaryEvent("catch")
+        .compensateEventDefinition("foo")
+        .waitForCompletion(false)
+        .compensateEventDefinitionDone()
+      .endEvent("end")
+      .done();
+
+    CompensateEventDefinition eventDefinition = assertAndGetSingleEventDefinition("catch", CompensateEventDefinition.class);
+    assertThat(eventDefinition.getId()).isEqualTo("foo");
+  }
+
+  @Test
+  public void testCompensateEventDefintionThrowEndEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("userTask")
+      .endEvent("end")
+        .compensateEventDefinition()
+        .activityRef("userTask")
+        .waitForCompletion(true)
+        .compensateEventDefinitionDone()
+      .done();
+
+    CompensateEventDefinition eventDefinition = assertAndGetSingleEventDefinition("end", CompensateEventDefinition.class);
+    Activity activity = eventDefinition.getActivity();
+    assertThat(activity).isEqualTo(modelInstance.getModelElementById("userTask"));
+    assertThat(eventDefinition.isWaitForCompletion()).isTrue();
+  }
+
+  @Test
+  public void testCompensateEventDefintionThrowIntermediateEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("userTask")
+      .intermediateThrowEvent("throw")
+        .compensateEventDefinition()
+        .activityRef("userTask")
+        .waitForCompletion(true)
+        .compensateEventDefinitionDone()
+      .endEvent("end")
+      .done();
+
+    CompensateEventDefinition eventDefinition = assertAndGetSingleEventDefinition("throw", CompensateEventDefinition.class);
+    Activity activity = eventDefinition.getActivity();
+    assertThat(activity).isEqualTo(modelInstance.getModelElementById("userTask"));
+    assertThat(eventDefinition.isWaitForCompletion()).isTrue();
+  }
+
+  @Test
+  public void testCompensateEventDefintionThrowIntermediateEventWithId() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("userTask")
+      .intermediateCatchEvent("throw")
+        .compensateEventDefinition("foo")
+        .activityRef("userTask")
+        .waitForCompletion(true)
+        .compensateEventDefinitionDone()
+      .endEvent("end")
+      .done();
+
+    CompensateEventDefinition eventDefinition = assertAndGetSingleEventDefinition("throw", CompensateEventDefinition.class);
+    assertThat(eventDefinition.getId()).isEqualTo("foo");
+  }
+
+  @Test
+  public void testCompensateEventDefintionReferencesNonExistingActivity() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("userTask")
+      .endEvent("end")
+      .done();
+
+    UserTask userTask = modelInstance.getModelElementById("userTask");
+    UserTaskBuilder userTaskBuilder = userTask.builder();
+
+    try {
+      userTaskBuilder
+        .boundaryEvent()
+        .compensateEventDefinition()
+        .activityRef("nonExistingTask")
+        .done();
+      fail("should fail");
+    } catch (BpmnModelException e) {
+      assertThat(e).hasMessageContaining("Activity with id 'nonExistingTask' does not exist");
+    }
+  }
+
+  @Test
+  public void testCompensateEventDefintionReferencesActivityInDifferentScope() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("userTask")
+      .subProcess()
+        .embeddedSubProcess()
+        .startEvent()
+        .userTask("subProcessTask")
+        .endEvent()
+        .subProcessDone()
+      .endEvent("end")
+      .done();
+
+    UserTask userTask = modelInstance.getModelElementById("userTask");
+    UserTaskBuilder userTaskBuilder = userTask.builder();
+
+    try {
+      userTaskBuilder
+        .boundaryEvent("boundary")
+        .compensateEventDefinition()
+        .activityRef("subProcessTask")
+        .done();
+      fail("should fail");
+    } catch (BpmnModelException e) {
+      assertThat(e).hasMessageContaining("Activity with id 'subProcessTask' must be in the same scope as 'boundary'");
+    }
   }
 
   protected Message assertMessageEventDefinition(String elementId, String messageName) {
