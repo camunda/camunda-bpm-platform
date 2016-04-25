@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.test.api.multitenancy.suspensionstate;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -22,15 +21,21 @@ import java.util.Arrays;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.RuleChain;
 
-public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyProcessInstanceSuspensionStateTest {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
@@ -49,26 +54,37 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
           .timerWithDuration("PT1M")
       .done();
 
-  @Override
-  protected void setUp() throws Exception {
+  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
 
-    deploymentForTenant(TENANT_ONE, PROCESS);
-    deploymentForTenant(TENANT_TWO, PROCESS);
-    deployment(PROCESS);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
-    runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionTenantId(TENANT_ONE).execute();
-    runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionTenantId(TENANT_TWO).execute();
-    runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionWithoutTenantId().execute();
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  @Rule
+  public ExpectedException thrown= ExpectedException.none();
+
+  @Before
+  public void setUp() throws Exception {
+
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_TWO, PROCESS);
+    testRule.deploy(PROCESS);
+
+    engineRule.getRuntimeService().createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionTenantId(TENANT_TWO).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionWithoutTenantId().execute();
   }
 
-  public void testSuspendAndActivateProcessInstancesForAllTenants() {
+  @Test
+  public void suspendAndActivateProcessInstancesForAllTenants() {
     // given activated process instances
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
     // first suspend
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
@@ -77,7 +93,7 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().count(), is(3L));
 
     // then activate
-    runtimeService
+    engineRule.getRuntimeService()
     .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .activate();
@@ -86,13 +102,14 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().count(), is(0L));
   }
 
-  public void testSuspendProcessInstanceForTenant() {
+  @Test
+  public void suspendProcessInstanceForTenant() {
     // given activated process instances
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
@@ -103,13 +120,14 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testSuspendProcessInstanceForNonTenant() {
+  @Test
+  public void suspendProcessInstanceForNonTenant() {
     // given activated process instances
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
@@ -120,18 +138,19 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().withoutTenantId().count(), is(1L));
   }
 
-  public void testActivateProcessInstanceForTenant() {
+  @Test
+  public void activateProcessInstanceForTenant() {
     // given suspended process instances
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
@@ -142,18 +161,19 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.active().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testActivateProcessInstanceForNonTenant() {
+  @Test
+  public void activateProcessInstanceForNonTenant() {
     // given suspended process instances
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
@@ -164,14 +184,15 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.active().withoutTenantId().count(), is(1L));
   }
 
-  public void testSuspendAndActivateProcessInstancesIncludingUserTasksForAllTenants() {
+  @Test
+  public void suspendAndActivateProcessInstancesIncludingUserTasksForAllTenants() {
     // given activated user tasks
-    TaskQuery query = taskService.createTaskQuery();
+    TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
     // first suspend
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
@@ -180,7 +201,7 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().count(), is(3L));
 
     // then activate
-    runtimeService
+    engineRule.getRuntimeService()
     .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .activate();
@@ -189,13 +210,14 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().count(), is(0L));
   }
 
-  public void testSuspendProcessInstanceIncludingUserTaskForTenant() {
+  @Test
+  public void suspendProcessInstanceIncludingUserTaskForTenant() {
     // given activated user tasks
-    TaskQuery query = taskService.createTaskQuery();
+    TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
@@ -206,13 +228,14 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testSuspendProcessInstanceIncludingUserTaskForNonTenant() {
+  @Test
+  public void suspendProcessInstanceIncludingUserTaskForNonTenant() {
     // given activated user tasks
-    TaskQuery query = taskService.createTaskQuery();
+    TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
@@ -223,18 +246,19 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().withoutTenantId().count(), is(1L));
   }
 
-  public void testActivateProcessInstanceIncludingUserTaskForTenant() {
+  @Test
+  public void activateProcessInstanceIncludingUserTaskForTenant() {
     // given suspended user tasks
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    TaskQuery query = taskService.createTaskQuery();
+    TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
@@ -245,18 +269,19 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.active().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testActivateProcessInstanceIncludingUserTaskForNonTenant() {
+  @Test
+  public void activateProcessInstanceIncludingUserTaskForNonTenant() {
     // given suspended user tasks
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    TaskQuery query = taskService.createTaskQuery();
+    TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
@@ -267,14 +292,15 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.active().withoutTenantId().count(), is(1L));
   }
 
-  public void testSuspendAndActivateProcessInstancesIncludingExternalTasksForAllTenants() {
+  @Test
+  public void suspendAndActivateProcessInstancesIncludingExternalTasksForAllTenants() {
     // given activated external tasks
-    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
+    ExternalTaskQuery query = engineRule.getExternalTaskService().createExternalTaskQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
     // first suspend
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
@@ -283,7 +309,7 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().count(), is(3L));
 
     // then activate
-    runtimeService
+    engineRule.getRuntimeService()
     .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .activate();
@@ -292,13 +318,14 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().count(), is(0L));
   }
 
-  public void testSuspendProcessInstanceIncludingExternalTaskForTenant() {
+  @Test
+  public void suspendProcessInstanceIncludingExternalTaskForTenant() {
     // given activated external tasks
-    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
+    ExternalTaskQuery query = engineRule.getExternalTaskService().createExternalTaskQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
@@ -309,13 +336,14 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testSuspendProcessInstanceIncludingExternalTaskForNonTenant() {
+  @Test
+  public void suspendProcessInstanceIncludingExternalTaskForNonTenant() {
     // given activated external tasks
-    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
+    ExternalTaskQuery query = engineRule.getExternalTaskService().createExternalTaskQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
@@ -326,18 +354,19 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().singleResult().getTenantId(), is(nullValue()));
   }
 
-  public void testActivateProcessInstanceIncludingExternalTaskForTenant() {
+  @Test
+  public void activateProcessInstanceIncludingExternalTaskForTenant() {
     // given suspended external tasks
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
+    ExternalTaskQuery query = engineRule.getExternalTaskService().createExternalTaskQuery();
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
@@ -348,18 +377,19 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.active().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testActivateProcessInstanceIncludingExternalTaskForNonTenant() {
+  @Test
+  public void activateProcessInstanceIncludingExternalTaskForNonTenant() {
     // given suspended external tasks
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
+    ExternalTaskQuery query = engineRule.getExternalTaskService().createExternalTaskQuery();
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
@@ -370,14 +400,15 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.active().singleResult().getTenantId(), is(nullValue()));
   }
 
-  public void testSuspendAndActivateProcessInstancesIncludingJobsForAllTenants() {
+  @Test
+  public void suspendAndActivateProcessInstancesIncludingJobsForAllTenants() {
     // given activated jobs
-    JobQuery query = managementService.createJobQuery();
+    JobQuery query = engineRule.getManagementService().createJobQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
     // first suspend
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
@@ -386,7 +417,7 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().count(), is(3L));
 
     // then activate
-    runtimeService
+    engineRule.getRuntimeService()
     .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .activate();
@@ -395,13 +426,14 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().count(), is(0L));
   }
 
-  public void testSuspendProcessInstanceIncludingJobForTenant() {
+  @Test
+  public void suspendProcessInstanceIncludingJobForTenant() {
     // given activated jobs
-    JobQuery query = managementService.createJobQuery();
+    JobQuery query = engineRule.getManagementService().createJobQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
@@ -412,13 +444,14 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testSuspendProcessInstanceIncludingJobForNonTenant() {
+  @Test
+  public void suspendProcessInstanceIncludingJobForNonTenant() {
     // given activated jobs
-    JobQuery query = managementService.createJobQuery();
+    JobQuery query = engineRule.getManagementService().createJobQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
@@ -429,18 +462,19 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().singleResult().getTenantId(), is(nullValue()));
   }
 
-  public void testActivateProcessInstanceIncludingJobForTenant() {
+  @Test
+  public void activateProcessInstanceIncludingJobForTenant() {
     // given suspended job
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    JobQuery query = managementService.createJobQuery();
+    JobQuery query = engineRule.getManagementService().createJobQuery();
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
@@ -451,18 +485,19 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.active().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testActivateProcessInstanceIncludingJobForNonTenant() {
+  @Test
+  public void activateProcessInstanceIncludingJobForNonTenant() {
     // given suspended jobs
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    JobQuery query = managementService.createJobQuery();
+    JobQuery query = engineRule.getManagementService().createJobQuery();
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
@@ -473,58 +508,59 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.active().singleResult().getTenantId(), is(nullValue()));
   }
 
-  public void testSuspendProcessInstanceNoAuthenticatedTenants() {
+  @Test
+  public void suspendProcessInstanceNoAuthenticatedTenants() {
     // given activated process instances
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    identityService.setAuthentication("user", null, null);
+    engineRule.getIdentityService().setAuthentication("user", null, null);
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    identityService.clearAuthentication();
+    engineRule.getIdentityService().clearAuthentication();
 
     assertThat(query.active().count(), is(2L));
     assertThat(query.suspended().count(), is(1L));
     assertThat(query.suspended().withoutTenantId().count(), is(1L));
   }
 
-  public void testFailToSuspendProcessInstanceByProcessDefinitionIdNoAuthenticatedTenants() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+  @Test
+  public void failToSuspendProcessInstanceByProcessDefinitionIdNoAuthenticatedTenants() {
+    ProcessDefinition processDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery()
         .processDefinitionKey(PROCESS_DEFINITION_KEY).tenantIdIn(TENANT_ONE).singleResult();
 
-    identityService.setAuthentication("user", null, null);
+    // declare expected exception
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot update the suspension state of an instance of the process definition");
 
-    try {
-      runtimeService
+    engineRule.getIdentityService().setAuthentication("user", null, null);
+
+    engineRule.getRuntimeService()
         .updateProcessInstanceSuspensionState()
         .byProcessDefinitionId(processDefinition.getId())
         .suspend();
-
-        fail("expected exception");
-    } catch(ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot update the suspension state of an instance of the process definition"));
-    }
   }
 
-  public void testSuspendProcessInstanceWithAuthenticatedTenant() {
+  @Test
+  public void suspendProcessInstanceWithAuthenticatedTenant() {
     // given activated process instances
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+    engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    identityService.clearAuthentication();
+    engineRule.getIdentityService().clearAuthentication();
 
     assertThat(query.active().count(), is(1L));
     assertThat(query.suspended().count(), is(2L));
@@ -533,16 +569,17 @@ public class MultiTenancyProcessInstanceSuspensionStateTest extends PluggablePro
     assertThat(query.suspended().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testSuspendProcessInstanceDisabledTenantCheck() {
+  @Test
+  public void suspendProcessInstanceDisabledTenantCheck() {
     // given activated process instances
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthentication("user", null, null);
+    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
+    engineRule.getIdentityService().setAuthentication("user", null, null);
 
-    runtimeService
+    engineRule.getRuntimeService()
       .updateProcessInstanceSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();

@@ -26,14 +26,20 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
-public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyJobDefinitionSuspensionStateTest {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
@@ -47,26 +53,34 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
       .endEvent()
       .done();
 
-  @Override
-  protected void setUp() throws Exception {
+  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
 
-    deploymentForTenant(TENANT_ONE, PROCESS);
-    deploymentForTenant(TENANT_TWO, PROCESS);
-    deployment(PROCESS);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
-    runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionTenantId(TENANT_ONE).execute();
-    runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionTenantId(TENANT_TWO).execute();
-    runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionWithoutTenantId().execute();
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  @Before
+  public void setUp() throws Exception {
+
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_TWO, PROCESS);
+    testRule.deploy(PROCESS);
+
+    engineRule.getRuntimeService().createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionTenantId(TENANT_TWO).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionWithoutTenantId().execute();
   }
 
-  public void testSuspendAndActivateJobDefinitionsForAllTenants() {
+  @Test
+  public void suspendAndActivateJobDefinitionsForAllTenants() {
     // given activated job definitions
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
     // first suspend
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
@@ -75,7 +89,7 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
     assertThat(query.suspended().count(), is(3L));
 
     // then activate
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .activate();
@@ -84,13 +98,14 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
     assertThat(query.suspended().count(), is(0L));
   }
 
-  public void testSuspendJobDefinitionForTenant() {
+  @Test
+  public void suspendJobDefinitionForTenant() {
     // given activated job definitions
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
@@ -101,13 +116,14 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
     assertThat(query.suspended().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testSuspendJobDefinitionForNonTenant() {
+  @Test
+  public void suspendJobDefinitionForNonTenant() {
     // given activated job definitions
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
@@ -118,18 +134,19 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
     assertThat(query.suspended().withoutTenantId().count(), is(1L));
   }
 
-  public void testActivateJobDefinitionForTenant() {
+  @Test
+  public void activateJobDefinitionForTenant() {
     // given suspend job definitions
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertThat(query.suspended().count(), is(3L));
     assertThat(query.active().count(), is(0L));
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
@@ -140,18 +157,19 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
     assertThat(query.active().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testJobProcessDefinitionForNonTenant() {
+  @Test
+  public void jobProcessDefinitionForNonTenant() {
     // given suspend job definitions
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertThat(query.suspended().count(), is(3L));
     assertThat(query.active().count(), is(0L));
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
@@ -162,14 +180,15 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
     assertThat(query.active().withoutTenantId().count(), is(1L));
   }
 
-  public void testSuspendAndActivateJobDefinitionsIncludingJobsForAllTenants() {
+  @Test
+  public void suspendAndActivateJobDefinitionsIncludingJobsForAllTenants() {
     // given activated job definitions
-    JobQuery query = managementService.createJobQuery();
+    JobQuery query = engineRule.getManagementService().createJobQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
     // first suspend
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .includeJobs(true)
@@ -179,7 +198,7 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
     assertThat(query.suspended().count(), is(3L));
 
     // then activate
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .includeJobs(true)
@@ -189,13 +208,14 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
     assertThat(query.suspended().count(), is(0L));
   }
 
-  public void testSuspendJobDefinitionIncludingJobsForTenant() {
+  @Test
+  public void suspendJobDefinitionIncludingJobsForTenant() {
     // given activated job definitions
-    JobQuery query = managementService.createJobQuery();
+    JobQuery query = engineRule.getManagementService().createJobQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
@@ -207,13 +227,14 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
     assertThat(query.suspended().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testSuspendJobDefinitionIncludingJobsForNonTenant() {
+  @Test
+  public void suspendJobDefinitionIncludingJobsForNonTenant() {
     // given activated job definitions
-    JobQuery query = managementService.createJobQuery();
+    JobQuery query = engineRule.getManagementService().createJobQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
@@ -225,19 +246,20 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
     assertThat(query.suspended().withoutTenantId().count(), is(1L));
   }
 
-  public void testActivateJobDefinitionIncludingJobsForTenant() {
+  @Test
+  public void activateJobDefinitionIncludingJobsForTenant() {
     // given suspend job definitions
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .includeJobs(true)
       .suspend();
 
-    JobQuery query = managementService.createJobQuery();
+    JobQuery query = engineRule.getManagementService().createJobQuery();
     assertThat(query.suspended().count(), is(3L));
     assertThat(query.active().count(), is(0L));
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
@@ -249,19 +271,20 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
     assertThat(query.active().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testActivateJobDefinitionIncludingJobsForNonTenant() {
+  @Test
+  public void activateJobDefinitionIncludingJobsForNonTenant() {
     // given suspend job definitions
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .includeJobs(true)
       .suspend();
 
-    JobQuery query = managementService.createJobQuery();
+    JobQuery query = engineRule.getManagementService().createJobQuery();
     assertThat(query.suspended().count(), is(3L));
     assertThat(query.active().count(), is(0L));
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
@@ -273,198 +296,206 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
     assertThat(query.active().withoutTenantId().count(), is(1L));
   }
 
-  public void testDelayedSuspendJobDefinitionsForAllTenants() {
+  @Test
+  public void delayedSuspendJobDefinitionsForAllTenants() {
     // given activated job definitions
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .executionDate(tomorrow())
       .suspend();
 
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
     // when execute the job to suspend the job definitions
-    Job job = managementService.createJobQuery().timers().singleResult();
+    Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
 
-    managementService.executeJob(job.getId());
+    engineRule.getManagementService().executeJob(job.getId());
 
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
   }
 
-  public void testDelayedSuspendJobDefinitionsForTenant() {
+  @Test
+  public void delayedSuspendJobDefinitionsForTenant() {
     // given activated job definitions
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
       .executionDate(tomorrow())
       .suspend();
 
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
     // when execute the job to suspend the job definitions
-    Job job = managementService.createJobQuery().timers().singleResult();
+    Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
 
-    managementService.executeJob(job.getId());
+    engineRule.getManagementService().executeJob(job.getId());
 
     assertThat(query.active().count(), is(2L));
     assertThat(query.suspended().count(), is(1L));
     assertThat(query.suspended().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testDelayedSuspendJobDefinitionsForNonTenant() {
+  @Test
+  public void delayedSuspendJobDefinitionsForNonTenant() {
     // given activated job definitions
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
       .executionDate(tomorrow())
       .suspend();
 
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
     // when execute the job to suspend the job definitions
-    Job job = managementService.createJobQuery().timers().singleResult();
+    Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
 
-    managementService.executeJob(job.getId());
+    engineRule.getManagementService().executeJob(job.getId());
 
     assertThat(query.active().count(), is(2L));
     assertThat(query.suspended().count(), is(1L));
     assertThat(query.suspended().withoutTenantId().count(), is(1L));
   }
 
-  public void testDelayedActivateJobDefinitionsForAllTenants() {
+  @Test
+  public void delayedActivateJobDefinitionsForAllTenants() {
     // given suspend job definitions
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .executionDate(tomorrow())
       .activate();
 
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
 
     // when execute the job to activate the job definitions
-    Job job = managementService.createJobQuery().timers().singleResult();
+    Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
 
-    managementService.executeJob(job.getId());
+    engineRule.getManagementService().executeJob(job.getId());
 
     assertThat(query.suspended().count(), is(0L));
     assertThat(query.active().count(), is(3L));
   }
 
-  public void testDelayedActivateJobDefinitionsForTenant() {
+  @Test
+  public void delayedActivateJobDefinitionsForTenant() {
     // given suspend job definitions
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionTenantId(TENANT_ONE)
       .executionDate(tomorrow())
       .activate();
 
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
 
     // when execute the job to activate the job definitions
-    Job job = managementService.createJobQuery().timers().singleResult();
+    Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
 
-    managementService.executeJob(job.getId());
+    engineRule.getManagementService().executeJob(job.getId());
 
     assertThat(query.suspended().count(), is(2L));
     assertThat(query.active().count(), is(1L));
     assertThat(query.active().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testDelayedActivateJobDefinitionsForNonTenant() {
+  @Test
+  public void delayedActivateJobDefinitionsForNonTenant() {
     // given suspend job definitions
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .processDefinitionWithoutTenantId()
       .executionDate(tomorrow())
       .activate();
 
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertThat(query.active().count(), is(0L));
     assertThat(query.suspended().count(), is(3L));
 
     // when execute the job to activate the job definitions
-    Job job = managementService.createJobQuery().timers().singleResult();
+    Job job = engineRule.getManagementService().createJobQuery().timers().singleResult();
     assertThat(job, is(notNullValue()));
 
-    managementService.executeJob(job.getId());
+    engineRule.getManagementService().executeJob(job.getId());
 
     assertThat(query.suspended().count(), is(2L));
     assertThat(query.active().count(), is(1L));
     assertThat(query.active().withoutTenantId().count(), is(1L));
   }
 
-  public void testSuspendJobDefinitionNoAuthenticatedTenants() {
+  @Test
+  public void suspendJobDefinitionNoAuthenticatedTenants() {
     // given activated job definitions
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    identityService.setAuthentication("user", null, null);
+    engineRule.getIdentityService().setAuthentication("user", null, null);
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    identityService.clearAuthentication();
+    engineRule.getIdentityService().clearAuthentication();
 
     assertThat(query.active().count(), is(2L));
     assertThat(query.suspended().count(), is(1L));
     assertThat(query.suspended().withoutTenantId().count(), is(1L));
   }
 
-  public void testSuspendJobDefinitionWithAuthenticatedTenant() {
+  @Test
+  public void suspendJobDefinitionWithAuthenticatedTenant() {
     // given activated job definitions
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+    engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
 
-    identityService.clearAuthentication();
+    engineRule.getIdentityService().clearAuthentication();
 
     assertThat(query.active().count(), is(1L));
     assertThat(query.suspended().count(), is(2L));
@@ -473,16 +504,17 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
     assertThat(query.suspended().tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testSuspendJobDefinitionDisabledTenantCheck() {
+  @Test
+  public void suspendJobDefinitionDisabledTenantCheck() {
     // given activated job definitions
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+    JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertThat(query.active().count(), is(3L));
     assertThat(query.suspended().count(), is(0L));
 
-    processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthentication("user", null, null);
+    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
+    engineRule.getIdentityService().setAuthentication("user", null, null);
 
-    managementService
+    engineRule.getManagementService()
       .updateJobDefinitionSuspensionState()
       .byProcessDefinitionKey(PROCESS_DEFINITION_KEY)
       .suspend();
@@ -498,9 +530,9 @@ public class MultiTenancyJobDefinitionSuspensionStateTest extends PluggableProce
     return calendar.getTime();
   }
 
-  @Override
+  @After
   public void tearDown() throws Exception {
-    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
         commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerActivateJobDefinitionHandler.TYPE);

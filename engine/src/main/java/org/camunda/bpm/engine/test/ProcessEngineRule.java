@@ -31,6 +31,8 @@ import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.junit.Assume;
@@ -99,6 +101,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   protected boolean ensureCleanAfterTest = false;
 
   protected ProcessEngine processEngine;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -177,6 +180,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   }
 
   protected void initializeServices() {
+    processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
     repositoryService = processEngine.getRepositoryService();
     runtimeService = processEngine.getRuntimeService();
     taskService = processEngine.getTaskService();
@@ -192,6 +196,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   }
 
   protected void clearServiceReferences() {
+    processEngineConfiguration = null;
     repositoryService = null;
     runtimeService = null;
     taskService = null;
@@ -219,6 +224,9 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
     ClockUtil.reset();
 
+    identityService.clearAuthentication();
+    processEngine.getProcessEngineConfiguration().setTenantCheckEnabled(true);
+
     clearServiceReferences();
   }
 
@@ -240,6 +248,14 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
   public void setProcessEngine(ProcessEngine processEngine) {
     this.processEngine = processEngine;
+  }
+
+  public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
+    return processEngineConfiguration;
+  }
+
+  public void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    this.processEngineConfiguration = processEngineConfiguration;
   }
 
   @Override
