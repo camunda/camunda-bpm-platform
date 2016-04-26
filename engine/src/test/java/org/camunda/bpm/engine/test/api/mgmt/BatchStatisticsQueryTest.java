@@ -408,6 +408,40 @@ public class BatchStatisticsQueryTest {
   }
 
   @Test
+  public void testStatisticsRetriedFailedJobs() {
+    // given
+    Batch batch = helper.createMigrationBatchWithSize(3);
+
+    // when
+    helper.completeSeedJobs(batch);
+    helper.failMigrationJobs(batch, 3);
+
+    // then
+    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
+      .singleResult();
+
+    assertEquals(3, batchStatistics.getSize());
+    assertEquals(3, batchStatistics.getJobsCreated());
+    assertEquals(3, batchStatistics.getRemainingJobs());
+    assertEquals(0, batchStatistics.getCompletedJobs());
+    assertEquals(3, batchStatistics.getFailedJobs());
+
+    // when
+    helper.setRetries(batch, 3, 1);
+    helper.completeMigrationJobs(batch, 3);
+
+    // then
+    batchStatistics = managementService.createBatchStatisticsQuery()
+      .singleResult();
+
+    assertEquals(3, batchStatistics.getSize());
+    assertEquals(3, batchStatistics.getJobsCreated());
+    assertEquals(0, batchStatistics.getRemainingJobs());
+    assertEquals(3, batchStatistics.getCompletedJobs());
+    assertEquals(0, batchStatistics.getFailedJobs());
+  }
+
+  @Test
   public void testStatisticsWithDeletedJobs() {
     // given
     Batch batch = helper.createMigrationBatchWithSize(13);
@@ -453,7 +487,7 @@ public class BatchStatisticsQueryTest {
     // given
     Batch batch1 = helper.createMigrationBatchWithSize(3);
     Batch batch2 = helper.createMigrationBatchWithSize(13);
-    Batch batch3 = helper.createMigrationBatchWithSize(4);
+    Batch batch3 = helper.createMigrationBatchWithSize(15);
 
     // when
     helper.executeJob(helper.getSeedJob(batch2));
@@ -461,7 +495,10 @@ public class BatchStatisticsQueryTest {
     helper.failMigrationJobs(batch2, 3);
 
     helper.executeJob(helper.getSeedJob(batch3));
-    helper.failMigrationJobs(batch3, 4);
+    deleteMigrationJobs(batch3);
+    helper.executeJob(helper.getSeedJob(batch3));
+    helper.completeMigrationJobs(batch3, 2);
+    helper.failMigrationJobs(batch3, 3);
 
     // then
     List<BatchStatistics> batchStatisticsList = managementService.createBatchStatisticsQuery()
@@ -486,16 +523,17 @@ public class BatchStatisticsQueryTest {
       }
       else if (batch3.getId().equals(batchStatistics.getId())) {
         // batch 3
-        assertEquals(4, batchStatistics.getSize());
-        assertEquals(4, batchStatistics.getJobsCreated());
-        assertEquals(4, batchStatistics.getRemainingJobs());
-        assertEquals(0, batchStatistics.getCompletedJobs());
-        assertEquals(4, batchStatistics.getFailedJobs());
+        assertEquals(15, batchStatistics.getSize());
+        assertEquals(15, batchStatistics.getJobsCreated());
+        assertEquals(3, batchStatistics.getRemainingJobs());
+        assertEquals(12, batchStatistics.getCompletedJobs());
+        assertEquals(3, batchStatistics.getFailedJobs());
       }
     }
   }
 
   protected void deleteMigrationJobs(Batch batch) {
+    // workaround for CAM-5857
     final BatchEntity batchEntity = (BatchEntity) batch;
     ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration())
       .getCommandExecutorTxRequired().execute(new Command<Void>() {

@@ -169,13 +169,18 @@ public class BatchMigrationHelper {
   }
 
   public void failMigrationJobs(Batch batch, int count) {
+    setRetries(batch, count, 0);
+  }
+
+  public void setRetries(Batch batch, int count, int retries) {
     List<Job> migrationJobs = getMigrationJobs(batch);
     assertTrue(migrationJobs.size() >= count);
 
     ManagementService managementService = engineRule.getManagementService();
     for (int i = 0; i < count; i++) {
-      managementService.setJobRetries(migrationJobs.get(i).getId(), 0);
+      managementService.setJobRetries(migrationJobs.get(i).getId(), retries);
     }
+
   }
 
   public void completeMonitorJobs(Batch batch) {

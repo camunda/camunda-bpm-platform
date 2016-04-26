@@ -109,6 +109,7 @@ public class BatchQueryTest {
     Assert.assertEquals(batch.getBatchJobsPerSeed(), resultBatch.getBatchJobsPerSeed());
     Assert.assertEquals(batch.getInvocationsPerBatchJob(), resultBatch.getInvocationsPerBatchJob());
     Assert.assertEquals(batch.getSize(), resultBatch.getSize());
+    Assert.assertEquals(batch.getJobsCreated(), resultBatch.getJobsCreated());
   }
 
   @Test
