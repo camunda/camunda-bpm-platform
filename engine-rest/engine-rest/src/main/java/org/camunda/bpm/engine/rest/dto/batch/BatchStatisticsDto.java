@@ -37,7 +37,7 @@ public class BatchStatisticsDto extends BatchDto {
     BatchStatisticsDto dto = new BatchStatisticsDto();
     dto.id = batchStatistics.getId();
     dto.type = batchStatistics.getType();
-    dto.size = batchStatistics.getSize();
+    dto.totalJobs = batchStatistics.getTotalJobs();
     dto.jobsCreated = batchStatistics.getJobsCreated();
     dto.batchJobsPerSeed = batchStatistics.getBatchJobsPerSeed();
     dto.invocationsPerBatchJob = batchStatistics.getInvocationsPerBatchJob();

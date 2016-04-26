@@ -289,7 +289,7 @@ public class HistoricBatchRestServiceQueryTest extends AbstractRestServiceTest {
     assertNotNull("The returned historic batch should not be null.", historicBatch);
     assertEquals(MockProvider.EXAMPLE_BATCH_ID, historicBatch.getId());
     assertEquals(MockProvider.EXAMPLE_BATCH_TYPE, historicBatch.getType());
-    assertEquals(MockProvider.EXAMPLE_BATCH_SIZE, historicBatch.getSize());
+    assertEquals(MockProvider.EXAMPLE_BATCH_TOTAL_JOBS, historicBatch.getTotalJobs());
     assertEquals(MockProvider.EXAMPLE_BATCH_JOBS_PER_SEED, historicBatch.getBatchJobsPerSeed());
     assertEquals(MockProvider.EXAMPLE_INVOCATIONS_PER_BATCH_JOB, historicBatch.getInvocationsPerBatchJob());
     assertEquals(MockProvider.EXAMPLE_SEED_JOB_DEFINITION_ID, historicBatch.getSeedJobDefinitionId());

@@ -55,7 +55,7 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
     <result property="type" column="TYPE_" jdbcType="VARCHAR" />
-    <result property="size" column="SIZE_" jdbcType="INTEGER" />
+    <result property="totalJobs" column="TOTAL_JOBS_" jdbcType="INTEGER" />
     <result property="jobsCreated" column="JOBS_CREATED_" jdbcType="INTEGER" />
     <result property="remainingJobs" column="REMAINING_JOBS_COUNT_" jdbcType="INTEGER" />
     <result property="failedJobs" column="FAILED_JOBS_COUNT_" jdbcType="INTEGER" />

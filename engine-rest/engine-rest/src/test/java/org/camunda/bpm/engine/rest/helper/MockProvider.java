@@ -762,7 +762,7 @@ public abstract class MockProvider {
   // batch
   public static final String EXAMPLE_BATCH_ID = "aBatchId";
   public static final String EXAMPLE_BATCH_TYPE = "aBatchType";
-  public static final int EXAMPLE_BATCH_SIZE = 10;
+  public static final int EXAMPLE_BATCH_TOTAL_JOBS = 10;
   public static final int EXAMPLE_BATCH_JOBS_CREATED = 9;
   public static final int EXAMPLE_BATCH_JOBS_PER_SEED = 11;
   public static final int EXAMPLE_INVOCATIONS_PER_BATCH_JOB = 12;
@@ -2591,7 +2591,7 @@ public abstract class MockProvider {
     return new MockBatchBuilder()
       .id(EXAMPLE_BATCH_ID)
       .type(EXAMPLE_BATCH_TYPE)
-      .size(EXAMPLE_BATCH_SIZE)
+      .size(EXAMPLE_BATCH_TOTAL_JOBS)
       .jobsCreated(EXAMPLE_BATCH_JOBS_CREATED)
       .batchJobsPerSeed(EXAMPLE_BATCH_JOBS_PER_SEED)
       .invocationsPerBatchJob(EXAMPLE_INVOCATIONS_PER_BATCH_JOB)
@@ -2615,7 +2615,7 @@ public abstract class MockProvider {
     return new MockHistoricBatchBuilder()
       .id(EXAMPLE_BATCH_ID)
       .type(EXAMPLE_BATCH_TYPE)
-      .size(EXAMPLE_BATCH_SIZE)
+      .size(EXAMPLE_BATCH_TOTAL_JOBS)
       .batchJobsPerSeed(EXAMPLE_BATCH_JOBS_PER_SEED)
       .invocationsPerBatchJob(EXAMPLE_INVOCATIONS_PER_BATCH_JOB)
       .seedJobDefinitionId(EXAMPLE_SEED_JOB_DEFINITION_ID)
@@ -2640,7 +2640,7 @@ public abstract class MockProvider {
     return new MockBatchStatisticsBuilder()
       .id(EXAMPLE_BATCH_ID)
       .type(EXAMPLE_BATCH_TYPE)
-      .size(EXAMPLE_BATCH_SIZE)
+      .size(EXAMPLE_BATCH_TOTAL_JOBS)
       .jobsCreated(EXAMPLE_BATCH_JOBS_CREATED)
       .batchJobsPerSeed(EXAMPLE_BATCH_JOBS_PER_SEED)
       .invocationsPerBatchJob(EXAMPLE_INVOCATIONS_PER_BATCH_JOB)

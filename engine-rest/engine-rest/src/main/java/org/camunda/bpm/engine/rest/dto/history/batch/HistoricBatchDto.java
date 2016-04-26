@@ -21,7 +21,7 @@ public class HistoricBatchDto {
 
   protected String id;
   protected String type;
-  protected int size;
+  protected int totalJobs;
   protected int batchJobsPerSeed;
   protected int invocationsPerBatchJob;
   protected String seedJobDefinitionId;
@@ -39,8 +39,8 @@ public class HistoricBatchDto {
     return type;
   }
 
-  public int getSize() {
-    return size;
+  public int getTotalJobs() {
+    return totalJobs;
   }
 
   public int getBatchJobsPerSeed() {
@@ -79,7 +79,7 @@ public class HistoricBatchDto {
     HistoricBatchDto dto = new HistoricBatchDto();
     dto.id = historicBatch.getId();
     dto.type = historicBatch.getType();
-    dto.size = historicBatch.getSize();
+    dto.totalJobs = historicBatch.getTotalJobs();
     dto.batchJobsPerSeed = historicBatch.getBatchJobsPerSeed();
     dto.invocationsPerBatchJob = historicBatch.getInvocationsPerBatchJob();
     dto.seedJobDefinitionId = historicBatch.getSeedJobDefinitionId();

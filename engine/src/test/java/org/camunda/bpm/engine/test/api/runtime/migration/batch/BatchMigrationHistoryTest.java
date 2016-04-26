@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.migration.batch.MigrationBatchJobHandler;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -98,7 +97,7 @@ public class BatchMigrationHistoryTest {
     assertNotNull(historicBatch);
     assertEquals(batch.getId(), historicBatch.getId());
     assertEquals(batch.getType(), historicBatch.getType());
-    assertEquals(batch.getSize(), historicBatch.getSize());
+    assertEquals(batch.getTotalJobs(), historicBatch.getTotalJobs());
     assertEquals(batch.getBatchJobsPerSeed(), historicBatch.getBatchJobsPerSeed());
     assertEquals(batch.getInvocationsPerBatchJob(), historicBatch.getInvocationsPerBatchJob());
     assertEquals(batch.getSeedJobDefinitionId(), historicBatch.getSeedJobDefinitionId());

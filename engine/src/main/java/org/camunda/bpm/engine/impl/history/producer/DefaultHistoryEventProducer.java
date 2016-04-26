@@ -746,7 +746,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     event.setId(batch.getId());
     event.setType(batch.getType());
-    event.setSize(batch.getSize());
+    event.setTotalJobs(batch.getTotalJobs());
     event.setBatchJobsPerSeed(batch.getBatchJobsPerSeed());
     event.setInvocationsPerBatchJob(batch.getInvocationsPerBatchJob());
     event.setSeedJobDefinitionId(batch.getSeedJobDefinitionId());

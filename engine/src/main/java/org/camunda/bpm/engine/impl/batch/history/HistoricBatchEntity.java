@@ -29,7 +29,7 @@ public class HistoricBatchEntity extends HistoryEvent implements HistoricBatch, 
   protected String id;
   protected String type;
 
-  protected int size;
+  protected int totalJobs;
   protected int batchJobsPerSeed;
   protected int invocationsPerBatchJob;
 
@@ -50,12 +50,12 @@ public class HistoricBatchEntity extends HistoryEvent implements HistoricBatch, 
     this.type = type;
   }
 
-  public int getSize() {
-    return size;
+  public int getTotalJobs() {
+    return totalJobs;
   }
 
-  public void setSize(int size) {
-    this.size = size;
+  public void setTotalJobs(int totalJobs) {
+    this.totalJobs = totalJobs;
   }
 
   public int getBatchJobsPerSeed() {

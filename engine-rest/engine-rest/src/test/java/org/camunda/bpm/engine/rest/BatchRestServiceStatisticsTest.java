@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
-import static org.camunda.bpm.engine.rest.BatchRestServiceQueryTest.BATCH_QUERY_COUNT_URL;
 import static org.camunda.bpm.engine.rest.util.JsonPathUtil.from;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
@@ -259,7 +258,7 @@ public class BatchRestServiceStatisticsTest extends AbstractRestServiceTest {
     assertNotNull("The returned batch statistics should not be null.", batchStatistics);
     assertEquals(MockProvider.EXAMPLE_BATCH_ID, batchStatistics.getId());
     assertEquals(MockProvider.EXAMPLE_BATCH_TYPE, batchStatistics.getType());
-    assertEquals(MockProvider.EXAMPLE_BATCH_SIZE, batchStatistics.getSize());
+    assertEquals(MockProvider.EXAMPLE_BATCH_TOTAL_JOBS, batchStatistics.getTotalJobs());
     assertEquals(MockProvider.EXAMPLE_BATCH_JOBS_CREATED, batchStatistics.getJobsCreated());
     assertEquals(MockProvider.EXAMPLE_BATCH_JOBS_PER_SEED, batchStatistics.getBatchJobsPerSeed());
     assertEquals(MockProvider.EXAMPLE_INVOCATIONS_PER_BATCH_JOB, batchStatistics.getInvocationsPerBatchJob());

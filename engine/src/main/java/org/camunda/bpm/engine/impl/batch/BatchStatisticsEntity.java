@@ -29,7 +29,7 @@ public class BatchStatisticsEntity extends BatchEntity implements BatchStatistic
   }
 
   public int getCompletedJobs() {
-    return size - getRemainingJobs();
+    return totalJobs - getRemainingJobs();
   }
 
   public int getFailedJobs() {
@@ -41,7 +41,7 @@ public class BatchStatisticsEntity extends BatchEntity implements BatchStatistic
   }
 
   public int getJobsToCreate() {
-    return size - jobsCreated;
+    return totalJobs - jobsCreated;
   }
 
   public String toString() {
@@ -49,7 +49,7 @@ public class BatchStatisticsEntity extends BatchEntity implements BatchStatistic
       "batchHandler=" + batchJobHandler +
       ", id='" + id + '\'' +
       ", type='" + type + '\'' +
-      ", size=" + size +
+      ", size=" + totalJobs +
       ", jobCreated=" + jobsCreated +
       ", remainingJobs=" + remainingJobs +
       ", failedJobs=" + failedJobs +

@@ -37,7 +37,7 @@ public interface BatchStatistics extends Batch {
    *
    * <p>
    *   See
-   *   {@link #getSize()} for the number of all batch execution jobs,
+   *   {@link #getTotalJobs()} for the number of all batch execution jobs,
    *   {@link #getCompletedJobs()} for the number of completed batch execution jobs and
    *   {@link #getFailedJobs()} for the number of failed batch execution jobs.
    * </p>
@@ -54,7 +54,7 @@ public interface BatchStatistics extends Batch {
    *
    * <p>
    *   See
-   *   {@link #getSize()} for the number of all batch execution jobs,
+   *   {@link #getTotalJobs()} for the number of all batch execution jobs,
    *   {@link #getRemainingJobs()} ()} for the number of remaining batch execution jobs and
    *   {@link #getFailedJobs()} for the number of failed batch execution jobs.
    * </p>
@@ -71,7 +71,7 @@ public interface BatchStatistics extends Batch {
    *
    * <p>
    *   See
-   *   {@link #getSize()} for the number of all batch execution jobs,
+   *   {@link #getTotalJobs()} for the number of all batch execution jobs,
    *   {@link #getRemainingJobs()} ()} for the number of remaining batch execution jobs and
    *   {@link #getCompletedJobs()} ()} for the number of completed batch execution jobs.
    * </p>

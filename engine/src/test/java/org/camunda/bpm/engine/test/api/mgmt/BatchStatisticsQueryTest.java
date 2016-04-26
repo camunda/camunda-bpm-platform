@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.test.api.mgmt;
 
-import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.batchById;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.batchStatisticsById;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
@@ -301,7 +300,7 @@ public class BatchStatisticsQueryTest {
       .singleResult();
 
     // then
-    assertEquals(3, batchStatistics.getSize());
+    assertEquals(3, batchStatistics.getTotalJobs());
     assertEquals(0, batchStatistics.getJobsCreated());
     assertEquals(3, batchStatistics.getRemainingJobs());
     assertEquals(0, batchStatistics.getCompletedJobs());
@@ -320,7 +319,7 @@ public class BatchStatisticsQueryTest {
     BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
       .singleResult();
 
-    assertEquals(13, batchStatistics.getSize());
+    assertEquals(13, batchStatistics.getTotalJobs());
     assertEquals(10, batchStatistics.getJobsCreated());
     assertEquals(13, batchStatistics.getRemainingJobs());
     assertEquals(0, batchStatistics.getCompletedJobs());
@@ -339,7 +338,7 @@ public class BatchStatisticsQueryTest {
     BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
       .singleResult();
 
-    assertEquals(3, batchStatistics.getSize());
+    assertEquals(3, batchStatistics.getTotalJobs());
     assertEquals(3, batchStatistics.getJobsCreated());
     assertEquals(3, batchStatistics.getRemainingJobs());
     assertEquals(0, batchStatistics.getCompletedJobs());
@@ -359,7 +358,7 @@ public class BatchStatisticsQueryTest {
     BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
       .singleResult();
 
-    assertEquals(3, batchStatistics.getSize());
+    assertEquals(3, batchStatistics.getTotalJobs());
     assertEquals(3, batchStatistics.getJobsCreated());
     assertEquals(2, batchStatistics.getRemainingJobs());
     assertEquals(1, batchStatistics.getCompletedJobs());
@@ -379,7 +378,7 @@ public class BatchStatisticsQueryTest {
     BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
       .singleResult();
 
-    assertEquals(3, batchStatistics.getSize());
+    assertEquals(3, batchStatistics.getTotalJobs());
     assertEquals(3, batchStatistics.getJobsCreated());
     assertEquals(3, batchStatistics.getRemainingJobs());
     assertEquals(0, batchStatistics.getCompletedJobs());
@@ -400,7 +399,7 @@ public class BatchStatisticsQueryTest {
     BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
       .singleResult();
 
-    assertEquals(3, batchStatistics.getSize());
+    assertEquals(3, batchStatistics.getTotalJobs());
     assertEquals(3, batchStatistics.getJobsCreated());
     assertEquals(2, batchStatistics.getRemainingJobs());
     assertEquals(1, batchStatistics.getCompletedJobs());
@@ -420,7 +419,7 @@ public class BatchStatisticsQueryTest {
     BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
       .singleResult();
 
-    assertEquals(3, batchStatistics.getSize());
+    assertEquals(3, batchStatistics.getTotalJobs());
     assertEquals(3, batchStatistics.getJobsCreated());
     assertEquals(3, batchStatistics.getRemainingJobs());
     assertEquals(0, batchStatistics.getCompletedJobs());
@@ -434,7 +433,7 @@ public class BatchStatisticsQueryTest {
     batchStatistics = managementService.createBatchStatisticsQuery()
       .singleResult();
 
-    assertEquals(3, batchStatistics.getSize());
+    assertEquals(3, batchStatistics.getTotalJobs());
     assertEquals(3, batchStatistics.getJobsCreated());
     assertEquals(0, batchStatistics.getRemainingJobs());
     assertEquals(3, batchStatistics.getCompletedJobs());
@@ -454,7 +453,7 @@ public class BatchStatisticsQueryTest {
     BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
       .singleResult();
 
-    assertEquals(13, batchStatistics.getSize());
+    assertEquals(13, batchStatistics.getTotalJobs());
     assertEquals(10, batchStatistics.getJobsCreated());
     assertEquals(3, batchStatistics.getRemainingJobs());
     assertEquals(10, batchStatistics.getCompletedJobs());
@@ -475,7 +474,7 @@ public class BatchStatisticsQueryTest {
     BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
       .singleResult();
 
-    assertEquals(13, batchStatistics.getSize());
+    assertEquals(13, batchStatistics.getTotalJobs());
     assertEquals(10, batchStatistics.getJobsCreated());
     assertEquals(11, batchStatistics.getRemainingJobs());
     assertEquals(2, batchStatistics.getCompletedJobs());
@@ -507,7 +506,7 @@ public class BatchStatisticsQueryTest {
     for (BatchStatistics batchStatistics : batchStatisticsList) {
       if (batch1.getId().equals(batchStatistics.getId())) {
         // batch 1
-        assertEquals(3, batchStatistics.getSize());
+        assertEquals(3, batchStatistics.getTotalJobs());
         assertEquals(0, batchStatistics.getJobsCreated());
         assertEquals(3, batchStatistics.getRemainingJobs());
         assertEquals(0, batchStatistics.getCompletedJobs());
@@ -515,7 +514,7 @@ public class BatchStatisticsQueryTest {
       }
       else if (batch2.getId().equals(batchStatistics.getId())) {
         // batch 2
-        assertEquals(13, batchStatistics.getSize());
+        assertEquals(13, batchStatistics.getTotalJobs());
         assertEquals(10, batchStatistics.getJobsCreated());
         assertEquals(11, batchStatistics.getRemainingJobs());
         assertEquals(2, batchStatistics.getCompletedJobs());
@@ -523,7 +522,7 @@ public class BatchStatisticsQueryTest {
       }
       else if (batch3.getId().equals(batchStatistics.getId())) {
         // batch 3
-        assertEquals(15, batchStatistics.getSize());
+        assertEquals(15, batchStatistics.getTotalJobs());
         assertEquals(15, batchStatistics.getJobsCreated());
         assertEquals(3, batchStatistics.getRemainingJobs());
         assertEquals(12, batchStatistics.getCompletedJobs());

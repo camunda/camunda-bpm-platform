@@ -335,7 +335,7 @@ public class BatchMigrationTest {
     assertEquals(5, batch.getInvocationsPerBatchJob());
 
     // and the size was correctly calculated
-    assertEquals(4, batch.getSize());
+    assertEquals(4, batch.getTotalJobs());
 
     // when the seed job is executed
     helper.executeSeedJob(batch);
@@ -512,7 +512,7 @@ public class BatchMigrationTest {
     assertNotNull(batch);
     assertNotNull(batch.getId());
     assertEquals("instance-migration", batch.getType());
-    assertEquals(processInstanceCount, batch.getSize());
+    assertEquals(processInstanceCount, batch.getTotalJobs());
     assertEquals(10, batch.getBatchJobsPerSeed());
     assertEquals(1, batch.getInvocationsPerBatchJob());
   }

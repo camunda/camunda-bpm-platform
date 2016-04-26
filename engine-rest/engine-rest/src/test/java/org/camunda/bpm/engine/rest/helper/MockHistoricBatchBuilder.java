@@ -93,7 +93,7 @@ public class MockHistoricBatchBuilder {
     HistoricBatch historicBatch = mock(HistoricBatch.class);
     when(historicBatch.getId()).thenReturn(id);
     when(historicBatch.getType()).thenReturn(type);
-    when(historicBatch.getSize()).thenReturn(size);
+    when(historicBatch.getTotalJobs()).thenReturn(size);
     when(historicBatch.getBatchJobsPerSeed()).thenReturn(batchJobsPerSeed);
     when(historicBatch.getInvocationsPerBatchJob()).thenReturn(invocationsPerBatchJob);
     when(historicBatch.getSeedJobDefinitionId()).thenReturn(seedJobDefinitionId);

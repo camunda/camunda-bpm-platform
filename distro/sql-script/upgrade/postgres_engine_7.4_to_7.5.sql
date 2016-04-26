@@ -183,7 +183,7 @@ create table ACT_RU_BATCH (
   ID_ varchar(64) not null,
   REV_ integer not null,
   TYPE_ varchar(255),
-  SIZE_ integer,
+  TOTAL_JOBS_ integer,
   JOBS_CREATED_ integer,
   JOBS_PER_SEED_ integer,
   INVOCATIONS_PER_JOB_ integer,
@@ -198,7 +198,7 @@ create table ACT_RU_BATCH (
 create table ACT_HI_BATCH (
     ID_ varchar(64) not null,
     TYPE_ varchar(255),
-    SIZE_ integer,
+    TOTAL_JOBS_ integer,
     JOBS_PER_SEED_ integer,
     INVOCATIONS_PER_JOB_ integer,
     SEED_JOB_DEF_ID_ varchar(64),

@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicB
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicBatchByStartTime;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
-import static org.camunda.bpm.model.cmmn.PlanItemTransition.complete;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -129,7 +128,7 @@ public class HistoricBatchQueryTest {
     assertEquals(batch.getType(), resultBatch.getType());
     assertEquals(batch.getBatchJobsPerSeed(), resultBatch.getBatchJobsPerSeed());
     assertEquals(batch.getInvocationsPerBatchJob(), resultBatch.getInvocationsPerBatchJob());
-    assertEquals(batch.getSize(), resultBatch.getSize());
+    assertEquals(batch.getTotalJobs(), resultBatch.getTotalJobs());
     assertEquals(startDate, resultBatch.getStartTime());
     assertEquals(endDate, resultBatch.getEndTime());
   }

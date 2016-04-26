@@ -264,7 +264,7 @@ create table ACT_RU_BATCH (
   ID_ nvarchar(64) not null,
   REV_ int not null,
   TYPE_ nvarchar(255),
-  SIZE_ int,
+  TOTAL_JOBS_ int,
   JOBS_CREATED_ int,
   JOBS_PER_SEED_ int,
   INVOCATIONS_PER_JOB_ int,

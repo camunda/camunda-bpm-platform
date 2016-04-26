@@ -85,7 +85,7 @@ public class MockBatchBuilder {
     Batch batch = mock(Batch.class);
     when(batch.getId()).thenReturn(id);
     when(batch.getType()).thenReturn(type);
-    when(batch.getSize()).thenReturn(size);
+    when(batch.getTotalJobs()).thenReturn(size);
     when(batch.getJobsCreated()).thenReturn(jobsCreated);
     when(batch.getBatchJobsPerSeed()).thenReturn(batchJobsPerSeed);
     when(batch.getInvocationsPerBatchJob()).thenReturn(invocationsPerBatchJob);

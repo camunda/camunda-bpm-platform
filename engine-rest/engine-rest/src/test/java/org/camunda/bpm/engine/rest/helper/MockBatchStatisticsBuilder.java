@@ -103,7 +103,7 @@ public class MockBatchStatisticsBuilder {
     BatchStatistics batchStatistics = mock(BatchStatistics.class);
     when(batchStatistics.getId()).thenReturn(id);
     when(batchStatistics.getType()).thenReturn(type);
-    when(batchStatistics.getSize()).thenReturn(size);
+    when(batchStatistics.getTotalJobs()).thenReturn(size);
     when(batchStatistics.getJobsCreated()).thenReturn(jobsCreated);
     when(batchStatistics.getBatchJobsPerSeed()).thenReturn(batchJobsPerSeed);
     when(batchStatistics.getInvocationsPerBatchJob()).thenReturn(invocationsPerBatchJob);

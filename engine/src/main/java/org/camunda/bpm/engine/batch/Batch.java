@@ -44,7 +44,7 @@ public interface Batch {
   /**
    * @return the number of batch execution jobs required to complete the batch
    */
-  int getSize();
+  int getTotalJobs();
 
   /**
    * @return the number of batch execution jobs already created by the seed job

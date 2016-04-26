@@ -21,7 +21,7 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.ANOTHER_EXAMPLE_PR
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_BATCH_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_BATCH_JOBS_PER_SEED;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_BATCH_JOB_DEFINITION_ID;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_BATCH_SIZE;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_BATCH_TOTAL_JOBS;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_BATCH_TYPE;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_INVOCATIONS_PER_BATCH_JOB;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_MONITOR_JOB_DEFINITION_ID;
@@ -807,7 +807,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .statusCode(Status.OK.getStatusCode())
       .body("id", is(EXAMPLE_BATCH_ID))
       .body("type", is(EXAMPLE_BATCH_TYPE))
-      .body("size", is(EXAMPLE_BATCH_SIZE))
+      .body("totalJobs", is(EXAMPLE_BATCH_TOTAL_JOBS))
       .body("batchJobsPerSeed", is(EXAMPLE_BATCH_JOBS_PER_SEED))
       .body("invocationsPerBatchJob", is(EXAMPLE_INVOCATIONS_PER_BATCH_JOB))
       .body("seedJobDefinitionId", is(EXAMPLE_SEED_JOB_DEFINITION_ID))
@@ -847,7 +847,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .statusCode(Status.OK.getStatusCode())
       .body("id", is(EXAMPLE_BATCH_ID))
       .body("type", is(EXAMPLE_BATCH_TYPE))
-      .body("size", is(EXAMPLE_BATCH_SIZE))
+      .body("totalJobs", is(EXAMPLE_BATCH_TOTAL_JOBS))
       .body("batchJobsPerSeed", is(EXAMPLE_BATCH_JOBS_PER_SEED))
       .body("invocationsPerBatchJob", is(EXAMPLE_INVOCATIONS_PER_BATCH_JOB))
       .body("seedJobDefinitionId", is(EXAMPLE_SEED_JOB_DEFINITION_ID))
