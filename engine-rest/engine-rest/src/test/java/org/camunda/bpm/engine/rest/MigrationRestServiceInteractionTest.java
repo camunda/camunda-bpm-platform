@@ -99,6 +99,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
   protected static final String MIGRATION_URL = TEST_RESOURCE_ROOT_PATH + "/migration";
   protected static final String GENERATE_MIGRATION_URL = MIGRATION_URL + "/generate";
+  protected static final String VALIDATE_MIGRATION_URL = MIGRATION_URL + "/validate";
   protected static final String EXECUTE_MIGRATION_URL = MIGRATION_URL + "/execute";
   protected static final String EXECUTE_MIGRATION_ASYNC_URL = MIGRATION_URL + "/executeAsync";
 
@@ -372,7 +373,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     .when()
       .post(EXECUTE_MIGRATION_URL);
 
-    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution);
+    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution.getMigrationPlan());
     verifyMigrationPlanExecutionInteraction(migrationExecution);
   }
 
@@ -400,7 +401,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     .when()
       .post(EXECUTE_MIGRATION_URL);
 
-    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution);
+    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution.getMigrationPlan());
     verifyMigrationPlanExecutionInteraction(migrationExecution);
   }
 
@@ -816,7 +817,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     .when()
       .post(EXECUTE_MIGRATION_ASYNC_URL);
 
-    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution);
+    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution.getMigrationPlan());
     verifyMigrationPlanAsyncExecutionInteraction(migrationExecution);
   }
 
@@ -856,7 +857,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     .when()
       .post(EXECUTE_MIGRATION_ASYNC_URL);
 
-    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution);
+    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution.getMigrationPlan());
     verifyMigrationPlanAsyncExecutionInteraction(migrationExecution);
   }
 
@@ -1190,8 +1191,68 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     .when()
       .post(EXECUTE_MIGRATION_URL);
 
-    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution);
+    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution.getMigrationPlan());
     verifyMigrationPlanExecutionInteraction(migrationExecution);
+  }
+
+  @Test
+  public void validateMigrationPlan() {
+    MigrationPlanDto migrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+      .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+      .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID, true)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationPlan)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(VALIDATE_MIGRATION_URL);
+
+    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationPlan);
+  }
+
+  @Test
+  public void validateMigrationPlanValidationException() {
+    MigrationInstruction migrationInstruction = mock(MigrationInstruction.class);
+    when(migrationInstruction.getSourceActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
+    when(migrationInstruction.getTargetActivityId()).thenReturn(ANOTHER_EXAMPLE_ACTIVITY_ID);
+
+    MigrationInstructionValidationReport instructionReport1 = mock(MigrationInstructionValidationReport.class);
+    when(instructionReport1.getMigrationInstruction()).thenReturn(migrationInstruction);
+    when(instructionReport1.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
+
+    MigrationInstructionValidationReport instructionReport2 = mock(MigrationInstructionValidationReport.class);
+    when(instructionReport2.getMigrationInstruction()).thenReturn(migrationInstruction);
+    when(instructionReport2.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
+
+    MigrationPlanValidationReport validationReport = mock(MigrationPlanValidationReport.class);
+    when(validationReport.getInstructionReports()).thenReturn(Arrays.asList(instructionReport1, instructionReport2));
+
+    when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
+
+    MigrationPlanDto migrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+      .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationPlan)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(MigrationPlanValidationException.class.getSimpleName()))
+      .body("message", is("fooo"))
+      .body("validationReport.instructionReports", hasSize(2))
+      .body("validationReport.instructionReports[0].instruction.sourceActivityIds", hasSize(1))
+      .body("validationReport.instructionReports[0].instruction.sourceActivityIds[0]", is(EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.instructionReports[0].instruction.targetActivityIds", hasSize(1))
+      .body("validationReport.instructionReports[0].instruction.targetActivityIds[0]", is(ANOTHER_EXAMPLE_ACTIVITY_ID))
+      .body("validationReport.instructionReports[0].failures", hasSize(2))
+      .body("validationReport.instructionReports[0].failures[0]", is("failure1"))
+      .body("validationReport.instructionReports[0].failures[1]", is("failure2"))
+    .when()
+      .post(VALIDATE_MIGRATION_URL);
   }
 
   protected void verifyGenerateMigrationPlanResponse(Response response) {
@@ -1226,8 +1287,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     verify(migrationPlanBuilderMock, never()).mapActivities(anyString(), anyString());
   }
 
-  protected void verifyCreateMigrationPlanInteraction(JoinedMigrationPlanBuilderMock migrationPlanBuilderMock, MigrationExecutionDto migrationExecution) {
-    MigrationPlanDto migrationPlan = migrationExecution.getMigrationPlan();
+  protected void verifyCreateMigrationPlanInteraction(JoinedMigrationPlanBuilderMock migrationPlanBuilderMock, MigrationPlanDto migrationPlan) {
     verify(runtimeServiceMock).createMigrationPlan(migrationPlan.getSourceProcessDefinitionId(), migrationPlan.getTargetProcessDefinitionId());
     // the map equal activities method should not be called
     verify(migrationPlanBuilderMock, never()).mapEqualActivities();

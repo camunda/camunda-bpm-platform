@@ -64,6 +64,10 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
     }
   }
 
+  public void validateMigrationPlan(MigrationPlanDto migrationPlanDto) {
+    createMigrationPlan(migrationPlanDto);
+  }
+
   public void executeMigrationPlan(MigrationExecutionDto migrationExecution) {
     createMigrationPlanExecutionBuilder(migrationExecution).execute();
   }
@@ -74,7 +78,7 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
 
   protected MigrationPlanExecutionBuilder createMigrationPlanExecutionBuilder(MigrationExecutionDto migrationExecution) {
-    MigrationPlan migrationPlan = createMigrationPlan(migrationExecution);
+    MigrationPlan migrationPlan = createMigrationPlan(migrationExecution.getMigrationPlan());
     List<String> processInstanceIds = migrationExecution.getProcessInstanceIds();
 
     MigrationPlanExecutionBuilder executionBuilder = processEngine.getRuntimeService()
@@ -89,8 +93,7 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
     return executionBuilder;
   }
 
-  protected MigrationPlan createMigrationPlan(MigrationExecutionDto migrationExecution) {
-    MigrationPlanDto migrationPlanDto = migrationExecution.getMigrationPlan();
+  protected MigrationPlan createMigrationPlan(MigrationPlanDto migrationPlanDto) {
     try {
       return MigrationPlanDto.toMigrationPlan(processEngine, migrationPlanDto);
     }

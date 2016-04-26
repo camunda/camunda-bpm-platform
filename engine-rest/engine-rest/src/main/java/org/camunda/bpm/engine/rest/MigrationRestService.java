@@ -33,6 +33,10 @@ public interface MigrationRestService {
   MigrationPlanDto generateMigrationPlan(MigrationPlanGenerationDto generationDto);
 
   @POST
+  @Path("/validate")
+  void validateMigrationPlan(MigrationPlanDto migrationPlanDto);
+
+  @POST
   @Path("/execute")
   void executeMigrationPlan(MigrationExecutionDto migrationPlan);
 
