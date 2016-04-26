@@ -81,9 +81,7 @@ public class BatchRestServiceImpl extends AbstractRestProcessEngineAware impleme
       batchStatisticsList = executePaginatedStatisticsQuery(query, firstResult, maxResults);
     }
     else {
-      batchStatisticsList = getProcessEngine().getManagementService()
-        .createBatchStatisticsQuery()
-        .list();
+      batchStatisticsList = query.list();
     }
 
     List<BatchStatisticsDto> statisticsResults = new ArrayList<BatchStatisticsDto>();
