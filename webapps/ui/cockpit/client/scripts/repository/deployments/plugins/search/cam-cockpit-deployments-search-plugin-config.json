@@ -115,9 +115,9 @@
     ]
   },
   "tooltips": {
-    "inputPlaceholder": "Add criteria",
-    "invalid": "This search query is not valid",
-    "deleteSearch": "Remove search",
+    "inputPlaceholder": "Add filtering criteria",
+    "invalid": "This filtering query is not valid",
+    "deleteSearch": "Remove filters",
     "type": "Type",
     "name": "Property",
     "operator": "Operator",
