@@ -148,7 +148,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
           else if (key.indexOf(DEPLOYMENT_KEY) === 0) {
             var resourceName = key.substring(DEPLOYMENT_KEY.length);
 
-            function loadResourceInDeployment(deploymentId)  {
+            var loadResourceInDeployment = function(deploymentId)  {
               deploymentResource.getResources(deploymentId, function(err, resourcesData) {
                 if (err) {
                   setAsynchronousFormKeyFailure(err);
