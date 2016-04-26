@@ -80,7 +80,10 @@ public enum Permissions implements Permission {
   TASK_WORK("TASK_WORK", 16384),
 
   /** Indicates that TASK_ASSIGN interactions are permitted */
-  TASK_ASSIGN("TASK_ASSIGN", 32768);
+  TASK_ASSIGN("TASK_ASSIGN", 32768),
+
+  /** Indicates that MIGRATE_INSTANCE interactions are permitted */
+  MIGRATE_INSTANCE("MIGRATE_INSTANCE", 65536);
 
   // implmentation //////////////////////////
 

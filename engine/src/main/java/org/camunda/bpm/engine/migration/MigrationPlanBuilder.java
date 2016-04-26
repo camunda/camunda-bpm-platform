@@ -12,6 +12,10 @@
  */
 package org.camunda.bpm.engine.migration;
 
+import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
+
 /**
  * @author Thorben Lindhauer
  *
@@ -35,6 +39,9 @@ public interface MigrationPlanBuilder {
    * @return a migration plan with all previously specified instructions
    *
    * @throws MigrationPlanValidationException if the migration plan contains instructions that are not valid
+   * @throws AuthorizationException
+   *         if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}
+   *         for both, source and target process definition.
    */
   MigrationPlan build();
 

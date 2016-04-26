@@ -18,36 +18,48 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.migration.AbstractMigrationCmd;
 import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 
-public class MigrateProcessInstanceBatchCmd implements Command<Batch> {
+public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> {
 
   protected static final MigrationLogger LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
-  protected MigrationPlanExecutionBuilderImpl migrationPlanExecutionBuilder;
-
   public MigrateProcessInstanceBatchCmd(MigrationPlanExecutionBuilderImpl migrationPlanExecutionBuilder) {
-    this.migrationPlanExecutionBuilder = migrationPlanExecutionBuilder;
+    super(migrationPlanExecutionBuilder);
   }
 
   @Override
   public Batch execute(CommandContext commandContext) {
-    BatchEntity batch = createBatch(commandContext);
+
+    MigrationPlan migrationPlan = executionBuilder.getMigrationPlan();
+    Collection<String> processInstanceIds = collectProcessInstanceIds(commandContext);
+
+    ensureNotNull(BadUserRequestException.class, "Migration plan cannot be null", "migration plan", migrationPlan);
+    ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be null or empty", "process instance ids", processInstanceIds);
+
+    ProcessDefinitionEntity sourceProcessDefinition = commandContext.getProcessEngineConfiguration()
+      .getDeploymentCache().findDeployedProcessDefinitionById(migrationPlan.getSourceProcessDefinitionId());
+    ProcessDefinitionEntity targetProcessDefinition = commandContext.getProcessEngineConfiguration()
+      .getDeploymentCache().findDeployedProcessDefinitionById(migrationPlan.getTargetProcessDefinitionId());
+
+    EnsureUtil.ensureNotNull("sourceProcessDefinition", sourceProcessDefinition);
+    EnsureUtil.ensureNotNull("targetProcessDefinition", targetProcessDefinition);
+    checkAuthorizations(commandContext, sourceProcessDefinition, targetProcessDefinition, processInstanceIds);
+
+    BatchEntity batch = createBatch(commandContext, migrationPlan, processInstanceIds);
 
     batch.createSeedJobDefinition();
     batch.createMonitorJobDefinition();
@@ -60,11 +72,11 @@ public class MigrateProcessInstanceBatchCmd implements Command<Batch> {
     return batch;
   }
 
-  protected BatchEntity createBatch(CommandContext commandContext) {
+  protected BatchEntity createBatch(CommandContext commandContext, MigrationPlan migrationPlan, Collection<String> processInstanceIds) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     BatchJobHandler<MigrationBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
 
-    MigrationBatchConfiguration configuration = createConfiguration();
+    MigrationBatchConfiguration configuration = createConfiguration(migrationPlan, processInstanceIds);
 
     BatchEntity batch = new BatchEntity();
     batch.setType(batchJobHandler.getType());
@@ -84,33 +96,12 @@ public class MigrateProcessInstanceBatchCmd implements Command<Batch> {
     return (int) Math.ceil(processInstanceCount / invocationsPerBatchJob);
   }
 
-  protected MigrationBatchConfiguration createConfiguration() {
-    MigrationPlan migrationPlan = migrationPlanExecutionBuilder.getMigrationPlan();
-    Collection<String> processInstanceIds = collectProcessInstanceIds();
-
-    ensureNotNull(BadUserRequestException.class, "Migration plan cannot be null", "migration plan", migrationPlan);
-    ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be null or empty", "process instance ids", processInstanceIds);
+  protected MigrationBatchConfiguration createConfiguration(MigrationPlan migrationPlan, Collection<String> processInstanceIds) {
 
     MigrationBatchConfiguration configuration = new MigrationBatchConfiguration();
     configuration.setMigrationPlan(migrationPlan);
     configuration.setProcessInstanceIds(new ArrayList<String>(processInstanceIds));
     return configuration;
-  }
-
-  protected Collection<String> collectProcessInstanceIds() {
-    Set<String> collectedProcessInstanceIds = new HashSet<String>();
-
-    List<String> processInstanceIds = migrationPlanExecutionBuilder.getProcessInstanceIds();
-    if (processInstanceIds != null) {
-      collectedProcessInstanceIds.addAll(processInstanceIds);
-    }
-
-    ProcessInstanceQueryImpl processInstanceQuery = (ProcessInstanceQueryImpl) migrationPlanExecutionBuilder.getProcessInstanceQuery();
-    if (processInstanceQuery != null) {
-      collectedProcessInstanceIds.addAll(processInstanceQuery.listIds());
-    }
-
-    return collectedProcessInstanceIds;
   }
 
   @SuppressWarnings("unchecked")

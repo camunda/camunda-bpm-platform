@@ -15,6 +15,9 @@ package org.camunda.bpm.engine.migration;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
@@ -24,12 +27,13 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 public interface MigrationPlanExecutionBuilder {
 
   /**
-   * @param processInstanceIds the process instance ids to migrate
+   * @param processInstanceIds the process instance ids to migrate.
    */
   MigrationPlanExecutionBuilder processInstanceIds(List<String> processInstanceIds);
 
   /**
-   * @param processInstanceQuery a query which selects the process instances to migrate
+   * @param processInstanceQuery a query which selects the process instances to migrate.
+   *   Query results are restricted to process instances for which the user has {@link Permissions#READ} permission.
    */
   MigrationPlanExecutionBuilder processInstanceQuery(ProcessInstanceQuery processInstanceQuery);
 
@@ -38,6 +42,9 @@ public interface MigrationPlanExecutionBuilder {
    *
    * @throws MigratingProcessInstanceValidationException if the migration plan contains
    *  instructions that are not applicable to any of the process instances
+   * @throws AuthorizationException
+   *         if the user has no {@link Permissions#MIGRATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
+   *         for both, source and target process definition.
    */
   void execute();
 
@@ -46,6 +53,10 @@ public interface MigrationPlanExecutionBuilder {
    * can be used to track the progress of the migration.
    *
    * @return the batch which executes the migration asynchronously.
+   *
+   * @throws AuthorizationException
+   *         if the user has no {@link Permissions#MIGRATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
+   *         for both, source and target process definition.
    */
   Batch executeAsync();
 }

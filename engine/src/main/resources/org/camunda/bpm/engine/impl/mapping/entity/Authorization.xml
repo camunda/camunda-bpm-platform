@@ -168,15 +168,11 @@
 
   <select id="isUserAuthorizedForResource" resultType="integer">
 
-    <if test="permissionChecks != null &amp;&amp; permissionChecks.atomicChecks.size() > 1">
-      SELECT
-    </if>
+  SELECT
 
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />
+  <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />
 
-   <if test="permissionChecks != null &amp;&amp; permissionChecks.atomicChecks.size() > 1">
-      ${dbSpecificDummyTable}
-    </if>
+  ${dbSpecificDummyTable}
 
   </select>
 
@@ -577,7 +573,7 @@
    -->
   <sql id="disjunctiveCompositeChecks">
     <foreach item="permissionChecks" index="index" collection="compositeChecks" separator=",">
-      ${dbSpecificIfNullFunction}(<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.atomicChecks" />
+      ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.atomicChecks" />)
     </foreach>
     , 0
     <foreach item="permissionChecks" index="index" collection="compositeChecks">
@@ -598,7 +594,7 @@
     </foreach>
     <foreach  item="permCheck" index="i" collection="atomicChecks">
       ${dbSpecificIfNullFunction}(
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>
+        (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
       , 0)
       <if test="i &gt; 0">
         ${bitand3}

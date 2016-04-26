@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.cfg.auth;
 
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
@@ -54,8 +55,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkReadProcessDefinition(ProcessDefinition processDefinition) {
-    // TODO extract logic from manager and delete the method
-    getAuthorizationManager().checkReadProcessDefinition(processDefinition.getKey());
+    getAuthorizationManager().checkAuthorization(READ, PROCESS_DEFINITION, processDefinition.getKey());
   }
 
   @Override

@@ -12,13 +12,29 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import static org.camunda.bpm.engine.authorization.Authorization.*;
-import static org.camunda.bpm.engine.authorization.Permissions.*;
-import static org.camunda.bpm.engine.authorization.Resources.*;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_TASK;
+import static org.camunda.bpm.engine.authorization.Permissions.TASK_ASSIGN;
+import static org.camunda.bpm.engine.authorization.Permissions.TASK_WORK;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
+import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
+import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Resources.TASK;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -172,19 +188,19 @@ public class AuthorizationManager extends AbstractManager {
     if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
       String userId = currentAuthentication.getUserId();
-      boolean isAuthorized = isAuthorized(userId, currentAuthentication.getGroupIds(), compositePermissionCheck);
+      boolean isAuthorized = isAuthorized(compositePermissionCheck);
       if (!isAuthorized) {
 
-        List<MissingAuthorization> info = new ArrayList<MissingAuthorization>();
+        List<MissingAuthorization> missingAuthorizations = new ArrayList<MissingAuthorization>();
 
         for (PermissionCheck check: compositePermissionCheck.getAllPermissionChecks()) {
-          info.add(new MissingAuthorization(
+          missingAuthorizations.add(new MissingAuthorization(
               check.getPermission().getName(),
               check.getResource().resourceName(),
               check.getResourceId()));
         }
 
-        throw new AuthorizationException(userId, info);
+        throw new AuthorizationException(userId, missingAuthorizations);
       }
     }
   }
@@ -199,16 +215,16 @@ public class AuthorizationManager extends AbstractManager {
       boolean isAuthorized = isAuthorized(userId, currentAuthentication.getGroupIds(), permissionChecks);
       if (!isAuthorized) {
 
-        List<MissingAuthorization> info = new ArrayList<MissingAuthorization>();
+        List<MissingAuthorization> missingAuthorizations = new ArrayList<MissingAuthorization>();
 
         for (PermissionCheck check: permissionChecks) {
-          info.add(new MissingAuthorization(
+          missingAuthorizations.add(new MissingAuthorization(
               check.getPermission().getName(),
               check.getResource().resourceName(),
               check.getResourceId()));
         }
 
-        throw new AuthorizationException(userId, info);
+        throw new AuthorizationException(userId, missingAuthorizations);
       }
     }
   }
@@ -287,6 +303,17 @@ public class AuthorizationManager extends AbstractManager {
     authCheck.setAuthGroupIds(filteredGroupIds);
     authCheck.setPermissionChecks(compositePermissionCheck);
     return getDbEntityManager().selectBoolean("isUserAuthorizedForResource", authCheck);
+  }
+
+  public boolean isAuthorized(CompositePermissionCheck compositePermissionCheck) {
+    Authentication currentAuthentication = getCurrentAuthentication();
+
+    if (currentAuthentication != null) {
+      return isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), compositePermissionCheck);
+    }
+    else {
+      return true;
+    }
   }
 
   // authorization checks on queries ////////////////////////////////
@@ -418,6 +445,7 @@ public class AuthorizationManager extends AbstractManager {
   // read permission //////////////////////////////////////////////////
 
   public void checkReadProcessDefinition(ProcessDefinitionEntity definition) {
+    // TODO consolidate usages of this method with AuthorizationCommandChecker
     checkReadProcessDefinition(definition.getKey());
   }
 
@@ -692,7 +720,7 @@ public class AuthorizationManager extends AbstractManager {
 
     String executionId = task.getExecutionId();
     if (executionId != null) {
-      
+
       // Permissions to task actions is based on the order in which PermissioncheckBuilder is built
       CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
           .disjunctive()
@@ -775,7 +803,7 @@ public class AuthorizationManager extends AbstractManager {
       }
     }
   }
-  
+
   // delete permission ////////////////////////////////////////
 
   public void checkDeleteTask(TaskEntity task) {
