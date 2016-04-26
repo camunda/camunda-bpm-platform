@@ -25,11 +25,9 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -57,7 +55,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   protected static final String DEMO_ASSIGNEE_PROCESS_KEY = "demoAssigneeProcess";
   protected static final String CANDIDATE_USERS_PROCESS_KEY = "candidateUsersProcess";
   protected static final String CANDIDATE_GROUPS_PROCESS_KEY = "candidateGroupsProcess";
-
+  protected static final String INVALID_PERMISSION = "invalidPermission";
   protected String deploymentId;
 
   public void setUp() throws Exception {
@@ -4701,7 +4699,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     deleteTask(taskId, true);
   }
@@ -4729,7 +4727,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     deleteTask(taskId, true);
   }
@@ -4759,7 +4757,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     deleteTask(taskId, true);
   }
@@ -4812,8 +4810,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
-
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
     deleteTask(taskId, true);
   }
 
@@ -4842,7 +4839,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     deleteTask(taskId, true);
   }
@@ -4871,7 +4868,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
   }
 
   public void testProcessTaskSetAssigneeUpdateAuthorization() {
@@ -4897,7 +4894,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
   }
 
   public void testProcessTaskSetAssigneeToNullAuthorizationStillAvailable() {
@@ -4925,7 +4922,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
   }
 
   public void testQueryProcessTaskSetAssignee() {
@@ -4973,7 +4970,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     // demo is able to retrieve the task
     identityService.clearAuthentication();
@@ -5034,7 +5031,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     deleteTask(taskId, true);
   }
@@ -5062,7 +5059,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     deleteTask(taskId, true);
   }
@@ -5114,7 +5111,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     deleteTask(taskId, true);
   }
@@ -5144,7 +5141,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     deleteTask(taskId, true);
   }
@@ -5173,7 +5170,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
   }
 
   public void testProcessTaskSetOwnerUpdateAuthorization() {
@@ -5199,7 +5196,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
   }
 
   public void testQueryProcessTaskSetOwner() {
@@ -5270,7 +5267,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     deleteTask(taskId, true);
   }
@@ -5298,7 +5295,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     deleteTask(taskId, true);
   }
@@ -5376,7 +5373,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
   }
 
   public void testProcessTaskAddCandidateUserUpdateAuthorization() {
@@ -5402,7 +5399,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
   }
 
   public void testQueryProcessTaskAddCandidateUser() {
@@ -5450,7 +5447,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     // an authorization for test has been created
     disableAuthorization();
@@ -5465,7 +5462,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     // demo is able to retrieve the task
     identityService.clearAuthentication();
@@ -5531,7 +5528,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     deleteTask(taskId, true);
   }
@@ -5559,7 +5556,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     deleteTask(taskId, true);
   }
@@ -5612,7 +5609,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
   }
 
   public void testProcessTaskAddCandidateGroupUpdateAuthorization() {
@@ -5638,7 +5635,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
   }
 
   public void testQueryProcessTaskAddCandidateGroup() {
@@ -5686,7 +5683,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     // an authorization for accounting has been created
     disableAuthorization();
@@ -5700,7 +5697,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(TASK.resourceType(), authorization.getResourceType());
     assertEquals(taskId, authorization.getResourceId());
     assertTrue(authorization.isPermissionGranted(READ));
-    assertTrue(authorization.isPermissionGranted(UPDATE));
+    assertTrue(authorization.isPermissionGranted(getDefaultTaskPermissionForUser()));
 
     // management is able to retrieve the task
     identityService.clearAuthentication();
@@ -10016,5 +10013,5 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   protected void verifyQueryResults(VariableInstanceQuery query, int countExpected) {
     verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
   }
-
+ 
 }

@@ -16,7 +16,6 @@ import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
-import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
 import static org.camunda.bpm.engine.authorization.Resources.FILTER;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
@@ -165,9 +164,10 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
       AuthorizationEntity authorization = getGrantAuthorizationByUserId(newAssignee, TASK, taskId);
 
       // update authorization:
-      // (1) fetched authorization == null -> create a new authorization (with READ/UPDATE permission)
-      // (2) fetched authorization != null -> add READ and UPDATE permission
-      authorization = updateAuthorization(authorization, newAssignee, null, TASK, taskId, READ, UPDATE);
+      // (1) fetched authorization == null -> create a new authorization (with READ and (UPDATE/TASK_WORK) permission)
+      // (2) fetched authorization != null -> add READ and (UPDATE/TASK_WORK) permission
+      // Update or TASK_WORK permission is configurable in camunda.cfg.xml and by default, UPDATE permission is provided
+      authorization = updateAuthorization(authorization, newAssignee, null, TASK, taskId, READ, getDefaultUserPermissionForTask());
 
       // return always created or updated authorization
       return new AuthorizationEntity[]{ authorization };
@@ -183,16 +183,16 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
           newOwner);
 
       // create (or update) an authorization for the new owner.
-
       String taskId = task.getId();
 
       // fetch existing authorization
       AuthorizationEntity authorization = getGrantAuthorizationByUserId(newOwner, TASK, taskId);
 
       // update authorization:
-      // (1) fetched authorization == null -> create a new authorization (with READ/UPDATE permission)
-      // (2) fetched authorization != null -> add READ and UPDATE permission
-      authorization = updateAuthorization(authorization, newOwner, null, TASK, taskId, READ, UPDATE);
+      // (1) fetched authorization == null -> create a new authorization (with READ and (UPDATE/TASK_WORK) permission)
+      // (2) fetched authorization != null -> add READ and (UPDATE/TASK_WORK) permission
+      // Update or TASK_WORK permission is configurable in camunda.cfg.xml and by default, UPDATE permission is provided
+      authorization = updateAuthorization(authorization, newOwner, null, TASK, taskId, READ, getDefaultUserPermissionForTask());
 
       // return always created or updated authorization
       return new AuthorizationEntity[]{ authorization };
@@ -214,9 +214,10 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     AuthorizationEntity authorization = getGrantAuthorizationByUserId(userId, TASK, taskId);
 
     // update authorization:
-    // (1) fetched authorization == null -> create a new authorization (with READ/UPDATE permission)
-    // (2) fetched authorization != null -> add READ and UPDATE permission
-    authorization = updateAuthorization(authorization, userId, null, TASK, taskId, READ, UPDATE);
+    // (1) fetched authorization == null -> create a new authorization (with READ and (UPDATE/TASK_WORK) permission)
+    // (2) fetched authorization != null -> add READ and (UPDATE or TASK_WORK) permission
+    // Update or TASK_WORK permission is configurable in camunda.cfg.xml and by default, UPDATE permission is provided
+    authorization = updateAuthorization(authorization, userId, null, TASK, taskId, READ, getDefaultUserPermissionForTask());
 
     // return always created or updated authorization
     return new AuthorizationEntity[]{ authorization };
@@ -230,14 +231,15 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     // create (or update) an authorization for the given group
     // whenever a new user identity link will be added
     String taskId = task.getId();
-
+    
     // fetch existing authorization
     AuthorizationEntity authorization = getGrantAuthorizationByGroupId(groupId, TASK, taskId);
 
     // update authorization:
-    // (1) fetched authorization == null -> create a new authorization (with READ/UPDATE permission)
+    // (1) fetched authorization == null -> create a new authorization (with READ and (UPDATE/TASK_WORK) permission)
     // (2) fetched authorization != null -> add READ and UPDATE permission
-    authorization = updateAuthorization(authorization, null, groupId, TASK, taskId, READ, UPDATE);
+    // Update or TASK_WORK permission is configurable in camunda.cfg.xml and by default, UPDATE permission is provided
+    authorization = updateAuthorization(authorization, null, groupId, TASK, taskId, READ, getDefaultUserPermissionForTask());
 
     // return always created or updated authorization
     return new AuthorizationEntity[]{ authorization };
@@ -313,4 +315,11 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     return authorization;
   }
 
+  public Permission getDefaultUserPermissionForTask() {
+    
+    // get the default task assignee permission
+    return Context
+    .getProcessEngineConfiguration()
+    .getDefaultUserPermissionForTask();
+  }
 }

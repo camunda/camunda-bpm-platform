@@ -63,6 +63,8 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.DecisionServiceImpl;
 import org.camunda.bpm.engine.impl.DefaultArtifactFactory;
@@ -591,6 +593,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<MigratingActivityInstanceValidator> migratingActivityInstanceValidators;
   protected List<MigratingTransitionInstanceValidator> migratingTransitionInstanceValidators;
 
+  // Default user permission for task
+  protected Permission defaultUserPermissionForTask;
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -655,7 +659,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initMigratingActivityInstanceValidators();
     initMigratingTransitionInstanceValidators();
     initCommandCheckers();
-
+    initDefaultTaskPermissionValidator(); 
     invokePostInit();
   }
 
@@ -2182,7 +2186,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  public Permission getDefaultUserPermissionForTask() {
+    return defaultUserPermissionForTask;
+  }
 
+  public ProcessEngineConfigurationImpl setDefaultUserPermissionForTask(Permission defaultUserPermissionForTask) {
+    this.defaultUserPermissionForTask = defaultUserPermissionForTask;
+    return this;
+  }
+  
   public Map<String, JobHandler> getJobHandlers() {
     return jobHandlers;
   }
@@ -3281,4 +3293,26 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.commandCheckers = commandCheckers;
   }
 
+  public Permission taskUserPermissionInputToPermission() {
+    return Permissions.nameToPermission(getDefaultTaskPermissionForUser());
+  }
+  
+  public void initDefaultTaskPermissionValidator() {
+
+    String localDefaultTaskUserPermission = getDefaultTaskPermissionForUser();
+    if(localDefaultTaskUserPermission == null) {
+      throw new ProcessEngineException("Default task assignee permission is null");
+    }
+
+    if(taskUserPermissionInputToPermission() == null) {
+      throw new ProcessEngineException("Permission '"+ localDefaultTaskUserPermission + "' is invalid");
+    }
+
+    Permission localDefaultPermissionForTaskUser = taskUserPermissionInputToPermission();
+    if(localDefaultPermissionForTaskUser != Permissions.UPDATE && localDefaultPermissionForTaskUser !=  Permissions.TASK_WORK) {
+      throw new ProcessEngineException("defaultTaskAssigneePermission is neither UPDATE nor TASK_WORK");
+    }
+
+    setDefaultUserPermissionForTask(localDefaultPermissionForTaskUser); 
+  }
 }

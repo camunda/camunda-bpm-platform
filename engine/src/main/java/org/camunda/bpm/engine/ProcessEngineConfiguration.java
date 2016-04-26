@@ -199,6 +199,17 @@ public abstract class ProcessEngineConfiguration {
   protected boolean authorizationEnabled = false;
 
   /**
+   * Provides the default task permission for the user related to a task
+   * User can be related to a task in the following ways
+   * - Candidate user
+   * - Part of candidate group
+   * - Assignee
+   * - Owner
+   * The default value is UPDATE.
+   */
+  protected String defaultTaskPermissionForUser = "UPDATE";
+
+  /**
    * <p>The following flag <code>authorizationEnabledForCustomCode</code> will
    * only be taken into account iff <code>authorizationEnabled</code> is set
    * <code>true</code>.</p>
@@ -608,6 +619,15 @@ public abstract class ProcessEngineConfiguration {
 
   public ProcessEngineConfiguration setAuthorizationEnabled(boolean isAuthorizationChecksEnabled) {
     this.authorizationEnabled = isAuthorizationChecksEnabled;
+    return this;
+  }
+
+  public String getDefaultTaskPermissionForUser() {
+    return defaultTaskPermissionForUser;
+  }
+
+  public ProcessEngineConfiguration setDefaultTaskPermissionForUser(String defaultTaskPermissionForUser) {
+    this.defaultTaskPermissionForUser = defaultTaskPermissionForUser;
     return this;
   }
 
