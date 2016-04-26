@@ -119,7 +119,7 @@ public class HistoricBatchQueryTest {
     HistoricBatch resultBatch = historyService.createHistoricBatchQuery().singleResult();
 
     // then
-    Assert.assertNotNull(batch);
+    Assert.assertNotNull(resultBatch);
 
     assertEquals(batch.getId(), resultBatch.getId());
     assertEquals(batch.getBatchJobDefinitionId(), resultBatch.getBatchJobDefinitionId());
@@ -277,7 +277,9 @@ public class HistoricBatchQueryTest {
   @Test
   public void testBatchQueryOrderByStartTimeDec() {
     // given
+    ClockTestUtil.setClockToDateWithoutMilliseconds();
     helper.migrateProcessInstancesAsync(1);
+    ClockTestUtil.incrementClock(1000);
     helper.migrateProcessInstancesAsync(1);
 
     // when
