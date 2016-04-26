@@ -1,6 +1,6 @@
 'use strict';
 
-var BpmnIO = require('bpmn-js/lib/NavigatedViewer');
+var BpmnIO = require('camunda-commons-ui/vendor/bpmn-js');
 
   var Service = ['$q', function ($q) {
     return {
@@ -8,7 +8,7 @@ var BpmnIO = require('bpmn-js/lib/NavigatedViewer');
         var deferred = $q.defer();
 
         BpmnIO.prototype.options = {};
-        var moddle = BpmnIO.prototype.createModdle();
+        var moddle = BpmnIO.prototype._createModdle({});
         moddle.fromXML(bpmn20Xml, 'bpmn:Definitions', function(err, definitions, context){
           deferred.resolve({
             definitions: definitions,

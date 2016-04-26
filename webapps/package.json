@@ -20,7 +20,6 @@
     "angular-data-depend": "git://github.com/camunda-third-party/angular-data-depend#8e3b66914c611069e3698fd5d4275e6cf8055d01",
     "angular-moment": "0.9.0",
     "angular-route": "1.2.29",
-    "bpmn-js": "0.12.1",
     "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master",
     "events": "1.1.0",
     "jquery": "2.1.1",
