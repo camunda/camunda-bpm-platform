@@ -34,6 +34,22 @@ var Batch = function(camAPI, eventBus) {
   };
 };
 
+Batch.prototype.getProgressPercentage = function(batch, type) {
+  switch(type) {
+    case 'success': return 100 * batch.completedJobs / (batch.completedJobs + batch.remainingJobs);
+    case 'failed': return 100 * batch.failedJobs / (batch.completedJobs + batch.remainingJobs);
+    case 'remaining': return 100 * (batch.remainingJobs - batch.failedJobs) / (batch.completedJobs + batch.remainingJobs);
+  }
+};
+
+Batch.prototype.getProgressAbsolute = function(batch, type) {
+  switch(type) {
+    case 'success': return batch.completedJobs;
+    case 'failed': return batch.failedJobs;
+    case 'remaining': return batch.remainingJobs - batch.failedJobs;
+  }
+};
+
 Batch.prototype.isSelected = function(batch) {
   return this._batches.selection.data.id === batch.id;
 };
@@ -116,7 +132,7 @@ Batch.prototype.loadDetails = function(id, type) {
   var self = this;
 
   var cb = (function(err, data) {
-    if(err) {
+    if(err || typeof data.length !== 'undefined' && data.length === 0) {
       // if the runtime version of the batch was requested,
       // try again with history (it may have finished in the meantime)
       if(type === 'runtime') {
@@ -128,18 +144,18 @@ Batch.prototype.loadDetails = function(id, type) {
         obj.state = 'ERROR';
       }
     } else {
-      obj.data = data;
+      obj.data = data.length ? data[0] : data;
       obj.state = 'LOADED';
       eventBus.emit('load:details:completed');
       if(type === 'runtime') {
-        this._loadFailedJobs(data);
+        this._loadFailedJobs(obj.data);
       }
     }
   }).bind(this);
 
   switch(type) {
     case 'runtime':
-      return this._sdk.resource('batch').get(id, cb);
+      return this._sdk.resource('batch').statistics({batchId: id}, cb);
     case 'history':
       return this._sdk.resource('history').singleBatch(id, cb);
   }
@@ -186,25 +202,32 @@ Batch.prototype._load = function(type) {
     firstResult: (obj.currentPage - 1) * PAGE_SIZE,
     maxResults: PAGE_SIZE
   };
+  var countCb = function(err, data) {
+    obj.state = data.count ? 'LOADED' : 'EMPTY';
+    obj.count = data.count;
+    eventBus.emit('load:'+type+':completed');
+  };
   var cb = function(err, data) {
     obj.data = data.items || data;
     if(typeof data.count !== 'undefined') {
-      obj.state = data.count ? 'LOADED' : 'EMPTY';
-      obj.count = data.count;
-      eventBus.emit('load:'+type+':completed');
+      countCb(err,data);
     } else {
-      this._sdk.resource('history').batchCount(params, function(err, data) {
-        obj.state = data.count ? 'LOADED' : 'EMPTY';
-        obj.count = data.count;
-        eventBus.emit('load:'+type+':completed');
-      });
+      switch(type) {
+        case 'runtime':
+          return this._sdk.resource('batch').statisticsCount(params, countCb);
+        case 'history':
+          return this._sdk.resource('history').batchCount(params, countCb);
+      }
     }
   }.bind(this);
 
   switch(type) {
     case 'runtime':
-      return this._sdk.resource('batch').list(params, cb);
+      return this._sdk.resource('batch').statistics(params, cb);
     case 'history':
+      params.completed = true;
+      params.sortBy = 'startTime';
+      params.sortOrder = 'desc';
       return this._sdk.resource('history').batch(params, cb);
   }
 };
