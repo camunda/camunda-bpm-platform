@@ -23,7 +23,7 @@ package org.camunda.bpm.engine.batch;
  *   execution jobs. The following relation between these exists:
  *
  *   <code>
- *     batch size = remaining jobs + completed jobs
+ *     batch total jobs = remaining jobs + completed jobs
  *   </code>
  * </p>
  */
