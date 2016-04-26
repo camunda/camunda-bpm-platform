@@ -109,7 +109,7 @@ public class JobExecutorLogger extends ProcessEngineLogger {
 
   public void debugNotifyingJobExecutor(String string) {
     logDebug(
-        "017", "Notofing Job Executor of new job {}", string);
+        "017", "Notifying Job Executor of new job {}", string);
   }
 
   public void startingToAacquireJobs(String name) {
@@ -119,7 +119,7 @@ public class JobExecutorLogger extends ProcessEngineLogger {
 
   public void exceptionDuringJobAcquisition(Exception e) {
     logError(
-        "019", "Exection during job acquistion {}", e.getMessage(), e);
+        "019", "Exception during job acquisition {}", e.getMessage(), e);
   }
 
   public void stoppedJobAcquisition(String name) {
