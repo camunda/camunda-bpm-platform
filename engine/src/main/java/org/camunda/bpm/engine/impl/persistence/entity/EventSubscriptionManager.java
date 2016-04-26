@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.EventSubscription;
@@ -263,7 +264,7 @@ public class EventSubscriptionManager extends AbstractManager {
    */
   @SuppressWarnings("unchecked")
   public List<MessageEventSubscriptionEntity> findMessageStartEventSubscriptionByName(String messageName) {
-    return getDbEntityManager().selectList("selectMessageStartEventSubscriptionByName", messageName);
+    return getDbEntityManager().selectList("selectMessageStartEventSubscriptionByName", configureParameterizedQuery(messageName));
   }
 
   /**
@@ -281,6 +282,10 @@ public class EventSubscriptionManager extends AbstractManager {
 
   protected void configureAuthorizationCheck(EventSubscriptionQueryImpl query) {
     getAuthorizationManager().configureEventSubscriptionQuery(query);
+  }
+
+  protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
+    return getTenantManager().configureQuery(parameter);
   }
 
   protected boolean matchesSubscription(EventSubscriptionEntity subscription, String type, String eventName) {
