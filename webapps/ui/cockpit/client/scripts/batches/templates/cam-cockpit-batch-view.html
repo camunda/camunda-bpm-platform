@@ -1,154 +1,160 @@
-<div class="batch-wrapper" style="position: absolute; width: 100%; top: 35px; bottom: 0; overflow: auto;">
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-sm-4">
-        <h3>Running Batches</h3>
-        <div cam-widget-loader
-             loading-state="{{ ctrl.getLoadingState('runtime') }}"
-             text-empty="No running batches">
+<div class="batch-wrapper">
+  <div class="row">
+    <div class="col-md-6">
+      <h3>Running Batches</h3>
+      <div cam-widget-loader
+           loading-state="{{ ctrl.getLoadingState('runtime') }}"
+           text-empty="No running batches">
 
-          <table class="cam-table">
-            <thead>
-              <tr>
-                <th class="id">ID</th>
-                <th class="type">Type</th>
-                <th>Progress</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="batch in ctrl.getBatches('runtime')" ng-class="{selected: ctrl.isSelected(batch)}">
-                <td class="uuid"><a ng-href="#/batch?details={{batch.id}}&type=runtime">{{batch.id}}</a></td>
-                <td>{{batch.type}}</td>
-                <td>
-                  <progress style="margin-bottom: 0;">
-                    <bar
-                      value="ctrl.getProgressPercentage(batch, 'success')"
-                      type="success"
-                      ng-if="ctrl.getProgressAbsolute(batch, 'success') > 0">
-                        <div tooltip="Completed Jobs"><span>{{ctrl.getProgressAbsolute(batch, 'success')}}</span></div>
-                    </bar>
-                    <bar
-                      value="ctrl.getProgressPercentage(batch, 'failed')"
-                      type="warning"
-                      ng-if="ctrl.getProgressAbsolute(batch, 'failed') > 0">
-                        <div tooltip="Failed Jobs"><span>{{ctrl.getProgressAbsolute(batch, 'failed')}}</span></div>
-                      </bar>
-                    <div
-                      style="text-align: center;"
-                      tooltip="Remaining Jobs"
-                      ng-if="ctrl.getProgressAbsolute(batch, 'remaining') > 0">
-                        <span>{{ctrl.getProgressAbsolute(batch, 'remaining')}}</span>
-                    </div>
-                  </progress></td>
-              </tr>
-            </tbody>
-          </table>
-          <pagination ng-if="ctrl.getBatchCount('runtime') > ctrl.getPageSize()"
-                        class="pagination-sm"
+        <table class="cam-table">
+          <thead>
+            <tr>
+              <th class="id">ID</th>
+              <th class="type">Type</th>
+              <th>Progress</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="batch in ctrl.getBatches('runtime')" ng-class="{selected: ctrl.isSelected(batch)}">
+              <td class="uuid"><a ng-href="#/batch?details={{batch.id}}&type=runtime">{{batch.id}}</a></td>
+              <td>{{batch.type}}</td>
+              <td>
+                <progress>
+                  <bar value="ctrl.getProgressPercentage(batch, 'success')"
+                       type="success"
+                       ng-if="ctrl.getProgressAbsolute(batch, 'success') > 0"
+                       class="jobs jobs-success">
+                    <div tooltip="Completed Jobs">{{ctrl.getProgressAbsolute(batch, 'success')}}</div>
+                  </bar>
+                  <bar value="ctrl.getProgressPercentage(batch, 'failed')"
+                       type="warning"
+                       ng-if="ctrl.getProgressAbsolute(batch, 'failed') > 0"
+                       class="jobs jobs-failed">
+                    <div tooltip="Failed Jobs">{{ctrl.getProgressAbsolute(batch, 'failed')}}</div>
+                  </bar>
+                  <div tooltip="Remaining Jobs"
+                       ng-if="ctrl.getProgressAbsolute(batch, 'remaining') > 0"
+                       class="jobs jobs-remaining">
+                     {{ctrl.getProgressAbsolute(batch, 'remaining')}}
+                  </div>
+                </progress>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination ng-if="ctrl.getBatchCount('runtime') > ctrl.getPageSize()"
+                    class="pagination-sm"
 
-                        page="ctrl.getCurrentPage('runtime')"
-                        ng-model="ctrl._batches.runtime.currentPage"
-                        ng-change="ctrl.updatePage('runtime')"
+                    page="ctrl.getCurrentPage('runtime')"
+                    ng-model="ctrl._batches.runtime.currentPage"
+                    ng-change="ctrl.updatePage('runtime')"
 
-                        total-items="ctrl.getBatchCount('runtime')"
-                        items-per-page="ctrl.getPageSize()"
+                    total-items="ctrl.getBatchCount('runtime')"
+                    items-per-page="ctrl.getPageSize()"
 
-                        max-size="7"
-                        boundary-links="true"></pagination>
-        </div>
-
-        <h3>Completed Batches</h3>
-
-        <div cam-widget-loader
-             loading-state="{{ ctrl.getLoadingState('history') }}"
-             text-empty="No finished batches">
-
-          <table class="cam-table">
-            <thead>
-              <tr>
-                <th class="id">ID</th>
-                <th class="type">Type</th>
-                <th class="start-time">Started</th>
-                <th class="end-time">Finished</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="batch in ctrl.getBatches('history')" ng-class="{selected: ctrl.isSelected(batch)}">
-                <td class="uuid"><a ng-href="#/batch?details={{batch.id}}&type=history">{{batch.id}}</a></td>
-                <td>{{batch.type}}</td>
-                <td>{{batch.startTime}}</td>
-                <td>{{batch.endTime}}</td>
-              </tr>
-            </tbody>
-          </table>
-          <pagination ng-if="ctrl.getBatchCount('history') > ctrl.getPageSize()"
-                        class="pagination-sm"
-
-                        page="ctrl.getCurrentPage('history')"
-                        ng-model="ctrl._batches.history.currentPage"
-                        ng-change="ctrl.updatePage('history')"
-
-                        total-items="ctrl.getBatchCount('history')"
-                        items-per-page="ctrl.getPageSize()"
-
-                        max-size="7"
-                        boundary-links="true"></pagination>
-        </div>
+                    max-size="7"
+                    boundary-links="true"></pagination>
       </div>
-      <div class="col-sm-8">
-        <div cam-widget-loader
-             loading-state="{{ ctrl.getLoadingState('selection') }}"
-             text-error="{{ctrl.getSelection()}}">
-          <!-- The check below is needed, because you cannot combine ng-if with transclusion in the loader widget. Thanks Angular -->
-          <div ng-if="ctrl.getLoadingState('selection') == 'LOADED'">
-            <h2><span ng-if="ctrl.getSelectionType() == 'history'">Completed</span><span ng-if="ctrl.getSelectionType() == 'runtime'">Running</span> Batch</h2>
 
-            <h3>Details</h3>
+      <h3>Completed Batches</h3>
+
+      <div cam-widget-loader
+           loading-state="{{ ctrl.getLoadingState('history') }}"
+           text-empty="No finished batches">
+
+        <table class="cam-table">
+          <thead>
+            <tr>
+              <th class="id">ID</th>
+              <th class="type">Type</th>
+              <th class="start-time">Started</th>
+              <th class="end-time">Finished</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="batch in ctrl.getBatches('history')" ng-class="{selected: ctrl.isSelected(batch)}">
+              <td class="uuid"><a ng-href="#/batch?details={{batch.id}}&type=history">{{batch.id}}</a></td>
+              <td>{{batch.type}}</td>
+              <td>{{batch.startTime}}</td>
+              <td>{{batch.endTime}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination ng-if="ctrl.getBatchCount('history') > ctrl.getPageSize()"
+                    class="pagination-sm"
+
+                    page="ctrl.getCurrentPage('history')"
+                    ng-model="ctrl._batches.history.currentPage"
+                    ng-change="ctrl.updatePage('history')"
+
+                    total-items="ctrl.getBatchCount('history')"
+                    items-per-page="ctrl.getPageSize()"
+
+                    max-size="7"
+                    boundary-links="true"></pagination>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div cam-widget-loader
+           loading-state="{{ ctrl.getLoadingState('selection') }}"
+           text-error="{{ctrl.getSelection()}}">
+        <!-- The check below is needed, because you cannot combine ng-if with transclusion in the loader widget. Thanks Angular -->
+        <div ng-if="ctrl.getLoadingState('selection') == 'LOADED'">
+          <h3>
+            <span ng-if="ctrl.getSelectionType() == 'history'">Completed</span>
+            <span ng-if="ctrl.getSelectionType() == 'runtime'">Running</span> Batch Details
+          </h3>
+
+          <!-- <h3>Details</h3> -->
+          <table class="cam-table">
+            <thead>
+              <th>Property</th>
+              <th>Value</th>
+            </thead>
+            <tbody>
+              <tr ng-repeat="(key, value) in ctrl.getSelection()">
+                <td>{{key}}</td>
+                <td>{{value}}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div ng-if="ctrl.getSelectionType() == 'runtime'">
+            <h3>Failed Jobs</h3>
+            <div cam-widget-loader
+                 loading-state="{{ ctrl.getLoadingState('jobs') }}"
+                 text-empty="No failed jobs"
+                 text-error="{{ctrl.getJobs()}}">
             <table class="cam-table">
               <thead>
-                <th>Property</th>
-                <th>Value</th>
+                <tr>
+                  <th class="id">ID</th>
+                  <th class="type">Exception</th>
+                </tr>
               </thead>
               <tbody>
-                <tr ng-repeat="(key, value) in ctrl.getSelection()">
-                  <td>{{key}}</td>
-                  <td>{{value}}</td>
+                <tr ng-repeat="job in ctrl.getJobs()">
+                  <td class="uuid stack-trace">
+                    <a ng-href="{{ctrl.getStacktraceUrl(job)}}" target="_blank" tooltip="Open stacktrace in new window">{{job.id}}</a>
+                  </td>
+                  <td>
+                    <span>{{job.exceptionMessage}}</span>
+                  </td>
                 </tr>
               </tbody>
             </table>
-            <div ng-if="ctrl.getSelectionType() == 'runtime'">
-              <h3>Failed Jobs</h3>
-              <div cam-widget-loader
-                   loading-state="{{ ctrl.getLoadingState('jobs') }}"
-                   text-empty="No failed jobs"
-                   text-error="{{ctrl.getJobs()}}">
-              <table class="cam-table">
-                <thead>
-                  <tr>
-                    <th class="id">ID</th>
-                    <th class="type">Exception</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="job in ctrl.getJobs()">
-                    <td class="uuid"><a ng-href="{{ctrl.getStacktraceUrl(job)}}" target="_blank" tooltip="Open stacktrace in new window" style="max-width: 100%; display: inline-block; text-overflow: ellipsis; overflow: hidden;">{{job.id}}</a></td>
-                    <td><span>{{job.exceptionMessage}}</span></td>
-                  </tr>
-                </tbody>
-              </table>
-              <pagination ng-if="ctrl.getJobCount() > ctrl.getPageSize()"
-                            class="pagination-sm"
+            <pagination ng-if="ctrl.getJobCount() > ctrl.getPageSize()"
+                        class="pagination-sm"
 
-                            page="ctrl.getCurrentPage('job')"
-                            ng-model="ctrl._jobs.currentPage"
-                            ng-change="ctrl.updatePage('job')"
+                        page="ctrl.getCurrentPage('job')"
+                        ng-model="ctrl._jobs.currentPage"
+                        ng-change="ctrl.updatePage('job')"
 
-                            total-items="ctrl.getJobCount()"
-                            items-per-page="ctrl.getPageSize()"
+                        total-items="ctrl.getJobCount()"
+                        items-per-page="ctrl.getPageSize()"
 
-                            max-size="7"
-                            boundary-links="true"></pagination>
-            </div>
+                        max-size="7"
+                        boundary-links="true"></pagination>
           </div>
         </div>
       </div>

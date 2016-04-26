@@ -1,9 +1,28 @@
 .batch-wrapper {
+  .container-fluid;
+  position: absolute;
+  width: 100%;
+  top: @breadcrumb-height;
+  bottom: 0;
+  overflow: auto;
+
+  .progress {
+    margin-bottom: 0;
+    text-align: center;
+  }
+
   table.cam-table > tbody > tr {
     border-left: 3px solid transparent;
 
     &.selected {
-      border-color: #b5152b;
+      border-color: @brand-primary;
     }
+  }
+
+  .stack-trace a {
+    max-width: 100%;
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 }
