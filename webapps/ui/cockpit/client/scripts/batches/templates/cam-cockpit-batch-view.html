@@ -12,12 +12,34 @@
               <tr>
                 <th class="id">ID</th>
                 <th class="type">Type</th>
+                <th>Progress</th>
               </tr>
             </thead>
             <tbody>
               <tr ng-repeat="batch in ctrl.getBatches('runtime')" ng-class="{selected: ctrl.isSelected(batch)}">
                 <td class="uuid"><a ng-href="#/batch?details={{batch.id}}&type=runtime">{{batch.id}}</a></td>
                 <td>{{batch.type}}</td>
+                <td>
+                  <progress style="margin-bottom: 0;">
+                    <bar
+                      value="ctrl.getProgressPercentage(batch, 'success')"
+                      type="success"
+                      ng-if="ctrl.getProgressAbsolute(batch, 'success') > 0">
+                        <div tooltip="Completed Jobs"><span>{{ctrl.getProgressAbsolute(batch, 'success')}}</span></div>
+                    </bar>
+                    <bar
+                      value="ctrl.getProgressPercentage(batch, 'failed')"
+                      type="warning"
+                      ng-if="ctrl.getProgressAbsolute(batch, 'failed') > 0">
+                        <div tooltip="Failed Jobs"><span>{{ctrl.getProgressAbsolute(batch, 'failed')}}</span></div>
+                      </bar>
+                    <div
+                      style="text-align: center;"
+                      tooltip="Remaining Jobs"
+                      ng-if="ctrl.getProgressAbsolute(batch, 'remaining') > 0">
+                        <span>{{ctrl.getProgressAbsolute(batch, 'remaining')}}</span>
+                    </div>
+                  </progress></td>
               </tr>
             </tbody>
           </table>
@@ -35,7 +57,7 @@
                         boundary-links="true"></pagination>
         </div>
 
-        <h3>All Batches</h3>
+        <h3>Completed Batches</h3>
 
         <div cam-widget-loader
              loading-state="{{ ctrl.getLoadingState('history') }}"
