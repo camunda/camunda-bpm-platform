@@ -56,7 +56,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
         if (el.length) {
           el[0].scrollIntoView();
         }
-      }, 100);
+      });
     }
 
     $rootScope.showBreadcrumbs = true;
