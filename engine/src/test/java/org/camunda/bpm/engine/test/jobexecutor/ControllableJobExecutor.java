@@ -67,7 +67,7 @@ public class ControllableJobExecutor extends JobExecutor {
    * <p>true: behave like embedded job executor where shutdown waits for all jobs to end
    * <p>false: behave like runtime container job executor where shutdown does not influence job execution
    */
-  public ControllableJobExecutor proceeedAndWaitOnShutdown(boolean syncOnShutdown) {
+  public ControllableJobExecutor proceedAndWaitOnShutdown(boolean syncOnShutdown) {
     this.syncOnShutdown = syncOnShutdown;
     return this;
   }

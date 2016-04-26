@@ -115,7 +115,8 @@ public class JobManager extends AbstractManager {
     if(!job.isSuspended()
             && job.isExclusive()
             && jobExecutorContext != null
-            && jobExecutorContext.isExecutingExclusiveJob()) {
+            && jobExecutorContext.isExecutingExclusiveJob()
+            && areInSameProcessInstance(job, jobExecutorContext.getCurrentJob())) {
       // lock job & add to the queue of the current processor
       Date currentTime = ClockUtil.getCurrentTime();
       job.setLockExpirationTime(new Date(currentTime.getTime() + jobExecutor.getLockTimeInMillis()));
@@ -128,6 +129,17 @@ public class JobManager extends AbstractManager {
     Context.getCommandContext()
     .getTransactionContext()
     .addTransactionListener(TransactionState.COMMITTED, transactionListener);
+  }
+
+  protected boolean areInSameProcessInstance(JobEntity job1, JobEntity job2) {
+    if (job1 == null || job2 == null) {
+      return false;
+    }
+
+    String instance1 = job1.getProcessInstanceId();
+    String instance2 = job2.getProcessInstanceId();
+
+    return instance1 != null && instance1.equals(instance2);
   }
 
   public void cancelTimers(ExecutionEntity execution) {

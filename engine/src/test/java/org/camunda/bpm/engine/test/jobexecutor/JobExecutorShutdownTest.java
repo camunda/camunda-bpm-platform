@@ -81,7 +81,7 @@ public class JobExecutorShutdownTest {
   protected static ControllableJobExecutor buildControllableJobExecutor() {
     ControllableJobExecutor jobExecutor = new ControllableJobExecutor();
     jobExecutor.setMaxJobsPerAcquisition(2);
-    jobExecutor.proceeedAndWaitOnShutdown(false);
+    jobExecutor.proceedAndWaitOnShutdown(false);
     return jobExecutor;
   }
 
