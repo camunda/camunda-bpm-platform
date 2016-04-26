@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEnt
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -226,6 +227,24 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertNotNull(historicProcessInstance.getEndTime());
   }
 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/multitenancy/failingTask.bpmn" })
+  public void testHistoricProcessInstanceQueryWithIncidents() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    Job job = managementService.createJobQuery().processDefinitionId(pi.getProcessDefinitionId()).singleResult();
+    try {
+      managementService.executeJob(job.getId());
+    } catch (ProcessEngineException e) {
+      // the job failed and created an incident
+    }
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    assertEquals(1, query.withIncidents().count());
+    assertEquals(1, query.incidentMessageLike("Unknown property used%").count());
+    assertEquals(1, query.incidentMessage("Unknown property used in expression: #{failing}. Cause: Cannot resolve identifier 'failing'").count());
+  }
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testHistoricProcessInstanceQuery() {
     Calendar startTime = Calendar.getInstance();
@@ -291,6 +310,15 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().finishedAfter(hourAgo.getTime()).count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().finishedAfter(hourFromNow.getTime()).count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().finishedAfter(hourFromNow.getTime()).finishedBefore(hourAgo.getTime()).count());
+
+    // No incidents should are created
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().withIncidents().count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().incidentMessageLike("Unknown property used%").count());
+    assertEquals(0, historyService
+                      .createHistoricProcessInstanceQuery()
+                      .incidentMessage("Unknown property used in expression: #{failing}. Cause: Cannot resolve identifier 'failing'")
+                      .count()
+    );
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
