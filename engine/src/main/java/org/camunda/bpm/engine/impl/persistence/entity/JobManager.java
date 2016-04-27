@@ -80,6 +80,13 @@ public class JobManager extends AbstractManager {
 
   }
 
+  public void insertAndHintJobExecutor(JobEntity jobEntity) {
+    jobEntity.insert();
+    if (Context.getProcessEngineConfiguration().isHintJobExecutor()) {
+      hintJobExecutor(jobEntity);
+    }
+  }
+
   public void send(MessageEntity message) {
     message.insert();
     if (Context.getProcessEngineConfiguration().isHintJobExecutor()) {

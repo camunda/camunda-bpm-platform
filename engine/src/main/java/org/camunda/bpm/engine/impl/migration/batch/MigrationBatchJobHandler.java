@@ -100,7 +100,7 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
       ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);
       JobEntity job = createBatchJob(jobDefinition, configurationEntity);
 
-      jobManager.insertJob(job);
+      jobManager.insertAndHintJobExecutor(job);
 
       idsForJob.clear();
       createdJobs++;

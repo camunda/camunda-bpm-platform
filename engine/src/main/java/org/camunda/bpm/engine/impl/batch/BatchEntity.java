@@ -250,7 +250,7 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
   public JobEntity createSeedJob() {
     JobEntity seedJob = BATCH_SEED_JOB_DECLARATION.createJobInstance(this);
 
-    Context.getCommandContext().getJobManager().insertJob(seedJob);
+    Context.getCommandContext().getJobManager().insertAndHintJobExecutor(seedJob);
 
     return seedJob;
   }
@@ -274,7 +274,7 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
     JobEntity monitorJob = BATCH_MONITOR_JOB_DECLARATION.createJobInstance(this);
     monitorJob.setDuedate(dueDate);
 
-    commandContext.getJobManager().insertJob(monitorJob);
+    commandContext.getJobManager().insertAndHintJobExecutor(monitorJob);
     return monitorJob;
   }
 
