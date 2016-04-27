@@ -15,10 +15,12 @@ package org.camunda.bpm.engine.rest.sub.runtime.impl;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDuedateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.PriorityDto;
@@ -119,6 +121,19 @@ public class JobResourceImpl implements JobResource {
     } catch (AuthorizationException e) {
       throw e;
     } catch (NotFoundException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
+    } catch (ProcessEngineException e) {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
+  }
+
+  public void deleteJob() {
+    try {
+      engine.getManagementService()
+        .deleteJob(jobId);
+    } catch (AuthorizationException e) {
+      throw e;
+    } catch (NullValueException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
     } catch (ProcessEngineException e) {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e.getMessage());

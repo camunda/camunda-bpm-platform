@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateTenantBuilder;
 import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
@@ -1269,6 +1270,88 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("message", equalTo(message))
     .when()
       .put(JOB_RESOURCE_SET_PRIORITY_URL);
+  }
+
+  @Test
+  public void deleteJob() {
+    String jobId = MockProvider.NON_EXISTING_JOB_ID;
+
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(SINGLE_JOB_RESOURCE_URL);
+
+    verify(mockManagementService).deleteJob(MockProvider.EXAMPLE_JOB_ID);
+    verifyNoMoreInteractions(mockManagementService);
+  }
+
+  @Test
+  public void deleteNotExistingJob() {
+    String jobId = MockProvider.NON_EXISTING_JOB_ID;
+
+    String expectedMessage = "No job found with id '" + jobId + "'.";
+
+    doThrow(new NullValueException(expectedMessage))
+      .when(mockManagementService).deleteJob(jobId);
+
+    given().log().all()
+      .pathParam("id", jobId)
+      .then().expect().log().all()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo(expectedMessage))
+      .when()
+      .delete(SINGLE_JOB_RESOURCE_URL);
+
+    verify(mockManagementService).deleteJob(jobId);
+    verifyNoMoreInteractions(mockManagementService);
+  }
+
+  @Test
+  public void deleteLockedJob() {
+    String jobId = MockProvider.EXAMPLE_JOB_ID;
+
+    String expectedMessage = "Cannot delete job when the job is being executed. Try again later.";
+
+    doThrow(new ProcessEngineException(expectedMessage))
+      .when(mockManagementService).deleteJob(jobId);
+
+    given()
+      .pathParam("id", jobId)
+      .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo(expectedMessage))
+      .when()
+      .delete(SINGLE_JOB_RESOURCE_URL);
+
+    verify(mockManagementService).deleteJob(jobId);
+    verifyNoMoreInteractions(mockManagementService);
+  }
+
+  @Test
+  public void deleteJobThrowAuthorizationException() {
+    String jobId = MockProvider.EXAMPLE_JOB_ID;
+
+    String expectedMessage = "Missing permissions";
+
+    doThrow(new AuthorizationException(expectedMessage))
+      .when(mockManagementService).deleteJob(jobId);
+
+    given()
+      .pathParam("id", jobId)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(expectedMessage))
+    .when()
+      .delete(SINGLE_JOB_RESOURCE_URL);
+
+    verify(mockManagementService).deleteJob(jobId);
+    verifyNoMoreInteractions(mockManagementService);
   }
 
 }
