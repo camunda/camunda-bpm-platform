@@ -32,11 +32,12 @@
                        class="jobs jobs-failed">
                     <div tooltip="Failed Jobs">{{ctrl.getProgressAbsolute(batch, 'failed')}}</div>
                   </bar>
-                  <div tooltip="Remaining Jobs"
+                  <bar value="ctrl.getProgressPercentage(batch, 'remaining')"
+                       type="info"
                        ng-if="ctrl.getProgressAbsolute(batch, 'remaining') > 0"
                        class="jobs jobs-remaining">
-                     {{ctrl.getProgressAbsolute(batch, 'remaining')}}
-                  </div>
+                     <div tooltip="Remaining Jobs">{{ctrl.getProgressAbsolute(batch, 'remaining')}}</div>
+                  </bar>
                 </progress>
               </td>
             </tr>
