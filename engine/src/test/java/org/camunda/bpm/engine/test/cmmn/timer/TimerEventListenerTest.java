@@ -56,9 +56,6 @@ public class TimerEventListenerTest extends CmmnProcessEngineTestCase {
     CaseInstance ci = createCaseInstanceByKey("case");
     assertNotNull(ci);
     CaseDefinition cd = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("case").singleResult();
-
-    System.out.println("Def count: "+managementService.createJobDefinitionQuery().count());
-
     List<JobDefinition> allJobs = managementService.createJobDefinitionQuery().list();
     assertNotNull(allJobs);
     assertTrue(!allJobs.isEmpty());
@@ -67,27 +64,18 @@ public class TimerEventListenerTest extends CmmnProcessEngineTestCase {
     assertTrue(allJobs.get(0).getJobType().equals("timer-event-listener"));
     assertNotNull(allJobs.get(0).getCaseDefinitionKey());
     assertNotNull(allJobs.get(0).getCaseDefinitionId());
+  }
 
-    //redeploy the same thing. to test isDeploymentNew==false case.
-    /*getProcessEngine()
-            .getRepositoryService()
-            .createDeployment()
-            .addClasspathResource("org/camunda/bpm/engine/test/cmmn/timer/TimerEventListenerTest.testTimerJobData.cmmn")
-            .deploy();
-
-
-
-    //update case to be tested.
-    CaseInstance ci1 = createCaseInstanceByKey("case");
-    assertNotNull(ci1);
-    List<CaseDefinition> cd1 = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("case").list();
-
-    System.out.println("Def count: "+managementService.createJobDefinitionQuery().count());
-
-    List<JobDefinition> allJobs1 = managementService.createJobDefinitionQuery().list();
-    assertNotNull(allJobs1);
-    assertTrue(!allJobs1.isEmpty());
-    assertTrue(allJobs.size()==1);*/
+  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/timer/TimerEventListenerTest.testTimerJobData.cmmn"})
+  public void testTimerEventListenerJobDefinitionIsDeploymentOld(){
+    processEngineConfiguration.getDeploymentCache().discardCaseDefinitionCache();
+    CaseInstance ci = createCaseInstanceByKey("case");
+    assertNotNull(ci);
+    List<CaseDefinition> cd = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("case").list();
+    List<JobDefinition> allJobs = managementService.createJobDefinitionQuery().list();
+    assertNotNull(allJobs);
+    assertTrue(!allJobs.isEmpty());
+    assertTrue(allJobs.size()==1);
   }
 
 }

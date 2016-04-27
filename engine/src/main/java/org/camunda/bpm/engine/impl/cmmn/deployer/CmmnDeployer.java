@@ -111,25 +111,15 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
 
     if(isNewDeployment) {
       for(JobDeclaration<?,?> jobDeclaration:jobDeclarations){
-        if(jobDeclaration instanceof TimerJobDeclaration){
-          createJobDefinition(definition, (TimerJobDeclaration<?>) jobDeclaration);
-        }else{
-          //TODO unable to handle this type of jobs, log warnings?
-          continue;
-        }
+        createJobDefinition(definition, jobDeclaration);
       }
-      // create new job definitions:
     } else {
-        //TODO more to be done here.
       List<JobDefinitionEntity> existingDefinitions = jobDefinitionManager.findByCaseDefinitionId(definition.getId());
-      // TODO is this call required for CMMN? LegacyBehavior.migrateMultiInstanceJobDefinitions(processDefinition, existingDefinitions);
       for (JobDeclaration<?, ?> jobDeclaration : jobDeclarations) {
         boolean jobDefinitionExists = false;
         for (JobDefinition jobDefinitionEntity : existingDefinitions) {
-
           // <!> Assumption: there can be only one job definition per activity and type
-          if(jobDeclaration.getActivityId().equals(jobDefinitionEntity.getActivityId()) &&
-                  jobDeclaration.getJobHandlerType().equals(jobDefinitionEntity.getJobType())) {
+          if(jobDeclaration.getJobHandlerType().equals(jobDefinitionEntity.getJobType())) {
             jobDeclaration.setJobDefinitionId(jobDefinitionEntity.getId());
             jobDefinitionExists = true;
             break;
@@ -137,7 +127,7 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
         }
         if(!jobDefinitionExists) {
           // not found: create new definition
-          createJobDefinition(definition, (TimerJobDeclaration<?>) jobDeclaration);
+          createJobDefinition(definition, jobDeclaration);
         }
 
       }
@@ -145,7 +135,7 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
     }
   }
 
-  private void createJobDefinition(CaseDefinitionEntity definition, TimerJobDeclaration<?> jobDeclaration) {
+  protected void createJobDefinition(CaseDefinitionEntity definition, JobDeclaration<?,?> jobDeclaration) {
     final JobDefinitionManager jobDefinitionManager = getJobDefinitionManager();
     JobDefinitionEntity jobDefinitionEntity = new JobDefinitionEntity(jobDeclaration);
     jobDefinitionEntity.setCaseDefinitionId(definition.getId());

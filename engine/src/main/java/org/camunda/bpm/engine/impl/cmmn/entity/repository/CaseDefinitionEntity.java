@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.entity.repository;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
@@ -24,8 +26,6 @@ import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinition;
-
-import java.util.Map;
 
 /**
  * @author Roman Smirnov
@@ -50,7 +50,6 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
   // this definition does not have any previous definitions
   protected boolean firstVersion = false;
   protected String previousCaseDefinitionId;
-
 
   public CaseDefinitionEntity() {
     super(null);
@@ -224,4 +223,5 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
   public String toString() {
     return "CaseDefinitionEntity["+id+"]";
   }
+
 }

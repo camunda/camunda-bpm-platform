@@ -78,4 +78,8 @@ public class JobDefinitionManager extends AbstractManager {
     getDbEntityManager().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", parameters);
   }
 
+  public void deleteJobDefinitionsByCaseDefinitionId(String definitionId) {
+    getDbEntityManager().delete(JobDefinitionEntity.class, "deleteJobDefinitionsByCaseDefinitionId", definitionId);
+  }
+
 }
