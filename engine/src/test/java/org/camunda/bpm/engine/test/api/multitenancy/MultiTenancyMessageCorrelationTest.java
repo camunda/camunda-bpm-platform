@@ -583,7 +583,7 @@ public class MultiTenancyMessageCorrelationTest {
   }
 
   @Test
-  public void failCorrelateMessageByProcessInstanceIdNoAuthenticatedTenants() {
+  public void failToCorrelateMessageByProcessInstanceIdNoAuthenticatedTenants() {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
 
     ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
@@ -617,11 +617,10 @@ public class MultiTenancyMessageCorrelationTest {
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
   }
 
   @Test
-  public void failCorrelateMessageByProcessDefinitionIdNoAuthenticatedTenants() {
+  public void failToCorrelateMessageByProcessDefinitionIdNoAuthenticatedTenants() {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_START_PROCESS);
 
     ProcessDefinition processDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery().
@@ -656,7 +655,6 @@ public class MultiTenancyMessageCorrelationTest {
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
   }
 
 }

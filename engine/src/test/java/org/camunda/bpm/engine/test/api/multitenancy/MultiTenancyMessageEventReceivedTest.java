@@ -74,7 +74,6 @@ public class MultiTenancyMessageEventReceivedTest {
     assertThat(query.count(), is(1L));
     assertThat(query.withoutTenantId().count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
   }
 
   @Test
@@ -97,7 +96,6 @@ public class MultiTenancyMessageEventReceivedTest {
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
   }
 
   @Test
@@ -126,7 +124,7 @@ public class MultiTenancyMessageEventReceivedTest {
   }
 
   @Test
-  public void failCorrelateReceivedMessageToIntermediateCatchEventNoAuthenticatedTenants() {
+  public void failToCorrelateReceivedMessageToIntermediateCatchEventNoAuthenticatedTenants() {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
 
     engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
