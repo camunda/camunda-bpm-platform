@@ -249,12 +249,11 @@
 
   <select id="selectMessageStartEventSubscriptionByName" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select *
-    from ${prefix}ACT_RU_EVENT_SUBSCR
+    from ${prefix}ACT_RU_EVENT_SUBSCR RES
     where (EVENT_TYPE_ = 'message')
         and (EVENT_NAME_ = #{parameter})
         and EXECUTION_ID_ is null
-        <bind name="columnPrefix" value="''"/>
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
   </select>
 
   <select id="selectMessageStartEventSubscriptionByNameAndTenantId" resultMap="eventSubscriptionResultMap" parameterType="string">
