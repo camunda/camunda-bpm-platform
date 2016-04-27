@@ -21,117 +21,108 @@
 
 
 
-      <table>
-        <tr>
-          <td>
-            <ul class="nav nav-tabs">
-              <li ng-class="{active: sidebarTab === 'info'}">
-                <a ng-click="sidebarTab = 'info'">Information</a>
-              </li>
-              <li ng-class="{active: sidebarTab === 'filters'}">
-                <a ng-click="sidebarTab = 'filters'">Filter</a>
-              </li>
-            </ul>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <div class="tab-content"
-                 ng-show="sidebarTab === 'info'">
-              <dl class="process-information">
-                <dt>
-                  <span tooltip="Process instance ID as it appears in the database">Instance ID:</span>
-                </dt>
-                <dd class="instance-id">{{ processInstance.id }}</dd>
+      <ul class="nav nav-tabs">
+        <li ng-class="{active: sidebarTab === 'info'}">
+          <a ng-click="sidebarTab = 'info'">Information</a>
+        </li>
+        <li ng-class="{active: sidebarTab === 'filters'}">
+          <a ng-click="sidebarTab = 'filters'">Filter</a>
+        </li>
+      </ul>
 
-                <dt>
-                  <span tooltip="Business key of the process instance">Business Key:</span>
-                </dt>
-                <dd ng-if="processInstance.businessKey"
-                    class="business-key">
-                  {{ processInstance.businessKey }}
-                </dd>
-                <dd ng-if="!processInstance.businessKey"
-                    class="business-key"><span class="null-value">null</span></dd>
+      <div class="tab-content"
+           ng-show="sidebarTab === 'info'">
+        <dl class="process-information">
+          <dt>
+            <span tooltip="Process instance ID as it appears in the database">Instance ID:</span>
+          </dt>
+          <dd class="instance-id">{{ processInstance.id }}</dd>
 
-                <dt>Definition Version:</dt>
-                <dd class="definition-version">
-                  {{ processDefinition.version }}
-                  <a ng-href="{{ getMigrationUrl() }}"
-                     class="instance-upgrade-link"
-                     ng-if="hasMigrationPlugin && !isLatestVersion()">
-                    <span class="glyphicon glyphicon-arrow-up"
-                          tooltip="Migrate this instance to latest version"></span>
-                  </a>
-                </dd>
+          <dt>
+            <span tooltip="Business key of the process instance">Business Key:</span>
+          </dt>
+          <dd ng-if="processInstance.businessKey"
+              class="business-key">
+            {{ processInstance.businessKey }}
+          </dd>
+          <dd ng-if="!processInstance.businessKey"
+              class="business-key"><span class="null-value">null</span></dd>
 
-                <dt>Definition ID:</dt>
-                <dd class="definition-id">
-                  <a ng-href="#/process-definition/{{ processDefinition.id }}/runtime">{{ processDefinition.id }}</a>
-                </dd>
+          <dt>Definition Version:</dt>
+          <dd class="definition-version">
+            {{ processDefinition.version }}
+            <a ng-href="{{ getMigrationUrl() }}"
+               class="instance-upgrade-link"
+               ng-if="hasMigrationPlugin && !isLatestVersion()">
+              <span class="glyphicon glyphicon-arrow-up"
+                    tooltip="Migrate this instance to latest version"></span>
+            </a>
+          </dd>
 
-                <dt>Definition Name:</dt>
-                <dd class="definition-name">{{ processDefinition.name }}</dd>
+          <dt>Definition ID:</dt>
+          <dd class="definition-id">
+            <a ng-href="#/process-definition/{{ processDefinition.id }}/runtime">{{ processDefinition.id }}</a>
+          </dd>
 
-                <dt>Definition Key:</dt>
-                <dd class="definition-key">{{ processDefinition.key }}</dd>
+          <dt>Definition Name:</dt>
+          <dd class="definition-name">{{ processDefinition.name }}</dd>
 
-                <dt>Tenant ID:</dt>
-                <dd class="tenant-id"
-                    ng-if="processDefinition.tenantId">{{ processDefinition.tenantId }}</dd>
-                <dd class="tenant-id"
-                    ng-if="!processDefinition.tenantId"><span class="null-value">null</span></dd>
+          <dt>Definition Key:</dt>
+          <dd class="definition-key">{{ processDefinition.key }}</dd>
 
-                <dt>Deployment ID:</dt>
-                <dd class="deployment-id">
-                  <a ng-href="{{ getDeploymentUrl() }}">{{ processDefinition.deploymentId }}</a>
-                </dd>
-              </dl>
-            </div>
+          <dt>Tenant ID:</dt>
+          <dd class="tenant-id"
+              ng-if="processDefinition.tenantId">{{ processDefinition.tenantId }}</dd>
+          <dd class="tenant-id"
+              ng-if="!processDefinition.tenantId"><span class="null-value">null</span></dd>
 
-            <div class="tab-content filters"
-                 ng-show="sidebarTab === 'filters'">
-              <h5>
-                Filter
-                <span class="glyphicon glyphicon-info-sign"
-                      tooltip="The activity instance tree with all currently selected activity instances. You may change the selection via (CTRL +) click."></span>
-              </h5>
+          <dt>Deployment ID:</dt>
+          <dd class="deployment-id">
+            <a ng-href="{{ getDeploymentUrl() }}">{{ processDefinition.deploymentId }}</a>
+          </dd>
+        </dl>
+      </div>
 
-              <div cam-quick-filter
-                   name-filter
-                   holder-selector=".instance-tree"
-                   label-selector=".tree-node-label"
-                   item-selector=".tree-node-group">
-              </div>
+      <div class="tab-content filters"
+           ng-show="sidebarTab === 'filters'">
+        <h5>
+          Filter
+          <span class="glyphicon glyphicon-info-sign"
+                tooltip="The activity instance tree with all currently selected activity instances. You may change the selection via (CTRL +) click."></span>
+        </h5>
 
-              <div class="filter-selection">
-                <button class="btn btn-link btn-xs btn-control"
-                        ng-show="filterData.activityInstanceCount"
-                        ng-click="clearSelection()">
-                  <span class="glyphicon glyphicon-remove"></span>
-                </button>
+        <div cam-quick-filter
+             name-filter
+             holder-selector=".instance-tree"
+             label-selector=".tree-node-label"
+             item-selector=".tree-node-group">
+        </div>
 
-                <ng-pluralize count="filterData.activityInstanceCount"
-                              when="{ 'null' : 'Nothing',
-                                      '0': 'Nothing',
-                                      'one': '1 activity instance',
-                                      'other': '{{ filterData.activityInstanceCount }} activity instances'}">
-                </ng-pluralize>
-                selected
-              </div>
+        <div class="filter-selection">
+          <button class="btn btn-link btn-xs btn-control"
+                  ng-show="filterData.activityInstanceCount"
+                  ng-click="clearSelection()">
+            <span class="glyphicon glyphicon-remove"></span>
+          </button>
+
+          <ng-pluralize count="filterData.activityInstanceCount"
+                        when="{ 'null' : 'Nothing',
+                                '0': 'Nothing',
+                                'one': '1 activity instance',
+                                'other': '{{ filterData.activityInstanceCount }} activity instances'}">
+          </ng-pluralize>
+          selected
+        </div>
 
 
-              <div class="filter instance-tree">
-                <div activity-instance-tree="activityInstanceTree"
-                     selection="filter"
-                     on-element-click="handleActivityInstanceSelection(id, activityId, $event)"
-                     order-children-by="orderChildrenBy()">
-                </div>
-              </div>
-            </div>
-          </td>
-        </tr>
-      </table>
+        <div class="filter instance-tree">
+          <div activity-instance-tree="activityInstanceTree"
+               selection="filter"
+               on-element-click="handleActivityInstanceSelection(id, activityId, $event)"
+               order-children-by="orderChildrenBy()">
+          </div>
+        </div>
+      </div>
 
       <a class="hide-collapsable pull-right"></a>
     </div>
