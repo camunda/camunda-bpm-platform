@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -1728,7 +1729,7 @@ public class BpmnParse extends Parse {
    *
    * @param activity the activity which gets the delegates
    */
-  private void setActivityAsyncDelegates(final ActivityImpl activity) {
+  protected void setActivityAsyncDelegates(final ActivityImpl activity) {
     activity.setDelegateAsyncAfterUpdate(new ActivityImpl.AsyncAfterUpdate() {
       @Override
       public void updateAsyncAfter(boolean asyncAfter, boolean exclusive) {
@@ -1760,7 +1761,7 @@ public class BpmnParse extends Parse {
    * @param activity the corresponding activity
    * @param exclusive the flag which indicates if the async should be exclusive
    */
-  private void addMessageJobDeclaration(MessageJobDeclaration messageJobDeclaration, ActivityImpl activity, boolean exclusive) {
+  protected void addMessageJobDeclaration(MessageJobDeclaration messageJobDeclaration, ActivityImpl activity, boolean exclusive) {
     ProcessDefinition procDef = (ProcessDefinition) activity.getProcessDefinition();
     if (!exists(messageJobDeclaration, procDef.getKey(), activity.getActivityId())) {
       messageJobDeclaration.setExclusive(exclusive);
@@ -1780,15 +1781,16 @@ public class BpmnParse extends Parse {
    * @param activityId the corresponding activity id
    * @return true if the message job declaration exists, false otherwise
    */
-  private boolean exists(MessageJobDeclaration msgJobdecl, String procDefKey, String activityId) {
+  protected boolean exists(MessageJobDeclaration msgJobdecl, String procDefKey, String activityId) {
     boolean exist = false;
     List<JobDeclaration<?, ?>> declarations = jobDeclarations.get(procDefKey);
     if (declarations != null) {
       for (int i = 0; i < declarations.size() && !exist; i++) {
         JobDeclaration<?, ?> decl = declarations.get(i);
         if (decl.getActivityId().equals(activityId) &&
-            decl.getJobConfiguration().equalsIgnoreCase(msgJobdecl.getJobConfiguration()))
+            decl.getJobConfiguration().equalsIgnoreCase(msgJobdecl.getJobConfiguration())) {
           exist = true;
+        }
       }
     }
     return exist;
@@ -1800,13 +1802,15 @@ public class BpmnParse extends Parse {
    * @param activity the activity of the job declaration
    * @param jobConfiguration  the job configuration of the declaration
    */
-  private void removeMessageJobDeclarationWithJobConfiguration(ActivityImpl activity, String jobConfiguration) {
+  protected void removeMessageJobDeclarationWithJobConfiguration(ActivityImpl activity, String jobConfiguration) {
     List<MessageJobDeclaration> messageJobDeclarations = (List<MessageJobDeclaration>) activity.getProperty(PROPERTYNAME_MESSAGE_JOB_DECLARATION);
     if (messageJobDeclarations != null) {
-      for (int i = messageJobDeclarations.size() -1; i >= 0; i--) {
-        if (messageJobDeclarations.get(i).getJobConfiguration().equalsIgnoreCase(jobConfiguration)
-          && messageJobDeclarations.get(i).getActivityId().equalsIgnoreCase(activity.getActivityId())) {
-          messageJobDeclarations.remove(i);
+      Iterator<MessageJobDeclaration> iter = messageJobDeclarations.iterator();
+      while (iter.hasNext()) {
+        MessageJobDeclaration msgDecl = iter.next();
+        if (msgDecl.getJobConfiguration().equalsIgnoreCase(jobConfiguration)
+          && msgDecl.getActivityId().equalsIgnoreCase(activity.getActivityId())) {
+          iter.remove();
         }
       }
     }
@@ -1814,10 +1818,12 @@ public class BpmnParse extends Parse {
     ProcessDefinition procDef = (ProcessDefinition) activity.getProcessDefinition();
     List<JobDeclaration<?, ?>> declarations = jobDeclarations.get(procDef.getKey());
     if (declarations != null) {
-      for (int i = declarations.size() -1; i >= 0; i--) {
-        if (declarations.get(i).getJobConfiguration().equalsIgnoreCase(jobConfiguration)
-            && declarations.get(i).getActivityId().equalsIgnoreCase(activity.getActivityId())) {
-          declarations.remove(i);
+      Iterator<JobDeclaration<?, ?>> iter = declarations.iterator();
+      while (iter.hasNext()) {
+        JobDeclaration<?, ?> jobDcl = iter.next();
+        if (jobDcl.getJobConfiguration().equalsIgnoreCase(jobConfiguration)
+            && jobDcl.getActivityId().equalsIgnoreCase(activity.getActivityId())) {
+          iter.remove();
         }
       }
     }

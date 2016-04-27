@@ -18,8 +18,6 @@ package org.camunda.bpm.engine.test.jobexecutor;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
@@ -38,19 +36,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
 
 /**
  * Represents a test class, which uses parse listeners 
@@ -101,23 +86,27 @@ public class JobDefinitionCreationBothAsyncWithParseListenerTest {
     String modelFileName = "jobCreationWithinParseListener.bpmn20.xml";
     InputStream in = JobDefinitionCreationWithParseListenerTest.class.getResourceAsStream(modelFileName);
     DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment().addInputStream(modelFileName, in);
+    
     //when the asyncBefore and asyncAfter is set to true in the parse listener 
     Deployment deployment = builder.deploy();
     engineRule.manageDeployment(deployment);  
+    
     //then there exists two job definitions
     JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
-    List<JobDefinition> definitions = query.list();
+    List<JobDefinition> definitions = query.orderByJobConfiguration().asc().list();
     assertEquals(definitions.size(), 2);    
-    //asyncBefore
-    JobDefinition asyncAfterBefore = definitions.get(0);
-    assertEquals(asyncAfterBefore.getProcessDefinitionKey(), "oneTaskProcess");
-    assertEquals(asyncAfterBefore.getActivityId(), "servicetask1");
-    assertEquals(asyncAfterBefore.getJobConfiguration(), MessageJobDeclaration.ASYNC_BEFORE);
+    
     //asyncAfter
-    JobDefinition asyncAfterAfter = definitions.get(1);
+    JobDefinition asyncAfterAfter = definitions.get(0);
     assertEquals(asyncAfterAfter.getProcessDefinitionKey(), "oneTaskProcess");
     assertEquals(asyncAfterAfter.getActivityId(), "servicetask1");
-    assertEquals(asyncAfterAfter.getJobConfiguration(), MessageJobDeclaration.ASYNC_AFTER);    
+    assertEquals(asyncAfterAfter.getJobConfiguration(), MessageJobDeclaration.ASYNC_AFTER);   
+    
+    //asyncBefore
+    JobDefinition asyncAfterBefore = definitions.get(1);
+    assertEquals(asyncAfterBefore.getProcessDefinitionKey(), "oneTaskProcess");
+    assertEquals(asyncAfterBefore.getActivityId(), "servicetask1");
+    assertEquals(asyncAfterBefore.getJobConfiguration(), MessageJobDeclaration.ASYNC_BEFORE);     
   }  
   
   @Test
@@ -126,23 +115,27 @@ public class JobDefinitionCreationBothAsyncWithParseListenerTest {
     String modelFileName = "jobAsyncBeforeCreationWithinParseListener.bpmn20.xml";
     InputStream in = JobDefinitionCreationWithParseListenerTest.class.getResourceAsStream(modelFileName);
     DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment().addInputStream(modelFileName, in);
+    
     //when the asyncBefore and asyncAfter is set to true in the parse listener 
     Deployment deployment = builder.deploy();
     engineRule.manageDeployment(deployment);  
+    
     //then there exists two job definitions
     JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
-    List<JobDefinition> definitions = query.list();
+    List<JobDefinition> definitions = query.orderByJobConfiguration().asc().list();
     assertEquals(definitions.size(), 2);    
+    
+    //asyncAfter
+    JobDefinition asyncAfterAfter = definitions.get(0);
+    assertEquals(asyncAfterAfter.getProcessDefinitionKey(), "oneTaskProcess");
+    assertEquals(asyncAfterAfter.getActivityId(), "servicetask1");
+    assertEquals(asyncAfterAfter.getJobConfiguration(), MessageJobDeclaration.ASYNC_AFTER);   
+    
     //asyncBefore
-    JobDefinition asyncAfterBefore = definitions.get(0);
+    JobDefinition asyncAfterBefore = definitions.get(1);
     assertEquals(asyncAfterBefore.getProcessDefinitionKey(), "oneTaskProcess");
     assertEquals(asyncAfterBefore.getActivityId(), "servicetask1");
     assertEquals(asyncAfterBefore.getJobConfiguration(), MessageJobDeclaration.ASYNC_BEFORE);
-    //asyncAfter
-    JobDefinition asyncAfterAfter = definitions.get(1);
-    assertEquals(asyncAfterAfter.getProcessDefinitionKey(), "oneTaskProcess");
-    assertEquals(asyncAfterAfter.getActivityId(), "servicetask1");
-    assertEquals(asyncAfterAfter.getJobConfiguration(), MessageJobDeclaration.ASYNC_AFTER); 
   }
   
   @Test
@@ -151,22 +144,26 @@ public class JobDefinitionCreationBothAsyncWithParseListenerTest {
     String modelFileName = "jobAsyncBothCreationWithinParseListener.bpmn20.xml";
     InputStream in = JobDefinitionCreationWithParseListenerTest.class.getResourceAsStream(modelFileName);
     DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment().addInputStream(modelFileName, in);
+    
     //when the asyncBefore and asyncAfter is set to true in the parse listener 
     Deployment deployment = builder.deploy();
     engineRule.manageDeployment(deployment);  
+    
     //then there exists two job definitions
     JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
-    List<JobDefinition> definitions = query.list();
+    List<JobDefinition> definitions = query.orderByJobConfiguration().asc().list();
     assertEquals(definitions.size(), 2);    
+    
+    //asyncAfter
+    JobDefinition asyncAfterAfter = definitions.get(0);
+    assertEquals(asyncAfterAfter.getProcessDefinitionKey(), "oneTaskProcess");
+    assertEquals(asyncAfterAfter.getActivityId(), "servicetask1");
+    assertEquals(asyncAfterAfter.getJobConfiguration(), MessageJobDeclaration.ASYNC_AFTER);   
+    
     //asyncBefore
-    JobDefinition asyncAfterBefore = definitions.get(0);
+    JobDefinition asyncAfterBefore = definitions.get(1);
     assertEquals(asyncAfterBefore.getProcessDefinitionKey(), "oneTaskProcess");
     assertEquals(asyncAfterBefore.getActivityId(), "servicetask1");
     assertEquals(asyncAfterBefore.getJobConfiguration(), MessageJobDeclaration.ASYNC_BEFORE);
-    //asyncAfter
-    JobDefinition asyncAfterAfter = definitions.get(1);
-    assertEquals(asyncAfterAfter.getProcessDefinitionKey(), "oneTaskProcess");
-    assertEquals(asyncAfterAfter.getActivityId(), "servicetask1");
-    assertEquals(asyncAfterAfter.getJobConfiguration(), MessageJobDeclaration.ASYNC_AFTER); 
   }
 }
