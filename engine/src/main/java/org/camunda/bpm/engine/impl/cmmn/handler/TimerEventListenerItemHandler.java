@@ -47,12 +47,7 @@ public class TimerEventListenerItemHandler extends EventListenerItemHandler {
   private void initializeTimerEventListenerJobDeclaration(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
     TimerEventListenerJobDeclaration timerEventListenerJobDeclaration = parseTimerExpression(element,context);
     activity.setProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION, timerEventListenerJobDeclaration);
-
-    CaseDefinitionEntity caseDefinition = (CaseDefinitionEntity) context.getCaseDefinition();
-    if(caseDefinition.getTimerJobDeclarationMap()==null) caseDefinition.setTimerJobDeclarationMap(new HashMap<String, TimerJobDeclaration<?>>());
-      caseDefinition.getTimerJobDeclarationMap().put(element.getId(),timerEventListenerJobDeclaration);
-    // ... and taskDefinition to caseDefinition
-    //caseDefinition.getTimerDeclarations().put(taskDefinition.getKey(), taskDefinition);
+    context.addJobDeclaration(timerEventListenerJobDeclaration);
   }
 
   private TimerEventListenerJobDeclaration parseTimerExpression(CmmnElement element, CmmnHandlerContext context) {

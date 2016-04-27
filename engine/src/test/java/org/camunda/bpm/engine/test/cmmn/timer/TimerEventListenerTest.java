@@ -68,7 +68,26 @@ public class TimerEventListenerTest extends CmmnProcessEngineTestCase {
     assertNotNull(allJobs.get(0).getCaseDefinitionKey());
     assertNotNull(allJobs.get(0).getCaseDefinitionId());
 
+    //redeploy the same thing. to test isDeploymentNew==false case.
+    /*getProcessEngine()
+            .getRepositoryService()
+            .createDeployment()
+            .addClasspathResource("org/camunda/bpm/engine/test/cmmn/timer/TimerEventListenerTest.testTimerJobData.cmmn")
+            .deploy();
 
+
+
+    //update case to be tested.
+    CaseInstance ci1 = createCaseInstanceByKey("case");
+    assertNotNull(ci1);
+    List<CaseDefinition> cd1 = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("case").list();
+
+    System.out.println("Def count: "+managementService.createJobDefinitionQuery().count());
+
+    List<JobDefinition> allJobs1 = managementService.createJobDefinitionQuery().list();
+    assertNotNull(allJobs1);
+    assertTrue(!allJobs1.isEmpty());
+    assertTrue(allJobs.size()==1);*/
   }
 
 }

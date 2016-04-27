@@ -1,7 +1,10 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 
 /**
  * @author Roman Smirnov
@@ -16,7 +19,10 @@ public class TimerEventListenerJobHandler extends TimerEventJobHandler {
   }
 
   public void execute(String configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
-
+    DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
+    String definitionKey = getKey(configuration);
+    CaseDefinition definition = deploymentCache.findDeployedLatestCaseDefinitionByKeyAndTenantId(definitionKey, tenantId);
+    //TODO the occur event here??
   }
 
 }

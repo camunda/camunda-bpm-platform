@@ -13,9 +13,7 @@
 package org.camunda.bpm.engine.impl.cmmn.transformer;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
@@ -30,6 +28,7 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.engine.impl.core.transformer.Transform;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.model.cmmn.Cmmn;
@@ -74,6 +73,12 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
   protected CmmnModelInstance model;
   protected CmmnHandlerContext context = new CmmnHandlerContext();
   protected List<CaseDefinitionEntity> caseDefinitions = new ArrayList<CaseDefinitionEntity>();
+
+  /**
+   * Mapping from a case definition key to this containing list of job
+   * declarations
+   **/
+  protected Map<String, List<JobDeclaration<?, ?>>> jobDeclarations = new HashMap<String, List<JobDeclaration<?, ?>>>();
 
   public CmmnTransform(CmmnTransformer transformer) {
     this.transformer = transformer;
@@ -170,6 +175,12 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
 
     for (CmmnTransformListener transformListener : transformListeners) {
       transformListener.transformCase(element, (CmmnCaseDefinition) definition);
+    }
+
+    List<JobDeclaration<?,?>> declarations = context.getJobDeclarations();
+    if (!declarations.isEmpty()) {
+      jobDeclarations.put(((CaseDefinitionEntity)definition).getKey(), new ArrayList<JobDeclaration<?,?>>(declarations));
+      declarations.clear();
     }
 
     return (CaseDefinitionEntity) definition;
@@ -369,6 +380,10 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
 
   public void setExpressionManager(ExpressionManager expressionManager) {
     this.expressionManager = expressionManager;
+  }
+
+  public Map<String, List<JobDeclaration<?, ?>>> getJobDeclarations() {
+    return jobDeclarations;
   }
 
 }

@@ -12,11 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.deployer;
 
-import java.util.*;
-
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
+import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransform;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
 import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.core.model.PropertyMapKey;
@@ -29,7 +28,12 @@ import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
-import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.management.JobDefinition;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * {@link Deployer} responsible to parse CMMN 1.0 XML files and create the
@@ -43,10 +47,8 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
 
   public static final String[] CMMN_RESOURCE_SUFFIXES = new String[] { "cmmn11.xml", "cmmn10.xml", "cmmn" };
 
-  protected static final PropertyMapKey<String, Map<String,TimerJobDeclaration<?>>> TIMER_EVENT_JOB_DECLARATIONS_PROPERTY =
-          new PropertyMapKey<String, Map<String,TimerJobDeclaration<?>>>("TIMER_EVENT_JOB_DECLARATIONS_PROPERTY");
-  private static final PropertyMapKey<String, TimerJobDeclaration<?>> TIMER_DECLR_KEY = new PropertyMapKey("TIMER_EVENT_JOB_DECLARATIONS_PROPERTY");
-
+  protected static final PropertyMapKey<String, List<JobDeclaration<?, ?>>> JOB_DECLARATIONS_PROPERTY =
+          new PropertyMapKey<String, List<JobDeclaration<?, ?>>>("JOB_DECLARATIONS_PROPERTY");
 
   protected ExpressionManager expressionManager;
   protected CmmnTransformer transformer;
@@ -58,16 +60,14 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
 
   @Override
   protected List<CaseDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource, Properties properties) {
-    List<CaseDefinitionEntity> defList=transformer.createTransform().deployment(deployment).resource(resource).transform();
+    CmmnTransform cmmnTransform = transformer.createTransform();
+
+    List<CaseDefinitionEntity> defList=cmmnTransform.deployment(deployment).resource(resource).transform();
     //
-    if(!properties.contains(TIMER_DECLR_KEY)){
-      properties.set(TIMER_DECLR_KEY,new HashMap());
+    if(!properties.contains(JOB_DECLARATIONS_PROPERTY)){
+      properties.set(JOB_DECLARATIONS_PROPERTY, new HashMap<String, List<JobDeclaration<?, ?>>>());
     }
-    for(CaseDefinitionEntity caseDefinitionEntity: defList){
-      if(caseDefinitionEntity.getTimerJobDeclarationMap()!=null){
-        properties.get(TIMER_DECLR_KEY).putAll(caseDefinitionEntity.getTimerJobDeclarationMap());
-      }
-    }
+    properties.get(JOB_DECLARATIONS_PROPERTY).putAll(cmmnTransform.getJobDeclarations());
 
     return defList;
   }
@@ -98,12 +98,11 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
 
   @Override
   protected void definitionAddedToDeploymentCache(DeploymentEntity deployment, CaseDefinitionEntity definition, Properties properties) {
-    Map<String, TimerJobDeclaration<?>> declarations = properties.get(TIMER_DECLR_KEY);
-
-    updateJobDeclarations(declarations, definition, deployment.isNew());
+    List<JobDeclaration<?, ?>> declarations = properties.get(JOB_DECLARATIONS_PROPERTY).get(definition.getKey());
+    if(declarations!=null && !declarations.isEmpty())updateJobDeclarations(declarations, definition, deployment.isNew());
   }
 
-  protected void updateJobDeclarations(Map<String, TimerJobDeclaration<?>> jobDeclarations, CaseDefinitionEntity definition, boolean isNewDeployment) {
+  protected void updateJobDeclarations(List<JobDeclaration<?, ?>> jobDeclarations, CaseDefinitionEntity definition, boolean isNewDeployment) {
     if(jobDeclarations == null || jobDeclarations.isEmpty()) {
       return;
     }
@@ -111,13 +110,38 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
    final JobDefinitionManager jobDefinitionManager = getJobDefinitionManager();
 
     if(isNewDeployment) {
-      // create new job definitions:
-      for (TimerJobDeclaration<?> jobDeclaration : jobDeclarations.values()) {
-        createJobDefinition(definition, jobDeclaration);
+      for(JobDeclaration<?,?> jobDeclaration:jobDeclarations){
+        if(jobDeclaration instanceof TimerJobDeclaration){
+          createJobDefinition(definition, (TimerJobDeclaration<?>) jobDeclaration);
+        }else{
+          //TODO unable to handle this type of jobs, log warnings?
+          continue;
+        }
       }
-
+      // create new job definitions:
     } else {
         //TODO more to be done here.
+      List<JobDefinitionEntity> existingDefinitions = jobDefinitionManager.findByCaseDefinitionId(definition.getId());
+      // TODO is this call required for CMMN? LegacyBehavior.migrateMultiInstanceJobDefinitions(processDefinition, existingDefinitions);
+      for (JobDeclaration<?, ?> jobDeclaration : jobDeclarations) {
+        boolean jobDefinitionExists = false;
+        for (JobDefinition jobDefinitionEntity : existingDefinitions) {
+
+          // <!> Assumption: there can be only one job definition per activity and type
+          if(jobDeclaration.getActivityId().equals(jobDefinitionEntity.getActivityId()) &&
+                  jobDeclaration.getJobHandlerType().equals(jobDefinitionEntity.getJobType())) {
+            jobDeclaration.setJobDefinitionId(jobDefinitionEntity.getId());
+            jobDefinitionExists = true;
+            break;
+          }
+        }
+        if(!jobDefinitionExists) {
+          // not found: create new definition
+          createJobDefinition(definition, (TimerJobDeclaration<?>) jobDeclaration);
+        }
+
+      }
+
     }
   }
 

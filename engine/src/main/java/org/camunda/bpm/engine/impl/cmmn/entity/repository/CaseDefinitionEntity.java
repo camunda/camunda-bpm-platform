@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.entity.repository;
 
-import java.util.Map;
-
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
@@ -22,12 +20,12 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerEventListenerJobDeclaration;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerJobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinition;
+
+import java.util.Map;
 
 /**
  * @author Roman Smirnov
@@ -48,7 +46,6 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
 
   protected Map<String, TaskDefinition> taskDefinitions;
 
-  protected Map<String,TimerJobDeclaration<?>> timerJobDeclarationMap;
   // firstVersion is true, when version == 1 or when
   // this definition does not have any previous definitions
   protected boolean firstVersion = false;
@@ -226,13 +223,5 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
   @Override
   public String toString() {
     return "CaseDefinitionEntity["+id+"]";
-  }
-
-  public Map<String, TimerJobDeclaration<?>> getTimerJobDeclarationMap() {
-    return timerJobDeclarationMap;
-  }
-
-  public void setTimerJobDeclarationMap(Map<String, TimerJobDeclaration<?>> timerJobDeclarationMap) {
-    this.timerJobDeclarationMap = timerJobDeclarationMap;
   }
 }

@@ -38,6 +38,10 @@ public class JobDefinitionManager extends AbstractManager {
     return getDbEntityManager().selectList("selectJobDefinitionsByProcessDefinitionId", processDefinitionId);
   }
 
+  public List<JobDefinitionEntity> findByCaseDefinitionId(String caseDefinitionId){
+    return getDbEntityManager().selectList("selectJobDefinitionsByCaseDefinitionId",caseDefinitionId);
+  }
+
   public void deleteJobDefinitionsByProcessDefinitionId(String id) {
     getDbEntityManager().delete(JobDefinitionEntity.class, "deleteJobDefinitionsByProcessDefinitionId", id);
   }

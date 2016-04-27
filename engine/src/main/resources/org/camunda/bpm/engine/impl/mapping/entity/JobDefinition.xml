@@ -115,6 +115,10 @@
     select * from ${prefix}ACT_RU_JOBDEF where PROC_DEF_ID_ = #{parameter}
   </select>
 
+  <select id="selectJobDefinitionsByCaseDefinitionId" resultMap="jobDefinitionResultMap">
+    select * from ${prefix}ACT_RU_JOBDEF where CASE_DEF_ID_ = #{parameter}
+  </select>
+
   <select id="selectJobDefinitionByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobDefinitionQueryImpl" resultMap="jobDefinitionResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
