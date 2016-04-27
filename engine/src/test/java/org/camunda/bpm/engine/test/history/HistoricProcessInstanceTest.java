@@ -24,6 +24,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
@@ -227,22 +228,54 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertNotNull(historicProcessInstance.getEndTime());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/multitenancy/failingTask.bpmn" })
-  public void testHistoricProcessInstanceQueryWithIncidents() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+  private void startHistoricProcessInstanceQueryWithIncidentsProcess() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("Process_1");
+    List<Job> jobList = managementService.createJobQuery().processDefinitionId(pi.getProcessDefinitionId()).list();
 
-    Job job = managementService.createJobQuery().processDefinitionId(pi.getProcessDefinitionId()).singleResult();
-    try {
-      managementService.executeJob(job.getId());
-    } catch (ProcessEngineException e) {
-      // the job failed and created an incident
+    for(Job job : jobList) {
+      try {
+        managementService.executeJob(job.getId());
+      } catch (ProcessEngineException e) {
+        // the job failed and created an incident
+      }
     }
+  }
+  @Deployment
+  public void testHistoricProcessInstanceQueryWithIncidents() {
+    startHistoricProcessInstanceQueryWithIncidentsProcess();
 
-    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().withIncidents().count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().withIncidents().list().size());
 
-    assertEquals(1, query.withIncidents().count());
-    assertEquals(1, query.incidentMessageLike("Unknown property used%").count());
-    assertEquals(1, query.incidentMessage("Unknown property used in expression: #{failing}. Cause: Cannot resolve identifier 'failing'").count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessageLike("Unknown property used%").count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessageLike("Unknown property used%").list().size());
+
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown property used in expression: ${incidentTrigger1}. Cause: Cannot resolve identifier 'incidentTrigger1'").count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown property used in expression: ${incidentTrigger1}. Cause: Cannot resolve identifier 'incidentTrigger1'").list().size());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testHistoricProcessInstanceQueryWithIncidents.bpmn"})
+  public void testHistoricProcessInstanceQueryWithIncidentMessageNull() {
+    startHistoricProcessInstanceQueryWithIncidentsProcess();
+
+    try {
+      historyService.createHistoricProcessInstanceQuery().incidentMessage(null).count();
+      fail("incidentMessage with null value is not allowed");
+    } catch( NullValueException nex ) {
+      // expected
+    }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testHistoricProcessInstanceQueryWithIncidents.bpmn"})
+  public void testHistoricProcessInstanceQueryWithIncidentMessageLikeNull() {
+    startHistoricProcessInstanceQueryWithIncidentsProcess();
+
+    try {
+      historyService.createHistoricProcessInstanceQuery().incidentMessageLike(null).count();
+      fail("incidentMessageLike with null value is not allowed");
+    } catch( NullValueException nex ) {
+      // expected
+    }
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})

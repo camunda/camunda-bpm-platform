@@ -129,12 +129,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
 
   public HistoricProcessInstanceQuery incidentMessage(String incidentMessage) {
+    ensureNotNull("incidentMessage", incidentMessage);
     this.incidentMessage = incidentMessage;
 
     return this;
   }
 
   public HistoricProcessInstanceQuery incidentMessageLike(String incidentMessageLike) {
+    ensureNotNull("incidentMessageLike", incidentMessageLike);
     this.incidentMessageLike = incidentMessageLike;
 
     return this;
