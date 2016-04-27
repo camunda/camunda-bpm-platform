@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -413,6 +414,8 @@ public class MultiTenancyMessageCorrelationTest {
     engineRule.getRuntimeService().createMessageCorrelation("message")
       .correlateStartMessage();
 
+    engineRule.getIdentityService().clearAuthentication();
+
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertThat(query.count(), is(1L));
     assertThat(query.withoutTenantId().count(), is(1L));
@@ -427,6 +430,8 @@ public class MultiTenancyMessageCorrelationTest {
 
     engineRule.getRuntimeService().createMessageCorrelation("message")
       .correlateStartMessage();
+
+    engineRule.getIdentityService().clearAuthentication();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
@@ -465,6 +470,8 @@ public class MultiTenancyMessageCorrelationTest {
     engineRule.getRuntimeService().createMessageCorrelation("message")
       .correlate();
 
+    engineRule.getIdentityService().clearAuthentication();
+
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.withoutTenantId().count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
@@ -483,6 +490,8 @@ public class MultiTenancyMessageCorrelationTest {
 
     engineRule.getRuntimeService().createMessageCorrelation("message")
       .correlate();
+
+    engineRule.getIdentityService().clearAuthentication();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
@@ -504,6 +513,8 @@ public class MultiTenancyMessageCorrelationTest {
       .tenantId(TENANT_ONE)
       .correlate();
 
+    engineRule.getIdentityService().clearAuthentication();
+
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
@@ -521,6 +532,8 @@ public class MultiTenancyMessageCorrelationTest {
 
     engineRule.getRuntimeService().createMessageCorrelation("message")
       .correlateAll();
+
+    engineRule.getIdentityService().clearAuthentication();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.count(), is(2L));
@@ -540,6 +553,8 @@ public class MultiTenancyMessageCorrelationTest {
 
     engineRule.getRuntimeService().createMessageCorrelation("message")
       .correlateAll();
+
+    engineRule.getIdentityService().clearAuthentication();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.count(), is(2L));
@@ -568,38 +583,36 @@ public class MultiTenancyMessageCorrelationTest {
   }
 
   @Test
-  public void correlateMessageByProcessInstanceIdNoAuthenticatedTenants() {
-    testRule.deploy(MESSAGE_CATCH_PROCESS);
+  public void failCorrelateMessageByProcessInstanceIdNoAuthenticatedTenants() {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionWithoutTenantId().execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
+    ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+
+    // declared expected exception
+    thrown.expect(MismatchingMessageCorrelationException.class);
+    thrown.expectMessage("Cannot correlate message");
 
     engineRule.getIdentityService().setAuthentication("user", null, null);
 
     engineRule.getRuntimeService().createMessageCorrelation("message")
       .processInstanceId(processInstance.getId())
       .correlate();
-
-    TaskQuery query = engineRule.getTaskService().createTaskQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.withoutTenantId().count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
   }
 
   @Test
   public void correlateMessageByProcessInstanceIdWithAuthenticatedTenant() {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
-    testRule.deployForTenant(TENANT_TWO, MESSAGE_CATCH_PROCESS);
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
+    ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").execute();
 
     engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     engineRule.getRuntimeService().createMessageCorrelation("message")
       .processInstanceId(processInstance.getId())
       .correlate();
+
+    engineRule.getIdentityService().clearAuthentication();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.count(), is(1L));
@@ -608,38 +621,37 @@ public class MultiTenancyMessageCorrelationTest {
   }
 
   @Test
-  public void correlateMessageByProcessDefinitionIdNoAuthenticatedTenants() {
-    testRule.deploy(MESSAGE_START_PROCESS);
+  public void failCorrelateMessageByProcessDefinitionIdNoAuthenticatedTenants() {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_START_PROCESS);
 
     ProcessDefinition processDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery().
-        processDefinitionKey("messageStart").withoutTenantId().singleResult();
+        processDefinitionKey("messageStart").tenantIdIn(TENANT_ONE).singleResult();
+
+    // declare expected exception
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot create an instance of the process definition");
 
     engineRule.getIdentityService().setAuthentication("user", null, null);
 
     engineRule.getRuntimeService().createMessageCorrelation("message")
       .processDefinitionId(processDefinition.getId())
       .correlateStartMessage();
-
-    TaskQuery query = engineRule.getTaskService().createTaskQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.withoutTenantId().count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
   }
 
   @Test
   public void correlateMessageByProcessDefinitionIdWithAuthenticatedTenant() {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_START_PROCESS);
-    testRule.deployForTenant(TENANT_TWO, MESSAGE_START_PROCESS);
 
     ProcessDefinition processDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery().
-        processDefinitionKey("messageStart").tenantIdIn(TENANT_ONE).singleResult();
+        processDefinitionKey("messageStart").singleResult();
 
     engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     engineRule.getRuntimeService().createMessageCorrelation("message")
       .processDefinitionId(processDefinition.getId())
       .correlateStartMessage();
+
+    engineRule.getIdentityService().clearAuthentication();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.count(), is(1L));
