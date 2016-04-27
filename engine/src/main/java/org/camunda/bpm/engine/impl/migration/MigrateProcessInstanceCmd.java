@@ -70,7 +70,8 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
 
   protected static final MigrationLogger LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
-  public MigrateProcessInstanceCmd(MigrationPlanExecutionBuilderImpl migrationPlanExecutionBuilder) {
+  public MigrateProcessInstanceCmd(MigrationPlanExecutionBuilderImpl migrationPlanExecutionBuilder,
+      boolean skipCustomListeners, boolean skipIoMappings) {
     super(migrationPlanExecutionBuilder);
   }
 
@@ -158,7 +159,7 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
             currentInstance.detachChildren();
 
             // 2. manipulate execution tree (i.e. remove this instance)
-            currentInstance.remove();
+            currentInstance.remove(executionBuilder.isSkipCustomListeners(), executionBuilder.isSkipIoMappings());
 
             // 3. reconnect parent and children
             for (MigratingProcessElementInstance child : children) {
@@ -375,7 +376,7 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
     ExecutionEntity newParentExecution = ancestorScopeInstance.createAttachableExecution();
 
     Map<PvmActivity, PvmExecutionImpl> createdExecutions =
-        newParentExecution.instantiateScopes((List) scopesToInstantiate);
+        newParentExecution.instantiateScopes((List) scopesToInstantiate, executionBuilder.isSkipCustomListeners(), executionBuilder.isSkipIoMappings());
 
     for (ScopeImpl scope : scopesToInstantiate) {
       ExecutionEntity createdExecution = (ExecutionEntity) createdExecutions.get(scope);

@@ -28,6 +28,8 @@ public class MigrationPlanExecutionBuilderImpl implements MigrationPlanExecution
   protected MigrationPlan migrationPlan;
   protected List<String> processInstanceIds;
   protected ProcessInstanceQuery processInstanceQuery;
+  protected boolean skipCustomListeners;
+  protected boolean skipIoMappings;
 
   public MigrationPlanExecutionBuilderImpl(CommandExecutor commandExecutor, MigrationPlan migrationPlan) {
     this.commandExecutor = commandExecutor;
@@ -56,8 +58,30 @@ public class MigrationPlanExecutionBuilderImpl implements MigrationPlanExecution
     return processInstanceQuery;
   }
 
+  public MigrationPlanExecutionBuilder skipCustomListeners() {
+    this.skipCustomListeners = true;
+    return this;
+  }
+
+  public boolean isSkipCustomListeners() {
+    return skipCustomListeners;
+  }
+
+  public MigrationPlanExecutionBuilder skipIoMappings() {
+    this.skipIoMappings = true;
+    return this;
+  }
+
+  public boolean isSkipIoMappings() {
+    return skipIoMappings;
+  }
+
   public void execute() {
-    commandExecutor.execute(new MigrateProcessInstanceCmd(this));
+    execute(false, false);
+  }
+
+  public void execute(boolean skipCustomListeners, boolean skipIoMappings) {
+    commandExecutor.execute(new MigrateProcessInstanceCmd(this, skipCustomListeners, skipIoMappings));
   }
 
   public Batch executeAsync() {

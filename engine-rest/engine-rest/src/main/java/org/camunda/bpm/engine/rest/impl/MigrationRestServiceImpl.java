@@ -90,6 +90,14 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
       executionBuilder.processInstanceQuery(processInstanceQuery);
     }
 
+    if (migrationExecution.isSkipCustomListeners()) {
+      executionBuilder.skipCustomListeners();
+    }
+
+    if (migrationExecution.isSkipIoMappings()) {
+      executionBuilder.skipIoMappings();
+    }
+
     return executionBuilder;
   }
 

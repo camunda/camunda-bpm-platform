@@ -26,12 +26,16 @@ public class MigrationBatchConfigurationJsonConverter extends JsonObjectConverte
 
   public static final String MIGRATION_PLAN = "migrationPlan";
   public static final String PROCESS_INSTANCE_IDS = "processInstanceIds";
+  public static final String SKIP_LISTENERS = "skipListeners";
+  public static final String SKIP_IO_MAPPINGS = "skipIoMappings";
 
   public JSONObject toJsonObject(MigrationBatchConfiguration configuration) {
     JSONObject json = new JSONObject();
 
     JsonUtil.addField(json, MIGRATION_PLAN, MigrationPlanJsonConverter.INSTANCE, configuration.getMigrationPlan());
     JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getProcessInstanceIds());
+    JsonUtil.addField(json, SKIP_LISTENERS, configuration.isSkipCustomListeners());
+    JsonUtil.addField(json, SKIP_IO_MAPPINGS, configuration.isSkipIoMappings());
 
     return json;
   }
@@ -41,6 +45,8 @@ public class MigrationBatchConfigurationJsonConverter extends JsonObjectConverte
 
     configuration.setMigrationPlan(JsonUtil.jsonObject(json.getJSONObject(MIGRATION_PLAN), MigrationPlanJsonConverter.INSTANCE));
     configuration.setProcessInstanceIds(readProcessInstanceIds(json));
+    configuration.setSkipCustomListeners(json.getBoolean(SKIP_LISTENERS));
+    configuration.setSkipIoMappings(json.getBoolean(SKIP_IO_MAPPINGS));
 
     return configuration;
   }

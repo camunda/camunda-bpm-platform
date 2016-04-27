@@ -67,7 +67,11 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     BatchJobHandler<MigrationBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
 
-    MigrationBatchConfiguration configuration = createConfiguration(migrationPlan, processInstanceIds);
+    MigrationBatchConfiguration configuration = MigrationBatchConfiguration
+      .create(migrationPlan,
+          new ArrayList<String>(processInstanceIds),
+          executionBuilder.isSkipCustomListeners(),
+          executionBuilder.isSkipIoMappings());
 
     BatchEntity batch = new BatchEntity();
     batch.setType(batchJobHandler.getType());
@@ -85,14 +89,6 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
     int processInstanceCount = batchConfiguration.getProcessInstanceIds().size();
 
     return (int) Math.ceil(processInstanceCount / invocationsPerBatchJob);
-  }
-
-  protected MigrationBatchConfiguration createConfiguration(MigrationPlan migrationPlan, Collection<String> processInstanceIds) {
-
-    MigrationBatchConfiguration configuration = new MigrationBatchConfiguration();
-    configuration.setMigrationPlan(migrationPlan);
-    configuration.setProcessInstanceIds(new ArrayList<String>(processInstanceIds));
-    return configuration;
   }
 
   @SuppressWarnings("unchecked")

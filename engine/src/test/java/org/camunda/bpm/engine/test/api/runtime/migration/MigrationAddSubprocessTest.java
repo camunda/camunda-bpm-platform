@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecution
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
@@ -25,6 +26,7 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
@@ -531,6 +533,101 @@ public class MigrationAddSubprocessTest {
     assertEquals("subProcess", event.getCurrentActivityId());
 
     DelegateEvent.clearEvents();
+  }
+
+  @Test
+  public void testSkipListenerInvocationForNewlyCreatedScope() {
+    // given
+    DelegateEvent.clearEvents();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, DelegateExecutionListener.class.getName())
+      .done()
+    );
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    // when
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
+    rule.getRuntimeService()
+      .newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .skipCustomListeners()
+      .execute();
+
+    // then
+    List<DelegateEvent> recordedEvents = DelegateEvent.getEvents();
+    assertEquals(0, recordedEvents.size());
+
+    DelegateEvent.clearEvents();
+  }
+
+  @Test
+  public void testIoMappingInvocationForNewlyCreatedScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+      .camundaInputParameter("foo", "bar")
+      .done()
+    );
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    // when
+    ProcessInstance processInstance = rule.getRuntimeService()
+      .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
+    rule.getRuntimeService()
+      .newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .execute();
+
+
+    // then
+    VariableInstance inputVariable = rule.getRuntimeService().createVariableInstanceQuery().singleResult();
+    Assert.assertNotNull(inputVariable);
+    assertEquals("foo", inputVariable.getName());
+    assertEquals("bar", inputVariable.getValue());
+
+    ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
+    assertEquals(activityInstance.getActivityInstances("subProcess")[0].getId(), inputVariable.getActivityInstanceId());
+  }
+
+  @Test
+  public void testSkipIoMappingInvocationForNewlyCreatedScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+      .camundaInputParameter("foo", "bar")
+      .done()
+    );
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    // when
+    ProcessInstance processInstance = rule.getRuntimeService()
+      .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
+    rule.getRuntimeService()
+      .newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .skipIoMappings()
+      .execute();
+
+    // then
+    assertEquals(0, rule.getRuntimeService().createVariableInstanceQuery().count());
   }
 
   @Test

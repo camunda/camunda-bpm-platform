@@ -406,6 +406,50 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   }
 
   @Test
+  public void executeMigrationPlanSkipListeners() {
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID)
+      .skipCustomListeners(true)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(EXECUTE_MIGRATION_URL);
+
+    verifyMigrationPlanExecutionInteraction(migrationExecution);
+  }
+
+  @Test
+  public void executeMigrationPlanSkipIoMappings() {
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID)
+      .skipIoMappings(true)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(EXECUTE_MIGRATION_URL);
+
+    verifyMigrationPlanExecutionInteraction(migrationExecution);
+  }
+
+  @Test
   public void executeMigrationPlanWithNullInstructions() {
     MigrationInstructionValidationReport instructionReport = mock(MigrationInstructionValidationReport.class);
     when(instructionReport.getMigrationInstruction()).thenReturn(null);
@@ -862,6 +906,54 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   }
 
   @Test
+  public void executeMigrationPlanAsyncSkipListeners() {
+    Batch batchMock = createMockBatch();
+    when(migrationPlanExecutionBuilderMock.executeAsync()).thenReturn(batchMock);
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID)
+      .skipCustomListeners(true)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(EXECUTE_MIGRATION_ASYNC_URL);
+
+    verifyMigrationPlanAsyncExecutionInteraction(migrationExecution);
+  }
+
+  @Test
+  public void executeMigrationPlanAsyncSkipIoMappings() {
+    Batch batchMock = createMockBatch();
+    when(migrationPlanExecutionBuilderMock.executeAsync()).thenReturn(batchMock);
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+      .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID)
+      .skipIoMappings(true)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(EXECUTE_MIGRATION_ASYNC_URL);
+
+    verifyMigrationPlanAsyncExecutionInteraction(migrationExecution);
+  }
+
+  @Test
   public void executeMigrationPlanAsyncWithNullInstructions() {
     MigrationInstructionValidationReport instructionReport = mock(MigrationInstructionValidationReport.class);
     when(instructionReport.getMigrationInstruction()).thenReturn(null);
@@ -1306,24 +1398,37 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
   protected void verifyMigrationPlanExecutionInteraction(MigrationExecutionDto migrationExecution) {
     InOrder inOrder = inOrder(runtimeServiceMock, migrationPlanExecutionBuilderMock);
+
     inOrder.verify(runtimeServiceMock).newMigration(any(MigrationPlan.class));
-    inOrder.verify(migrationPlanExecutionBuilderMock).processInstanceIds(eq(migrationExecution.getProcessInstanceIds()));
-    if (migrationExecution.getProcessInstanceQuery() != null) {
-      verifyMigrationPlanExecutionProcessInstanceQuery(inOrder);
-    }
+
+    verifyMigrationExecutionBuilderInteraction(inOrder, migrationExecution);
     inOrder.verify(migrationPlanExecutionBuilderMock).execute();
+
     inOrder.verifyNoMoreInteractions();
   }
 
   protected void verifyMigrationPlanAsyncExecutionInteraction(MigrationExecutionDto migrationExecution) {
     InOrder inOrder = inOrder(runtimeServiceMock, migrationPlanExecutionBuilderMock);
+
     inOrder.verify(runtimeServiceMock).newMigration(any(MigrationPlan.class));
+
+    verifyMigrationExecutionBuilderInteraction(inOrder, migrationExecution);
+    inOrder.verify(migrationPlanExecutionBuilderMock).executeAsync();
+
+    Mockito.verifyNoMoreInteractions(migrationPlanExecutionBuilderMock);
+  }
+
+  protected void verifyMigrationExecutionBuilderInteraction(InOrder inOrder, MigrationExecutionDto migrationExecution) {
     inOrder.verify(migrationPlanExecutionBuilderMock).processInstanceIds(eq(migrationExecution.getProcessInstanceIds()));
     if (migrationExecution.getProcessInstanceQuery() != null) {
       verifyMigrationPlanExecutionProcessInstanceQuery(inOrder);
     }
-    inOrder.verify(migrationPlanExecutionBuilderMock).executeAsync();
-    inOrder.verifyNoMoreInteractions();
+    if (migrationExecution.isSkipCustomListeners()) {
+      inOrder.verify(migrationPlanExecutionBuilderMock).skipCustomListeners();
+    }
+    if (migrationExecution.isSkipIoMappings()) {
+      inOrder.verify(migrationPlanExecutionBuilderMock).skipIoMappings();
+    }
   }
 
   protected void verifyMigrationPlanExecutionProcessInstanceQuery(InOrder inOrder) {

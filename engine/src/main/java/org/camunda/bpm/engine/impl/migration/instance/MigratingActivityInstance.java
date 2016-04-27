@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
  * @author Thorben Lindhauer
  *
  */
-public class MigratingActivityInstance extends MigratingProcessElementInstance implements MigratingInstance, RemovingInstance {
+public class MigratingActivityInstance extends MigratingProcessElementInstance implements MigratingInstance {
 
   public static final MigrationLogger MIGRATION_LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
@@ -235,9 +235,8 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
     }
   }
 
-  @Override
-  public void remove() {
-    instanceBehavior.remove();
+  public void remove(boolean skipCustomListeners, boolean skipIoMappings) {
+    instanceBehavior.remove(skipCustomListeners, skipIoMappings);
   }
 
   @Override
@@ -277,7 +276,7 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
 
     void migrateState();
 
-    void remove();
+    void remove(boolean skipCustomListeners, boolean skipIoMappings);
 
     ExecutionEntity resolveRepresentativeExecution();
 
@@ -362,7 +361,7 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
     }
 
     @Override
-    public void remove() {
+    public void remove(boolean skipCustomListeners, boolean skipIoMappings) {
       // nothing to do; we don't remove non-scope instances
     }
 
@@ -469,7 +468,7 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
     }
 
     @Override
-    public void remove() {
+    public void remove(boolean skipCustomListeners, boolean skipIoMappings) {
 
       ExecutionEntity currentExecution = resolveRepresentativeExecution();
       ExecutionEntity parentExecution = currentExecution.getParent();
@@ -477,7 +476,7 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
       currentExecution.setActivity((PvmActivity) sourceScope);
       currentExecution.setActivityInstanceId(activityInstance.getId());
 
-      currentExecution.deleteCascade("migration");
+      currentExecution.deleteCascade("migration", skipCustomListeners, skipIoMappings);
 
       parentInstance.destroyAttachableExecution(parentExecution);
 
@@ -516,7 +515,6 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
       if (currentScope.getActivityBehavior() instanceof ModificationObserverBehavior) {
         ModificationObserverBehavior behavior = (ModificationObserverBehavior) currentScope.getActivityBehavior();
         behavior.destroyInnerInstance(execution);
-
       }
       else {
         if (execution.isConcurrent()) {

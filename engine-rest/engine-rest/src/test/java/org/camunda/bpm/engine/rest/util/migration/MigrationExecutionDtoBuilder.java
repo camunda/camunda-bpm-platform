@@ -48,6 +48,16 @@ public class MigrationExecutionDtoBuilder {
     return this;
   }
 
+  public MigrationExecutionDtoBuilder skipCustomListeners(boolean skipCustomListeners) {
+    migrationExecutionDto.setSkipCustomListeners(skipCustomListeners);
+    return this;
+  }
+
+  public MigrationExecutionDtoBuilder skipIoMappings(boolean skipIoMappings) {
+    migrationExecutionDto.setSkipIoMappings(skipIoMappings);
+    return this;
+  }
+
   public MigrationExecutionDto build() {
     return migrationExecutionDto;
   }

@@ -38,6 +38,16 @@ public interface MigrationPlanExecutionBuilder {
   MigrationPlanExecutionBuilder processInstanceQuery(ProcessInstanceQuery processInstanceQuery);
 
   /**
+   * Skips custom execution listeners when creating/removing activity instances during migration
+   */
+  MigrationPlanExecutionBuilder skipCustomListeners();
+
+  /**
+   * Skips io mappings when creating/removing activity instances during migration
+   */
+  MigrationPlanExecutionBuilder skipIoMappings();
+
+  /**
    * Execute the migration synchronously.
    *
    * @throws MigratingProcessInstanceValidationException if the migration plan contains

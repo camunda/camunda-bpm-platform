@@ -807,11 +807,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   /**
    * Instantiates the given set of activities and returns the execution for the bottom-most activity
    */
-  public Map<PvmActivity, PvmExecutionImpl> instantiateScopes(List<PvmActivity> activityStack) {
+  public Map<PvmActivity, PvmExecutionImpl> instantiateScopes(List<PvmActivity> activityStack,
+      boolean skipCustomListeners,
+      boolean skipIoMappings) {
 
     if (activityStack.isEmpty()) {
       return Collections.emptyMap();
     }
+
+    this.skipCustomListeners = skipCustomListeners;
+    this.skipIoMapping = skipIoMappings;
 
     ExecutionStartContext executionStartContext = new ExecutionStartContext(false);
 

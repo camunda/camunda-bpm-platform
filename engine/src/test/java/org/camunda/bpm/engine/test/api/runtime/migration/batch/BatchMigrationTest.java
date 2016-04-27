@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration.batch;
 
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
@@ -21,6 +22,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +33,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -38,15 +41,20 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateEvent;
+import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateExecutionListener;
 import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -515,6 +523,141 @@ public class BatchMigrationTest {
 
     // then a batch is created
     assertBatchCreated(batch, processInstanceCount);
+  }
+
+  @Test
+  public void testListenerInvocationForNewlyCreatedScope() {
+    // given
+    DelegateEvent.clearEvents();
+
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, DelegateExecutionListener.class.getName())
+      .done()
+    );
+
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    Batch batch = engineRule.getRuntimeService().newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .executeAsync();
+    helper.executeSeedJob(batch);
+
+    // when
+    helper.executeMigrationJobs(batch);
+
+    // then
+    List<DelegateEvent> recordedEvents = DelegateEvent.getEvents();
+    assertEquals(1, recordedEvents.size());
+
+    DelegateEvent event = recordedEvents.get(0);
+    assertEquals(targetProcessDefinition.getId(), event.getProcessDefinitionId());
+    assertEquals("subProcess", event.getCurrentActivityId());
+
+    DelegateEvent.clearEvents();
+  }
+
+  @Test
+  public void testSkipListenerInvocationForNewlyCreatedScope() {
+    // given
+    DelegateEvent.clearEvents();
+
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, DelegateExecutionListener.class.getName())
+      .done()
+    );
+
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    Batch batch = engineRule.getRuntimeService().newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .skipCustomListeners()
+      .executeAsync();
+    helper.executeSeedJob(batch);
+
+    // when
+    helper.executeMigrationJobs(batch);
+
+    // then
+    assertEquals(0, DelegateEvent.getEvents().size());
+  }
+
+  @Test
+  public void testIoMappingInvocationForNewlyCreatedScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+      .camundaInputParameter("foo", "bar")
+      .done()
+    );
+
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    Batch batch = engineRule.getRuntimeService().newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .executeAsync();
+    helper.executeSeedJob(batch);
+
+    // when
+    helper.executeMigrationJobs(batch);
+
+    // then
+    VariableInstance inputVariable = engineRule.getRuntimeService().createVariableInstanceQuery().singleResult();
+    Assert.assertNotNull(inputVariable);
+    assertEquals("foo", inputVariable.getName());
+    assertEquals("bar", inputVariable.getValue());
+
+    ActivityInstance activityInstance = engineRule.getRuntimeService().getActivityInstance(processInstance.getId());
+    assertEquals(activityInstance.getActivityInstances("subProcess")[0].getId(), inputVariable.getActivityInstanceId());
+  }
+
+  @Test
+  public void testSkipIoMappingInvocationForNewlyCreatedScope() {
+ // given
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+      .camundaInputParameter("foo", "bar")
+      .done()
+    );
+
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    Batch batch = engineRule.getRuntimeService().newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .skipIoMappings()
+      .executeAsync();
+    helper.executeSeedJob(batch);
+
+    // when
+    helper.executeMigrationJobs(batch);
+
+    // then
+    assertEquals(0, engineRule.getRuntimeService().createVariableInstanceQuery().count());
   }
 
   protected void assertBatchCreated(Batch batch, int processInstanceCount) {

@@ -22,6 +22,8 @@ public class MigrationExecutionDto {
   protected MigrationPlanDto migrationPlan;
   protected List<String> processInstanceIds;
   protected ProcessInstanceQueryDto processInstanceQuery;
+  protected boolean skipIoMappings;
+  protected boolean skipCustomListeners;
 
   public MigrationPlanDto getMigrationPlan() {
     return migrationPlan;
@@ -45,6 +47,22 @@ public class MigrationExecutionDto {
 
   public void setProcessInstanceQuery(ProcessInstanceQueryDto processInstanceQuery) {
     this.processInstanceQuery = processInstanceQuery;
+  }
+
+  public boolean isSkipIoMappings() {
+    return skipIoMappings;
+  }
+
+  public void setSkipIoMappings(boolean skipIoMappings) {
+    this.skipIoMappings = skipIoMappings;
+  }
+
+  public boolean isSkipCustomListeners() {
+    return skipCustomListeners;
+  }
+
+  public void setSkipCustomListeners(boolean skipCustomListeners) {
+    this.skipCustomListeners = skipCustomListeners;
   }
 
 }

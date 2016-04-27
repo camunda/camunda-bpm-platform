@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.migration.batch;
 import java.io.ByteArrayOutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.batch.Batch;
@@ -38,6 +37,7 @@ import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
 import org.camunda.bpm.engine.impl.util.json.JSONTokener;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 
 /**
  * Job handler for batch migration jobs. The batch migration job
@@ -96,7 +96,8 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
       // view of process instances for this job
       List<String> idsForJob = processInstancesToProcess.subList(0, lastIdIndex);
 
-      MigrationBatchConfiguration jobConfiguration = createConfigurationForIds(migrationPlan, idsForJob);
+      MigrationBatchConfiguration jobConfiguration = MigrationBatchConfiguration
+          .create(migrationPlan, idsForJob, configuration.isSkipCustomListeners(), configuration.isSkipIoMappings());
       ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);
       JobEntity job = createBatchJob(jobDefinition, configurationEntity);
 
@@ -113,13 +114,6 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
     batch.setConfigurationBytes(writeConfiguration(configuration));
 
     return processInstanceIds.isEmpty();
-  }
-
-  protected MigrationBatchConfiguration createConfigurationForIds(MigrationPlan migrationPlan, List<String> idsForJob) {
-    MigrationBatchConfiguration jobConfiguration = new MigrationBatchConfiguration();
-    jobConfiguration.setMigrationPlan(migrationPlan);
-    jobConfiguration.setProcessInstanceIds(new ArrayList<String>(idsForJob));
-    return jobConfiguration;
   }
 
   protected ByteArrayEntity saveConfiguration(ByteArrayManager byteArrayManager, MigrationBatchConfiguration jobConfiguration) {
@@ -158,11 +152,19 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
 
     MigrationBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
-    commandContext.getProcessEngineConfiguration()
+    MigrationPlanExecutionBuilder executionBuilder = commandContext.getProcessEngineConfiguration()
       .getRuntimeService()
       .newMigration(batchConfiguration.getMigrationPlan())
-        .processInstanceIds(batchConfiguration.getProcessInstanceIds())
-        .execute();
+        .processInstanceIds(batchConfiguration.getProcessInstanceIds());
+
+    if (batchConfiguration.isSkipCustomListeners()) {
+      executionBuilder.skipCustomListeners();
+    }
+    if (batchConfiguration.isSkipIoMappings()) {
+      executionBuilder.skipIoMappings();
+    }
+
+    executionBuilder.execute();
 
     commandContext.getByteArrayManager().delete(configurationEntity);
   }
