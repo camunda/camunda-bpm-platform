@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Execution;
 
 /**
  * Is invoked while executing a command to check if the current operation is
@@ -69,5 +70,10 @@ public interface CommandChecker {
    * Checks if it is allowed to update a process instance of the given process instance id.
    */
   void checkUpdateProcessInstanceById(String processInstanceId);
+
+  /**
+   * Checks if it is allowed to update a process instance of the given execution.
+   */
+  void checkUpdateProcessInstance(Execution execution);
 
 }

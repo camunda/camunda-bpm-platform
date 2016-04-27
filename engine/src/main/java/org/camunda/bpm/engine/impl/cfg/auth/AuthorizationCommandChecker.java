@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Execution;
 
 /**
  * {@link CommandChecker} that uses the {@link AuthorizationManager} to perform
@@ -118,6 +119,11 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
+  public void checkUpdateProcessInstance(Execution execution) {
+    getAuthorizationManager().checkUpdateProcessInstance((ExecutionEntity) execution);
+  }
+
   protected AuthorizationManager getAuthorizationManager() {
     return Context.getCommandContext().getAuthorizationManager();
   }
@@ -129,4 +135,5 @@ public class AuthorizationCommandChecker implements CommandChecker {
   protected ExecutionEntity findExecutionById(String processInstanceId) {
     return Context.getCommandContext().getExecutionManager().findExecutionById(processInstanceId);
   }
+
 }

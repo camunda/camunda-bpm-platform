@@ -19,9 +19,9 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 
@@ -52,8 +52,9 @@ public class SignalCmd implements Command<Object>, Serializable {
           .findExecutionById(executionId);
     ensureNotNull(BadUserRequestException.class, "execution "+executionId+" doesn't exist", "execution", execution);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateProcessInstance(execution);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkUpdateProcessInstance(execution);
+    }
 
     if(processVariables != null) {
       execution.setVariables(processVariables);

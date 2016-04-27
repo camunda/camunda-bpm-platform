@@ -123,6 +123,8 @@
     where (EVENT_TYPE_ = 'signal')
       and (EVENT_NAME_ = #{parameter})
       and (EVT.EXECUTION_ID_ is null or EXC.SUSPENSION_STATE_ = 1)
+    <bind name="columnPrefix" value="'EVT.'"/>
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
   </select>
 
   <select id="selectSignalEventSubscriptionsByEventNameAndTenantId" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
