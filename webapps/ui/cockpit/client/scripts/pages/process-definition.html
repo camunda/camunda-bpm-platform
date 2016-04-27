@@ -18,363 +18,352 @@
          ctn-collapsable="left"
          ng-controller="ProcessDefinitionFilterController">
 
+      <ul class="nav nav-tabs">
+        <li ng-class="{active: sidebarTab === 'info'}">
+          <a ng-click="sidebarTab = 'info'">Information</a>
+        </li>
+        <li ng-class="{active: sidebarTab === 'filters'}">
+          <a ng-click="sidebarTab = 'filters'">Filter</a>
+        </li>
+      </ul>
 
+      <div class="tab-content"
+           ng-show="sidebarTab === 'info'">
+        <dl class="process-information">
+          <dt>Definition Version:</dt>
+          <dd class="definition-version">
+            <span ng-if="!instanceStatistics.$loaded"
+                  class="glyphicon glyphicon-refresh animate-spin"></span>
 
-      <table>
-        <tr>
-          <td>
-            <ul class="nav nav-tabs">
-              <li ng-class="{active: sidebarTab === 'info'}">
-                <a ng-click="sidebarTab = 'info'">Information</a>
+            <div class="dropdown"
+                 ng-if="instanceStatistics.$loaded && filterData.allDefinitions.length > 1">
+              <a href
+                 class="dropdown-toggle">
+                {{ processDefinition.version }}
+                <span class="caret"></span>
+              </a>
+
+              <ul class="dropdown-menu">
+                <li ng-repeat="definition in filterData.allDefinitions">
+                  <a ng-href="#/process-definition/{{ definition.id }}">
+                    {{ definition.version }}
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <span ng-if="instanceStatistics.$loaded && filterData.allDefinitions.length < 2">
+              {{ processDefinition.version }}
+            </span>
+          </dd>
+
+          <dt>Version Tag:</dt>
+          <dd class="version-tag"
+              ng-if="processDefinition.versionTag">{{ processDefinition.versionTag }}</dd>
+          <dd class="version-tag"
+              ng-if="!processDefinition.versionTag"><span class="null-value">null</span></dd>
+
+          <dt>Definition ID:</dt>
+          <dd class="definition-id">{{ processDefinition.id }}</dd>
+
+          <dt>Definition Key:</dt>
+          <dd class="definition-key">{{ processDefinition.key }}</dd>
+
+          <dt>Definition Name:</dt>
+          <dd class="definition-name"
+              ng-if="processDefinition.name && processDefinition.name !== processDefinition.key">{{ processDefinition.name }}</dd>
+          <dd class="definition-name"
+              ng-if="!processDefinition.name || processDefinition.name === processDefinition.key"><span class="null-value">null</span></dd>
+
+          <dt>Tenant ID:</dt>
+          <dd class="tenant-id"
+              ng-if="processDefinition.tenantId">{{ processDefinition.tenantId }}</dd>
+          <dd class="tenant-id"
+              ng-if="!processDefinition.tenantId"><span class="null-value">null</span></dd>
+
+          <dt>Deployment ID:</dt>
+          <dd class="deployment-id">
+            <a ng-href="{{ getDeploymentUrl() }}">{{ processDefinition.deploymentId }}</a>
+          </dd>
+
+          <dt>Instances Running:</dt>
+          <dd class="running-instances">
+            <span ng-if="!instanceStatistics.$loaded"
+                  class="glyphicon glyphicon-refresh animate-spin"></span>
+            <ul ng-if="instanceStatistics.$loaded">
+              <li>
+                current version:
+                <strong class="current-version">{{ instanceStatistics.current.count }}</strong>
+                <a ng-href="{{ getMigrationUrl() }}"
+                   class="instance-upgrade-link"
+                   ng-if="hasMigrationPlugin && !isLatestVersion() && instanceStatistics.current.count > 0">
+                  <span class="glyphicon glyphicon-arrow-up"
+                        tooltip="Migrate Process Instances to latest version"></span>
+                </a>
               </li>
-              <li ng-class="{active: sidebarTab === 'filters'}">
-                <a ng-click="sidebarTab = 'filters'">Filter</a>
+              <li>
+                all versions:
+                <strong class="all-versions">{{ instanceStatistics.all.count }}</strong>
+                <a ng-href="{{ getMigrationUrl() }}"
+                   class="instance-upgrade-link"
+                   ng-if="hasMigrationPlugin && isLatestVersion() && instanceStatistics.all.count !== instanceStatistics.current.count">
+                  <span class="glyphicon glyphicon-arrow-up"
+                        tooltip="Migrate Process Instances to latest version"></span>
+                </a>
               </li>
             </ul>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <div class="tab-content"
-                 ng-show="sidebarTab === 'info'">
-              <dl class="process-information">
-                <dt>Definition Version:</dt>
-                <dd class="definition-version">
-                  <span ng-if="!instanceStatistics.$loaded"
-                        class="glyphicon glyphicon-refresh animate-spin"></span>
+          </dd>
+        </dl>
 
-                  <div class="dropdown"
-                       ng-if="instanceStatistics.$loaded && filterData.allDefinitions.length > 1">
-                    <a href
-                       class="dropdown-toggle">
-                      {{ processDefinition.version }}
-                      <span class="caret"></span>
-                    </a>
+        <!-- <a class="navigate-deployment" ng-href="{{ getDeploymentUrl() }}">Navigate to deployment</a> -->
+        <a ng-if="hasReportPlugin"
+           class="report-link"
+           ng-href="#/reports/?processDefinitionKey={{ processDefinition.key }}&processDefinitionVersion={{ processDefinition.version }}">
+          <span class="glyphicon glyphicon-signal"></span>
+        </a>
+      </div>
 
-                    <ul class="dropdown-menu">
-                      <li ng-repeat="definition in filterData.allDefinitions">
-                        <a ng-href="#/process-definition/{{ definition.id }}">
-                          {{ definition.version }}
-                        </a>
-                      </li>
-                    </ul>
+
+
+      <div class="tab-content filters"
+           ng-show="sidebarTab === 'filters'">
+        <h5>
+          Filter
+          <div class="btn-group btn-control dropdown">
+            <button class="btn btn-link dropdown-toggle"
+                    data-toggle="dropdown">
+              <span class="glyphicon glyphicon-plus-sign"></span>
+            </button>
+
+            <ul class="dropdown-menu">
+              <li>
+                <a href
+                   ng-click="addVariableFilter()">
+                  by variable
+                </a>
+              </li>
+              <li ng-hide="filterData.businessKey">
+                <a href
+                   ng-click="addBusinessKeyFilter()">
+                  by business key
+                </a>
+              </li>
+              <li ng-hide="filterData.start.length">
+                <a href
+                   ng-click="addStartDateFilter()">
+                  by start date
+                </a>
+              </li>
+            </ul>
+          </div>
+        </h5>
+
+
+        <form name="filterForm"
+              novalidate
+              ng-submit="filterChanged()">
+          <ul class="list-unstyled">
+            <li class="parent-filter filter" ng-if="filterData.parent">
+              <div class="name">
+                Parent
+              </div>
+
+              <div class="search search-text">
+
+                <button class="btn btn-link btn-xs btn-control remove"
+                        ng-click="removeParentFilter()">
+                  <span class="glyphicon glyphicon-remove"></span>
+                </button>
+
+                <a ng-href="#/process-definition/{{ filterData.parent.id }}">
+                  {{ filterData.parent.name || filterData.parent.key }}
+                </a>
+              </div>
+            </li>
+
+            <li class="business-key-filter filter" ng-if="filterData.businessKey">
+              <div class="name">
+                Business Key
+              </div>
+
+              <div class="search">
+                <button class="btn btn-link btn-xs btn-control remove"
+                        ng-click="removeBusinessKeyFilter()">
+                  <span class="glyphicon glyphicon-remove"></span>
+                </button>
+                <input type="text"
+                       required
+                       placeholder="Filter Business Key"
+                       name="businessKey"
+                       class="form-control"
+                       ng-model="filterData.businessKey.value"
+                       ng-change="filterChanged()" />
+              </div>
+
+              <div class="note note-error note-small"
+                   ng-if="filterForm.businessKey.$invalid">
+                Field is required
+              </div>
+            </li>
+
+            <li class="date-filter filter" ng-if="filterData.start.length">
+              <div class="name">
+                Start Date
+              </div>
+
+              <div class="search search-date"
+                   ng-repeat="date in filterData.start">
+                <div class="wrapper">
+                  <select ng-model="date.type"
+                          ng-options="item as item for item in dateTypeItems"
+                          required
+                          class="form-control"
+                          cam-dynamic-name="startDateFilterType{{$index}}"
+                          ng-change="dateFilterTypeChanged(filterForm['startDateFilterType0'], filterForm['startDateFilterType1'])">
+                  </select>
+
+                  <div class="removable-input">
+                    <input type="text"
+                           class="form-control"
+                           date
+                           required
+                           ng-change="filterChanged()"
+                           ng-model="date.value"
+                           cam-dynamic-name="startDateFilterValue{{$index}}" />
+
+                    <button class="btn btn-link btn-xs btn-control remove-date-filter"
+                            ng-click="removeStartDateFilter(date)">
+                      <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                  </div>
+                </div><!-- / .wrapper -->
+
+                <div class="note note-error note-small"
+                     ng-if="filterForm['startDateFilterValue' + $index].$invalid">
+                  <div ng-show="filterForm['startDateFilterValue' + $index].$error.required">
+                    Field is required.
                   </div>
 
-                  <span ng-if="instanceStatistics.$loaded && filterData.allDefinitions.length < 2">
-                    {{ processDefinition.version }}
-                  </span>
-                </dd>
+                  <div ng-show="filterForm['startDateFilterValue' + $index].$error.date && !filterForm['startDateFilterValue' + $index].$error.required">
+                    Syntax for a date is <code>yyyy-MM-ddTHH:mm:ss</code>.
+                  </div>
+                </div><!-- / .error -->
 
-                <dt>Version Tag:</dt>
-                <dd class="version-tag"
-                    ng-if="processDefinition.versionTag">{{ processDefinition.versionTag }}</dd>
-                <dd class="version-tag"
-                    ng-if="!processDefinition.versionTag"><span class="null-value">null</span></dd>
+                <div class="note note-error note-small"
+                     ng-if="filterForm['startDateFilterType0'].$invalid && filterForm['startDateFilterType1'].$invalid">
+                  <div ng-show="filterForm['startDateFilterType0'].$error.dateTypeEqual && filterForm['startDateFilterType1'].$error.dateTypeEqual">
+                    Only the combination <code>after/before</code> is allowed.
+                  </div>
+                </div><!-- / .error -->
 
-                <dt>Definition ID:</dt>
-                <dd class="definition-id">{{ processDefinition.id }}</dd>
+                <a class="glyphicon glyphicon-plus-sign pull-right"
+                   tooltip="Add a start date filter"
+                   tooltip-placement="right"
+                   ng-click="addStartDateFilter()"
+                   ng-if="filterData.start.length < 2"></a>
+              </div><!-- ./ ng-repeat -->
 
-                <dt>Definition Key:</dt>
-                <dd class="definition-key">{{ processDefinition.key }}</dd>
+            </li>
 
-                <dt>Definition Name:</dt>
-                <dd class="definition-name"
-                    ng-if="processDefinition.name && processDefinition.name !== processDefinition.key">{{ processDefinition.name }}</dd>
-                <dd class="definition-name"
-                    ng-if="!processDefinition.name || processDefinition.name === processDefinition.key"><span class="null-value">null</span></dd>
-
-                <dt>Tenant ID:</dt>
-                <dd class="tenant-id"
-                    ng-if="processDefinition.tenantId">{{ processDefinition.tenantId }}</dd>
-                <dd class="tenant-id"
-                    ng-if="!processDefinition.tenantId"><span class="null-value">null</span></dd>
-
-                <dt>Deployment ID:</dt>
-                <dd class="deployment-id">
-                  <a ng-href="{{ getDeploymentUrl() }}">{{ processDefinition.deploymentId }}</a>
-                </dd>
-
-                <dt>Instances Running:</dt>
-                <dd class="running-instances">
-                  <span ng-if="!instanceStatistics.$loaded"
-                        class="glyphicon glyphicon-refresh animate-spin"></span>
-                  <ul ng-if="instanceStatistics.$loaded">
-                    <li>
-                      current version:
-                      <strong class="current-version">{{ instanceStatistics.current.count }}</strong>
-                      <a ng-href="{{ getMigrationUrl() }}"
-                         class="instance-upgrade-link"
-                         ng-if="hasMigrationPlugin && !isLatestVersion() && instanceStatistics.current.count > 0">
-                        <span class="glyphicon glyphicon-arrow-up"
-                              tooltip="Migrate Process Instances to latest version"></span>
-                      </a>
-                    </li>
-                    <li>
-                      all versions:
-                      <strong class="all-versions">{{ instanceStatistics.all.count }}</strong>
-                      <a ng-href="{{ getMigrationUrl() }}"
-                         class="instance-upgrade-link"
-                         ng-if="hasMigrationPlugin && isLatestVersion() && instanceStatistics.all.count !== instanceStatistics.current.count">
-                        <span class="glyphicon glyphicon-arrow-up"
-                              tooltip="Migrate Process Instances to latest version"></span>
-                      </a>
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-
-              <!-- <a class="navigate-deployment" ng-href="{{ getDeploymentUrl() }}">Navigate to deployment</a> -->
-              <a ng-if="hasReportPlugin"
-                 class="report-link"
-                 ng-href="#/reports/?processDefinitionKey={{ processDefinition.key }}&processDefinitionVersion={{ processDefinition.version }}">
-                <span class="glyphicon glyphicon-signal"></span>
-              </a>
-            </div>
-
-
-
-            <div class="tab-content filters"
-                 ng-show="sidebarTab === 'filters'">
-              <h5>
-                Filter
-                <div class="btn-group btn-control dropdown">
-                  <button class="btn btn-link dropdown-toggle"
-                          data-toggle="dropdown">
-                    <span class="glyphicon glyphicon-plus-sign"></span>
-                  </button>
-
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a href
-                         ng-click="addVariableFilter()">
-                        by variable
-                      </a>
-                    </li>
-                    <li ng-hide="filterData.businessKey">
-                      <a href
-                         ng-click="addBusinessKeyFilter()">
-                        by business key
-                      </a>
-                    </li>
-                    <li ng-hide="filterData.start.length">
-                      <a href
-                         ng-click="addStartDateFilter()">
-                        by start date
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </h5>
-
-
-              <form name="filterForm"
-                    novalidate
-                    ng-submit="filterChanged()">
-                <ul class="list-unstyled">
-                  <li class="parent-filter filter" ng-if="filterData.parent">
-                    <div class="name">
-                      Parent
-                    </div>
-
-                    <div class="search search-text">
-
-                      <button class="btn btn-link btn-xs btn-control remove"
-                              ng-click="removeParentFilter()">
-                        <span class="glyphicon glyphicon-remove"></span>
-                      </button>
-
-                      <a ng-href="#/process-definition/{{ filterData.parent.id }}">
-                        {{ filterData.parent.name || filterData.parent.key }}
-                      </a>
-                    </div>
-                  </li>
-
-                  <li class="business-key-filter filter" ng-if="filterData.businessKey">
-                    <div class="name">
-                      Business Key
-                    </div>
-
-                    <div class="search">
-                      <button class="btn btn-link btn-xs btn-control remove"
-                              ng-click="removeBusinessKeyFilter()">
-                        <span class="glyphicon glyphicon-remove"></span>
-                      </button>
-                      <input type="text"
-                             required
-                             placeholder="Filter Business Key"
-                             name="businessKey"
-                             class="form-control"
-                             ng-model="filterData.businessKey.value"
-                             ng-change="filterChanged()" />
-                    </div>
-
-                    <div class="note note-error note-small"
-                         ng-if="filterForm.businessKey.$invalid">
-                      Field is required
-                    </div>
-                  </li>
-
-                  <li class="date-filter filter" ng-if="filterData.start.length">
-                    <div class="name">
-                      Start Date
-                    </div>
-
-                    <div class="search search-date"
-                         ng-repeat="date in filterData.start">
-                      <div class="wrapper">
-                        <select ng-model="date.type"
-                                ng-options="item as item for item in dateTypeItems"
-                                required
-                                class="form-control"
-                                cam-dynamic-name="startDateFilterType{{$index}}"
-                                ng-change="dateFilterTypeChanged(filterForm['startDateFilterType0'], filterForm['startDateFilterType1'])">
-                        </select>
-
-                        <div class="removable-input">
-                          <input type="text"
-                                 class="form-control"
-                                 date
-                                 required
-                                 ng-change="filterChanged()"
-                                 ng-model="date.value"
-                                 cam-dynamic-name="startDateFilterValue{{$index}}" />
-
-                          <button class="btn btn-link btn-xs btn-control remove-date-filter"
-                                  ng-click="removeStartDateFilter(date)">
-                            <span class="glyphicon glyphicon-remove"></span>
-                          </button>
-                        </div>
-                      </div><!-- / .wrapper -->
-
-                      <div class="note note-error note-small"
-                           ng-if="filterForm['startDateFilterValue' + $index].$invalid">
-                        <div ng-show="filterForm['startDateFilterValue' + $index].$error.required">
-                          Field is required.
-                        </div>
-
-                        <div ng-show="filterForm['startDateFilterValue' + $index].$error.date && !filterForm['startDateFilterValue' + $index].$error.required">
-                          Syntax for a date is <code>yyyy-MM-ddTHH:mm:ss</code>.
-                        </div>
-                      </div><!-- / .error -->
-
-                      <div class="note note-error note-small"
-                           ng-if="filterForm['startDateFilterType0'].$invalid && filterForm['startDateFilterType1'].$invalid">
-                        <div ng-show="filterForm['startDateFilterType0'].$error.dateTypeEqual && filterForm['startDateFilterType1'].$error.dateTypeEqual">
-                          Only the combination <code>after/before</code> is allowed.
-                        </div>
-                      </div><!-- / .error -->
-
-                      <a class="glyphicon glyphicon-plus-sign pull-right"
-                         tooltip="Add a start date filter"
-                         tooltip-placement="right"
-                         ng-click="addStartDateFilter()"
-                         ng-if="filterData.start.length < 2"></a>
-                    </div><!-- ./ ng-repeat -->
-
-                  </li>
-
-                  <li class="variable-filter filter"
-                      ng-if="filterData.variables.length">
-                    <div class="name">
-                      Variables
-                      <a href
-                         ng-click="toggleVariableFilterHelp()"
-                         tooltip-placement="right"
-                         tooltip="Get help on variable filters">
-                        <span class="glyphicon glyphicon-question-sign"></span>
-                      </a>
-                    </div>
-
-                    <div class="search"
-                         ng-repeat="variable in filterData.variables">
-
-                      <button class="btn btn-link btn-xs btn-control remove"
-                              ng-click="removeVariableFilter(variable)">
-                        <span class="glyphicon glyphicon-remove"></span>
-                      </button>
-
-                      <input type="text"
-                             required
-                             class="form-control"
-                             cam-dynamic-name="variableFilter{{$index}}"
-                             placeholder="Filter Variable"
-                             ng-model="variable.value"
-                             ng-change="filterChanged()"
-                             process-variable />
-
-                      <div class="note note-error note-small"
-                           ng-show="filterForm['variableFilter' + $index].$invalid">
-                        <div ng-show="filterForm['variableFilter' + $index].$error.required">
-                          Field is required.
-                        </div>
-                        <div ng-show="filterForm['variableFilter' + $index].$error.processVariableFilter && !filterForm['variableFilter' + $index].$error.required">
-                          Syntax for variable filters is <code>variableName OPERATOR value</code>.
-                          <a href
-                             ng-show="!showVariableFilterHelp" ng-click="toggleVariableFilterHelp()">
-                            Learn more.
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-
-                    <a tooltip="Add a variable filter"
-                       tooltip-placement="right"
-                       class="pull-right glyphicon glyphicon-plus-sign"
-                       ng-click="addVariableFilter()">
-                    </a>
-
-                    <div class="note"
-                         ng-show="showVariableFilterHelp">
-                      <h5>
-                        Variable filter syntax
-                        <a ng-click="toggleVariableFilterHelp()">hide</a>
-                      </h5>
-
-                      <div>
-                        Filters on variables must be specified as
-                        <code>variableName OPERATOR value</code> where <code>OPERATOR</code> may be any of
-                        <span ng-repeat="op in operators">
-                          <span ng-show="$index > 0">, </span>
-                          <code>{{ op }}</code>
-                        </span>.
-                        <br/>
-                        All variable filters are applied using the logical <code>AND</code>.
-                        Strings must be properly enclosed in <code>""</code>.
-                        <br/>
-                        <br/>
-                        Samples:  <code>customerId = 1212</code>,
-                                  <code>name like "%Walter"</code>,
-                                  <code>checked = true</code>
-                      </div>
-                    </div>
-                  </li>
-
-                  <li class="activity-filter filter"
-                      ng-if="filterData.activities.length">
-                    <div class="name">
-                      Activity
-                    </div>
-
-                    <div class="search search-text"
-                         ng-repeat="activity in filterData.activities">
-                      <button class="btn btn-link btn-xs btn-control remove"
-                              ng-click="removeActivityFilter(activity)">
-                        <span class="glyphicon glyphicon-remove"></span>
-                      </button>
-                      {{ activity.name }}
-                    </div>
-                  </li>
-                </ul>
-              </form>
-
-              <div class="footer"
-                   ng-show="filterChanged.$loading">
-                <span class="glyphicon glyphicon-refresh animate-spin"></span> refreshing…
+            <li class="variable-filter filter"
+                ng-if="filterData.variables.length">
+              <div class="name">
+                Variables
+                <a href
+                   ng-click="toggleVariableFilterHelp()"
+                   tooltip-placement="right"
+                   tooltip="Get help on variable filters">
+                  <span class="glyphicon glyphicon-question-sign"></span>
+                </a>
               </div>
-            </div>
-          </td>
-        </tr>
-      </table>
+
+              <div class="search"
+                   ng-repeat="variable in filterData.variables">
+
+                <button class="btn btn-link btn-xs btn-control remove"
+                        ng-click="removeVariableFilter(variable)">
+                  <span class="glyphicon glyphicon-remove"></span>
+                </button>
+
+                <input type="text"
+                       required
+                       class="form-control"
+                       cam-dynamic-name="variableFilter{{$index}}"
+                       placeholder="Filter Variable"
+                       ng-model="variable.value"
+                       ng-change="filterChanged()"
+                       process-variable />
+
+                <div class="note note-error note-small"
+                     ng-show="filterForm['variableFilter' + $index].$invalid">
+                  <div ng-show="filterForm['variableFilter' + $index].$error.required">
+                    Field is required.
+                  </div>
+                  <div ng-show="filterForm['variableFilter' + $index].$error.processVariableFilter && !filterForm['variableFilter' + $index].$error.required">
+                    Syntax for variable filters is <code>variableName OPERATOR value</code>.
+                    <a href
+                       ng-show="!showVariableFilterHelp" ng-click="toggleVariableFilterHelp()">
+                      Learn more.
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <a tooltip="Add a variable filter"
+                 tooltip-placement="right"
+                 class="pull-right glyphicon glyphicon-plus-sign"
+                 ng-click="addVariableFilter()">
+              </a>
+
+              <div class="note"
+                   ng-show="showVariableFilterHelp">
+                <h5>
+                  Variable filter syntax
+                  <a ng-click="toggleVariableFilterHelp()">hide</a>
+                </h5>
+
+                <div>
+                  Filters on variables must be specified as
+                  <code>variableName OPERATOR value</code> where <code>OPERATOR</code> may be any of
+                  <span ng-repeat="op in operators">
+                    <span ng-show="$index > 0">, </span>
+                    <code>{{ op }}</code>
+                  </span>.
+                  <br/>
+                  All variable filters are applied using the logical <code>AND</code>.
+                  Strings must be properly enclosed in <code>""</code>.
+                  <br/>
+                  <br/>
+                  Samples:  <code>customerId = 1212</code>,
+                            <code>name like "%Walter"</code>,
+                            <code>checked = true</code>
+                </div>
+              </div>
+            </li>
+
+            <li class="activity-filter filter"
+                ng-if="filterData.activities.length">
+              <div class="name">
+                Activity
+              </div>
+
+              <div class="search search-text"
+                   ng-repeat="activity in filterData.activities">
+                <button class="btn btn-link btn-xs btn-control remove"
+                        ng-click="removeActivityFilter(activity)">
+                  <span class="glyphicon glyphicon-remove"></span>
+                </button>
+                {{ activity.name }}
+              </div>
+            </li>
+          </ul>
+        </form>
+
+        <div class="footer"
+             ng-show="filterChanged.$loading">
+          <span class="glyphicon glyphicon-refresh animate-spin"></span> refreshing…
+        </div>
+      </div>
 
       <a class="hide-collapsable pull-right"></a>
     </div>
