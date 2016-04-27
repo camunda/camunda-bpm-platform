@@ -194,7 +194,7 @@ public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTestCase{
     deleteTasks(task);
   }
 
-  public void testGetIdentityLinkWithTenantId() {
+  public void testGetIdentityLinkWithTenantIdForCandidateUsers() {
 
     // given
     BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
@@ -209,6 +209,31 @@ public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTestCase{
     .processDefinitionTenantId("tenant")
     .execute();
     
+    Task tenantTask = taskService
+        .createTaskQuery()
+        .processInstanceId(tenantProcessInstance.getId())
+        .singleResult();
+    
+    List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(tenantTask.getId());
+    assertEquals(identityLinks.size(),1);
+    assertEquals(identityLinks.get(0).getTenantId(), "tenant");
+  }
+
+  public void testGetIdentityLinkWithTenantIdForCandidateGroup() {
+
+    // given
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
+    .startEvent()
+    .userTask("task").camundaCandidateGroups("aGroupId")
+    .endEvent()
+    .done();
+    
+    deploymentForTenant("tenant", oneTaskProcess);
+    
+    ProcessInstance tenantProcessInstance = runtimeService.createProcessInstanceByKey("testProcess")
+    .processDefinitionTenantId("tenant")
+    .execute();
+
     Task tenantTask = taskService
         .createTaskQuery()
         .processInstanceId(tenantProcessInstance.getId())
