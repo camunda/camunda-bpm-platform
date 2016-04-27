@@ -24,7 +24,7 @@ public class MockHistoricBatchBuilder {
 
   protected String id;
   protected String type;
-  protected int size;
+  protected int totalJobs;
   protected int batchJobsPerSeed;
   protected int invocationsPerBatchJob;
   protected String seedJobDefinitionId;
@@ -44,8 +44,8 @@ public class MockHistoricBatchBuilder {
     return this;
   }
 
-  public MockHistoricBatchBuilder size(int size) {
-    this.size = size;
+  public MockHistoricBatchBuilder totalJobs(int totalJobs) {
+    this.totalJobs = totalJobs;
     return this;
   }
 
@@ -93,7 +93,7 @@ public class MockHistoricBatchBuilder {
     HistoricBatch historicBatch = mock(HistoricBatch.class);
     when(historicBatch.getId()).thenReturn(id);
     when(historicBatch.getType()).thenReturn(type);
-    when(historicBatch.getTotalJobs()).thenReturn(size);
+    when(historicBatch.getTotalJobs()).thenReturn(totalJobs);
     when(historicBatch.getBatchJobsPerSeed()).thenReturn(batchJobsPerSeed);
     when(historicBatch.getInvocationsPerBatchJob()).thenReturn(invocationsPerBatchJob);
     when(historicBatch.getSeedJobDefinitionId()).thenReturn(seedJobDefinitionId);
