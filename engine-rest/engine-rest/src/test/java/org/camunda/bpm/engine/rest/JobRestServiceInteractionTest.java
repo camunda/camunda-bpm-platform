@@ -1274,9 +1274,6 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void deleteJob() {
-    String jobId = MockProvider.NON_EXISTING_JOB_ID;
-
-
     given()
       .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
     .then().expect()
