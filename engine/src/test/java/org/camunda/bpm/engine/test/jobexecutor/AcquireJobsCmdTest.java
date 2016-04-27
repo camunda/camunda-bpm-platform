@@ -1,4 +1,4 @@
-package org.camunda.bpm.engine.test.standalone.jobexecutor;
+package org.camunda.bpm.engine.test.jobexecutor;
 
 import java.util.Date;
 

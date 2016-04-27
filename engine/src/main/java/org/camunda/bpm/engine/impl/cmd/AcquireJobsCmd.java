@@ -61,17 +61,18 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
       .getJobManager()
       .findNextJobsToExecute(new Page(0, numJobsToAcquire));
 
-    for (JobEntity job: jobs) {
+    for (JobEntity job : jobs) {
       List<String> jobIds = new ArrayList<String>();
 
       if (job != null && !acquiredJobs.contains(job.getId())) {
+
         if (job.isExclusive() && job.getProcessInstanceId() != null) {
           // acquire all exclusive jobs in the same process instance
           // (includes the current job)
-          List<JobEntity> exclusiveJobs = commandContext.getJobManager()
-            .findExclusiveJobsToExecute(job.getProcessInstanceId());
+          List<JobEntity> exclusiveJobs = commandContext.getJobManager().findExclusiveJobsToExecute(job.getProcessInstanceId());
           for (JobEntity exclusiveJob : exclusiveJobs) {
-            if(exclusiveJob != null) {
+
+            if (exclusiveJob != null && !acquiredJobs.contains(exclusiveJob.getId())) {
               lockJob(exclusiveJob, lockOwner, lockTimeInMillis);
               jobIds.add(exclusiveJob.getId());
             }
@@ -80,10 +81,11 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
           lockJob(job, lockOwner, lockTimeInMillis);
           jobIds.add(job.getId());
         }
-
       }
 
-      acquiredJobs.addJobIdBatch(jobIds);
+      if (!jobIds.isEmpty()) {
+        acquiredJobs.addJobIdBatch(jobIds);
+      }
     }
 
     // register an OptimisticLockingListener which is notified about jobs which cannot be acquired.

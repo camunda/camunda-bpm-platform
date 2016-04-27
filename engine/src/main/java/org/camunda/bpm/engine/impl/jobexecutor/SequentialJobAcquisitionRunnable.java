@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import java.util.Iterator;
 import java.util.List;
+
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -37,7 +38,7 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
   }
 
   public synchronized void run() {
-    LOG.startingToAacquireJobs(jobExecutor.getName());
+    LOG.startingToAcquireJobs(jobExecutor.getName());
 
     JobAcquisitionStrategy acquisitionStrategy = initializeAcquisitionStrategy();
 
@@ -107,12 +108,16 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
     List<List<String>> additionalJobs = context.getAdditionalJobsByEngine().get(currentProcessEngine.getName());
     if (additionalJobs != null) {
       for (List<String> jobBatch : additionalJobs) {
+        LOG.executeJobs(currentProcessEngine.getName(), jobBatch);
+
         jobExecutor.executeJobs(jobBatch, currentProcessEngine);
       }
     }
 
     // submit those jobs that were acquired in the current cycle
     for (List<String> jobIds : acquiredJobs.getJobIdBatches()) {
+      LOG.executeJobs(currentProcessEngine.getName(), jobIds);
+
       jobExecutor.executeJobs(jobIds, currentProcessEngine);
     }
   }
@@ -140,6 +145,8 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
 
     jobExecutor.logAcquiredJobs(currentProcessEngine, acquiredJobs.size());
     jobExecutor.logAcquisitionFailureJobs(currentProcessEngine, acquiredJobs.getNumberOfJobsFailedToLock());
+
+    LOG.acquiredJobs(currentProcessEngine.getName(), acquiredJobs);
 
     return acquiredJobs;
   }

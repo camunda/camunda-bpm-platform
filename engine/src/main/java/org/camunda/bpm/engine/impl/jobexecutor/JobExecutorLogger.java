@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import java.util.Collection;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -53,7 +55,7 @@ public class JobExecutorLogger extends ProcessEngineLogger {
     logWarn(
         "006", "Exception while executing job {}: ", nextJobId, t);
   }
-  
+
   public void couldNotDeterminePriority(ExecutionEntity execution, Object value, ProcessEngineException e) {
     logWarn(
         "007",
@@ -112,7 +114,7 @@ public class JobExecutorLogger extends ProcessEngineLogger {
         "017", "Notifying Job Executor of new job {}", string);
   }
 
-  public void startingToAacquireJobs(String name) {
+  public void startingToAcquireJobs(String name) {
     logInfo(
         "018", "{} starting to acquire jobs", name);
   }
@@ -129,8 +131,20 @@ public class JobExecutorLogger extends ProcessEngineLogger {
 
   public void exceptionWhileUnlockingJob(String jobId, Throwable t) {
     logWarn(
-        "021", 
+        "021",
         "Exception while unaquiring job {}: ", jobId, t);
+  }
+
+  public void acquiredJobs(String processEngine, AcquiredJobs acquiredJobs) {
+    logDebug(
+        "022",
+        "Acquired {} jobs for process engine '{}': {}", acquiredJobs.size(), processEngine, acquiredJobs.getJobIdBatches());
+  }
+
+  public void executeJobs(String processEngine, Collection<String> jobs) {
+    logDebug(
+        "023",
+        "Execute jobs for process engine '{}': {}", processEngine, jobs);
   }
 
 }
