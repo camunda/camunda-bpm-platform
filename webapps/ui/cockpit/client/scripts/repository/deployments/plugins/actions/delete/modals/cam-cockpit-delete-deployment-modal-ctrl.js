@@ -97,7 +97,7 @@
     };
 
     var hasInstances = $scope.hasInstances = function() {
-      return $scope.processInstanceCount > 0 || $scope.caseInstanceCount > 0;
+      return ($scope.processInstanceCount && $scope.processInstanceCount.count > 0) || $scope.caseInstanceCount > 0;
     };
 
     $scope.canDeleteDeployment = function() {
