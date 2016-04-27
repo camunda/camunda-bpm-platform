@@ -66,7 +66,7 @@ public class JobExecutorFollowUpTest {
       .endEvent()
       .done();
 
-  protected ProcessEngineRule engineRule = new CachedProcessEngineRule();
+  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(engineRule) {
     @Override
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
