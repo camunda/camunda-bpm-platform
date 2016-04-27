@@ -1,22 +1,28 @@
 'use strict';
 
 var angular = require('camunda-commons-ui/vendor/angular');
-var Ctrl = require('../components/batch.js');
-var EventEmitter = require('events');
+var Ctrl = require('../components/batch');
+var events = require('../components/events');
+
+var fs = require('fs');
+
+var deleteModalTemplate = fs.readFileSync(__dirname + '/../templates/delete-modal.html', 'utf8');
+var deleteModalCtrl = require('./modal-ctrl');
 
 module.exports = [
   '$scope',
   'page',
   'camAPI',
   '$location',
+  '$modal',
 function(
   $scope,
   page,
   camAPI,
-  $location
+  $location,
+  $modal
 ) {
 
-  var events = new EventEmitter();
   $scope.$on('$destroy', function() {
     events.removeAllListeners();
     $scope.ctrl.stopLoadingPeriodically();
@@ -34,8 +40,15 @@ function(
     $location.search('type', 'history');
   });
 
+  events.on('deleteModal:open', function(deleteModal) {
+    deleteModal.instance = $modal.open({
+      template: deleteModalTemplate,
+      controller: deleteModalCtrl,
+    });
+  });
+
   require('../components/breadcrumbs')(page, $scope.$root);
 
-  $scope.ctrl = new Ctrl(camAPI, events);
+  $scope.ctrl = new Ctrl(camAPI);
   $scope.ctrl.loadPeriodically(5000);
 }];

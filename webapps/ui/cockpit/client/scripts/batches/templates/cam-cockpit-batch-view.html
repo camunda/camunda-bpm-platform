@@ -104,6 +104,8 @@
           <h3>
             <span ng-if="ctrl.getSelectionType() == 'history'">Completed</span>
             <span ng-if="ctrl.getSelectionType() == 'runtime'">Running</span> Batch Details
+            <a ng-if="ctrl.getSelectionType() == 'runtime'" class="btn btn-danger action-button pull-right" ng-click="ctrl.openDeleteModal()" tooltip="Delete this batch"><span class="glyphicon glyphicon-trash"></span></a>
+            <a ng-if="ctrl.getSelectionType() == 'runtime' && ctrl.getJobs().length > 0" class="btn btn-default action-button pull-right" ng-click="ctrl.retryAll()" tooltip="Increment Number of Retries for all Failed Jobs"><span class="glyphicon glyphicon-repeat"></span></a>
           </h3>
 
           <!-- <h3>Details</h3> -->
@@ -130,6 +132,7 @@
                 <tr>
                   <th class="id">ID</th>
                   <th class="type">Exception</th>
+                  <th class="action">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -139,6 +142,10 @@
                   </td>
                   <td>
                     <span>{{job.exceptionMessage}}</span>
+                  </td>
+                  <td>
+                    <a class="btn btn-default action-button" ng-click="ctrl.retryJob(job)" tooltip="Increment Number of Retries for this Job"><span class="glyphicon glyphicon-repeat"></span></a>
+                    <a class="btn btn-default action-button" ng-click="ctrl.deleteJob(job)" tooltip="Delete this Job"><span class="glyphicon glyphicon-trash"></span></a>
                   </td>
                 </tr>
               </tbody>

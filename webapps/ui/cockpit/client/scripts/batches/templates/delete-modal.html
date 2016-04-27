@@ -1,0 +1,13 @@
+<div class="modal-header">
+  <h3 class="modal-title">Delete Batch</h3>
+</div>
+<div class="modal-body">
+  Do you really want to delete this batch and all related jobs and job definitions?<br />
+  <br />
+  <input type="radio" ng-model="ctrl.cascade" ng-value="false" /> Keep the historic batch and historic job logs<br />
+  <input type="radio" ng-model="ctrl.cascade" ng-value="true" /> Delete the historic batch and historic job logs, too
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="ctrl.cancel()">Cancel</button>
+    <button class="btn btn-primary" ng-click="ctrl.confirm()">Delete Batch</button>
+</div>
