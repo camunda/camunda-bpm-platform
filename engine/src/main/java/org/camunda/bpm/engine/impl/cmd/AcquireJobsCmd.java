@@ -52,9 +52,6 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
 
   public AcquiredJobs execute(CommandContext commandContext) {
 
-    String lockOwner = jobExecutor.getLockOwner();
-    int lockTimeInMillis = jobExecutor.getLockTimeInMillis();
-
     acquiredJobs = new AcquiredJobs(numJobsToAcquire);
 
     List<JobEntity> jobs = commandContext
@@ -62,29 +59,17 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
       .findNextJobsToExecute(new Page(0, numJobsToAcquire));
 
     for (JobEntity job : jobs) {
-      List<String> jobIds = new ArrayList<String>();
 
       if (job != null && !acquiredJobs.contains(job.getId())) {
 
         if (job.isExclusive() && job.getProcessInstanceId() != null) {
-          // acquire all exclusive jobs in the same process instance
-          // (includes the current job)
-          List<JobEntity> exclusiveJobs = commandContext.getJobManager().findExclusiveJobsToExecute(job.getProcessInstanceId());
-          for (JobEntity exclusiveJob : exclusiveJobs) {
+          List<String> jobIds = lockExclusiveJobs(commandContext, job);
+          acquiredJobs.addJobIdBatch(jobIds);
 
-            if (exclusiveJob != null && !acquiredJobs.contains(exclusiveJob.getId())) {
-              lockJob(exclusiveJob, lockOwner, lockTimeInMillis);
-              jobIds.add(exclusiveJob.getId());
-            }
-          }
         } else {
-          lockJob(job, lockOwner, lockTimeInMillis);
-          jobIds.add(job.getId());
+          lockJob(job);
+          acquiredJobs.addJobIdBatch(job.getId());
         }
-      }
-
-      if (!jobIds.isEmpty()) {
-        acquiredJobs.addJobIdBatch(jobIds);
       }
     }
 
@@ -97,8 +82,32 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
     return acquiredJobs;
   }
 
-  protected void lockJob(JobEntity job, String lockOwner, int lockTimeInMillis) {
+  protected List<String> lockExclusiveJobs(CommandContext commandContext, JobEntity job) {
+    List<String> jobIds = new ArrayList<String>();
+
+    // acquire all exclusive jobs in the same process instance
+    // (includes the current job)
+    List<JobEntity> exclusiveJobs = commandContext.getJobManager().findExclusiveJobsToExecute(job.getProcessInstanceId());
+    // ensure that the job is not locked by another job executor concurrently
+    if (exclusiveJobs.contains(job)) {
+
+      for (JobEntity exclusiveJob : exclusiveJobs) {
+
+        if (exclusiveJob != null && !acquiredJobs.contains(exclusiveJob.getId())) {
+          lockJob(exclusiveJob);
+          jobIds.add(exclusiveJob.getId());
+        }
+      }
+    }
+    return jobIds;
+  }
+
+  protected void lockJob(JobEntity job) {
+    String lockOwner = jobExecutor.getLockOwner();
     job.setLockOwner(lockOwner);
+
+    int lockTimeInMillis = jobExecutor.getLockTimeInMillis();
+
     GregorianCalendar gregorianCalendar = new GregorianCalendar();
     gregorianCalendar.setTime(ClockUtil.getCurrentTime());
     gregorianCalendar.add(Calendar.MILLISECOND, lockTimeInMillis);
