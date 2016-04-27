@@ -270,7 +270,7 @@ describe('Tasklist Start Spec', function () {
 
       // when
       startDialogPage.startProcess();
-
+      browser.sleep(300);
       // then
 
       // following line probably causing stale element reference error in Jenkins
