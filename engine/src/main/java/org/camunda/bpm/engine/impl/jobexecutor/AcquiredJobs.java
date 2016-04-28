@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -49,8 +48,10 @@ public class AcquiredJobs {
   }
 
   public void addJobIdBatch(String jobId) {
-    acquiredJobBatches.add(Arrays.asList(jobId));
-    acquiredJobs.add(jobId);
+    ArrayList<String> list = new ArrayList<String>();
+    list.add(jobId);
+
+    addJobIdBatch(list);
   }
 
   public boolean contains(String jobId) {
