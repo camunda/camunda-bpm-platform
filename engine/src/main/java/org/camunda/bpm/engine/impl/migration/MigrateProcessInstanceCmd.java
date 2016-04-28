@@ -25,6 +25,7 @@ import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
@@ -117,6 +118,7 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
 
     ensureProcessInstanceExist(processInstanceId, processInstance);
     ensureSameProcessDefinition(processInstance, migrationPlan.getSourceProcessDefinitionId());
+    ensureOperationAllowed(commandContext, processInstance, targetProcessDefinition);
 
     MigratingProcessInstanceValidationReportImpl processInstanceReport = new MigratingProcessInstanceValidationReportImpl();
 
@@ -405,5 +407,13 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
       throw LOGGER.processDefinitionOfInstanceDoesNotMatchMigrationPlan(processInstance, processDefinitionId);
     }
   }
+
+  protected void ensureOperationAllowed(CommandContext commandContext, ExecutionEntity processInstance, ProcessDefinitionEntity targetProcessDefinition) {
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkMigrateProcessInstance(processInstance, targetProcessDefinition);
+    }
+
+  }
+
 
 }

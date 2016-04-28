@@ -104,8 +104,7 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
   protected void checkAuthorization(CommandContext commandContext, ProcessDefinitionEntity sourceProcessDefinition, ProcessDefinitionEntity targetProcessDefinition) {
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkReadProcessDefinition(sourceProcessDefinition);
-      checker.checkReadProcessDefinition(targetProcessDefinition);
+      checker.checkCreateMigrationPlan(sourceProcessDefinition, targetProcessDefinition);
     }
   }
 

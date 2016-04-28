@@ -124,6 +124,16 @@ public class AuthorizationCommandChecker implements CommandChecker {
     getAuthorizationManager().checkUpdateProcessInstance((ExecutionEntity) execution);
   }
 
+  @Override
+  public void checkCreateMigrationPlan(ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition) {
+    checkReadProcessDefinition(sourceProcessDefinition);
+    checkReadProcessDefinition(targetProcessDefinition);
+  }
+
+  @Override
+  public void checkMigrateProcessInstance(ExecutionEntity processInstance, ProcessDefinition targetProcessDefinition) {
+  }
+
   protected AuthorizationManager getAuthorizationManager() {
     return Context.getCommandContext().getAuthorizationManager();
   }

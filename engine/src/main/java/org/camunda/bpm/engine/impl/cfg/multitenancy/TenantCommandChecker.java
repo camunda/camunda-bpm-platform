@@ -108,6 +108,28 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
+  public void checkCreateMigrationPlan(ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition) {
+    String sourceTenant = sourceProcessDefinition.getTenantId();
+    String targetTenant = targetProcessDefinition.getTenantId();
+
+    if (sourceTenant != null && targetTenant != null && !sourceTenant.equals(targetTenant)) {
+      throw ProcessEngineLogger.MIGRATION_LOGGER
+        .cannotMigrateBetweenTenants(sourceTenant, targetTenant);
+    }
+  }
+
+  @Override
+  public void checkMigrateProcessInstance(ExecutionEntity processInstance, ProcessDefinition targetProcessDefinition) {
+    String sourceTenant = processInstance.getTenantId();
+    String targetTenant = targetProcessDefinition.getTenantId();
+
+    if (targetTenant != null && (sourceTenant == null || !sourceTenant.equals(targetTenant))) {
+      throw ProcessEngineLogger.MIGRATION_LOGGER
+        .cannotMigrateInstanceBetweenTenants(processInstance.getId(), sourceTenant, targetTenant);
+    }
+  }
+
   protected TenantManager getTenantManager() {
     return Context.getCommandContext().getTenantManager();
   }

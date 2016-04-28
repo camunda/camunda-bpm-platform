@@ -113,7 +113,11 @@ public class ProcessEngineTestRule extends TestWatcher {
   }
 
   public ProcessDefinition deployAndGetDefinition(BpmnModelInstance bpmnModel) {
-    Deployment deployment = deploy(bpmnModel);
+    return deployForTenantAndGetDefinition(null, bpmnModel);
+  }
+
+  public ProcessDefinition deployForTenantAndGetDefinition(String tenant, BpmnModelInstance bpmnModel) {
+    Deployment deployment = deploy(createDeploymentBuilder().tenantId(tenant), Collections.singletonList(bpmnModel), Collections.<String>emptyList());
 
     return processEngineRule.getRepositoryService()
       .createProcessDefinitionQuery()

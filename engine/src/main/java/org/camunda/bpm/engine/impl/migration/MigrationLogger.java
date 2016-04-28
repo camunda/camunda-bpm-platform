@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationPla
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 /**
  * @author Thorben Lindhauer
@@ -107,6 +108,36 @@ public class MigrationLogger extends ProcessEngineLogger {
       "Target process definition with id '{}' does not exist",
       targetProcessDefinitionId
     ));
+  }
+
+  public ProcessEngineException cannotMigrateBetweenTenants(String sourceTenantId, String targetTenantId) {
+    return new ProcessEngineException(exceptionMessage(
+        "010",
+        "Cannot migrate process instances between processes of different tenants ('{}' != '{}')",
+        sourceTenantId,
+        targetTenantId));
+  }
+
+  public ProcessEngineException cannotMigrateInstanceBetweenTenants(String processInstanceId, String sourceTenantId, String targetTenantId) {
+
+    String detailMessage = null;
+    if (sourceTenantId != null) {
+      detailMessage = exceptionMessage(
+          "011",
+          "Cannot migrate process instance '{}' to a process definition of a different tenant ('{}' != '{}')",
+          processInstanceId,
+          sourceTenantId,
+          targetTenantId);
+    }
+    else {
+      detailMessage = exceptionMessage(
+          "011",
+          "Cannot migrate process instance '{}' without tenant to a process definition with a tenant ('{}')",
+          processInstanceId,
+          targetTenantId);
+    }
+
+    return new ProcessEngineException(detailMessage);
   }
 
 }
