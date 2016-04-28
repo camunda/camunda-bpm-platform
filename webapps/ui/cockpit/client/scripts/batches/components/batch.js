@@ -44,7 +44,7 @@ var Batch = function(camAPI) {
     self.deleteModal.instance = null;
   });
 
-  events.on('delete.confirm', function(params) {
+  events.on('delete:confirm', function(params) {
     self.deleteModal.instance && self.deleteModal.instance.close();
     self.deleteModal.instance = null;
     self._remove(params);
