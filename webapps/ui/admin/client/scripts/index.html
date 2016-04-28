@@ -4,7 +4,7 @@
     <meta http-equiv="X-UA-Compatible"
           content="IE=edge" />
 
-    <title>camunda Admin</title>
+    <title>Camunda Admin</title>
 
     <meta charset="utf-8" />
     <meta name="viewport"
@@ -88,6 +88,11 @@
     <!-- content -->
     <div class="ctn-main">
       <div class="ctn-wrapper">
+        <div ng-if="showBreadcrumbs"
+             cam-breadcrumbs-panel
+             divider="&raquo;"
+             class="breadcrumbs-panel"></div>
+
         <div notifications-panel
              class="page-notifications"></div>
 

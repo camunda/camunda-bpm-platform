@@ -6,7 +6,7 @@ var template = fs.readFileSync(__dirname + '/users.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  var Controller = ['$scope', '$location', 'search', 'UserResource', function ($scope, $location, search, UserResource) {
+  var Controller = ['$scope', '$location', 'search', 'UserResource', 'page', function ($scope, $location, search, UserResource, pageService) {
 
     $scope.availableOperations={};
     $scope.loadingState = 'LOADING';
@@ -52,6 +52,16 @@ var angular = require('camunda-commons-ui/vendor/angular');
       });
     });
 
+    $scope.$root.showBreadcrumbs = true;
+
+    pageService.titleSet('Users');
+
+    pageService.breadcrumbsClear();
+
+    pageService.breadcrumbsAdd({
+      label: 'Users',
+      href: '#/users/'
+    });
   }];
 
   module.exports = [ '$routeProvider', function($routeProvider) {

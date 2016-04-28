@@ -9,6 +9,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
   var Controller = [
     '$scope',
+    'page',
     '$routeParams',
     'search',
     'GroupResource',
@@ -19,6 +20,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
     '$modal',
   function (
     $scope,
+    pageService,
     $routeParams,
     search,
     GroupResource,
@@ -28,6 +30,19 @@ var angular = require('camunda-commons-ui/vendor/angular');
     $location,
     $modal
   ) {
+
+    $scope.$root.showBreadcrumbs = true;
+
+    pageService.titleSet('Group');
+
+    pageService.breadcrumbsClear();
+
+    pageService.breadcrumbsAdd([
+      {
+        label: 'Groups',
+        href: '#/groups'
+      }
+    ]);
 
     $scope.group = null;
     $scope.groupName = null;
@@ -58,6 +73,16 @@ var angular = require('camunda-commons-ui/vendor/angular');
         $scope.group = response;
         $scope.groupName = (!!response.name ? response.name : response.id);
         $scope.groupCopy = angular.copy(response);
+
+        pageService.titleSet($scope.groupName + ' Group');
+
+        pageService.breadcrumbsAdd([
+          {
+            label: $scope.groupName,
+            href: '#/groups/' + $scope.group.id
+          }
+        ]);
+
       }, function () {
         $scope.groupLoadingState = 'ERROR';
       });

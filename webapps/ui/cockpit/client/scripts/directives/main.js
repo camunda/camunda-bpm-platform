@@ -2,7 +2,7 @@
 
 var angular = require('camunda-commons-ui/vendor/angular'),
 
-  breadcrumbs = require('./breadcrumbs'),
+  breadcrumbs = require('./../../../../common/scripts/directives/breadcrumbs'),
   numeric = require('./numeric'),
   date = require('./date'),
   processDiagram = require('./processDiagram'),

@@ -1,27 +1,18 @@
 <!-- # CE - camunda-admin-ui/client/scripts/pages/system.html -->
-<div class="container-fluid"
-     ng-cloak>
-  <section class="row">
-    <div class="page-header">
-      <h1>System Settings</h1>
-    </div>
+<section ng-cloak>
+  <aside>
+    <ul>
+      <li ng-class="activeClass('section='+systemSettingsProvider.id)"
+          ng-repeat="systemSettingsProvider in systemSettingsProviders">
+        <a href="#/system/?section={{systemSettingsProvider.id}}">
+          {{systemSettingsProvider.label}}
+        </a>
+      </li>
+    </ul>
+  </aside>
 
-    <div class="col-sm-3 col-lg-2">
-      <div class="sidebar-nav">
-        <ul>
-          <li ng-class="activeClass('section='+systemSettingsProvider.id)"
-              ng-repeat="systemSettingsProvider in systemSettingsProviders">
-            <a href="#/system/?section={{systemSettingsProvider.id}}">
-              {{systemSettingsProvider.label}}
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="col-sm-9 col-lg-10">
-      <view provider="activeSettingsProvier" />
-    </div>
-  </section>
-</div>
+  <div class="section-content">
+    <view provider="activeSettingsProvier" />
+  </div>
+</section>
 <!-- / CE - camunda-admin-ui/client/scripts/pages/system.html -->

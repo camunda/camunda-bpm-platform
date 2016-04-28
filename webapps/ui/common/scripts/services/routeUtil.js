@@ -1,6 +1,6 @@
 'use strict';
 
-var routeUtil = require('../util/routeUtil');
+var routeUtil = require('./../util/routeUtil');
 
 /**
  * A wrapper to use the cockpit/util/routeUtil as a angular service

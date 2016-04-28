@@ -4,7 +4,24 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/groupCreate.html', 'utf8');
 
-  var Controller = ['$scope', 'GroupResource', 'Notifications', '$location', function ($scope, GroupResource, Notifications, $location) {
+  var Controller = ['$scope', 'page', 'GroupResource', 'Notifications', '$location', function ($scope, pageService, GroupResource, Notifications, $location) {
+
+    $scope.$root.showBreadcrumbs = true;
+
+    pageService.titleSet('Create New Group');
+
+    pageService.breadcrumbsClear();
+
+    pageService.breadcrumbsAdd([
+      {
+        label: 'Groups',
+        href: '#/groups'
+      },
+      {
+        label: 'Create New Group',
+        href: '#/group-create'
+      }
+    ]);
 
     // data model for new group
     $scope.group = {
