@@ -7,6 +7,7 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.calendar.BusinessCalendar;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
@@ -18,6 +19,21 @@ import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 public class TimerEventListenerJobDeclaration extends TimerJobDeclaration<CaseExecutionEntity> {
 
   private static final long serialVersionUID = 1L;
+
+  protected CmmnActivity cmmnActivity;
+
+  public void setActivity(CmmnActivity activity) {
+    this.cmmnActivity = activity;
+  }
+
+  public String getActivityId() {
+    if (cmmnActivity != null) {
+      return cmmnActivity.getId();
+    }
+    else {
+      return null;
+    }
+  }
 
   public TimerEventListenerJobDeclaration(Expression expression, TimerDeclarationType type, String jobHandlerType) {
     super(expression, type, jobHandlerType);

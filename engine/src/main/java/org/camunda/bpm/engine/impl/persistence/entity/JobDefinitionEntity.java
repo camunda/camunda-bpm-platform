@@ -35,6 +35,9 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEnti
   protected String processDefinitionId;
   protected String processDefinitionKey;
 
+  protected String caseDefinitionId;
+  protected String caseDefinitionKey;
+
   /* Note: this is the id of the activity which is the cause that a Job is created.
    * If the Job corresponds to an event scope, it may or may not correspond to the
    * activity which defines the event scope.
@@ -71,6 +74,8 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEnti
     HashMap<String, Object> state = new HashMap<String, Object>();
     state.put("processDefinitionId", processDefinitionId);
     state.put("processDefinitionKey", processDefinitionKey);
+    state.put("caseDefinitionId",caseDefinitionId);
+    state.put("caseDefinitionKey",caseDefinitionKey);
     state.put("activityId", activityId);
     state.put("jobType", jobType);
     state.put("jobConfiguration", jobConfiguration);
@@ -176,4 +181,21 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEnti
     this.tenantId = tenantId;
   }
 
+  @Override
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
+  }
+
+  public void setCaseDefinitionId(String caseDefinitionId) {
+    this.caseDefinitionId = caseDefinitionId;
+  }
+
+  @Override
+  public String getCaseDefinitionKey() {
+    return caseDefinitionKey;
+  }
+
+  public void setCaseDefinitionKey(String caseDefinitionKey) {
+    this.caseDefinitionKey = caseDefinitionKey;
+  }
 }

@@ -14,14 +14,18 @@ package org.camunda.bpm.engine.impl.cmmn.handler;
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.TimerEventListenerActivityBehavior;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationType;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventListenerJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventListenerJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerJobDeclaration;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.TimerEventListener;
 import org.camunda.bpm.model.cmmn.instance.TimerExpression;
+
+import java.util.HashMap;
 
 /**
  *  @author Roman Smirnov
@@ -42,7 +46,9 @@ public class TimerEventListenerItemHandler extends EventListenerItemHandler {
 
   private void initializeTimerEventListenerJobDeclaration(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
     TimerEventListenerJobDeclaration timerEventListenerJobDeclaration = parseTimerExpression(element,context);
+    timerEventListenerJobDeclaration.setActivity(activity);
     activity.setProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION, timerEventListenerJobDeclaration);
+    context.addJobDeclaration(timerEventListenerJobDeclaration);
   }
 
   private TimerEventListenerJobDeclaration parseTimerExpression(CmmnElement element, CmmnHandlerContext context) {

@@ -38,6 +38,10 @@ public class JobDefinitionManager extends AbstractManager {
     return getDbEntityManager().selectList("selectJobDefinitionsByProcessDefinitionId", processDefinitionId);
   }
 
+  public List<JobDefinitionEntity> findByCaseDefinitionId(String caseDefinitionId){
+    return getDbEntityManager().selectList("selectJobDefinitionsByCaseDefinitionId",caseDefinitionId);
+  }
+
   public void deleteJobDefinitionsByProcessDefinitionId(String id) {
     getDbEntityManager().delete(JobDefinitionEntity.class, "deleteJobDefinitionsByProcessDefinitionId", id);
   }
@@ -72,6 +76,10 @@ public class JobDefinitionManager extends AbstractManager {
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbEntityManager().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", parameters);
+  }
+
+  public void deleteJobDefinitionsByCaseDefinitionId(String definitionId) {
+    getDbEntityManager().delete(JobDefinitionEntity.class, "deleteJobDefinitionsByCaseDefinitionId", definitionId);
   }
 
 }

@@ -16,8 +16,12 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.handler.HandlerContext;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>This context contains necessary information (like caseDefinition)
@@ -33,6 +37,7 @@ public class CmmnHandlerContext implements HandlerContext {
   protected CmmnModelInstance model;
   protected CmmnActivity parent;
   protected Deployment deployment;
+  protected List<JobDeclaration<?, ?>> jobDeclarations = new ArrayList<JobDeclaration<?, ?>>();
 
   public CmmnHandlerContext() {
   }
@@ -76,5 +81,15 @@ public class CmmnHandlerContext implements HandlerContext {
   public void setExpressionManager(ExpressionManager expressionManager) {
     this.expressionManager = expressionManager;
   }
+
+  public void addJobDeclaration(JobDeclaration<?, ?> jobDeclaration) {
+    jobDeclarations.add(jobDeclaration);
+  }
+
+  public List<JobDeclaration<?, ?>> getJobDeclarations() {
+    return jobDeclarations;
+  }
+
+
 
 }

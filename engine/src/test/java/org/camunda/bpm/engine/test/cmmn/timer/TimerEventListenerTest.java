@@ -12,11 +12,16 @@
  */
 package org.camunda.bpm.engine.test.cmmn.timer;
 
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventListenerJobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
+import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+
+import java.util.List;
 
 /**
  * @author smirnov
@@ -44,6 +49,33 @@ public class TimerEventListenerTest extends CmmnProcessEngineTestCase {
     assertNotNull(job.getCaseInstanceId());
     assertEquals("case", job.getCaseDefinitionKey());
     assertTrue((job instanceof TimerEntity));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/timer/TimerEventListenerTest.testTimerJobData.cmmn"})
+  public void testTimerEventListenerJobDefinition(){
+    CaseInstance ci = createCaseInstanceByKey("case");
+    assertNotNull(ci);
+    CaseDefinition cd = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("case").singleResult();
+    List<JobDefinition> allJobs = managementService.createJobDefinitionQuery().list();
+    assertNotNull(allJobs);
+    assertTrue(!allJobs.isEmpty());
+    assertTrue(allJobs.size()==1);
+    assertNotNull(allJobs.get(0));
+    assertTrue(allJobs.get(0).getJobType().equals("timer-event-listener"));
+    assertNotNull(allJobs.get(0).getCaseDefinitionKey());
+    assertNotNull(allJobs.get(0).getCaseDefinitionId());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/timer/TimerEventListenerTest.testTimerJobData.cmmn"})
+  public void testTimerEventListenerJobDefinitionIsDeploymentOld(){
+    processEngineConfiguration.getDeploymentCache().discardCaseDefinitionCache();
+    CaseInstance ci = createCaseInstanceByKey("case");
+    assertNotNull(ci);
+    List<CaseDefinition> cd = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("case").list();
+    List<JobDefinition> allJobs = managementService.createJobDefinitionQuery().list();
+    assertNotNull(allJobs);
+    assertTrue(!allJobs.isEmpty());
+    assertTrue(allJobs.size()==1);
   }
 
 }
