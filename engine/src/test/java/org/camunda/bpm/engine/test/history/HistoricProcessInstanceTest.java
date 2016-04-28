@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 
 /**
@@ -241,6 +242,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     }
   }
   @Deployment
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testHistoricProcessInstanceQueryWithIncidents() {
     startHistoricProcessInstanceQueryWithIncidentsProcess();
 
