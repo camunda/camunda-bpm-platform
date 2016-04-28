@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEnt
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -229,22 +228,18 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertNotNull(historicProcessInstance.getEndTime());
   }
 
-  private void startHistoricProcessInstanceQueryWithIncidentsProcess() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("Process_1");
-    List<Job> jobList = managementService.createJobQuery().processDefinitionId(pi.getProcessDefinitionId()).list();
-
-    for(Job job : jobList) {
-      try {
-        managementService.executeJob(job.getId());
-      } catch (ProcessEngineException e) {
-        // the job failed and created an incident
-      }
-    }
-  }
   @Deployment
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testHistoricProcessInstanceQueryWithIncidents() {
-    startHistoricProcessInstanceQueryWithIncidentsProcess();
+    // start instance with incidents
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("Process_1");
+    executeAvailableJobs();
+
+    // start instance without incidents
+    runtimeService.startProcessInstanceByKey("Process_1");
+
+    assertEquals(2, historyService.createHistoricProcessInstanceQuery().count());
+    assertEquals(2, historyService.createHistoricProcessInstanceQuery().list().size());
 
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().withIncidents().count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().withIncidents().list().size());
@@ -252,8 +247,17 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessageLike("Unknown property used%").count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessageLike("Unknown property used%").list().size());
 
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().incidentMessageLike("Unknown message%").count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().incidentMessageLike("Unknown message%").list().size());
+
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown property used in expression: ${incidentTrigger1}. Cause: Cannot resolve identifier 'incidentTrigger1'").count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown property used in expression: ${incidentTrigger1}. Cause: Cannot resolve identifier 'incidentTrigger1'").list().size());
+
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown property used in expression: ${incidentTrigger2}. Cause: Cannot resolve identifier 'incidentTrigger2'").count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown property used in expression: ${incidentTrigger2}. Cause: Cannot resolve identifier 'incidentTrigger2'").list().size());
+
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown message").count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown message").list().size());
   }
 
   public void testHistoricProcessInstanceQueryWithIncidentMessageNull() {
