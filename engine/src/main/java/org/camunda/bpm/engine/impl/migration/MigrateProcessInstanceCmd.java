@@ -82,17 +82,25 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
     ensureNotNull(BadUserRequestException.class, "Migration plan cannot be null", "migration plan", migrationPlan);
     ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be null or empty", "process instance ids", processInstanceIds);
 
-    checkRequiredAuthorizations(commandContext, migrationPlan, processInstanceIds);
+    ProcessDefinitionEntity sourceDefinition = resolveSourceProcessDefinition(commandContext);
+    final ProcessDefinitionEntity targetDefinition = resolveTargetProcessDefinition(commandContext);
 
-    final ProcessDefinitionEntity targetProcessDefinition = commandContext.getProcessEngineConfiguration()
-      .getDeploymentCache().findDeployedProcessDefinitionById(migrationPlan.getTargetProcessDefinitionId());
+    checkAuthorizations(commandContext,
+        sourceDefinition,
+        targetDefinition,
+        processInstanceIds);
+    writeUserOperationLog(commandContext,
+        sourceDefinition,
+        targetDefinition,
+        processInstanceIds.size(),
+        false);
 
     commandContext.runWithoutAuthorization(new Callable<Void>() {
 
       @Override
       public Void call() throws Exception {
         for (String processInstanceId : processInstanceIds) {
-          migrateProcessInstance(commandContext, processInstanceId, migrationPlan, targetProcessDefinition);
+          migrateProcessInstance(commandContext, processInstanceId, migrationPlan, targetDefinition);
         }
         return null;
       }

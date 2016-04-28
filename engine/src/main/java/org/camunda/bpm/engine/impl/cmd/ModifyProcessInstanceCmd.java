@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 
+import java.util.Collections;
 import java.util.List;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -74,7 +75,11 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
       }
     }
 
-    commandContext.getOperationLogManager().logProcessInstanceOperation(getLogEntryOperation(), processInstanceId, null, null, PropertyChange.EMPTY_CHANGE);
+    commandContext.getOperationLogManager().logProcessInstanceOperation(getLogEntryOperation(),
+        processInstanceId,
+        null,
+        null,
+        Collections.singletonList(PropertyChange.EMPTY_CHANGE));
 
     return null;
   }

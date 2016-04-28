@@ -83,6 +83,7 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_UPDATE = "Update";
   public static String OPERATION_TYPE_ACTIVATE = "Activate";
   public static String OPERATION_TYPE_SUSPEND = "Suspend";
+  public static String OPERATION_TYPE_MIGRATE = "Migrate";
 
   public static String OPERATION_TYPE_ADD_USER_LINK = "AddUserLink";
   public static String OPERATION_TYPE_DELETE_USER_LINK = "DeleteUserLink";

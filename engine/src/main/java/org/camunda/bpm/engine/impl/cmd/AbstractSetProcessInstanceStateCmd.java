@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.Collections;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -105,7 +107,7 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
     PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, getNewSuspensionState().getName());
     commandContext.getOperationLogManager()
       .logProcessInstanceOperation(getLogEntryOperation(), processInstanceId, processDefinitionId,
-        processDefinitionKey, propertyChange);
+        processDefinitionKey, Collections.singletonList(propertyChange));
   }
 
   protected UpdateJobSuspensionStateBuilderImpl createJobCommandBuilder() {
