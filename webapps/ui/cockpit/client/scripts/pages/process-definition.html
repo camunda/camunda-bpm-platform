@@ -113,14 +113,22 @@
               </li>
             </ul>
           </dd>
-        </dl>
 
-        <!-- <a class="navigate-deployment" ng-href="{{ getDeploymentUrl() }}">Navigate to deployment</a> -->
-        <a ng-if="hasReportPlugin"
-           class="report-link"
-           ng-href="#/reports/?processDefinitionKey={{ processDefinition.key }}&processDefinitionVersion={{ processDefinition.version }}">
-          <span class="glyphicon glyphicon-signal"></span>
-        </a>
+          <dt>Related</dt>
+          <dd>
+            <ul>
+              <li ng-if="hasReportPlugin">
+                <a class="report-link"
+                   ng-href="#/reports/?processDefinitionKey={{ processDefinition.key }}&processDefinitionVersion={{ processDefinition.version }}">
+                  Reports
+                </a>
+              </li>
+              <li>
+                <a ng-href="#/migration?searchQuery=%5B%5D&sourceKey={{ processDefinition.key }}">Migration</a>
+              </li>
+            </ul>
+          </dd>
+        </dl>
       </div>
 
 

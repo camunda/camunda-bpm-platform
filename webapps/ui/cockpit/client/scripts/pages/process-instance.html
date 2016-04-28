@@ -80,6 +80,15 @@
           <dd class="deployment-id">
             <a ng-href="{{ getDeploymentUrl() }}">{{ processDefinition.deploymentId }}</a>
           </dd>
+
+          <dt>Related</dt>
+          <dd>
+            <ul>
+              <li>
+                <a ng-href="#/migration?searchQuery=%5B%5D&sourceKey={{ processDefinition.key }}">Migration</a>
+              </li>
+            </ul>
+          </dd>
         </dl>
       </div>
 
