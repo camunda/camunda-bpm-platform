@@ -68,6 +68,9 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private String processInstanceBusinessKeyLike;
   private Boolean finished;
   private Boolean unfinished;
+  private Boolean withIncidents;
+  private String incidentMessage;
+  private String incidentMessageLike;
   private Date startedBefore;
   private Date startedAfter;
   private Date finishedBefore;
@@ -141,6 +144,21 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   @CamundaQueryParam(value = "unfinished", converter = BooleanConverter.class)
   public void setUnfinished(Boolean unfinished) {
     this.unfinished = unfinished;
+  }
+
+  @CamundaQueryParam(value = "withIncidents", converter = BooleanConverter.class)
+  public void setWithIncidents(Boolean withIncidents) {
+    this.withIncidents = withIncidents;
+  }
+
+  @CamundaQueryParam(value = "incidentMessage")
+  public void setIncidentMessage(String incidentMessage) {
+    this.incidentMessage = incidentMessage;
+  }
+
+  @CamundaQueryParam(value = "incidentMessageLike")
+  public void setIncidentMessageLike(String incidentMessageLike) {
+    this.incidentMessageLike = incidentMessageLike;
   }
 
   @CamundaQueryParam(value = "startedBefore", converter = DateConverter.class)
@@ -248,6 +266,15 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     }
     if (unfinished != null && unfinished) {
       query.unfinished();
+    }
+    if (withIncidents != null && withIncidents) {
+      query.withIncidents();
+    }
+    if(incidentMessage != null) {
+      query.incidentMessage(incidentMessage);
+    }
+    if(incidentMessageLike != null) {
+      query.incidentMessageLike(incidentMessageLike);
     }
     if (startedBefore != null) {
       query.startedBefore(startedBefore);

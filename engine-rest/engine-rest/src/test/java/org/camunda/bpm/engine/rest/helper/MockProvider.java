@@ -601,6 +601,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_INCIDENT_ROOT_CAUSE_INCIDENT_ID = "aRootCauseIncidentId";
   public static final String EXAMPLE_INCIDENT_CONFIGURATION = "aConfiguration";
   public static final String EXAMPLE_INCIDENT_MESSAGE = "anIncidentMessage";
+  public static final String EXAMPLE_INCIDENT_MESSAGE_LIKE = "%anIncidentMessageLike%";
 
   public static final int EXAMPLE_INCIDENT_COUNT = 1;
 

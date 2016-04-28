@@ -26,6 +26,7 @@ import java.util.Set;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -732,6 +733,107 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
 
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
     Assert.assertEquals(null, returnedEndTime);
+  }
+
+  @Test
+  public void testQueryWithIncidents() {
+    given()
+      .queryParam("withIncidents", true)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    InOrder inOrder = inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).withIncidents();
+    inOrder.verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testQueryWithIncidentsAsPost() {
+    Map<String, Boolean> body = new HashMap<String, Boolean>();
+    body.put("withIncidents", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(body)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    InOrder inOrder = inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).withIncidents();
+    inOrder.verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testQueryIncidentMessage() {
+    given()
+      .queryParam("incidentMessage", MockProvider.EXAMPLE_INCIDENT_MESSAGE)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    InOrder inOrder = inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).incidentMessage(MockProvider.EXAMPLE_INCIDENT_MESSAGE);
+    inOrder.verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testQueryIncidentMessageAsPost() {
+    Map<String, String> body = new HashMap<String, String>();
+    body.put("incidentMessage", MockProvider.EXAMPLE_INCIDENT_MESSAGE);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(body)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    InOrder inOrder = inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).incidentMessage(MockProvider.EXAMPLE_INCIDENT_MESSAGE);
+    inOrder.verify(mockedQuery).list();
+  }
+  @Test
+  public void testQueryIncidentMessageLike() {
+    given()
+      .queryParam("incidentMessageLike", MockProvider.EXAMPLE_INCIDENT_MESSAGE_LIKE)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    InOrder inOrder = inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).incidentMessageLike(MockProvider.EXAMPLE_INCIDENT_MESSAGE_LIKE);
+    inOrder.verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testQueryIncidentMessageLikeAsPost() {
+    Map<String, String> body = new HashMap<String, String>();
+    body.put("incidentMessageLike", MockProvider.EXAMPLE_INCIDENT_MESSAGE_LIKE);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(body)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    InOrder inOrder = inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).incidentMessageLike(MockProvider.EXAMPLE_INCIDENT_MESSAGE_LIKE);
+    inOrder.verify(mockedQuery).list();
   }
 
   @Test
