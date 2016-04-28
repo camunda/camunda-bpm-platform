@@ -119,7 +119,8 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
         boolean jobDefinitionExists = false;
         for (JobDefinition jobDefinitionEntity : existingDefinitions) {
           // <!> Assumption: there can be only one job definition per activity and type
-          if(jobDeclaration.getJobHandlerType().equals(jobDefinitionEntity.getJobType())) {
+          if(jobDeclaration.getActivityId().equals(jobDefinitionEntity.getActivityId()) &&
+                  jobDeclaration.getJobHandlerType().equals(jobDefinitionEntity.getJobType())) {
             jobDeclaration.setJobDefinitionId(jobDefinitionEntity.getId());
             jobDefinitionExists = true;
             break;
@@ -141,6 +142,7 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
     jobDefinitionEntity.setCaseDefinitionId(definition.getId());
     jobDefinitionEntity.setCaseDefinitionKey(definition.getKey());
     jobDefinitionEntity.setTenantId(definition.getTenantId());
+    jobDefinitionEntity.setActivityId(jobDeclaration.getActivityId());
     jobDefinitionManager.insert(jobDefinitionEntity);
     jobDeclaration.setJobDefinitionId(jobDefinitionEntity.getId());
   }

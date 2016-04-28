@@ -46,6 +46,7 @@ public class TimerEventListenerItemHandler extends EventListenerItemHandler {
 
   private void initializeTimerEventListenerJobDeclaration(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
     TimerEventListenerJobDeclaration timerEventListenerJobDeclaration = parseTimerExpression(element,context);
+    timerEventListenerJobDeclaration.setActivity(activity);
     activity.setProperty(ItemHandler.PROPERTY_TIMERVEVENTLISTENER_JOBDECLARATION, timerEventListenerJobDeclaration);
     context.addJobDeclaration(timerEventListenerJobDeclaration);
   }
