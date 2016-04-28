@@ -209,6 +209,7 @@
   bottom: 0;
   height: @ctn-content-bottom-height;
   border-top: 1px solid @gray-lighter;
+  background: @custom-gray-lighter;
   overflow: auto;
 }
 
@@ -270,6 +271,7 @@ a.expand-collapse {
 .resize-handle {
   position: absolute;
   background: transparent;
+  transition: background-color 0.218s ease;
   z-index: 15;
 
   &.horizontal {
@@ -285,5 +287,9 @@ a.expand-collapse {
     bottom: 0;
     top: 0;
     cursor: e-resize;
+  }
+
+  &:hover {
+    background-color: fade(@gray, 50);
   }
 }

@@ -102,7 +102,7 @@ require('jquery-ui/draggable');
 
           if (originalCollapsabled === 'yes') {
             collapsableElement.css(changeAttr, 0);
-            compensateElement.css(direction, 6 +'px');
+            compensateElement.css(direction, 3 +'px');
           }
           else {
             collapsableElement.css(changeAttr, originalCollapsableSize);
@@ -140,7 +140,7 @@ require('jquery-ui/draggable');
               setCollapsed(pos < 10);
 
               collapsableElement.css(changeAttr, pos);
-              compensateElement.css(direction, (pos + 6) +'px');
+              compensateElement.css(direction, (pos + 3) +'px');
 
               if (localStorage) {
                 localStorage.setItem('ctnCollapsableParent:size:'+ containerId, pos);
