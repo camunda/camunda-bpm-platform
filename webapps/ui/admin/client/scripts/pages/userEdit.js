@@ -12,8 +12,8 @@ var angular = require('camunda-commons-ui/vendor/angular');
     $routeProvider.when('/users/:userId', {
       template: template,
       controller: [
-              '$scope', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$modal', 'AuthorizationResource', 'authentication',
-      function($scope,   $routeParams,   UserResource,   GroupResource,   GroupMembershipResource,   Notifications,   $location,   $modal,   AuthorizationResource,   authentication) {
+              '$scope', 'page', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$modal', 'AuthorizationResource', 'authentication',
+      function($scope,   page,   $routeParams,   UserResource,   GroupResource,   GroupMembershipResource,   Notifications,   $location,   $modal,   AuthorizationResource,   authentication) {
 
         $scope.encodedUserId = $routeParams.userId
                                                 .replace(/\//g, '%2F')
@@ -66,12 +66,19 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         var loadProfile = $scope.loadProfile = function() {
           UserResource.profile({userId : $scope.encodedUserId}).$promise.then(function(response) {
-            // console.warn('not sure it blends', response);
             $scope.user = response;
-            // $scope.profile = angular.copy(response.data);
-            // $scope.profileCopy = angular.copy(response.data);
+
             $scope.profile = angular.copy(response);
             $scope.profileCopy = angular.copy(response);
+
+            page.titleSet('Edit `' + $scope.user + '` user');
+
+            page.breadcrumbsAdd([
+              {
+                label: [$scope.user.firstName, $scope.user.lastName].filter(function (v) { return !!v; }).join(' '),
+                href: '#/users/' + $scope.user.id
+              }
+            ]);
           });
         };
 
@@ -218,6 +225,20 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         // initialization ///////////////////////////////////
 
+
+        $scope.$root.showBreadcrumbs = true;
+
+        page.titleSet('Edit user');
+
+        page.breadcrumbsClear();
+
+        page.breadcrumbsAdd([
+          {
+            label: 'Users',
+            href: '#/users/'
+          },
+        ]);
+
         loadProfile();
         checkRemoveGroupMembershipAuthorized();
 
@@ -225,7 +246,6 @@ var angular = require('camunda-commons-ui/vendor/angular');
           $location.search({'tab': 'profile'});
           $location.replace();
         }
-
       }],
       authentication: 'required',
       reloadOnSearch: false

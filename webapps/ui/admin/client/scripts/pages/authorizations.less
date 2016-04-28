@@ -1,41 +1,55 @@
-.authorizations td {
-  &.authorization-type {
-    min-width: 120px;
-    max-width: 160px;
-    width: 120px;
-    select {
-      padding-left: 3px;
+.authorizations {
+  td {
+    &.authorization-type {
+      min-width: 120px;
+      max-width: 160px;
+      width: 120px;
+      select {
+        padding-left: 3px;
+      }
     }
-  }
 
-  &.identity-id {
-    width: 180px;
-  }
+    &.identity-id {
+      width: 180px;
+    }
 
-  &.user {
-    width: 180px;
-  }
+    &.user {
+      width: 180px;
+    }
 
-  &.resource-id {
-    min-width: 320px;
-    max-width: 350px;
-    width: 320px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  &.permissions {
-    .form-control-static {
-      max-width: 100%;
+    &.resource-id {
+      min-width: 320px;
+      max-width: 350px;
+      width: 320px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .input-group-btn {
-      vertical-align: top;
+
+    &.permissions {
+      .form-control-static {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .input-group-btn {
+        vertical-align: top;
+      }
+    }
+
+    &.action {
+      width: 120px;
+      text-align: center;
     }
   }
+}
 
-  &.action {
-    width: 120px;
+table.cam-table > tbody > tr.editing {
+  > td {
+    &.identity-id,
+    &.permissions,
+    &.resource-id {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
   }
 }

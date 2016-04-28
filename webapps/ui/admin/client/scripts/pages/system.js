@@ -6,13 +6,30 @@ var template = fs.readFileSync(__dirname + '/system.html', 'utf8');
 
   var Controller = [
     '$scope',
+    'page',
     '$location',
     '$routeParams',
     'Views',
-    function($scope,
-             $location,
-             $routeParams,
-             Views) {
+  function(
+    $scope,
+    page,
+    $location,
+    $routeParams,
+    Views
+  ) {
+
+    $scope.$root.showBreadcrumbs = true;
+
+    page.titleSet('System Settings');
+
+    page.breadcrumbsClear();
+
+    page.breadcrumbsAdd([
+      {
+        label: 'System Settings',
+        href: '#/system'
+      }
+    ]);
 
     $scope.systemSettingsProviders = Views.getProviders({ component: 'admin.system'});
 

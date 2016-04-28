@@ -4,10 +4,10 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
    transform = require('./transform'),
    variables = require('./variables'),
-   page = require('./page'),
    breadcrumbTrails = require('./breadcrumbTrails'),
-   routeUtil = require('./routeUtil'),
-   camAPI = require('./cam-api');
+   routeUtil = require('./../../../../common/scripts/services/routeUtil'),
+   page = require('./../../../../common/scripts/services/page'),
+   camAPI = require('./../../../../common/scripts/services/cam-api');
 
   var servicesModule = angular.module('cam.cockpit.services', []);
 

@@ -11,8 +11,14 @@ var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization
     $routeProvider.when('/authorization', {
       template: template,
       controller: [
-               '$scope', '$routeParams', '$modal', 'AuthorizationResource', 'Notifications', '$location',
-      function ($scope,   $routeParams,   $modal,   AuthorizationResource,   Notifications,   $location) {
+               '$scope', 'page',      '$routeParams', '$modal', 'AuthorizationResource', 'Notifications', '$location',
+      function ($scope,   pageService, $routeParams,   $modal,   AuthorizationResource,   Notifications,   $location) {
+
+        $scope.$root.showBreadcrumbs = true;
+
+        pageService.titleSet('Authorizations');
+
+        pageService.breadcrumbsClear();
 
         $scope.allPermissionsValue = 2147483647;
 
@@ -29,6 +35,25 @@ var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization
           9: 'Deployment',
          10: 'Decision Definition'
         };
+
+        var choices = []
+        /*
+        // could be some awesome... could...
+        choices = Object.keys($scope.resourceMap).map(function (k) {
+          return {
+            active: $location.search().resource === '' + k,
+            label: $scope.resourceMap[k],
+            href: '#/authorization?resource=' + k
+          };
+        });
+        */
+        pageService.breadcrumbsAdd([
+          {
+            label: 'Authorizations',
+            href: '#/authorization',
+            choices: choices
+          }
+        ]);
 
         $scope.permissionMap = {
           0: [ 'ACCESS' ],

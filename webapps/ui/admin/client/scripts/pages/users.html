@@ -1,70 +1,73 @@
 <!-- # CE - camunda-admin-ui/client/scripts/pages/users.html -->
-<div class="container-fluid" ng-cloak>
-  <div class="row">
-    <div class="page-header">
-      <h1>
-        Users
-        <a ng-show="availableOperations.create"
-           href="#/user-create"
-           tooltip-placement="right"
-           tooltip="Create a new user">
+<section ng-cloak>
+  <!-- <aside></aside> -->
+  <div class="section-content">
+    <header class="row">
+      <div class="col-xs-8">
+        <h3>List of users</h3>
+      </div>
+      <div class="col-xs-4 text-right">
+        <a class="btn btn-default"
+           ng-show="availableOperations.create"
+           href="#/user-create">
+          Add user
           <span class="glyphicon glyphicon-plus-sign"></span>
         </a>
-      </h1>
+      </div>
+    </header>
+
+    <div cam-widget-loader
+         loading-state="{{ loadingState }}">
+      <table class="cam-table">
+        <thead>
+          <tr>
+            <th class="name">Name</th>
+            <th class="username">Username</th>
+            <th class="action">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="user in userList">
+            <td class="name">
+              <a ng-href="#/users/{{user.id | escape}}">{{user.firstName}} {{user.lastName}}</a>
+            </td>
+
+            <td class="username">
+              {{user.id}}
+            </td>
+
+            <td class="action">
+              <a ng-href="#/users/{{user.id | escape}}">Edit</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+
+    <div ng-show="loadingState === 'EMPTY' && pages.total && (!userList || !userList.length)"
+         class="well">
+      <span class="glyphicon glyphicon-info-sign"></span>
+      The current search parameters could not retrieve any users. Try to <a ng-click="pageChange(1)">reset page number.</a>
+    </div>
+
+    <pagination ng-if="pages.total > pages.size"
+                class="pagination-sm"
+
+                ng-model="pages.current"
+                ng-change="pageChange(pages.current)"
+
+                total-items="pages.total"
+                items-per-page="pages.size"
+                max-size="7"
+
+                boundary-links="true"
+
+                next-text="&rsaquo;"
+                last-text="&raquo;"
+                previous-text="&lsaquo;"
+                first-text="&laquo;"></pagination>
+
   </div>
-
-  <div cam-widget-loader
-       loading-state="{{ loadingState }}">
-    <table class="cam-table">
-      <thead>
-        <tr>
-          <th class="name">Name</th>
-          <th class="username">Username</th>
-          <th class="action">Action</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr ng-repeat="user in userList">
-          <td class="name">
-            <a ng-href="#/users/{{user.id | escape}}">{{user.firstName}} {{user.lastName}}</a>
-          </td>
-
-          <td class="username">
-            {{user.id}}
-          </td>
-
-          <td class="action">
-            <a ng-href="#/users/{{user.id | escape}}">Edit</a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div ng-show="loadingState === 'EMPTY' && pages.total && (!userList || !userList.length)"
-       class="well">
-    <span class="glyphicon glyphicon-info-sign"></span>
-    The current search parameters could not retrieve any users. Try to <a ng-click="pageChange(1)">reset page number.</a>
-  </div>
-
-  <pagination ng-if="pages.total > pages.size"
-              class="pagination-sm"
-
-              ng-model="pages.current"
-              ng-change="pageChange(pages.current)"
-
-              total-items="pages.total"
-              items-per-page="pages.size"
-              max-size="7"
-
-              boundary-links="true"
-
-              next-text="&rsaquo;"
-              last-text="&raquo;"
-              previous-text="&lsaquo;"
-              first-text="&laquo;"></pagination>
-
-</div>
+</section>
 <!-- / CE - camunda-admin-ui/client/scripts/pages/users.html -->

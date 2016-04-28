@@ -9,9 +9,39 @@
   border: none;
 }
 
+section,
+aside,
+.section-content {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  overflow: auto;
+}
 
-.sidebar-nav {
-  border-right: 1px solid mix(@gray-light, @gray-lighter);
+section {
+  padding: 0 (@grid-gutter-width * 0.5);
+  width: 100%;
+}
+
+.section-content {
+  padding: (@grid-gutter-width * 0.5);
+  right: 0;
+  width: 100%;
+}
+
+aside {
+  left: 0;
+  width: 15%;
+  padding: (@grid-gutter-width * 0.5) 0;
+}
+aside + .section-content {
+  width: 85%;
+}
+
+
+aside {
+  border-right: 1px solid @gray-lighter;
+  background-color: @custom-gray-lighter;
 
   ul {
     .menu-ul(16px, 24px);
@@ -37,7 +67,44 @@
   }
 }
 
+td.authorization-type {
+  width: 120px;
+}
+td.resource-id {
+  width: 160px;
+}
+td.action {
+  width: 90px;
+}
+table.cam-table > tbody > tr > td.action {
+  vertical-align: middle;
+}
 
 /* ---------------------------------------------------------------- */
 
 @import "pages/authorizations.less";
+@import "directives/cam-breadcrumbs-panel.less";
+
+.ctn-main {
+  position: absolute;
+  width: 100%;
+  top: @header-height;
+  bottom: @footer-height;
+}
+
+.ctn-wrapper {
+  height: 100%;
+  width: 100%;
+  > [ng-view] {
+    position: absolute;
+    width: 100%;
+    top: @breadcrumb-height;
+    bottom: 0;
+    overflow: auto;
+  }
+}
+
+.container-fluid {
+  padding-top: @grid-gutter-width * 0.5;
+  padding-bottom: @grid-gutter-width * 0.5;
+}

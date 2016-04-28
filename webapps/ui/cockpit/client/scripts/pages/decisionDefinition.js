@@ -5,7 +5,7 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/decision-definition.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular'),
-    routeUtil = require('../util/routeUtil'),
+    routeUtil = require('../../../../common/scripts/util/routeUtil'),
     dataDepend = require('angular-data-depend'),
     camCommons = require('camunda-commons-ui/lib');
 

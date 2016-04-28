@@ -1,5 +1,8 @@
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular'),
 
-module.exports = angular.module('admin.directives', []);
+  breadcrumbs = require('./../../../../common/scripts/directives/breadcrumbs');
+
+var directivesModule = module.exports = angular.module('cam.admin.directives', []);
+directivesModule.directive('camBreadcrumbsPanel', breadcrumbs);

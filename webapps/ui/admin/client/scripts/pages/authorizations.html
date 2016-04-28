@@ -1,39 +1,32 @@
 <!-- # CE - camunda-admin-ui/client/scripts/pages/authorizations.html -->
-<div class="container-fluid"
-     ng-cloak>
-  <section class="authorizations row">
-    <div class="page-header">
-      <h1 ng-controller="AuthorizationCreateController">
-        Authorizations
-        <!-- <a ng-click="addNewAuthorization()"
-           tooltip-placement="right"
-           tooltip="Create a new authorization">
+<section>
+  <aside>
+    <ul>
+      <li ng-class="activeClass('resource='+res.id)"
+          ng-repeat="res in resourceList | orderBy:'name':false">
+        <a href="#/authorization/?resource={{res.id}}">{{res.name}}</a>
+      </li>
+    </ul>
+  </aside>
+
+  <div class="section-content">
+    <header class="row">
+      <div class="col-xs-8">
+        <h3>{{title}} Authorizations</h3>
+      </div>
+      <div class="col-xs-4 text-right"
+           ng-controller="AuthorizationCreateController">
+        <a ng-click="addNewAuthorization()"
+           class="btn btn-default">
+          Create new authorization
           <span class="glyphicon glyphicon-plus-sign"></span>
-        </a> -->
-      </h1>
-    </div>
-
-    <div class="col-sm-3 col-lg-2 sidebar-nav">
-      <ul>
-        <li ng-class="activeClass('resource='+res.id)"
-            ng-repeat="res in resourceList | orderBy:'name':false">
-          <a href="#/authorization/?resource={{res.id}}">{{res.name}}</a>
-        </li>
-      </ul>
-    </div>
-
-    <form class="col-sm-9 col-lg-10 form-horizontal"
-          name="createAuthForm"
-          ng-controller="AuthorizationCreateController">
-
-      <div class="h4">
-        {{title}} Authorizations
-        <a tooltip="Create new {{title}} authorization"
-           ng-click="addNewAuthorization()"
-           class="glyphicon glyphicon-plus-sign">
         </a>
       </div>
+    </header>
 
+    <form class="form-horizontal"
+          name="createAuthForm"
+          ng-controller="AuthorizationCreateController">
       <table class="cam-table">
         <thead>
           <tr>
@@ -46,11 +39,14 @@
         </thead>
 
         <tbody>
-          <tr ng-repeat="authorization in authorizations | orderBy:getIdentityId:false">
-            <td class="authorization-type" ng-if="!authorization.inUpdate || !!authorization.id">
+          <tr ng-repeat="authorization in authorizations | orderBy:getIdentityId:false"
+              ng-class="{editing: !!authorization.inUpdate}">
+            <td class="authorization-type"
+                ng-if="!authorization.inUpdate || !!authorization.id">
               {{getType(authorization)}}
             </td>
-            <td class="authorization-type" ng-if="!!authorization.inUpdate && !authorization.id">
+            <td class="authorization-type"
+                ng-if="!!authorization.inUpdate && !authorization.id">
               <select ng-model="authorization.type"
                       class="select-auth-type form-control"
                       ng-change="ensureValidUser(authorization)">
@@ -60,7 +56,8 @@
               </select>
             </td>
 
-            <td class="user group" ng-if="!authorization.inUpdate">
+            <td class="user group"
+                ng-if="!authorization.inUpdate">
               <span ng-show="!!authorization.userId"
                     tooltip="User">
                 <span class="glyphicon glyphicon-user"></span>
@@ -73,7 +70,8 @@
                 {{authorization.groupId}}
               </span>
             </td>
-            <td class="identity-id" ng-if="!!authorization.inUpdate">
+            <td class="identity-id"
+                ng-if="!!authorization.inUpdate">
               <div class="input-group">
                 <a class="input-group-addon"
                    ng-disabled="isIdentityIdDisabledFor(authorization)"
@@ -92,10 +90,12 @@
               </div>
             </td>
 
-            <td class="permissions" ng-if="!authorization.inUpdate">
+            <td class="permissions"
+                ng-if="!authorization.inUpdate">
               {{formatPermissions(authorization.permissions)}}
             </td>
-            <td class="permissions" ng-if="!!authorization.inUpdate">
+            <td class="permissions"
+                ng-if="!!authorization.inUpdate">
               <div class="input-group">
 
                 <div class="form-control-static"
@@ -130,21 +130,25 @@
               </div><!-- /input-group -->
             </td>
 
-            <td class="resource-id" ng-if="!authorization.inUpdate">
+            <td class="resource-id"
+                ng-if="!authorization.inUpdate">
               {{authorization.resourceId}}
             </td>
-            <td class="resource-id" ng-if="!!authorization.inUpdate">
+            <td class="resource-id"
+                ng-if="!!authorization.inUpdate">
               <input type="text"
                      id="inputResourceId"
                      ng-model="authorization.resourceId"
                      ng-class="{'ng-invalid': !authorization.resourceId}"
-                     class="in-place-edit form-control" />
+                     class="in-place-edit form-control"
+                        />
 
               <span ng-show="selectedResourceType==0"
                     class="text-muted">(cockpit or tasklist or *)</span>
             </td>
 
-            <td class="action" ng-if="!authorization.inUpdate">
+            <td class="action"
+                ng-if="!authorization.inUpdate">
               <a ng-click="updateAuthorization(authorization)">
                 Edit
               </a>
@@ -152,8 +156,9 @@
                 Delete
               </a>
             </td>
-            <td class="action" ng-if="!!authorization.inUpdate">
-              <div class="btn-group">
+            <td class="action"
+                ng-if="!!authorization.inUpdate">
+              <div class="btn-group btn-group-xs">
                 <button type="submit"
                         class="btn btn-primary"
                         ng-disabled="!isAuthorizationValid(authorization)"
@@ -166,15 +171,6 @@
                   <span class="glyphicon glyphicon-ban-circle"></span>
                 </a>
               </div>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="4"><!-- good ol' tables --></td>
-            <td>
-              <a ng-click="addNewAuthorization()">
-                Create New
-                <span class="glyphicon glyphicon-plus-sign"></span>
-              </a>
             </td>
           </tr>
         </tbody>
@@ -193,6 +189,6 @@
                   boundary-links="true"></pagination>
 
     </form>
-  </section>
-</div>
+  </div>
+</section>
 <!-- / CE - camunda-admin-ui/client/scripts/pages/authorizations.html -->

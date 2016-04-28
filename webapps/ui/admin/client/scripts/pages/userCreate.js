@@ -4,7 +4,24 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/userCreate.html', 'utf8');
 
-  var Controller = ['$scope', 'UserResource', 'Notifications', '$location', function ($scope, UserResource, Notifications, $location) {
+  var Controller = ['$scope', 'page', 'UserResource', 'Notifications', '$location', function ($scope, page, UserResource, Notifications, $location) {
+
+    $scope.$root.showBreadcrumbs = true;
+
+    page.titleSet('Create User');
+
+    page.breadcrumbsClear();
+
+    page.breadcrumbsAdd([
+      {
+        label: 'Users',
+        href: '#/users/'
+      },
+      {
+        label: 'Create',
+        href: '#/users-create'
+      }
+    ]);
 
     // data model for user profile
     $scope.profile = {

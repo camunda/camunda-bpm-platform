@@ -1,75 +1,77 @@
 <!-- # CE - camunda-admin-ui/client/scripts/pages/groups.html -->
-<div class="container-fluid" ng-cloak>
-  <div class="row">
-    <div class="page-header">
-      <h1>
-        Groups
-        <a ng-show="availableOperations.create"
-           href="#/group-create"
-           tooltip-placement="right"
-           tooltip="Create a new group">
+<section ng-cloak>
+  <!-- <aside></aside> -->
+  <div class="section-content">
+    <header class="row">
+      <div class="col-xs-8">
+        <h3>List of groups</h3>
+      </div>
+      <div class="col-xs-4 text-right"
+           ng-show="availableOperations.create">
+        <a href="#/group-create"
+           class="btn btn-default">
+          Create new group
           <span class="glyphicon glyphicon-plus-sign"></span>
         </a>
-      </h1>
+      </div>
+    </header>
+    <div cam-widget-loader
+         loading-state="{{ loadingState }}">
+      <table class="cam-table">
+        <thead>
+          <tr>
+            <th class="group-id">Group Id</th>
+            <th class="group-name">Group Name</th>
+            <th class="group-type">Group Type</th>
+            <th class="action">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="group in groupList">
+            <td class="group-id">
+              <a href="#/groups/{{group.id | escape}}">{{group.id}}</a>
+            </td>
+
+            <td class="group-name">
+              {{group.name}}
+            </td>
+
+            <td class="group-type">
+              {{group.type}}
+            </td>
+
+            <td class="action">
+              <a href="#/groups/{{group.id | escape}}">Edit</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+
+    <div ng-show="loadingState === 'EMPTY' && pages.total && (!groupList || !groupList.length)"
+         class="well">
+      <span class="glyphicon glyphicon-info-sign"></span>
+      The current search parameters could not retrieve any groups. Try to <a ng-click="pageChange(1)">reset page number.</a>
+    </div>
+
+    <pagination ng-if="pages.total > pages.size"
+                class="pagination-sm"
+
+                ng-model="pages.current"
+                ng-change="pageChange(pages.current)"
+
+                total-items="pages.total"
+                items-per-page="pages.size"
+                max-size="7"
+
+                boundary-links="true"
+
+                next-text="&rsaquo;"
+                last-text="&raquo;"
+                previous-text="&lsaquo;"
+                first-text="&laquo;"></pagination>
+
   </div>
-
-  <div cam-widget-loader
-       loading-state="{{ loadingState }}">
-    <table class="cam-table">
-      <thead>
-        <tr>
-          <th class="group-id">Group Id</th>
-          <th class="group-name">Group Name</th>
-          <th class="group-type">Group Type</th>
-          <th class="action">Action</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr ng-repeat="group in groupList">
-          <td class="group-id">
-            <a href="#/groups/{{group.id | escape}}">{{group.id}}</a>
-          </td>
-
-          <td class="group-name">
-            {{group.name}}
-          </td>
-
-          <td class="group-type">
-            {{group.type}}
-          </td>
-
-          <td class="action">
-            <a href="#/groups/{{group.id | escape}}">Edit</a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div ng-show="loadingState === 'EMPTY' && pages.total && (!groupList || !groupList.length)"
-       class="well">
-    <span class="glyphicon glyphicon-info-sign"></span>
-    The current search parameters could not retrieve any groups. Try to <a ng-click="pageChange(1)">reset page number.</a>
-  </div>
-
-  <pagination ng-if="pages.total > pages.size"
-              class="pagination-sm"
-
-              ng-model="pages.current"
-              ng-change="pageChange(pages.current)"
-
-              total-items="pages.total"
-              items-per-page="pages.size"
-              max-size="7"
-
-              boundary-links="true"
-
-              next-text="&rsaquo;"
-              last-text="&raquo;"
-              previous-text="&lsaquo;"
-              first-text="&laquo;"></pagination>
-
-</div>
+</section>
 <!-- / CE - camunda-admin-ui/client/scripts/pages/groups.html -->

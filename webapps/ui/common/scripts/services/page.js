@@ -27,13 +27,14 @@ var angular = require('camunda-commons-ui/vendor/angular');
       breadcrumbs: []
     };
 
-    var headTitle = angular.element('head title');
+    var headTitle = angular.element(document.querySelector('head title'));
+    var originalTitle = headTitle[0].textContent || 'Camunda Cockpit';
 
     // add a listener to the $rootScope to propagate the changes in the page title
     // sure... we could put that in the titleSet() function
     // or elsewhere but it's almost philosophical
     $rootScope.$on('page.title.changed', function() {
-      headTitle.text(['Camunda Cockpit', page.title].join(' | '));
+      headTitle.text([originalTitle, page.title].join(' | '));
     });
 
 

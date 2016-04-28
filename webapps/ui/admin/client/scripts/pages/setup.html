@@ -1,12 +1,16 @@
 <!-- # CE - camunda-admin-ui/client/scripts/pages/setup.html -->
-<div class="container-fluid">
-  <section id="users"
-           ng-switch on="created">
-    <div class="row">
-      <div class="page-header">
-        <h1>Setup</h1>
+<section>
+  <!-- <aside></aside> -->
+  <div class="section-content"
+       id="users"
+       ng-switch on="created">
+    <header class="row">
+      <div class="col-xs-8">
+        <h3>Setup</h3>
       </div>
-    </div>
+      <div class="col-xs-4 text-right">
+      </div>
+    </header>
 
     <div class="row"
          ng-switch-when="true">
@@ -166,19 +170,21 @@
         </form>
       </div>
 
-      <div class="col-md-4 well">
-        <div class="h4">Why is this page shown?</div>
-        <p>You are trying to access the process engine &quot;<strong>{{ engineName }}</strong>&quot;.
-        This process engine is configured to use the built-in identity service (database) but has no administrative users configured.
-        This page allows you to create a user for accessing the process engine.</p>
-        <p>
-          <a href="http://docs.camunda.org/guides/installation-guide/"
-             class="btn btn-success">
-            » Setup LDAP instead
-          </a>
-        </p>
-      </div>
+      <div class="col-md-4">
+        <div class="well">
+          <div class="h4">Why is this page shown?</div>
+          <p>You are trying to access the process engine &quot;<strong>{{ engineName }}</strong>&quot;.
+          This process engine is configured to use the built-in identity service (database) but has no administrative users configured.
+          This page allows you to create a user for accessing the process engine.</p>
+          <p>
+            <a href="http://docs.camunda.org/guides/installation-guide/"
+               class="btn btn-success">
+              » Setup LDAP instead
+            </a>
+          </p>
+        </div>
+        </div>
     </div>
-  </section>
-</div>
+  </div>
+</section>
 <!-- / CE - camunda-admin-ui/client/scripts/pages/setup.html -->
