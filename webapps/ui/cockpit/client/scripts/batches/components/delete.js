@@ -13,7 +13,7 @@ Delete.prototype.cancel = function() {
 };
 
 Delete.prototype.confirm = function() {
-  events.emit('delete.confirm', {
+  events.emit('delete:confirm', {
     cascade: this.cascade
   });
 };
