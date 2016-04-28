@@ -25,6 +25,8 @@ import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.migration.MigrationPlan;
 
 /**
  * @author Thorben Lindhauer
@@ -67,5 +69,16 @@ public abstract class AbstractMigrationCmd<T> implements Command<T> {
     }
 
     return collectedProcessInstanceIds;
+  }
+
+  protected void checkRequiredAuthorizations(CommandContext commandContext, MigrationPlan migrationPlan, Collection<String> processInstanceIds) {
+    ProcessDefinitionEntity sourceProcessDefinition = commandContext.getProcessEngineConfiguration()
+      .getDeploymentCache().findDeployedProcessDefinitionById(migrationPlan.getSourceProcessDefinitionId());
+    ProcessDefinitionEntity targetProcessDefinition = commandContext.getProcessEngineConfiguration()
+      .getDeploymentCache().findDeployedProcessDefinitionById(migrationPlan.getTargetProcessDefinitionId());
+
+    EnsureUtil.ensureNotNull("sourceProcessDefinition", sourceProcessDefinition);
+    EnsureUtil.ensureNotNull("targetProcessDefinition", targetProcessDefinition);
+    checkAuthorizations(commandContext, sourceProcessDefinition, targetProcessDefinition, processInstanceIds);
   }
 }

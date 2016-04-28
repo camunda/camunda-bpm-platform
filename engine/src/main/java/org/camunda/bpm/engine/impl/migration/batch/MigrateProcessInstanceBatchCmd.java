@@ -29,8 +29,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.migration.AbstractMigrationCmd;
 import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 
 public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> {
@@ -50,14 +48,7 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
     ensureNotNull(BadUserRequestException.class, "Migration plan cannot be null", "migration plan", migrationPlan);
     ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be null or empty", "process instance ids", processInstanceIds);
 
-    ProcessDefinitionEntity sourceProcessDefinition = commandContext.getProcessEngineConfiguration()
-      .getDeploymentCache().findDeployedProcessDefinitionById(migrationPlan.getSourceProcessDefinitionId());
-    ProcessDefinitionEntity targetProcessDefinition = commandContext.getProcessEngineConfiguration()
-      .getDeploymentCache().findDeployedProcessDefinitionById(migrationPlan.getTargetProcessDefinitionId());
-
-    EnsureUtil.ensureNotNull("sourceProcessDefinition", sourceProcessDefinition);
-    EnsureUtil.ensureNotNull("targetProcessDefinition", targetProcessDefinition);
-    checkAuthorizations(commandContext, sourceProcessDefinition, targetProcessDefinition, processInstanceIds);
+    checkRequiredAuthorizations(commandContext, migrationPlan, processInstanceIds);
 
     BatchEntity batch = createBatch(commandContext, migrationPlan, processInstanceIds);
 
