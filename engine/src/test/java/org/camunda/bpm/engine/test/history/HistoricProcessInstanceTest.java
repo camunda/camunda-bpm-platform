@@ -256,10 +256,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown property used in expression: ${incidentTrigger1}. Cause: Cannot resolve identifier 'incidentTrigger1'").list().size());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testHistoricProcessInstanceQueryWithIncidents.bpmn"})
   public void testHistoricProcessInstanceQueryWithIncidentMessageNull() {
-    startHistoricProcessInstanceQueryWithIncidentsProcess();
-
     try {
       historyService.createHistoricProcessInstanceQuery().incidentMessage(null).count();
       fail("incidentMessage with null value is not allowed");
@@ -268,10 +265,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testHistoricProcessInstanceQueryWithIncidents.bpmn"})
   public void testHistoricProcessInstanceQueryWithIncidentMessageLikeNull() {
-    startHistoricProcessInstanceQueryWithIncidentsProcess();
-
     try {
       historyService.createHistoricProcessInstanceQuery().incidentMessageLike(null).count();
       fail("incidentMessageLike with null value is not allowed");
