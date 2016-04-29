@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.spring.test.configuration;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.spring.SpringProcessEngineServicesConfiguration;
 import org.camunda.bpm.engine.spring.impl.test.SpringProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +25,14 @@ import org.springframework.test.context.ContextConfiguration;
 /**
  * @author Philipp Ossler
  */
-@ContextConfiguration(classes = InMemProcessEngineConfiguration.class)
+@ContextConfiguration(classes = { InMemProcessEngineConfiguration.class, SpringProcessEngineServicesConfiguration.class })
 public class JavaBasedProcessEngineConfigTest extends SpringProcessEngineTestCase {
 
   @Autowired
   private Counter couter;
+
+  @Autowired
+  protected RuntimeService runtimeService;
 
   @Deployment
   public void testDelegateExpression() {
