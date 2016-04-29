@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.camunda.bpm.engine.authorization.Permissions.TASK_WORK;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import java.util.Arrays;
@@ -24,41 +25,8 @@ public class DefaultAuthorizationTest extends AuthorizationTest {
   protected String groupId2 = "accounting2";
   protected Group group2;
   
-  @Override
-  public void setUp() {
-    processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("camunda.cfg.xml");
-    user = createUser(userId);
-    user2 = createUser(userId2);
-    
-    group = createGroup(groupId);
-    group2 = createGroup(groupId2);
-    
-    processEngine.getIdentityService().createMembership(userId, groupId);
-    processEngine.getIdentityService().createMembership(userId2, groupId2);
-    
-    processEngine.getIdentityService().setAuthentication(userId, Arrays.asList(groupId));
-    processEngineConfiguration.setAuthorizationEnabled(true);
-  }
-  
-  @Override
-  public void tearDown() {
-    processEngineConfiguration.setAuthorizationEnabled(false);
-    if (processEngine != null) {
-      for (User user : processEngine.getIdentityService().createUserQuery().list()) {
-        processEngine.getIdentityService().deleteUser(user.getId());
-      }
-      for (Group group : processEngine.getIdentityService().createGroupQuery().list()) {
-        processEngine.getIdentityService().deleteGroup(group.getId());
-      }
-      for (Authorization authorization : processEngine.getAuthorizationService().createAuthorizationQuery().list()) {
-        processEngine.getAuthorizationService().deleteAuthorization(authorization.getId());
-      }
-      processEngine.close();
-    }
-  }
-  
   // defaultTaskPermissionForUser configuration test cases 
-  public void testShouldCheckUpdatePermissionForTaskAssignee() {
+  public void testShouldCheckDefaultTaskPermissionasUpdateForUser() {
     
     processEngineConfiguration.setDefaultTaskPermissionForUser(UPDATE.getName());
     processEngine = processEngineConfiguration.buildProcessEngine();
@@ -75,8 +43,20 @@ public class DefaultAuthorizationTest extends AuthorizationTest {
     // then
     assertEquals(TASK_WORK, processEngineConfiguration.getDefaultUserPermissionForTask());
   }
-  
-  public void testShouldCheckInvalidTaskPermissionForUser() {
+
+ public void testShouldCheckDefaultTaskPermissionForUserWithRandomPermission() {
+    
+    processEngineConfiguration.setDefaultTaskPermissionForUser(READ.getName());
+   
+    try {
+      processEngine = processEngineConfiguration.buildProcessEngine();
+      fail("Error expected: DefaultTaskAssigneePermission should be either TASK_WORK or UPDATE");
+    } catch (Exception ex) {
+      assertTextPresent("defaultTaskPermissionForUser is neither UPDATE nor TASK_WORK", ex.getMessage());
+    }
+  }
+
+  public void testShouldCheckDefaultTaskPermissionForUserWithInvalidPermission() {
     processEngineConfiguration.setDefaultTaskPermissionForUser("invalidPermission");
     
     try {
@@ -87,7 +67,7 @@ public class DefaultAuthorizationTest extends AuthorizationTest {
     }
   }
   
-  public void testShouldCheckNullTaskPermissionForUser() {
+  public void testShouldCheckDefaultTaskPermissionForUserWithNullPermission() {
     
     processEngineConfiguration.setDefaultTaskPermissionForUser(null);
     

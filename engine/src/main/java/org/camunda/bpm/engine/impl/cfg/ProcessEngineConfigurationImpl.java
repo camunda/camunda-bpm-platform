@@ -3310,7 +3310,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     Permission localDefaultPermissionForTaskUser = taskUserPermissionInputToPermission();
     if(localDefaultPermissionForTaskUser != Permissions.UPDATE && localDefaultPermissionForTaskUser !=  Permissions.TASK_WORK) {
-      throw new ProcessEngineException("defaultTaskAssigneePermission is neither UPDATE nor TASK_WORK");
+      throw new ProcessEngineException("defaultTaskPermissionForUser is neither UPDATE nor TASK_WORK");
     }
 
     setDefaultUserPermissionForTask(localDefaultPermissionForTaskUser); 
