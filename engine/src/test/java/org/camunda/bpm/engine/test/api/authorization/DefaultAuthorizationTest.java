@@ -1,15 +1,12 @@
 package org.camunda.bpm.engine.test.api.authorization;
 
-import static org.camunda.bpm.engine.authorization.Permissions.TASK_WORK;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.TASK_WORK;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import java.util.Arrays;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import junit.framework.AssertionFailedError;
 
 /**
