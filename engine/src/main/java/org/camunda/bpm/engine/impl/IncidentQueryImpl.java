@@ -40,6 +40,7 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
   protected String rootCauseIncidentId;
   protected String configuration;
   protected String[] tenantIds;
+  protected String[] jobDefinitionIds;
 
   public IncidentQueryImpl() {
   }
@@ -101,6 +102,12 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
   public IncidentQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    return this;
+  }
+
+  public IncidentQuery jobDefinitionIdIn(String... jobDefinitionIds) {
+    ensureNotNull("jobDefinitionIds", (Object[]) jobDefinitionIds);
+    this.jobDefinitionIds = jobDefinitionIds;
     return this;
   }
 

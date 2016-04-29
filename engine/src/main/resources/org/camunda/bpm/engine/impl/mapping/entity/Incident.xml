@@ -26,6 +26,7 @@
       ROOT_CAUSE_INCIDENT_ID_, 
       CONFIGURATION_, 
       TENANT_ID_,
+      JOB_DEF_ID_,
       REV_)
     values (
       #{id ,jdbcType=VARCHAR},
@@ -40,6 +41,7 @@
       #{rootCauseIncidentId ,jdbcType=VARCHAR},
       #{configuration, jdbcType=VARCHAR},
       #{tenantId, jdbcType=VARCHAR},
+      #{jobDefinitionId, jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -59,6 +61,7 @@
     <result property="rootCauseIncidentId" column="ROOT_CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
     <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
   </resultMap>
   
@@ -145,6 +148,13 @@
         <foreach item="tenantId" index="index" collection="tenantIds"
                  open="(" separator="," close=")">
           #{tenantId}
+        </foreach>
+      </if>
+      <if test="jobDefinitionIds != null &amp;&amp; jobDefinitionIds.length > 0">
+        and RES.JOB_DEF_ID_ in
+        <foreach item="jobDefinitionId" index="index" collection="jobDefinitionIds"
+                 open="(" separator="," close=")">
+          #{jobDefinitionId}
         </foreach>
       </if>
 

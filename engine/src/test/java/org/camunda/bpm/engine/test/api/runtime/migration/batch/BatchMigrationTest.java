@@ -438,6 +438,58 @@ public class BatchMigrationTest {
   }
 
   @Test
+  public void testBatchWithFailedSeedJobDeletionWithCascade() {
+    Batch batch = helper.migrateProcessInstancesAsync(2);
+
+    // create incident
+    Job seedJob = helper.getSeedJob(batch);
+    managementService.setJobRetries(seedJob.getId(), 0);
+
+    // when
+    managementService.deleteBatch(batch.getId(), true);
+
+    // then the no historic incidents exists
+    long historicIncidents = historyService.createHistoricIncidentQuery().count();
+    assertEquals(0, historicIncidents);
+  }
+
+  @Test
+  public void testBatchWithFailedMigrationJobDeletionWithCascade() {
+    Batch batch = helper.migrateProcessInstancesAsync(2);
+    helper.executeSeedJob(batch);
+
+    // create incidents
+    List<Job> migrationJobs = helper.getMigrationJobs(batch);
+    for (Job migrationJob : migrationJobs) {
+      managementService.setJobRetries(migrationJob.getId(), 0);
+    }
+
+    // when
+    managementService.deleteBatch(batch.getId(), true);
+
+    // then the no historic incidents exists
+    long historicIncidents = historyService.createHistoricIncidentQuery().count();
+    assertEquals(0, historicIncidents);
+  }
+
+  @Test
+  public void testBatchWithFailedMonitorJobDeletionWithCascade() {
+    Batch batch = helper.migrateProcessInstancesAsync(2);
+    helper.executeSeedJob(batch);
+
+    // create incident
+    Job monitorJob = helper.getMonitorJob(batch);
+    managementService.setJobRetries(monitorJob.getId(), 0);
+
+    // when
+    managementService.deleteBatch(batch.getId(), true);
+
+    // then the no historic incidents exists
+    long historicIncidents = historyService.createHistoricIncidentQuery().count();
+    assertEquals(0, historicIncidents);
+  }
+
+  @Test
   public void testBatchExecutionFailureWithMissingProcessInstance() {
     Batch batch = helper.migrateProcessInstancesAsync(2);
     helper.executeSeedJob(batch);

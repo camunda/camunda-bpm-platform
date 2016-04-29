@@ -61,6 +61,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNotNull(job);
 
     assertEquals(job.getId(), incident.getConfiguration());
+    assertEquals(job.getJobDefinitionId(), incident.getJobDefinitionId());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn"})
@@ -146,6 +147,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(incident.getId(), incident.getCauseIncidentId());
     assertEquals(incident.getId(), incident.getRootCauseIncidentId());
     assertEquals(job.getId(), incident.getConfiguration());
+    assertEquals(job.getJobDefinitionId(), incident.getJobDefinitionId());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateRecursiveIncidents.bpmn",
@@ -182,6 +184,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(causeIncident.getId(), causeIncident.getCauseIncidentId());
     assertEquals(causeIncident.getId(), causeIncident.getRootCauseIncidentId());
     assertEquals(job.getId(), causeIncident.getConfiguration());
+    assertEquals(job.getJobDefinitionId(), causeIncident.getJobDefinitionId());
 
     // Recursive created incident
     Incident recursiveCreatedIncident = runtimeService.createIncidentQuery().processDefinitionId(callProcess.getProcessDefinitionId()).singleResult();
@@ -200,6 +203,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(causeIncident.getId(), recursiveCreatedIncident.getCauseIncidentId());
     assertEquals(causeIncident.getId(), recursiveCreatedIncident.getRootCauseIncidentId());
     assertNull(recursiveCreatedIncident.getConfiguration());
+    assertNull(recursiveCreatedIncident.getJobDefinitionId());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateRecursiveIncidentsForNestedCallActivity.bpmn",
@@ -234,6 +238,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(rootCauseIncident.getId(), rootCauseIncident.getCauseIncidentId());
     assertEquals(rootCauseIncident.getId(), rootCauseIncident.getRootCauseIncidentId());
     assertEquals(job.getId(), rootCauseIncident.getConfiguration());
+    assertEquals(job.getJobDefinitionId(), rootCauseIncident.getJobDefinitionId());
 
     // Cause Incident
     ProcessInstance callFailingProcess = runtimeService.createProcessInstanceQuery().processDefinitionKey("callFailingProcess").singleResult();
@@ -255,6 +260,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(rootCauseIncident.getId(), causeIncident.getCauseIncidentId());
     assertEquals(rootCauseIncident.getId(), causeIncident.getRootCauseIncidentId());
     assertNull(causeIncident.getConfiguration());
+    assertNull(causeIncident.getJobDefinitionId());
 
     // Top level incident of the startet process (recursive created incident for super super process instance)
     Incident topLevelIncident = runtimeService.createIncidentQuery().processDefinitionId(processInstance.getProcessDefinitionId()).singleResult();
@@ -273,6 +279,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(causeIncident.getId(), topLevelIncident.getCauseIncidentId());
     assertEquals(rootCauseIncident.getId(), topLevelIncident.getRootCauseIncidentId());
     assertNull(topLevelIncident.getConfiguration());
+    assertNull(topLevelIncident.getJobDefinitionId());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn"})

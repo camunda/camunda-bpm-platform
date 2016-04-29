@@ -208,6 +208,7 @@ create table ACT_HI_INCIDENT (
   CONFIGURATION_ varchar(255),
   INCIDENT_STATE_ integer,
   TENANT_ID_ varchar(64),
+  JOB_DEF_ID_ varchar(64),
   primary key (ID_)
 );
 

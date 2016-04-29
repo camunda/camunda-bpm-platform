@@ -77,6 +77,7 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
   protected Boolean resolved;
   protected Boolean deleted;
   protected List<String> tenantIds;
+  protected List<String> jobDefinitionIds;
 
   public HistoricIncidentQueryDto() {}
 
@@ -154,6 +155,11 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "jobDefinitionIdIn", converter = StringListConverter.class)
+  public void setJobDefinitionIdIn(List<String> jobDefinitionIds) {
+    this.jobDefinitionIds = jobDefinitionIds;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -207,6 +213,9 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (jobDefinitionIds != null && !jobDefinitionIds.isEmpty()) {
+      query.jobDefinitionIdIn(jobDefinitionIds.toArray(new String[jobDefinitionIds.size()]));
     }
   }
 

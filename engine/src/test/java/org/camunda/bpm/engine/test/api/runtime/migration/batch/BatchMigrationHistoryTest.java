@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
@@ -33,6 +34,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
@@ -41,6 +43,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class BatchMigrationHistoryTest {
 
   protected static final Date START_DATE = new Date(1457326800000L);
@@ -335,6 +338,61 @@ public class BatchMigrationHistoryTest {
     assertTrue(helper.getHistoricSeedJobLog(batch).isEmpty());
     assertTrue(helper.getHistoricMonitorJobLog(batch).isEmpty());
     assertTrue(helper.getHistoricBatchJobLog(batch).isEmpty());
+  }
+
+  @Test
+  public void testHistoricSeedJobIncidentDeletion() {
+    // given
+    Batch batch = helper.migrateProcessInstancesAsync(1);
+
+    Job seedJob = helper.getSeedJob(batch);
+    managementService.setJobRetries(seedJob.getId(), 0);
+
+    managementService.deleteBatch(batch.getId(), false);
+
+    // when
+    historyService.deleteHistoricBatch(batch.getId());
+
+    // then the historic incident was deleted
+    long historicIncidents = historyService.createHistoricIncidentQuery().count();
+    assertEquals(0, historicIncidents);
+  }
+
+  @Test
+  public void testHistoricMonitorJobIncidentDeletion() {
+    // given
+    Batch batch = helper.migrateProcessInstancesAsync(1);
+
+    helper.executeSeedJob(batch);
+    Job monitorJob = helper.getMonitorJob(batch);
+    managementService.setJobRetries(monitorJob.getId(), 0);
+
+    managementService.deleteBatch(batch.getId(), false);
+
+    // when
+    historyService.deleteHistoricBatch(batch.getId());
+
+    // then the historic incident was deleted
+    long historicIncidents = historyService.createHistoricIncidentQuery().count();
+    assertEquals(0, historicIncidents);
+  }
+
+  @Test
+  public void testHistoricBatchJobLogIncidentDeletion() {
+    // given
+    Batch batch = helper.migrateProcessInstancesAsync(3);
+
+    helper.executeSeedJob(batch);
+    helper.failMigrationJobs(batch, 3);
+
+    managementService.deleteBatch(batch.getId(), false);
+
+    // when
+    historyService.deleteHistoricBatch(batch.getId());
+
+    // then the historic incident was deleted
+    long historicIncidents = historyService.createHistoricIncidentQuery().count();
+    assertEquals(0, historicIncidents);
   }
 
   protected void assertCommonMonitorJobLogProperties(Batch batch, HistoricJobLog jobLog) {

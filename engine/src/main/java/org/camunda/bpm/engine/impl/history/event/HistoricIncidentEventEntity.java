@@ -34,6 +34,7 @@ public class HistoricIncidentEventEntity extends HistoryEvent {
   protected String incidentMessage;
   protected int incidentState;
   protected String tenantId;
+  protected String jobDefinitionId;
 
   public Date getCreateTime() {
     return createTime;
@@ -109,6 +110,14 @@ public class HistoricIncidentEventEntity extends HistoryEvent {
 
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
+  }
+
+  public String getJobDefinitionId() {
+    return jobDefinitionId;
+  }
+
+  public void setJobDefinitionId(String jobDefinitionId) {
+    this.jobDefinitionId = jobDefinitionId;
   }
 
   public boolean isOpen() {

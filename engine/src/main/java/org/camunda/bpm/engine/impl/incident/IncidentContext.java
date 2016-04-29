@@ -25,6 +25,7 @@ public class IncidentContext {
   protected String executionId;
   protected String configuration;
   protected String tenantId;
+  protected String jobDefinitionId;
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
@@ -64,6 +65,14 @@ public class IncidentContext {
 
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
+  }
+
+  public String getJobDefinitionId() {
+    return jobDefinitionId;
+  }
+
+  public void setJobDefinitionId(String jobDefinitionId) {
+    this.jobDefinitionId = jobDefinitionId;
   }
 
 }

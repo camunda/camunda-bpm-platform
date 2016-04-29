@@ -127,4 +127,10 @@ public interface HistoricIncident {
    */
   public String getTenantId();
 
+  /**
+   * Returns the id of the job definition the incident belongs to. Can be <code>null</code>
+   * if the incident belongs to no job definition.
+   */
+  String getJobDefinitionId();
+
 }

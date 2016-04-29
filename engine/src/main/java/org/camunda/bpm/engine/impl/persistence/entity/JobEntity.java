@@ -348,6 +348,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     incidentContext.setExecutionId(executionId);
     incidentContext.setTenantId(tenantId);
     incidentContext.setConfiguration(id);
+    incidentContext.setJobDefinitionId(jobDefinitionId);
 
     return incidentContext;
   }

@@ -22,7 +22,8 @@
         ROOT_CAUSE_INCIDENT_ID_,
         CONFIGURATION_,
         INCIDENT_STATE_,
-        TENANT_ID_
+        TENANT_ID_,
+        JOB_DEF_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{processDefinitionKey, jdbcType=VARCHAR},
@@ -38,7 +39,8 @@
         #{rootCauseIncidentId ,jdbcType=VARCHAR},
         #{configuration, jdbcType=VARCHAR},
         #{incidentState, jdbcType=INTEGER},
-        #{tenantId, jdbcType=VARCHAR}
+        #{tenantId, jdbcType=VARCHAR},
+        #{jobDefinitionId, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -68,6 +70,10 @@
     delete from ${prefix}ACT_HI_INCIDENT where PROC_DEF_ID_ = #{processDefinitionId} and PROC_INST_ID_ is null
   </delete>
 
+  <delete id="deleteHistoricIncidentsByJobDefinitionId">
+    delete from ${prefix}ACT_HI_INCIDENT where JOB_DEF_ID_ = #{jobDefinitionId}
+  </delete>
+
   <!-- HISTORIC INCIDENT RESULTMAP -->
 
   <resultMap id="historicIncidentResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity">
@@ -86,6 +92,7 @@
     <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
     <result property="incidentState" column="INCIDENT_STATE_" jdbcType="INTEGER" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- HISTORIC INCIDENT SELECT -->
@@ -159,6 +166,13 @@
         <foreach item="tenantId" index="index" collection="tenantIds"
                  open="(" separator="," close=")">
           #{tenantId}
+        </foreach>
+      </if>
+      <if test="jobDefinitionIds != null &amp;&amp; jobDefinitionIds.length > 0">
+        and RES.JOB_DEF_ID_ in
+        <foreach item="jobDefinitionId" index="index" collection="jobDefinitionIds"
+                 open="(" separator="," close=")">
+          #{jobDefinitionId}
         </foreach>
       </if>
 

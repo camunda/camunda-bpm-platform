@@ -3,6 +3,9 @@ package org.camunda.bpm.engine.rest.history;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_JOB_ACTIVITY_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_JOB_DEFINITION_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_JOB_DEFINITION_ID;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -337,6 +340,7 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     Boolean returnedIncidentDeleted = from(content).getBoolean("[0].deleted");
     Boolean returnedIncidentResolved = from(content).getBoolean("[0].resolved");
     String returnedTenantId = from(content).getString("[0].tenantId");
+    String returnedJobDefinitionId = from(content).getString("[0].jobDefinitionId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_PROC_INST_ID, returnedProcessInstanceId);
@@ -355,6 +359,7 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_STATE_DELETED, returnedIncidentDeleted);
     Assert.assertEquals(MockProvider.EXAMPLE_HIST_INCIDENT_STATE_RESOLVED, returnedIncidentResolved);
     Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
+    Assert.assertEquals(EXAMPLE_JOB_DEFINITION_ID, returnedJobDefinitionId);
   }
 
   @Test
@@ -532,6 +537,21 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
 
     assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void testQueryByJobDefinitionIds() {
+    String jobDefinitionIds = EXAMPLE_JOB_DEFINITION_ID + "," + NON_EXISTING_JOB_DEFINITION_ID;
+
+    Response response = given()
+        .queryParam("jobDefinitionIdIn", jobDefinitionIds)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORY_INCIDENT_QUERY_URL);
+
+    verify(mockedQuery).jobDefinitionIdIn(EXAMPLE_JOB_DEFINITION_ID, NON_EXISTING_JOB_DEFINITION_ID);
+    verify(mockedQuery).list();
   }
 
 }

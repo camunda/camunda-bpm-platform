@@ -433,7 +433,6 @@
                 <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceAuthorizationTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceTest.java</exclude>
-                <exclude>**/BatchMigrationHistoryTest.java</exclude>
                 <exclude>**/MigrationHistoryVariablesTest.java</exclude>
                 <exclude>**/HistoricBatchQueryTest.java</exclude>
                 <exclude>**/HistoricIdentityLink*Test*.java</exclude>
@@ -479,7 +478,6 @@
                 <exclude>**/CompensateEventHistoryTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceAuthorizationTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceTest.java</exclude>
-                <exclude>**/BatchMigrationHistoryTest.java</exclude>
                 <exclude>**/MigrationHistoryVariablesTest.java</exclude>
                 <exclude>**/HistoricBatchQueryTest.java</exclude>
                 <exclude>**/HistoricIdentityLink*Test*.java</exclude>
@@ -524,7 +522,6 @@
                 <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompensateEventHistoryTest.java</exclude>
-                <exclude>**/BatchMigrationHistoryTest.java</exclude>
                 <exclude>**/MigrationHistoryVariablesTest.java</exclude>
                 <exclude>**/HistoricBatchQueryTest.java</exclude>
                 <exclude>**/HistoricIdentityLink*Test*.java</exclude>

@@ -35,6 +35,7 @@ public class IncidentDto {
   protected String configuration;
   protected String incidentMessage;
   protected String tenantId;
+  protected String jobDefinitionId;
 
   public String getId() {
     return id;
@@ -84,6 +85,10 @@ public class IncidentDto {
     return tenantId;
   }
 
+  public String getJobDefinitionId() {
+    return jobDefinitionId;
+  }
+
   public static IncidentDto fromIncident(Incident incident) {
     IncidentDto dto = new IncidentDto();
 
@@ -99,6 +104,7 @@ public class IncidentDto {
     dto.configuration = incident.getConfiguration();
     dto.incidentMessage = incident.getIncidentMessage();
     dto.tenantId = incident.getTenantId();
+    dto.jobDefinitionId = incident.getJobDefinitionId();
 
     return dto;
   }

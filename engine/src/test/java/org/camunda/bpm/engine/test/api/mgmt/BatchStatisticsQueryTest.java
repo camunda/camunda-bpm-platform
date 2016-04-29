@@ -73,19 +73,6 @@ public class BatchStatisticsQueryTest {
     for (HistoricBatch historicBatch : historyService.createHistoricBatchQuery().list()) {
       historyService.deleteHistoricBatch(historicBatch.getId());
     }
-
-    // delete historic incidents (workaround for CAM-5848)
-    ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
-    configuration.getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        HistoricIncidentManager historicIncidentManager = commandContext.getHistoricIncidentManager();
-        for (HistoricIncident historicIncident : historyService.createHistoricIncidentQuery().list()) {
-          historicIncidentManager
-            .delete((HistoricIncidentEntity) historicIncident);
-        }
-        return null;
-      }
-    });
   }
 
   @Test

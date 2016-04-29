@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
@@ -314,6 +315,11 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
     fireHistoricEndEvent();
 
     if (cascadeToHistory) {
+      HistoricIncidentManager historicIncidentManager = commandContext.getHistoricIncidentManager();
+      historicIncidentManager.deleteHistoricIncidentsByJobDefinitionId(seedJobDefinitionId);
+      historicIncidentManager.deleteHistoricIncidentsByJobDefinitionId(monitorJobDefinitionId);
+      historicIncidentManager.deleteHistoricIncidentsByJobDefinitionId(batchJobDefinitionId);
+
       HistoricJobLogManager historicJobLogManager = commandContext.getHistoricJobLogManager();
       historicJobLogManager.deleteHistoricJobLogsByJobDefinitionId(seedJobDefinitionId);
       historicJobLogManager.deleteHistoricJobLogsByJobDefinitionId(monitorJobDefinitionId);

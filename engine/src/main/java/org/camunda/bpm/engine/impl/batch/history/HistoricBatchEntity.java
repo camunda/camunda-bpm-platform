@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogManager;
 
 public class HistoricBatchEntity extends HistoryEvent implements HistoricBatch, DbEntity {
@@ -132,6 +133,11 @@ public class HistoricBatchEntity extends HistoryEvent implements HistoricBatch, 
   }
 
   public void delete() {
+    HistoricIncidentManager historicIncidentManager = Context.getCommandContext().getHistoricIncidentManager();
+    historicIncidentManager.deleteHistoricIncidentsByJobDefinitionId(seedJobDefinitionId);
+    historicIncidentManager.deleteHistoricIncidentsByJobDefinitionId(monitorJobDefinitionId);
+    historicIncidentManager.deleteHistoricIncidentsByJobDefinitionId(batchJobDefinitionId);
+
     HistoricJobLogManager historicJobLogManager = Context.getCommandContext().getHistoricJobLogManager();
     historicJobLogManager.deleteHistoricJobLogsByJobDefinitionId(seedJobDefinitionId);
     historicJobLogManager.deleteHistoricJobLogsByJobDefinitionId(monitorJobDefinitionId);

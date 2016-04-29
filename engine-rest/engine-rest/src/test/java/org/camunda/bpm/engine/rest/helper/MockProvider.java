@@ -2127,6 +2127,7 @@ public abstract class MockProvider {
     when(incident.getConfiguration()).thenReturn(EXAMPLE_INCIDENT_CONFIGURATION);
     when(incident.getIncidentMessage()).thenReturn(EXAMPLE_INCIDENT_MESSAGE);
     when(incident.getTenantId()).thenReturn(tenantId);
+    when(incident.getJobDefinitionId()).thenReturn(EXAMPLE_JOB_DEFINITION_ID);
 
     return incident;
   }
@@ -2162,6 +2163,7 @@ public abstract class MockProvider {
     when(incident.isDeleted()).thenReturn(EXAMPLE_HIST_INCIDENT_STATE_DELETED);
     when(incident.isResolved()).thenReturn(EXAMPLE_HIST_INCIDENT_STATE_RESOLVED);
     when(incident.getTenantId()).thenReturn(tenantId);
+    when(incident.getJobDefinitionId()).thenReturn(EXAMPLE_JOB_DEFINITION_ID);
 
     return incident;
   }

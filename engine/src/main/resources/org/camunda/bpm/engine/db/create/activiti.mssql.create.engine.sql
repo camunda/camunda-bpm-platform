@@ -205,6 +205,7 @@ create table ACT_RU_INCIDENT (
   ROOT_CAUSE_INCIDENT_ID_ nvarchar(64),
   CONFIGURATION_ nvarchar(255),
   TENANT_ID_ nvarchar(64),
+  JOB_DEF_ID_ nvarchar(64),
   primary key (ID_)
 );
 

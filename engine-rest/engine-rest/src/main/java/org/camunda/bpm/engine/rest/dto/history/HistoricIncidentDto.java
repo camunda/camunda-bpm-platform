@@ -36,6 +36,7 @@ public class HistoricIncidentDto {
   protected String configuration;
   protected String incidentMessage;
   protected String tenantId;
+  protected String jobDefinitionId;
   protected Boolean open;
   protected Boolean deleted;
   protected Boolean resolved;
@@ -96,6 +97,10 @@ public class HistoricIncidentDto {
     return tenantId;
   }
 
+  public String getJobDefinitionId() {
+    return jobDefinitionId;
+  }
+
   public Boolean isOpen() {
     return open;
   }
@@ -128,6 +133,7 @@ public class HistoricIncidentDto {
     dto.deleted = historicIncident.isDeleted();
     dto.resolved = historicIncident.isResolved();
     dto.tenantId = historicIncident.getTenantId();
+    dto.jobDefinitionId = historicIncident.getJobDefinitionId();
 
     return dto;
   }

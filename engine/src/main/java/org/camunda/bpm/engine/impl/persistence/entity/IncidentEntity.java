@@ -54,6 +54,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
   protected String configuration;
   protected String incidentMessage;
   protected String tenantId;
+  protected String jobDefinitionId;
 
   public List<IncidentEntity> createRecursiveIncidents() {
     List<IncidentEntity> createdIncidents = new ArrayList<IncidentEntity>();
@@ -109,8 +110,9 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     newIncident.setActivityId(context.getActivityId());
     newIncident.setProcessDefinitionId(context.getProcessDefinitionId());
     newIncident.setTenantId(context.getTenantId());
+    newIncident.setJobDefinitionId(context.getJobDefinitionId());
 
-    if(context.getExecutionId() != null) {
+    if (context.getExecutionId() != null) {
       // fetch execution
       ExecutionEntity execution = Context
         .getCommandContext()
@@ -358,6 +360,15 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     this.tenantId = tenantId;
   }
 
+
+  public void setJobDefinitionId(String jobDefinitionId) {
+    this.jobDefinitionId = jobDefinitionId;
+  }
+
+  public String getJobDefinitionId() {
+    return jobDefinitionId;
+  }
+
   public void setExecution(ExecutionEntity execution) {
     if (execution != null) {
       executionId = execution.getId();
@@ -420,6 +431,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
            + ", configuration=" + configuration
            + ", tenantId=" + tenantId
            + ", incidentMessage=" + incidentMessage
+           + ", jobDefinitionId=" + jobDefinitionId
            + "]";
   }
 
@@ -447,7 +459,5 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
       return false;
     return true;
   }
-
-
 
 }

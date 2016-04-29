@@ -3,6 +3,10 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_JOB_ACTIVITY_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_JOB_DEFINITION_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TENANT_ID_LIST;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_JOB_DEFINITION_ID;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -323,6 +327,7 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
     String returnedConfiguration = from(content).getString("[0].configuration");
     String returnedIncidentMessage = from(content).getString("[0].incidentMessage");
     String returnedTenantId = from(content).getString("[0].tenantId");
+    String returnedJobDefinitionId = from(content).getString("[0].jobDefinitionId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_PROC_INST_ID, returnedProcessInstanceId);
@@ -465,7 +470,7 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
         MockProvider.createMockIncident(MockProvider.ANOTHER_EXAMPLE_TENANT_ID)));
 
     Response response = given()
-      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+      .queryParam("tenantIdIn", EXAMPLE_TENANT_ID_LIST)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when()
@@ -483,6 +488,21 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
 
     assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void testQueryByJobDefinitionIds() {
+    String jobDefinitionIds = EXAMPLE_JOB_DEFINITION_ID + "," + NON_EXISTING_JOB_DEFINITION_ID;
+
+    given()
+        .queryParam("jobDefinitionIdIn", jobDefinitionIds)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(INCIDENT_QUERY_URL);
+
+    verify(mockedQuery).jobDefinitionIdIn(EXAMPLE_JOB_DEFINITION_ID, NON_EXISTING_JOB_DEFINITION_ID);
+    verify(mockedQuery).list();
   }
 
 }
