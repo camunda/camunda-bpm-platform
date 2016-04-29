@@ -90,7 +90,7 @@ public class MigrationPlanCreationTest {
         .build();
       fail("Should not succeed");
     } catch (BadUserRequestException e) {
-      assertExceptionMessage(e, "source process definition with id aNonExistingProcDefId does not exist");
+      assertExceptionMessage(e, "Source process definition with id 'aNonExistingProcDefId' does not exist");
     }
   }
 
@@ -119,7 +119,7 @@ public class MigrationPlanCreationTest {
         .build();
       fail("Should not succeed");
     } catch (BadUserRequestException e) {
-      assertExceptionMessage(e, "target process definition with id aNonExistingProcDefId does not exist");
+      assertExceptionMessage(e, "Target process definition with id 'aNonExistingProcDefId' does not exist");
     }
   }
 

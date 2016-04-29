@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -54,30 +55,12 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
 
   @Override
   public MigrationPlan execute(CommandContext commandContext) {
-    String sourceProcessDefinitionId = migrationBuilder.getSourceProcessDefinitionId();
-    String targetProcessDefinitionId = migrationBuilder.getTargetProcessDefinitionId();
-    MigrationPlanImpl migrationPlan = new MigrationPlanImpl(sourceProcessDefinitionId, targetProcessDefinitionId);
-
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "sourceProcessDefinitionId", sourceProcessDefinitionId);
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "targetProcessDefinitionId", targetProcessDefinitionId);
-
-    ProcessDefinitionEntity sourceProcessDefinition = commandContext.getProcessEngineConfiguration()
-        .getDeploymentCache().findProcessDefinitionFromCache(sourceProcessDefinitionId);
-    ProcessDefinitionEntity targetProcessDefinition = commandContext.getProcessEngineConfiguration()
-        .getDeploymentCache().findProcessDefinitionFromCache(targetProcessDefinitionId);
-
-    EnsureUtil.ensureNotNull(BadUserRequestException.class,
-      "source process definition with id " + sourceProcessDefinitionId + " does not exist",
-      "sourceProcessDefinition",
-      sourceProcessDefinition);
-
-    EnsureUtil.ensureNotNull(BadUserRequestException.class,
-      "target process definition with id " + targetProcessDefinitionId + " does not exist",
-      "targetProcessDefinition",
-      targetProcessDefinition);
+    ProcessDefinitionEntity sourceProcessDefinition = getSourceProcessDefinition(commandContext);
+    ProcessDefinitionEntity targetProcessDefinition = getTargetProcessDefinition(commandContext);
 
     checkAuthorization(commandContext, sourceProcessDefinition, targetProcessDefinition);
 
+    MigrationPlanImpl migrationPlan = new MigrationPlanImpl(sourceProcessDefinition.getId(), targetProcessDefinition.getId());
     List<MigrationInstruction> instructions = new ArrayList<MigrationInstruction>();
 
     if (migrationBuilder.isMapEqualActivities()) {
@@ -90,6 +73,32 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
     validateMigrationPlan(commandContext, migrationPlan, sourceProcessDefinition, targetProcessDefinition);
 
     return migrationPlan;
+  }
+
+  protected ProcessDefinitionEntity getSourceProcessDefinition(CommandContext commandContext) {
+    String sourceProcessDefinitionId = migrationBuilder.getSourceProcessDefinitionId();
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "sourceProcessDefinitionId", sourceProcessDefinitionId);
+
+    try {
+      return commandContext.getProcessEngineConfiguration()
+        .getDeploymentCache().findDeployedProcessDefinitionById(sourceProcessDefinitionId);
+    }
+    catch (NullValueException e) {
+      throw LOG.sourceProcessDefinitionDoesNotExist(sourceProcessDefinitionId);
+    }
+  }
+
+  protected ProcessDefinitionEntity getTargetProcessDefinition(CommandContext commandContext) {
+    String targetProcessDefinitionId = migrationBuilder.getTargetProcessDefinitionId();
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "targetProcessDefinitionId", targetProcessDefinitionId);
+
+    try {
+      return commandContext.getProcessEngineConfiguration()
+        .getDeploymentCache().findDeployedProcessDefinitionById(targetProcessDefinitionId);
+    }
+    catch (NullValueException e) {
+      throw LOG.targetProcessDefinitionDoesNotExist(targetProcessDefinitionId);
+    }
   }
 
   protected void checkAuthorization(CommandContext commandContext, ProcessDefinitionEntity sourceProcessDefinition, ProcessDefinitionEntity targetProcessDefinition) {

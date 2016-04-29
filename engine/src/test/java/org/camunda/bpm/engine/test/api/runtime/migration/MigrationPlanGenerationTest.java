@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.api.runtime.migration;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.migrate;
+import static org.junit.Assert.assertNotNull;
 
 import org.camunda.bpm.engine.migration.MigrationInstructionsBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -855,6 +856,23 @@ public class MigrationPlanGenerationTest {
         migrate("messageCatch").to("messageCatch").updateEventTrigger(true)
       );
   }
+
+  @Test
+  public void testMigrationPlanCreationWithEmptyDeploymentCache() {
+    // given
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    rule.getProcessEngineConfiguration().getDeploymentCache().discardProcessDefinitionCache();
+
+    // when
+    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    // then
+    assertNotNull(migrationPlan);
+  }
+
 
   // helper
 
