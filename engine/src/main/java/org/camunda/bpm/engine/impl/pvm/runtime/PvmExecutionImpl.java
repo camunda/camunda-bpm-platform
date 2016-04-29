@@ -324,8 +324,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   @Override
   public void endCompensation() {
-    remove();
     performOperation(PvmAtomicOperation.FIRE_ACTIVITY_END);
+    remove();
 
     PvmExecutionImpl parent = getParent();
 
