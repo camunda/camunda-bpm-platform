@@ -70,6 +70,10 @@
           <a href="#/groups">Groups</a>
         </li>
 
+        <li ng-class="activeClass('#/tenant')">
+          <a href="#/tenants">Tenants</a>
+        </li>
+
         <li ng-class="activeClass('#/authorization')"
             show-if-authorized
             auth-permission="ALL"

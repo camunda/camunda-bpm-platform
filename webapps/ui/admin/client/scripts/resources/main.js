@@ -5,7 +5,8 @@ var angular = require('camunda-commons-ui/vendor/angular'),
   groupResource = require('./groupResource'),
   groupMembershipResource = require('./groupMembershipResource'),
   initialUserResource = require('./initialUserResource'),
-  metricsResource = require('./metricsResource');
+  metricsResource = require('./metricsResource'),
+  tenantResource = require('./tenantResource');
 
   var ngModule = angular.module('admin.resources', []);
 
@@ -14,5 +15,6 @@ var angular = require('camunda-commons-ui/vendor/angular'),
   ngModule.factory('GroupMembershipResource', groupMembershipResource);
   ngModule.factory('InitialUserResource', initialUserResource);
   ngModule.factory('MetricsResource', metricsResource);
+  ngModule.factory('TenantResource', tenantResource);
 
   module.exports = ngModule;

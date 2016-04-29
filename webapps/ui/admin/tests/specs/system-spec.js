@@ -16,7 +16,7 @@ describe('Admin system Spec with normal user', function() {
     })
   });
 
-  it('should not show authorization navbar item for normal user', function() {
+  it('should not show system navbar item for normal user', function() {
     // when
     systemPage.authentication.userLogin('ringo', 'cam123');
 

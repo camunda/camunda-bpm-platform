@@ -7,6 +7,7 @@ var navigationSection = element(by.css('[ng-controller="NavigationController"]')
 var index = [
   'Users',
   'Groups',
+  'Tenants',
   'Authorizations',
   'System'
 ];

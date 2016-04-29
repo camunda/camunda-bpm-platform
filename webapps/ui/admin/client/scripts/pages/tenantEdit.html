@@ -1,0 +1,155 @@
+<!-- # CE - camunda-admin-ui/client/scripts/pages/tenantEdit.html -->
+<section ng-cloak>
+  <aside>
+    <ul>
+      <li ng-class="activeClass('tab=tenant')">
+        <a href="#/tenants/{{ tenant.id | escape }}?tab=tenant">Information</a>
+      </li>
+      <li ng-class="activeClass('tab=groups')">
+        <a href="#/tenants/{{ tenant.id | escape }}?tab=groups">Groups</a>
+      </li>
+      <li ng-class="activeClass('tab=users')">
+        <a href="#/tenants/{{ tenant.id | escape }}?tab=users">Users</a>
+      </li>
+    </ul>
+  </aside>
+
+  <div class="section-content">
+    <form ng-show="show('tenant')"
+          class="form-horizontal"
+          name="editTenantForm"
+          cam-widget-loader
+          loading-state="{{ tenantLoadingState }}">
+      <div class="h3">{{ tenant.name }}</div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-4 col-md-2"
+               for="inputName">Tenant Name*</label>
+
+        <div class="col-sm-8 col-md-10">
+          <input id="inputName"
+                 name="tenantName"
+                 class="form-control"
+                 type="text"
+                 ng-model="tenant.name"
+                 novalidate
+                 required
+                 ng-disabled="!availableOperations.update" />
+
+          <p class="text-danger"
+             ng-show="editTenantForm.tenantName.$error.required">
+            Name is required.
+          </p>
+        </div>
+      </div>
+
+      <div class="form-group"
+           ng-show="availableOperations.update">
+        <div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 text-right">
+          <button type="submit"
+                  class="btn btn-primary"
+                  ng-disabled="!canSubmit(editTenantForm, 'tenant')"
+                  ng-click="updateTenant()">Update Tenant</button>
+        </div>
+      </div>
+    </form>
+
+    <form class="form-horizontal"
+          ng-show="show('tenant') && availableOperations.delete">
+      <div class="h4">Delete Tenant</div>
+
+      <div class="alert alert-danger">
+        <strong>Warning:</strong> deleting a tenant cannot be undone.
+      </div>
+
+      <div class="text-right">
+        <button type="submit"
+                class="btn btn-danger"
+                ng-click="deleteTenant()">
+          Delete Tenant
+        </button>
+      </div>
+    </form>
+
+    <div ng-show="show('users')">
+      <div class="h4">Tenant Users</div>
+
+      <div cam-widget-loader
+           loading-state="{{ userLoadingState }}"
+           text-empty="Tenant {{ tenant.name }} does not currently have any users.">
+        <table class="cam-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Username</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="user in tenantUserList">
+              <td><a ng-href="#/users/{{ user.id | escape }}">{{ user.firstName }} {{ user.lastName }}</a></td>
+              <td>{{ user.id }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div><!-- /cam-widget-loader -->
+
+      <pagination ng-if="tenantUserPages.total > tenantUserPages.size"
+                  class="pagination-sm"
+
+                  ng-model="tenantUserPages.current"
+                  ng-change="pageChange(tenantUserPages.current)"
+
+                  total-items="tenantUserPages.total"
+                  items-per-page="tenantUserPages.size"
+                  max-size="7"
+
+                  boundary-links="true"
+
+                  next-text="&rsaquo;"
+                  last-text="&raquo;"
+                  previous-text="&lsaquo;"
+                  first-text="&laquo;"></pagination>
+
+    </div>
+
+    <div ng-show="show('groups')">
+      <div class="h4">Tenant Groups</div>
+
+      <div cam-widget-loader
+           loading-state="{{ groupLoadingState }}"
+           text-empty="Tenant {{ tenant.name }} does not currently have any groups.">
+        <table class="cam-table">
+          <thead>
+          <tr>
+            <th>Name</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="group in tenantGroupList">
+            <td><a ng-href="#/groups/{{ group.id | escape }}">{{ group.name }}</a></td>
+          </tr>
+          </tbody>
+        </table>
+      </div><!-- /cam-widget-loader -->
+
+      <pagination ng-if="tenantGroupPages.total > tenantGroupPages.size"
+                  class="pagination-sm"
+
+                  ng-model="tenantGroupPages.current"
+                  ng-change="pageChange(tenantGroupPages.current)"
+
+                  total-items="tenantGroupPages.total"
+                  items-per-page="tenantGroupPages.size"
+                  max-size="7"
+
+                  boundary-links="true"
+
+                  next-text="&rsaquo;"
+                  last-text="&raquo;"
+                  previous-text="&lsaquo;"
+                  first-text="&laquo;"></pagination>
+
+    </div>
+  </div>
+</section>
+<!-- / CE - camunda-admin-ui/client/scripts/pages/tenantEdit.html -->

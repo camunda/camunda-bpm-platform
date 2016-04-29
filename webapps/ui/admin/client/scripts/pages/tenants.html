@@ -1,0 +1,73 @@
+<!-- # CE - camunda-admin-ui/client/scripts/pages/tenant.html -->
+<section ng-cloak>
+  <!-- <aside></aside> -->
+  <div class="section-content">
+    <header class="row">
+      <div class="col-xs-8">
+        <h3>List of tenants</h3>
+      </div>
+      <div class="col-xs-4 text-right"
+           ng-show="availableOperations.create">
+        <a href="#/tenant-create"
+           class="btn btn-default">
+          Create new tenant
+          <span class="glyphicon glyphicon-plus-sign"></span>
+        </a>
+      </div>
+    </header>
+
+    <div cam-widget-loader
+         loading-state="{{ loadingState }}">
+      <table class="cam-table">
+        <thead>
+          <tr>
+            <th class="id">Tenant Id</th>
+            <th class="name">Tenant Name</th>
+            <th class="action">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="tenant in tenantList">
+            <td class="tenant-id">
+              <a ng-href="#/tenants/{{ tenant.id | escape }}">{{ tenant.id }}</a>
+            </td>
+
+            <td class="tenant-name">
+              {{ tenant.name }}
+            </td>
+
+            <td class="action">
+              <a ng-href="#/tenants/{{ tenant.id | escape }}">Edit</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div ng-show="loadingState === 'EMPTY' && !pages.total && (!tenantList || !tenantList.length)"
+         class="well">
+      <span class="glyphicon glyphicon-info-sign"></span>
+      The current search parameters could not retrieve any tenants. Try to <a ng-click="pageChange(1)">reset page number.</a>
+    </div>
+
+    <pagination ng-if="pages.total > pages.size"
+                class="pagination-sm"
+
+                ng-model="pages.current"
+                ng-change="pageChange(pages.current)"
+
+                total-items="pages.total"
+                items-per-page="pages.size"
+                max-size="7"
+
+                boundary-links="true"
+
+                next-text="&rsaquo;"
+                last-text="&raquo;"
+                previous-text="&lsaquo;"
+                first-text="&laquo;"></pagination>
+
+  </div>
+</section>
+<!-- / CE - camunda-admin-ui/client/scripts/pages/tenant.html -->
