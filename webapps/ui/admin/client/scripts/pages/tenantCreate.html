@@ -1,0 +1,65 @@
+<!-- # CE - camunda-admin-ui/client/scripts/pages/tenantCreate.html -->
+<section>
+  <div class="section-content">
+    <header class="row">
+      <div class="col-xs-8">
+        <h3>Create new tenant</h3>
+      </div>
+    </header>
+
+    <form class="form-horizontal"
+          name="createTenantForm">
+      <div class="col-xs-12">
+        <div class="form-group">
+          <label class="control-label col-sm-4 col-md-2"
+                 for="inputTenantId">Tenant Id*</label>
+
+          <div class="col-sm-8 col-md-10">
+            <input id="inputTenantId"
+                   name="tenantId"
+                   class="form-control"
+                   type="text"
+                   ng-model="tenant.id"
+                   novalidate required />
+            <span class="help-inline"
+                ng-show="createTenantForm.tenantId.$error.required">Tenant id is required.</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4 col-md-2"
+                 for="inputName">Tenant Name*</label>
+
+          <div class="col-sm-8 col-md-10">
+            <input id="inputTenantName"
+                   name="name"
+                   type="text"
+                   class="form-control"
+                   ng-model="tenant.name"
+                   novalidate required />
+            <span class="help-inline"
+                ng-show="createTenantForm.name.$error.required">Name is required.</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 text-right">
+            <a class="btn btn-link"
+               href="#/tenants">
+              Cancel
+            </a>
+
+            <button type="submit"
+                    class="btn btn-primary"
+                    ng-disabled="!createTenantForm.$valid"
+                    ng-click="createTenant()">
+              Create new Tenant
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</section>
+<!-- / CE - camunda-admin-ui/client/scripts/pages/tenantCreate.html -->

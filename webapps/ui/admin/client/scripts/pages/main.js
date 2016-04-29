@@ -17,6 +17,9 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     setup = require('./setup'),
     system = require('./system'),
     systemSettingsGeneral = require('./systemSettingsGeneral'),
+    tenants = require('./tenants'),
+    tenantCreate = require('./tenantCreate'),
+    tenantEdit = require('./tenantEdit'),
     executionMetrics = require('./execution-metrics');
 
   var ngModule = angular.module('cam.admin.pages', ['ngRoute', 'cam.commons']);
@@ -35,6 +38,9 @@ var angular = require('camunda-commons-ui/vendor/angular'),
   ngModule.config(setup);
   ngModule.config(system);
   ngModule.config(systemSettingsGeneral);
+  ngModule.config(tenants);
+  ngModule.config(tenantCreate);
+  ngModule.config(tenantEdit);
   ngModule.config(executionMetrics);
 
   module.exports = ngModule;

@@ -2,24 +2,11 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/groups.html', 'utf8');
+var template = fs.readFileSync(__dirname + '/tenants.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  var Controller = ['$scope', 'page', '$location', 'search', 'GroupResource', function ($scope, pageService, $location, search, GroupResource) {
-
-    $scope.$root.showBreadcrumbs = true;
-
-    pageService.titleSet('Groups');
-
-    pageService.breadcrumbsClear();
-
-    pageService.breadcrumbsAdd([
-      {
-        label: 'Groups',
-        href: '#/groups'
-      }
-    ]);
+  var Controller = ['$scope', '$location', 'search', 'TenantResource', 'page', function ($scope, $location, search, TenantResource, pageService) {
 
     $scope.availableOperations={};
     $scope.loadingState = 'LOADING';
@@ -48,27 +35,37 @@ var angular = require('camunda-commons-ui/vendor/angular');
       };
 
       $scope.loadingState = 'LOADING';
-      GroupResource.query(pagingParams).$promise.then(function(response) {
-        $scope.groupList = response;
+      TenantResource.query(pagingParams).$promise.then(function(response) {
+        $scope.tenantList = response;
         $scope.loadingState = response.length ? 'LOADED' : 'EMPTY';
       });
 
-      GroupResource.count().$promise.then(function(response) {
+      TenantResource.count().$promise.then(function(response) {
         pages.total = response.count;
       });
 
     }
 
-    GroupResource.OPTIONS().$promise.then(function(response) {
+    TenantResource.OPTIONS().$promise.then(function(response) {
       angular.forEach(response.links, function(link){
         $scope.availableOperations[link.rel] = true;
       });
     });
 
+    $scope.$root.showBreadcrumbs = true;
+
+    pageService.titleSet('Tenants');
+
+    pageService.breadcrumbsClear();
+
+    pageService.breadcrumbsAdd({
+      label: 'Tenants',
+      href: '#/tenants/'
+    });
   }];
 
   module.exports = [ '$routeProvider', function($routeProvider) {
-    $routeProvider.when('/groups', {
+    $routeProvider.when('/tenants', {
       template: template,
       controller: Controller,
       authentication: 'required',
