@@ -27,7 +27,7 @@ module.exports = Page.extend({
   },
 
   addGroupButton: function() {
-    return formElement.element(by.css('[ng-click="openCreateGroupMembershipDialog()"]'));
+    return element(by.css('[ng-click="openCreateGroupMembershipDialog()"]'));
   },
 
   removeGroup: function(idx) {

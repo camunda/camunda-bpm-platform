@@ -1,0 +1,19 @@
+<section class="dashboard">
+  <div class="section-content sections">
+    <section ng-repeat="plugin in dashboardPlugins"
+             ng-if="!plugin.noDashboardSection"
+             class="col-sm-4">
+      <header>
+        <h1 class="section-title">
+          <a ng-if="plugin.pagePath"
+             ng-href="{{ plugin.pagePath }}">{{ plugin.label }}</a>
+          <span ng-if="!plugin.pagePath">{{ plugin.label }}</span>
+        </h1>
+      </header>
+      <div class="stats">
+        <view data-plugin-id="{{ plugin.id }}"
+              provider="plugin"></view>
+      </div>
+    </section>
+  </div>
+</section>

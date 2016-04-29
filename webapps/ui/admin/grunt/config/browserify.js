@@ -33,4 +33,32 @@ module.exports = function(config, browserifyConfig) {
     dest: '<%= pkg.gruntConfig.adminBuildTarget %>/scripts/camunda-admin-ui.js'
   };
 
+  browserifyConfig.admin_plugins = {
+    options: {
+      watch: true,
+      transform: [
+        'brfs',
+        [ 'exposify',
+            {
+              expose: {
+               'angular': 'angular',
+               'jquery': 'jquery',
+               'camunda-commons-ui': 'camunda-commons-ui',
+               'camunda-bpm-sdk-js': 'camunda-bpm-sdk-js',
+               'angular-data-depend': 'angular-data-depend',
+               'moment': 'moment',
+               'events': 'events'
+              }
+            }
+        ]
+      ],
+      browserifyOptions: {
+        standalone: 'AdminPlugins',
+        debug: true
+      }
+    },
+    src: ['./<%= pkg.gruntConfig.pluginSourceDir %>/admin/plugins/adminPlugins.js'],
+    dest: '<%= pkg.gruntConfig.pluginBuildTarget %>/admin/app/plugin.js'
+  };
+
 };

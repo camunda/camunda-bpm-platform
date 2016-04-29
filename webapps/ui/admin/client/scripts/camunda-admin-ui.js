@@ -38,7 +38,7 @@ var pagesModule = require('./pages/main'),
       $routeProvider,
       UriProvider
     ) {
-      $routeProvider.otherwise({ redirectTo: '/users' });
+      $routeProvider.otherwise({ redirectTo: '/' });
 
       function getUri(id) {
         var uri = $('base').attr(id);

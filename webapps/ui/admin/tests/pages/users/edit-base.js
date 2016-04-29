@@ -23,9 +23,9 @@ module.exports = Page.extend({
     var itemIndex = index.indexOf(navbarItem) + 1;
 
     if (itemIndex)
-      item = userSection.element(by.css('.sidebar-nav ul li:nth-child(' + itemIndex + ')'));
+      item = userSection.element(by.css('aside ul li:nth-child(' + itemIndex + ')'));
     else
-      item = userSection.element(by.css('.sidebar-nav ul li:nth-child(1)'));
+      item = userSection.element(by.css('aside ul li:nth-child(1)'));
 
     item.click();
     return item;

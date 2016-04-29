@@ -2,16 +2,14 @@
 
 var Page = require('./../base');
 
-var groupsSection = element(by.css('section.authorizations'));
-
 module.exports = Page.extend({
 
   selectAuthorizationNavbarItem: function(navbarItem) {
-    return element(by.cssContainingText('.sidebar-nav li', navbarItem)).click();
+    return element(by.cssContainingText('aside li', navbarItem)).click();
   },
 
   boxHeader: function() {
-    return groupsSection.element(by.css('[ng-controller="AuthorizationCreateController"] .h4')).getText();
+    return element(by.css('.section-content > header h3')).getText();
   },
 
   newAuthorizationButton: function() {

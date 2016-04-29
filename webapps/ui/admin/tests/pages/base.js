@@ -14,7 +14,11 @@ var index = [
 module.exports = Page.extend({
 
   pageHeader: function() {
-    return element(by.css('.page-header')).getText();
+    return element(by.css('.breadcrumbs-panel li.active .text')).getText();
+  },
+
+  boxHeader: function() {
+    return element(by.css('.section-content div.h3, .section-content h3')).getText();
   },
 
   selectNavbarItem: function(navbarItem) {
@@ -27,7 +31,7 @@ module.exports = Page.extend({
 
     item = navigationSection.element(by.css('[cam-widget-header] ul li:nth-child(' + itemIndex + ')'));
     item.click();
-    
+
     return item;
   },
 
