@@ -72,8 +72,17 @@ public class CommandContextInterceptor extends CommandInterceptor {
   }
 
   public <T> T execute(Command<T> command) {
-    CommandContext context  = Context.getCommandContext();
-    boolean openNew = (alwaysOpenNew || context == null);
+    CommandContext context = null;
+
+    if(!alwaysOpenNew) {
+      // check whether we can reuse the command context
+      CommandContext existingCommandContext = Context.getCommandContext();
+      if(existingCommandContext != null && isFromSameEngine(existingCommandContext)) {
+        context = existingCommandContext;
+      }
+    }
+
+    boolean openNew = (context == null);
 
     CommandInvocationContext commandInvocationContext = new CommandInvocationContext(command);
     Context.setCommandInvocationContext(commandInvocationContext);
@@ -113,6 +122,10 @@ public class CommandContextInterceptor extends CommandInterceptor {
     }
 
     return null;
+  }
+
+  protected boolean isFromSameEngine(CommandContext existingCommandContext) {
+    return processEngineConfiguration == existingCommandContext.getProcessEngineConfiguration();
   }
 
   public CommandContextFactory getCommandContextFactory() {
