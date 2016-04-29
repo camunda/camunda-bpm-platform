@@ -12,9 +12,6 @@
  */
 package org.camunda.bpm.engine.migration;
 
-import org.camunda.bpm.engine.migration.MigrationPlan;
-import org.camunda.bpm.engine.migration.MigrationInstructionBuilder;
-
 /**
  * Represents an instruction to migrate instances of one activity to another activity.
  * Migration instructions are always contained in a {@link MigrationPlan}.

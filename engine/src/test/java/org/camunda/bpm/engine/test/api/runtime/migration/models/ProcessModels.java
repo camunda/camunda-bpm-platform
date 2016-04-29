@@ -25,14 +25,25 @@ import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
 public class ProcessModels {
 
   public static final String PROCESS_KEY = "Process";
-
+  public static final String PROCESS_KEY_2 = "Process2";
 
   public static ProcessBuilder newModel() {
-    return Bpmn.createExecutableProcess(PROCESS_KEY);
+    return newModel(PROCESS_KEY);
+  }
+
+  public static ProcessBuilder newModel(String processKey) {
+    return Bpmn.createExecutableProcess(processKey);
   }
 
   public static final BpmnModelInstance ONE_TASK_PROCESS =
       newModel()
+      .startEvent("startEvent")
+      .userTask("userTask").name("User Task")
+      .endEvent("endEvent")
+      .done();
+
+  public static final BpmnModelInstance ONE_TASK_PROCESS_2 =
+      newModel(PROCESS_KEY_2)
       .startEvent("startEvent")
       .userTask("userTask").name("User Task")
       .endEvent("endEvent")

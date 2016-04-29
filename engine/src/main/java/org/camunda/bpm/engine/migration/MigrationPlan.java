@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.migration;
 
 import java.util.List;
-import org.camunda.bpm.engine.migration.MigrationInstruction;
 
 /**
  * <p>Specifies how process instances from one process definition (the <i>source process definition</i>)

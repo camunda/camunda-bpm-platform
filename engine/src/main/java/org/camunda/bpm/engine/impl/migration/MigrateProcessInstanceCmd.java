@@ -26,6 +26,9 @@ import java.util.concurrent.Callable;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstanceBranch;
@@ -121,6 +124,12 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
     deleteUnmappedActivityInstances(migratingProcessInstance);
 
     migrateProcessInstance(migratingProcessInstance);
+
+    //Create historic event for migration of process instance
+    HistoryEventProducer historyEventProducter = Context.getProcessEngineConfiguration().getHistoryEventProducer();
+    HistoryEventHandler historyEventHandler = Context.getProcessEngineConfiguration().getHistoryEventHandler();
+    HistoryEvent migrateProcessInstanceEvent = historyEventProducter.createProcessInstanceUpdateEvt(processInstance);
+    historyEventHandler.handleEvent(migrateProcessInstanceEvent);
 
     return null;
   }
