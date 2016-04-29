@@ -15,6 +15,8 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration.history;
 
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -25,12 +27,11 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
-import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -38,7 +39,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class MigrationHistoryProcessInstanceTest {
 
-  protected ProcessEngineRule rule = new CachedProcessEngineRule();
+  protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule

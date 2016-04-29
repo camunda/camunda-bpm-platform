@@ -19,9 +19,9 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
 import org.camunda.bpm.engine.test.jobexecutor.RecordingAcquireJobsRunnable.RecordedWaitEvent;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.junit.After;
 import org.junit.Rule;
@@ -40,8 +40,7 @@ public class JobAcquisitionBackoffIdleTest {
   protected ControllableJobExecutor jobExecutor;
   protected ThreadControl acquisitionThread;
 
-  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(engineRule) {
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       jobExecutor = new ControllableJobExecutor();
       jobExecutor.setMaxJobsPerAcquisition(1);
@@ -52,6 +51,7 @@ public class JobAcquisitionBackoffIdleTest {
       return configuration.setJobExecutor(jobExecutor);
     }
   };
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule);

@@ -17,23 +17,19 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
 public class ProcessEngineBootstrapRule extends TestWatcher {
 
-  private final ProcessEngineRule processEngineRule;
   private ProcessEngine processEngine;
 
-  public ProcessEngineBootstrapRule(ProcessEngineRule processEngineRule) {
-    this(processEngineRule, "camunda.cfg.xml");
+  public ProcessEngineBootstrapRule() {
+    this("camunda.cfg.xml");
   }
 
-  public ProcessEngineBootstrapRule(ProcessEngineRule processEngineRule, String configurationResource) {
-    this.processEngineRule = processEngineRule;
+  public ProcessEngineBootstrapRule(String configurationResource) {
     this.processEngine = bootstrapEngine(configurationResource);
-    this.processEngineRule.setProcessEngine(processEngine);
   }
 
   public ProcessEngine bootstrapEngine(String configurationResource) {
@@ -47,9 +43,12 @@ public class ProcessEngineBootstrapRule extends TestWatcher {
     return configuration;
   }
 
+  public ProcessEngine getProcessEngine() {
+    return processEngine;
+  }
+
   @Override
   protected void finished(Description description) {
-    processEngineRule.setProcessEngine(null);
     processEngine.close();
     ProcessEngines.unregister(processEngine);
     processEngine = null;

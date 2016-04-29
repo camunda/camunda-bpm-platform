@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.After;
@@ -71,7 +71,7 @@ public class PrimitiveTypeValueSerializationTest {
   private String deploymentId;
 
   @Rule
-  public ProcessEngineRule rule = new CachedProcessEngineRule();
+  public ProcessEngineRule rule = new ProvidedProcessEngineRule();
 
   @Before
   public void setup() {

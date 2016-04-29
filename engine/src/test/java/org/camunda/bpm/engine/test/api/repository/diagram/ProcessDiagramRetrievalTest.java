@@ -43,7 +43,7 @@ import org.camunda.bpm.engine.repository.DiagramNode;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -79,7 +79,7 @@ public class ProcessDiagramRetrievalTest {
   private static final boolean OVERWRITE_EXPECTED_HTML_FILES = false;
   
   @Rule
-  public ProcessEngineRule activitiRule = new CachedProcessEngineRule();
+  public ProcessEngineRule activitiRule = new ProvidedProcessEngineRule();
 
   /**
    * Provides a list of parameters for

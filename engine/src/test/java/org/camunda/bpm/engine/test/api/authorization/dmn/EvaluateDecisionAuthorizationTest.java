@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
-import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
@@ -50,7 +50,7 @@ public class EvaluateDecisionAuthorizationTest {
   protected static final String DMN_FILE = "org/camunda/bpm/engine/test/api/dmn/Example.dmn";
   protected static final String DECISION_DEFINITION_KEY = "decision";
 
-  public ProcessEngineRule engineRule = new CachedProcessEngineRule();
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
 
   @Rule

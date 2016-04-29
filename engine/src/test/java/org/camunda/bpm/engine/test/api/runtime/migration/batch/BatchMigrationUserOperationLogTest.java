@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
-import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.junit.After;
 import org.junit.Assert;
@@ -47,7 +47,7 @@ public class BatchMigrationUserOperationLogTest {
 
   public static final String USER_ID = "userId";
 
-  protected ProcessEngineRule engineRule = new CachedProcessEngineRule();
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
   protected ProcessEngineTestRule engineTestHelper = new ProcessEngineTestRule(engineRule);
 

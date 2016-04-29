@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.multitenancy.StaticTenantIdTestProvider;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -46,9 +47,8 @@ public class MultiTenancyProcessDefinitionSuspensionStateTenantIdProviderTest {
       .endEvent()
     .done();
 
-  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(engineRule) {
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
 
@@ -58,6 +58,7 @@ public class MultiTenancyProcessDefinitionSuspensionStateTenantIdProviderTest {
       return configuration;
     }
   };
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
 
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 

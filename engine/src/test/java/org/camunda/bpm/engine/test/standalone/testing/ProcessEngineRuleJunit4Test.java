@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,7 +42,7 @@ import org.junit.Test;
 public class ProcessEngineRuleJunit4Test {
 
   @Rule
-  public ProcessEngineRule engineRule = new CachedProcessEngineRule();
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
   @Test
   @Deployment
