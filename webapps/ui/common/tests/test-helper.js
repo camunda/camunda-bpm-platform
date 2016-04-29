@@ -76,36 +76,25 @@ module.exports = function (operations, noReset, done) {
 
     var resource = new camClient.resource('job');
 
-    resource.list({}, function(err, listResult) {
-      if(err) {
-        deferred.reject();
-        return done(err, result);
-      }
-
-      if (!listResult) {
-        deferred.reject();
-        return done(new Error('job resource list no results'));
-      }
-
-      var jobTasks = listResult.map(function (job) {
-        return function(cb) {
-          resource.setRetries({
-            id: job.id,
-            retries: 0
-          }, cb);
-        };
-      });
-
-      CamSDK.utils.series(jobTasks, function(err, finalResult) {
-        if (err) {
+    var pollCount = 0;
+    var pollFct = function() {
+      pollCount++;
+      resource.count({ "executable" : true }, function(err, res) {
+        if(pollCount > 50 || err) {
           deferred.reject();
+          done(err || new Error('Job Executor could not execute jobs within 10 seconds. Giving up.'));
+          return;
         }
-        else {
+        if( res == 0 ) {
           deferred.fulfill();
+          done(err, {});
+        } else {
+          setTimeout(pollFct, 200);
         }
-        done(err, finalResult);
       });
-    });
+    };
+
+    pollFct();
   });
 
   return deferred.promise;
