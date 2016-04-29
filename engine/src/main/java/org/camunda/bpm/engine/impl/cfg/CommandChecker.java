@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.cfg;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -80,4 +81,26 @@ public interface CommandChecker {
   void checkCreateMigrationPlan(ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition);
 
   void checkMigrateProcessInstance(ExecutionEntity processInstance, ProcessDefinition targetProcessDefinition);
+
+  void checkReadProcessInstance(String processInstanceId);
+
+  /**
+   * Checks if it is allowed to read a process instance of the given process instance id.
+   */
+  void checkReadProcessInstance(ExecutionEntity execution);
+
+  /**
+   * Check if it is allowed to delete a process instance of the given execution.
+   */
+  void checkDeleteProcessInstance(ExecutionEntity execution);
+
+  /**
+   * Check if it is allowed to read a task.
+   */
+  void checkReadTask(TaskEntity task);
+
+  /**
+   * Check if it is allowed to update a task
+   */
+  void checkUpdateTask(TaskEntity task);
 }

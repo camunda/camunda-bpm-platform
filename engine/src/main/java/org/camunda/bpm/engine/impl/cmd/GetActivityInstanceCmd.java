@@ -22,10 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -73,8 +74,8 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       return null;
     }
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadProcessInstance(processInstanceId);
+    // check authorization
+    checkAuthorization(processInstanceId);
 
     List<ExecutionEntity> nonEventScopeExecutions = filterNonEventScopeExecutions(executionList);
     List<ExecutionEntity> leaves = filterLeaves(nonEventScopeExecutions);
@@ -172,6 +173,14 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     populateChildInstances(activityInstances, transitionInstances);
 
     return processActInst;
+  }
+
+  public void checkAuthorization(String processInstanceId) {
+    CommandContext commandContext = Context.getCommandContext();
+
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadProcessInstance(processInstanceId);
+    }
   }
 
   protected void orderById(List<ExecutionEntity> leaves) {

@@ -19,8 +19,9 @@ import java.util.Collection;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
@@ -45,8 +46,7 @@ public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
 
     ensureNotNull(BadUserRequestException.class, "Cannot find task with id '" + resourceId + "'.", "task", task);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadTask(task);
+    checkAuthorization(task);
 
     VariableMapImpl result = new VariableMapImpl();
 
@@ -67,4 +67,11 @@ public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
     return result;
   }
 
+  public void checkAuthorization(TaskEntity task) {
+    CommandContext commandContext = Context.getCommandContext();
+
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadTask(task);
+    }
+  }
 }

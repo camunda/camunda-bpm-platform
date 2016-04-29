@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -86,6 +87,15 @@ public class TenantCommandChecker implements CommandChecker {
   }
 
   @Override
+  public void checkUpdateProcessInstance(Execution execution) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("update the process instance", execution);
+      }
+    }
+  }
+
+  @Override
   public void checkUpdateProcessInstanceByProcessDefinitionKey(String processDefinitionKey) {
   }
 
@@ -99,14 +109,6 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
-  @Override
-  public void checkUpdateProcessInstance(Execution execution) {
-    if (getTenantManager().isTenantCheckEnabled()) {
-      if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
-        throw LOG.exceptionCommandWithUnauthorizedTenant("update the process instance", execution);
-      }
-    }
-  }
 
   @Override
   public void checkCreateMigrationPlan(ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition) {
@@ -119,6 +121,32 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  public void checkReadProcessInstance(String processInstanceId) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      ExecutionEntity execution = findExecutionById(processInstanceId);
+      if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("read the process instance", execution);
+      }
+    }
+  }
+
+  @Override
+  public void checkReadProcessInstance(ExecutionEntity execution) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("read the process instance", execution);
+      }
+    } 
+  }
+
+  public void checkDeleteProcessInstance(ExecutionEntity execution) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("delete the process instance", execution);
+      }
+    }
+  }
+
   @Override
   public void checkMigrateProcessInstance(ExecutionEntity processInstance, ProcessDefinition targetProcessDefinition) {
     String sourceTenant = processInstance.getTenantId();
@@ -127,6 +155,25 @@ public class TenantCommandChecker implements CommandChecker {
     if (targetTenant != null && (sourceTenant == null || !sourceTenant.equals(targetTenant))) {
       throw ProcessEngineLogger.MIGRATION_LOGGER
         .cannotMigrateInstanceBetweenTenants(processInstance.getId(), sourceTenant, targetTenant);
+    }
+  }
+
+  public void checkReadTask(TaskEntity task) {
+    ExecutionEntity execution = findExecutionById(task.getExecutionId());
+    if (getTenantManager().isTenantCheckEnabled()) {
+      if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("read the task", execution);
+      }
+    }
+  }
+
+  @Override
+  public void checkUpdateTask(TaskEntity task) {
+    ExecutionEntity execution = findExecutionById(task.getExecutionId());
+    if (getTenantManager().isTenantCheckEnabled()) {
+      if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("update the task", execution);
+      }
     }
   }
 
@@ -146,4 +193,5 @@ public class TenantCommandChecker implements CommandChecker {
     return Context.getCommandContext().getExecutionManager().findExecutionById(processInstanceId);
   }
 
+  
 }

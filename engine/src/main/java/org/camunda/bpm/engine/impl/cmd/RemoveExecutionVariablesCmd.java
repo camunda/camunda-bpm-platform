@@ -4,8 +4,10 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Collection;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
@@ -30,8 +32,7 @@ public class RemoveExecutionVariablesCmd extends AbstractRemoveVariableCmd {
 
     ensureNotNull("execution " + entityId + " doesn't exist", "execution", execution);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateProcessInstance(execution);
+    checkAuthorization(execution);
 
     return execution;
   }
@@ -39,5 +40,13 @@ public class RemoveExecutionVariablesCmd extends AbstractRemoveVariableCmd {
   protected void logVariableOperation(AbstractVariableScope scope) {
     ExecutionEntity execution = (ExecutionEntity) scope;
     commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), execution.getId(), null, PropertyChange.EMPTY_CHANGE);
+  }
+
+  public void checkAuthorization(ExecutionEntity execution) {
+    CommandContext commandContext = Context.getCommandContext();
+
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkUpdateProcessInstance(execution);
+    }
   }
 }

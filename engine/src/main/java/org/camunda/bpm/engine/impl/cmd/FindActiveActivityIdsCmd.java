@@ -18,6 +18,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
@@ -46,10 +48,17 @@ public class FindActiveActivityIdsCmd implements Command<List<String>>, Serializ
     ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
 
     // check authorization
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadProcessInstance(execution);
+    checkAuthorization(execution);
 
     // fetch active activities
     return execution.findActiveActivityIds();
+  }
+
+  public void checkAuthorization(ExecutionEntity execution) {
+    CommandContext commandContext = Context.getCommandContext();
+
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadProcessInstance(execution);
+    }
   }
 }

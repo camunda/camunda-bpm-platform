@@ -21,13 +21,13 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
-
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -111,6 +111,13 @@ public class AuthorizationCommandChecker implements CommandChecker {
     getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);
   }
 
+  public void checkReadProcessInstance(String processInstanceId) {
+    getAuthorizationManager().checkReadProcessInstance(processInstanceId);
+  }
+  public void checkDeleteProcessInstance(ExecutionEntity execution) {
+    getAuthorizationManager().checkDeleteProcessInstance(execution);
+  }
+
   @Override
   public void checkUpdateProcessInstanceById(String processInstanceId) {
     ExecutionEntity execution = findExecutionById(processInstanceId);
@@ -132,6 +139,20 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkMigrateProcessInstance(ExecutionEntity processInstance, ProcessDefinition targetProcessDefinition) {
+  }
+
+  public void checkReadProcessInstance(ExecutionEntity execution) {
+    getAuthorizationManager().checkReadProcessInstance(execution);
+  }
+
+  @Override
+  public void checkReadTask(TaskEntity task) {
+    getAuthorizationManager().checkReadTask(task);
+  }
+
+  @Override
+  public void checkUpdateTask(TaskEntity task) {
+    getAuthorizationManager().checkUpdateTask(task);
   }
 
   protected AuthorizationManager getAuthorizationManager() {

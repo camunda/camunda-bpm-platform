@@ -17,10 +17,12 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
 
@@ -51,8 +53,7 @@ public class GetTaskVariableCmd implements Command<Object>, Serializable {
 
     ensureNotNull("task " + taskId + " doesn't exist", "task", task);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadTask(task);
+    checkAuthorization(task);
 
     Object value;
 
@@ -63,5 +64,13 @@ public class GetTaskVariableCmd implements Command<Object>, Serializable {
     }
 
     return value;
+  }
+
+  public void checkAuthorization(TaskEntity task) {
+    CommandContext commandContext = Context.getCommandContext();
+
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadTask(task);
+    }
   }
 }
