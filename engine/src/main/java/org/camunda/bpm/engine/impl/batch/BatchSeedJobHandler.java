@@ -53,7 +53,7 @@ public class BatchSeedJobHandler implements JobHandler<BatchSeedJobConfiguration
       batch.createSeedJob();
     }
     else {
-      batch.createMonitorJob();
+      batch.createMonitorJob(false);
     }
   }
 

@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
+import java.util.List;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -30,6 +31,7 @@ import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
@@ -165,39 +167,60 @@ public class BatchMigrationHistoryTest {
   public void testHistoricMonitorJobLog() {
     Batch batch = helper.migrateProcessInstancesAsync(1);
 
-    // when
+    // when the seed job is executed
     helper.executeSeedJob(batch);
 
-    // then a historic job log exists for the monitor job
-    HistoricJobLog jobLog = helper.getHistoricMonitorJobLog(batch).get(0);
-    assertNotNull(jobLog);
-    assertTrue(jobLog.isCreationLog());
-    assertEquals(batch.getMonitorJobDefinitionId(), jobLog.getJobDefinitionId());
-    assertEquals(BatchMonitorJobHandler.TYPE, jobLog.getJobDefinitionType());
-    assertEquals(batch.getId(), jobLog.getJobDefinitionConfiguration());
-    assertEquals(START_DATE, jobLog.getTimestamp());
-    assertNull(jobLog.getDeploymentId());
-    assertNull(jobLog.getProcessDefinitionId());
-    assertNull(jobLog.getExecutionId());
-    assertEquals(helper.addSeconds(START_DATE, 30), jobLog.getJobDueDate());
+    Job monitorJob = helper.getMonitorJob(batch);
+    List<HistoricJobLog> jobLogs = helper.getHistoricMonitorJobLog(batch, monitorJob);
+    assertEquals(1, jobLogs.size());
 
-    // when the migration and monitor job are executed
+    // then a creation historic job log exists for the monitor job without due date
+    HistoricJobLog jobLog = jobLogs.get(0);
+    assertCommonMonitorJobLogProperties(batch, jobLog);
+    assertTrue(jobLog.isCreationLog());
+    assertEquals(START_DATE, jobLog.getTimestamp());
+    assertNull(jobLog.getJobDueDate());
+
+    // when the monitor job is executed
     Date executionDate = helper.addSecondsToClock(15);
+    Date monitorJobDueDate = helper.addSeconds(executionDate, 30);
+    helper.executeMonitorJob(batch);
+
+    jobLogs = helper.getHistoricMonitorJobLog(batch, monitorJob);
+    assertEquals(2, jobLogs.size());
+
+    // then a success job log was created for the last monitor job
+    jobLog = jobLogs.get(1);
+    assertCommonMonitorJobLogProperties(batch, jobLog);
+    assertTrue(jobLog.isSuccessLog());
+    assertEquals(executionDate, jobLog.getTimestamp());
+    assertNull(jobLog.getJobDueDate());
+
+    // and a creation job log for the new monitor job was created with due date
+    monitorJob = helper.getMonitorJob(batch);
+    jobLogs = helper.getHistoricMonitorJobLog(batch, monitorJob);
+    assertEquals(1, jobLogs.size());
+
+    jobLog = jobLogs.get(0);
+    assertCommonMonitorJobLogProperties(batch, jobLog);
+    assertTrue(jobLog.isCreationLog());
+    assertEquals(executionDate, jobLog.getTimestamp());
+    assertEquals(monitorJobDueDate, jobLog.getJobDueDate());
+
+    // when the migration and monitor jobs are executed
+    executionDate = helper.addSecondsToClock(15);
     helper.executeMigrationJobs(batch);
     helper.executeMonitorJob(batch);
 
-    // then the an new job log was created
-    jobLog = helper.getHistoricMonitorJobLog(batch).get(1);
-    assertNotNull(jobLog);
+    jobLogs = helper.getHistoricMonitorJobLog(batch, monitorJob);
+    assertEquals(2, jobLogs.size());
+
+    // then a success job log was created for the last monitor job
+    jobLog = jobLogs.get(1);
+    assertCommonMonitorJobLogProperties(batch, jobLog);
     assertTrue(jobLog.isSuccessLog());
-    assertEquals(batch.getMonitorJobDefinitionId(), jobLog.getJobDefinitionId());
-    assertEquals(BatchMonitorJobHandler.TYPE, jobLog.getJobDefinitionType());
-    assertEquals(batch.getId(), jobLog.getJobDefinitionConfiguration());
     assertEquals(executionDate, jobLog.getTimestamp());
-    assertNull(jobLog.getDeploymentId());
-    assertNull(jobLog.getProcessDefinitionId());
-    assertNull(jobLog.getExecutionId());
-    assertEquals(helper.addSeconds(START_DATE, 30), jobLog.getJobDueDate());
+    assertEquals(monitorJobDueDate, jobLog.getJobDueDate());
   }
 
   @Test
@@ -313,5 +336,16 @@ public class BatchMigrationHistoryTest {
     assertTrue(helper.getHistoricMonitorJobLog(batch).isEmpty());
     assertTrue(helper.getHistoricBatchJobLog(batch).isEmpty());
   }
+
+  protected void assertCommonMonitorJobLogProperties(Batch batch, HistoricJobLog jobLog) {
+    assertNotNull(jobLog);
+    assertEquals(batch.getMonitorJobDefinitionId(), jobLog.getJobDefinitionId());
+    assertEquals(BatchMonitorJobHandler.TYPE, jobLog.getJobDefinitionType());
+    assertEquals(batch.getId(), jobLog.getJobDefinitionConfiguration());
+    assertNull(jobLog.getDeploymentId());
+    assertNull(jobLog.getProcessDefinitionId());
+    assertNull(jobLog.getExecutionId());
+  }
+
 
 }

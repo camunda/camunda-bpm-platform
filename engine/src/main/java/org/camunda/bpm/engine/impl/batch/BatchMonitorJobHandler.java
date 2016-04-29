@@ -42,7 +42,7 @@ public class BatchMonitorJobHandler implements JobHandler<BatchMonitorJobConfigu
     boolean completed = batch.isCompleted();
 
     if (!completed) {
-      batch.createMonitorJob();
+      batch.createMonitorJob(true);
     }
     else {
       batch.delete(false);

@@ -214,6 +214,16 @@ public class BatchMigrationHelper {
       .list();
   }
 
+  public List<HistoricJobLog> getHistoricMonitorJobLog(Batch batch, Job monitorJob) {
+    return engineRule.getHistoryService()
+      .createHistoricJobLogQuery()
+      .jobDefinitionId(batch.getMonitorJobDefinitionId())
+      .jobId(monitorJob.getId())
+      .orderPartiallyByOccurrence()
+      .asc()
+      .list();
+  }
+
   public List<HistoricJobLog> getHistoricBatchJobLog(Batch batch) {
     return engineRule.getHistoryService()
       .createHistoricJobLogQuery()

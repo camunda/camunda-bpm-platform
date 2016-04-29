@@ -45,6 +45,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.CachedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -358,13 +359,20 @@ public class BatchMigrationTest {
   public void testMonitorJobPollingForCompletion() {
     Batch batch = helper.migrateProcessInstancesAsync(10);
 
-    // when
-    Date createDate = new Date(1457326800000L);
-    ClockUtil.setCurrentTime(createDate);
+    // when the seed job creates the monitor job
+    Date createDate = ClockTestUtil.setClockToDateWithoutMilliseconds();
     helper.executeSeedJob(batch);
 
-    // then the monitor job has a due date of the default batch poll time
+    // then the monitor job has a no due date set
     Job monitorJob = helper.getMonitorJob(batch);
+    assertNotNull(monitorJob);
+    assertNull(monitorJob.getDuedate());
+
+    // when the monitor job is executed
+    helper.executeMonitorJob(batch);
+
+    // then the monitor job has a due date of the default batch poll time
+    monitorJob = helper.getMonitorJob(batch);
     Date dueDate = helper.addSeconds(createDate, 30);
     assertEquals(dueDate, monitorJob.getDuedate());
   }
