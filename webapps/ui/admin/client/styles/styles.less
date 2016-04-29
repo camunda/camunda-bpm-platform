@@ -2,42 +2,44 @@
 @import "app-variables.less";
 @import "cam-webapps-common.less";
 
+
 /* ---------------------------------------------------------------- */
 
 .page-header{
   margin: 0 (@grid-gutter-width * 0.5);
   border: none;
 }
+[ng-view] > section {
+  &,
+  > aside,
+  > .section-content {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    overflow: auto;
+  }
 
-section,
-aside,
-.section-content {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  overflow: auto;
-}
-
-section {
   padding: 0 (@grid-gutter-width * 0.5);
   width: 100%;
-}
 
-.section-content {
-  padding: (@grid-gutter-width * 0.5);
-  right: 0;
-  width: 100%;
-}
+  > .section-content {
+    padding: (@grid-gutter-width * 0.5);
+    right: 0;
+    width: 100%;
+    > header > .text-right {
+      padding-top: 7px;
+    }
+  }
 
-aside {
-  left: 0;
-  width: 15%;
-  padding: (@grid-gutter-width * 0.5) 0;
+  > aside {
+    left: 0;
+    width: 20%;
+    padding: (@grid-gutter-width * 0.5) 0;
+  }
+  > aside + .section-content {
+    width: 80%;
+  }
 }
-aside + .section-content {
-  width: 85%;
-}
-
 
 aside {
   border-right: 1px solid @gray-lighter;
@@ -83,6 +85,7 @@ table.cam-table > tbody > tr > td.action {
 /* ---------------------------------------------------------------- */
 
 @import "pages/authorizations.less";
+@import "pages/dashboard";
 @import "directives/cam-breadcrumbs-panel.less";
 
 .ctn-main {

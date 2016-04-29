@@ -20,7 +20,7 @@ describe('Admin admin-user Spec', function() {
     usersPage.navigateToWebapp('Admin');
 
     // then
-    testHelper.expectStringEqual(usersPage.adminUserSetup.pageHeader(), 'SETUP');
+    testHelper.expectStringEqual(usersPage.adminUserSetup.boxHeader(), 'SETUP');
     expect(usersPage.adminUserSetup.createNewAdminButton().isEnabled()).to.eventually.eql(false);
   });
 
@@ -47,6 +47,7 @@ describe('Admin admin-user Spec', function() {
     // when
     usersPage.navigateToWebapp('Admin');
     usersPage.authentication.userLogin('Admin', 'admin123');
+    browser.get(usersPage.url);
 
     // then
     expect(usersPage.userFirstNameAndLastName(0)).to.eventually.eql('Über Admin');

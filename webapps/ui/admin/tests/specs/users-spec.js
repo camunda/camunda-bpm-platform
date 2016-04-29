@@ -86,7 +86,7 @@ describe('Admin Users Spec', function() {
 
       // then
       usersPage.newUser.isActive();
-      testHelper.expectStringEqual(usersPage.newUser.pageHeader(), 'Create New User');
+      testHelper.expectStringEqual(usersPage.newUser.pageHeader(), 'Create');
       expect(usersPage.newUser.createNewUserButton().isEnabled()).to.eventually.eql(false);
     });
 
@@ -119,6 +119,7 @@ describe('Admin Users Spec', function() {
 
       // when
       usersPage.authentication.userLogin('Xäbi', 'password1234');
+      browser.get(usersPage.url);
 
       // then
       expect(usersPage.loggedInUser()).to.eventually.eql('Xäbi Älönsö');
@@ -135,6 +136,7 @@ describe('Admin Users Spec', function() {
 
         usersPage.navigateToWebapp('Admin');
         usersPage.authentication.userLogin('admin', 'admin');
+        browser.get(usersPage.url);
       });
     });
 
@@ -172,6 +174,7 @@ describe('Admin Users Spec', function() {
 
         usersPage.navigateToWebapp('Admin');
         usersPage.authentication.userLogin('admin', 'admin');
+        browser.get(usersPage.url);
       });
     });
 
@@ -262,6 +265,7 @@ describe('Admin Users Spec', function() {
 
         // when
         usersPage.authentication.userLogin(users[2].params.id, 'asdfasdf');
+        browser.get(usersPage.url);
 
         // then
         expect(usersPage.userFirstNameAndLastName(0)).to.eventually.eql(users[2].params.firstName + ' ' + users[2].params.lastName);
@@ -279,6 +283,7 @@ describe('Admin Users Spec', function() {
 
         usersPage.navigateToWebapp('Admin');
         usersPage.authentication.userLogin('admin', 'admin');
+        browser.get(usersPage.url);
       });
     });
 
@@ -358,6 +363,7 @@ describe('Admin Users Spec', function() {
 
           usersPage.navigateToWebapp('Admin');
           usersPage.authentication.userLogin('admin', 'admin');
+          browser.get(usersPage.url);
         });
       });
 
@@ -419,6 +425,7 @@ describe('Admin Users Spec', function() {
       return testHelper(setupFile.setup3, function() {
         usersPage.navigateToWebapp('Admin');
         usersPage.authentication.userLogin('admin', 'admin');
+        browser.get(usersPage.url);
       });
     });
 

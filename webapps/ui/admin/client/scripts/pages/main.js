@@ -7,6 +7,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     authorizationCreate = require('./authorizationCreate'),
     authorizationDeleteConfirm = require('./authorizationDeleteConfirm'),
     users = require('./users'),
+    dashboard = require('./dashboard'),
     userCreate = require('./userCreate'),
     userEdit = require('./userEdit'),
     groups = require('./groups'),
@@ -18,11 +19,12 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     systemSettingsGeneral = require('./systemSettingsGeneral'),
     executionMetrics = require('./execution-metrics');
 
-  var ngModule = angular.module('admin.pages', ['ngRoute', 'cam.commons']);
+  var ngModule = angular.module('cam.admin.pages', ['ngRoute', 'cam.commons']);
 
   ngModule.config(authorizations);
   ngModule.controller('AuthorizationCreateController', authorizationCreate);
   ngModule.controller('ConfirmDeleteAuthorizationController', authorizationDeleteConfirm);
+  ngModule.config(dashboard);
   ngModule.config(users);
   ngModule.config(userCreate);
   ngModule.config(userEdit);

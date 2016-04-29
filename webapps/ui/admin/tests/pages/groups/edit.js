@@ -50,10 +50,10 @@ module.exports = Page.extend({
     var itemIndex = index.indexOf(navbarItem) + 1;
 
     if (itemIndex) {
-      item = element(by.css('.sidebar-nav ul li:nth-child(' + itemIndex + ')'));
+      item = element(by.css('aside ul li:nth-child(' + itemIndex + ')'));
     }
     else {
-      item = element(by.css('.sidebar-nav ul li:nth-child(1)'));
+      item = element(by.css('aside ul li:nth-child(1)'));
     }
 
     item.click();
