@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.api.runtime.migration.history;
 import static org.junit.Assert.assertEquals;
 
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
@@ -25,6 +26,7 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -55,6 +57,7 @@ public class MigrationHistoryProcessInstanceTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testMigrateHistoryProcessInstance() {
     //given
     int processInstanceCount = 10;
