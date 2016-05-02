@@ -13,34 +13,70 @@
 
 package org.camunda.bpm.engine.test.api.identity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Picture;
-import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.identity.Authentication;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Frederik Heremans
  */
-public class IdentityServiceTest extends PluggableProcessEngineTestCase {
+public class IdentityServiceTest {
 
+  @Rule
+  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
+  protected IdentityService identityService;
+
+  @Before
+  public void init() {
+    identityService = engineRule.getIdentityService();
+  }
+
+  @After
+  public void cleanUp() {
+    for (User user : identityService.createUserQuery().list()) {
+      identityService.deleteUser(user.getId());
+    }
+    for (Group group : identityService.createGroupQuery().list()) {
+      identityService.deleteGroup(group.getId());
+    }
+  }
+
+  @Test
   public void testIsReadOnly() {
     assertFalse(identityService.isReadOnly());
   }
 
+  @Test
   public void testUserInfo() {
     User user = identityService.newUser("testuser");
     identityService.saveUser(user);
@@ -57,6 +93,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser(user.getId());
   }
 
+  @Test
   public void testUserAccount() {
     User user = identityService.newUser("testuser");
     identityService.saveUser(user);
@@ -94,7 +131,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
   }
 
   private void assertListElementsMatch(List<String> list1, List<String> list2) {
-    if(list1 != null) {
+    if (list1 != null) {
       assertNotNull(list2);
       assertEquals(list1.size(), list2.size());
       for (String value : list1) {
@@ -106,6 +143,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testUserAccountDetails() {
     User user = identityService.newUser("testuser");
     identityService.saveUser(user);
@@ -120,6 +158,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser(user.getId());
   }
 
+  @Test
   public void testCreateExistingUser() {
     User user = identityService.newUser("testuser");
     identityService.saveUser(user);
@@ -128,12 +167,14 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
       identityService.saveUser(secondUser);
       fail("Exception should have been thrown");
     } catch (RuntimeException re) {
-      // Expected exception while saving new user with the same name as an existing one.
+      // Expected exception while saving new user with the same name as an
+      // existing one.
     }
 
     identityService.deleteUser(user.getId());
   }
 
+  @Test
   public void testUpdateUser() {
     // First, create a new user
     User user = identityService.newUser("johndoe");
@@ -159,6 +200,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser(user.getId());
   }
 
+  @Test
   public void testUserPicture() {
     // First, create a new user
     User user = identityService.newUser("johndoe");
@@ -191,6 +233,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser(user.getId());
   }
 
+  @Test
   public void testUpdateGroup() {
     Group group = identityService.newGroup("sales");
     group.setName("Sales");
@@ -206,18 +249,19 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteGroup(group.getId());
   }
 
+  @Test
   public void findUserByUnexistingId() {
     User user = identityService.createUserQuery().userId("unexistinguser").singleResult();
     assertNull(user);
   }
 
+  @Test
   public void findGroupByUnexistingId() {
     Group group = identityService.createGroupQuery().groupId("unexistinggroup").singleResult();
     assertNull(group);
   }
 
-
-
+  @Test
   public void testCreateMembershipUnexistingGroup() {
     User johndoe = identityService.newUser("johndoe");
     identityService.saveUser(johndoe);
@@ -225,13 +269,14 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createMembership(johndoe.getId(), "unexistinggroup");
       fail("Expected exception");
-    } catch(RuntimeException re) {
+    } catch (RuntimeException re) {
       // Exception expected
     }
 
     identityService.deleteUser(johndoe.getId());
   }
 
+  @Test
   public void testCreateMembershipUnexistingUser() {
     Group sales = identityService.newGroup("sales");
     identityService.saveGroup(sales);
@@ -239,13 +284,14 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createMembership("unexistinguser", sales.getId());
       fail("Expected exception");
-    } catch(RuntimeException re) {
+    } catch (RuntimeException re) {
       // Exception expected
     }
 
     identityService.deleteGroup(sales.getId());
   }
 
+  @Test
   public void testCreateMembershipAlreadyExisting() {
     Group sales = identityService.newGroup("sales");
     identityService.saveGroup(sales);
@@ -257,81 +303,78 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
 
     try {
       identityService.createMembership(johndoe.getId(), sales.getId());
-    } catch(RuntimeException re) {
-     // Expected exception, membership already exists
+    } catch (RuntimeException re) {
+      // Expected exception, membership already exists
     }
 
     identityService.deleteGroup(sales.getId());
     identityService.deleteUser(johndoe.getId());
   }
 
+  @Test
   public void testSaveGroupNullArgument() {
-    try {
-      identityService.saveGroup(null);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      assertTextPresent("group is null", ae.getMessage());
-    }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("group is null");
+
+    identityService.saveGroup(null);
   }
 
+  @Test
   public void testSaveUserNullArgument() {
-    try {
-      identityService.saveUser(null);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      assertTextPresent("user is null", ae.getMessage());
-    }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("user is null");
+
+    identityService.saveUser(null);
   }
 
+  @Test
   public void testFindGroupByIdNullArgument() {
-    try {
-      identityService.createGroupQuery().groupId(null).singleResult();
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      assertTextPresent("id is null", ae.getMessage());
-    }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("id is null");
+
+    identityService.createGroupQuery().groupId(null).singleResult();
   }
 
-  public void testCreateMembershipNullArguments() {
-    try {
-      identityService.createMembership(null, "group");
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      assertTextPresent("userId is null", ae.getMessage());
-    }
+  @Test
+  public void testCreateMembershipNullUserArgument() {
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("userId is null");
 
-    try {
-      identityService.createMembership("userId", null);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      assertTextPresent("groupId is null", ae.getMessage());
-    }
+    identityService.createMembership(null, "group");
   }
 
+  @Test
+  public void testCreateMembershipNullGroupArgument() {
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("groupId is null");
+
+    identityService.createMembership("userId", null);
+  }
+
+  @Test
   public void testFindGroupsByUserIdNullArguments() {
-    try {
-      identityService.createGroupQuery().groupMember(null).singleResult();
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      assertTextPresent("userId is null", ae.getMessage());
-    }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("userId is null");
+
+    identityService.createGroupQuery().groupMember(null).singleResult();
   }
 
+  @Test
   public void testFindUsersByGroupUnexistingGroup() {
     List<User> users = identityService.createUserQuery().memberOfGroup("unexistinggroup").list();
     assertNotNull(users);
     assertTrue(users.isEmpty());
   }
 
+  @Test
   public void testDeleteGroupNullArguments() {
-    try {
-      identityService.deleteGroup(null);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      assertTextPresent("groupId is null", ae.getMessage());
-    }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("groupId is null");
+
+    identityService.deleteGroup(null);
   }
 
+  @Test
   public void testDeleteMembership() {
     Group sales = identityService.newGroup("sales");
     identityService.saveGroup(sales);
@@ -354,6 +397,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser("johndoe");
   }
 
+  @Test
   public void testDeleteMembershipWhenUserIsNoMember() {
     Group sales = identityService.newGroup("sales");
     identityService.saveGroup(sales);
@@ -368,6 +412,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser("johndoe");
   }
 
+  @Test
   public void testDeleteMembershipUnexistingGroup() {
     User johndoe = identityService.newUser("johndoe");
     identityService.saveUser(johndoe);
@@ -376,6 +421,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser(johndoe.getId());
   }
 
+  @Test
   public void testDeleteMembershipUnexistingUser() {
     Group sales = identityService.newGroup("sales");
     identityService.saveGroup(sales);
@@ -384,37 +430,38 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteGroup(sales.getId());
   }
 
-  public void testDeleteMemberschipNullArguments() {
-    try {
-      identityService.deleteMembership(null, "group");
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      assertTextPresent("userId is null", ae.getMessage());
-    }
+  @Test
+  public void testDeleteMemberschipNullUserArgument() {
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("userId is null");
 
-    try {
-      identityService.deleteMembership("user", null);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      assertTextPresent("groupId is null", ae.getMessage());
-    }
+    identityService.deleteMembership(null, "group");
   }
 
+  @Test
+  public void testDeleteMemberschipNullGroupArgument() {
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("groupId is null");
+
+    identityService.deleteMembership("user", null);
+  }
+
+  @Test
   public void testDeleteUserNullArguments() {
-    try {
-      identityService.deleteUser(null);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      assertTextPresent("userId is null", ae.getMessage());
-    }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("userId is null");
+
+    identityService.deleteUser(null);
   }
 
+  @Test
   public void testDeleteUserUnexistingUserId() {
     // No exception should be thrown. Deleting an unexisting user should
     // be ignored silently
-     identityService.deleteUser("unexistinguser");
+    identityService.deleteUser("unexistinguser");
   }
 
+  @Test
   public void testCheckPassword() {
 
     // store user with password
@@ -429,6 +476,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testUpdatePassword() {
 
     // store user with password
@@ -437,7 +485,6 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.saveUser(user);
 
     assertTrue(identityService.checkPassword(user.getId(), "s3cret"));
-
 
     user.setPassword("new-password");
     identityService.saveUser(user);
@@ -448,12 +495,14 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testCheckPasswordNullSafe() {
     assertFalse(identityService.checkPassword("userId", null));
     assertFalse(identityService.checkPassword(null, "passwd"));
     assertFalse(identityService.checkPassword(null, null));
   }
 
+  @Test
   public void testUserOptimisticLockingException() {
     User user = identityService.newUser("kermit");
     identityService.saveUser(user);
@@ -477,6 +526,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser(user.getId());
   }
 
+  @Test
   public void testGroupOptimisticLockingException() {
     Group group = identityService.newGroup("group");
     identityService.saveGroup(group);
@@ -500,83 +550,51 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteGroup(group.getId());
   }
 
+  @Test
   public void testSaveUserWithGenericResourceId() {
     User user = identityService.newUser("*");
 
-    try {
-      identityService.saveUser(user);
-      fail("it should not be possible to save a user with the generic resource id *");
-    } catch (ProcessEngineException e) {
-      assertTextPresent("has an invalid id: id cannot be *. * is a reserved identifier.", e.getMessage());
-    }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("has an invalid id: id cannot be *. * is a reserved identifier.");
+
+    identityService.saveUser(user);
   }
 
+  @Test
   public void testSaveGroupWithGenericResourceId() {
     Group group = identityService.newGroup("*");
 
-    try {
-      identityService.saveGroup(group);
-      fail("it should not be possible to save a group with the generic resource id *");
-    } catch (ProcessEngineException e) {
-      assertTextPresent("has an invalid id: id cannot be *. * is a reserved identifier.", e.getMessage());
-    }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("has an invalid id: id cannot be *. * is a reserved identifier.");
+
+    identityService.saveGroup(group);
   }
 
+  @Test
   public void testSetAuthenticatedIdToGenericId() {
-    try {
-      identityService.setAuthenticatedUserId("*");
-      fail("exception expected");
-    } catch (ProcessEngineException e) {
-      assertTextPresent("Invalid user id provided: id cannot be *. * is a reserved identifier.", e.getMessage());
-      assertNull(identityService.getCurrentAuthentication());
-    }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Invalid user id provided: id cannot be *. * is a reserved identifier.");
+
+    identityService.setAuthenticatedUserId("*");
   }
 
+  @Test
   public void testSetAuthenticationUserIdToGenericId() {
-    try {
-      identityService.setAuthentication("*", Collections.<String>emptyList());
-      fail("exception expected");
-    } catch (ProcessEngineException e) {
-      assertTextPresent("Invalid user id provided: id cannot be *. * is a reserved identifier.", e.getMessage());
-      assertNull(identityService.getCurrentAuthentication());
-    }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("invalid group id provided: id cannot be *. * is a reserved identifier.");
 
-    try {
-      identityService.setAuthentication("aUserId", Arrays.asList("*"));
-      fail("exception expected");
-    } catch (ProcessEngineException e) {
-      assertTextPresent("At least one invalid group id provided: id cannot be *. * is a reserved identifier.", e.getMessage());
-      assertNull(identityService.getCurrentAuthentication());
-    }
-
-    try {
-      identityService.setAuthentication(new Authentication("*", Collections.<String>emptyList()));
-      fail("exception expected");
-    } catch (ProcessEngineException e) {
-      assertTextPresent("Invalid user id provided: id cannot be *. * is a reserved identifier.", e.getMessage());
-      assertNull(identityService.getCurrentAuthentication());
-    }
-
-    try {
-      identityService.setAuthentication(new Authentication("aUserId", Arrays.asList("*")));
-      fail("exception expected");
-    } catch (ProcessEngineException e) {
-      assertTextPresent("At least one invalid group id provided: id cannot be *. * is a reserved identifier.", e.getMessage());
-      assertNull(identityService.getCurrentAuthentication());
-    }
+    identityService.setAuthentication("aUserId", Arrays.asList("*"));
   }
 
+  @Test
   public void testSetAuthenticatedTenantIdToGenericId() {
-    try {
-      identityService.setAuthentication(null, null, Arrays.asList("*"));
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("invalid tenant id provided: id cannot be *. * is a reserved identifier.");
 
-      fail("exception expected");
-    } catch (ProcessEngineException e) {
-      assertTextPresent("At least one invalid tenant id provided: id cannot be *. * is a reserved identifier.", e.getMessage());
-      assertNull(identityService.getCurrentAuthentication());
-    }
+    identityService.setAuthentication(null, null, Arrays.asList("*"));
   }
 
+  @Test
   public void testSetAuthenticatedUserId() {
     identityService.setAuthenticatedUserId("john");
 
@@ -588,6 +606,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     assertNull(currentAuthentication.getTenantIds());
   }
 
+  @Test
   public void testSetAuthenticatedUserAndGroups() {
     List<String> groups = Arrays.asList("sales", "development");
 
@@ -601,6 +620,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     assertNull(currentAuthentication.getTenantIds());
   }
 
+  @Test
   public void testSetAuthenticatedUserGroupsAndTenants() {
     List<String> groups = Arrays.asList("sales", "development");
     List<String> tenants = Arrays.asList("tenant1", "tenant2");
@@ -615,6 +635,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(tenants, currentAuthentication.getTenantIds());
   }
 
+  @Test
   public void testAuthentication() {
     User user = identityService.newUser("johndoe");
     user.setPassword("xxx");
@@ -626,6 +647,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser("johndoe");
   }
 
+  @Test
   public void testFindGroupsByUserAndType() {
     Group sales = identityService.newGroup("sales");
     sales.setType("hierarchy");
@@ -683,6 +705,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser("jackblack");
   }
 
+  @Test
   public void testUser() {
     User user = identityService.newUser("johndoe");
     user.setFirstName("John");
@@ -699,6 +722,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser("johndoe");
   }
 
+  @Test
   public void testGroup() {
     Group group = identityService.newGroup("sales");
     group.setName("Sales division");
@@ -711,28 +735,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteGroup("sales");
   }
 
-  public void testTenant() {
-    // create
-    Tenant tenant = identityService.newTenant("tenant");
-    tenant.setName("Tenant");
-    identityService.saveTenant(tenant);
-
-    tenant = identityService.createTenantQuery().singleResult();
-    assertNotNull(tenant);
-    assertEquals("tenant", tenant.getId());
-    assertEquals("Tenant", tenant.getName());
-
-    // update
-    tenant.setName("newName");
-    identityService.saveTenant(tenant);
-
-    tenant = identityService.createTenantQuery().singleResult();
-    assertEquals("newName", tenant.getName());
-
-    // delete
-    identityService.deleteTenant("tenant");
-  }
-
+  @Test
   public void testMembership() {
     Group sales = identityService.newGroup("sales");
     identityService.saveGroup(sales);
@@ -786,14 +789,15 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     return stringSet;
   }
 
-  public Set<String> getGroupIds(List<Group> groups) {
+  protected Set<String> getGroupIds(List<Group> groups) {
     Set<String> groupIds = new HashSet<String>();
     for (Group group : groups) {
       groupIds.add(group.getId());
     }
     return groupIds;
   }
-  public Set<String> getUserIds(List<User> users) {
+
+  protected Set<String> getUserIds(List<User> users) {
     Set<String> userIds = new HashSet<String>();
     for (User user : users) {
       userIds.add(user.getId());
@@ -802,5 +806,3 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
   }
 
 }
-
-

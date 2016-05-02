@@ -57,6 +57,11 @@ public interface IdentityService {
    *
    * <li> {@link #createMembership(String, String)} </li>
    * <li> {@link #deleteMembership(String, String)} </li>
+   *
+   * <li> {@link #createTenantUserMembership(String, String)} </li>
+   * <li> {@link #createTenantGroupMembership(String, String)} </li>
+   * <li> {@link #deleteTenantUserMembership(String, String)} </li>
+   * <li> {@link #deleteTenantGroupMembership(String, String)} </li>
    * </ul>
    *
    * <p>If these methods are invoked on a read-only identity service implementation,
@@ -206,6 +211,78 @@ public interface IdentityService {
    *           {@link Resources#TENANT}.
    */
   void deleteTenant(String tenantId);
+
+  /**
+   * Creates a new membership between the given user and tenant.
+   *
+   * @param tenantId
+   *          the id of the tenant, cannot be null.
+   * @param userId
+   *          the id of the user, cannot be null.
+   * @throws RuntimeException
+   *           when the given tenant or user doesn't exist or the user is
+   *           already a member of this tenant.
+   * @throws UnsupportedOperationException
+   *           if identity service implementation is read only. See
+   *           {@link #isReadOnly()}
+   * @throws AuthorizationException
+   *           if the user has no {@link Permissions#CREATE} permissions on
+   *           {@link Resources#TENANT_MEMBERSHIP}.
+   */
+  void createTenantUserMembership(String tenantId, String userId);
+
+  /**
+   * Creates a new membership between the given group and tenant.
+   *
+   * @param tenantId
+   *          the id of the tenant, cannot be null.
+   * @param groupId
+   *          the id of the group, cannot be null.
+   * @throws RuntimeException
+   *           when the given tenant or group doesn't exist or when the group
+   *           is already a member of this tenant.
+   * @throws UnsupportedOperationException
+   *           if identity service implementation is read only. See
+   *           {@link #isReadOnly()}
+   * @throws AuthorizationException
+   *           if the user has no {@link Permissions#CREATE} permissions on
+   *           {@link Resources#TENANT_MEMBERSHIP}.
+   */
+  void createTenantGroupMembership(String tenantId, String groupId);
+
+  /**
+   * Deletes the membership between the given user and tenant. The operation is
+   * ignored when the given user, tenant or membership don't exist.
+   *
+   * @param tenantId
+   *          the id of the tenant, cannot be null.
+   * @param userId
+   *          the id of the user, cannot be null.
+   * @throws UnsupportedOperationException
+   *           if identity service implementation is read only. See
+   *           {@link #isReadOnly()}
+   * @throws AuthorizationException
+   *           if the user has no {@link Permissions#DELETE} permissions on
+   *           {@link Resources#TENANT_MEMBERSHIP}.
+   */
+  void deleteTenantUserMembership(String tenantId, String userId);
+
+  /**
+   * Deletes the membership between the given group and tenant. The operation is
+   * ignored when the given group, tenant or membership don't exist.
+   *
+   * @param tenantId
+   *          the id of the tenant, cannot be null.
+   * @param groupId
+   *          the id of the group, cannot be null.
+   * @throws UnsupportedOperationException
+   *           if identity service implementation is read only. See
+   *           {@link #isReadOnly()}
+   * @throws AuthorizationException
+   *           if the user has no {@link Permissions#DELETE} permissions on
+   *           {@link Resources#TENANT_MEMBERSHIP}.
+   */
+  void deleteTenantGroupMembership(String tenantId, String groupId);
 
   /**
    * Checks if the password is valid for the given user. Arguments userId

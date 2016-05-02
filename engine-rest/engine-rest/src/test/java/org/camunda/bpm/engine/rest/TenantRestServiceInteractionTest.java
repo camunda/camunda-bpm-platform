@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.TENANT;
+import static org.camunda.bpm.engine.authorization.Resources.TENANT_MEMBERSHIP;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.any;
@@ -61,6 +62,10 @@ public class TenantRestServiceInteractionTest extends AbstractRestServiceTest {
   protected static final String SERVICE_URL = TEST_RESOURCE_ROOT_PATH + "/tenant";
   protected static final String TENANT_URL = SERVICE_URL + "/{id}";
   protected static final String TENANT_CREATE_URL = SERVICE_URL + "/create";
+  protected static final String TENANT_USER_MEMBERS_URL = TENANT_URL + "/user-members";
+  protected static final String TENANT_USER_MEMBER_URL = TENANT_USER_MEMBERS_URL + "/{userId}";
+  protected static final String TENANT_GROUP_MEMBERS_URL = TENANT_URL + "/group-members";
+  protected static final String TENANT_GROUP_MEMBER_URL = TENANT_GROUP_MEMBERS_URL + "/{groupId}";
 
   protected IdentityService identityServiceMock;
   protected AuthorizationService authorizationServiceMock;
@@ -533,6 +538,290 @@ public class TenantRestServiceInteractionTest extends AbstractRestServiceTest {
   }
 
   @Test
+  public void createTenantUserMembership() {
+
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+        .pathParam("userId", MockProvider.EXAMPLE_USER_ID)
+    .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+        .put(TENANT_USER_MEMBER_URL);
+
+    verify(identityServiceMock).createTenantUserMembership(MockProvider.EXAMPLE_TENANT_ID, MockProvider.EXAMPLE_USER_ID);
+  }
+
+  @Test
+  public void createTenantGroupMembership() {
+
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+        .pathParam("groupId", MockProvider.EXAMPLE_GROUP_ID)
+    .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+        .put(TENANT_GROUP_MEMBER_URL);
+
+    verify(identityServiceMock).createTenantGroupMembership(MockProvider.EXAMPLE_TENANT_ID, MockProvider.EXAMPLE_GROUP_ID);
+  }
+
+  @Test
+  public void createTenantUserMembershipThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(identityServiceMock).createTenantUserMembership(MockProvider.EXAMPLE_TENANT_ID, MockProvider.EXAMPLE_USER_ID);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+      .pathParam("userId", MockProvider.EXAMPLE_USER_ID)
+    .then().expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo(message))
+    .when()
+        .put(TENANT_USER_MEMBER_URL);
+  }
+
+  @Test
+  public void deleteTenantUserMembership() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+      .pathParam("userId", MockProvider.EXAMPLE_USER_ID)
+    .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+        .delete(TENANT_USER_MEMBER_URL);
+
+    verify(identityServiceMock).deleteTenantUserMembership(MockProvider.EXAMPLE_TENANT_ID, MockProvider.EXAMPLE_USER_ID);
+  }
+
+  @Test
+  public void deleteTenantGroupMembership() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+      .pathParam("groupId", MockProvider.EXAMPLE_GROUP_ID)
+    .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+        .delete(TENANT_GROUP_MEMBER_URL);
+
+    verify(identityServiceMock).deleteTenantGroupMembership(MockProvider.EXAMPLE_TENANT_ID, MockProvider.EXAMPLE_GROUP_ID);
+  }
+
+  @Test
+  public void deleteTenantGroupMembershipThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(identityServiceMock).deleteTenantGroupMembership(MockProvider.EXAMPLE_TENANT_ID, MockProvider.EXAMPLE_GROUP_ID);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+      .pathParam("groupId", MockProvider.EXAMPLE_GROUP_ID)
+    .then().expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo(message))
+    .when()
+        .delete(TENANT_GROUP_MEMBER_URL);
+  }
+
+  @Test
+  public void tenantUserMembershipResourceOptionsUnauthenticated() {
+    String fullMembersUrl = getFullAuthorizationTenantUrl() + "/user-members";
+
+    when(processEngineConfigurationMock.isAuthorizationEnabled()).thenReturn(true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+      .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+
+      .body("links[0].href", equalTo(fullMembersUrl))
+      .body("links[0].method", equalTo(HttpMethod.GET))
+      .body("links[0].rel", equalTo("self"))
+
+      .body("links[1].href", equalTo(fullMembersUrl))
+      .body("links[1].method", equalTo(HttpMethod.DELETE))
+      .body("links[1].rel", equalTo("delete"))
+
+      .body("links[2].href", equalTo(fullMembersUrl))
+      .body("links[2].method", equalTo(HttpMethod.PUT))
+      .body("links[2].rel", equalTo("create"))
+
+    .when()
+      .options(TENANT_USER_MEMBERS_URL);
+
+    verify(identityServiceMock, times(2)).getCurrentAuthentication();
+  }
+
+  @Test
+  public void tenantUserMembershipResourceOptionsAuthorized() {
+    String fullMembersUrl = getFullAuthorizationTenantUrl() + "/user-members";
+
+    Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, null);
+    when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID)).thenReturn(true);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, CREATE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID)).thenReturn(true);
+
+    when(processEngineConfigurationMock.isAuthorizationEnabled()).thenReturn(true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+
+      .body("links[0].href", equalTo(fullMembersUrl))
+      .body("links[0].method", equalTo(HttpMethod.GET))
+      .body("links[0].rel", equalTo("self"))
+
+      .body("links[1].href", equalTo(fullMembersUrl))
+      .body("links[1].method", equalTo(HttpMethod.DELETE))
+      .body("links[1].rel", equalTo("delete"))
+
+      .body("links[2].href", equalTo(fullMembersUrl))
+      .body("links[2].method", equalTo(HttpMethod.PUT))
+      .body("links[2].rel", equalTo("create"))
+
+    .when()
+      .options(TENANT_USER_MEMBERS_URL);
+
+    verify(identityServiceMock, times(2)).getCurrentAuthentication();
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID);
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, CREATE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void tenantGroupMembershipResourceOptionsAuthorized() {
+    String fullMembersUrl = getFullAuthorizationTenantUrl() + "/group-members";
+
+    Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, null);
+    when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID)).thenReturn(true);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, CREATE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID)).thenReturn(true);
+
+    when(processEngineConfigurationMock.isAuthorizationEnabled()).thenReturn(true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+
+      .body("links[0].href", equalTo(fullMembersUrl))
+      .body("links[0].method", equalTo(HttpMethod.GET))
+      .body("links[0].rel", equalTo("self"))
+
+      .body("links[1].href", equalTo(fullMembersUrl))
+      .body("links[1].method", equalTo(HttpMethod.DELETE))
+      .body("links[1].rel", equalTo("delete"))
+
+      .body("links[2].href", equalTo(fullMembersUrl))
+      .body("links[2].method", equalTo(HttpMethod.PUT))
+      .body("links[2].rel", equalTo("create"))
+
+    .when()
+      .options(TENANT_GROUP_MEMBERS_URL);
+
+    verify(identityServiceMock, times(2)).getCurrentAuthentication();
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID);
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, CREATE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void tenantUserMembershipResourceOptionsUnauthorized() {
+    String fullMembersUrl =  getFullAuthorizationTenantUrl() + "/user-members";
+
+    Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, null);
+    when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID)).thenReturn(false);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, CREATE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID)).thenReturn(false);
+
+    when(processEngineConfigurationMock.isAuthorizationEnabled()).thenReturn(true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+
+      .body("links[0].href", equalTo(fullMembersUrl))
+      .body("links[0].method", equalTo(HttpMethod.GET))
+      .body("links[0].rel", equalTo("self"))
+
+      .body("links[1]", nullValue())
+
+      .body("links[2]", nullValue())
+
+    .when()
+      .options(TENANT_USER_MEMBERS_URL);
+
+    verify(identityServiceMock, times(2)).getCurrentAuthentication();
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID);
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, CREATE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void tenantGroupMembershipResourceOptionsUnauthorized() {
+    String fullMembersUrl =  getFullAuthorizationTenantUrl() + "/group-members";
+
+    Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, null);
+    when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID)).thenReturn(false);
+    when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, CREATE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID)).thenReturn(false);
+
+    when(processEngineConfigurationMock.isAuthorizationEnabled()).thenReturn(true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+
+      .body("links[0].href", equalTo(fullMembersUrl))
+      .body("links[0].method", equalTo(HttpMethod.GET))
+      .body("links[0].rel", equalTo("self"))
+
+      .body("links[1]", nullValue())
+
+      .body("links[2]", nullValue())
+
+    .when()
+      .options(TENANT_GROUP_MEMBERS_URL);
+
+    verify(identityServiceMock, times(2)).getCurrentAuthentication();
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID);
+    verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, CREATE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void tenantUserMembershipResourceOptionsWithAuthorizationDisabled() {
+    String fullMembersUrl = getFullAuthorizationTenantUrl() + "/user-members";
+
+    when(processEngineConfigurationMock.isAuthorizationEnabled()).thenReturn(false);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+    .then()
+      .expect().statusCode(Status.OK.getStatusCode())
+
+      .body("links[0].href", equalTo(fullMembersUrl))
+      .body("links[0].method", equalTo(HttpMethod.GET))
+      .body("links[0].rel", equalTo("self"))
+
+      .body("links[1].href", equalTo(fullMembersUrl))
+      .body("links[1].method", equalTo(HttpMethod.DELETE))
+      .body("links[1].rel", equalTo("delete"))
+
+      .body("links[2].href", equalTo(fullMembersUrl))
+      .body("links[2].method", equalTo(HttpMethod.PUT))
+      .body("links[2].rel", equalTo("create"))
+
+    .when()
+      .options(TENANT_USER_MEMBERS_URL);
+
+    verifyNoAuthorizationCheckPerformed();
+  }
+
+  @Test
   public void failToCreateTenantForReadOnlyService() {
     Tenant newTenant = MockProvider.createMockTenant();
     when(identityServiceMock.isReadOnly()).thenReturn(true);
@@ -581,6 +870,74 @@ public class TenantRestServiceInteractionTest extends AbstractRestServiceTest {
       .delete(TENANT_URL);
 
     verify(identityServiceMock, never()).deleteTenant(MockProvider.EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void failToCreateTenantUserMembershipForReadOnlyService() {
+    when(identityServiceMock.isReadOnly()).thenReturn(true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+      .pathParam("userId", MockProvider.EXAMPLE_USER_ID)
+    .then().expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Identity service implementation is read-only."))
+    .when()
+        .put(TENANT_USER_MEMBER_URL);
+
+    verify(identityServiceMock, never()).createTenantUserMembership(MockProvider.EXAMPLE_TENANT_ID, MockProvider.EXAMPLE_USER_ID);
+  }
+
+  @Test
+  public void failToCreateTenantGroupMembershipForReadOnlyService() {
+    when(identityServiceMock.isReadOnly()).thenReturn(true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+      .pathParam("groupId", MockProvider.EXAMPLE_GROUP_ID)
+    .then().expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Identity service implementation is read-only."))
+    .when()
+        .put(TENANT_GROUP_MEMBER_URL);
+
+    verify(identityServiceMock, never()).createTenantGroupMembership(MockProvider.EXAMPLE_TENANT_ID, MockProvider.EXAMPLE_GROUP_ID);
+  }
+
+  @Test
+  public void failToDeleteTenantUserMembershipForReadOnlyService() {
+    when(identityServiceMock.isReadOnly()).thenReturn(true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+      .pathParam("userId", MockProvider.EXAMPLE_USER_ID)
+    .then().expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Identity service implementation is read-only."))
+    .when()
+        .delete(TENANT_USER_MEMBER_URL);
+
+    verify(identityServiceMock, never()).deleteTenantUserMembership(MockProvider.EXAMPLE_TENANT_ID, MockProvider.EXAMPLE_USER_ID);
+  }
+
+  @Test
+  public void failToDeleteTenantGroupMembershipForReadOnlyService() {
+    when(identityServiceMock.isReadOnly()).thenReturn(true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TENANT_ID)
+      .pathParam("groupId", MockProvider.EXAMPLE_GROUP_ID)
+    .then().expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Identity service implementation is read-only."))
+    .when()
+        .delete(TENANT_GROUP_MEMBER_URL);
+
+    verify(identityServiceMock, never()).deleteTenantGroupMembership(MockProvider.EXAMPLE_TENANT_ID, MockProvider.EXAMPLE_GROUP_ID);
   }
 
   protected void verifyNoAuthorizationCheckPerformed() {

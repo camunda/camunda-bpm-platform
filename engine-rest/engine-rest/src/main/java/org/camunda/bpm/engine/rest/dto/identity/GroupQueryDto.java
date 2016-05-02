@@ -48,6 +48,7 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
   protected String nameLike;
   protected String type;
   protected String member;
+  protected String tenantId;
 
   public GroupQueryDto() {
 
@@ -82,6 +83,11 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
     this.member = member;
   }
 
+  @CamundaQueryParam("memberOfTenant")
+  public void setMemberOfTenant(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -108,6 +114,9 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
     }
     if (member != null) {
       query.groupMember(member);
+    }
+    if (tenantId != null) {
+      query.memberOfTenant(tenantId);
     }
   }
 

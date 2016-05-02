@@ -70,6 +70,14 @@ public class MyResourceAuthorizationProvider implements ResourceAuthorizationPro
     return null;
   }
 
+  public AuthorizationEntity[] tenantMembershipCreated(Tenant tenant, User user) {
+    return null;
+  }
+
+  public AuthorizationEntity[] tenantMembershipCreated(Tenant tenant, Group group) {
+    return null;
+  }
+
   public AuthorizationEntity[] newFilter(Filter filter) {
     return null;
   }

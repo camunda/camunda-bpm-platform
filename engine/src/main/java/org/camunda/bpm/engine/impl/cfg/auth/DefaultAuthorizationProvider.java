@@ -92,6 +92,16 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     return null;
   }
 
+  public AuthorizationEntity[] tenantMembershipCreated(Tenant tenant, User user) {
+    // no default authorizations on tenant memberships.
+    return null;
+  }
+
+  public AuthorizationEntity[] tenantMembershipCreated(Tenant tenant, Group group) {
+    // no default authorizations on tenant memberships.
+    return null;
+  }
+
   public AuthorizationEntity[] newFilter(Filter filter) {
 
     String owner = filter.getOwner();

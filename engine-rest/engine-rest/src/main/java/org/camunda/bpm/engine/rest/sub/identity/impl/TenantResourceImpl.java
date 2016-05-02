@@ -28,7 +28,9 @@ import org.camunda.bpm.engine.rest.TenantRestService;
 import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
 import org.camunda.bpm.engine.rest.dto.identity.TenantDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.sub.identity.TenantGroupMembersResource;
 import org.camunda.bpm.engine.rest.sub.identity.TenantResource;
+import org.camunda.bpm.engine.rest.sub.identity.TenantUserMembersResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;;
 
@@ -72,7 +74,6 @@ public class TenantResourceImpl extends AbstractIdentityResource implements Tena
   }
 
   public ResourceOptionsDto availableOperations(UriInfo context) {
-
     ResourceOptionsDto dto = new ResourceOptionsDto();
 
     // add links if operations are authorized
@@ -91,6 +92,14 @@ public class TenantResourceImpl extends AbstractIdentityResource implements Tena
       dto.addReflexiveLink(uri, HttpMethod.PUT, "update");
     }
     return dto;
+  }
+
+  public TenantUserMembersResource getTenantUserMembersResource() {
+    return new TenantUserMembersResourceImpl(processEngine.getName(), resourceId, rootResourcePath, getObjectMapper());
+  }
+
+  public TenantGroupMembersResource getTenantGroupMembersResource() {
+    return new TenantGroupMembersResourceImpl(processEngine.getName(), resourceId, rootResourcePath, getObjectMapper());
   }
 
   protected Tenant findTenantObject() {

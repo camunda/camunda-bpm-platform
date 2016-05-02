@@ -26,6 +26,9 @@ public abstract class TenantQueryImpl extends AbstractQuery<TenantQuery, Tenant>
   protected String[] ids;
   protected String name;
   protected String nameLike;
+  protected String userId;
+  protected String groupId;
+  protected boolean includingGroups = false;
 
   public TenantQueryImpl() {
   }
@@ -58,6 +61,23 @@ public abstract class TenantQueryImpl extends AbstractQuery<TenantQuery, Tenant>
     return this;
   }
 
+  public TenantQuery userMember(String userId) {
+    ensureNotNull("user id", userId);
+    this.userId = userId;
+    return this;
+  }
+
+  public TenantQuery groupMember(String groupId) {
+    ensureNotNull("group id", groupId);
+    this.groupId = groupId;
+    return this;
+  }
+
+  public TenantQuery includingGroupsOfUser(boolean includingGroups) {
+    this.includingGroups = includingGroups;
+    return this;
+  }
+
   //sorting ////////////////////////////////////////////////////////
 
   public TenantQuery orderByTenantId() {
@@ -84,6 +104,18 @@ public abstract class TenantQueryImpl extends AbstractQuery<TenantQuery, Tenant>
 
   public String[] getIds() {
     return ids;
+  }
+
+  public String getUserId() {
+    return userId;
+  }
+
+  public String getGroupId() {
+    return groupId;
+  }
+
+  public boolean isIncludingGroups() {
+    return includingGroups;
   }
 
 }

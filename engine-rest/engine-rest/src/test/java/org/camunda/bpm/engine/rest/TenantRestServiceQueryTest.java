@@ -129,6 +129,8 @@ public class TenantRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).tenantId(MockProvider.EXAMPLE_TENANT_ID);
     verify(mockQuery).tenantName(MockProvider.EXAMPLE_TENANT_NAME);
     verify(mockQuery).tenantNameLike("%" + MockProvider.EXAMPLE_TENANT_NAME + "%");
+    verify(mockQuery).userMember(MockProvider.EXAMPLE_USER_ID);
+    verify(mockQuery).groupMember(MockProvider.EXAMPLE_GROUP_ID);
 
     verify(mockQuery).list();
   }
@@ -139,8 +141,27 @@ public class TenantRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("id", MockProvider.EXAMPLE_TENANT_ID);
     parameters.put("name", MockProvider.EXAMPLE_TENANT_NAME);
     parameters.put("nameLike", "%" + MockProvider.EXAMPLE_TENANT_NAME + "%");
+    parameters.put("userMember", MockProvider.EXAMPLE_USER_ID);
+    parameters.put("groupMember", MockProvider.EXAMPLE_GROUP_ID);
 
     return parameters;
+  }
+
+  @Test
+  public void queryByUserIncludingGroups() {
+
+    given()
+      .queryParam("userMember", MockProvider.EXAMPLE_USER_ID)
+      .queryParam("includingGroupsOfUser", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(QUERY_URL);
+
+    verify(mockQuery).userMember(MockProvider.EXAMPLE_USER_ID);
+    verify(mockQuery).includingGroupsOfUser(true);
+
+    verify(mockQuery).list();
   }
 
   @Test

@@ -110,7 +110,7 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
 
   //tenants //////////////////////////////////////////
 
-  public Tenant findTenantById(String tenantId) {
+  public TenantEntity findTenantById(String tenantId) {
     checkAuthorization(Permissions.READ, Resources.TENANT, tenantId);
     return getDbEntityManager().selectById(TenantEntity.class, tenantId);
   }

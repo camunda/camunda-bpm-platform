@@ -34,6 +34,16 @@ public interface TenantQuery extends Query<TenantQuery, Tenant> {
    *  The syntax to use is that of SQL, eg. %tenant%. */
   TenantQuery tenantNameLike(String tenantNameLike);
 
+  /** Only select {@link Tenant}s where the given user is member of. */
+  TenantQuery userMember(String userId);
+
+  /** Only select {@link Tenant}s where the given group is member of. */
+  TenantQuery groupMember(String groupId);
+
+  /** Selects the {@link Tenant}s which belongs to one of the user's groups.
+   * Can only be used in combination with {@link #userMember(String)} */
+  TenantQuery includingGroupsOfUser(boolean includingGroups);
+
   //sorting ////////////////////////////////////////////////////////
 
   /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). */

@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -41,6 +42,9 @@ public class TenantQueryDto extends AbstractQueryDto<TenantQuery> {
   protected String id;
   protected String name;
   protected String nameLike;
+  protected String userId;
+  protected String groupId;
+  protected Boolean includingGroupsOfUser;
 
   public TenantQueryDto() {
   }
@@ -64,6 +68,21 @@ public class TenantQueryDto extends AbstractQueryDto<TenantQuery> {
     this.nameLike = nameLike;
   }
 
+  @CamundaQueryParam("userMember")
+  public void setUserMember(String userId) {
+    this.userId = userId;
+  }
+
+  @CamundaQueryParam("groupMember")
+  public void setGroupMember(String groupId) {
+    this.groupId = groupId;
+  }
+
+  @CamundaQueryParam(value = "includingGroupsOfUser", converter = BooleanConverter.class)
+  public void setIncludingGroupsOfUser(Boolean includingGroupsOfUser) {
+    this.includingGroupsOfUser = includingGroupsOfUser;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -84,6 +103,15 @@ public class TenantQueryDto extends AbstractQueryDto<TenantQuery> {
     }
     if (nameLike != null) {
       query.tenantNameLike(nameLike);
+    }
+    if (userId != null) {
+      query.userMember(userId);
+    }
+    if (groupId != null) {
+      query.groupMember(groupId);
+    }
+    if (Boolean.TRUE.equals(includingGroupsOfUser)) {
+      query.includingGroupsOfUser(true);
     }
   }
 

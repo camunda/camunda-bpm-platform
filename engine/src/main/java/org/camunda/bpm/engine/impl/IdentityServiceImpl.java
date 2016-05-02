@@ -28,12 +28,16 @@ import org.camunda.bpm.engine.impl.cmd.CreateGroupCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateGroupQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateMembershipCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateTenantCmd;
+import org.camunda.bpm.engine.impl.cmd.CreateTenantGroupMembershipCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateTenantQueryCmd;
+import org.camunda.bpm.engine.impl.cmd.CreateTenantUserMembershipCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateUserCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateUserQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteGroupCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteMembershipCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteTenantCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteTenantGroupMembershipCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteTenantUserMembershipCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteUserCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteUserInfoCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteUserPictureCmd;
@@ -206,6 +210,22 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
 
   public void setUserAccount(String userId, String userPassword, String accountName, String accountUsername, String accountPassword, Map<String, String> accountDetails) {
     commandExecutor.execute(new SetUserInfoCmd(userId, userPassword, accountName, accountUsername, accountPassword, accountDetails));
+  }
+
+  public void createTenantUserMembership(String tenantId, String userId) {
+    commandExecutor.execute(new CreateTenantUserMembershipCmd(tenantId, userId));
+  }
+
+  public void createTenantGroupMembership(String tenantId, String groupId) {
+    commandExecutor.execute(new CreateTenantGroupMembershipCmd(tenantId, groupId));
+  }
+
+  public void deleteTenantUserMembership(String tenantId, String userId) {
+    commandExecutor.execute(new DeleteTenantUserMembershipCmd(tenantId, userId));
+  }
+
+  public void deleteTenantGroupMembership(String tenantId, String groupId) {
+    commandExecutor.execute(new DeleteTenantGroupMembershipCmd(tenantId, groupId));
   }
 
 }

@@ -20,8 +20,10 @@ import static org.junit.Assert.assertThat;
 import java.util.List;
 
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
+import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
@@ -29,6 +31,12 @@ import org.junit.Rule;
 import org.junit.Test;
 
 public class TenantQueryTest {
+
+  protected static final String TENANT_ONE = "tenant1";
+  protected static final String TENANT_TWO = "tenant2";
+
+  protected static final String USER = "user";
+  protected static final String GROUP = "group";
 
   @Rule
   public ProcessEngineRule engineRule = new ProcessEngineRule(true);
@@ -39,13 +47,24 @@ public class TenantQueryTest {
   public void setUp() {
     identityService = engineRule.getIdentityService();
 
-    createTenant("tenant1", "Tenant 1");
-    createTenant("tenant2", "Tenant 2");
+    createTenant(TENANT_ONE, "Tenant 1");
+    createTenant(TENANT_TWO, "Tenant 2");
+
+    User user = identityService.newUser(USER);
+    identityService.saveUser(user);
+
+    Group group = identityService.newGroup(GROUP);
+    identityService.saveGroup(group);
+
+    identityService.createMembership(USER, GROUP);
+
+    identityService.createTenantUserMembership(TENANT_ONE, USER);
+    identityService.createTenantGroupMembership(TENANT_TWO, GROUP);
   }
 
   @Test
   public void queryById() {
-    TenantQuery query = identityService.createTenantQuery().tenantId("tenant1");
+    TenantQuery query = identityService.createTenantQuery().tenantId(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
     assertThat(query.list().size(), is(1));
@@ -67,7 +86,7 @@ public class TenantQueryTest {
     TenantQuery query = identityService.createTenantQuery();
 
     assertThat(query.tenantIdIn("non", "existing").count(), is(0L));
-    assertThat(query.tenantIdIn("tenant1", "tenant2").count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count(), is(2L));
   }
 
   @Test
@@ -89,19 +108,45 @@ public class TenantQueryTest {
   }
 
   @Test
+  public void queryByUser() {
+    TenantQuery query = identityService.createTenantQuery();
+
+    assertThat(query.userMember("nonExisting").count(), is(0L));
+    assertThat(query.userMember(USER).count(), is(1L));
+    assertThat(query.userMember(USER).tenantId(TENANT_ONE).count(), is(1L));
+  }
+
+  @Test
+  public void queryByGroup() {
+    TenantQuery query = identityService.createTenantQuery();
+
+    assertThat(query.groupMember("nonExisting").count(), is(0L));
+    assertThat(query.groupMember(GROUP).count(), is(1L));
+    assertThat(query.groupMember(GROUP).tenantId(TENANT_TWO).count(), is(1L));
+  }
+
+  @Test
+  public void queryByUserIncludingGroups() {
+    TenantQuery query = identityService.createTenantQuery().userMember(USER);
+
+    assertThat(query.includingGroupsOfUser(false).count(), is(1L));
+    assertThat(query.includingGroupsOfUser(true).count(), is(2L));
+  }
+
+  @Test
   public void queryOrderById() {
     // ascending
     List<Tenant> tenants = identityService.createTenantQuery().orderByTenantId().asc().list();
     assertThat(tenants.size(), is(2));
 
-    assertThat(tenants.get(0).getId(), is("tenant1"));
-    assertThat(tenants.get(1).getId(), is("tenant2"));
+    assertThat(tenants.get(0).getId(), is(TENANT_ONE));
+    assertThat(tenants.get(1).getId(), is(TENANT_TWO));
 
     // descending
     tenants = identityService.createTenantQuery().orderByTenantId().desc().list();
 
-    assertThat(tenants.get(0).getId(), is("tenant2"));
-    assertThat(tenants.get(1).getId(), is("tenant1"));
+    assertThat(tenants.get(0).getId(), is(TENANT_TWO));
+    assertThat(tenants.get(1).getId(), is(TENANT_ONE));
   }
 
   @Test
@@ -130,8 +175,11 @@ public class TenantQueryTest {
 
   @After
   public void tearDown() throws Exception {
-    identityService.deleteTenant("tenant1");
-    identityService.deleteTenant("tenant2");
+    identityService.deleteTenant(TENANT_ONE);
+    identityService.deleteTenant(TENANT_TWO);
+
+    identityService.deleteUser(USER);
+    identityService.deleteGroup(GROUP);
   }
 
 }

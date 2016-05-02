@@ -171,6 +171,40 @@ create table ACT_ID_TENANT (
     primary key (ID_)
 );
 
+create table ACT_ID_TENANT_MEMBER (
+    ID_ varchar(64) not null,
+    TENANT_ID_ varchar(64) not null,
+    USER_ID_ varchar(64),
+    GROUP_ID_ varchar(64),
+    primary key (ID_)
+);
+
+alter table ACT_ID_TENANT_MEMBER
+    add constraint ACT_UNIQ_TENANT_MEMB_USER
+    unique (TENANT_ID_, USER_ID_);
+
+alter table ACT_ID_TENANT_MEMBER
+    add constraint ACT_UNIQ_TENANT_MEMB_GROUP
+    unique (TENANT_ID_, GROUP_ID_);
+
+create index ACT_IDX_TENANT_MEMB on ACT_ID_TENANT_MEMBER(TENANT_ID);  
+alter table ACT_ID_TENANT_MEMBER
+    add constraint ACT_FK_TENANT_MEMB
+    foreign key (TENANT_ID_)
+    references ACT_ID_TENANT;  
+    
+create index ACT_IDX_TENANT_MEMB_USER on ACT_ID_TENANT_MEMBER(USER_ID);
+alter table ACT_ID_TENANT_MEMBER
+    add constraint ACT_FK_TENANT_MEMB_USER
+    foreign key (USER_ID_)
+    references ACT_ID_USER;    
+    
+create index ACT_IDX_TENANT_MEMB_GROUP on ACT_ID_TENANT_MEMBER(GROUP_ID);    
+alter table ACT_ID_TENANT_MEMBER
+    add constraint ACT_FK_TENANT_MEMB_GROUP
+    foreign key (GROUP_ID_)
+    references ACT_ID_GROUP;      
+
 --- BATCH ---
 
 -- remove not null from job definition table --

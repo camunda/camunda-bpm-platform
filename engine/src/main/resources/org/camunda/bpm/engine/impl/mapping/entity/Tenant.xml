@@ -62,7 +62,10 @@
   
   <sql id="selectTenantByQueryCriteriaSql">
     from ${prefix}ACT_ID_TENANT RES
-   <where>
+    <if test="userId != null || groupId != null">
+      inner join ${prefix}ACT_ID_TENANT_MEMBER TM on RES.ID_ = TM.TENANT_ID_
+    </if>
+    <where>
       <if test="id != null">
         RES.ID_ = #{id}
       </if>
@@ -79,6 +82,20 @@
       <if test="nameLike != null">
         and RES.NAME_ like #{nameLike}
       </if>      
+      <if test="userId != null">
+        and (TM.USER_ID_ = #{userId}
+        <if test="includingGroups">
+          or TM.GROUP_ID_ in (
+            select M.GROUP_ID_
+            from ${prefix}ACT_ID_MEMBERSHIP M
+            where M.USER_ID_ = #{userId}
+          )
+        </if>
+        )
+      </if>
+      <if test="groupId != null">
+        and TM.GROUP_ID_ = #{groupId}
+      </if>
       
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
     </where>

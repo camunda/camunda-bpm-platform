@@ -171,6 +171,34 @@ create table ACT_ID_TENANT (
     primary key (ID_)
 );
 
+create table ACT_ID_TENANT_MEMBER (
+    ID_ varchar(64) not null,
+    TENANT_ID_ varchar(64) not null,
+    USER_ID_ varchar(64),
+    GROUP_ID_ varchar(64),
+    primary key (ID_),
+    UNI_USER_ID_ varchar (255) not null generated always as (case when "USER_ID_" is null then "ID_" else "USER_ID_" end),
+    UNI_GROUP_ID_ varchar (255) not null generated always as (case when "GROUP_ID_" is null then "ID_" else "GROUP_ID_" end)
+);
+
+alter table ACT_ID_TENANT_MEMBER
+    add constraint ACT_FK_TENANT_MEMB
+    foreign key (TENANT_ID_)
+    references ACT_ID_TENANT (ID_);    
+    
+alter table ACT_ID_TENANT_MEMBER
+    add constraint ACT_FK_TENANT_MEMB_USER
+    foreign key (USER_ID_)
+    references ACT_ID_USER (ID_);    
+    
+alter table ACT_ID_TENANT_MEMBER
+    add constraint ACT_FK_TENANT_MEMB_GROUP
+    foreign key (GROUP_ID_)
+    references ACT_ID_GROUP (ID_);  
+    
+create unique index ACT_UNIQ_TENANT_MEMB_USER on ACT_ID_TENANT_MEMBER(TENANT_ID_,UNI_USER_ID_);
+create unique index ACT_UNIQ_TENANT_MEMB_GROUP on ACT_ID_TENANT_MEMBER(TENANT_ID_,UNI_GROUP_ID_);
+
 --- BATCH ---
 
 -- remove not null from job definition table --

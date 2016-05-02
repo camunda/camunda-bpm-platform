@@ -12,42 +12,32 @@
  */
 package org.camunda.bpm.engine.rest.sub.identity;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
-import org.camunda.bpm.engine.rest.dto.identity.TenantDto;
 
-public interface TenantResource {
+public interface TenantGroupMembersResource {
 
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  public TenantDto getTenant(@Context UriInfo context);
-
-  @DELETE
-  @Produces(MediaType.APPLICATION_JSON)
-  public void deleteTenant();
+  public static final String PATH = "/group-members";
 
   @PUT
-  @Consumes(MediaType.APPLICATION_JSON)
-  public void updateTenant(TenantDto tenant);
+  @Path("/{groupId}")
+  public void createMembership(@PathParam("groupId") String groupId);
+
+  @DELETE
+  @Path("/{groupId}")
+  public void deleteMembership(@PathParam("groupId") String groupId);
 
   @OPTIONS
   @Produces(MediaType.APPLICATION_JSON)
   ResourceOptionsDto availableOperations(@Context UriInfo context);
-
-  @Path(TenantUserMembersResource.PATH)
-  TenantUserMembersResource getTenantUserMembersResource();
-
-  @Path(TenantGroupMembersResource.PATH)
-  TenantGroupMembersResource getTenantGroupMembersResource();
 
 }

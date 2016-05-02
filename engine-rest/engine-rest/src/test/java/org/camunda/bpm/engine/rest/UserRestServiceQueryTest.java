@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,7 +48,7 @@ public class UserRestServiceQueryTest extends AbstractRestServiceTest {
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
-  
+
   protected static final String USER_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/user";
   protected static final String USER_COUNT_QUERY_URL = USER_QUERY_URL + "/count";
 
@@ -63,22 +63,22 @@ public class UserRestServiceQueryTest extends AbstractRestServiceTest {
     UserQuery sampleUserQuery = mock(UserQuery.class);
     when(sampleUserQuery.list()).thenReturn(list);
     when(sampleUserQuery.count()).thenReturn((long) list.size());
-  
+
     when(processEngine.getIdentityService().createUserQuery()).thenReturn(sampleUserQuery);
-  
+
     return sampleUserQuery;
   }
-  
+
   @Test
   public void testEmptyQuery() {
-    
+
     String queryKey = "";
     given().queryParam("name", queryKey)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(USER_QUERY_URL);
-    
+
   }
-  
+
   @Test
   public void testSortByParameterOnly() {
     given().queryParam("sortBy", "firstName")
@@ -87,7 +87,7 @@ public class UserRestServiceQueryTest extends AbstractRestServiceTest {
       .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
       .when().get(USER_QUERY_URL);
   }
-  
+
   @Test
   public void testSortOrderParameterOnly() {
     given().queryParam("sortOrder", "asc")
@@ -96,23 +96,23 @@ public class UserRestServiceQueryTest extends AbstractRestServiceTest {
       .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
       .when().get(USER_QUERY_URL);
   }
-  
+
   @Test
   public void testNoParametersQuery() {
     expect().statusCode(Status.OK.getStatusCode()).when().get(USER_QUERY_URL);
-    
+
     verify(mockQuery).list();
     verifyNoMoreInteractions(mockQuery);
   }
-  
+
   @Test
   public void testSimpleUserQuery() {
     String queryFirstName = MockProvider.EXAMPLE_USER_FIRST_NAME;
-    
+
     Response response = given().queryParam("firstName", queryFirstName)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(USER_QUERY_URL);
-    
+
     InOrder inOrder = inOrder(mockQuery);
     inOrder.verify(mockQuery).userFirstName(queryFirstName);
     inOrder.verify(mockQuery).list();
@@ -124,7 +124,6 @@ public class UserRestServiceQueryTest extends AbstractRestServiceTest {
   public void testCompleteGetParameters() {
 
     Map<String, String> queryParameters = getCompleteStringQueryParameters();
-    queryParameters.put("memberOfGroup", MockProvider.EXAMPLE_GROUP_ID);
 
     RequestSpecification requestSpecification = given().contentType(POST_JSON_CONTENT_TYPE);
     for (Entry<String, String> paramEntry : queryParameters.entrySet()) {
@@ -138,6 +137,7 @@ public class UserRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).userFirstName(MockProvider.EXAMPLE_USER_FIRST_NAME);
     verify(mockQuery).userLastName(MockProvider.EXAMPLE_USER_LAST_NAME);
     verify(mockQuery).memberOfGroup(MockProvider.EXAMPLE_GROUP_ID);
+    verify(mockQuery).memberOfTenant(MockProvider.EXAMPLE_TENANT_ID);
 
     verify(mockQuery).list();
 
@@ -209,6 +209,8 @@ public class UserRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("firstName", MockProvider.EXAMPLE_USER_FIRST_NAME);
     parameters.put("lastName", MockProvider.EXAMPLE_USER_LAST_NAME);
     parameters.put("email", MockProvider.EXAMPLE_USER_EMAIL);
+    parameters.put("memberOfGroup", MockProvider.EXAMPLE_GROUP_ID);
+    parameters.put("memberOfTenant", MockProvider.EXAMPLE_TENANT_ID);
 
     return parameters;
   }
@@ -248,5 +250,5 @@ public class UserRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXAMPLE_USER_EMAIL, returnedEmail);
   }
 
-  
+
 }

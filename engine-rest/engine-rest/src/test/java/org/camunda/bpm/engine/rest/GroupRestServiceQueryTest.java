@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,7 +48,7 @@ public class GroupRestServiceQueryTest extends AbstractRestServiceTest {
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
-  
+
   protected static final String GROUP_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/group";
   protected static final String GROUP_COUNT_QUERY_URL = GROUP_QUERY_URL + "/count";
 
@@ -63,22 +63,22 @@ public class GroupRestServiceQueryTest extends AbstractRestServiceTest {
     GroupQuery sampleGroupQuery = mock(GroupQuery.class);
     when(sampleGroupQuery.list()).thenReturn(list);
     when(sampleGroupQuery.count()).thenReturn((long) list.size());
-  
+
     when(processEngine.getIdentityService().createGroupQuery()).thenReturn(sampleGroupQuery);
-  
+
     return sampleGroupQuery;
   }
-  
+
   @Test
   public void testEmptyQuery() {
-    
+
     String queryKey = "";
     given().queryParam("name", queryKey)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(GROUP_QUERY_URL);
-    
+
   }
-  
+
   @Test
   public void testSortByParameterOnly() {
     given().queryParam("sortBy", "name")
@@ -87,7 +87,7 @@ public class GroupRestServiceQueryTest extends AbstractRestServiceTest {
       .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
       .when().get(GROUP_QUERY_URL);
   }
-  
+
   @Test
   public void testSortOrderParameterOnly() {
     given().queryParam("sortOrder", "asc")
@@ -96,90 +96,94 @@ public class GroupRestServiceQueryTest extends AbstractRestServiceTest {
       .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
       .when().get(GROUP_QUERY_URL);
   }
-  
+
   @Test
   public void testNoParametersQuery() {
     expect().statusCode(Status.OK.getStatusCode()).when().get(GROUP_QUERY_URL);
-    
+
     verify(mockQuery).list();
     verifyNoMoreInteractions(mockQuery);
   }
-  
+
   @Test
   public void testSimpleGroupQuery() {
     String queryName = MockProvider.EXAMPLE_GROUP_NAME;
-    
+
     Response response = given().queryParam("name", queryName)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(GROUP_QUERY_URL);
-    
+
     InOrder inOrder = inOrder(mockQuery);
     inOrder.verify(mockQuery).groupName(queryName);
     inOrder.verify(mockQuery).list();
-    
+
     String content = response.asString();
     List<String> instances = from(content).getList("");
     Assert.assertEquals("There should be one group returned.", 1, instances.size());
     Assert.assertNotNull("The returned group should not be null.", instances.get(0));
-    
+
     String returendName = from(content).getString("[0].name");
     String returendType = from(content).getString("[0].type");
-    
+
     Assert.assertEquals(MockProvider.EXAMPLE_GROUP_NAME, returendName);
     Assert.assertEquals(MockProvider.EXAMPLE_GROUP_TYPE, returendType);
-    
+
   }
-  
+
   @Test
   public void testCompleteGetParameters() {
-    
+
     Map<String, String> queryParameters = getCompleteStringQueryParameters();
-    queryParameters.put("member", MockProvider.EXAMPLE_USER_ID);
-    
+
     RequestSpecification requestSpecification = given().contentType(POST_JSON_CONTENT_TYPE);
     for (Entry<String, String> paramEntry : queryParameters.entrySet()) {
       requestSpecification.parameter(paramEntry.getKey(), paramEntry.getValue());
     }
-    
+
     requestSpecification.expect().statusCode(Status.OK.getStatusCode())
       .when().get(GROUP_QUERY_URL);
-    
+
     verify(mockQuery).groupName(MockProvider.EXAMPLE_GROUP_NAME);
+    verify(mockQuery).groupNameLike("%" + MockProvider.EXAMPLE_GROUP_NAME + "%");
     verify(mockQuery).groupType(MockProvider.EXAMPLE_GROUP_TYPE);
     verify(mockQuery).groupMember(MockProvider.EXAMPLE_USER_ID);
-    
+    verify(mockQuery).memberOfTenant(MockProvider.EXAMPLE_TENANT_ID);
+
     verify(mockQuery).list();
-    
+
   }
 
   private Map<String, String> getCompleteStringQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
-    
+
     parameters.put("name", MockProvider.EXAMPLE_GROUP_NAME);
+    parameters.put("nameLike", "%" + MockProvider.EXAMPLE_GROUP_NAME + "%");
     parameters.put("type", MockProvider.EXAMPLE_GROUP_TYPE);
-  
+    parameters.put("member", MockProvider.EXAMPLE_USER_ID);
+    parameters.put("memberOfTenant", MockProvider.EXAMPLE_TENANT_ID);
+
     return parameters;
   }
-  
+
   @Test
   public void testQueryCount() {
     expect().statusCode(Status.OK.getStatusCode())
       .body("count", equalTo(1))
       .when().get(GROUP_COUNT_QUERY_URL);
-    
+
     verify(mockQuery).count();
   }
-  
+
   @Test
-  public void testSuccessfulPagination() {    
+  public void testSuccessfulPagination() {
     int firstResult = 0;
     int maxResults = 10;
     given().queryParam("firstResult", firstResult).queryParam("maxResults", maxResults)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(GROUP_QUERY_URL);
-    
+
     verify(mockQuery).listPage(firstResult, maxResults);
   }
 
-  
+
 }

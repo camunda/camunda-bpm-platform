@@ -98,7 +98,7 @@ public interface WritableIdentityProvider extends Session {
    * </p>
    *
    * <p>
-   * NOTE: the implementation does not validate the uniqueness of the groupId
+   * NOTE: the implementation does not validate the uniqueness of the tenantId
    * parameter at this time.
    * </p>
    *
@@ -142,13 +142,52 @@ public interface WritableIdentityProvider extends Session {
   public void createMembership(String userId, String groupId);
 
   /**
-   * Creates a membership relation between a user and a group. If the user is not part of that group,
-   * IdentityProviderException is thrown.
+   * Deletes a membership relation between a user and a group.
    *
    * @param userId the id of the user
    * @param groupId id of the group
    * @throws IdentityProviderException
    */
   public void deleteMembership(String userId, String groupId);
+
+  /**
+   * Creates a membership relation between a tenant and a user.
+   *
+   * @param tenantId
+   *          the id of the tenant
+   * @param userId
+   *          the id of the user
+   */
+  public void createTenantUserMembership(String tenantId, String userId);
+
+  /**
+   * Creates a membership relation between a tenant and a group.
+   *
+   * @param tenantId
+   *          the id of the tenant
+   * @param groupId
+   *          the id of the group
+   */
+  public void createTenantGroupMembership(String tenantId, String groupId);
+
+  /**
+   * Deletes a membership relation between a tenant and a user.
+   *
+   * @param tenantId
+   *          the id of the tenant
+   * @param userId
+   *          the id of the user
+   */
+  public void deleteTenantUserMembership(String tenantId, String userId);
+
+  /**
+   * Deletes a membership relation between a tenant and a group.
+   *
+   * @param tenantId
+   *          the id of the tenant
+   * @param groupId
+   *          the id of the group
+   */
+  public void deleteTenantGroupMembership(String tenantId, String groupId);
 
 }

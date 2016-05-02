@@ -12,17 +12,14 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.impl.persistence.entity.TenantEntity;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Daniel Meyer
@@ -35,6 +32,9 @@ public class ReadOnlyIdentityServiceTest {
   @Rule
   public ProcessEngineRule engineRule = new ProcessEngineRule(CONFIGURATION_RESOURCE, true);
 
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
   protected IdentityService identityService;
 
   @Before
@@ -45,97 +45,132 @@ public class ReadOnlyIdentityServiceTest {
   }
 
   @Test
-  public void unsupportedMethodsForUser() {
-    try {
-      identityService.newUser("whatever");
-      fail("exception expected");
-    } catch (UnsupportedOperationException e) {
-      assertThat(e.getMessage(), containsString("This identity service implementation is read-only."));
-    }
+  public void newUser() {
+    thrown.expect(UnsupportedOperationException.class);
+    thrown.expectMessage("This identity service implementation is read-only.");
 
-    try {
-      identityService.saveUser(null);
-      fail("exception expected");
-    } catch (UnsupportedOperationException e) {
-      assertThat(e.getMessage(), containsString("This identity service implementation is read-only."));
-    }
-
-    try {
-      identityService.deleteUser("whatever");
-      fail("exception expected");
-    } catch (UnsupportedOperationException e) {
-      assertThat(e.getMessage(), containsString("This identity service implementation is read-only."));
-    }
+    identityService.newUser("user");
   }
 
   @Test
-  public void unsupportedMethodsForGroup() {
-    try {
-      identityService.newGroup("whatever");
-      fail("exception expected");
-    } catch (UnsupportedOperationException e) {
-      assertThat(e.getMessage(), containsString("This identity service implementation is read-only."));
-    }
+  public void saveUser() {
+    thrown.expect(UnsupportedOperationException.class);
+    thrown.expectMessage("This identity service implementation is read-only.");
 
-    try {
-      identityService.saveGroup(null);
-      fail("exception expected");
-    } catch (UnsupportedOperationException e) {
-      assertThat(e.getMessage(), containsString("This identity service implementation is read-only."));
-    }
-
-    try {
-      identityService.deleteGroup("whatever");
-      fail("exception expected");
-    } catch (UnsupportedOperationException e) {
-      assertThat(e.getMessage(), containsString("This identity service implementation is read-only."));
-    }
+    identityService.saveUser(null);
   }
 
   @Test
-  public void unsupportedMethodsForMembership() {
-    try {
-      identityService.createMembership("whatever", "this won't work");
-      fail("exception expected");
-    } catch (UnsupportedOperationException e) {
-      assertThat(e.getMessage(), containsString("This identity service implementation is read-only."));
-    }
+  public void deleteUser() {
+    thrown.expect(UnsupportedOperationException.class);
+    thrown.expectMessage("This identity service implementation is read-only.");
 
-    try {
-      identityService.deleteMembership("whatever", "this won't work");
-      fail("exception expected");
-    } catch (UnsupportedOperationException e) {
-      assertThat(e.getMessage(), containsString("This identity service implementation is read-only."));
-    }
+    identityService.deleteUser("user");
   }
 
   @Test
-  public void unsupportedMethodsForTenant() {
-    try {
-      identityService.newTenant("whatever");
-      fail("exception expected");
-    } catch (UnsupportedOperationException e) {
-      assertThat(e.getMessage(), containsString("This identity service implementation is read-only."));
-    }
+  public void newGroup() {
+    thrown.expect(UnsupportedOperationException.class);
+    thrown.expectMessage("This identity service implementation is read-only.");
 
-    try {
-      identityService.saveTenant(new TenantEntity());
-      fail("exception expected");
-    } catch (UnsupportedOperationException e) {
-      assertThat(e.getMessage(), containsString("This identity service implementation is read-only."));
-    }
-
-    try {
-      identityService.deleteTenant("whatever");
-      fail("exception expected");
-    } catch (UnsupportedOperationException e) {
-      assertThat(e.getMessage(), containsString("This identity service implementation is read-only."));
-    }
+    identityService.newGroup("group");
   }
 
   @Test
-  public void supportedMethods() {
+  public void saveGroup() {
+    thrown.expect(UnsupportedOperationException.class);
+    thrown.expectMessage("This identity service implementation is read-only.");
+
+    identityService.saveGroup(null);
+  }
+
+  @Test
+  public void deleteGroup() {
+    thrown.expect(UnsupportedOperationException.class);
+    thrown.expectMessage("This identity service implementation is read-only.");
+
+    identityService.deleteGroup("group");
+  }
+
+  @Test
+  public void newTenant() {
+    thrown.expect(UnsupportedOperationException.class);
+    thrown.expectMessage("This identity service implementation is read-only.");
+
+    identityService.newTenant("tenant");
+  }
+
+  @Test
+  public void saveTenant() {
+    thrown.expect(UnsupportedOperationException.class);
+    thrown.expectMessage("This identity service implementation is read-only.");
+
+    identityService.saveTenant(null);
+  }
+
+  @Test
+  public void deleteTenant() {
+    thrown.expect(UnsupportedOperationException.class);
+    thrown.expectMessage("This identity service implementation is read-only.");
+
+    identityService.deleteTenant("tenant");
+  }
+
+  @Test
+  public void createGroupMembership() {
+    thrown.expect(UnsupportedOperationException.class);
+    thrown.expectMessage("This identity service implementation is read-only.");
+
+    identityService.createMembership("user", "group");
+  }
+
+  @Test
+  public void deleteGroupMembership() {
+    thrown.expect(UnsupportedOperationException.class);
+    thrown.expectMessage("This identity service implementation is read-only.");
+
+    identityService.deleteMembership("user", "group");
+  }
+
+  @Test
+  public void createTenantUserMembership() {
+    thrown.expect(UnsupportedOperationException.class);
+    thrown.expectMessage("This identity service implementation is read-only.");
+
+    identityService.createTenantUserMembership("tenant", "user");
+  }
+
+  @Test
+  public void createTenantGroupMembership() {
+    thrown.expect(UnsupportedOperationException.class);
+    thrown.expectMessage("This identity service implementation is read-only.");
+
+    identityService.createTenantGroupMembership("tenant", "group");
+  }
+
+  @Test
+  public void deleteTenantUserMembership() {
+    thrown.expect(UnsupportedOperationException.class);
+    thrown.expectMessage("This identity service implementation is read-only.");
+
+    identityService.deleteTenantUserMembership("tenant", "user");
+  }
+
+  @Test
+  public void deleteTenantGroupMembership() {
+    thrown.expect(UnsupportedOperationException.class);
+    thrown.expectMessage("This identity service implementation is read-only.");
+
+    identityService.deleteTenantGroupMembership("tenant", "group");
+  }
+
+  @Test
+  public void checkPassword() {
     identityService.checkPassword("user", "password");
+  }
+
+  @Test
+  public void createQuery() {
     identityService.createUserQuery().list();
     identityService.createGroupQuery().list();
     identityService.createTenantQuery().list();

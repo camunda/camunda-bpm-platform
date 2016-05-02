@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
  */
 public class UserQueryTest extends PluggableProcessEngineTestCase {
 
+  @Override
   protected void setUp() throws Exception {
     super.setUp();
 
@@ -36,10 +37,14 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     identityService.saveGroup(identityService.newGroup("muppets"));
     identityService.saveGroup(identityService.newGroup("frogs"));
 
+    identityService.saveTenant(identityService.newTenant("tenant"));
+
     identityService.createMembership("kermit", "muppets");
     identityService.createMembership("kermit", "frogs");
     identityService.createMembership("fozzie", "muppets");
     identityService.createMembership("gonzo", "muppets");
+
+    identityService.createTenantUserMembership("tenant", "kermit");
   }
 
   private User createUser(String id, String firstName, String lastName, String email) {
@@ -59,6 +64,8 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
 
     identityService.deleteGroup("muppets");
     identityService.deleteGroup("frogs");
+
+    identityService.deleteTenant("tenant");
 
     super.tearDown();
   }
@@ -221,7 +228,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
-  public void testQueryByMemberOf() {
+  public void testQueryByMemberOfGroup() {
     UserQuery query = identityService.createUserQuery().memberOfGroup("muppets");
     verifyQueryResults(query, 3);
 
@@ -232,7 +239,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("kermit", result.getId());
   }
 
-  public void testQueryByInvalidMemberOf() {
+  public void testQueryByInvalidMemberOfGoup() {
     UserQuery query = identityService.createUserQuery().memberOfGroup("invalid");
     verifyQueryResults(query, 0);
 
@@ -240,6 +247,17 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
       identityService.createUserQuery().memberOfGroup(null).list();
       fail();
     } catch (ProcessEngineException e) { }
+  }
+
+  public void testQueryByMemberOfTenant() {
+    UserQuery query = identityService.createUserQuery().memberOfTenant("nonExisting");
+    verifyQueryResults(query, 0);
+
+    query = identityService.createUserQuery().memberOfTenant("tenant");
+    verifyQueryResults(query, 1);
+
+    User result = query.singleResult();
+    assertEquals("kermit", result.getId());
   }
 
   private void verifyQueryResults(UserQuery query, int countExpected) {

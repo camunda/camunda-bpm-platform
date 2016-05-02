@@ -57,7 +57,10 @@ public interface UserQuery extends Query<UserQuery, User> {
   UserQuery memberOfGroup(String groupId);
 
   /** Only select {@link User}S that are potential starter for the given process definition. */
-  public UserQuery potentialStarter(String procDefId);
+  UserQuery potentialStarter(String procDefId);
+
+  /** Only select {@link User}s that belongs to the given tenant. */
+  UserQuery memberOfTenant(String tenantId);
 
   //sorting ////////////////////////////////////////////////////////
 

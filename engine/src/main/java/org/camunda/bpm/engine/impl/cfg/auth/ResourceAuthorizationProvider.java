@@ -83,6 +83,30 @@ public interface ResourceAuthorizationProvider {
    */
   public AuthorizationEntity[] groupMembershipCreated(String groupId, String userId);
 
+  /**
+   * <p>Invoked whenever an user is added to a tenant.</p>
+   *
+   * @param tenant
+   *          the id of the tenant
+   * @param userId
+   *          the id of the user
+   * @return a list of authorizations to be automatically added when a new
+   *         membership is created.
+   */
+  public AuthorizationEntity[] tenantMembershipCreated(Tenant tenant, User user);
+
+  /**
+   * <p>Invoked whenever a group is added to a tenant.</p>
+   *
+   * @param tenant
+   *          the id of the tenant
+   * @param groupId
+   *          the id of the group
+   * @return a list of authorizations to be automatically added when a new
+   *         membership is created.
+   */
+  public AuthorizationEntity[] tenantMembershipCreated(Tenant tenant, Group group);
+
   // Filter ////////////////////////////////////////////////
 
   /**

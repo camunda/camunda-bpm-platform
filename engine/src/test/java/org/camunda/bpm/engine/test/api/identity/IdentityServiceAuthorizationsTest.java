@@ -24,6 +24,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP_MEMBERSHIP;
 import static org.camunda.bpm.engine.authorization.Resources.TENANT;
+import static org.camunda.bpm.engine.authorization.Resources.TENANT_MEMBERSHIP;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestUtil.assertExceptionInfo;
 
@@ -441,6 +442,130 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(DELETE.getName(), GROUP_MEMBERSHIP.resourceName(), "group1", info);
+    }
+  }
+
+  public void testTenantUserMembershipCreateAuthorizations() {
+
+    User jonny1 = identityService.newUser("jonny1");
+    identityService.saveUser(jonny1);
+
+    Tenant tenant1 = identityService.newTenant("tenant1");
+    identityService.saveTenant(tenant1);
+
+    // add base permission which allows nobody to create memberships
+    Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
+    basePerms.setResource(TENANT_MEMBERSHIP);
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'create'
+    basePerms.removePermission(CREATE);
+    authorizationService.saveAuthorization(basePerms);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(jonny2);
+
+    try {
+      identityService.createTenantUserMembership("tenant1", "jonny1");
+      fail("exception expected");
+
+    } catch (AuthorizationException e) {
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
+      assertEquals(jonny2, e.getUserId());
+      assertExceptionInfo(CREATE.getName(), TENANT_MEMBERSHIP.resourceName(), "tenant1", info);
+    }
+  }
+
+  public void testTenantGroupMembershipCreateAuthorizations() {
+
+    Group group1 = identityService.newGroup("group1");
+    identityService.saveGroup(group1);
+
+    Tenant tenant1 = identityService.newTenant("tenant1");
+    identityService.saveTenant(tenant1);
+
+    // add base permission which allows nobody to create memberships
+    Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
+    basePerms.setResource(TENANT_MEMBERSHIP);
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'create'
+    basePerms.removePermission(CREATE);
+    authorizationService.saveAuthorization(basePerms);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(jonny2);
+
+    try {
+      identityService.createTenantGroupMembership("tenant1", "group1");
+      fail("exception expected");
+
+    } catch (AuthorizationException e) {
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
+      assertEquals(jonny2, e.getUserId());
+      assertExceptionInfo(CREATE.getName(), TENANT_MEMBERSHIP.resourceName(), "tenant1", info);
+    }
+  }
+
+  public void testTenantUserMembershipDeleteAuthorizations() {
+
+    User jonny1 = identityService.newUser("jonny1");
+    identityService.saveUser(jonny1);
+
+    Tenant tenant1 = identityService.newTenant("tenant1");
+    identityService.saveTenant(tenant1);
+
+    // add base permission which allows nobody to delete memberships
+    Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
+    basePerms.setResource(TENANT_MEMBERSHIP);
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'delete'
+    basePerms.removePermission(DELETE);
+    authorizationService.saveAuthorization(basePerms);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(jonny2);
+
+    try {
+      identityService.deleteTenantUserMembership("tenant1", "jonny1");
+      fail("exception expected");
+
+    } catch (AuthorizationException e) {
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
+      assertEquals(jonny2, e.getUserId());
+      assertExceptionInfo(DELETE.getName(), TENANT_MEMBERSHIP.resourceName(), "tenant1", info);
+    }
+  }
+
+  public void testTenanGroupMembershipDeleteAuthorizations() {
+
+    Group group1 = identityService.newGroup("group1");
+    identityService.saveGroup(group1);
+
+    Tenant tenant1 = identityService.newTenant("tenant1");
+    identityService.saveTenant(tenant1);
+
+    // add base permission which allows nobody to delete memberships
+    Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
+    basePerms.setResource(TENANT_MEMBERSHIP);
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'delete'
+    basePerms.removePermission(DELETE);
+    authorizationService.saveAuthorization(basePerms);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(jonny2);
+
+    try {
+      identityService.deleteTenantGroupMembership("tenant1", "group1");
+      fail("exception expected");
+
+    } catch (AuthorizationException e) {
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
+      assertEquals(jonny2, e.getUserId());
+      assertExceptionInfo(DELETE.getName(), TENANT_MEMBERSHIP.resourceName(), "tenant1", info);
     }
   }
 

@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
  */
 public class GroupQueryTest extends PluggableProcessEngineTestCase {
 
+  @Override
   protected void setUp() throws Exception {
     super.setUp();
 
@@ -38,6 +39,8 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     identityService.saveUser(identityService.newUser("fozzie"));
     identityService.saveUser(identityService.newUser("mispiggy"));
 
+    identityService.saveTenant(identityService.newTenant("tenant"));
+
     identityService.createMembership("kermit", "muppets");
     identityService.createMembership("fozzie", "muppets");
     identityService.createMembership("mispiggy", "muppets");
@@ -48,6 +51,8 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     identityService.createMembership("mispiggy", "mammals");
 
     identityService.createMembership("kermit", "admin");
+
+    identityService.createTenantGroupMembership("tenant", "frogs");
 
   }
 
@@ -69,6 +74,8 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     identityService.deleteGroup("mammals");
     identityService.deleteGroup("frogs");
     identityService.deleteGroup("admin");
+
+    identityService.deleteTenant("tenant");
 
     super.tearDown();
   }
@@ -200,6 +207,17 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
       identityService.createGroupQuery().groupMember(null).list();
       fail();
     } catch (ProcessEngineException e) {}
+  }
+
+  public void testQueryByMemberOfTenant() {
+    GroupQuery query = identityService.createGroupQuery().memberOfTenant("nonExisting");
+    verifyQueryResults(query, 0);
+
+    query = identityService.createGroupQuery().memberOfTenant("tenant");
+    verifyQueryResults(query, 1);
+
+    Group group = query.singleResult();
+    assertEquals("frogs", group.getId());
   }
 
   public void testQuerySorting() {

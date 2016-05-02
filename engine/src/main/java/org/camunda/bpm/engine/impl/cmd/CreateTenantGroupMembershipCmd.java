@@ -16,26 +16,29 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
-import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-public class SaveTenantCmd extends AbstractWritableIdentityServiceCmd<Void> implements Command<Void>, Serializable {
+public class CreateTenantGroupMembershipCmd extends AbstractWritableIdentityServiceCmd<Void> implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  protected Tenant tenant;
 
-  public SaveTenantCmd(Tenant tenant) {
-    this.tenant = tenant;
+  protected final String tenantId;
+  protected final String groupId;
+
+  public CreateTenantGroupMembershipCmd(String tenantId, String groupId) {
+    this.tenantId = tenantId;
+    this.groupId = groupId;
   }
 
   @Override
   protected Void executeCmd(CommandContext commandContext) {
-    ensureNotNull("tenant", tenant);
+    ensureNotNull("tenantId", tenantId);
+    ensureNotNull("groupId", groupId);
 
     commandContext
       .getWritableIdentityProvider()
-      .saveTenant(tenant);
+      .createTenantGroupMembership(tenantId, groupId);
 
     return null;
   }
