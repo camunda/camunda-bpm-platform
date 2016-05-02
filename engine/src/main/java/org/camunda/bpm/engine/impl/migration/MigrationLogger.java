@@ -93,7 +93,7 @@ public class MigrationLogger extends ProcessEngineLogger {
 
   public BadUserRequestException processDefinitionDoesNotExist(String processDefinitionId, String type) {
     return new BadUserRequestException(exceptionMessage(
-      "009",
+      "008",
       "{} process definition with id '{}' does not exist",
       type, processDefinitionId
     ));
@@ -101,7 +101,7 @@ public class MigrationLogger extends ProcessEngineLogger {
 
   public ProcessEngineException cannotMigrateBetweenTenants(String sourceTenantId, String targetTenantId) {
     return new ProcessEngineException(exceptionMessage(
-        "010",
+        "09",
         "Cannot migrate process instances between processes of different tenants ('{}' != '{}')",
         sourceTenantId,
         targetTenantId));
@@ -112,7 +112,7 @@ public class MigrationLogger extends ProcessEngineLogger {
     String detailMessage = null;
     if (sourceTenantId != null) {
       detailMessage = exceptionMessage(
-          "011",
+          "010",
           "Cannot migrate process instance '{}' to a process definition of a different tenant ('{}' != '{}')",
           processInstanceId,
           sourceTenantId,
@@ -120,7 +120,7 @@ public class MigrationLogger extends ProcessEngineLogger {
     }
     else {
       detailMessage = exceptionMessage(
-          "011",
+          "010",
           "Cannot migrate process instance '{}' without tenant to a process definition with a tenant ('{}')",
           processInstanceId,
           targetTenantId);
