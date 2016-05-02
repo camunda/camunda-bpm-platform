@@ -64,15 +64,14 @@ public class MigrationHistoryProcessInstanceTest {
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testMigrateHistoryProcessInstance() {
     //given
-    int processInstanceCount = 10;
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS_2);
+    ModifiableBpmnModelInstance modifiedModel = modify(ProcessModels.ONE_TASK_PROCESS).changeElementId("Process", "Process2")
+                                                                                      .changeElementId("userTask", "userTask2");
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modifiedModel);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
-    for(int i = 0; i < processInstanceCount; i++) {
-      runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
-    }
+                                                                                            .mapActivities("userTask", "userTask2")
+                                                                                            .build();
+    runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
     HistoricProcessInstanceQuery sourceHistoryProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
                                                                                    .processDefinitionId(sourceProcessDefinition.getId());
     HistoricProcessInstanceQuery targetHistoryProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
@@ -80,7 +79,7 @@ public class MigrationHistoryProcessInstanceTest {
 
 
     //when
-    assertEquals(10, sourceHistoryProcessInstanceQuery.count());
+    assertEquals(1, sourceHistoryProcessInstanceQuery.count());
     assertEquals(0, targetHistoryProcessInstanceQuery.count());
     ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(sourceProcessDefinition.getId());
     runtimeService.newMigration(migrationPlan)
@@ -89,11 +88,10 @@ public class MigrationHistoryProcessInstanceTest {
 
     //then
     assertEquals(0, sourceHistoryProcessInstanceQuery.count());
-    assertEquals(10, targetHistoryProcessInstanceQuery.count());
+    assertEquals(1, targetHistoryProcessInstanceQuery.count());
 
-    for (HistoricProcessInstance instance : targetHistoryProcessInstanceQuery.list()) {
-      assertEquals(instance.getProcessDefinitionKey(), targetProcessDefinition.getKey());
-    }
+    HistoricProcessInstance instance = targetHistoryProcessInstanceQuery.singleResult();
+    assertEquals(instance.getProcessDefinitionKey(), targetProcessDefinition.getKey());
   }
 
 
