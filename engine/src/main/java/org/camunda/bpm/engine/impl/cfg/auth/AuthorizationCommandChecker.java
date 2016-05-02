@@ -21,6 +21,8 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+
+import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
@@ -153,6 +155,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
   @Override
   public void checkUpdateTask(TaskEntity task) {
     getAuthorizationManager().checkUpdateTask(task);
+  }
+
+  @Override
+  public void checkDeleteBatch(BatchEntity batch) {
   }
 
   protected AuthorizationManager getAuthorizationManager() {

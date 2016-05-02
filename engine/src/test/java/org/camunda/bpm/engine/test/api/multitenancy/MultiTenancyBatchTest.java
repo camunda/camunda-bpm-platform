@@ -16,8 +16,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
@@ -31,6 +33,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHel
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -58,8 +61,10 @@ public class MultiTenancyBatchTest {
   protected ManagementService managementService;
   protected RuntimeService runtimeService;
   protected HistoryService historyService;
+  protected IdentityService identityService;
 
   protected ProcessDefinition tenant1Definition;
+  protected ProcessDefinition tenant2Definition;
   protected ProcessDefinition sharedDefinition;
 
   @Before
@@ -67,12 +72,14 @@ public class MultiTenancyBatchTest {
     managementService= engineRule.getManagementService();
     runtimeService = engineRule.getRuntimeService();
     historyService = engineRule.getHistoryService();
+    identityService = engineRule.getIdentityService();
   }
 
   @Before
   public void deployProcesses() {
     sharedDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_TWO, ProcessModels.ONE_TASK_PROCESS);
   }
 
   @After
@@ -236,4 +243,55 @@ public class MultiTenancyBatchTest {
     Job monitorJob = batchHelper.getMonitorJob(batch);
     Assert.assertEquals(TENANT_ONE, monitorJob.getTenantId());
   }
+
+  @Test
+  public void testDeleteBatch() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(tenant1Definition.getId());
+
+    MigrationPlan migrationPlan = runtimeService
+      .createMigrationPlan(tenant1Definition.getId(), tenant1Definition.getId())
+      .mapEqualActivities()
+      .build();
+    Batch batch = runtimeService.newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .executeAsync();
+
+    // when
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+    managementService.deleteBatch(batch.getId(), true);
+    identityService.clearAuthentication();
+
+    // then
+    Assert.assertEquals(0, managementService.createBatchQuery().count());
+  }
+
+  @Test
+  public void testDeleteBatchFailsWithWrongTenant() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(tenant2Definition.getId());
+
+    MigrationPlan migrationPlan = runtimeService
+      .createMigrationPlan(tenant2Definition.getId(), tenant2Definition.getId())
+      .mapEqualActivities()
+      .build();
+    Batch batch = runtimeService.newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .executeAsync();
+
+    // when
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+    try {
+      managementService.deleteBatch(batch.getId(), true);
+      Assert.fail("exception expected");
+    }
+    catch (ProcessEngineException e) {
+      // then
+      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Cannot delete batch because it belongs to no authenticated tenant"));
+    }
+    finally {
+      identityService.clearAuthentication();
+    }
+  }
+
 }

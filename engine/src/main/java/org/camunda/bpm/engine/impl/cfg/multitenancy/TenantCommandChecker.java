@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.cfg.multitenancy;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -136,7 +137,7 @@ public class TenantCommandChecker implements CommandChecker {
       if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
         throw LOG.exceptionCommandWithUnauthorizedTenant("read the process instance", execution);
       }
-    } 
+    }
   }
 
   public void checkDeleteProcessInstance(ExecutionEntity execution) {
@@ -175,6 +176,15 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
+  public void checkDeleteBatch(BatchEntity batch) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      if (batch != null && !getTenantManager().isAuthenticatedTenant(batch.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("delete batch", batch);
+      }
+    }
+  }
+
   protected TenantManager getTenantManager() {
     return Context.getCommandContext().getTenantManager();
   }
@@ -191,5 +201,5 @@ public class TenantCommandChecker implements CommandChecker {
     return Context.getCommandContext().getExecutionManager().findExecutionById(processInstanceId);
   }
 
-  
+
 }

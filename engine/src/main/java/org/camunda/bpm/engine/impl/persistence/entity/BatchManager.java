@@ -31,6 +31,7 @@ public class BatchManager extends AbstractManager {
   }
 
   public long findBatchCountByQueryCriteria(BatchQueryImpl batchQuery) {
+    configureQuery(batchQuery);
     return (Long) getDbEntityManager().selectOne("selectBatchCountByQueryCriteria", batchQuery);
   }
 

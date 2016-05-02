@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.cfg;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -103,4 +104,6 @@ public interface CommandChecker {
    * Check if it is allowed to update a task
    */
   void checkUpdateTask(TaskEntity task);
+
+  void checkDeleteBatch(BatchEntity batch);
 }

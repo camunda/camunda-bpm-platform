@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.batch;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
@@ -39,12 +40,17 @@ public class DeleteBatchCmd implements Command<Void> {
     BatchEntity batchEntity = commandContext.getBatchManager().findBatchById(batchId);
     ensureNotNull(BadUserRequestException.class, "Batch for id '" + batchId + "' cannot be found", "batch", batchEntity);
 
-    // TODO: check authorizations
-
+    checkAccess(commandContext, batchEntity);
 
     batchEntity.delete(cascadeToHistory);
 
     return null;
+  }
+
+  protected void checkAccess(CommandContext commandContext, BatchEntity batch) {
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkDeleteBatch(batch);
+    }
   }
 
 }
