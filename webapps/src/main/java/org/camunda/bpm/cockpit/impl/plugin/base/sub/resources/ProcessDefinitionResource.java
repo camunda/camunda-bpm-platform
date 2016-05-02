@@ -81,6 +81,7 @@ public class ProcessDefinitionResource extends AbstractPluginResource {
 
   protected void configureExecutionQuery(ProcessDefinitionQueryDto query) {
     configureAuthorizationCheck(query);
+    configureTenantCheck(query);
     addPermissionCheck(query, PROCESS_INSTANCE, "EXEC2.PROC_INST_ID_", READ);
     addPermissionCheck(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE);
   }

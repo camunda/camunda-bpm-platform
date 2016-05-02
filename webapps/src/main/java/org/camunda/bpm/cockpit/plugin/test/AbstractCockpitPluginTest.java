@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.cockpit.plugin.test;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.ibatis.logging.LogFactory;
@@ -22,8 +24,11 @@ import org.camunda.bpm.cockpit.impl.DefaultCockpitRuntimeDelegate;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.util.LogUtil;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -37,6 +42,7 @@ import org.junit.Rule;
 public abstract class AbstractCockpitPluginTest {
 
   private static TestCockpitRuntimeDelegate RUNTIME_DELEGATE = new TestCockpitRuntimeDelegate();
+  private static final String DEFAULT_BPMN_RESOURCE_NAME = "process.bpmn20.xml";
 
   static {
     LogUtil.readJavaUtilLoggingConfigFromClasspath();
@@ -67,6 +73,7 @@ public abstract class AbstractCockpitPluginTest {
   @After
   public void after() {
     RUNTIME_DELEGATE.ENGINE = null;
+    getProcessEngine().getIdentityService().clearAuthentication();
   }
 
   public ProcessEngine getProcessEngine() {
@@ -96,6 +103,36 @@ public abstract class AbstractCockpitPluginTest {
     }
 
     executeAvailableJobs();
+  }
+
+  public Deployment deploy(String... resources) {
+    return deploy(createDeploymentBuilder(), Collections.<BpmnModelInstance> emptyList(), Arrays.asList(resources));
+  }
+
+  public Deployment deployForTenant(String tenantId, String... resources) {
+    return deploy(createDeploymentBuilder().tenantId(tenantId), Collections.<BpmnModelInstance> emptyList(), Arrays.asList(resources));
+  }
+
+  protected Deployment deploy(DeploymentBuilder deploymentBuilder, List<BpmnModelInstance> bpmnModelInstances, List<String> resources) {
+    int i = 0;
+    for (BpmnModelInstance bpmnModelInstance : bpmnModelInstances) {
+      deploymentBuilder.addModelInstance(i + "_" + DEFAULT_BPMN_RESOURCE_NAME, bpmnModelInstance);
+      i++;
+    }
+
+    for (String resource : resources) {
+      deploymentBuilder.addClasspathResource(resource);
+    }
+
+    Deployment deployment = deploymentBuilder.deploy();
+
+    processEngineRule.manageDeployment(deployment);
+
+    return deployment;
+  }
+
+  protected DeploymentBuilder createDeploymentBuilder() {
+    return getProcessEngine().getRepositoryService().createDeployment();
   }
 
   private static class TestCockpitRuntimeDelegate extends DefaultCockpitRuntimeDelegate {

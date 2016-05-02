@@ -127,6 +127,7 @@ public class ProcessInstanceRestService extends AbstractPluginResource {
 
   protected void configureExecutionQuery(ProcessInstanceQueryDto query) {
     configureAuthorizationCheck(query);
+    configureTenantCheck(query);
     addPermissionCheck(query, PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ);
     addPermissionCheck(query, PROCESS_DEFINITION, "P.KEY_", READ_INSTANCE);
   }

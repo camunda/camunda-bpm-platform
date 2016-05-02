@@ -14,13 +14,16 @@ package org.camunda.bpm.cockpit.plugin.base;
 
 import static org.fest.assertions.Assertions.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.resources.IncidentRestService;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -33,17 +36,24 @@ import org.junit.Test;
  */
 public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
 
+  protected static final String TENANT_ONE = "tenant1";
+  protected static final String TENANT_TWO = "tenant2";
+
   private ProcessEngine processEngine;
+  private ProcessEngineConfiguration processEngineConfiguration;
   private RuntimeService runtimeService;
   private IncidentRestService resource;
+  private IdentityService identityService;
 
   @Before
   public void setUp() throws Exception {
     super.before();
 
     processEngine = getProcessEngine();
+    processEngineConfiguration = processEngine.getProcessEngineConfiguration();
 
     runtimeService = processEngine.getRuntimeService();
+    identityService = processEngine.getIdentityService();
 
     resource = new IncidentRestService(processEngine.getName());
   }
@@ -288,6 +298,90 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     result = resource.queryIncidents(queryParameter, null, 4);
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(4);
+  }
+
+  @Test
+  public void queryIncidentsByProcessInstanceIdsNoAuthenticatedTenants() {
+    deployForTenant(TENANT_ONE, "processes/failing-process.bpmn");
+    deployForTenant(TENANT_TWO, "processes/failing-process.bpmn");
+
+    ProcessInstance processInstance1 = runtimeService.createProcessInstanceByKey("FailingProcess")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+
+    ProcessInstance processInstance2 = runtimeService.createProcessInstanceByKey("FailingProcess")
+        .processDefinitionTenantId(TENANT_TWO).execute();
+
+    executeAvailableJobs();
+
+    String[] processInstanceIds= {processInstance1.getId(), processInstance2.getId()};
+
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
+    queryParameter.setProcessInstanceIdIn(processInstanceIds);
+
+    identityService.setAuthentication("user", null, null);
+
+    List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void queryIncidentsByProcessInstanceIdsWithAuthenticatedTenant() {
+    deployForTenant(TENANT_ONE, "processes/failing-process.bpmn");
+    deployForTenant(TENANT_TWO, "processes/failing-process.bpmn");
+
+    ProcessInstance processInstance1 = runtimeService.createProcessInstanceByKey("FailingProcess")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+
+    ProcessInstance processInstance2 = runtimeService.createProcessInstanceByKey("FailingProcess")
+        .processDefinitionTenantId(TENANT_TWO).execute();
+
+    executeAvailableJobs();
+
+    String[] processInstanceIds= {processInstance1.getId(), processInstance2.getId()};
+
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
+    queryParameter.setProcessInstanceIdIn(processInstanceIds);
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(1);
+
+    IncidentDto incident = result.get(0);
+    assertThat(incident.getProcessInstanceId()).isEqualTo(processInstance1.getId());
+  }
+
+  @Test
+  public void queryIncidentsByProcessInstanceIdsDisabledTenantCheck() {
+    deployForTenant(TENANT_ONE, "processes/failing-process.bpmn");
+    deployForTenant(TENANT_TWO, "processes/failing-process.bpmn");
+
+    ProcessInstance processInstance1 = runtimeService.createProcessInstanceByKey("FailingProcess")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+
+    ProcessInstance processInstance2 = runtimeService.createProcessInstanceByKey("FailingProcess")
+        .processDefinitionTenantId(TENANT_TWO).execute();
+
+    executeAvailableJobs();
+
+    String[] processInstanceIds= {processInstance1.getId(), processInstance2.getId()};
+
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
+    queryParameter.setProcessInstanceIdIn(processInstanceIds);
+
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(2);
+
+    IncidentDto incident1 = result.get(0);
+    assertThat(incident1.getProcessInstanceId()).isEqualTo(processInstance1.getId());
+
+    IncidentDto incident2 = result.get(1);
+    assertThat(incident2.getProcessInstanceId()).isEqualTo(processInstance2.getId());
   }
 
 }
