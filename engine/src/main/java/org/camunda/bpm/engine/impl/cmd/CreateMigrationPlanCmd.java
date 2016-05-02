@@ -55,8 +55,8 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
 
   @Override
   public MigrationPlan execute(CommandContext commandContext) {
-    ProcessDefinitionEntity sourceProcessDefinition = getSourceProcessDefinition(commandContext);
-    ProcessDefinitionEntity targetProcessDefinition = getTargetProcessDefinition(commandContext);
+    ProcessDefinitionEntity sourceProcessDefinition = getProcessDefinition(commandContext, migrationBuilder.getSourceProcessDefinitionId(), "Source");
+    ProcessDefinitionEntity targetProcessDefinition = getProcessDefinition(commandContext, migrationBuilder.getTargetProcessDefinitionId(), "Target");
 
     checkAuthorization(commandContext, sourceProcessDefinition, targetProcessDefinition);
 
@@ -75,29 +75,15 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
     return migrationPlan;
   }
 
-  protected ProcessDefinitionEntity getSourceProcessDefinition(CommandContext commandContext) {
-    String sourceProcessDefinitionId = migrationBuilder.getSourceProcessDefinitionId();
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "sourceProcessDefinitionId", sourceProcessDefinitionId);
+  protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext, String id, String type) {
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, type + " process definition id", id);
 
     try {
       return commandContext.getProcessEngineConfiguration()
-        .getDeploymentCache().findDeployedProcessDefinitionById(sourceProcessDefinitionId);
+        .getDeploymentCache().findDeployedProcessDefinitionById(id);
     }
     catch (NullValueException e) {
-      throw LOG.sourceProcessDefinitionDoesNotExist(sourceProcessDefinitionId);
-    }
-  }
-
-  protected ProcessDefinitionEntity getTargetProcessDefinition(CommandContext commandContext) {
-    String targetProcessDefinitionId = migrationBuilder.getTargetProcessDefinitionId();
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "targetProcessDefinitionId", targetProcessDefinitionId);
-
-    try {
-      return commandContext.getProcessEngineConfiguration()
-        .getDeploymentCache().findDeployedProcessDefinitionById(targetProcessDefinitionId);
-    }
-    catch (NullValueException e) {
-      throw LOG.targetProcessDefinitionDoesNotExist(targetProcessDefinitionId);
+      throw LOG.processDefinitionDoesNotExist(id, type);
     }
   }
 

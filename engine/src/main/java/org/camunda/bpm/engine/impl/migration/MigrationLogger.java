@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.migration;
 
-import static groovy.xml.Entity.not;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -24,7 +22,6 @@ import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationPla
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 /**
  * @author Thorben Lindhauer
@@ -94,19 +91,11 @@ public class MigrationLogger extends ProcessEngineLogger {
         attachingInstance));
   }
 
-  public BadUserRequestException sourceProcessDefinitionDoesNotExist(String sourceProcessDefinitionId) {
-    return new BadUserRequestException(exceptionMessage(
-      "008",
-      "Source process definition with id '{}' does not exist",
-      sourceProcessDefinitionId
-    ));
-  }
-
-  public BadUserRequestException targetProcessDefinitionDoesNotExist(String targetProcessDefinitionId) {
+  public BadUserRequestException processDefinitionDoesNotExist(String processDefinitionId, String type) {
     return new BadUserRequestException(exceptionMessage(
       "009",
-      "Target process definition with id '{}' does not exist",
-      targetProcessDefinitionId
+      "{} process definition with id '{}' does not exist",
+      type, processDefinitionId
     ));
   }
 
