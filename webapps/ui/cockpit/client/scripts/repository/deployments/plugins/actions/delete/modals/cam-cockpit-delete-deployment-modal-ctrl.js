@@ -107,13 +107,13 @@
     $scope.getInfoSnippet = function() {
       var info = [ 'There are' ];
 
-      if ($scope.processInstanceCount > 0) {
-        info.push($scope.processInstanceCount);
+      if (($scope.processInstanceCount && $scope.processInstanceCount.count > 0)) {
+        info.push($scope.processInstanceCount.count);
         info.push('running process');
-        $scope.processInstanceCount > 1 ? info.push('instances') : info.push('instance');
+        ($scope.processInstanceCount && $scope.processInstanceCount.count > 1) ? info.push('instances') : info.push('instance');
       }
 
-      if ($scope.processInstanceCount > 0 && $scope.caseInstanceCount > 0) {
+      if (($scope.processInstanceCount && $scope.processInstanceCount.count > 0) && $scope.caseInstanceCount > 0) {
         info.push('and');
       }
 
