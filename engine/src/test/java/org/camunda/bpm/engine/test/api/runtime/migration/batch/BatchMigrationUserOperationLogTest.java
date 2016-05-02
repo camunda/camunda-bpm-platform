@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -49,12 +48,11 @@ public class BatchMigrationUserOperationLogTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
-  protected ProcessEngineTestRule engineTestHelper = new ProcessEngineTestRule(engineRule);
 
   protected BatchMigrationHelper batchHelper = new BatchMigrationHelper(engineRule, migrationRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(migrationRule).around(engineTestHelper);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(migrationRule);
 
   @After
   public void removeBatches() {
@@ -173,7 +171,7 @@ public class BatchMigrationUserOperationLogTest {
       .executeAsync();
 
     // when
-    engineTestHelper.waitForJobExecutorToProcessAllJobs(5000L);
+    migrationRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     // then
     Assert.assertEquals(0, engineRule.getHistoryService().createUserOperationLogQuery().count());

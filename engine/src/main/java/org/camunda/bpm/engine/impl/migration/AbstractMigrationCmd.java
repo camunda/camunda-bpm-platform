@@ -73,19 +73,7 @@ public abstract class AbstractMigrationCmd<T> implements Command<T> {
     return collectedProcessInstanceIds;
   }
 
-//  protected void checkRequiredAuthorizations(CommandContext commandContext,
-//      MigrationPlan migrationPlan,
-//      Collection<String> processInstanceIds) {
-//    ProcessDefinitionEntity sourceProcessDefinition = commandContext.getProcessEngineConfiguration()
-//      .getDeploymentCache().findDeployedProcessDefinitionById(migrationPlan.getSourceProcessDefinitionId());
-//    ProcessDefinitionEntity targetProcessDefinition = commandContext.getProcessEngineConfiguration()
-//      .getDeploymentCache().findDeployedProcessDefinitionById(migrationPlan.getTargetProcessDefinitionId());
-//
-//    EnsureUtil.ensureNotNull("sourceProcessDefinition", sourceProcessDefinition);
-//    EnsureUtil.ensureNotNull("targetProcessDefinition", targetProcessDefinition);
-//    checkAuthorizations(commandContext, sourceProcessDefinition, targetProcessDefinition, processInstanceIds);
-
-    protected void writeUserOperationLog(CommandContext commandContext,
+  protected void writeUserOperationLog(CommandContext commandContext,
       ProcessDefinitionEntity sourceProcessDefinition,
       ProcessDefinitionEntity targetProcessDefinition,
       int numInstances,
