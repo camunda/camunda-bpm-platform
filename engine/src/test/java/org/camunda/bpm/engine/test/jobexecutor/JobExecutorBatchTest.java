@@ -77,7 +77,7 @@ public class JobExecutorBatchTest {
     jobExecutor.startRecord();
 
     // when a batch is created
-    Batch batch = helper.migrateProcessInstancesAsync(2);
+    helper.migrateProcessInstancesAsync(2);
 
     // then the job executor is hinted for the seed job
     assertEquals(1, jobExecutor.getJobsAdded());

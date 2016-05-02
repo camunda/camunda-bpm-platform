@@ -53,6 +53,8 @@ public class BatchSeedJobHandler implements JobHandler<BatchSeedJobConfiguration
       batch.createSeedJob();
     }
     else {
+      // create monitor job initially without due date to
+      // enable rapid completion of simple batches
       batch.createMonitorJob(false);
     }
   }

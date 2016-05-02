@@ -134,8 +134,8 @@ public class JobManager extends AbstractManager {
       transactionListener = new MessageAddedNotification(jobExecutor);
     }
     Context.getCommandContext()
-    .getTransactionContext()
-    .addTransactionListener(TransactionState.COMMITTED, transactionListener);
+      .getTransactionContext()
+      .addTransactionListener(TransactionState.COMMITTED, transactionListener);
   }
 
   protected boolean areInSameProcessInstance(JobEntity job1, JobEntity job2) {
