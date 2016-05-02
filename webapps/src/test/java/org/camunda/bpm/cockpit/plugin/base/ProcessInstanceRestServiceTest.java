@@ -33,7 +33,9 @@ import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.resources.ProcessInstanceRestService;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -55,9 +57,14 @@ import org.junit.experimental.categories.Category;
  */
 public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
+  protected static final String TENANT_ONE = "tenant1";
+  protected static final String TENANT_TWO = "tenant2";
+
   private ProcessEngine processEngine;
+  private ProcessEngineConfiguration processEngineConfiguration;
   private RuntimeService runtimeService;
   private RepositoryService repositoryService;
+  private IdentityService identityService;
 
   private ProcessInstanceRestService resource;
 
@@ -66,9 +73,11 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     super.before();
 
     processEngine = getProcessEngine();
+    processEngineConfiguration = getProcessEngine().getProcessEngineConfiguration();
 
     runtimeService = processEngine.getRuntimeService();
     repositoryService = processEngine.getRepositoryService();
+    identityService = processEngine.getIdentityService();
 
     resource = new ProcessInstanceRestService(processEngine.getName());
   }
@@ -86,6 +95,15 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     for (int i = 0; i < numOfInstances; i++) {
       ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 3000));
       runtimeService.startProcessInstanceByKey(processDefinitionKey, "businessKey_" + i);
+    }
+
+    executeAvailableJobs();
+  }
+
+  private void startProcessInstancesWithTenantId(String processDefinitionKey, String tenantId, int numOfInstances) {
+    for (int i = 0; i < numOfInstances; i++) {
+      ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 1000));
+      runtimeService.createProcessInstanceByKey(processDefinitionKey).processDefinitionTenantId(tenantId).execute();
     }
 
     executeAvailableJobs();
@@ -3267,6 +3285,141 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     assertThat(result).hasSize(5);
   }
 
+  @Test
+  public void queryCountNoAuthenticatedTenants() {
+    deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
+    deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
+
+    startProcessInstancesWithTenantId("userTaskProcess", TENANT_ONE, 3);
+    startProcessInstancesWithTenantId("userTaskProcess", TENANT_TWO, 3);
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    String[] activityIds = {"theUserTask"};
+    queryParameter.setActivityIdIn(activityIds);
+
+    identityService.setAuthentication("user", null, null);
+
+    CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
+    assertThat(result).isNotNull();
+    assertThat(result.getCount()).isEqualTo(0);
+  }
+
+  @Test
+  public void queryCountWithAuthenticatedTenant() {
+    deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
+    deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
+
+    startProcessInstancesWithTenantId("userTaskProcess", TENANT_ONE, 3);
+    startProcessInstancesWithTenantId("userTaskProcess", TENANT_TWO, 3);
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    String[] activityIds = {"theUserTask"};
+    queryParameter.setActivityIdIn(activityIds);
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
+    assertThat(result).isNotNull();
+    assertThat(result.getCount()).isEqualTo(3);
+  }
+
+  @Test
+  public void queryCountDisabledTenantCheck() {
+    deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
+    deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
+
+    startProcessInstancesWithTenantId("userTaskProcess", TENANT_ONE, 3);
+    startProcessInstancesWithTenantId("userTaskProcess", TENANT_TWO, 3);
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    String[] activityIds = {"theUserTask"};
+    queryParameter.setActivityIdIn(activityIds);
+
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
+    assertThat(result).isNotNull();
+    assertThat(result.getCount()).isEqualTo(6);
+  }
+
+  @Test
+  public void queryWithContainingIncidentsNoAuthenticatedTenants() {
+    deployForTenant(TENANT_ONE, "processes/failing-process.bpmn");
+    deployForTenant(TENANT_TWO, "processes/failing-process.bpmn");
+
+    startProcessInstancesWithTenantId("FailingProcess", TENANT_ONE, 1);
+    startProcessInstancesWithTenantId("FailingProcess", TENANT_TWO, 1);
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    String[] activityIds = {"ServiceTask_1"};
+    queryParameter.setActivityIdIn(activityIds);
+
+    identityService.setAuthentication("user", null, null);
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
+
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void queryWithContainingIncidentsWithAuthenticatedTenant() {
+    deployForTenant(TENANT_ONE, "processes/failing-process.bpmn");
+    deployForTenant(TENANT_TWO, "processes/failing-process.bpmn");
+
+    startProcessInstancesWithTenantId("FailingProcess", TENANT_ONE, 1);
+    startProcessInstancesWithTenantId("FailingProcess", TENANT_TWO, 1);
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    String[] activityIds = {"ServiceTask_1"};
+    queryParameter.setActivityIdIn(activityIds);
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
+
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(1);
+
+    identityService.clearAuthentication();
+
+    List<IncidentStatisticsDto> incidents = result.get(0).getIncidents();
+
+    assertThat(incidents).isNotEmpty();
+    assertThat(incidents).hasSize(1);
+  }
+
+  @Test
+  public void queryWithContainingIncidentsDisabledTenantCheck() {
+    deployForTenant(TENANT_ONE, "processes/failing-process.bpmn");
+    deployForTenant(TENANT_TWO, "processes/failing-process.bpmn");
+
+    startProcessInstancesWithTenantId("FailingProcess", TENANT_ONE, 1);
+    startProcessInstancesWithTenantId("FailingProcess", TENANT_TWO, 1);
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    String[] activityIds = {"ServiceTask_1"};
+    queryParameter.setActivityIdIn(activityIds);
+
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
+
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(2);
+
+    identityService.clearAuthentication();
+
+    List<IncidentStatisticsDto> incidents = result.get(0).getIncidents();
+    assertThat(incidents).isNotEmpty();
+    assertThat(incidents).hasSize(1);
+
+    incidents = result.get(1).getIncidents();
+    assertThat(incidents).isNotEmpty();
+    assertThat(incidents).hasSize(1);
+  }
+
   private VariableQueryParameterDto createVariableParameter(String name, String operator, Object value) {
     VariableQueryParameterDto variable = new VariableQueryParameterDto();
     variable.setName(name);
@@ -3275,6 +3428,5 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     return variable;
   }
-
 
 }

@@ -102,6 +102,7 @@ public class IncidentRestService extends AbstractPluginResource {
 
   protected void configureExecutionQuery(IncidentQueryDto query) {
     configureAuthorizationCheck(query);
+    configureTenantCheck(query);
     addPermissionCheck(query, PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ);
     addPermissionCheck(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE);
   }

@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
+import org.camunda.bpm.engine.impl.db.TenantCheck;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.webapp.plugin.resource.AbstractAppPluginResource;
 
@@ -68,6 +69,13 @@ public class AbstractCockpitPluginResource extends AbstractAppPluginResource<Coc
   }
 
   /**
+   * Return <code>true</code> if tenant check is enabled.
+   */
+  protected boolean isTenantCheckEnabled() {
+    return getProcessEngine().getProcessEngineConfiguration().isTenantCheckEnabled();
+  }
+
+  /**
    * Return the current authentication.
    */
   protected Authentication getCurrentAuthentication() {
@@ -90,6 +98,24 @@ public class AbstractCockpitPluginResource extends AbstractAppPluginResource<Coc
       List<String> currentGroupIds = currentAuthentication.getGroupIds();
       authCheck.setAuthUserId(currentUserId);
       authCheck.setAuthGroupIds(currentGroupIds);
+    }
+  }
+
+  /**
+   * Configure the tenant check for the given {@link QueryParameters}.
+   */
+  protected void configureTenantCheck(QueryParameters<?> query) {
+    Authentication currentAuthentication = getCurrentAuthentication();
+
+    TenantCheck tenantCheck = query.getTenantCheck();
+
+    if (isTenantCheckEnabled() && currentAuthentication != null) {
+
+      tenantCheck.setTenantCheckEnabled(true);
+      tenantCheck.setAuthTenantIds(currentAuthentication.getTenantIds());
+    } else {
+      tenantCheck.setTenantCheckEnabled(false);
+      tenantCheck.setAuthTenantIds(null);
     }
   }
 
