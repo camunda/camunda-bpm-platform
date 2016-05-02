@@ -16,8 +16,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
@@ -244,6 +249,18 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
     instanceBehavior.migrateState();
   }
 
+  protected void migrateHistory(DelegateExecution execution) {
+    HistoryEventProducer historyEventProducer = Context.getProcessEngineConfiguration().getHistoryEventProducer();
+    HistoryEventHandler historyEventHandler = Context.getProcessEngineConfiguration().getHistoryEventHandler();
+    HistoryEvent historyEvent;
+    if (activityInstance.getId().equalsIgnoreCase(activityInstance.getProcessInstanceId())) {
+      historyEvent = historyEventProducer.createProcessInstanceUpdateEvt(execution);
+    } else {
+      historyEvent = historyEventProducer.createActivityInstanceUpdateEvt(execution, null);
+    }
+    historyEventHandler.handleEvent(historyEvent);
+  }
+
   public ExecutionEntity createAttachableExecution() {
     return instanceBehavior.createAttachableExecution();
   }
@@ -325,6 +342,8 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
       if (targetScope.isScope()) {
         becomeScope();
       }
+
+      migrateHistory(currentExecution);
     }
 
     protected void becomeScope() {
@@ -436,6 +455,8 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
       if (sourceScope.getActivityBehavior() instanceof MigrationObserverBehavior) {
         ((MigrationObserverBehavior) sourceScope.getActivityBehavior()).migrateScope(currentScopeExecution);
       }
+
+      migrateHistory(currentScopeExecution);
     }
 
     protected void becomeNonScope() {

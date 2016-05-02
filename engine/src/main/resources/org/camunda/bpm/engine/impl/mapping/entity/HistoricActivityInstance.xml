@@ -70,7 +70,10 @@
     UPDATE
         ${prefix}ACT_HI_ACTINST
     SET
-      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+      PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      ACT_ID_ = #{activityId, jdbcType=VARCHAR}
       <if test="eventType == 'update'">
         , ASSIGNEE_ = #{taskAssignee, jdbcType=VARCHAR}
         , TASK_ID_ = #{taskId, jdbcType=VARCHAR}
@@ -130,7 +133,7 @@
   <select id="selectHistoricActivityInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="historicActivityInstanceResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select RES.*
     ${limitBetween}
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
     ${orderBy}
