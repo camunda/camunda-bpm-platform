@@ -13,9 +13,11 @@
 package org.camunda.bpm.engine.impl.migration.batch;
 
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
+import org.camunda.bpm.engine.impl.migration.batch.MigrationBatchJobDeclaration.BatchJobContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
@@ -24,7 +26,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
  * Job declaration for batch migration jobs. The batch migration job
  * migrates a list of process instances.
  */
-public class MigrationBatchJobDeclaration extends JobDeclaration<ByteArrayEntity, MessageEntity> {
+public class MigrationBatchJobDeclaration extends JobDeclaration<BatchJobContext, MessageEntity> {
 
   private static final long serialVersionUID = 1L;
 
@@ -32,17 +34,35 @@ public class MigrationBatchJobDeclaration extends JobDeclaration<ByteArrayEntity
     super(Batch.TYPE_PROCESS_INSTANCE_MIGRATION);
   }
 
-  protected ExecutionEntity resolveExecution(ByteArrayEntity configuration) {
+  @Override
+  protected ExecutionEntity resolveExecution(BatchJobContext context) {
     return null;
   }
 
-  protected MessageEntity newJobInstance(ByteArrayEntity configuration) {
+  @Override
+  protected MessageEntity newJobInstance(BatchJobContext context) {
     return new MessageEntity();
   }
 
   @Override
-  protected JobHandlerConfiguration resolveJobHandlerConfiguration(ByteArrayEntity configuration) {
-    return new BatchJobConfiguration(configuration.getId());
+  protected JobHandlerConfiguration resolveJobHandlerConfiguration(BatchJobContext context) {
+    return new BatchJobConfiguration(context.configuration.getId());
+  }
+
+  @Override
+  protected String resolveJobDefinitionId(BatchJobContext context) {
+    return context.batch.getBatchJobDefinitionId();
+  }
+
+  public static class BatchJobContext {
+
+    public BatchJobContext(BatchEntity batchEntity, ByteArrayEntity configuration) {
+      this.batch = batchEntity;
+      this.configuration = configuration;
+    }
+
+    protected BatchEntity batch;
+    protected ByteArrayEntity configuration;
   }
 
 }

@@ -218,6 +218,7 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
   public JobDefinitionEntity createSeedJobDefinition() {
     seedJobDefinition = new JobDefinitionEntity(BATCH_SEED_JOB_DECLARATION);
     seedJobDefinition.setJobConfiguration(id);
+    seedJobDefinition.setTenantId(tenantId);
 
     Context.getCommandContext().getJobDefinitionManager().insert(seedJobDefinition);
 
@@ -229,6 +230,7 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
   public JobDefinitionEntity createMonitorJobDefinition() {
     monitorJobDefinition = new JobDefinitionEntity(BATCH_MONITOR_JOB_DECLARATION);
     monitorJobDefinition.setJobConfiguration(id);
+    monitorJobDefinition.setTenantId(tenantId);
 
     Context.getCommandContext().getJobDefinitionManager().insert(monitorJobDefinition);
 
@@ -240,6 +242,7 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
   public JobDefinitionEntity createBatchJobDefinition() {
     batchJobDefinition = new JobDefinitionEntity(getBatchJobHandler().getJobDeclaration());
     batchJobDefinition.setJobConfiguration(id);
+    batchJobDefinition.setTenantId(tenantId);
 
     Context.getCommandContext().getJobDefinitionManager().insert(batchJobDefinition);
 

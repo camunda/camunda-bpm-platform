@@ -26,10 +26,10 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.json.MigrationBatchConfigurationJsonConverter;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
+import org.camunda.bpm.engine.impl.migration.batch.MigrationBatchJobDeclaration.BatchJobContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
@@ -84,8 +84,6 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
     int batchJobsPerSeed = batch.getBatchJobsPerSeed();
     int invocationsPerBatchJob = batch.getInvocationsPerBatchJob();
 
-    JobDefinitionEntity jobDefinition = batch.getBatchJobDefinition();
-
     List<String> processInstanceIds = configuration.getProcessInstanceIds();
     int numberOfInstancesToProcess = Math.min(invocationsPerBatchJob * batchJobsPerSeed, processInstanceIds.size());
     // view of process instances to process
@@ -100,7 +98,7 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
       MigrationBatchConfiguration jobConfiguration = MigrationBatchConfiguration
           .create(migrationPlan, idsForJob, configuration.isSkipCustomListeners(), configuration.isSkipIoMappings());
       ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);
-      JobEntity job = createBatchJob(jobDefinition, configurationEntity);
+      JobEntity job = createBatchJob(batch, configurationEntity);
 
       jobManager.insertAndHintJobExecutor(job);
 
@@ -124,10 +122,9 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
     return configurationEntity;
   }
 
-  protected JobEntity createBatchJob(JobDefinitionEntity jobDefinition, ByteArrayEntity configurationEntity) {
-    MessageEntity jobInstance = JOB_DECLARATION.createJobInstance(configurationEntity);
-    jobInstance.setJobDefinition(jobDefinition);
-    return jobInstance;
+  protected JobEntity createBatchJob(BatchEntity batch, ByteArrayEntity configuration) {
+    BatchJobContext creationContext = new BatchJobContext(batch, configuration);
+    return JOB_DECLARATION.createJobInstance(creationContext);
   }
 
   @Override

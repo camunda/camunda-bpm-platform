@@ -51,6 +51,10 @@ public class BatchMigrationHelper {
     this.migrationRule = migrationRule;
   }
 
+  public BatchMigrationHelper(ProcessEngineRule engineRule) {
+    this(engineRule, null);
+  }
+
   public Batch createMigrationBatchWithSize(int batchSize) {
     int invocationsPerBatchJob = ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration()).getInvocationsPerBatchJob();
     return migrateProcessInstancesAsync(invocationsPerBatchJob * batchSize);

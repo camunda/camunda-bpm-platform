@@ -62,7 +62,7 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
         processInstanceIds.size(),
         true);
 
-    BatchEntity batch = createBatch(commandContext, migrationPlan, processInstanceIds);
+    BatchEntity batch = createBatch(commandContext, migrationPlan, processInstanceIds, sourceProcessDefinition);
 
     batch.createSeedJobDefinition();
     batch.createMonitorJobDefinition();
@@ -75,7 +75,10 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
     return batch;
   }
 
-  protected BatchEntity createBatch(CommandContext commandContext, MigrationPlan migrationPlan, Collection<String> processInstanceIds) {
+  protected BatchEntity createBatch(CommandContext commandContext,
+      MigrationPlan migrationPlan,
+      Collection<String> processInstanceIds,
+      ProcessDefinitionEntity sourceProcessDefinition) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     BatchJobHandler<MigrationBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
 
@@ -91,6 +94,7 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
     batch.setBatchJobsPerSeed(processEngineConfiguration.getBatchJobsPerSeed());
     batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
     batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
+    batch.setTenantId(sourceProcessDefinition.getTenantId());
     commandContext.getBatchManager().insert(batch);
 
     return batch;
