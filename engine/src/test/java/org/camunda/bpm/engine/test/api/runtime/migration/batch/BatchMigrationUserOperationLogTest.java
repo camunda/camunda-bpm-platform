@@ -143,6 +143,7 @@ public class BatchMigrationUserOperationLogTest {
       .newMigration(migrationPlan)
       .processInstanceIds(Arrays.asList(processInstance.getId()))
       .executeAsync();
+    batchHelper.executeSeedJob(batch);
 
     // when
     engineRule.getIdentityService().setAuthenticatedUserId(USER_ID);

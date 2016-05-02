@@ -77,7 +77,11 @@ public class MigrationPlanExecutionBuilderImpl implements MigrationPlanExecution
   }
 
   public void execute() {
-    commandExecutor.execute(new MigrateProcessInstanceCmd(this));
+    execute(true);
+  }
+
+  public void execute(boolean writeOperationLog) {
+    commandExecutor.execute(new MigrateProcessInstanceCmd(this, writeOperationLog));
   }
 
   public Batch executeAsync() {

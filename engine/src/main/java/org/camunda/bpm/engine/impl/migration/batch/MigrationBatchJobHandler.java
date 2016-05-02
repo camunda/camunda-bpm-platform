@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.json.MigrationBatchConfigurationJsonConverter;
+import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -164,7 +165,9 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
       executionBuilder.skipIoMappings();
     }
 
-    executionBuilder.execute();
+    // uses internal API in order to skip writing user operation log (CommandContext#disableUserOperationLog
+    // is not sufficient with legacy engine config setting "restrictUserOperationLogToAuthenticatedUsers" = false)
+    ((MigrationPlanExecutionBuilderImpl) executionBuilder).execute(false);
 
     commandContext.getByteArrayManager().delete(configurationEntity);
   }

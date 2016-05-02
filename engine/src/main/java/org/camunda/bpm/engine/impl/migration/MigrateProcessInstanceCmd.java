@@ -71,8 +71,11 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
 
   protected static final MigrationLogger LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
-  public MigrateProcessInstanceCmd(MigrationPlanExecutionBuilderImpl migrationPlanExecutionBuilder) {
+  protected boolean writeOperationLog;
+
+  public MigrateProcessInstanceCmd(MigrationPlanExecutionBuilderImpl migrationPlanExecutionBuilder, boolean writeOperationLog) {
     super(migrationPlanExecutionBuilder);
+    this.writeOperationLog = writeOperationLog;
   }
 
   public Void execute(final CommandContext commandContext) {
@@ -89,11 +92,13 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
         sourceDefinition,
         targetDefinition,
         processInstanceIds);
-    writeUserOperationLog(commandContext,
-        sourceDefinition,
-        targetDefinition,
-        processInstanceIds.size(),
-        false);
+    if (writeOperationLog) {
+      writeUserOperationLog(commandContext,
+          sourceDefinition,
+          targetDefinition,
+          processInstanceIds.size(),
+          false);
+    }
 
     commandContext.runWithoutAuthorization(new Callable<Void>() {
 
