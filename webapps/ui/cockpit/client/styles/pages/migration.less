@@ -11,7 +11,7 @@
   section {
     position: absolute;
     width: 100%;
-    top: 60px;
+    top: @progress-indicator-height;
     bottom: 0;
 
     margin-left: -(@grid-gutter-width * 0.5);
@@ -40,30 +40,9 @@
     }
   }
 
-  .page-mapping .section-content {
-    position: absolute;
-    height: ~"calc(100% - 64px)";
-    width: 100%;
-    top: 0;
-    overflow: hidden;
-  }
-
-  .source-column,
-  .target-column {
-    position: absolute;
-    width: 50%;
-    height: 100%;//~"calc(100% - 64px)";
-    bottom: 0;
-    border-top: 1px solid @custom-gray-light;
-    border-bottom: 1px solid @custom-gray-light;
-  }
-
-  .source-column {
-    border-right: 1px solid @custom-gray-light;
-    left: 0;
-  }
-  .target-column {
-    right: 0;
+  .section-content {
+    border: 1px solid @custom-gray-light;
+    border-width: 1px 0;
   }
 
   .page-mapping,
@@ -101,6 +80,30 @@
     background-color: #70b8db;
     border-color: #143d52;
     color: #143d52;
+  }
+
+  .section-content {
+    position: absolute;
+    height: ~"calc(100% - 64px)";
+    width: 100%;
+    top: 0;
+    overflow: auto;
+  }
+
+  .source-column,
+  .target-column {
+    position: absolute;
+    width: 50%;
+    height: 100%;//~"calc(100% - 64px)";
+    bottom: 0;
+  }
+
+  .source-column {
+    border-right: 1px solid @custom-gray-light;
+    left: 0;
+  }
+  .target-column {
+    right: 0;
   }
 
   .instance-number code {
@@ -172,6 +175,19 @@
       color: @brand-info;
     }
   }
+
+  .page-instances,
+  .page-confirm,
+  .page-progress {
+    > .section-content {
+      padding-top: @grid-gutter-width * 0.5;
+      padding-bottom: @grid-gutter-width * 0.5;
+    }
+  }
+
+  .process-instances {
+    margin: (@grid-gutter-width * 0.5) 0;
+  }
 }
 
 
@@ -189,7 +205,7 @@
     display: block;
     position: absolute;
     height: 2px;
-    top: 30px;
+    top: (@progress-indicator-height * 0.5);
     left: 12.5%;
     margin-top: -1px;
   }
@@ -253,6 +269,9 @@
     text-align: center;
     padding: 0;
     margin: 0;
+
+    height: @progress-indicator-height - @grid-gutter-width;
+    vertical-align: middle;
 
     &.active a,
     &.disabled a {
