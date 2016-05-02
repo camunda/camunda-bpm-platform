@@ -81,8 +81,8 @@
             <a ng-href="{{ getDeploymentUrl() }}">{{ processDefinition.deploymentId }}</a>
           </dd>
 
-          <dt>Related</dt>
-          <dd>
+          <dt ng-if="hasMigrationPlugin">Related</dt>
+          <dd ng-if="hasMigrationPlugin">
             <ul>
               <li>
                 <a ng-href="#/migration?searchQuery=%5B%5D&sourceKey={{ processDefinition.key }}">Migration</a>

@@ -114,8 +114,8 @@
             </ul>
           </dd>
 
-          <dt>Related</dt>
-          <dd>
+          <dt ng-if="hasMigrationPlugin || hasReportPlugin">Related</dt>
+          <dd ng-if="hasMigrationPlugin || hasReportPlugin">
             <ul>
               <li ng-if="hasReportPlugin">
                 <a class="report-link"
@@ -123,7 +123,7 @@
                   Reports
                 </a>
               </li>
-              <li>
+              <li ng-if="hasMigrationPlugin">
                 <a ng-href="#/migration?searchQuery=%5B%5D&sourceKey={{ processDefinition.key }}">Migration</a>
               </li>
             </ul>
