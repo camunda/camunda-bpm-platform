@@ -102,6 +102,8 @@
       <if test="type != null">
         and RES.TYPE_ = #{type}
       </if>
+      
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
     </where>
   </sql>
 
