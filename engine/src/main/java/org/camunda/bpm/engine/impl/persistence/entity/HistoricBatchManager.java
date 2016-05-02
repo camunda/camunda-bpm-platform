@@ -31,14 +31,19 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 public class HistoricBatchManager extends AbstractManager {
 
   public long findBatchCountByQueryCriteria(HistoricBatchQueryImpl historicBatchQuery) {
-    // TODO: authorization
+    configureQuery(historicBatchQuery);
     return (Long) getDbEntityManager().selectOne("selectHistoricBatchCountByQueryCriteria", historicBatchQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricBatch> findBatchesByQueryCriteria(HistoricBatchQueryImpl historicBatchQuery, Page page) {
-    // TODO: authorization
+    configureQuery(historicBatchQuery);
     return getDbEntityManager().selectList("selectHistoricBatchesByQueryCriteria", historicBatchQuery, page);
+  }
+
+  protected void configureQuery(HistoricBatchQueryImpl query) {
+    // TODO: authorization
+    getTenantManager().configureQuery(query);
   }
 
   public HistoricBatchEntity findHistoricBatchById(String batchId) {

@@ -107,6 +107,8 @@
       <if test="completed != null &amp;&amp; !completed">
         and RES.END_TIME_ is null
       </if>
+      
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
     </where>
   </sql>
 
