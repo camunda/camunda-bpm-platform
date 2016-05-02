@@ -36,22 +36,10 @@ var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization
          10: 'Decision Definition'
         };
 
-        var choices = []
-        /*
-        // could be some awesome... could...
-        choices = Object.keys($scope.resourceMap).map(function (k) {
-          return {
-            active: $location.search().resource === '' + k,
-            label: $scope.resourceMap[k],
-            href: '#/authorization?resource=' + k
-          };
-        });
-        */
         pageService.breadcrumbsAdd([
           {
             label: 'Authorizations',
-            href: '#/authorization',
-            choices: choices
+            href: '#/authorization'
           }
         ]);
 
