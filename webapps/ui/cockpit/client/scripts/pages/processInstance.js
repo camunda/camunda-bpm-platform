@@ -15,9 +15,11 @@ var angular = require('camunda-commons-ui/vendor/angular'),
           '$scope', '$filter', '$rootScope', '$location', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Data', 'Transform', 'processInstance', 'dataDepend', 'page', 'breadcrumbTrails',
   function($scope,   $filter,   $rootScope,   $location,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   IncidentResource,   Views,   Data,   Transform,   processInstance,   dataDepend,   page,   breadcrumbTrails) {
 
-    $scope.hasMigrationPlugin = Views.getProviders({ component: 'cockpit.processes.dashboard' }).filter(function(plugin) {
-      return plugin.id === 'migration';
-    }).length > 0;
+    $scope.hasMigrationPlugin = false;
+    try {
+      $scope.hasMigrationPlugin = !!angular.module('cockpit.plugin.migration');
+    }
+    catch (e) {}
 
     $scope.processInstance = processInstance;
 

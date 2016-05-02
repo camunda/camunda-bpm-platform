@@ -25,11 +25,13 @@ function (
       '$scope',
       'Data',
       'dataDepend',
+      'Views',
       'camAPI',
     function(
       $scope,
       Data,
       dataDepend,
+      Views,
       camAPI
     ) {
       var processData = $scope.processData = dataDepend.create($scope);
@@ -102,6 +104,12 @@ function (
           procStats.incidents.value += stats.incidents.length;
         });
       });
+
+      $scope.hasMigrationPlugin = false;
+      try {
+        $scope.hasMigrationPlugin = !!angular.module('cockpit.plugin.migration');
+      }
+      catch (e) {}
     }],
 
     priority: 0
