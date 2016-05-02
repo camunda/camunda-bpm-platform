@@ -105,7 +105,7 @@ public class MigrationPlanCreationTest {
         .build();
       fail("Should not succeed");
     } catch (BadUserRequestException e) {
-      assertExceptionMessage(e, "sourceProcessDefinitionId is null");
+      assertExceptionMessage(e, "Source process definition id is null");
     }
   }
 
@@ -134,7 +134,7 @@ public class MigrationPlanCreationTest {
         .build();
       fail("Should not succeed");
     } catch (BadUserRequestException e) {
-      assertExceptionMessage(e, "targetProcessDefinitionId is null");
+      assertExceptionMessage(e, "Target process definition id is null");
     }
   }
 
