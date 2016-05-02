@@ -77,11 +77,7 @@ public class MigrationPlanExecutionBuilderImpl implements MigrationPlanExecution
   }
 
   public void execute() {
-    execute(false, false);
-  }
-
-  public void execute(boolean skipCustomListeners, boolean skipIoMappings) {
-    commandExecutor.execute(new MigrateProcessInstanceCmd(this, skipCustomListeners, skipIoMappings));
+    commandExecutor.execute(new MigrateProcessInstanceCmd(this));
   }
 
   public Batch executeAsync() {

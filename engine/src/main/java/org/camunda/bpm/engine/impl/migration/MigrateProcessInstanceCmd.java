@@ -71,8 +71,7 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
 
   protected static final MigrationLogger LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
-  public MigrateProcessInstanceCmd(MigrationPlanExecutionBuilderImpl migrationPlanExecutionBuilder,
-      boolean skipCustomListeners, boolean skipIoMappings) {
+  public MigrateProcessInstanceCmd(MigrationPlanExecutionBuilderImpl migrationPlanExecutionBuilder) {
     super(migrationPlanExecutionBuilder);
   }
 
