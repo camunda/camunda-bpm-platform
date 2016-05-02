@@ -13,6 +13,10 @@
 package org.camunda.bpm.engine.impl.migration.instance;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -69,5 +73,10 @@ public class MigratingUserTaskInstance implements MigratingInstance {
   @Override
   public void migrateState() {
     userTask.setProcessDefinitionId(migratingActivityInstance.targetScope.getProcessDefinition().getId());
+
+    HistoryEventProducer historyEventProducer = Context.getProcessEngineConfiguration().getHistoryEventProducer();
+    HistoryEvent historyEvent = historyEventProducer.createTaskInstanceUpdateEvt(userTask);
+    HistoryEventHandler historyEventHandler = Context.getProcessEngineConfiguration().getHistoryEventHandler();
+    historyEventHandler.handleEvent(historyEvent);
   }
 }

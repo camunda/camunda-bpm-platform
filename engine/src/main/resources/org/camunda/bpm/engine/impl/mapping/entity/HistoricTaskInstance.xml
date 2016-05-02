@@ -79,6 +79,8 @@
   <update id="updateHistoricTaskInstanceEvent" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
     update ${prefix}ACT_HI_TASKINST set
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+      PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       NAME_ = #{name, jdbcType=VARCHAR},
       PARENT_TASK_ID_ = #{parentTaskId, jdbcType=VARCHAR},
       DESCRIPTION_ = #{description, jdbcType=VARCHAR},

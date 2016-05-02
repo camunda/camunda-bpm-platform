@@ -25,6 +25,8 @@ import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -38,6 +40,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -54,24 +57,33 @@ public class MigrationHistoryProcessInstanceTest {
   protected RuntimeService runtimeService;
   protected HistoryService historyService;
 
+  //============================================================================
+  //===================================Migration================================
+  //============================================================================
+  protected ProcessDefinition sourceProcessDefinition;
+  protected ProcessDefinition targetProcessDefinition;
+  protected MigrationPlan migrationPlan;
+
   @Before
-  public void initServices() {
+  public void initTest() {
     runtimeService = rule.getRuntimeService();
     historyService = rule.getHistoryService();
+
+
+    sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ModifiableBpmnModelInstance modifiedModel = modify(ProcessModels.ONE_TASK_PROCESS).changeElementId("Process", "Process2")
+                                                                                      .changeElementId("userTask", "userTask2");
+    targetProcessDefinition = testHelper.deployAndGetDefinition(modifiedModel);
+    migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+                                                                                            .mapActivities("userTask", "userTask2")
+                                                                                            .build();
+    runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
   }
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testMigrateHistoryProcessInstance() {
     //given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ModifiableBpmnModelInstance modifiedModel = modify(ProcessModels.ONE_TASK_PROCESS).changeElementId("Process", "Process2")
-                                                                                      .changeElementId("userTask", "userTask2");
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modifiedModel);
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-                                                                                            .mapActivities("userTask", "userTask2")
-                                                                                            .build();
-    runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
     HistoricProcessInstanceQuery sourceHistoryProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
                                                                                    .processDefinitionId(sourceProcessDefinition.getId());
     HistoricProcessInstanceQuery targetHistoryProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
@@ -99,14 +111,6 @@ public class MigrationHistoryProcessInstanceTest {
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testMigrateHistoryActivityInstance() {
     //given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ModifiableBpmnModelInstance modifiedModel = modify(ProcessModels.ONE_TASK_PROCESS).changeElementId("Process", "Process2")
-                                                                                      .changeElementId("userTask", "userTask2");
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modifiedModel);
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-                                                                                            .mapActivities("userTask", "userTask2")
-                                                                                            .build();
-    runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
     HistoricActivityInstanceQuery sourceHistoryActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery()
                                                                                    .processDefinitionId(sourceProcessDefinition.getId());
     HistoricActivityInstanceQuery targetHistoryActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery()
@@ -129,5 +133,31 @@ public class MigrationHistoryProcessInstanceTest {
     HistoricActivityInstance instance = targetHistoryActivityInstanceQuery.singleResult();
     assertEquals(instance.getProcessDefinitionKey(), targetProcessDefinition.getKey());
     assertEquals(instance.getActivityId(), "userTask2");
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  public void testMigrateHistoryUserTaskInstance() {
+    //given
+    HistoricTaskInstanceQuery sourceHistoryTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery()
+                                                                                   .processDefinitionId(sourceProcessDefinition.getId());
+    HistoricTaskInstanceQuery targetHistoryTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery()
+                                                                                    .processDefinitionId(targetProcessDefinition.getId());
+
+    //when
+    assertEquals(1, sourceHistoryTaskInstanceQuery.count());
+    assertEquals(0, targetHistoryTaskInstanceQuery.count());
+    ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(sourceProcessDefinition.getId());
+    runtimeService.newMigration(migrationPlan)
+      .processInstanceQuery(sourceProcessInstanceQuery)
+      .execute();
+
+    //then
+    assertEquals(0, sourceHistoryTaskInstanceQuery.count());
+    assertEquals(1, targetHistoryTaskInstanceQuery.count());
+
+    HistoricTaskInstance instance = targetHistoryTaskInstanceQuery.singleResult();
+    assertEquals(instance.getProcessDefinitionKey(), targetProcessDefinition.getKey());
+    assertEquals(instance.getProcessDefinitionId(), targetProcessDefinition.getId());
   }
 }
