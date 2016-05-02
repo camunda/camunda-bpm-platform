@@ -68,13 +68,18 @@ public class StatisticsManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<BatchStatistics> getStatisticsGroupedByBatch(BatchStatisticsQueryImpl query, Page page) {
-    // TODO: authorizations
+    configureQuery(query);
     return getDbEntityManager().selectList("selectBatchStatistics", query, page);
   }
 
   public long getStatisticsCountGroupedByBatch(BatchStatisticsQueryImpl query) {
-    // TODO: authorizations
+    configureQuery(query);
     return (Long) getDbEntityManager().selectOne("selectBatchStatisticsCount", query);
+  }
+
+  protected void configureQuery(BatchStatisticsQueryImpl batchQuery) {
+    // TODO: authorization
+    getTenantManager().configureQuery(batchQuery);
   }
 
   protected void checkReadProcessDefinition(ActivityStatisticsQueryImpl query) {

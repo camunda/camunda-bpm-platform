@@ -605,11 +605,11 @@
   <sql id="selectBatchStatisticsByQueryCriteriaSql">
     from (
       select
-        BATCH.*
+        RES.*
         , JOB.REMAINING_JOBS_COUNT_
         , JOB.FAILED_JOBS_COUNT_
       from
-        ${prefix}ACT_RU_BATCH BATCH
+        ${prefix}ACT_RU_BATCH RES
 
       left outer join
 
@@ -626,15 +626,17 @@
           JOB_DEF_ID_
       ) JOB
       on
-        BATCH.BATCH_JOB_DEF_ID_ = JOB.JOB_DEF_ID_
+        RES.BATCH_JOB_DEF_ID_ = JOB.JOB_DEF_ID_
 
       <where>
         <if test="batchId != null">
-          BATCH.ID_ = #{batchId}
+          RES.ID_ = #{batchId}
         </if>
         <if test="type != null">
-          and BATCH.TYPE_ = #{type}
+          and RES.TYPE_ = #{type}
         </if>
+        
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
       </where>
 
     ) RES

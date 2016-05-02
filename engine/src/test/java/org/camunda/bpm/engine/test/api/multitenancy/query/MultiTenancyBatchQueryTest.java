@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.BatchStatistics;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -139,6 +140,53 @@ public class MultiTenancyBatchQueryTest {
     // then
     Assert.assertEquals(3, batches.size());
     Assert.assertEquals(3, managementService.createBatchQuery().count());
+
+    identityService.clearAuthentication();
+  }
+
+  @Test
+  public void testBatchStatisticsNoAuthenticatedTenant() {
+    // given
+    identityService.setAuthentication("user", null, null);
+
+    // when
+    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery().list();
+
+    // then
+    Assert.assertEquals(1, statistics.size());
+    Assert.assertEquals(sharedBatch.getId(), statistics.get(0).getId());
+
+    Assert.assertEquals(1, managementService.createBatchStatisticsQuery().count());
+
+    identityService.clearAuthentication();
+  }
+
+  @Test
+  public void testBatchStatisticsAuthenticatedTenant() {
+    // given
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    // when
+    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery().list();
+
+    // then
+    Assert.assertEquals(2, statistics.size());
+
+    Assert.assertEquals(2, managementService.createBatchStatisticsQuery().count());
+
+    identityService.clearAuthentication();
+  }
+
+  @Test
+  public void testBatchStatisticsAuthenticatedTenants() {
+    // given
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
+
+    // then
+    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery().list();
+    Assert.assertEquals(3, statistics.size());
+
+    Assert.assertEquals(3, managementService.createBatchStatisticsQuery().count());
 
     identityService.clearAuthentication();
   }
