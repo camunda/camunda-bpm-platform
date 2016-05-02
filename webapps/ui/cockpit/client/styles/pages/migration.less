@@ -1,15 +1,18 @@
-@progress-indicator-height: 60px;
+@progress-indicator-height: 75px;
 
 .migration-page {
   position: absolute;
   top: @breadcrumb-height;
   bottom: 0;
-  width: 100%;
-  padding-bottom: @grid-gutter-width * 0.5;
+  left: 0;
+  right: 0;
+  max-width: 100%;
 
   section {
-    height: ~"calc(100% - @{progress-indicator-height})";
-    position: relative;
+    position: absolute;
+    width: 100%;
+    top: 60px;
+    bottom: 0;
 
     margin-left: -(@grid-gutter-width * 0.5);
     margin-right: -(@grid-gutter-width * 0.5);
@@ -26,19 +29,41 @@
 
   footer {
     padding-top: (@grid-gutter-width * 0.5);
-    height: (36px + (@grid-gutter-width * 0.5));
+    padding-bottom: (@grid-gutter-width * 0.5);
     line-height: 36px;
+
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    .text-help {
+      margin: 0;
+    }
   }
 
-  .section-content {
-    border: 1px solid @gray-lighter;
-    border-width: 1px 0;
+  .page-mapping .section-content {
+    position: absolute;
+    height: ~"calc(100% - 64px)";
+    width: 100%;
+    top: 0;
+    overflow: hidden;
+  }
 
-    padding-top: (@grid-gutter-width * 0.5);
-    padding-bottom: (@grid-gutter-width * 0.5);
+  .source-column,
+  .target-column {
+    position: absolute;
+    width: 50%;
+    height: 100%;//~"calc(100% - 64px)";
+    bottom: 0;
+    border-top: 1px solid @custom-gray-light;
+    border-bottom: 1px solid @custom-gray-light;
+  }
 
-    overflow: auto;
-    height: ~"calc(100% - (36px + (@{grid-gutter-width} * 0.5)))";
+  .source-column {
+    border-right: 1px solid @custom-gray-light;
+    left: 0;
+  }
+  .target-column {
+    right: 0;
   }
 
   .page-mapping,
@@ -56,10 +81,11 @@
   }
 
   [cam-widget-bpmn-viewer] {
-    margin: (@grid-gutter-width * 0.5) 0;
-    height: 50vh;
-    max-height: 650px;
-    min-height: 350px;
+    position: absolute;
+    top: 64px;
+    bottom: 0;
+    width: 100%;
+    border: none;
   }
 
   .badge-migration {
@@ -124,8 +150,27 @@
     color: @btn-warning-color;
   }
 
-  .text-help {
-    margin: 10px 0;
+  .form-inline {
+    padding: (@grid-gutter-width * 0.5);
+    .form-control {
+      width: 100%;
+    }
+  }
+
+  .link-diagrams {
+    position: absolute;
+    height: 30px;
+    width: 30px;
+    text-align: center;
+    margin-top: -15px;
+    margin-right: -15px;
+    top: 50%;
+    right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    .active {
+      color: @brand-info;
+    }
   }
 }
 
