@@ -12,6 +12,10 @@
       <a ng-href="{{ prop.link }}">{{ gimmeDaLabel(prop) }}</a>
     </span>
   </li>
+  <li ng-if="hasMigrationPlugin">
+    <span class="value"></span>
+    <a href="#/migration">Migration</a>
+  </li>
 </ul>
 <div ng-if="!procDefStatsKeys.length"
    class="well">
