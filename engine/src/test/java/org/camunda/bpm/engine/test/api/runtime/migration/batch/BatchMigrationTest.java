@@ -41,6 +41,7 @@ import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -657,6 +658,36 @@ public class BatchMigrationTest {
 
     // then
     assertEquals(0, engineRule.getRuntimeService().createVariableInstanceQuery().count());
+  }
+
+  @Test
+  public void testUpdateEventTrigger() {
+    // given
+    String newMessageName = "newMessage";
+
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_RECEIVE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(modify(ProcessModels.ONE_RECEIVE_TASK_PROCESS)
+      .renameMessage("Message", newMessageName)
+    );
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .updateEventTriggers()
+      .build();
+
+    Batch batch = runtimeService.newMigration(migrationPlan)
+      .processInstanceIds(Collections.singletonList(processInstance.getId()))
+      .executeAsync();
+
+    helper.executeSeedJob(batch);
+
+    // when
+    helper.executeMigrationJobs(batch);
+
+    // then the message event subscription's event name was changed
+    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+    assertEquals(newMessageName, eventSubscription.getEventName());
   }
 
   protected void assertBatchCreated(Batch batch, int processInstanceCount) {

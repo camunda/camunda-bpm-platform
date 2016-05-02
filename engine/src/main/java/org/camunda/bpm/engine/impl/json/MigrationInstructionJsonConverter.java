@@ -26,12 +26,14 @@ public class MigrationInstructionJsonConverter extends JsonObjectConverter<Migra
 
   public static final String SOURCE_ACTIVITY_IDS = "sourceActivityIds";
   public static final String TARGET_ACTIVITY_IDS = "targetActivityIds";
+  public static final String UPDATE_EVENT_TRIGGER = "updateEventTrigger";
 
   public JSONObject toJsonObject(MigrationInstruction instruction) {
     JSONObject json = new JSONObject();
 
     JsonUtil.addArrayField(json, SOURCE_ACTIVITY_IDS, new String[]{instruction.getSourceActivityId()});
     JsonUtil.addArrayField(json, TARGET_ACTIVITY_IDS, new String[]{instruction.getTargetActivityId()});
+    JsonUtil.addField(json, UPDATE_EVENT_TRIGGER, instruction.isUpdateEventTrigger());
 
     return json;
   }
@@ -39,7 +41,8 @@ public class MigrationInstructionJsonConverter extends JsonObjectConverter<Migra
   public MigrationInstruction toObject(JSONObject json) {
     return new MigrationInstructionImpl(
       readSourceActivityId(json),
-      readTargetActivityId(json)
+      readTargetActivityId(json),
+      json.getBoolean(UPDATE_EVENT_TRIGGER)
     );
   }
 
