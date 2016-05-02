@@ -171,6 +171,7 @@
     right: 0;
     padding-left: 0;
     padding-right: 0;
+    z-index: 99;
     .active {
       color: @brand-info;
     }
@@ -187,6 +188,26 @@
 
   .process-instances {
     margin: (@grid-gutter-width * 0.5) 0;
+  }
+
+
+  .popover {
+    display: none;
+    width: 260px;
+    margin-left: 35px;
+    margin-top: -60px;
+    .popover-content {
+      overflow: auto;
+      height: 105px;
+    }
+    b {
+      min-width: 4em;
+      display: inline-block;
+    }
+    .from,
+    .to {
+      margin-bottom: @padding-base-vertical;
+    }
   }
 }
 
