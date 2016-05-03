@@ -209,6 +209,10 @@
       margin-bottom: @padding-base-vertical;
     }
   }
+
+  .validation-errors {
+    margin-top: @grid-gutter-width * 0.5;
+  }
 }
 
 
@@ -280,6 +284,16 @@
     display: inline-block;
     min-width: 33%;
     background-color: @body-bg;
+
+    &:after {
+      display: block;
+      content: '';
+      height: 2px;
+      background-color: @gray-lighter;
+      width: 0;
+      transition: width 0.218s linear,
+                  background-color 0.218s linear;
+    }
   }
 
   li {
@@ -297,11 +311,22 @@
     &.active a,
     &.disabled a {
       cursor: default;
-      color: @text-color;
+    }
+
+    &.disabled a {
+      color: @gray-light;
     }
 
     &.active a {
       color: @gray-base;
+      &:after {
+        width: 100%;
+        background-color: @brand-primary;
+      }
+    }
+    &.done a:after {
+      width: 100%;
+      background-color: @gray-lighter;
     }
   }
 }
