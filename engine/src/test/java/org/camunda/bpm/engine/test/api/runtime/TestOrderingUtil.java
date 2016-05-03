@@ -661,7 +661,40 @@ public class TestOrderingUtil {
     };
   }
 
+  public static NullTolerantComparator<BatchStatistics> batchStatisticsByTenantId() {
+    return propertyComparator(new PropertyAccessor<BatchStatistics, String>() {
+      @Override
+      public String getProperty(BatchStatistics obj) {
+        return obj.getTenantId();
+      }
+    });
+  }
+
   // general
+
+  public static <T, P extends Comparable<P>> NullTolerantComparator<T> propertyComparator(
+      final PropertyAccessor<T, P> accessor) {
+    return new NullTolerantComparator<T>() {
+
+      @Override
+      public int compare(T o1, T o2) {
+        P prop1 = accessor.getProperty(o1);
+        P prop2 = accessor.getProperty(o2);
+
+        return prop1.compareTo(prop2);
+      }
+
+      @Override
+      public boolean hasNullProperty(T object) {
+        return accessor.getProperty(object) != null;
+      }
+    };
+  }
+
+  protected static interface PropertyAccessor<T, P extends Comparable<P>> {
+    P getProperty(T obj);
+  }
+
 
   public static <T> NullTolerantComparator<T> inverted(final NullTolerantComparator<T> comparator) {
     return new NullTolerantComparator<T>() {
@@ -674,6 +707,7 @@ public class TestOrderingUtil {
       }
     };
   }
+
 
   public static <T> NullTolerantComparator<T> hierarchical(final NullTolerantComparator<T> baseComparator,
       final NullTolerantComparator<T>... minorOrderings) {

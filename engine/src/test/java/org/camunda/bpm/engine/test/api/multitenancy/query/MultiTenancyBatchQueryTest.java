@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy.query;
 
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.batchByTenantId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.batchStatisticsByTenantId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 
@@ -277,7 +278,84 @@ public class MultiTenancyBatchQueryTest {
     verifySorting(orderedBatches, inverted(batchByTenantId()));
   }
 
-  // TODO: auch noch für statistics query bauen
+  @Test
+  public void testBatchStatisticsQueryFilterByTenant() {
+    // when
+    BatchStatistics returnedBatch = managementService.createBatchStatisticsQuery().tenantIdIn(TENANT_ONE).singleResult();
+
+    // then
+    Assert.assertNotNull(returnedBatch);
+    Assert.assertEquals(tenant1Batch.getId(), returnedBatch.getId());
+  }
+
+  @Test
+  public void testBatchStatisticsQueryFilterByTenants() {
+    // when
+    List<BatchStatistics> returnedBatches = managementService.createBatchStatisticsQuery()
+      .tenantIdIn(TENANT_ONE, TENANT_TWO)
+      .orderByTenantId()
+      .asc()
+      .list();
+
+    // then
+    Assert.assertEquals(2, returnedBatches.size());
+    Assert.assertEquals(tenant1Batch.getId(), returnedBatches.get(0).getId());
+    Assert.assertEquals(tenant2Batch.getId(), returnedBatches.get(1).getId());
+  }
+
+  @Test
+  public void testBatchStatisticsQueryFilterWithoutTenantId() {
+    // when
+    BatchStatistics returnedBatch = managementService.createBatchStatisticsQuery().withoutTenantId().singleResult();
+
+    // then
+    Assert.assertNotNull(returnedBatch);
+    Assert.assertEquals(sharedBatch.getId(), returnedBatch.getId());
+  }
+
+  @Test
+  public void testBatchStatisticsQueryFailOnNullTenantIdCase1() {
+
+    String[] tenantIds = null;
+    try {
+      managementService.createBatchStatisticsQuery().tenantIdIn(tenantIds);
+      Assert.fail("exception expected");
+    }
+    catch (NullValueException e) {
+      // happy path
+    }
+  }
+
+  @Test
+  public void testBatchStatisticsQueryFailOnNullTenantIdCase2() {
+
+    String[] tenantIds = new String[]{ null };
+    try {
+      managementService.createBatchStatisticsQuery().tenantIdIn(tenantIds);
+      Assert.fail("exception expected");
+    }
+    catch (NullValueException e) {
+      // happy path
+    }
+  }
+
+  @Test
+  public void testBatchStatisticsQueryOrderByTenantIdAsc() {
+    // when
+    List<BatchStatistics> orderedBatches = managementService.createBatchStatisticsQuery().orderByTenantId().asc().list();
+
+    // then
+    verifySorting(orderedBatches, batchStatisticsByTenantId());
+  }
+
+  @Test
+  public void testBatchStatisticsQueryOrderByTenantIdDesc() {
+    // when
+    List<BatchStatistics> orderedBatches = managementService.createBatchStatisticsQuery().orderByTenantId().desc().list();
+
+    // then
+    verifySorting(orderedBatches, inverted(batchStatisticsByTenantId()));
+  }
 
   protected Batch createInstanceAndStartBatchMigration(ProcessDefinition processDefinition) {
     ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(processDefinition.getId());

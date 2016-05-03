@@ -27,9 +27,20 @@ public interface BatchStatisticsQuery extends Query<BatchStatisticsQuery, BatchS
    */
   BatchStatisticsQuery type(String type);
 
+  /** Only selects batch statistics with one of the given tenant ids. */
+  BatchStatisticsQuery tenantIdIn(String... tenantIds);
+
+  /** Only selects batch statistics which have no tenant id. */
+  BatchStatisticsQuery withoutTenantId();
+
   /**
    * Returns batch statistics sorted by batch id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
    */
   BatchStatisticsQuery orderById();
+
+  /**
+   * Returns batch statistics sorted by tenant id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   */
+  BatchStatisticsQuery orderByTenantId();
 
 }

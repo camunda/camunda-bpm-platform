@@ -17,6 +17,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.batch.BatchQuery;
 import org.camunda.bpm.engine.batch.BatchStatistics;
 import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
@@ -31,6 +32,8 @@ public class BatchStatisticsQueryImpl extends AbstractQuery<BatchStatisticsQuery
 
   protected String batchId;
   protected String type;
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
 
   public BatchStatisticsQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -56,8 +59,34 @@ public class BatchStatisticsQueryImpl extends AbstractQuery<BatchStatisticsQuery
     return type;
   }
 
+  public BatchStatisticsQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public String[] getTenantIds() {
+    return tenantIds;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
+
+  public BatchStatisticsQuery withoutTenantId() {
+    this.tenantIds = null;
+    isTenantIdSet = true;
+    return this;
+  }
+
   public BatchStatisticsQuery orderById() {
     return orderBy(BatchQueryProperty.ID);
+  }
+
+  @Override
+  public BatchStatisticsQuery orderByTenantId() {
+    return orderBy(BatchQueryProperty.TENANT_ID);
   }
 
   public long executeCount(CommandContext commandContext) {
