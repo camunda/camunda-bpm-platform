@@ -13,9 +13,12 @@
 package org.camunda.bpm.cockpit.plugin.base;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.hasItems;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.CalledProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
@@ -218,8 +221,6 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
     resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
 
     CalledProcessInstanceQueryDto queryParameter = new CalledProcessInstanceQueryDto();
-    // set sorting order to make sure to get the right order for the assertion
-    queryParameter.setOrderBy("EXEC1.ACT_ID_");
 
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
@@ -230,10 +231,11 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
 
     identityService.clearAuthentication();
 
-    CalledProcessInstanceDto dto = result.get(0);
-    assertThat(dto.getCallActivityId()).isEqualTo("CallActivity_Tenant1");
+    Set<String> callActivityIds = new HashSet<String>();
+    for (CalledProcessInstanceDto calledProcessInstanceDto : result) {
+       callActivityIds.add(calledProcessInstanceDto.getCallActivityId());
+    }
 
-    dto = result.get(1);
-    assertThat(dto.getCallActivityId()).isEqualTo("CallActivity_Tenant2");
+    org.junit.Assert.assertThat(callActivityIds, hasItems("CallActivity_Tenant1", "CallActivity_Tenant2"));
   }
 }
