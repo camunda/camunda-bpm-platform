@@ -14,6 +14,8 @@
 package org.camunda.bpm.engine.impl.batch.history;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.impl.batch.BatchEntity;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -32,10 +34,17 @@ public class DeleteHistoricBatchCmd implements Command<Object> {
     HistoricBatchEntity historicBatch = commandContext.getHistoricBatchManager().findHistoricBatchById(batchId);
     EnsureUtil.ensureNotNull(BadUserRequestException.class, "Historic batch for id '" + batchId + "' cannot be found", "historic batch", historicBatch);
 
-    // TODO: check authorizations
+    checkAccess(commandContext, historicBatch);
 
     historicBatch.delete();
 
     return null;
   }
+
+  protected void checkAccess(CommandContext commandContext, HistoricBatchEntity batch) {
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkDeleteHistoricBatch(batch);
+    }
+  }
+
 }

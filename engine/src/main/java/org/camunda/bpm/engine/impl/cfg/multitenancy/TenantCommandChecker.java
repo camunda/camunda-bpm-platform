@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.cfg.multitenancy;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
+import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -181,6 +182,15 @@ public class TenantCommandChecker implements CommandChecker {
     if (getTenantManager().isTenantCheckEnabled()) {
       if (batch != null && !getTenantManager().isAuthenticatedTenant(batch.getTenantId())) {
         throw LOG.exceptionCommandWithUnauthorizedTenant("delete batch", batch);
+      }
+    }
+  }
+
+  @Override
+  public void checkDeleteHistoricBatch(HistoricBatchEntity batch) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      if (batch != null && !getTenantManager().isAuthenticatedTenant(batch.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("delete historic batch", batch);
       }
     }
   }

@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
@@ -32,6 +33,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHel
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -145,6 +147,41 @@ public class MultiTenancyHistoricBatchQueryTest {
     Assert.assertEquals(3, batches.size());
 
     Assert.assertEquals(3, historyService.createHistoricBatchQuery().count());
+
+    identityService.clearAuthentication();
+  }
+
+  @Test
+  public void testDeleteHistoricBatch() {
+    // given
+    Batch tenant1Batch = createInstanceAndStartBatchMigration(tenant1Definition);
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    // when
+    historyService.deleteHistoricBatch(tenant1Batch.getId());
+
+    // then
+    identityService.clearAuthentication();
+    Assert.assertEquals(0, historyService.createHistoricBatchQuery().count());
+  }
+
+  @Test
+  public void testDeleteHistoricBatchFailsWithWrongTenant() {
+    // given
+    Batch tenant2Batch = createInstanceAndStartBatchMigration(tenant2Definition);
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    // when
+    try {
+      historyService.deleteHistoricBatch(tenant2Batch.getId());
+      Assert.fail("exception expected");
+    }
+    catch (ProcessEngineException e) {
+      // then
+      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Cannot delete historic batch because it belongs to no authenticated tenant"));
+    }
 
     identityService.clearAuthentication();
   }
