@@ -153,6 +153,12 @@
     color: @btn-warning-color;
   }
 
+  .migration-error {
+    background-color: @btn-danger-bg;
+    border: 1px solid @btn-danger-border;
+    color: @btn-danger-color;
+  }
+
   .form-inline {
     padding: (@grid-gutter-width * 0.5);
     .form-control {
@@ -193,13 +199,15 @@
 
   .popover {
     display: none;
-    width: 260px;
+    width: 350px;
     margin-left: 35px;
-    margin-top: -60px;
-    .popover-content {
-      overflow: auto;
-      height: 105px;
+    margin-top: -15px;
+    min-height: 105px;
+
+    &.right > .arrow {
+      top: 25px;
     }
+
     b {
       min-width: 4em;
       display: inline-block;
