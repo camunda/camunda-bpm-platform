@@ -30,20 +30,12 @@ public class UserAuthentication extends Authentication {
 
   protected List<String> groupIds;
 
-  private final Set<String> authorizedApps;
+  protected List<String> tenantIds;
 
-  /**
-   * @param userId the id of the user
-   * @param groupIds
-   * @param processEngineName the name of the process engine
-   * @param authorizedApps
-   */
-  public UserAuthentication(String userId, List<String> groupIds, String processEngineName, Set<String> authorizedApps) {
+  protected Set<String> authorizedApps;
+
+  public UserAuthentication(String userId, String processEngineName) {
     super(userId, processEngineName);
-
-    this.groupIds = groupIds;
-
-    this.authorizedApps = authorizedApps;
   }
 
   public List<String> getGroupIds() {
@@ -56,5 +48,21 @@ public class UserAuthentication extends Authentication {
 
   public Set<String> getAuthorizedApps() {
     return authorizedApps;
+  }
+
+  public List<String> getTenantIds() {
+    return tenantIds;
+  }
+
+  public void setTenantIds(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
+  public void setGroupIds(List<String> groupIds) {
+    this.groupIds = groupIds;
+  }
+
+  public void setAuthorizedApps(Set<String> authorizedApps) {
+    this.authorizedApps = authorizedApps;
   }
 }

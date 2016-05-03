@@ -58,11 +58,15 @@ public class SecurityActions {
 
       String userId = authentication.getIdentityId();
       List<String> groupIds = null;
+      List<String> tenantIds = null;
+
       if (authentication instanceof UserAuthentication) {
-        groupIds = ((UserAuthentication) authentication).getGroupIds();
+        UserAuthentication userAuthentication = (UserAuthentication) authentication;
+        groupIds = userAuthentication.getGroupIds();
+        tenantIds = userAuthentication.getTenantIds();
       }
 
-      processEngine.getIdentityService().setAuthentication(userId, groupIds);
+      processEngine.getIdentityService().setAuthentication(userId, groupIds, tenantIds);
     }
   }
 
