@@ -404,7 +404,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<BatchJobHandler<?>> customBatchJobHandlers;
 
   /** Number of jobs created by a batch seed job invocation */
-  protected int batchJobsPerSeed = 10;
+  protected int batchJobsPerSeed = 100;
   /** Number of invocations executed by a single batch job */
   protected int invocationsPerBatchJob = 1;
   /** seconds to wait between polling for batch completion */

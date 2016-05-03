@@ -103,16 +103,14 @@ public class BatchMigrationTest {
 
   @Before
   public void storeEngineSettings() {
-    ProcessEngineConfigurationImpl configuration =
-      (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
     defaultBatchJobsPerSeed = configuration.getBatchJobsPerSeed();
     defaultInvocationsPerBatchJob = configuration.getInvocationsPerBatchJob();
   }
 
   @After
   public void restoreEngineSettings() {
-    ProcessEngineConfigurationImpl configuration =
-      (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
     configuration.setBatchJobsPerSeed(defaultBatchJobsPerSeed);
     configuration.setInvocationsPerBatchJob(defaultInvocationsPerBatchJob);
   }
@@ -234,6 +232,9 @@ public class BatchMigrationTest {
 
   @Test
   public void testMigrationJobsCreation() {
+    // reduce number of batch jobs per seed to not have to create a lot of instances
+    engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(10);
+
     Batch batch = helper.migrateProcessInstancesAsync(20);
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
     JobDefinition migrationJobDefinition = helper.getMigrationJobDefinition(batch);
@@ -306,7 +307,10 @@ public class BatchMigrationTest {
 
   @Test
   public void testNumberOfJobsCreatedBySeedJobPerInvocation() {
-    int batchJobsPerSeed = ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration()).getBatchJobsPerSeed();
+    // reduce number of batch jobs per seed to not have to create a lot of instances
+    int batchJobsPerSeed = 10;
+    engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(10);
+
     Batch batch = helper.migrateProcessInstancesAsync(batchJobsPerSeed * 2 + 4);
 
     // when
@@ -332,8 +336,16 @@ public class BatchMigrationTest {
   }
 
   @Test
+  public void testDefaultBatchConfiguration() {
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
+    assertEquals(100, configuration.getBatchJobsPerSeed());
+    assertEquals(1, configuration.getInvocationsPerBatchJob());
+    assertEquals(30, configuration.getBatchPollTime());
+  }
+
+  @Test
   public void testCustomNumberOfJobsCreateBySeedJob() {
-    ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
     configuration.setBatchJobsPerSeed(2);
     configuration.setInvocationsPerBatchJob(5);
 
@@ -747,8 +759,8 @@ public class BatchMigrationTest {
     assertNotNull(batch.getId());
     assertEquals("instance-migration", batch.getType());
     assertEquals(processInstanceCount, batch.getTotalJobs());
-    assertEquals(10, batch.getBatchJobsPerSeed());
-    assertEquals(1, batch.getInvocationsPerBatchJob());
+    assertEquals(defaultBatchJobsPerSeed, batch.getBatchJobsPerSeed());
+    assertEquals(defaultInvocationsPerBatchJob, batch.getInvocationsPerBatchJob());
   }
 
 }

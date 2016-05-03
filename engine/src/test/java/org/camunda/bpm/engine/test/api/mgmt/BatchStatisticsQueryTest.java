@@ -27,13 +27,10 @@ import org.camunda.bpm.engine.batch.BatchStatistics;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
@@ -56,10 +53,25 @@ public class BatchStatisticsQueryTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(migrationRule);
 
   protected ManagementService managementService;
+  protected int defaultBatchJobsPerSeed;
 
   @Before
   public void initServices() {
     managementService = engineRule.getManagementService();
+  }
+
+  @Before
+  public void saveAndReduceBatchJobsPerSeed() {
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
+    defaultBatchJobsPerSeed = configuration.getBatchJobsPerSeed();
+    // reduce number of batch jobs per seed to not have to create a lot of instances
+    configuration.setBatchJobsPerSeed(10);
+  }
+
+  @After
+  public void resetBatchJobsPerSeed() {
+    engineRule.getProcessEngineConfiguration()
+      .setBatchJobsPerSeed(defaultBatchJobsPerSeed);
   }
 
   @After

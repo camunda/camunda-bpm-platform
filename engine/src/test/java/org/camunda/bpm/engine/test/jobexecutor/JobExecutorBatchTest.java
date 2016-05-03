@@ -43,6 +43,7 @@ public class JobExecutorBatchTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(migrationRule);
   public CountingJobExecutor jobExecutor;
   protected JobExecutor defaultJobExecutor;
+  protected int defaultBatchJobsPerSeed;
 
   @Before
   public void replaceJobExecutor() throws Exception {
@@ -52,10 +53,21 @@ public class JobExecutorBatchTest {
     processEngineConfiguration.setJobExecutor(jobExecutor);
   }
 
+  @Before
+  public void saveBatchJobsPerSeed() {
+    defaultBatchJobsPerSeed = engineRule.getProcessEngineConfiguration().getBatchJobsPerSeed();
+  }
+
   @After
   public void resetJobExecutor() {
     engineRule.getProcessEngineConfiguration()
       .setJobExecutor(defaultJobExecutor);
+  }
+
+  @After
+  public void resetBatchJobsPerSeed() {
+    engineRule.getProcessEngineConfiguration()
+      .setBatchJobsPerSeed(defaultBatchJobsPerSeed);
   }
 
   @After
@@ -85,6 +97,9 @@ public class JobExecutorBatchTest {
 
   @Test
   public void testJobExecutorHintedSeedJobExecution() {
+    // reduce number of batch jobs per seed to not have to create a lot of instances
+    engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(10);
+
     // given
     Batch batch = helper.migrateProcessInstancesAsync(13);
     jobExecutor.startRecord();
