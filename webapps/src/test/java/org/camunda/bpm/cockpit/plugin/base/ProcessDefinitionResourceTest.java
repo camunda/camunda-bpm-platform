@@ -689,6 +689,8 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     resource = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance.getProcessDefinitionId());
 
     ProcessDefinitionQueryDto queryParameter = new ProcessDefinitionQueryDto();
+    // set sorting order to make sure to get the right order for the assertion
+    queryParameter.setOrderBy("EXEC2.ACT_ID_");
 
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
