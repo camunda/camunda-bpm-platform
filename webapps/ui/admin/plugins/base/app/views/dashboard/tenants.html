@@ -1,8 +1,8 @@
 <ul>
-  <li>
+  <li ng-if="access.create">
     <a href="#/tenant-create">Create New Tenant</a>
   </li>
-  <li>
+  <li ng-if="access.list">
     <a href="#/tenants">List of Tenants</a>
   </li>
 </ul>

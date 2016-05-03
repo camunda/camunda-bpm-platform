@@ -1,8 +1,8 @@
 <ul>
-  <li>
+  <li ng-if="access.create">
     <a href="#/group-create">Create New Group</a>
   </li>
-  <li>
+  <li ng-if="access.list">
     <a href="#/groups">List of Groups</a>
   </li>
 </ul>
