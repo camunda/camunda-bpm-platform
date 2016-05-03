@@ -35,6 +35,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
@@ -97,17 +98,8 @@ public class UserAuthenticationResource {
 
     } else {
 
-      // get user's groups
-      final List<Group> groupList = processEngine.getIdentityService().createGroupQuery()
-        .groupMember(username)
-        .list();
-
-      // transform into array of strings:
-      List<String> groupIds = new ArrayList<String>();
-
-      for (Group group : groupList) {
-        groupIds.add(group.getId());
-      }
+      List<String> groupIds = getGroupsOfUser(processEngine, username);
+      List<String> tenantIds = getTenantsOfUser(processEngine, username);
 
       // check user's app authorizations
       AuthorizationService authorizationService = processEngine.getAuthorizationService();
@@ -133,7 +125,10 @@ public class UserAuthenticationResource {
       final Authentications authentications = Authentications.getCurrent();
 
       // create new authentication
-      UserAuthentication newAuthentication = new UserAuthentication(username, groupIds, engineName, authorizedApps);
+      UserAuthentication newAuthentication = new UserAuthentication(username, engineName);
+      newAuthentication.setGroupIds(groupIds);
+      newAuthentication.setTenantIds(tenantIds);
+      newAuthentication.setAuthorizedApps(authorizedApps);
       authentications.addAuthentication(newAuthentication);
 
       // send reponse including updated cookie
@@ -141,6 +136,30 @@ public class UserAuthenticationResource {
     }
   }
 
+  protected List<String> getGroupsOfUser(ProcessEngine engine, String userId) {
+    List<Group> groups = engine.getIdentityService().createGroupQuery()
+      .groupMember(userId)
+      .list();
+
+    List<String> groupIds = new ArrayList<String>();
+    for (Group group : groups) {
+      groupIds.add(group.getId());
+    }
+    return groupIds;
+  }
+
+  protected List<String> getTenantsOfUser(ProcessEngine engine, String userId) {
+    List<Tenant> tenants = engine.getIdentityService().createTenantQuery()
+      .userMember(userId)
+      .includingGroupsOfUser(true)
+      .list();
+
+    List<String> tenantIds = new ArrayList<String>();
+    for(Tenant tenant : tenants) {
+      tenantIds.add(tenant.getId());
+    }
+    return tenantIds;
+  }
 
   @POST
   @Path("/{processEngineName}/logout")

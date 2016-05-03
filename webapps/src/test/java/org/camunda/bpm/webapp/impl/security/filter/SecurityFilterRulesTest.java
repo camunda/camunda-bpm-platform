@@ -191,10 +191,12 @@ public class SecurityFilterRulesTest {
   }
 
   private void authenticatedForApp(String engineName, String appName, Runnable codeBlock) {
-    List<String> groups = Collections.<String>emptyList();
     HashSet<String> authorizedApps = new HashSet<String>(Arrays.asList(appName));
 
-    Authentication engineAuth = new UserAuthentication(LOGGED_IN_USER.getIdentityId(), groups, engineName, authorizedApps);
+    UserAuthentication engineAuth = new UserAuthentication(LOGGED_IN_USER.getIdentityId(), engineName);
+    engineAuth.setGroupIds(Collections.<String> emptyList());
+    engineAuth.setTenantIds(Collections.<String> emptyList());
+    engineAuth.setAuthorizedApps(authorizedApps);
 
     Authentications authentications = new Authentications();
     authentications.addAuthentication(engineAuth);
