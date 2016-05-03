@@ -73,9 +73,11 @@ var pagesModule = require('./pages/main'),
 
     appNgModule.controller('camAdminAppCtrl', [
       '$scope',
+      '$route',
       'UserResource',
     function (
       $scope,
+      $route,
       UserResource
     ) {
       function getUserProfile(auth) {
@@ -92,7 +94,12 @@ var pagesModule = require('./pages/main'),
       }
 
       $scope.$on('authentication.changed', function (ev, auth) {
-        getUserProfile(auth);
+        if (auth) {
+          getUserProfile(auth);
+        }
+        else {
+          $route.reload();
+        }
       });
 
       getUserProfile($scope.authentication);

@@ -38,6 +38,21 @@ module.exports = Page.extend({
     this.usernameInput(username);
     this.passwordInput(password);
     this.loginButton().click();
+  },
+
+  ensureUserLogout: function () {
+    var self = this;
+    var el = element(by.css('.account.dropdown'));
+    el.isPresent().then(function (yepNope) {
+      if (yepNope) {
+        self.userLogout();
+      }
+    });
+  },
+
+  userLogout: function () {
+    element(by.css('.account.dropdown > .dropdown-toggle')).click();
+    element(by.css('.account.dropdown > .dropdown-menu > .logout > a')).click();
   }
 
 });

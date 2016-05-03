@@ -16,7 +16,6 @@ describe('Admin Users Spec', function() {
   describe('user page navigation', function() {
 
     before(function() {
-      console.log(setupFile.setup1[1].params.id);
       return testHelper(setupFile.setup1, function() {
 
         usersPage.navigateToWebapp('Admin');
