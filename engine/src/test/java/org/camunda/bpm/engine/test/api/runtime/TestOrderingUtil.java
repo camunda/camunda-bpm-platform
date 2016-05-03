@@ -557,7 +557,7 @@ public class TestOrderingUtil {
 
     };
   }
-  
+
   public static NullTolerantComparator<ExternalTask> externalTaskByPriority() {
     return new NullTolerantComparator<ExternalTask>() {
 
@@ -585,6 +585,18 @@ public class TestOrderingUtil {
 
       public boolean hasNullProperty(Batch object) {
         return false;
+      }
+    };
+  }
+
+  public static NullTolerantComparator<Batch> batchByTenantId() {
+    return new NullTolerantComparator<Batch>() {
+      public int compare(Batch o1, Batch o2) {
+        return o1.getTenantId().compareTo(o2.getTenantId());
+      }
+
+      public boolean hasNullProperty(Batch object) {
+        return object.getTenantId() == null;
       }
     };
   }

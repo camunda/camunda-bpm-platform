@@ -24,4 +24,6 @@ public interface BatchQueryProperty {
 
   QueryProperty ID = new QueryPropertyImpl("ID_");
 
+  QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
+
 }

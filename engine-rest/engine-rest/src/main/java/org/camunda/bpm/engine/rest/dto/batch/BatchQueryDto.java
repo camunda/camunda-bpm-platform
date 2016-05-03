@@ -23,20 +23,26 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.batch.BatchQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class BatchQueryDto extends AbstractQueryDto<BatchQuery> {
 
   private static final String SORT_BY_BATCH_ID_VALUE = "batchId";
+  private static final String SORT_BY_TENANT_ID_VALUE = "tenantId";
 
   protected String batchId;
   protected String type;
+  private List<String> tenantIds;
+  private Boolean withoutTenantId;
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
     VALID_SORT_BY_VALUES = new ArrayList<String>();
     VALID_SORT_BY_VALUES.add(SORT_BY_BATCH_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID_VALUE);
   }
 
   public BatchQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
@@ -53,6 +59,16 @@ public class BatchQueryDto extends AbstractQueryDto<BatchQuery> {
     this.type = type;
   }
 
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
   }
@@ -65,7 +81,12 @@ public class BatchQueryDto extends AbstractQueryDto<BatchQuery> {
     if (batchId != null) {
       query.batchId(batchId);
     }
-
+    if (Boolean.TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
+    }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
     if (type != null) {
       query.type(type);
     }
@@ -74,6 +95,9 @@ public class BatchQueryDto extends AbstractQueryDto<BatchQuery> {
   protected void applySortBy(BatchQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
     if (sortBy.equals(SORT_BY_BATCH_ID_VALUE)) {
       query.orderById();
+    }
+    else if (sortBy.equals(SORT_BY_TENANT_ID_VALUE)) {
+      query.orderByTenantId();
     }
   }
 

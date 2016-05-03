@@ -28,9 +28,19 @@ public interface BatchQuery extends Query<BatchQuery, Batch> {
    */
   BatchQuery type(String type);
 
+  /** Only selects batches with one of the given tenant ids. */
+  BatchQuery tenantIdIn(String... tenantIds);
+
+  /** Only selects batches which have no tenant id. */
+  BatchQuery withoutTenantId();
+
   /**
    * Returns batches sorted by id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
    */
   BatchQuery orderById();
+  /**
+   * Returns batches sorted by tenant id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   */
+  BatchQuery orderByTenantId();
 
 }
