@@ -159,20 +159,18 @@ public class TenantCommandChecker implements CommandChecker {
   }
 
   public void checkReadTask(TaskEntity task) {
-    ExecutionEntity execution = findExecutionById(task.getExecutionId());
     if (getTenantManager().isTenantCheckEnabled()) {
-      if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
-        throw LOG.exceptionCommandWithUnauthorizedTenant("read the task", execution);
+      if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("read the task", task);
       }
     }
   }
 
   @Override
   public void checkUpdateTask(TaskEntity task) {
-    ExecutionEntity execution = findExecutionById(task.getExecutionId());
     if (getTenantManager().isTenantCheckEnabled()) {
-      if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
-        throw LOG.exceptionCommandWithUnauthorizedTenant("update the task", execution);
+      if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("update the task", task);
       }
     }
   }
