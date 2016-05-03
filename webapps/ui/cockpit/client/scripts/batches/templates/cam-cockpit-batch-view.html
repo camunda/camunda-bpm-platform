@@ -115,10 +115,10 @@
               <th>Property</th>
               <th>Value</th>
             </thead>
-            <tbody>
-              <tr ng-repeat="(key, value) in ctrl.getSelection()">
+            <tbody ng-init="selection = ctrl.getSelection()">
+              <tr ng-repeat="key in ctrl.sortingKeys">
                 <td>{{key}}</td>
-                <td>{{value}}</td>
+                <td>{{selection[key]}}</td>
               </tr>
             </tbody>
           </table>
@@ -139,14 +139,26 @@
               <tbody>
                 <tr ng-repeat="job in ctrl.getJobs()">
                   <td class="uuid stack-trace">
-                    <a ng-href="{{ctrl.getStacktraceUrl(job)}}" target="_blank" tooltip="Open stacktrace in new window">{{job.id}}</a>
+                    <a ng-href="{{ctrl.getStacktraceUrl(job)}}"
+                       target="_blank"
+                       tooltip="Open stacktrace in new window">{{job.id}}</a>
                   </td>
                   <td>
                     <span>{{job.exceptionMessage}}</span>
                   </td>
                   <td>
-                    <a class="btn btn-default action-button" ng-click="ctrl.retryJob(job)" tooltip="Increment Number of Retries for this Job"><span class="glyphicon glyphicon-repeat"></span></a>
-                    <a class="btn btn-default action-button" ng-click="ctrl.deleteJob(job)" tooltip="Delete this Job"><span class="glyphicon glyphicon-trash"></span></a>
+                    <div class="btn-group btn-group-sm">
+                      <a class="btn btn-default action-button"
+                         ng-click="ctrl.retryJob(job)"
+                         tooltip="Increment Number of Retries for this Job">
+                        <span class="glyphicon glyphicon-repeat"></span>
+                      </a>
+                      <a class="btn btn-default action-button"
+                         ng-click="ctrl.deleteJob(job)"
+                         tooltip="Delete this Job">
+                        <span class="glyphicon glyphicon-trash"></span>
+                      </a>
+                    </div>
                   </td>
                 </tr>
               </tbody>

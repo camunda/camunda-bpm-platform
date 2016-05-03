@@ -314,4 +314,19 @@ Batch.prototype._load = function(type) {
   }
 };
 
+
+Batch.prototype.sortingKeys = [
+  'id',
+  'startTime',
+  'endTime',
+  'type',
+  'totalJobs',
+  'batchJobsPerSeed',
+  'invocationsPerBatchJob',
+  'tenantId',
+  'batchJobDefinitionId',
+  'monitorJobDefinitionId',
+  'seedJobDefinitionId',
+];
+
 module.exports = Batch;
