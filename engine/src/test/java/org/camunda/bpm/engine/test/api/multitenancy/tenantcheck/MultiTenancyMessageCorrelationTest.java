@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.test.api.multitenancy.cmd;
+package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;

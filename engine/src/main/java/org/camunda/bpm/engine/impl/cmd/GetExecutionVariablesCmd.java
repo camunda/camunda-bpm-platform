@@ -18,10 +18,8 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
@@ -55,7 +53,7 @@ public class GetExecutionVariablesCmd implements Command<VariableMap>, Serializa
 
     ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
 
-    checkAuthorization(execution);
+    checkGetExecutionVariables(execution, commandContext);
 
     VariableMapImpl executionVariables = new VariableMapImpl();
 
@@ -65,9 +63,7 @@ public class GetExecutionVariablesCmd implements Command<VariableMap>, Serializa
     return executionVariables;
   }
 
-  public void checkAuthorization(ExecutionEntity execution) {
-    CommandContext commandContext = Context.getCommandContext();
-
+  protected void checkGetExecutionVariables(ExecutionEntity execution, CommandContext commandContext) {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkReadProcessInstance(execution);
     }

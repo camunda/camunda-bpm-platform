@@ -54,7 +54,7 @@ public class GetTaskVariableCmdTyped implements Command<TypedValue>, Serializabl
 
     ensureNotNull("task " + taskId + " doesn't exist", "task", task);
 
-    checkAuthorization(task);
+    checkGetTaskVariableTyped(task, commandContext);
 
     TypedValue value;
 
@@ -67,9 +67,7 @@ public class GetTaskVariableCmdTyped implements Command<TypedValue>, Serializabl
     return value;
   }
 
-  public void checkAuthorization(TaskEntity task) {
-    CommandContext commandContext = Context.getCommandContext();
-
+  protected void checkGetTaskVariableTyped(TaskEntity task, CommandContext commandContext) {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkReadTask(task);
     }

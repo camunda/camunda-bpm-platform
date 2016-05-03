@@ -20,7 +20,6 @@ import java.util.Collections;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -53,8 +52,7 @@ public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
     ExecutionEntity execution = executionManager.findExecutionById(processInstanceId);
     ensureNotNull(BadUserRequestException.class, "No process instance found for id '" + processInstanceId + "'", "processInstance", execution);
 
-    // check authorization
-    checkAuthorization(execution);
+    checkDeleteProcessInstance(execution, commandContext);
 
     // delete process instance
     commandContext
@@ -69,9 +67,7 @@ public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
     return null;
   }
 
-  public void checkAuthorization(ExecutionEntity execution) {
-    CommandContext commandContext = Context.getCommandContext();
-
+  protected void checkDeleteProcessInstance(ExecutionEntity execution, CommandContext commandContext) {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkDeleteProcessInstance(execution);
     }

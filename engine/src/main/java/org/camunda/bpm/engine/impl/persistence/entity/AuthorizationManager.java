@@ -16,7 +16,6 @@ import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
-import static org.camunda.bpm.engine.authorization.Permissions.DELETE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
@@ -441,36 +440,6 @@ public class AuthorizationManager extends AbstractManager {
 
   // read permission ////////////////////////////////////////////////////
 
-  public void checkReadProcessInstance(String processInstanceId) {
-    ExecutionEntity execution = getProcessInstanceManager().findExecutionById(processInstanceId);
-    if (execution != null) {
-      checkReadProcessInstance(execution);
-    }
-  }
-
-  public void checkReadProcessInstance(ExecutionEntity execution) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
-
-    // necessary permissions:
-    // - READ on PROCESS_INSTANCE
-
-    PermissionCheck firstCheck = new PermissionCheck();
-    firstCheck.setPermission(READ);
-    firstCheck.setResource(PROCESS_INSTANCE);
-    firstCheck.setResourceId(execution.getProcessInstanceId());
-
-    // ... OR ...
-
-    // - READ_INSTANCE on PROCESS_DEFINITION
-    PermissionCheck secondCheck = new PermissionCheck();
-    secondCheck.setPermission(READ_INSTANCE);
-    secondCheck.setResource(PROCESS_DEFINITION);
-    secondCheck.setResourceId(processDefinition.getKey());
-    secondCheck.setAuthorizationNotFoundReturnValue(0l);
-
-    checkAuthorization(firstCheck, secondCheck);
-  }
-
   public void checkReadProcessInstance(JobEntity job) {
     if (job.getProcessDefinitionKey() == null) {
       // "standalone" job: nothing to do!
@@ -508,31 +477,6 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   // update permission //////////////////////////////////////////////////
-
-  public void checkUpdateProcessInstance(ExecutionEntity execution) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
-
-    // necessary permissions:
-    // - UPDATE on PROCESS_INSTANCE
-
-    PermissionCheck firstCheck = new PermissionCheck();
-    firstCheck.setPermission(UPDATE);
-    firstCheck.setResource(PROCESS_INSTANCE);
-    firstCheck.setResourceId(execution.getProcessInstanceId());
-
-    // ... OR ...
-
-    // - UPDATE_INSTANCE on PROCESS_DEFINITION
-
-    PermissionCheck secondCheck = new PermissionCheck();
-    secondCheck.setPermission(UPDATE_INSTANCE);
-    secondCheck.setResource(PROCESS_DEFINITION);
-    secondCheck.setResourceId(processDefinition.getKey());
-    secondCheck.setAuthorizationNotFoundReturnValue(0l);
-
-    checkAuthorization(firstCheck, secondCheck);
-  }
-
   public void checkUpdateProcessInstance(JobEntity job) {
     if (job.getProcessDefinitionKey() == null) {
       // "standalone" job: nothing to do!
@@ -560,30 +504,6 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   // delete permission /////////////////////////////////////////////////
-
-  public void checkDeleteProcessInstance(ExecutionEntity execution) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
-
-    // necessary permissions:
-    // - DELETE on PROCESS_INSTANCE
-
-    PermissionCheck firstCheck = new PermissionCheck();
-    firstCheck.setPermission(DELETE);
-    firstCheck.setResource(PROCESS_INSTANCE);
-    firstCheck.setResourceId(execution.getProcessInstanceId());
-
-    // ... OR ...
-
-    // - DELETE_INSTANCE on PROCESS_DEFINITION
-
-    PermissionCheck secondCheck = new PermissionCheck();
-    secondCheck.setPermission(DELETE_INSTANCE);
-    secondCheck.setResource(PROCESS_DEFINITION);
-    secondCheck.setResourceId(processDefinition.getKey());
-    secondCheck.setAuthorizationNotFoundReturnValue(0l);
-
-    checkAuthorization(firstCheck, secondCheck);
-  }
 
   public void checkDeleteHistoricProcessInstance(HistoricProcessInstance instance) {
     checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, instance.getProcessDefinitionKey());
@@ -647,54 +567,6 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   // update permission ////////////////////////////////////////////
-
-  public void checkUpdateTask(TaskEntity task) {
-    String taskId = task.getId();
-
-    String executionId = task.getExecutionId();
-    if (executionId != null) {
-
-      // if task exists in context of a process instance
-      // then check the following permissions:
-      // - UPDATE on TASK
-      // - UPDATE_TASK on PROCESS_DEFINITION
-
-      ExecutionEntity execution = task.getExecution();
-      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
-
-      PermissionCheck updatePermissionCheck = new PermissionCheck();
-      updatePermissionCheck.setPermission(UPDATE);
-      updatePermissionCheck.setResource(TASK);
-      updatePermissionCheck.setResourceId(taskId);
-
-      PermissionCheck updateTaskPermissionCheck = new PermissionCheck();
-      updateTaskPermissionCheck.setPermission(UPDATE_TASK);
-      updateTaskPermissionCheck.setResource(PROCESS_DEFINITION);
-      updateTaskPermissionCheck.setResourceId(processDefinition.getKey());
-      updateTaskPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
-
-      checkAuthorization(updatePermissionCheck, updateTaskPermissionCheck);
-
-    } else {
-
-      // if task does not exist in context of process
-      // instance, then it is either a (a) standalone task
-      // or (b) it exists in context of a case instance.
-
-      // (a) standalone task: check following permission
-      // - READ on TASK
-      // (b) task in context of a case instance, in this
-      // case it is not necessary to check any permission,
-      // because such tasks can always be updated
-
-      String caseExecutionId = task.getCaseExecutionId();
-      if (caseExecutionId == null) {
-        // standalone task
-        checkAuthorization(UPDATE, TASK, taskId);
-      }
-
-    }
-  }
 
   public void checkTaskWork(TaskEntity task) {
 

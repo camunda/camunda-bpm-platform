@@ -17,10 +17,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -53,7 +51,7 @@ public class GetExecutionVariableTypedCmd<T extends TypedValue> implements Comma
 
     ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
 
-    checkAuthorization(execution);
+    checkGetExecutionVariableTyped(execution, commandContext);
 
     T value;
 
@@ -66,9 +64,7 @@ public class GetExecutionVariableTypedCmd<T extends TypedValue> implements Comma
     return value;
   }
 
-  public void checkAuthorization(ExecutionEntity execution) {
-    CommandContext commandContext = Context.getCommandContext();
-
+  public void checkGetExecutionVariableTyped(ExecutionEntity execution, CommandContext commandContext) {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkReadProcessInstance(execution);
     }

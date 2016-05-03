@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.Execution;
 
 /**
  * {@link CommandChecker} to ensure that commands are only executed for
@@ -90,7 +89,7 @@ public class TenantCommandChecker implements CommandChecker {
   }
 
   @Override
-  public void checkUpdateProcessInstance(Execution execution) {
+  public void checkUpdateProcessInstance(ExecutionEntity execution) {
     if (getTenantManager().isTenantCheckEnabled()) {
       if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
         throw LOG.exceptionCommandWithUnauthorizedTenant("update the process instance");

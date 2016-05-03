@@ -18,9 +18,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
@@ -46,7 +44,7 @@ public class SetTaskVariablesCmd extends AbstractSetVariableCmd {
 
     ensureNotNull("task " + entityId + " doesn't exist", "task", task);
 
-    checkAuthorization(task);
+    checkSetTaskVariables(task);
 
     return task;
   }
@@ -57,9 +55,7 @@ public class SetTaskVariablesCmd extends AbstractSetVariableCmd {
       PropertyChange.EMPTY_CHANGE);
   }
 
-  public void checkAuthorization(TaskEntity task) {
-    CommandContext commandContext = Context.getCommandContext();
-
+  protected void checkSetTaskVariables(TaskEntity task) {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkUpdateTask(task);
     }

@@ -5,9 +5,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.Collection;
 
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
@@ -32,7 +30,7 @@ public class RemoveTaskVariablesCmd extends AbstractRemoveVariableCmd {
 
     ensureNotNull("Cannot find task with id " + entityId, "task", task);
 
-    checkAuthorization(task);
+    checkRemoveTaskVariables(task);
 
     return task;
   }
@@ -42,9 +40,7 @@ public class RemoveTaskVariablesCmd extends AbstractRemoveVariableCmd {
     commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), null, task.getId(), PropertyChange.EMPTY_CHANGE);
   }
 
-  public void checkAuthorization(TaskEntity task) {
-    CommandContext commandContext = Context.getCommandContext();
-
+  protected void checkRemoveTaskVariables(TaskEntity task) {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkUpdateTask(task);
     }

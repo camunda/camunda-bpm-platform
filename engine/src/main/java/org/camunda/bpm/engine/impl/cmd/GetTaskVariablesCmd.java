@@ -22,8 +22,6 @@ import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
@@ -57,7 +55,7 @@ public class GetTaskVariablesCmd implements Command<VariableMap>, Serializable {
 
     ensureNotNull("task " + taskId + " doesn't exist", "task", task);
 
-    checkAuthorization(task);
+    checkGetTaskVariables(task, commandContext);
 
     VariableMapImpl variables = new VariableMapImpl();
 
@@ -68,9 +66,7 @@ public class GetTaskVariablesCmd implements Command<VariableMap>, Serializable {
 
   }
 
-  public void checkAuthorization(TaskEntity task) {
-    CommandContext commandContext = Context.getCommandContext();
-
+  protected void checkGetTaskVariables(TaskEntity task, CommandContext commandContext) {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkReadTask(task);
     }

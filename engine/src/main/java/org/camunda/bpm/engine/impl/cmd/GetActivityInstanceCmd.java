@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
@@ -74,8 +73,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       return null;
     }
 
-    // check authorization
-    checkAuthorization(processInstanceId);
+    checkGetActivityInstance(processInstanceId, commandContext);
 
     List<ExecutionEntity> nonEventScopeExecutions = filterNonEventScopeExecutions(executionList);
     List<ExecutionEntity> leaves = filterLeaves(nonEventScopeExecutions);
@@ -175,9 +173,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     return processActInst;
   }
 
-  public void checkAuthorization(String processInstanceId) {
-    CommandContext commandContext = Context.getCommandContext();
-
+  protected void checkGetActivityInstance(String processInstanceId, CommandContext commandContext) {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkReadProcessInstance(processInstanceId);
     }
