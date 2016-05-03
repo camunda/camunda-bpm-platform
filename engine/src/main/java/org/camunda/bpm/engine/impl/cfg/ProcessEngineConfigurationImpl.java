@@ -3297,18 +3297,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return Permissions.nameToPermission(getDefaultTaskPermissionForUser());
   }
   
-  public void initDefaultTaskPermissionValidator() {
+  protected void initDefaultTaskPermissionValidator() {
 
     String localDefaultTaskUserPermission = getDefaultTaskPermissionForUser();
     if(localDefaultTaskUserPermission == null) {
       throw new ProcessEngineException("Default task assignee permission is null");
     }
-
-    if(taskUserPermissionInputToPermission() == null) {
+    
+    Permission localDefaultPermissionForTaskUser = taskUserPermissionInputToPermission();
+    if(localDefaultPermissionForTaskUser == null) {
       throw new ProcessEngineException("Permission '"+ localDefaultTaskUserPermission + "' is invalid");
     }
 
-    Permission localDefaultPermissionForTaskUser = taskUserPermissionInputToPermission();
     if(localDefaultPermissionForTaskUser != Permissions.UPDATE && localDefaultPermissionForTaskUser !=  Permissions.TASK_WORK) {
       throw new ProcessEngineException("defaultTaskPermissionForUser is neither UPDATE nor TASK_WORK");
     }

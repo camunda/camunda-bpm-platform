@@ -5,8 +5,11 @@ import static org.camunda.bpm.engine.authorization.Permissions.TASK_WORK;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import java.util.Arrays;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+
 import junit.framework.AssertionFailedError;
 
 /**
@@ -21,6 +24,21 @@ public class DefaultAuthorizationTest extends AuthorizationTest {
   
   protected String groupId2 = "accounting2";
   protected Group group2;
+  
+  protected String defaultTaskPermissionValue;
+
+  @Override
+  public void setUp() throws Exception {
+    super.setUp();
+    defaultTaskPermissionValue = processEngineConfiguration.getDefaultTaskPermissionForUser();
+  }
+
+  @Override
+  public void tearDown() {
+    super.tearDown();
+    processEngineConfiguration.setDefaultTaskPermissionForUser(defaultTaskPermissionValue);
+    
+  }
   
   // defaultTaskPermissionForUser configuration test cases 
   public void testShouldCheckDefaultTaskPermissionasUpdateForUser() {
@@ -76,7 +94,7 @@ public class DefaultAuthorizationTest extends AuthorizationTest {
     }
   }
   
-  // default authorization for task assignee as Task work (Should fail task actions)
+  // default authorization for user as Task work
   public void testShouldCheckDefaultTaskAssigneePermissionAsTaskWork() {
     processEngineConfiguration.setDefaultTaskPermissionForUser(TASK_WORK.getName());
     processEngine = processEngineConfiguration.buildProcessEngine();
@@ -89,18 +107,14 @@ public class DefaultAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(TASK, taskId, userId, UPDATE);
     
     // when
-    processEngine.getTaskService().setAssignee(taskId, "demo");
+    processEngine.getTaskService().setAssignee(taskId, userId2);
     
     // Change context to user demo
-    processEngine.getIdentityService().setAuthentication("demo", Arrays.asList(groupId));
+    processEngine.getIdentityService().setAuthentication(userId2, null);
     
-    try {
-      processEngine.getTaskService().setAssignee(taskId, "demo2");
-      fail("Exception expected: It should not be possible to set assignee.");
-    } catch (Exception exception) {
-      assertTextPresent("The user with id 'demo' does not have one of the following permissions: 'TASK_ASSIGN'", exception.getMessage());
-    }
-    
+    assertEquals(true,authorizationService.isUserAuthorized(userId2, null, Permissions.READ, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null,Permissions.TASK_WORK, Resources.TASK, taskId));
+
     deleteTask(taskId, true);
   }
   
@@ -120,14 +134,10 @@ public class DefaultAuthorizationTest extends AuthorizationTest {
     processEngine.getTaskService().addCandidateUser(taskId, userId2);
     
     // Change context to user demo
-    processEngine.getIdentityService().setAuthentication(userId2, Arrays.asList(groupId2));
+    processEngine.getIdentityService().setAuthentication(userId2, null);
     
-    try {
-      processEngine.getTaskService().delegateTask(taskId, "demo2");
-      fail("Exception expected: It should not be possible for the candidate user to delegate a task.");
-    } catch (Exception exception) {
-      assertTextPresent("The user with id 'demo' does not have one of the following permissions: 'TASK_ASSIGN'", exception.getMessage());
-    }
+    assertEquals(true,authorizationService.isUserAuthorized(userId2, null, Permissions.READ, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null,Permissions.TASK_WORK, Resources.TASK, taskId));
     
     deleteTask(taskId, true);
   }
@@ -150,12 +160,8 @@ public class DefaultAuthorizationTest extends AuthorizationTest {
     // Change context to user demo
     processEngine.getIdentityService().setAuthentication(userId2, Arrays.asList(groupId2));
     
-    try {
-      processEngine.getTaskService().addCandidateGroup(taskId, "demo2");
-      fail("Exception expected: It should not be possible for the user (part of candidate group) to add another candidate group.");
-    } catch (Exception exception) {
-      assertTextPresent("The user with id 'demo' does not have one of the following permissions: 'TASK_ASSIGN'", exception.getMessage());
-    }
+    assertEquals(true,authorizationService.isUserAuthorized(userId2, Arrays.asList(groupId2), Permissions.READ, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, Arrays.asList(groupId2),Permissions.TASK_WORK, Resources.TASK, taskId));
     
     deleteTask(taskId, true);
   }
@@ -173,113 +179,13 @@ public class DefaultAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(TASK, taskId, userId, UPDATE);
     
     // when
-    processEngine.getTaskService().setOwner(taskId, "demo");
-    
-    // Change context to user demo
-    processEngine.getIdentityService().setAuthentication("demo", Arrays.asList(groupId));
-    
-    try {
-      processEngine.getTaskService().delegateTask(taskId, "demo2");
-      fail("Exception expected: It should not be possible for the owner to delegate the task.");
-    } catch (Exception exception) {
-      assertTextPresent("The user with id 'demo' does not have one of the following permissions: 'TASK_ASSIGN'", exception.getMessage());
-    }
-    
-    deleteTask(taskId, true);
-  }
-  
-  // default task assignee permission as task work (should pass task actions)
-  public void testUserTaskCompletionWithDefaultTaskPermissionAsTaskWork() {
-    processEngineConfiguration.setDefaultTaskPermissionForUser(TASK_WORK.getName());
-    processEngine = processEngineConfiguration.buildProcessEngine();
-    
-    String taskId = "myTask";
-    createTask(taskId);
-    
-    enableAuthorization();
-    
-    createGrantAuthorization(TASK, taskId, userId, UPDATE);
-    
-    // when
-    processEngine.getTaskService().setAssignee(taskId, "demo");
-    
-    // Change context to user demo
-    processEngine.getIdentityService().setAuthentication("demo", Arrays.asList(groupId));
-    
-    // then
-    processEngine.getTaskService().complete(taskId);
-    
-    deleteTask(taskId, true);
-  }
-  
-  public void testUserTaskCompletionWithDefaultTaskPermissionAsTaskWorkForCandidateUser() {
-    processEngineConfiguration.setDefaultTaskPermissionForUser(TASK_WORK.getName());
-    processEngine = processEngineConfiguration.buildProcessEngine();
-    
-    String taskId = "myTask";
-    createTask(taskId);
-    
-    enableAuthorization();
-    
-    createGrantAuthorization(TASK, taskId, userId, UPDATE);
-    
-    // when
-    processEngine.getTaskService().addCandidateUser(taskId, userId2);
-    
-    // Change context to user demo
-    processEngine.getIdentityService().setAuthentication(userId2, Arrays.asList(groupId));
-    
-    // then
-    processEngine.getTaskService().claim(taskId, userId2);
-    processEngine.getTaskService().complete(taskId);
-    
-    deleteTask(taskId, true);
-  }
-  
-  public void testUserTaskCompletionWithDefaultTaskPermissionAsTaskWorkForCandidateGroup() {
-    processEngineConfiguration.setDefaultTaskPermissionForUser(TASK_WORK.getName());
-    processEngine = processEngineConfiguration.buildProcessEngine();
-    
-    String taskId = "myTask";
-    createTask(taskId);
-    
-    enableAuthorization();
-    
-    createGrantAuthorization(TASK, taskId, userId, UPDATE);
-    
-    // when
-    processEngine.getTaskService().addCandidateGroup(taskId, groupId2);
-    
-    // Change context to user demo
-    processEngine.getIdentityService().setAuthentication(userId2, Arrays.asList(groupId2));
-    
-    // then
-    processEngine.getTaskService().claim(taskId, userId2);
-    processEngine.getTaskService().complete(taskId);
-    
-    deleteTask(taskId, true);
-  }
-  
-  public void testUserTaskCompletionWithDefaultTaskPermissionAsTaskWorkForOwner() {
-    processEngineConfiguration.setDefaultTaskPermissionForUser(TASK_WORK.getName());
-    processEngine = processEngineConfiguration.buildProcessEngine();
-    
-    String taskId = "myTask";
-    createTask(taskId);
-    
-    enableAuthorization();
-    
-    createGrantAuthorization(TASK, taskId, userId, UPDATE);
-    
-    // when
     processEngine.getTaskService().setOwner(taskId, userId2);
     
     // Change context to user demo
-    processEngine.getIdentityService().setAuthentication(userId2, Arrays.asList(groupId2));
+    processEngine.getIdentityService().setAuthentication(userId2, null);
     
-    // then
-    processEngine.getTaskService().claim(taskId, userId2);
-    processEngine.getTaskService().complete(taskId);
+    assertEquals(true,authorizationService.isUserAuthorized(userId2, null, Permissions.READ, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null,Permissions.TASK_WORK, Resources.TASK, taskId));
     
     deleteTask(taskId, true);
   }
@@ -301,10 +207,10 @@ public class DefaultAuthorizationTest extends AuthorizationTest {
     processEngine.getTaskService().setAssignee(taskId, userId2);
     
     // Change context to user demo
-    processEngine.getIdentityService().setAuthentication(userId2, Arrays.asList(groupId));
+    processEngine.getIdentityService().setAuthentication(userId2, null);
     
-    processEngine.getTaskService().delegateTask(taskId, "demo2");
-    processEngine.getTaskService().complete(taskId);
+    assertEquals(true,authorizationService.isUserAuthorized(userId2, null, Permissions.READ, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null,Permissions.UPDATE, Resources.TASK, taskId));
     
     deleteTask(taskId, true);
   }
@@ -322,12 +228,13 @@ public class DefaultAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(TASK, taskId, userId, UPDATE);
     
     // when
-    processEngine.getTaskService().addCandidateUser(taskId, "demo");
+    processEngine.getTaskService().addCandidateUser(taskId, userId2);
     
     // Change context to user demo
-    processEngine.getIdentityService().setAuthentication("demo", Arrays.asList(groupId));
+    processEngine.getIdentityService().setAuthentication(userId2, null);
     
-    processEngine.getTaskService().delegateTask(taskId, "demo2");
+    assertEquals(true,authorizationService.isUserAuthorized(userId2, null, Permissions.READ, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null,Permissions.UPDATE, Resources.TASK, taskId));
     
     deleteTask(taskId, true);
   }
@@ -348,9 +255,10 @@ public class DefaultAuthorizationTest extends AuthorizationTest {
     processEngine.getTaskService().addCandidateGroup(taskId, groupId);
     
     // Change context to user demo
-    processEngine.getIdentityService().setAuthentication("demo", Arrays.asList(groupId));
+    processEngine.getIdentityService().setAuthentication(userId2, Arrays.asList(groupId));
     
-    processEngine.getTaskService().delegateTask(taskId, "demo2");
+    assertEquals(true,authorizationService.isUserAuthorized(userId2, Arrays.asList(groupId), Permissions.READ, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, Arrays.asList(groupId),Permissions.UPDATE, Resources.TASK, taskId));
     
     deleteTask(taskId, true);
   }
@@ -368,16 +276,41 @@ public class DefaultAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(TASK, taskId, userId, UPDATE);
     
     // when
-    processEngine.getTaskService().setOwner(taskId, "demo");
+    processEngine.getTaskService().setOwner(taskId, userId2);
     
     // Change context to user demo
-    processEngine.getIdentityService().setAuthentication("demo", Arrays.asList(groupId));
+    processEngine.getIdentityService().setAuthentication(userId2, null);
     
-    processEngine.getTaskService().setOwner(taskId, "demo2");
+    assertEquals(true,authorizationService.isUserAuthorized(userId2, null, Permissions.READ, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null,Permissions.UPDATE, Resources.TASK, taskId));
     
     deleteTask(taskId, true);
   }
-  
+
+  // check default permission is UPDATE without configuration
+  public void testShouldCheckDefaultTaskPermissionAsUpdate() {
+
+    processEngine = processEngineConfiguration.buildProcessEngine();
+
+    String taskId = "myTask";
+    createTask(taskId);
+    
+    processEngine.getProcessEngineConfiguration().setAuthorizationEnabled(true);
+    
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    
+    // when
+    processEngine.getTaskService().setAssignee(taskId, userId2);
+    
+    // Change context to user demo
+    processEngine.getIdentityService().setAuthentication(userId2, null);
+    
+    assertEquals(true,authorizationService.isUserAuthorized(userId2, null, Permissions.READ, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null,Permissions.UPDATE, Resources.TASK, taskId));
+    
+    deleteTask(taskId, true);
+  }
+
   public void assertTextPresent(String expected, String actual) {
     if ((actual == null) || (actual.indexOf(expected) == -1)) {
       throw new AssertionFailedError("expected presence of [" + expected + "], but was [" + actual + "]");
