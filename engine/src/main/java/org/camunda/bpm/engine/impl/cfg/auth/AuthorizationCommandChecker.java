@@ -19,6 +19,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.TASK_ASSIGN;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
@@ -31,7 +32,9 @@ import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
+import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -308,4 +311,81 @@ public class AuthorizationCommandChecker implements CommandChecker {
     return Context.getCommandContext().getExecutionManager().findExecutionById(processInstanceId);
   }
 
+  public void checkTaskAssign(TaskEntity task) {
+
+    String taskId = task.getId();
+
+    String executionId = task.getExecutionId();
+    if (executionId != null) {
+
+      // Permissions to task actions is based on the order in which PermissioncheckBuilder is built
+      CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
+        .disjunctive()
+          .atomicCheckForResourceId(TASK, taskId, TASK_ASSIGN)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), TASK_ASSIGN)
+          .atomicCheckForResourceId(TASK, taskId, UPDATE)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), UPDATE_TASK)
+        .build();
+
+      getAuthorizationManager().checkAuthorization(taskWorkPermission);
+
+    }
+    else {
+
+      // if task does not exist in context of process
+      // instance, then it is either a (a) standalone task
+      // or (b) it exists in context of a case instance.
+
+      // (a) standalone task: check following permission
+      // - TASK_ASSIGN or UPDATE
+      // (b) task in context of a case instance, in this
+      // case it is not necessary to check any permission,
+      // because such tasks can always be updated
+
+      String caseExecutionId = task.getCaseExecutionId();
+      if (caseExecutionId == null) {
+        // standalone task
+        CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
+            .disjunctive()
+            .atomicCheckForResourceId(TASK, taskId, TASK_ASSIGN)
+            .atomicCheckForResourceId(TASK, taskId, UPDATE)
+          .build();
+
+        getAuthorizationManager().checkAuthorization(taskWorkPermission);
+      }
+    }
+  }
+
+  // create permission /////////////////////////////////////////////
+
+  public void checkCreateTask(TaskEntity entity) {
+    getAuthorizationManager().checkAuthorization(CREATE, TASK);
+  }
+
+  public void checkCreateTask() {
+    getAuthorizationManager().checkAuthorization(CREATE, TASK);
+  }
+
+  @Override
+  public void checkTaskWork(TaskEntity task) {
+    getAuthorizationManager().checkTaskWork(task);
+  }
+
+  public void checkDeleteTask(TaskEntity task) {
+    String taskId = task.getId();
+
+    // Note: Calling TaskService#deleteTask() to
+    // delete a task which exists in context of
+    // a process instance or case instance cannot
+    // be deleted. In such a case TaskService#deleteTask()
+    // throws an exception before invoking the
+    // authorization check.
+
+    String executionId = task.getExecutionId();
+    String caseExecutionId = task.getCaseExecutionId();
+
+    if (executionId == null && caseExecutionId == null) {
+      getAuthorizationManager().checkAuthorization(DELETE, TASK, taskId);
+    }
+  }
 }

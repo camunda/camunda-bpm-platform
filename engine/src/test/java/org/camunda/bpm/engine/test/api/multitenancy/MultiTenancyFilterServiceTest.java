@@ -209,7 +209,7 @@ public class MultiTenancyFilterServiceTest extends PluggableProcessEngineTestCas
   @Override
   protected void tearDown() throws Exception {
     filterService.deleteFilter(filterId);
-
+    identityService.clearAuthentication();
     for(String taskId : taskIds) {
       taskService.deleteTask(taskId, true);
     }

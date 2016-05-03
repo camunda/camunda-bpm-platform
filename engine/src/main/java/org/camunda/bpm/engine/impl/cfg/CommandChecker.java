@@ -105,6 +105,9 @@ public interface CommandChecker {
    */
   void checkUpdateTask(TaskEntity task);
 
+  /**
+   * Check if it is allowed to delete a batch
+   */
   void checkDeleteBatch(BatchEntity batch);
 
   void checkDeleteHistoricBatch(HistoricBatchEntity batch);
@@ -123,4 +126,30 @@ public interface CommandChecker {
    * Checks if it is allowed to delete a deployment of the given deployment id.
    */
   void checkDeleteDeployment(String deploymentId);
+
+  /**
+   * Check if it is allowed to assign a task
+   */
+  void checkTaskAssign(TaskEntity task);
+
+  /**
+   * Check if it is allowed to create a task
+   */
+  void checkCreateTask(TaskEntity task);
+
+  /**
+   * Check if it is allowed to create a task
+   */
+  void checkCreateTask();
+
+  /**
+   * Check if it is allowed to work on a task
+   */
+  void checkTaskWork(TaskEntity task);
+  
+  /**
+   *  Check if it is allowed to delete a task
+   */
+  void checkDeleteTask(TaskEntity task);
+
 }

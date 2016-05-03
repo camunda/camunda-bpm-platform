@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.task.Task;
 
@@ -31,12 +31,16 @@ public class CreateTaskCmd implements Command<Task> {
   }
 
   public Task execute(CommandContext commandContext) {
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkCreateTask();
+    checkCreateTask(commandContext);
 
     TaskEntity task = TaskEntity.create();
     task.setId(taskId);
     return task;
   }
 
+  protected void checkCreateTask(CommandContext commandContext) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkCreateTask();
+    }
+  }
 }

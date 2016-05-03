@@ -189,6 +189,7 @@ public class MultiTenancyTaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Override
   protected void tearDown() throws Exception {
+    identityService.clearAuthentication();
     for (String taskId : taskIds) {
       taskService.deleteTask(taskId, true);
     }

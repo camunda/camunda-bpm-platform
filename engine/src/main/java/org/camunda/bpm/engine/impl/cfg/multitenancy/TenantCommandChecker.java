@@ -219,6 +219,43 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
+  public void checkDeleteTask(TaskEntity task) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("delete the task");
+      }
+    }
+  }
+
+  public void checkTaskAssign(TaskEntity task) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("assign the task");
+      }
+    }    
+  }
+
+  public void checkCreateTask(TaskEntity task) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("create the task");
+      }
+    }    
+  }
+
+  @Override
+  public void checkCreateTask() {
+  }
+
+  public void checkTaskWork(TaskEntity task) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("work on task");
+      }
+    }
+  }
+
   protected TenantManager getTenantManager() {
     return Context.getCommandContext().getTenantManager();
   }
@@ -238,5 +275,4 @@ public class TenantCommandChecker implements CommandChecker {
   protected DeploymentEntity findDeploymentById(String deploymentId) {
     return Context.getCommandContext().getDeploymentManager().findDeploymentById(deploymentId);
   }
-
 }
