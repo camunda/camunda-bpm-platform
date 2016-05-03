@@ -12,10 +12,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
     'page',
     '$routeParams',
     'search',
-    'TenantResource',
-    'GroupResource',
-    'UserResource',
-    'AuthorizationResource',
+    'camAPI',
     'Notifications',
     '$location',
     '$modal',
@@ -24,27 +21,34 @@ var angular = require('camunda-commons-ui/vendor/angular');
     pageService,
     $routeParams,
     search,
-    TenantResource,
-    GroupResource,
-    UserResource,
-    AuthorizationResource,
+    camAPI,
     Notifications,
     $location,
     $modal
   ) {
 
+    var TenantResource        = camAPI.resource('tenant'),
+        GroupResource         = camAPI.resource('group'),
+        UserResource          = camAPI.resource('user');
+    
     $scope.$root.showBreadcrumbs = true;
+
+    
 
     pageService.titleSet('Tenant');
 
-    pageService.breadcrumbsClear();
 
-    pageService.breadcrumbsAdd([
-      {
-        label: 'Tenants',
-        href: '#/tenants'
-      }
-    ]);
+
+    function refreshBreadcrumbs() {
+      pageService.breadcrumbsClear();
+
+      pageService.breadcrumbsAdd([{
+          label: 'Tenants',
+          href: '#/tenants'
+        }]);
+    }
+    refreshBreadcrumbs();
+
 
     $scope.tenant = null;
     $scope.tenantName = null;
@@ -72,21 +76,21 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
     var loadTenant = $scope.loadTenant = function() {
       $scope.tenantLoadingState = 'LOADING';
-      TenantResource.get({ tenantId : $scope.encodedTenantId }).$promise.then(function(response) {
+      TenantResource.get($scope.encodedTenantId , function(err, res) {
         $scope.tenantLoadingState = 'LOADED';
-        $scope.tenant = response;
-        $scope.tenantName = (!!response.name ? response.name : response.id);
-        $scope.tenantCopy = angular.copy(response);
+        $scope.tenant = res;
+        $scope.tenantName = (!!res.name ? res.name : res.id);
+        $scope.tenantCopy = angular.copy(res);
 
         pageService.titleSet($scope.tenantName + ' Tenant');
 
-        pageService.breadcrumbsAdd([
-          {
-            label: $scope.tenantName,
-            href: '#/tenants/' + $scope.tenant.id
-          }
-        ]);
+        refreshBreadcrumbs();
 
+        pageService.breadcrumbsAdd([{
+          label: $scope.tenantName,
+          href: '#/tenants/' + $scope.tenant.id
+        }]);
+        
       }, function () {
         $scope.tenantLoadingState = 'ERROR';
       });
@@ -136,15 +140,17 @@ var angular = require('camunda-commons-ui/vendor/angular');
       var prep = prepareTenantMemberView(tenantGroupPages);
 
       $scope.groupLoadingState = 'LOADING';
-      GroupResource.query(angular.extend({}, prep.searchParams, prep.pagingParams)).$promise.then(function(response) {
-        $scope.tenantUserList = response;
-        $scope.groupLoadingState = response.length ? 'LOADED' : 'EMPTY';
-      }, function() {
-        $scope.groupLoadingState = 'ERROR';
+      GroupResource.list(angular.extend({}, prep.searchParams, prep.pagingParams), function(err, res) {
+        if( err === null ) {
+          $scope.tenantGroupList = res;
+          $scope.groupLoadingState = res.length ? 'LOADED' : 'EMPTY';
+        } else {
+          $scope.groupLoadingState = 'ERROR';
+        }
       });
 
-      GroupResource.count(prep.searchParams).$promise.then(function(response) {
-        tenantGroupPages.total = response.count;
+      GroupResource.count(prep.searchParams, function(err, res) {
+        tenantGroupPages.total = res.count;
       });
     }
 
@@ -152,41 +158,48 @@ var angular = require('camunda-commons-ui/vendor/angular');
       var prep = prepareTenantMemberView(tenantUserPages);
 
       $scope.userLoadingState = 'LOADING';
-      UserResource.query(angular.extend({}, prep.searchParams, prep.pagingParams)).$promise.then(function(response) {
-        $scope.tenantUserList = response;
-        $scope.userLoadingState = response.length ? 'LOADED' : 'EMPTY';
-      }, function() {
-        $scope.userLoadingState = 'ERROR';
+      UserResource.list(angular.extend({}, prep.searchParams, prep.pagingParams), function(err, res) {
+        if( err === null ) {
+          $scope.tenantUserList = res;
+          $scope.userLoadingState = res.length ? 'LOADED' : 'EMPTY';
+        } else {
+          $scope.userLoadingState = 'ERROR';
+        }
       });
 
-      UserResource.count(prep.searchParams).$promise.then(function(response) {
-        tenantUserPages.total = response.count;
+      UserResource.count(prep.searchParams, function(err, res) {
+        tenantUserPages.total = res.count;
       });
     }
 
-    TenantResource.OPTIONS({tenantId : $scope.encodedTenantId}).$promise.then(function(response) {
-      angular.forEach(response.links, function(link){
+    TenantResource.options($scope.encodedTenantId, function(err, res) {
+      angular.forEach(res.links, function(link){
         $scope.availableOperations[link.rel] = true;
       });
     });
 
     $scope.updateTenant = function() {
 
-      TenantResource.update({ tenantId: $scope.encodedTenantId }, $scope.tenant).$promise.then(function() {
+      var updateData = {
+        id: $scope.encodedTenantId,
+        name: $scope.tenant.name
+      };
+
+      TenantResource.update(updateData, function(err, res) {
+        if( err === null ) {
           Notifications.addMessage({
-            type: 'success',
-            status: 'Success',
-            message: 'Tenant successfully updated.'
+            type : 'success',
+            status : 'Success',
+            message : 'Tenant successfully updated.'
           });
           loadTenant();
-        },
-        function() {
+        } else {
           Notifications.addError({
-            status: 'Failed',
-            message: 'Failed to update tenant'
+            status : 'Failed',
+            message : 'Failed to update tenant.'
           });
         }
-      );
+      });
     };
 
     // delete group form /////////////////////////////
@@ -198,18 +211,22 @@ var angular = require('camunda-commons-ui/vendor/angular');
           $dialogScope.question = 'Really delete tenant ' + $scope.tenant.id + '?';
         }]
       }).result.then(function () {
-        TenantResource.delete({
-          'tenantId':$scope.encodedTenantId
-        }).$promise.then(
-          function() {
+        TenantResource.delete({ id: $scope.encodedTenantId }, function(err, res) {
+          if(err === null) {
             Notifications.addMessage({
               type: 'success',
               status: 'Success',
               message: 'Tenant ' + $scope.tenant.id + ' successfully deleted.'
             });
             $location.path('/tenants');
+          } else {
+            Notifications.addMessage({
+              type: 'success',
+              status: 'Success',
+              message: 'Failed to delete tenant ' + $scope.tenant.id + '.'
+            });
           }
-        );
+        });
       });
     };
 
