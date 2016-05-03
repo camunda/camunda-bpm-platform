@@ -256,7 +256,7 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
     if (activityInstance.getId().equalsIgnoreCase(activityInstance.getProcessInstanceId())) {
       historyEvent = historyEventProducer.createProcessInstanceUpdateEvt(execution);
     } else {
-      historyEvent = historyEventProducer.createActivityInstanceUpdateEvt(execution, null);
+      historyEvent = historyEventProducer.createActivityInstanceUpdateEvt(execution, this);
     }
     historyEventHandler.handleEvent(historyEvent);
   }

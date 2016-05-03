@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -69,9 +70,26 @@ import org.camunda.bpm.engine.task.IdentityLink;
 public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected void initActivityInstanceEvent(HistoricActivityInstanceEventEntity evt, ExecutionEntity execution, HistoryEventType eventType) {
+    initActivityInstanceEvent(evt, null, execution, eventType);
+  }
 
-    String activityId = execution.getActivityId();
-    String activityInstanceId = execution.getActivityInstanceId();
+  protected void initActivityInstanceEvent(HistoricActivityInstanceEventEntity evt, MigratingActivityInstance actInstance, ExecutionEntity execution, HistoryEventType eventType) {
+
+    String activityId;
+    String activityInstanceId;
+    PvmScope eventSource;
+    if (actInstance == null) {
+      activityId = execution.getActivityId();
+      activityInstanceId = execution.getActivityInstanceId();
+      if(activityId != null) {
+        eventSource = execution.getActivity();
+      } else {
+        eventSource = (PvmScope) execution.getEventSource();
+      }
+    } else {
+      activityInstanceId = actInstance.getActivityInstance().getId();
+      eventSource = actInstance.getTargetScope();
+    }
 
     String parentActivityInstanceId = null;
     ExecutionEntity parentExecution = execution.getParent();
@@ -98,18 +116,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       evt.setProcessDefinitionKey(definition.getKey());
     }
 
-    PvmScope eventSource = null;
-    if(activityId != null) {
-      eventSource = execution.getActivity();
-    } else {
-      eventSource = (PvmScope) execution.getEventSource();
-    }
-
     evt.setActivityId(eventSource.getId());
     evt.setActivityName((String) eventSource.getProperty("name"));
     evt.setActivityType((String) eventSource.getProperty("type"));
-
   }
+
 
   protected void initProcessInstanceEvent(HistoricProcessInstanceEventEntity evt, ExecutionEntity execution, HistoryEventType eventType) {
 
@@ -475,14 +486,29 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return evt;
   }
 
+  @Override
+  public HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution) {
+    return createActivityInstanceUpdateEvt(execution, null, null);
+  }
+
+  @Override
   public HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution, DelegateTask task) {
+    return createActivityInstanceUpdateEvt(execution, task, null);
+  }
+
+  @Override
+  public HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution, MigratingActivityInstance actInstance) {
+    return createActivityInstanceUpdateEvt(execution, null, actInstance);
+  }
+
+  protected HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution, DelegateTask task, MigratingActivityInstance actInstance) {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
     // create event instance
     HistoricActivityInstanceEventEntity evt = loadActivityInstanceEventEntity(executionEntity);
 
     // initialize event
-    initActivityInstanceEvent(evt, executionEntity, HistoryEventTypes.ACTIVITY_INSTANCE_UPDATE);
+    initActivityInstanceEvent(evt, actInstance, executionEntity, HistoryEventTypes.ACTIVITY_INSTANCE_UPDATE);
 
     // update task assignment
     if(task != null) {
@@ -504,6 +530,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     return evt;
   }
+
 
   public HistoryEvent createActivityInstanceEndEvt(DelegateExecution execution) {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;

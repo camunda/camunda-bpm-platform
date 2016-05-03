@@ -139,7 +139,6 @@ public class MigrationHistoryProcessInstanceTest {
     assertEquals(instance.getActivityId(), "userTask2");
   }
 
-  @Ignore
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testMigrateHistoricSubProcessInstance() {
@@ -173,7 +172,6 @@ public class MigrationHistoryProcessInstanceTest {
     assertMigratedTo(historicInstances.get(1), processDefinition, "userTask");
   }
 
-  @Ignore
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testMigrateHistoricSubProcessRename() {
@@ -210,7 +208,6 @@ public class MigrationHistoryProcessInstanceTest {
     assertMigratedTo(historicInstances.get(1), targetDefinition, "userTask");
   }
 
-  @Ignore
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testHistoricActivityInstanceBecomeScope() {

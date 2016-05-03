@@ -355,7 +355,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
       // publish update event for current activity instance (containing the id
       // of the sub process/case)
-      HistoryEvent haie = eventFactory.createActivityInstanceUpdateEvt(this, null);
+      HistoryEvent haie = eventFactory.createActivityInstanceUpdateEvt(this);
       eventHandler.handleEvent(haie);
     }
   }

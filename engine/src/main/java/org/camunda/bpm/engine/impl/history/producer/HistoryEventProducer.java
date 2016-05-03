@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -78,10 +79,27 @@ public interface HistoryEventProducer {
    * Creates the history event fired when an activity instances is <strong>updated</strong>.
    *
    * @param execution the current execution.
+   * @return the history event
+   */
+  HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution);
+
+  /**
+   * Creates the history event fired when an activity instances is <strong>updated</strong>.
+   *
+   * @param execution the current execution.
    * @param task the task association that is currently updated. (May be null in case there is not task associated.)
    * @return the history event
    */
   HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution, DelegateTask task);
+
+  /**
+   * Creates the history event which is fired when an activity instance is updated during a migration.
+   *
+   * @param execution the current execution
+   * @param actInstance the migrated activity instance which contains the new id's
+   * @return the created history event
+   */
+  HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution, MigratingActivityInstance actInstance);
 
   /**
    * Creates the history event fired when an activity instances is <strong>ended</strong>.
@@ -225,14 +243,14 @@ public interface HistoryEventProducer {
    * @since 7.5
    */
   HistoryEvent createBatchEndEvent(Batch batch);
-  
+
   /**
-   * Fired when an identity link is added 
+   * Fired when an identity link is added
    * @param identitylink
    * @return
    */
   HistoryEvent createHistoricIdentityLinkAddEvent(IdentityLink identitylink);
-  
+
   /**
    * Fired when an identity links is deleted
    * @param identityLink
