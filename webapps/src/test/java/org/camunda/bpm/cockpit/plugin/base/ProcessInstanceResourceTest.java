@@ -218,6 +218,8 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
     resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
 
     CalledProcessInstanceQueryDto queryParameter = new CalledProcessInstanceQueryDto();
+    // set sorting order to make sure to get the right order for the assertion
+    queryParameter.setOrderBy("EXEC1.ACT_ID_");
 
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
