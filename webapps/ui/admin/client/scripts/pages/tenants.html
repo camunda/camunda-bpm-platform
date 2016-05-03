@@ -17,7 +17,8 @@
     </header>
 
     <div cam-widget-loader
-         loading-state="{{ loadingState }}">
+         loading-state="{{ loadingState }}"
+         text-empty="There are no tenants in the system.">
       <table class="cam-table">
         <thead>
           <tr>
@@ -45,7 +46,7 @@
       </table>
     </div>
 
-    <div ng-show="loadingState === 'EMPTY' && !pages.total && (!tenantList || !tenantList.length)"
+    <div ng-show="loadingState === 'EMPTY' && pages.total && (!tenantList || !tenantList.length)"
          class="well">
       <span class="glyphicon glyphicon-info-sign"></span>
       The current search parameters could not retrieve any tenants. Try to <a ng-click="pageChange(1)">reset page number.</a>

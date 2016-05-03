@@ -196,7 +196,7 @@ describe('Admin Tenants Spec', function() {
 
     });
 
-    describe('list of users in tenant', function() {
+    describe('list of groups in tenant', function() {
 
       before(function() {
         return testHelper(setupFile.setup3, function() {
