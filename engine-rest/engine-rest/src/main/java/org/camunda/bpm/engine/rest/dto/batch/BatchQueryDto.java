@@ -35,8 +35,8 @@ public class BatchQueryDto extends AbstractQueryDto<BatchQuery> {
 
   protected String batchId;
   protected String type;
-  private List<String> tenantIds;
-  private Boolean withoutTenantId;
+  protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -81,14 +81,14 @@ public class BatchQueryDto extends AbstractQueryDto<BatchQuery> {
     if (batchId != null) {
       query.batchId(batchId);
     }
+    if (type != null) {
+      query.type(type);
+    }
     if (Boolean.TRUE.equals(withoutTenantId)) {
       query.withoutTenantId();
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
-    }
-    if (type != null) {
-      query.type(type);
     }
   }
 

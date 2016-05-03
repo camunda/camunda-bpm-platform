@@ -31,6 +31,8 @@ public class HistoricBatchQueryImpl extends AbstractQuery<HistoricBatchQuery, Hi
   protected String batchId;
   protected String type;
   protected Boolean completed;
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
 
   public HistoricBatchQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -57,6 +59,27 @@ public class HistoricBatchQueryImpl extends AbstractQuery<HistoricBatchQuery, Hi
     return this;
   }
 
+  public HistoricBatchQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public String[] getTenantIds() {
+    return tenantIds;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
+
+  public HistoricBatchQuery withoutTenantId() {
+    this.tenantIds = null;
+    isTenantIdSet = true;
+    return this;
+  }
+
   public String getType() {
     return type;
   }
@@ -71,6 +94,11 @@ public class HistoricBatchQueryImpl extends AbstractQuery<HistoricBatchQuery, Hi
 
   public HistoricBatchQuery orderByEndTime() {
     return orderBy(HistoricBatchQueryProperty.END_TIME);
+  }
+
+  @Override
+  public HistoricBatchQuery orderByTenantId() {
+    return orderBy(HistoricBatchQueryProperty.TENANT_ID);
   }
 
   @Override

@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -32,10 +33,13 @@ public class HistoricBatchQueryDto extends AbstractQueryDto<HistoricBatchQuery> 
   private static final String SORT_BY_BATCH_ID_VALUE = "batchId";
   private static final String SORT_BY_BATCH_START_TIME_VALUE = "startTime";
   private static final String SORT_BY_BATCH_END_TIME_VALUE = "endTime";
+  private static final String SORT_BY_TENANT_ID_VALUE = "tenantId";
 
   protected String batchId;
   protected String type;
   protected Boolean completed;
+  protected List<String> tenantIds;
+  protected Boolean withoutTenantId;
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -43,6 +47,7 @@ public class HistoricBatchQueryDto extends AbstractQueryDto<HistoricBatchQuery> 
     VALID_SORT_BY_VALUES.add(SORT_BY_BATCH_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_BATCH_START_TIME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_BATCH_END_TIME_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID_VALUE);
   }
 
   public HistoricBatchQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
@@ -64,6 +69,16 @@ public class HistoricBatchQueryDto extends AbstractQueryDto<HistoricBatchQuery> 
     this.completed = completed;
   }
 
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
+  }
+
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
   }
@@ -76,13 +91,17 @@ public class HistoricBatchQueryDto extends AbstractQueryDto<HistoricBatchQuery> 
     if (batchId != null) {
       query.batchId(batchId);
     }
-
     if (type != null) {
       query.type(type);
     }
-
     if (completed != null) {
       query.completed(completed);
+    }
+    if (Boolean.TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
+    }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
     }
   }
 
@@ -95,6 +114,9 @@ public class HistoricBatchQueryDto extends AbstractQueryDto<HistoricBatchQuery> 
     }
     if (sortBy.equals(SORT_BY_BATCH_END_TIME_VALUE)) {
       query.orderByEndTime();
+    }
+    if (sortBy.equals(SORT_BY_TENANT_ID_VALUE)) {
+      query.orderByTenantId();
     }
   }
 

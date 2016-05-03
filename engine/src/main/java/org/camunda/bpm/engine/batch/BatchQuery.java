@@ -38,6 +38,7 @@ public interface BatchQuery extends Query<BatchQuery, Batch> {
    * Returns batches sorted by id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
    */
   BatchQuery orderById();
+
   /**
    * Returns batches sorted by tenant id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
    */

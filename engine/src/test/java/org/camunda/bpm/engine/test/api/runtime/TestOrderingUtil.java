@@ -613,6 +613,18 @@ public class TestOrderingUtil {
     };
   }
 
+  public static NullTolerantComparator<HistoricBatch> historicBatchByTenantId() {
+    return new NullTolerantComparator<HistoricBatch>() {
+      public int compare(HistoricBatch o1, HistoricBatch o2) {
+        return o1.getTenantId().compareTo(o2.getTenantId());
+      }
+
+      public boolean hasNullProperty(HistoricBatch object) {
+        return object.getTenantId() == null;
+      }
+    };
+  }
+
   public static NullTolerantComparator<HistoricBatch> historicBatchByStartTime() {
     return new NullTolerantComparator<HistoricBatch>() {
       public int compare(HistoricBatch o1, HistoricBatch o2) {
@@ -632,7 +644,7 @@ public class TestOrderingUtil {
       }
 
       public boolean hasNullProperty(HistoricBatch object) {
-        return true;
+        return object.getEndTime() == null;
       }
     };
   }

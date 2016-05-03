@@ -255,6 +255,16 @@ public class HistoricBatchRestServiceQueryTest extends AbstractRestServiceTest {
     executeAndVerifySorting("endTime", "asc", Status.OK);
     inOrder.verify(queryMock).orderByEndTime();
     inOrder.verify(queryMock).asc();
+
+    inOrder = Mockito.inOrder(queryMock);
+    executeAndVerifySorting("tenantId", "desc", Status.OK);
+    inOrder.verify(queryMock).orderByTenantId();
+    inOrder.verify(queryMock).desc();
+
+    inOrder = Mockito.inOrder(queryMock);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(queryMock).orderByTenantId();
+    inOrder.verify(queryMock).asc();
   }
 
   private void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
@@ -272,6 +282,8 @@ public class HistoricBatchRestServiceQueryTest extends AbstractRestServiceTest {
 
     parameters.put("batchId", MockProvider.EXAMPLE_BATCH_ID);
     parameters.put("type", MockProvider.EXAMPLE_BATCH_TYPE);
+    parameters.put("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID + "," + MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    parameters.put("withoutTenantId", true);
 
     return parameters;
   }
@@ -279,6 +291,8 @@ public class HistoricBatchRestServiceQueryTest extends AbstractRestServiceTest {
   protected void verifyQueryParameterInvocations() {
     verify(queryMock).batchId(MockProvider.EXAMPLE_BATCH_ID);
     verify(queryMock).type(MockProvider.EXAMPLE_BATCH_TYPE);
+    verify(queryMock).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(queryMock).withoutTenantId();
   }
 
   protected void verifyHistoricBatchListJson(String historicBatchListJson) {

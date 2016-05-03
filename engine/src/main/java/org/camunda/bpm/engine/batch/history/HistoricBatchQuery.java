@@ -34,6 +34,12 @@ public interface HistoricBatchQuery extends Query<HistoricBatchQuery, HistoricBa
    */
   HistoricBatchQuery completed(boolean completed);
 
+  /** Only selects historic batches with one of the given tenant ids. */
+  HistoricBatchQuery tenantIdIn(String... tenantIds);
+
+  /** Only selects historic batches which have no tenant id. */
+  HistoricBatchQuery withoutTenantId();
+
   /**
    * Returns historic batches sorted by id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
    */
@@ -48,6 +54,11 @@ public interface HistoricBatchQuery extends Query<HistoricBatchQuery, HistoricBa
    * Returns historic batches sorted by end time; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
    */
   HistoricBatchQuery orderByEndTime();
+
+  /**
+   * Returns historic batches sorted by tenant id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   */
+  HistoricBatchQuery orderByTenantId();
 
 
 }

@@ -12,6 +12,10 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicBatchByTenantId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +29,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -154,8 +159,6 @@ public class MultiTenancyHistoricBatchQueryTest {
   @Test
   public void testDeleteHistoricBatch() {
     // given
-    Batch tenant1Batch = createInstanceAndStartBatchMigration(tenant1Definition);
-
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     // when
@@ -163,14 +166,12 @@ public class MultiTenancyHistoricBatchQueryTest {
 
     // then
     identityService.clearAuthentication();
-    Assert.assertEquals(0, historyService.createHistoricBatchQuery().count());
+    Assert.assertEquals(2, historyService.createHistoricBatchQuery().count());
   }
 
   @Test
   public void testDeleteHistoricBatchFailsWithWrongTenant() {
     // given
-    Batch tenant2Batch = createInstanceAndStartBatchMigration(tenant2Definition);
-
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     // when
@@ -184,6 +185,88 @@ public class MultiTenancyHistoricBatchQueryTest {
     }
 
     identityService.clearAuthentication();
+  }
+
+
+  @Test
+  public void testHistoricBatchQueryFilterByTenant() {
+    // when
+    HistoricBatch returnedBatch = historyService.createHistoricBatchQuery().tenantIdIn(TENANT_ONE).singleResult();
+
+    // then
+    Assert.assertNotNull(returnedBatch);
+    Assert.assertEquals(tenant1Batch.getId(), returnedBatch.getId());
+  }
+
+  @Test
+  public void testHistoricBatchQueryFilterByTenants() {
+    // when
+    List<HistoricBatch> returnedBatches = historyService.createHistoricBatchQuery()
+      .tenantIdIn(TENANT_ONE, TENANT_TWO)
+      .orderByTenantId()
+      .asc()
+      .list();
+
+    // then
+    Assert.assertEquals(2, returnedBatches.size());
+    Assert.assertEquals(tenant1Batch.getId(), returnedBatches.get(0).getId());
+    Assert.assertEquals(tenant2Batch.getId(), returnedBatches.get(1).getId());
+  }
+
+  @Test
+  public void testHistoricBatchQueryFilterWithoutTenantId() {
+    // when
+    HistoricBatch returnedBatch = historyService.createHistoricBatchQuery().withoutTenantId().singleResult();
+
+    // then
+    Assert.assertNotNull(returnedBatch);
+    Assert.assertEquals(sharedBatch.getId(), returnedBatch.getId());
+  }
+
+  @Test
+  public void testBatchQueryFailOnNullTenantIdCase1() {
+
+    String[] tenantIds = null;
+    try {
+      historyService.createHistoricBatchQuery().tenantIdIn(tenantIds);
+      Assert.fail("exception expected");
+    }
+    catch (NullValueException e) {
+      // happy path
+    }
+  }
+
+  @Test
+  public void testBatchQueryFailOnNullTenantIdCase2() {
+
+    String[] tenantIds = new String[]{ null };
+    try {
+      historyService.createHistoricBatchQuery().tenantIdIn(tenantIds);
+      Assert.fail("exception expected");
+    }
+    catch (NullValueException e) {
+      // happy path
+    }
+  }
+
+  @Test
+  public void testOrderByTenantIdAsc() {
+
+    // when
+    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByTenantId().asc().list();
+
+    // then
+    verifySorting(orderedBatches, historicBatchByTenantId());
+  }
+
+  @Test
+  public void testOrderByTenantIdDesc() {
+
+    // when
+    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByTenantId().desc().list();
+
+    // then
+    verifySorting(orderedBatches, inverted(historicBatchByTenantId()));
   }
 
   protected Batch createInstanceAndStartBatchMigration(ProcessDefinition processDefinition) {
