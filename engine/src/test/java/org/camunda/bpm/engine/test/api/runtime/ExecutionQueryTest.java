@@ -169,7 +169,7 @@ public class ExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     executions = runtimeService.createExecutionQuery().orderByProcessDefinitionId().asc().list();
     assertEquals(13, executions.size());
-    verifySorting(executions, executionByProcessDefinitionId(processEngine));
+    verifySorting(executions, executionByProcessDefinitionId());
 
     executions = runtimeService.createExecutionQuery().orderByProcessDefinitionKey().asc().list();
     assertEquals(13, executions.size());
@@ -181,7 +181,7 @@ public class ExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     executions = runtimeService.createExecutionQuery().orderByProcessDefinitionId().desc().list();
     assertEquals(13, executions.size());
-    verifySorting(executions, inverted(executionByProcessDefinitionId(processEngine)));
+    verifySorting(executions, inverted(executionByProcessDefinitionId()));
 
     executions = runtimeService.createExecutionQuery().orderByProcessDefinitionKey().desc().list();
     assertEquals(13, executions.size());
@@ -189,11 +189,11 @@ public class ExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     executions = runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).orderByProcessDefinitionId().asc().list();
     assertEquals(12, executions.size());
-    verifySorting(executions, executionByProcessDefinitionId(processEngine));
+    verifySorting(executions, executionByProcessDefinitionId());
 
     executions = runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).orderByProcessDefinitionId().desc().list();
     assertEquals(12, executions.size());
-    verifySorting(executions, executionByProcessDefinitionId(processEngine));
+    verifySorting(executions, executionByProcessDefinitionId());
 
     executions = runtimeService.createExecutionQuery().processDefinitionKey(CONCURRENT_PROCESS_KEY).orderByProcessDefinitionKey().asc()
         .orderByProcessInstanceId().desc().list();

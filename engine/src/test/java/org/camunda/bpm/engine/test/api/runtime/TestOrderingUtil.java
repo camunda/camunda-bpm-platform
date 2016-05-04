@@ -60,7 +60,7 @@ public class TestOrderingUtil {
     });
   }
 
-  public static NullTolerantComparator<Execution> executionByProcessDefinitionId(final ProcessEngine processEngine) {
+  public static NullTolerantComparator<Execution> executionByProcessDefinitionId() {
     return propertyComparator(new PropertyAccessor<Execution, String>() {
       @Override
       public String getProperty(Execution obj) {
@@ -139,7 +139,7 @@ public class TestOrderingUtil {
     return propertyComparator(new PropertyAccessor<Task, Integer>() {
       @Override
       public Integer getProperty(Task obj) {
-        return Integer.valueOf(obj.getPriority());
+        return obj.getPriority();
       }
     });
   }
@@ -267,7 +267,7 @@ public class TestOrderingUtil {
     return propertyComparator(new PropertyAccessor<HistoricJobLog, Integer>() {
       @Override
       public Integer getProperty(HistoricJobLog obj) {
-        return Integer.valueOf(obj.getJobRetries());
+        return obj.getJobRetries();
       }
     });
   }
@@ -333,7 +333,7 @@ public class TestOrderingUtil {
     return propertyComparator(new PropertyAccessor<HistoricJobLog, Long>() {
       @Override
       public Long getProperty(HistoricJobLog obj) {
-        return Long.valueOf(obj.getJobPriority());
+        return obj.getJobPriority();
       }
     });
   }
@@ -342,7 +342,7 @@ public class TestOrderingUtil {
     return propertyComparator(new PropertyAccessor<HistoricJobLog, Long>() {
       @Override
       public Long getProperty(HistoricJobLog obj) {
-        return Long.valueOf(((HistoricJobLogEventEntity) obj).getSequenceCounter());
+        return ((HistoricJobLogEventEntity) obj).getSequenceCounter();
       }
     });
   }
@@ -353,7 +353,7 @@ public class TestOrderingUtil {
     return propertyComparator(new PropertyAccessor<Job, Long>() {
       @Override
       public Long getProperty(Job obj) {
-        return Long.valueOf(obj.getPriority());
+        return obj.getPriority();
       }
     });
   }
@@ -409,7 +409,7 @@ public class TestOrderingUtil {
     return propertyComparator(new PropertyAccessor<ExternalTask, Long>() {
       @Override
       public Long getProperty(ExternalTask obj) {
-        return Long.valueOf(obj.getPriority());
+        return obj.getPriority();
       }
     });
   }
@@ -509,7 +509,7 @@ public class TestOrderingUtil {
     };
   }
 
-  protected static interface PropertyAccessor<T, P extends Comparable<P>> {
+  protected interface PropertyAccessor<T, P extends Comparable<P>> {
     P getProperty(T obj);
   }
 
@@ -620,16 +620,4 @@ public class TestOrderingUtil {
     verifySorting(elements, expectedOrdering);
   }
 
-  public static int compareDates(Date date1, Date date2) {
-    boolean before = date1.before(date2);
-    boolean after = date1.after(date2);
-
-    if (before) {
-      return -1;
-    } else if (after) {
-      return 1;
-    } else {
-      return 0;
-    }
-  }
 }
