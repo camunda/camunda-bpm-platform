@@ -73,7 +73,10 @@
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
-      ACT_ID_ = #{activityId, jdbcType=VARCHAR}
+      ACT_ID_ = #{activityId, jdbcType=VARCHAR},
+      ACT_NAME_ = #{activityName, jdbcType=VARCHAR},
+      ACT_TYPE_ = #{activityType, jdbcType=VARCHAR},
+      PARENT_ACT_INST_ID_ = #{parentActivityInstanceId, jdbcType=VARCHAR}
       <if test="eventType == 'update'">
         , ASSIGNEE_ = #{taskAssignee, jdbcType=VARCHAR}
         , TASK_ID_ = #{taskId, jdbcType=VARCHAR}

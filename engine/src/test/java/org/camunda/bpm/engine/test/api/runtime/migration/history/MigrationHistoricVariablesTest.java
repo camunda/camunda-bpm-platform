@@ -35,7 +35,7 @@ import org.junit.rules.RuleChain;
  * @author Thorben Lindhauer
  *
  */
-public class MigrationHistoryVariablesTest {
+public class MigrationHistoricVariablesTest {
 
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);

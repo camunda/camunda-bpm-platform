@@ -30,6 +30,7 @@ import org.camunda.bpm.model.bpmn.instance.Activity;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
+import org.camunda.bpm.model.bpmn.instance.FlowElement;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Message;
 import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
@@ -143,6 +144,12 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
   public ModifiableBpmnModelInstance changeElementId(String oldId, String newId) {
     BaseElement element = getModelElementById(oldId);
     element.setId(newId);
+    return this;
+  }
+
+  public ModifiableBpmnModelInstance changeElementName(String elementId, String newName) {
+    FlowElement flowElement = getModelElementById(elementId);
+    flowElement.setName(newName);
     return this;
   }
 

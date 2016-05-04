@@ -95,11 +95,10 @@ public interface HistoryEventProducer {
   /**
    * Creates the history event which is fired when an activity instance is updated during a migration.
    *
-   * @param execution the current execution
    * @param actInstance the migrated activity instance which contains the new id's
    * @return the created history event
    */
-  HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution, MigratingActivityInstance actInstance);
+  HistoryEvent createActivityInstanceUpdateEvt(MigratingActivityInstance actInstance);
 
   /**
    * Creates the history event fired when an activity instances is <strong>ended</strong>.

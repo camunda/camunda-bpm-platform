@@ -70,30 +70,14 @@ import org.camunda.bpm.engine.task.IdentityLink;
 public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected void initActivityInstanceEvent(HistoricActivityInstanceEventEntity evt, ExecutionEntity execution, HistoryEventType eventType) {
-    initActivityInstanceEvent(evt, null, execution, eventType);
-  }
-
-  protected void initActivityInstanceEvent(HistoricActivityInstanceEventEntity evt, MigratingActivityInstance actInstance, ExecutionEntity execution, HistoryEventType eventType) {
-
-    String activityId;
-    String activityInstanceId;
-    PvmScope eventSource;
-    if (actInstance == null) {
-      activityId = execution.getActivityId();
-      activityInstanceId = execution.getActivityInstanceId();
-      if(activityId != null) {
-        eventSource = execution.getActivity();
-      } else {
-        eventSource = (PvmScope) execution.getEventSource();
-      }
-    } else {
-      activityInstanceId = actInstance.getActivityInstance().getId();
-      eventSource = actInstance.getTargetScope();
+    PvmScope eventSource = execution.getActivity();
+    if (eventSource == null) {
+      eventSource = (PvmScope) execution.getEventSource();
     }
+    String activityInstanceId = execution.getActivityInstanceId();
 
     String parentActivityInstanceId = null;
     ExecutionEntity parentExecution = execution.getParent();
-    String tenantId = execution.getTenantId();
 
     if (parentExecution != null && CompensationBehavior.isCompensationThrowing(parentExecution)) {
       parentActivityInstanceId = CompensationBehavior.getParentActivityInstanceId(execution);
@@ -102,6 +86,41 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       parentActivityInstanceId = execution.getParentActivityInstanceId();
     }
 
+    initActivityInstanceEvent(evt,
+        execution,
+        eventSource,
+        activityInstanceId,
+        parentActivityInstanceId,
+        eventType);
+  }
+
+  protected void initActivityInstanceEvent(HistoricActivityInstanceEventEntity evt, MigratingActivityInstance migratingActivityInstance, HistoryEventType eventType) {
+    PvmScope eventSource = migratingActivityInstance.getTargetScope();
+    String activityInstanceId = migratingActivityInstance.getActivityInstanceId();
+
+    MigratingActivityInstance parentInstance = migratingActivityInstance.getParent();
+    String parentActivityInstanceId = null;
+    if (parentInstance != null) {
+      parentActivityInstanceId = parentInstance.getActivityInstanceId();
+    }
+
+    ExecutionEntity execution = migratingActivityInstance.resolveRepresentativeExecution();
+
+    initActivityInstanceEvent(evt,
+        execution,
+        eventSource,
+        activityInstanceId,
+        parentActivityInstanceId,
+        eventType);
+  }
+
+  protected void initActivityInstanceEvent(HistoricActivityInstanceEventEntity evt,
+      ExecutionEntity execution,
+      PvmScope eventSource,
+      String activityInstanceId,
+      String parentActivityInstanceId,
+      HistoryEventType eventType) {
+
     evt.setId(activityInstanceId);
     evt.setEventType(eventType.getEventName());
     evt.setActivityInstanceId(activityInstanceId);
@@ -109,7 +128,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setProcessDefinitionId(execution.getProcessDefinitionId());
     evt.setProcessInstanceId(execution.getProcessInstanceId());
     evt.setExecutionId(execution.getId());
-    evt.setTenantId(tenantId);
+    evt.setTenantId(execution.getTenantId());
 
     ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
     if (definition != null) {
@@ -119,6 +138,18 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setActivityId(eventSource.getId());
     evt.setActivityName((String) eventSource.getProperty("name"));
     evt.setActivityType((String) eventSource.getProperty("type"));
+
+    // update sub process reference
+    ExecutionEntity subProcessInstance = execution.getSubProcessInstance();
+    if (subProcessInstance != null) {
+      evt.setCalledProcessInstanceId(subProcessInstance.getId());
+    }
+
+    // update sub case reference
+    CaseExecutionEntity subCaseInstance = execution.getSubCaseInstance();
+    if (subCaseInstance != null) {
+      evt.setCalledCaseInstanceId(subCaseInstance.getId());
+    }
   }
 
 
@@ -489,27 +520,18 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   @Override
   public HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution) {
-    return createActivityInstanceUpdateEvt(execution, null, null);
+    return createActivityInstanceUpdateEvt(execution, null);
   }
 
   @Override
   public HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution, DelegateTask task) {
-    return createActivityInstanceUpdateEvt(execution, task, null);
-  }
-
-  @Override
-  public HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution, MigratingActivityInstance actInstance) {
-    return createActivityInstanceUpdateEvt(execution, null, actInstance);
-  }
-
-  protected HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution, DelegateTask task, MigratingActivityInstance actInstance) {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
     // create event instance
     HistoricActivityInstanceEventEntity evt = loadActivityInstanceEventEntity(executionEntity);
 
     // initialize event
-    initActivityInstanceEvent(evt, actInstance, executionEntity, HistoryEventTypes.ACTIVITY_INSTANCE_UPDATE);
+    initActivityInstanceEvent(evt, executionEntity, HistoryEventTypes.ACTIVITY_INSTANCE_UPDATE);
 
     // update task assignment
     if(task != null) {
@@ -517,17 +539,17 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       evt.setTaskAssignee(task.getAssignee());
     }
 
-    // update sub process reference
-    ExecutionEntity subProcessInstance = executionEntity.getSubProcessInstance();
-    if (subProcessInstance != null) {
-      evt.setCalledProcessInstanceId(subProcessInstance.getId());
-    }
+    return evt;
+  }
 
-    // update sub case reference
-    CaseExecutionEntity subCaseInstance = executionEntity.getSubCaseInstance();
-    if (subCaseInstance != null) {
-      evt.setCalledCaseInstanceId(subCaseInstance.getId());
-    }
+  @Override
+  public HistoryEvent createActivityInstanceUpdateEvt(MigratingActivityInstance actInstance) {
+
+    // create event instance
+    HistoricActivityInstanceEventEntity evt = loadActivityInstanceEventEntity(actInstance.resolveRepresentativeExecution());
+
+    // initialize event
+    initActivityInstanceEvent(evt, actInstance, HistoryEventTypes.ACTIVITY_INSTANCE_UPDATE);
 
     return evt;
   }

@@ -211,6 +211,19 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
     return activityInstance;
   }
 
+  public String getActivityInstanceId() {
+    if (activityInstance != null) {
+      return activityInstance.getId();
+    }
+    else {
+      // - this branch is only executed for emerging activity instances
+      // - emerging activity instances are never leaf activities
+      // - therefore it is fine to always look up the activity instance id on the parent
+      ExecutionEntity execution = resolveRepresentativeExecution();
+      return execution.getParentActivityInstanceId();
+    }
+  }
+
   /**
    * Returns a copy of all children, modifying the returned set does not have any further effect.
    * @return
@@ -256,7 +269,7 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
     if (activityInstance.getId().equalsIgnoreCase(activityInstance.getProcessInstanceId())) {
       historyEvent = historyEventProducer.createProcessInstanceUpdateEvt(execution);
     } else {
-      historyEvent = historyEventProducer.createActivityInstanceUpdateEvt(execution, this);
+      historyEvent = historyEventProducer.createActivityInstanceUpdateEvt(this);
     }
     historyEventHandler.handleEvent(historyEvent);
   }
