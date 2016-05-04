@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
@@ -531,15 +532,9 @@ public class BatchStatisticsQueryTest {
   }
 
   protected void deleteMigrationJobs(Batch batch) {
-    // workaround for CAM-5857
-    final BatchEntity batchEntity = (BatchEntity) batch;
-    ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration())
-      .getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        batchEntity.getBatchJobHandler().deleteJobs(batchEntity);
-        return null;
-      }
-    });
+    for (Job migrationJob: helper.getMigrationJobs(batch)) {
+      managementService.deleteJob(migrationJob.getId());
+    }
   }
 
 }

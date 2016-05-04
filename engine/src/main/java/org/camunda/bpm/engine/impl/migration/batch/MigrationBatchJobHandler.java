@@ -174,4 +174,12 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
     return new BatchJobConfiguration(canonicalString);
   }
 
+  public void onDelete(BatchJobConfiguration configuration, JobEntity jobEntity) {
+    String byteArrayId = configuration.getConfigurationByteArrayId();
+    if (byteArrayId != null) {
+      Context.getCommandContext().getByteArrayManager()
+        .deleteByteArrayById(byteArrayId);
+    }
+  }
+
 }

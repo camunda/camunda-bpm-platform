@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.impl.cmd.AbstractSetProcessDefinitionStateCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler.ProcessDefinitionSuspensionStateConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
 
@@ -159,6 +160,10 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
     }
 
 
+  }
+
+  public void onDelete(ProcessDefinitionSuspensionStateConfiguration configuration, JobEntity jobEntity) {
+    // do nothing
   }
 
 }

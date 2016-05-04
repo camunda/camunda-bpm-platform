@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 /**
  * Job handler for batch monitor jobs. The batch monitor job
@@ -69,6 +70,10 @@ public class BatchMonitorJobHandler implements JobHandler<BatchMonitorJobConfigu
     public String toCanonicalString() {
       return batchId;
     }
+  }
+
+  public void onDelete(BatchMonitorJobConfiguration configuration, JobEntity jobEntity) {
+    // do nothing
   }
 
 }

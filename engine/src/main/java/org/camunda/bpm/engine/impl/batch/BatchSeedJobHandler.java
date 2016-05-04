@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 /**
  * The batch seed job handler is responsible to
@@ -79,6 +80,10 @@ public class BatchSeedJobHandler implements JobHandler<BatchSeedJobConfiguration
     public String toCanonicalString() {
       return batchId;
     }
+  }
+
+  public void onDelete(BatchSeedJobConfiguration configuration, JobEntity jobEntity) {
+    // do nothing
   }
 
 }

@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler.EventSubscriptionJobConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 
 /**
@@ -65,6 +66,10 @@ public class ProcessEventJobHandler implements JobHandler<EventSubscriptionJobCo
       return eventSubscriptionId;
     }
 
+  }
+
+  public void onDelete(EventSubscriptionJobConfiguration configuration, JobEntity jobEntity) {
+    // do nothing
   }
 
 }

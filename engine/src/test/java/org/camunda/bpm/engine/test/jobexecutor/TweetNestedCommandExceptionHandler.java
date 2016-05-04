@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 
 /**
@@ -52,4 +53,9 @@ public class TweetNestedCommandExceptionHandler implements JobHandler<JobHandler
       }
     };
   }
+
+  public void onDelete(JobHandlerConfiguration configuration, JobEntity jobEntity) {
+    // do nothing
+  }
+
 }

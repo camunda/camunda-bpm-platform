@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler.AsyncContinuationConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
@@ -158,5 +159,9 @@ public class AsyncContinuationJobHandler implements JobHandler<AsyncContinuation
       return configuration;
     }
 
+  }
+
+  public void onDelete(AsyncContinuationConfiguration configuration, JobEntity jobEntity) {
+    // do nothing
   }
 }

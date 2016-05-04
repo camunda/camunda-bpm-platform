@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.test.jobexecutor.TweetHandler.TweetJobConfiguration;
 import org.junit.Assert;
 
@@ -58,4 +59,9 @@ public class TweetHandler implements JobHandler<TweetJobConfiguration> {
       return message;
     }
   }
+
+  public void onDelete(TweetJobConfiguration configuration, JobEntity jobEntity) {
+    // do nothing
+  }
+
 }

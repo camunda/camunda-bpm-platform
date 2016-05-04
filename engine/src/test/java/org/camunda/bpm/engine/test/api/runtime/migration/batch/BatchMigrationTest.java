@@ -36,6 +36,11 @@ import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -754,6 +759,28 @@ public class BatchMigrationTest {
     assertEquals(newMessageName, eventSubscription.getEventName());
   }
 
+  @Test
+  public void testDeleteBatchJobManually() {
+    // given
+    Batch batch = helper.createMigrationBatchWithSize(1);
+    helper.executeSeedJob(batch);
+
+    JobEntity migrationJob = (JobEntity) helper.getMigrationJobs(batch).get(0);
+    String byteArrayId = migrationJob.getJobHandlerConfigurationRaw();
+
+    ByteArrayEntity byteArrayEntity = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+      .execute(new GetByteArrayCommand(byteArrayId));
+    assertNotNull(byteArrayEntity);
+
+    // when
+    managementService.deleteJob(migrationJob.getId());
+
+    // then
+    byteArrayEntity = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+      .execute(new GetByteArrayCommand(byteArrayId));
+    assertNull(byteArrayEntity);
+  }
+
   protected void assertBatchCreated(Batch batch, int processInstanceCount) {
     assertNotNull(batch);
     assertNotNull(batch.getId());
@@ -761,6 +788,21 @@ public class BatchMigrationTest {
     assertEquals(processInstanceCount, batch.getTotalJobs());
     assertEquals(defaultBatchJobsPerSeed, batch.getBatchJobsPerSeed());
     assertEquals(defaultInvocationsPerBatchJob, batch.getInvocationsPerBatchJob());
+  }
+
+  public class GetByteArrayCommand implements Command<ByteArrayEntity> {
+
+    protected String byteArrayId;
+
+    public GetByteArrayCommand(String byteArrayId) {
+      this.byteArrayId = byteArrayId;
+    }
+
+    public ByteArrayEntity execute(CommandContext commandContext) {
+      return (ByteArrayEntity) commandContext.getDbEntityManager()
+        .selectOne("selectByteArray", byteArrayId);
+    }
+
   }
 
 }

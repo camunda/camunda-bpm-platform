@@ -166,6 +166,13 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     CommandContext commandContext = Context.getCommandContext();
 
     incrementSequenceCounter();
+
+    // clean additional data related to this job
+    JobHandler jobHandler = getJobHandler();
+    if (jobHandler != null) {
+      jobHandler.onDelete(getJobHandlerConfiguration(), this);
+    }
+
     commandContext.getJobManager().deleteJob(this, !executing);
 
     // Also delete the job's exception byte array

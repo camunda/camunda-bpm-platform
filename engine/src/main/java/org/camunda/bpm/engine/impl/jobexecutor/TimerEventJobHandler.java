@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 
 /**
@@ -76,6 +77,10 @@ public abstract class TimerEventJobHandler implements JobHandler<TimerJobConfigu
       return canonicalString;
     }
 
+  }
+
+  public void onDelete(TimerJobConfiguration configuration, JobEntity jobEntity) {
+    // do nothing
   }
 
 }

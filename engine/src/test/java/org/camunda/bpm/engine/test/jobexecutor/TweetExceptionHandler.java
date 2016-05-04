@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
 
 
@@ -52,6 +53,10 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
         return null;
       }
     };
+  }
+
+  public void onDelete(JobHandlerConfiguration configuration, JobEntity jobEntity) {
+    // do nothing
   }
 
   public int getExceptionsRemaining() {
