@@ -69,7 +69,7 @@ public class MultiTenancyBatchTest {
 
   @Before
   public void initServices() {
-    managementService= engineRule.getManagementService();
+    managementService = engineRule.getManagementService();
     runtimeService = engineRule.getRuntimeService();
     historyService = engineRule.getHistoryService();
     identityService = engineRule.getIdentityService();
@@ -84,16 +84,7 @@ public class MultiTenancyBatchTest {
 
   @After
   public void removeBatches() {
-    HistoryService historyService = engineRule.getHistoryService();
-
-    for (Batch batch : managementService.createBatchQuery().list()) {
-      managementService.deleteBatch(batch.getId(), true);
-    }
-
-    // remove history of completed batches
-    for (HistoricBatch historicBatch : historyService.createHistoricBatchQuery().list()) {
-      historyService.deleteHistoricBatch(historicBatch.getId());
-    }
+    batchHelper.removeAllRunningAndHistoricBatches();
   }
 
   /**

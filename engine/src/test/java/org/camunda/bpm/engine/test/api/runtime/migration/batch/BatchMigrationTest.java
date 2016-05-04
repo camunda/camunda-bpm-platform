@@ -91,14 +91,7 @@ public class BatchMigrationTest {
 
   @After
   public void removeBatches() {
-    for (Batch batch : managementService.createBatchQuery().list()) {
-      managementService.deleteBatch(batch.getId(), true);
-    }
-
-    // remove history of completed batches
-    for (HistoricBatch historicBatch : historyService.createHistoricBatchQuery().list()) {
-      historyService.deleteHistoricBatch(historicBatch.getId());
-    }
+    helper.removeAllRunningAndHistoricBatches();
   }
 
   @After

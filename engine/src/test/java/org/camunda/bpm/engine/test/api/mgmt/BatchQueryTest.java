@@ -63,9 +63,7 @@ public class BatchQueryTest {
 
   @After
   public void removeBatches() {
-    for (Batch batch : managementService.createBatchQuery().list()) {
-      managementService.deleteBatch(batch.getId(), true);
-    }
+    helper.removeAllRunningAndHistoricBatches();
   }
 
   @Test

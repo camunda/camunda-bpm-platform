@@ -54,17 +54,7 @@ public class MultiTenancyMigrationAsyncTest {
 
   @After
   public void removeBatches() {
-    ManagementService managementService = defaultEngineRule.getManagementService();
-    HistoryService historyService = defaultEngineRule.getHistoryService();
-
-    for (Batch batch : managementService.createBatchQuery().list()) {
-      managementService.deleteBatch(batch.getId(), true);
-    }
-
-    // remove history of completed batches
-    for (HistoricBatch historicBatch : historyService.createHistoricBatchQuery().list()) {
-      historyService.deleteHistoricBatch(historicBatch.getId());
-    }
+    batchHelper.removeAllRunningAndHistoricBatches();
   }
 
   @Test

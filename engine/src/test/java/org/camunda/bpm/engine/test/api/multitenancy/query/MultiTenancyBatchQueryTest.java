@@ -91,16 +91,7 @@ public class MultiTenancyBatchQueryTest {
 
   @After
   public void removeBatches() {
-    HistoryService historyService = engineRule.getHistoryService();
-
-    for (Batch batch : managementService.createBatchQuery().list()) {
-      managementService.deleteBatch(batch.getId(), true);
-    }
-
-    // remove history of completed batches
-    for (HistoricBatch historicBatch : historyService.createHistoricBatchQuery().list()) {
-      historyService.deleteHistoricBatch(historicBatch.getId());
-    }
+    batchHelper.removeAllRunningAndHistoricBatches();
   }
 
   @Test

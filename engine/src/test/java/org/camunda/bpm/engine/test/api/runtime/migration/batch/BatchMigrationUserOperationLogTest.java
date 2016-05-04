@@ -56,14 +56,7 @@ public class BatchMigrationUserOperationLogTest {
 
   @After
   public void removeBatches() {
-    for (Batch batch : engineRule.getManagementService().createBatchQuery().list()) {
-      engineRule.getManagementService().deleteBatch(batch.getId(), true);
-    }
-
-    // remove history of completed batches
-    for (HistoricBatch historicBatch : engineRule.getHistoryService().createHistoricBatchQuery().list()) {
-      engineRule.getHistoryService().deleteHistoricBatch(historicBatch.getId());
-    }
+    batchHelper.removeAllRunningAndHistoricBatches();
   }
 
   @Test

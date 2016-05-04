@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
@@ -256,4 +257,23 @@ public class BatchMigrationHelper {
     ClockUtil.setCurrentTime(newDate);
     return newDate;
   }
+
+  /**
+   * Remove all batches and historic batches. Usually called in {@link org.junit.After} method.
+   */
+  public void removeAllRunningAndHistoricBatches() {
+    HistoryService historyService = engineRule.getHistoryService();
+    ManagementService managementService = engineRule.getManagementService();
+
+    for (Batch batch : managementService.createBatchQuery().list()) {
+      managementService.deleteBatch(batch.getId(), true);
+    }
+
+    // remove history of completed batches
+    for (HistoricBatch historicBatch : historyService.createHistoricBatchQuery().list()) {
+      historyService.deleteHistoricBatch(historicBatch.getId());
+    }
+
+  }
+
 }

@@ -72,15 +72,7 @@ public class JobExecutorBatchTest {
 
   @After
   public void removeBatches() {
-    ManagementService managementService = engineRule.getManagementService();
-    HistoryService historyService = engineRule.getHistoryService();
-
-    for (Batch batch : managementService.createBatchQuery().list()) {
-      managementService.deleteBatch(batch.getId(), true);
-    }
-    for (HistoricBatch historicBatch : historyService.createHistoricBatchQuery().list()) {
-      historyService.deleteHistoricBatch(historicBatch.getId());
-    }
+    helper.removeAllRunningAndHistoricBatches();
   }
 
   @Test

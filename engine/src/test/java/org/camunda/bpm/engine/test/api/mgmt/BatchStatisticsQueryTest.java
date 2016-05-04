@@ -77,15 +77,7 @@ public class BatchStatisticsQueryTest {
 
   @After
   public void removeBatches() {
-    for (Batch batch : managementService.createBatchQuery().list()) {
-      managementService.deleteBatch(batch.getId(), true);
-    }
-
-    // remove history of completed batches
-    final HistoryService historyService = engineRule.getHistoryService();
-    for (HistoricBatch historicBatch : historyService.createHistoricBatchQuery().list()) {
-      historyService.deleteHistoricBatch(historicBatch.getId());
-    }
+    helper.removeAllRunningAndHistoricBatches();
   }
 
   @Test
