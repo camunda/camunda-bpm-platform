@@ -18,7 +18,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -162,16 +161,12 @@ public class IdentityServiceTest {
   public void testCreateExistingUser() {
     User user = identityService.newUser("testuser");
     identityService.saveUser(user);
-    try {
-      User secondUser = identityService.newUser("testuser");
-      identityService.saveUser(secondUser);
-      fail("Exception should have been thrown");
-    } catch (RuntimeException re) {
-      // Expected exception while saving new user with the same name as an
-      // existing one.
-    }
 
-    identityService.deleteUser(user.getId());
+    User secondUser = identityService.newUser("testuser");
+
+    thrown.expect(ProcessEngineException.class);
+
+    identityService.saveUser(secondUser);
   }
 
   @Test
@@ -266,14 +261,9 @@ public class IdentityServiceTest {
     User johndoe = identityService.newUser("johndoe");
     identityService.saveUser(johndoe);
 
-    try {
-      identityService.createMembership(johndoe.getId(), "unexistinggroup");
-      fail("Expected exception");
-    } catch (RuntimeException re) {
-      // Exception expected
-    }
+    thrown.expect(ProcessEngineException.class);
 
-    identityService.deleteUser(johndoe.getId());
+    identityService.createMembership(johndoe.getId(), "unexistinggroup");
   }
 
   @Test
@@ -281,14 +271,9 @@ public class IdentityServiceTest {
     Group sales = identityService.newGroup("sales");
     identityService.saveGroup(sales);
 
-    try {
-      identityService.createMembership("unexistinguser", sales.getId());
-      fail("Expected exception");
-    } catch (RuntimeException re) {
-      // Exception expected
-    }
+    thrown.expect(ProcessEngineException.class);
 
-    identityService.deleteGroup(sales.getId());
+    identityService.createMembership("unexistinguser", sales.getId());
   }
 
   @Test
@@ -301,14 +286,9 @@ public class IdentityServiceTest {
     // Create the membership
     identityService.createMembership(johndoe.getId(), sales.getId());
 
-    try {
-      identityService.createMembership(johndoe.getId(), sales.getId());
-    } catch (RuntimeException re) {
-      // Expected exception, membership already exists
-    }
+    thrown.expect(ProcessEngineException.class);
 
-    identityService.deleteGroup(sales.getId());
-    identityService.deleteUser(johndoe.getId());
+    identityService.createMembership(johndoe.getId(), sales.getId());
   }
 
   @Test
@@ -513,17 +493,10 @@ public class IdentityServiceTest {
     user1.setFirstName("name one");
     identityService.saveUser(user1);
 
-    try {
+    thrown.expect(OptimisticLockingException.class);
 
-      user2.setFirstName("name two");
-      identityService.saveUser(user2);
-
-      fail("Expected an exception");
-    } catch (OptimisticLockingException e) {
-      // Expected an exception
-    }
-
-    identityService.deleteUser(user.getId());
+    user2.setFirstName("name two");
+    identityService.saveUser(user2);
   }
 
   @Test
@@ -537,17 +510,10 @@ public class IdentityServiceTest {
     group1.setName("name one");
     identityService.saveGroup(group1);
 
-    try {
+    thrown.expect(OptimisticLockingException.class);
 
-      group2.setName("name two");
-      identityService.saveGroup(group2);
-
-      fail("Expected an exception");
-    } catch (OptimisticLockingException e) {
-      // Expected an exception
-    }
-
-    identityService.deleteGroup(group.getId());
+    group2.setName("name two");
+    identityService.saveGroup(group2);
   }
 
   @Test

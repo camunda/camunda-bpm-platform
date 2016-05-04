@@ -17,7 +17,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -189,13 +188,9 @@ public class IdentityServiceTenantTest {
 
     identityService.createTenantUserMembership(TENANT_ONE, USER_ONE);
 
-    try {
-      identityService.createTenantUserMembership(TENANT_ONE, USER_ONE);
+    thrown.expect(ProcessEngineException.class);
 
-      fail("expected exception");
-    } catch (ProcessEngineException e) {
-      // expected
-    }
+    identityService.createTenantUserMembership(TENANT_ONE, USER_ONE);
   }
 
   @Test
@@ -208,13 +203,9 @@ public class IdentityServiceTenantTest {
 
     identityService.createTenantGroupMembership(TENANT_ONE, GROUP_ONE);
 
-    try {
-      identityService.createTenantGroupMembership(TENANT_ONE, GROUP_ONE);
+    thrown.expect(ProcessEngineException.class);
 
-      fail("expected exception");
-    } catch (ProcessEngineException e) {
-      // expected
-    }
+    identityService.createTenantGroupMembership(TENANT_ONE, GROUP_ONE);
   }
 
   @Test
