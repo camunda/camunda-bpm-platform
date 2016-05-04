@@ -321,12 +321,15 @@ Batch.prototype.sortingKeys = [
   'endTime',
   'type',
   'totalJobs',
+  'completedJobs',
+  'remainingJobs',
+  'failedJobs',
   'batchJobsPerSeed',
   'invocationsPerBatchJob',
   'tenantId',
   'batchJobDefinitionId',
   'monitorJobDefinitionId',
-  'seedJobDefinitionId',
+  'seedJobDefinitionId'
 ];
 
 module.exports = Batch;

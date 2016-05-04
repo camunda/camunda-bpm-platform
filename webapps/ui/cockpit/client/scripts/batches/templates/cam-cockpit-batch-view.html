@@ -109,14 +109,14 @@
             <a ng-if="ctrl.getSelectionType() == 'runtime' && ctrl.getJobs().length > 0" class="btn btn-default action-button pull-right" ng-click="ctrl.retryAll()" tooltip="Increment Number of Retries for all Failed Jobs"><span class="glyphicon glyphicon-repeat"></span></a>
           </h3>
 
-          <!-- <h3>Details</h3> -->
           <table class="cam-table">
             <thead>
               <th>Property</th>
               <th>Value</th>
             </thead>
             <tbody ng-init="selection = ctrl.getSelection()">
-              <tr ng-repeat="key in ctrl.sortingKeys">
+              <tr ng-repeat="key in ctrl.sortingKeys"
+                  ng-if="selection[key]">
                 <td>{{key}}</td>
                 <td>{{selection[key]}}</td>
               </tr>
