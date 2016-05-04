@@ -14,6 +14,10 @@
       <li ng-class="activeClass('groups')">
         <a href="#/users/{{user.id | escape}}?tab=groups">Groups</a>
       </li>
+
+      <li ng-class="activeClass('tenants')">
+        <a href="#/users/{{user.id | escape}}?tab=tenants">Tenants</a>
+      </li>
     </ul>
   </aside>
 
@@ -27,6 +31,13 @@
            ng-if="show('groups')"
            ng-click="openCreateGroupMembershipDialog()">
           Add to a group
+          <span class="glyphicon glyphicon-plus-sign"></span>
+        </a>
+
+        <a class="btn btn-default"
+           ng-if="show('tenants')"
+           ng-click="openCreateTenantMembershipDialog()">
+          Add to a tenant
           <span class="glyphicon glyphicon-plus-sign"></span>
         </a>
       </div>
@@ -263,6 +274,52 @@
                   <a ng-click="removeGroup(group.id)">Remove</a>
                 </td>
               </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </form>
+    </div>
+
+    <div ng-if="show('tenants')">
+      <form class="form-horizontal"
+            name="updateTenantMemberships">
+
+        <div class="h4">
+          {{user.firstName}} {{user.lastName}}&#39;s Tenants
+        </div>
+
+        <div cam-widget-loader
+             loading-state="{{ tenantLoadingState }}"
+             text-empty="User {{user.firstName}} {{user.lastName}} is currently not member of any tenants.">
+          <table class="cam-table"
+                 ng-hide="tenantList.length == 0">
+            <thead>
+            <tr>
+              <th class="tenant-id">Tenant Id</th>
+              <th class="tenant-name">Tenant Name</th>
+              <th class="action"
+                  ng-show="availableOperations.removeTenant">
+                Action
+              </th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr ng-repeat="tenant in tenantList">
+              <td class="tenant-id">
+                <a href="#/tenants/{{ tenant.id | escape }}?tab=tenant">{{ tenant.id }}</a>
+              </td>
+
+              <td class="tenant-name">
+                {{ tenant.name }}
+              </td>
+
+              <td class="action"
+                  ng-show="availableOperations.removeTenant">
+                <a ng-click="removeTenant(tenant.id)">Remove</a>
+              </td>
+            </tr>
             </tbody>
           </table>
         </div>

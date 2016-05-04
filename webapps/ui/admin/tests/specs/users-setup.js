@@ -39,6 +39,15 @@ var fragment1 = combine(
     type: "WORKFLOW"
   }]),
 
+  operation('tenant', 'create', [{
+    id: 'tenantOne',
+    name: 'Tenant One'
+  },
+    {
+      id: 'tenantTwo',
+      name: 'Tenant Two'
+    }]),
+
   operation('group', 'createMember', [{
     id:     "accounting",
     userId: "ringo"

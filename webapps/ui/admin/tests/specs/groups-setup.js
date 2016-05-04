@@ -83,6 +83,15 @@ module.exports = {
         name: "Marketing",
         type: "WORKFLOW"
       }]),
+      
+      operation('tenant', 'create', [{
+        id: 'tenantOne',
+        name: 'Tenant One'
+      },
+      {
+        id: 'tenantTwo',
+        name: 'Tenant Two'
+      }]),
 
       operation('group', 'createMember', [{
         id:     "marketing",

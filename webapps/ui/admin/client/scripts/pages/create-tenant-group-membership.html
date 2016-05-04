@@ -1,0 +1,73 @@
+<!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/create-group-membership.html -->
+<div class="modal-header">
+  <h3>Select Tenants</h3>
+</div>
+
+<div class="create-tenant-membership modal-body">
+  <div notifications-panel></div>
+
+  <table class="cam-table"
+         ng-hide="status !== 'beforeCreate' || availableTenants.length == 0">
+    <thead>
+      <tr>
+        <th class="select">
+          <input type="checkbox"
+                 ng-checked="allTenantsChecked()"
+                 ng-click="checkAllTenants()"  />
+        </th>
+        <th class="group-id">Tenant Id</th>
+        <th class="group-name">Tenant Name</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr ng-repeat="tenant in availableTenants">
+        <td class="select">
+          <input type="checkbox"
+                 ng-model="tenant.checked" />
+        </td>
+
+        <td class="tenant-id">
+          <a href="#/tenants/{{ tenant.id | escape }}">{{ tenant.id }}</a>
+        </td>
+
+        <td class="tenant-name">
+          {{ tenant.name }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p ng-show="availableTenants.length == 0">
+    There are no additional tenants available to which the user can be added.
+    You can create a new tenant <a href="#/tenant-create" ng-click="close">here</a>.
+  </p>
+
+  <p ng-show="status === 'SUCCESS'">
+    User was successfully added to selected tenants.
+  </p>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="close()"
+          ng-disabled="status === 'performCreate'"
+          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">
+    Close
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="close(status)"
+          ng-show="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">
+    OK
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="createGroupMemberships()"
+          ng-disabled="status !== 'beforeCreate'"
+          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed' || availableTenants.length == 0">
+    Add Tenants
+  </button>
+</div>
+<!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/create-group-membership.html -->

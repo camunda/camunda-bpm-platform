@@ -4,6 +4,7 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/userEdit.html', 'utf8');
 var groupTemplate = fs.readFileSync(__dirname + '/create-group-membership.html', 'utf8');
+var tenantTemplate = fs.readFileSync(__dirname + '/create-tenant-user-membership.html', 'utf8');
 var confirmationTemplate = fs.readFileSync(__dirname + '/generic-confirmation.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular');
@@ -12,22 +13,31 @@ var angular = require('camunda-commons-ui/vendor/angular');
     $routeProvider.when('/users/:userId', {
       template: template,
       controller: [
-              '$scope', 'page', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$modal', 'AuthorizationResource', 'authentication',
-      function($scope,   page,   $routeParams,   UserResource,   GroupResource,   GroupMembershipResource,   Notifications,   $location,   $modal,   AuthorizationResource,   authentication) {
+              '$scope', 'page', '$routeParams', 'camAPI', 'Notifications', '$location', '$modal', 'authentication',
+      function($scope,   page,   $routeParams,   camAPI,   Notifications,   $location,   $modal,   authentication) {
 
+        var AuthorizationResource = camAPI.resource('authorization'),
+            GroupResource         = camAPI.resource('group'),
+            TenantResource        = camAPI.resource('tenant'),
+            UserResource          = camAPI.resource('user');
 
-        function refreshBreadcrumbs() {
+        var encodeId = function(id) {
+          return id
+            .replace(/\//g, '%2F')
+            .replace(/\\/g, '%5C');
+        };
+
+        $scope.encodedUserId = encodeId($routeParams.userId);
+
+        var refreshBreadcrumbs = function() {
           page.breadcrumbsClear();
-
           page.breadcrumbsAdd({
             label: 'Users',
             href: '#/users/'
           });
-        }
+        };
 
-        $scope.encodedUserId = $routeParams.userId
-                                                .replace(/\//g, '%2F')
-                                                .replace(/\\/g, '%5C');
+        $scope.encodedUserId = encodeId($routeParams.userId);
         $scope.decodedUserId = $routeParams.userId
                                                 .replace(/%2F/g, '/')
                                                 .replace(/%5C/g, '\\');
@@ -65,9 +75,8 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         // load options ////////////////////////////////////
 
-        UserResource.OPTIONS({userId : $scope.encodedUserId}).$promise.then(function(response) {
-          // angular.forEach(response.data.links, function(link){
-          angular.forEach(response.links, function(link){
+        UserResource.options({ id : $scope.encodedUserId }, function(err, res) {
+          angular.forEach(res.links, function(link){
             $scope.availableOperations[link.rel] = true;
           });
         });
@@ -75,11 +84,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
         // update profile form /////////////////////////////
 
         var loadProfile = $scope.loadProfile = function() {
-          UserResource.profile({userId : $scope.encodedUserId}).$promise.then(function(response) {
-            $scope.user = response;
+          UserResource.profile({ id : $scope.encodedUserId }, function(err, res) {
+            $scope.user = res;
 
-            $scope.profile = angular.copy(response);
-            $scope.profileCopy = angular.copy(response);
+            $scope.profile = angular.copy(res);
+            $scope.profileCopy = angular.copy(res);
 
             page.titleSet('Edit `' + $scope.user + '` user');
 
@@ -93,18 +102,25 @@ var angular = require('camunda-commons-ui/vendor/angular');
         };
 
         $scope.updateProfile = function() {
-
-          UserResource.updateProfile({userId: $scope.encodedUserId}, $scope.profile).$promise.then(
-            function() {
-              Notifications.addMessage({type:'success', status:'Success', message:'User profile successfully updated.'});
+          var resourceData = angular.extend({}, { id : $scope.encodedUserId }, $scope.profile);
+          UserResource.updateProfile(resourceData, function(err, res) {
+            if( err === null ) {
+              Notifications.addMessage({
+                type : 'success',
+                status : 'Success',
+                message : 'User profile successfully updated.'
+              });
               loadProfile();
-            },
-            function() {
-              Notifications.addError({ status: 'Failed', message: 'Failed to update user profile' });
-            }
-          );
-        };
 
+            } else {
+
+              Notifications.addError({
+                status : 'Failed',
+                message : 'Failed to update user profile'
+              });
+            }
+          });
+        };
         // update password form ////////////////////////////
 
         var resetCredentials = function() {
@@ -116,27 +132,48 @@ var angular = require('camunda-commons-ui/vendor/angular');
         };
 
         $scope.updateCredentials = function() {
-          var pathParams = { userId: $scope.encodedUserId },
-              params = {authenticatedUserPassword: $scope.credentials.authenticatedUserPassword, password: $scope.credentials.password };
+          var credentialsData = {
+            authenticatedUserPassword: $scope.credentials.authenticatedUserPassword,
+            password: $scope.credentials.password
+          };
 
-          UserResource.updateCredentials(pathParams, params).$promise.then(
+          var resourceData = angular.extend({}, { id : $scope.encodedUserId }, credentialsData);
 
-            function() {
-              Notifications.addMessage({ type: 'success', status: 'Password', message: 'Changed the password.', duration: 5000, exclusive: true });
+          UserResource.updateCredentials(resourceData, function(err, res) {
+            if( err === null ) {
+              Notifications.addMessage({
+                type: 'success',
+                status: 'Password',
+                message: 'Changed the password.',
+                duration: 5000,
+                exclusive: true
+              });
               resetCredentials();
-            },
 
-            function(error) {
-              if (error.status === 400) {
-                if ($scope.decodedUserId === $scope.authenticatedUser) {
-                  Notifications.addError({ status: 'Password', message: 'Old password is not valid.', exclusive: true });
+            } else {
+              if( err.status === 400 ) {
+                if( $scope.decodedUserId === $scope.authenticatedUser ) {
+                  Notifications.addError({
+                    status : 'Password',
+                    message : 'Old password is not valid.',
+                    exclusive : true
+                  });
+
                 } else {
-                  Notifications.addError({ status: 'Password', message: 'Your password is not valid.', exclusive: true });
+                  Notifications.addError({
+                    status : 'Password',
+                    message : 'Your password is not valid.',
+                    exclusive : true
+                  });
                 }
               } else {
-                Notifications.addError({ status: 'Password', message: 'Could not change the password.' });
+                Notifications.addError({
+                  status : 'Password',
+                  message : 'Could not change the password.'
+                });
               }
-            });
+            }
+          });
         };
 
         // delete user form /////////////////////////////
@@ -148,9 +185,12 @@ var angular = require('camunda-commons-ui/vendor/angular');
               $dialogScope.question = 'Really delete user ' + $scope.user.id + '?';
             }]
           }).result.then(function () {
-            UserResource.delete({'userId':$scope.encodedUserId}).$promise.then(
-              function(){
-                Notifications.addMessage({type:'success', status:'Success', message:'User '+$scope.user.id+' successfully deleted.'});
+            UserResource.delete({ id: $scope.encodedUserId }, function(err, res) {
+                Notifications.addMessage({
+                  type: 'success',
+                  status: 'Success',
+                  message: 'User '+$scope.user.id+' successfully deleted.'
+                });
                 $location.path('/users');
               }
             );
@@ -167,61 +207,156 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         var loadGroups = $scope.loadGroups = function() {
           $scope.groupLoadingState = 'LOADING';
-          GroupResource.query({'member' : $scope.decodedUserId}).$promise.then(function(response) {
-            $scope.groupLoadingState = response.length ? 'LOADED' : 'EMPTY';
+          GroupResource.list({ member: $scope.decodedUserId }, function(err, res) {
+            $scope.groupLoadingState = res.length ? 'LOADED' : 'EMPTY';
 
-            $scope.groupList = response;
+            $scope.groupList = res;
             $scope.groupIdList = [];
             angular.forEach($scope.groupList, function(group) {
               $scope.groupIdList.push(group.id);
             });
           });
         };
-
+        
         $scope.removeGroup = function(groupId) {
-          var encodedGroupId = groupId
-                                    .replace(/\//g, '%2F')
-                                    .replace(/\\/g, '%5C');
-          GroupMembershipResource.delete({'userId':$scope.encodedUserId, 'groupId': encodedGroupId}).$promise.then(
-            function(){
-              Notifications.addMessage({type:'success', status:'Success', message:'User '+$scope.user.id+' removed from group.'});
+          var encodedGroupId = encodeId(groupId);
+
+          GroupResource.deleteMember({ userId: $scope.encodedUserId, id: encodedGroupId}, function(err, res){
+              Notifications.addMessage({
+                type:'success',
+                status:'Success',
+                message:'User '+$scope.user.id+' removed from group.'
+              });
               loadGroups();
             }
           );
         };
 
         $scope.openCreateGroupMembershipDialog = function() {
-          var dialog = $modal.open({
-            controller: 'GroupMembershipDialogController',
+          var dialogConfig = {
+            ctrl: 'GroupMembershipDialogController',
             template: groupTemplate,
-            resolve: {
-              user: function() {
-                return $scope.user;
-              },
-              userId: function() {
-                return $scope.encodedUserId;
-              },
-              groupIdList: function() {
+            callback: $scope.loadGroups,
+            resolve: prepareResolveObject({
+              idList : function() {
                 return $scope.groupIdList;
               }
+            })
+          };
+
+          openCreateDialog(dialogConfig);
+        };
+
+        var checkRemoveGroupMembershipAuthorized = function() {
+          checkDeleteAuthorized('group membership', function(err, res) {
+            $scope.availableOperations.removeGroup = res.authorized;
+          });
+        };
+
+        
+        // Tenant Form ///////////////////////////////////////////
+        
+        $scope.$watch(function() {
+          return $location.search().tab === 'tenants';
+        }, function(newValue) {
+          return newValue && loadTenants();
+        });
+
+        var loadTenants = $scope.loadTenants = function() {
+          $scope.tenantLoadingState = 'LOADING';
+          TenantResource.list({ userMember: $scope.decodedUserId }, function(err, res) {
+            $scope.tenantLoadingState = res.length ? 'LOADED' : 'EMPTY';
+
+            $scope.tenantList = res;
+            $scope.idList = [];
+            angular.forEach($scope.tenantList, function(tenant) {
+              $scope.idList.push(tenant.id);
+            });
+          });
+        };
+        
+        $scope.removeTenant = function(tenantId) {
+          var encodedTenantId = encodeId(tenantId);
+
+          TenantResource.deleteUserMember({userId: $scope.encodedUserId, id: encodedTenantId}, function(err, res){
+              Notifications.addMessage({
+                type:'success',
+                status:'Success',
+                message:'User '+$scope.user.id+' removed from tenant.'
+              });
+              loadTenants();
             }
+          );
+        };
+
+        $scope.openCreateTenantMembershipDialog = function() {
+          var dialogConfig = {
+            ctrl: 'TenantMembershipDialogController',
+            template: tenantTemplate,
+            callback: $scope.loadTenants,
+            resolve: prepareResolveObject({
+              idList: function() {
+                return $scope.idList;
+              }
+            })
+          };
+
+          openCreateDialog(dialogConfig);
+        };
+
+        var checkRemoveTenantMembershipAuthorized = function() {
+          checkDeleteAuthorized('tenant membership', function(err, res) {
+            $scope.availableOperations.removeTenant = res.authorized;
+          });
+        };
+
+        
+        // Modal Dialog Configuration /////////////////////////////// 
+        
+        var openCreateDialog = function(dialogCfg) {
+          var dialog = $modal.open({
+            controller: dialogCfg.ctrl,
+            template: dialogCfg.template,
+            resolve: dialogCfg.resolve
           });
 
           dialog.result.then(function(result) {
 
             if (result == 'SUCCESS') {
-              $scope.loadGroups();
+              dialogCfg.callback();
             }
           });
         };
 
-        function checkRemoveGroupMembershipAuthorized() {
-          AuthorizationResource.check({permissionName:'DELETE', resourceName:'group membership', resourceType:3}).$promise.then(function(response) {
-            // $scope.availableOperations.removeGroup = response.data.authorized;
-            $scope.availableOperations.removeGroup = response.authorized;
-          });
-        }
+        var prepareResolveObject = function(listObj) {
+          return angular.extend(
+            {},
 
+            {
+              member : function() {
+                return $scope.user;
+              },
+              memberId : function() {
+                return $scope.encodedUserId;
+              }
+            },
+
+            listObj
+          );
+        };
+        
+        
+        // Delete Authorization Check /////////////////////////
+        
+        var checkDeleteAuthorized = function(resourceName, cb) {
+          AuthorizationResource.check({
+            permissionName: 'DELETE',
+            resourceName: resourceName,
+            resourceType: 3
+          }, cb);
+        };
+
+        
         // page controls ////////////////////////////////////
 
         $scope.show = function(fragment) {
@@ -243,6 +378,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         loadProfile();
         checkRemoveGroupMembershipAuthorized();
+        checkRemoveTenantMembershipAuthorized();
 
         if(!$location.search().tab) {
           $location.search({'tab': 'profile'});
