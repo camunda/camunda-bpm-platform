@@ -210,11 +210,11 @@ public class CommandLogger extends ProcessEngineLogger {
         errorCode), cause);
   }
 
-  public ProcessEngineException exceptionCommandWithUnauthorizedTenant(String command, Object entity) {
+  public ProcessEngineException exceptionCommandWithUnauthorizedTenant(String command) {
     return new ProcessEngineException(exceptionMessage(
         "034",
         "Cannot {} because it belongs to no authenticated tenant: {}",
-        command, entity
+        command
         ));
   }
 }
