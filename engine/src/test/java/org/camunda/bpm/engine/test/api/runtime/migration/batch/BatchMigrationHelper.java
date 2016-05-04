@@ -64,7 +64,14 @@ public class BatchMigrationHelper {
   public Batch migrateProcessInstancesAsync(int numberOfProcessInstances) {
     sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     targetProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    return migrateProcessInstancesAsync(numberOfProcessInstances, sourceProcessDefinition, targetProcessDefinition);
+  }
 
+  public Batch migrateProcessInstanceAsync(ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition) {
+    return migrateProcessInstancesAsync(1, sourceProcessDefinition, targetProcessDefinition);
+  }
+
+  public Batch migrateProcessInstancesAsync(int numberOfProcessInstances, ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition) {
     RuntimeService runtimeService = engineRule.getRuntimeService();
 
     List<String> processInstanceIds = new ArrayList<String>(numberOfProcessInstances);

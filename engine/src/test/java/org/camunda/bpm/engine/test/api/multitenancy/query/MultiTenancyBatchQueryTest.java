@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.query;
 
+import static java.util.Collections.singletonList;
+
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.batchByTenantId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.batchStatisticsByTenantId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
@@ -22,17 +24,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchStatistics;
-import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -62,8 +59,6 @@ public class MultiTenancyBatchQueryTest {
   protected BatchMigrationHelper batchHelper = new BatchMigrationHelper(engineRule);
 
   protected ManagementService managementService;
-  protected RuntimeService runtimeService;
-  protected HistoryService historyService;
   protected IdentityService identityService;
 
   protected Batch sharedBatch;
@@ -73,8 +68,6 @@ public class MultiTenancyBatchQueryTest {
   @Before
   public void initServices() {
     managementService= engineRule.getManagementService();
-    runtimeService = engineRule.getRuntimeService();
-    historyService = engineRule.getHistoryService();
     identityService = engineRule.getIdentityService();
   }
 
@@ -84,9 +77,9 @@ public class MultiTenancyBatchQueryTest {
     ProcessDefinition tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
     ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_TWO, ProcessModels.ONE_TASK_PROCESS);
 
-    sharedBatch = createInstanceAndStartBatchMigration(sharedDefinition);
-    tenant1Batch = createInstanceAndStartBatchMigration(tenant1Definition);
-    tenant2Batch = createInstanceAndStartBatchMigration(tenant2Definition);
+    sharedBatch = batchHelper.migrateProcessInstanceAsync(sharedDefinition, sharedDefinition);
+    tenant1Batch = batchHelper.migrateProcessInstanceAsync(tenant1Definition, tenant1Definition);
+    tenant2Batch = batchHelper.migrateProcessInstanceAsync(tenant2Definition, tenant2Definition);
   }
 
   @After
@@ -112,7 +105,7 @@ public class MultiTenancyBatchQueryTest {
   @Test
   public void testBatchQueryAuthenticatedTenant() {
     // given
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, singletonList(TENANT_ONE));
 
     // when
     List<Batch> batches = managementService.createBatchQuery().list();
@@ -161,7 +154,7 @@ public class MultiTenancyBatchQueryTest {
   @Test
   public void testBatchStatisticsAuthenticatedTenant() {
     // given
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, singletonList(TENANT_ONE));
 
     // when
     List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery().list();
@@ -347,23 +340,6 @@ public class MultiTenancyBatchQueryTest {
     // then
     verifySorting(orderedBatches, inverted(batchStatisticsByTenantId()));
   }
-
-  protected Batch createInstanceAndStartBatchMigration(ProcessDefinition processDefinition) {
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(processDefinition.getId());
-
-    MigrationPlan migrationPlan = engineRule.getRuntimeService()
-      .createMigrationPlan(processDefinition.getId(), processDefinition.getId())
-      .mapEqualActivities()
-      .build();
-
-    Batch batch = engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
-
-    return batch;
-  }
-
 
   protected void assertBatches(List<? extends Batch> actualBatches, String... expectedIds) {
     Assert.assertEquals(expectedIds.length, actualBatches.size());

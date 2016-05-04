@@ -12,7 +12,8 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy;
 
-import java.util.Arrays;
+import static java.util.Collections.singletonList;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.HistoryService;
@@ -20,14 +21,11 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.management.JobDefinition;
-import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
@@ -59,7 +57,6 @@ public class MultiTenancyBatchTest {
   protected BatchMigrationHelper batchHelper = new BatchMigrationHelper(engineRule);
 
   protected ManagementService managementService;
-  protected RuntimeService runtimeService;
   protected HistoryService historyService;
   protected IdentityService identityService;
 
@@ -70,7 +67,6 @@ public class MultiTenancyBatchTest {
   @Before
   public void initServices() {
     managementService = engineRule.getManagementService();
-    runtimeService = engineRule.getRuntimeService();
     historyService = engineRule.getHistoryService();
     identityService = engineRule.getIdentityService();
   }
@@ -94,17 +90,7 @@ public class MultiTenancyBatchTest {
   @Test
   public void testBatchTenantIdCase1() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sharedDefinition.getId());
-
-    MigrationPlan migrationPlan = runtimeService
-      .createMigrationPlan(sharedDefinition.getId(), sharedDefinition.getId())
-      .mapEqualActivities()
-      .build();
-
-    // when
-    Batch batch = runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+    Batch batch = batchHelper.migrateProcessInstanceAsync(sharedDefinition, sharedDefinition);
 
     // then
     Assert.assertNull(batch.getTenantId());
@@ -117,17 +103,7 @@ public class MultiTenancyBatchTest {
   @Test
   public void testBatchTenantIdCase2() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(tenant1Definition.getId());
-
-    MigrationPlan migrationPlan = runtimeService
-      .createMigrationPlan(tenant1Definition.getId(), sharedDefinition.getId())
-      .mapEqualActivities()
-      .build();
-
-    // when
-    Batch batch = runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+    Batch batch = batchHelper.migrateProcessInstanceAsync(tenant1Definition, sharedDefinition);
 
     // then
     Assert.assertEquals(TENANT_ONE, batch.getTenantId());
@@ -140,17 +116,7 @@ public class MultiTenancyBatchTest {
   @Test
   public void testBatchTenantIdCase3() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sharedDefinition.getId());
-
-    MigrationPlan migrationPlan = runtimeService
-      .createMigrationPlan(sharedDefinition.getId(), tenant1Definition.getId())
-      .mapEqualActivities()
-      .build();
-
-    // when
-    Batch batch = runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+    Batch batch = batchHelper.migrateProcessInstanceAsync(sharedDefinition, tenant1Definition);
 
     // then
     Assert.assertNull(batch.getTenantId());
@@ -160,67 +126,33 @@ public class MultiTenancyBatchTest {
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testHistoricBatchTenantId() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(tenant1Definition.getId());
-
-    MigrationPlan migrationPlan = runtimeService
-      .createMigrationPlan(tenant1Definition.getId(), tenant1Definition.getId())
-      .mapEqualActivities()
-      .build();
-
-    // when
-    runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
-
-    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
+    batchHelper.migrateProcessInstanceAsync(tenant1Definition, tenant1Definition);
 
     // then
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
     Assert.assertEquals(TENANT_ONE, historicBatch.getTenantId());
   }
 
   @Test
   public void testBatchJobDefinitionsTenantId() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(tenant1Definition.getId());
-
-    MigrationPlan migrationPlan = runtimeService
-      .createMigrationPlan(tenant1Definition.getId(), tenant1Definition.getId())
-      .mapEqualActivities()
-      .build();
-
-    // when
-    Batch batch = runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+    Batch batch = batchHelper.migrateProcessInstanceAsync(tenant1Definition, tenant1Definition);
 
     // then
-    JobDefinition migrationJobDefinition = managementService.createJobDefinitionQuery()
-        .jobDefinitionId(batch.getBatchJobDefinitionId()).singleResult();
+    JobDefinition migrationJobDefinition = batchHelper.getMigrationJobDefinition(batch);
     Assert.assertEquals(TENANT_ONE, migrationJobDefinition.getTenantId());
 
-    JobDefinition monitorJobDefinition = managementService.createJobDefinitionQuery()
-        .jobDefinitionId(batch.getMonitorJobDefinitionId()).singleResult();
+    JobDefinition monitorJobDefinition = batchHelper.getMonitorJobDefinition(batch);
     Assert.assertEquals(TENANT_ONE, monitorJobDefinition.getTenantId());
 
-    JobDefinition seedJobDefinition = managementService.createJobDefinitionQuery()
-        .jobDefinitionId(batch.getSeedJobDefinitionId()).singleResult();
+    JobDefinition seedJobDefinition = batchHelper.getSeedJobDefinition(batch);
     Assert.assertEquals(TENANT_ONE, seedJobDefinition.getTenantId());
   }
 
   @Test
   public void testBatchJobsTenantId() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(tenant1Definition.getId());
-
-    MigrationPlan migrationPlan = runtimeService
-      .createMigrationPlan(tenant1Definition.getId(), tenant1Definition.getId())
-      .mapEqualActivities()
-      .build();
-
-    // when
-    Batch batch = runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+    Batch batch = batchHelper.migrateProcessInstanceAsync(tenant1Definition, tenant1Definition);
 
     // then
     Job seedJob = batchHelper.getSeedJob(batch);
@@ -238,18 +170,10 @@ public class MultiTenancyBatchTest {
   @Test
   public void testDeleteBatch() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(tenant1Definition.getId());
-
-    MigrationPlan migrationPlan = runtimeService
-      .createMigrationPlan(tenant1Definition.getId(), tenant1Definition.getId())
-      .mapEqualActivities()
-      .build();
-    Batch batch = runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+    Batch batch = batchHelper.migrateProcessInstanceAsync(tenant1Definition, tenant1Definition);
 
     // when
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, singletonList(TENANT_ONE));
     managementService.deleteBatch(batch.getId(), true);
     identityService.clearAuthentication();
 
@@ -260,18 +184,10 @@ public class MultiTenancyBatchTest {
   @Test
   public void testDeleteBatchFailsWithWrongTenant() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(tenant2Definition.getId());
-
-    MigrationPlan migrationPlan = runtimeService
-      .createMigrationPlan(tenant2Definition.getId(), tenant2Definition.getId())
-      .mapEqualActivities()
-      .build();
-    Batch batch = runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+    Batch batch = batchHelper.migrateProcessInstanceAsync(tenant2Definition, tenant2Definition);
 
     // when
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, singletonList(TENANT_ONE));
     try {
       managementService.deleteBatch(batch.getId(), true);
       Assert.fail("exception expected");
