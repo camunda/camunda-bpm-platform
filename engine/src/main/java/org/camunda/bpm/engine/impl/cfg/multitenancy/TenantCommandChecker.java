@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -195,6 +196,30 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
+  public void checkCreateDeployment() {
+  }
+
+  @Override
+  public void checkReadDeployment(String deploymentId) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      DeploymentEntity deployment = findDeploymentById(deploymentId);
+      if (deployment != null && !getTenantManager().isAuthenticatedTenant(deployment.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("get the deployment", deployment);
+      }
+    }
+  }
+
+  @Override
+  public void checkDeleteDeployment(String deploymentId) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      DeploymentEntity deployment = findDeploymentById(deploymentId);
+      if (deployment != null && !getTenantManager().isAuthenticatedTenant(deployment.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("delete the deployment", deployment);
+      }
+    }
+  }
+
   protected TenantManager getTenantManager() {
     return Context.getCommandContext().getTenantManager();
   }
@@ -211,5 +236,8 @@ public class TenantCommandChecker implements CommandChecker {
     return Context.getCommandContext().getExecutionManager().findExecutionById(processInstanceId);
   }
 
+  protected DeploymentEntity findDeploymentById(String deploymentId) {
+    return Context.getCommandContext().getDeploymentManager().findDeploymentById(deploymentId);
+  }
 
 }

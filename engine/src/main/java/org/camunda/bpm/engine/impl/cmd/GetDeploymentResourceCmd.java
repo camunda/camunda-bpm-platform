@@ -19,9 +19,9 @@ import java.io.InputStream;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.exception.DeploymentResourceNotFoundException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 
 
@@ -43,8 +43,9 @@ public class GetDeploymentResourceCmd implements Command<InputStream>, Serializa
     ensureNotNull("deploymentId", deploymentId);
     ensureNotNull("resourceName", resourceName);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadDeployment(deploymentId);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadDeployment(deploymentId);
+    }
 
     ResourceEntity resource = commandContext
       .getResourceManager()

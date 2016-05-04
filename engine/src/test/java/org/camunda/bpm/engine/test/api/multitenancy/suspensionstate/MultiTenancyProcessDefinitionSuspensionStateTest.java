@@ -609,7 +609,7 @@ public class MultiTenancyProcessDefinitionSuspensionStateTest {
   }
 
   @Test
-  public void failToSuspendProcessDefinitionByIdNoAuthenticatedTenants() throws Exception {
+  public void failToSuspendProcessDefinitionByIdNoAuthenticatedTenants() {
     ProcessDefinition processDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery()
         .processDefinitionKey(PROCESS_DEFINITION_KEY).tenantIdIn(TENANT_ONE).singleResult();
 

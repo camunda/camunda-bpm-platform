@@ -18,9 +18,9 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 
 
@@ -42,8 +42,9 @@ public class GetDeploymentResourceForIdCmd implements Command<InputStream>, Seri
     ensureNotNull("deploymentId", deploymentId);
     ensureNotNull("resourceId", resourceId);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadDeployment(deploymentId);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadDeployment(deploymentId);
+    }
 
     ResourceEntity resource = commandContext
       .getResourceManager()

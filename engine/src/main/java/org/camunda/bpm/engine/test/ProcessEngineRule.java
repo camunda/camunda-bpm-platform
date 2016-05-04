@@ -213,6 +213,9 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
   @Override
   public void finished(Description description) {
+    identityService.clearAuthentication();
+    processEngine.getProcessEngineConfiguration().setTenantCheckEnabled(true);
+
     TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, description.getTestClass(), description.getMethodName());
     for (String additionalDeployment : additionalDeployments) {
       TestHelper.deleteDeployment(processEngine, additionalDeployment);
@@ -224,8 +227,6 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
     ClockUtil.reset();
 
-    identityService.clearAuthentication();
-    processEngine.getProcessEngineConfiguration().setTenantCheckEnabled(true);
 
     clearServiceReferences();
   }

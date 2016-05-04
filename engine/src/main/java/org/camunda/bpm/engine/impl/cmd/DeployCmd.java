@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.TransactionLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
@@ -42,7 +43,6 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentFailListener;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessApplicationDeploymentImpl;
@@ -107,9 +107,10 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
       ensureDeploymentsWithIdsExists(deploymentIds, deployments);
     }
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkCreateDeployment();
-    checkReadDeployments(authorizationManager, deploymentIds);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkCreateDeployment();
+    }
+    checkReadDeployments(commandContext, deploymentIds);
 
     // set deployment name if it should retrieved from an existing deployment
     String nameFromDeployment = deploymentBuilder.getNameFromDeployment();
@@ -399,9 +400,11 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     return result;
   }
 
-  protected void checkReadDeployments(AuthorizationManager authorizationManager, Set<String> deploymentIds) {
+  protected void checkReadDeployments(CommandContext commandContext, Set<String> deploymentIds) {
     for (String deploymentId : deploymentIds) {
-      authorizationManager.checkReadDeployment(deploymentId);
+      for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+        checker.checkReadDeployment(deploymentId);
+      }
     }
   }
 

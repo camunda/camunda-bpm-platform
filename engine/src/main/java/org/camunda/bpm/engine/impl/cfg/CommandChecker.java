@@ -109,4 +109,19 @@ public interface CommandChecker {
   void checkDeleteBatch(BatchEntity batch);
 
   void checkDeleteHistoricBatch(HistoricBatchEntity batch);
+
+  /**
+   * Checks if it is allowed to create a deployment.
+   */
+  void checkCreateDeployment();
+
+  /**
+   * Checks if it is allowed to read a deployment of the given deployment id.
+   */
+  void checkReadDeployment(String deploymentId);
+
+  /**
+   * Checks if it is allowed to delete a deployment of the given deployment id.
+   */
+  void checkDeleteDeployment(String deploymentId);
 }

@@ -17,10 +17,10 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 
 
 /**
@@ -39,8 +39,9 @@ public class GetDeploymentResourcesCmd implements Command<List>, Serializable {
   public List execute(CommandContext commandContext) {
     ensureNotNull("deploymentId", deploymentId);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadDeployment(deploymentId);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadDeployment(deploymentId);
+    }
 
     return Context
       .getCommandContext()

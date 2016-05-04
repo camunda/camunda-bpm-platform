@@ -422,24 +422,6 @@ public class AuthorizationManager extends AbstractManager {
 
   /* DEPLOYMENT */
 
-  // create permission ////////////////////////////////////////////////
-
-  public void checkCreateDeployment() {
-    checkAuthorization(CREATE, DEPLOYMENT);
-  }
-
-  // read permission //////////////////////////////////////////////////
-
-  public void checkReadDeployment(String deploymentId) {
-    checkAuthorization(READ, DEPLOYMENT, deploymentId);
-  }
-
-  // delete permission ///////////////////////////////////////////////
-
-  public void checkDeleteDeployment(String deploymentId) {
-    checkAuthorization(DELETE, DEPLOYMENT, deploymentId);
-  }
-
   /* PROCESS DEFINITION */
 
   // read permission //////////////////////////////////////////////////

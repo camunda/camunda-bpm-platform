@@ -15,10 +15,12 @@ package org.camunda.bpm.engine.impl.cfg.auth;
 
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 
@@ -164,6 +166,26 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkDeleteHistoricBatch(HistoricBatchEntity batch) {
+  }
+
+  /* DEPLOYMENT */
+
+  // create permission ////////////////////////////////////////////////
+
+  public void checkCreateDeployment() {
+    getAuthorizationManager().checkAuthorization(CREATE, DEPLOYMENT);
+  }
+
+  // read permission //////////////////////////////////////////////////
+
+  public void checkReadDeployment(String deploymentId) {
+    getAuthorizationManager().checkAuthorization(READ, DEPLOYMENT, deploymentId);
+  }
+
+  // delete permission //////////////////////////////////////////////////
+
+  public void checkDeleteDeployment(String deploymentId) {
+    getAuthorizationManager().checkAuthorization(DELETE, DEPLOYMENT, deploymentId);
   }
 
   protected AuthorizationManager getAuthorizationManager() {
