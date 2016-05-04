@@ -96,13 +96,17 @@ function (
       processData.observe('processDefinitionStatistics', function (defStats) {
         $scope.loadingState = 'LOADED';
 
-        procStats.incidents.value = 0;
         procStats.instances.value = 0;
 
         each(defStats, function (stats) {
           procStats.instances.value += stats.instances || 0;
-          procStats.incidents.value += stats.incidents.length;
         });
+      });
+
+      var incidentsService = camAPI.resource('incident');
+      incidentsService.count({}, function (err, data) {
+        if (err) { throw err; }
+        procStats.incidents.value = data.count;
       });
 
       $scope.hasMigrationPlugin = false;
