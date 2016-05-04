@@ -15,6 +15,16 @@ var angular = require('camunda-commons-ui/vendor/angular');
               '$scope', 'page', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$modal', 'AuthorizationResource', 'authentication',
       function($scope,   page,   $routeParams,   UserResource,   GroupResource,   GroupMembershipResource,   Notifications,   $location,   $modal,   AuthorizationResource,   authentication) {
 
+
+        function refreshBreadcrumbs() {
+          page.breadcrumbsClear();
+
+          page.breadcrumbsAdd({
+            label: 'Users',
+            href: '#/users/'
+          });
+        }
+
         $scope.encodedUserId = $routeParams.userId
                                                 .replace(/\//g, '%2F')
                                                 .replace(/\\/g, '%5C');
@@ -73,12 +83,12 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
             page.titleSet('Edit `' + $scope.user + '` user');
 
-            page.breadcrumbsAdd([
-              {
-                label: [$scope.user.firstName, $scope.user.lastName].filter(function (v) { return !!v; }).join(' '),
-                href: '#/users/' + $scope.user.id
-              }
-            ]);
+            refreshBreadcrumbs();
+
+            page.breadcrumbsAdd({
+              label: [$scope.user.firstName, $scope.user.lastName].filter(function (v) { return !!v; }).join(' '),
+              href: '#/users/' + $scope.user.id
+            });
           });
         };
 
@@ -229,15 +239,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
         $scope.$root.showBreadcrumbs = true;
 
         page.titleSet('Edit user');
-
-        page.breadcrumbsClear();
-
-        page.breadcrumbsAdd([
-          {
-            label: 'Users',
-            href: '#/users/'
-          },
-        ]);
+        refreshBreadcrumbs();
 
         loadProfile();
         checkRemoveGroupMembershipAuthorized();
