@@ -17,16 +17,11 @@ package org.camunda.bpm.engine.test.api.multitenancy;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
-import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 
-import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
@@ -39,9 +34,7 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
-import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -73,14 +66,12 @@ public class MultiTenancyRepositoryServiceTest {
   public ExpectedException thrown= ExpectedException.none();
 
   protected RepositoryService repositoryService;
-  protected IdentityService identityService;
   protected ProcessEngineConfiguration processEngineConfiguration;
 
   @Before
   public void init() {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     repositoryService = engineRule.getRepositoryService();
-    identityService = engineRule.getIdentityService();
   }
 
   @Test
@@ -291,259 +282,6 @@ public class MultiTenancyRepositoryServiceTest {
 
     assertThat(previousDefinitionTenantTwo.getVersion(), is(1));
     assertThat(previousDefinitionTenantTwo.getTenantId(), is(TENANT_TWO));
-  }
-
-  @Test
-  public void createDeploymentForAnotherTenant() {
-    identityService.setAuthentication("user", null, null);
-
-    repositoryService.createDeployment().addModelInstance("emptyProcess.bpmn", emptyProcess)
-      .tenantId(TENANT_ONE).deploy();
-
-    identityService.clearAuthentication();
-
-    DeploymentQuery query = repositoryService.createDeploymentQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-  }
-
-  @Test
-  public void createDeploymentWithAuthenticatedTenant() {
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
-
-    repositoryService.createDeployment().addModelInstance("emptyProcess.bpmn", emptyProcess)
-      .tenantId(TENANT_ONE).deploy();
-
-    identityService.clearAuthentication();
-
-    DeploymentQuery query = repositoryService.createDeploymentQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-  }
-
-  @Test
-  public void createDeploymentDisabledTenantCheck() {
-    processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthentication("user", null, null);
-
-    repositoryService.createDeployment().addModelInstance("emptyProcessOne", emptyProcess).tenantId(TENANT_ONE).deploy();
-    repositoryService.createDeployment().addModelInstance("emptyProcessTwo", emptyProcess).tenantId(TENANT_TWO).deploy();
-
-    DeploymentQuery query = repositoryService.createDeploymentQuery();
-    assertThat(query.count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
-  }
-
-  @Test
-  public void failToDeleteDeploymentNoAuthenticatedTenant() {
-    Deployment deployment = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-
-    identityService.setAuthentication("user", null, null);
-
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot delete the deployment");
-
-    repositoryService.deleteDeployment(deployment.getId());
-  }
-
-  @Test
-  public void deleteDeploymentWithAuthenticatedTenant() {
-    Deployment deployment = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
-
-    repositoryService.deleteDeployment(deployment.getId());
-
-    identityService.clearAuthentication();
-
-    DeploymentQuery query = repositoryService.createDeploymentQuery();
-    assertThat(query.count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
-  }
-
-  @Test
-  public void deleteDeploymentDisabledTenantCheck() {
-    Deployment deploymentOne = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-    Deployment deploymentTwo = testRule.deployForTenant(TENANT_TWO, emptyProcess);
-
-    processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthentication("user", null, null);
-
-    repositoryService.deleteDeployment(deploymentOne.getId());
-    repositoryService.deleteDeployment(deploymentTwo.getId());
-
-    DeploymentQuery query = repositoryService.createDeploymentQuery();
-    assertThat(query.count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
-  }
-
-  @Test
-  public void failToGetDeploymentResourceNamesNoAuthenticatedTenant() {
-    Deployment deployment = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-
-    identityService.setAuthentication("user", null, null);
-
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the deployment");
-
-    repositoryService.getDeploymentResourceNames(deployment.getId());
-  }
-
-  @Test
-  public void getDeploymentResourceNamesWithAuthenticatedTenant() {
-    Deployment deployment = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
-
-    List<String> deploymentResourceNames = repositoryService.getDeploymentResourceNames(deployment.getId());
-    assertThat(deploymentResourceNames, hasSize(1));
-  }
-
-  @Test
-  public void getDeploymentResourceNamesDisabledTenantCheck() {
-    Deployment deploymentOne = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-    Deployment deploymentTwo = testRule.deployForTenant(TENANT_TWO, emptyProcess);
-
-    processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthentication("user", null, null);
-
-    List<String> deploymentResourceNames = repositoryService.getDeploymentResourceNames(deploymentOne.getId());
-    assertThat(deploymentResourceNames, hasSize(1));
-
-    deploymentResourceNames = repositoryService.getDeploymentResourceNames(deploymentTwo.getId());
-    assertThat(deploymentResourceNames, hasSize(1));
-  }
-
-  @Test
-  public void failToGetDeploymentResourcesNoAuthenticatedTenant() {
-    Deployment deployment = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-
-    identityService.setAuthentication("user", null, null);
-
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the deployment");
-
-    repositoryService.getDeploymentResources(deployment.getId());
-  }
-
-  @Test
-  public void getDeploymentResourcesWithAuthenticatedTenant() {
-    Deployment deployment = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
-
-    List<Resource> deploymentResources = repositoryService.getDeploymentResources(deployment.getId());
-    assertThat(deploymentResources, hasSize(1));
-  }
-
-  @Test
-  public void getDeploymentResourcesDisabledTenantCheck() {
-    Deployment deploymentOne = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-    Deployment deploymentTwo = testRule.deployForTenant(TENANT_TWO, emptyProcess);
-
-    processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthentication("user", null, null);
-
-    List<Resource> deploymentResources = repositoryService.getDeploymentResources(deploymentOne.getId());
-    assertThat(deploymentResources, hasSize(1));
-
-    deploymentResources = repositoryService.getDeploymentResources(deploymentTwo.getId());
-    assertThat(deploymentResources, hasSize(1));
-  }
-
-  @Test
-  public void failToGetResourceAsStreamNoAuthenticatedTenant() {
-    Deployment deployment = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-
-    Resource resource = repositoryService.getDeploymentResources(deployment.getId()).get(0);
-
-    identityService.setAuthentication("user", null, null);
-
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the deployment");
-
-    repositoryService.getResourceAsStream(deployment.getId(), resource.getName());
-  }
-
-  @Test
-  public void getResourceAsStreamWithAuthenticatedTenant() {
-    Deployment deployment = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-
-    Resource resource = repositoryService.getDeploymentResources(deployment.getId()).get(0);
-
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
-
-    InputStream inputStream = repositoryService.getResourceAsStream(deployment.getId(), resource.getName());
-    assertThat(inputStream, notNullValue());
-  }
-
-  @Test
-  public void getResourceAsStreamDisabledTenantCheck() {
-    Deployment deploymentOne = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-    Deployment deploymentTwo = testRule.deployForTenant(TENANT_TWO, emptyProcess);
-
-    Resource resourceOne = repositoryService.getDeploymentResources(deploymentOne.getId()).get(0);
-    Resource resourceTwo = repositoryService.getDeploymentResources(deploymentTwo.getId()).get(0);
-
-    processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthentication("user", null, null);
-
-    InputStream inputStream = repositoryService.getResourceAsStream(deploymentOne.getId(), resourceOne.getName());
-    assertThat(inputStream, notNullValue());
-
-    inputStream = repositoryService.getResourceAsStream(deploymentTwo.getId(), resourceTwo.getName());
-    assertThat(inputStream, notNullValue());
-  }
-
-  @Test
-  public void failToGetResourceAsStreamByIdNoAuthenticatedTenant() {
-    Deployment deployment = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-
-    Resource resource = repositoryService.getDeploymentResources(deployment.getId()).get(0);
-
-    identityService.setAuthentication("user", null, null);
-
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the deployment");
-
-    repositoryService.getResourceAsStreamById(deployment.getId(), resource.getId());
-  }
-
-  @Test
-  public void getResourceAsStreamByIdWithAuthenticatedTenant() {
-    Deployment deployment = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-
-    Resource resource = repositoryService.getDeploymentResources(deployment.getId()).get(0);
-
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
-
-    InputStream inputStream = repositoryService.getResourceAsStreamById(deployment.getId(), resource.getId());
-    assertThat(inputStream, notNullValue());
-  }
-
-  @Test
-  public void getResourceAsStreamByIdDisabledTenantCheck() {
-    Deployment deploymentOne = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-    Deployment deploymentTwo = testRule.deployForTenant(TENANT_TWO, emptyProcess);
-
-    Resource resourceOne = repositoryService.getDeploymentResources(deploymentOne.getId()).get(0);
-    Resource resourceTwo = repositoryService.getDeploymentResources(deploymentTwo.getId()).get(0);
-
-    processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthentication("user", null, null);
-
-    InputStream inputStream = repositoryService.getResourceAsStreamById(deploymentOne.getId(), resourceOne.getId());
-    assertThat(inputStream, notNullValue());
-
-    inputStream = repositoryService.getResourceAsStreamById(deploymentTwo.getId(), resourceTwo.getId());
-    assertThat(inputStream, notNullValue());
   }
 
   protected <T extends ResourceDefinitionEntity> T getPreviousDefinition(final T definitionEntity) {
