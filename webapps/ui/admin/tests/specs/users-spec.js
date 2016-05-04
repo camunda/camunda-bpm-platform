@@ -418,6 +418,71 @@ describe('Admin Users Spec', function() {
 
   });
 
+  describe('User Tenants', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
+
+        usersPage.navigateToWebapp('Admin');
+        usersPage.authentication.userLogin('admin', 'admin');
+      });
+    });
+
+    it('should navigate to tenants menu', function() {
+      // given
+      usersPage.navigateTo();
+
+      // when
+      usersPage.selectUserByEditLink(3);
+      usersPage.editUserProfile.selectUserNavbarItem('Tenants');
+
+      // then
+      usersPage.editUserTenants.isActive({ user: users[2].params.id });
+      expect(usersPage.editUserTenants.subHeader()).to.eventually
+        .eql(users[2].params.firstName + ' ' + users[2].params.lastName + '\'s' + ' ' + 'Tenants');
+      expect(usersPage.editUserTenants.tenantList().count()).to.eventually.eql(0);
+    });
+
+    it('should add user to tenant - select tenant modal', function() {
+
+      // when
+      usersPage.editUserTenants.openAddTenantModal();
+
+      //then
+      expect(usersPage.editUserTenants.selectTenantModal.pageHeader()).to.eventually.eql('Select Tenants');
+      expect(usersPage.editUserTenants.selectTenantModal.tenantList().count()).to.eventually.eql(2);
+    });
+
+    it('should add user to tenants', function() {
+      // when
+      usersPage.editUserTenants.selectTenantModal.addTenants();
+
+      // then
+      expect(usersPage.editUserTenants.tenantId(0)).to.eventually.eql('tenantOne');
+      expect(usersPage.editUserTenants.tenantList().count()).to.eventually.eql(2);
+    });
+
+    it('should show tenants', function() {
+      // given
+      usersPage.navigateTo();
+
+      // when
+      usersPage.selectUserByEditLink(3);
+      usersPage.editUserProfile.selectUserNavbarItem('Tenants');
+
+      // then
+      usersPage.editUserTenants.isActive({ user: users[2].params.id });
+      expect(usersPage.editUserTenants.tenantList().count()).to.eventually.eql(2);
+    });
+
+    it('should remove tenant', function() {
+      // when
+      usersPage.editUserTenants.removeTenant(0);
+
+      expect(usersPage.editUserTenants.tenantList().count()).to.eventually.eql(1);
+    });
+  });
+
   describe('Pagination', function () {
 
     before(function() {

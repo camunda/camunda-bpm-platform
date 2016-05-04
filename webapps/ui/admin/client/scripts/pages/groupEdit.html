@@ -5,6 +5,9 @@
       <li ng-class="activeClass('tab=group')">
         <a href="#/groups/{{group.id | escape}}?tab=group">Information</a>
       </li>
+      <li ng-class="activeClass('tab=tenants')">
+        <a href="#/groups/{{ group.id | escape }}?tab=tenants">Tenants</a>
+      </li>
       <li ng-class="activeClass('tab=users')">
         <a href="#/groups/{{group.id | escape}}?tab=users">Users</a>
       </li>
@@ -12,12 +15,27 @@
   </aside>
 
   <div class="section-content">
+    <header class="row">
+      <div class="col-xs-8">
+        <h3>Edit group {{ group.name }}</h3>
+      </div>
+      <div class="col-xs-4 text-right">
+        <a class="btn btn-default"
+           ng-if="show('tenants')"
+           ng-click="openCreateTenantMembershipDialog()">
+          Add to a tenant
+          <span class="glyphicon glyphicon-plus-sign"></span>
+        </a>
+      </div>
+    </header>
+
     <form ng-show="show('group')"
           class="form-horizontal"
           name="editGroupForm"
           cam-widget-loader
           loading-state="{{ groupLoadingState }}">
-      <div class="h3">{{ group.name }}</div>
+      <div class="h4">Group Details</div>
+
       <div class="form-group">
         <label class="control-label col-sm-4 col-md-2"
                for="inputName">Group Name*</label>
@@ -80,6 +98,52 @@
         </button>
       </div>
     </form>
+
+    <div ng-if="show('tenants')">
+      <form class="form-horizontal"
+            name="updateTenantMemberships">
+
+        <div class="h4">
+          {{ group.name }}&#39;s Tenants
+        </div>
+
+        <div cam-widget-loader
+             loading-state="{{ tenantLoadingState }}"
+             text-empty="Group {{ group.name }} is currently not member of any tenants.">
+          <table class="cam-table"
+                 ng-hide="tenantList.length == 0">
+            <thead>
+            <tr>
+              <th class="tenant-id">Tenant Id</th>
+              <th class="tenant-name">Tenant Name</th>
+              <th class="action"
+                  ng-show="availableOperations.removeTenant">
+                Action
+              </th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr ng-repeat="tenant in tenantList">
+              <td class="tenant-id">
+                <a href="#/tenants/{{ tenant.id | escape }}?tab=tenant">{{ tenant.id }}</a>
+              </td>
+
+              <td class="tenant-name">
+                {{ tenant.name }}
+              </td>
+
+              <td class="action"
+                  ng-show="availableOperations.removeTenant">
+                <a ng-click="removeTenant(tenant.id)">Remove</a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </form>
+    </div>
 
     <div ng-show="show('users')">
       <div class="h3">Group users</div>

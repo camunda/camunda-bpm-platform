@@ -17,7 +17,8 @@ module.exports = Page.extend({
     var index = [
       'Profile',
       'Account',
-      'Groups'
+      'Groups',
+      'Tenants'
     ];
     var item;
     var itemIndex = index.indexOf(navbarItem) + 1;

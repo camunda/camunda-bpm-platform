@@ -104,8 +104,7 @@ describe('Admin Groups Spec', function() {
     });
 
   });
-
-
+  
   describe('update/delete group', function() {
 
     before(function() {
@@ -151,7 +150,71 @@ describe('Admin Groups Spec', function() {
       // then
       expect(groupsPage.groupList().count()).to.eventually.eql(3);
     });
+  });
 
+  describe('Group Tenants', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
+
+        usersPage.navigateToWebapp('Admin');
+        usersPage.authentication.userLogin('admin', 'admin');
+      });
+    });
+
+    it('should navigate to tenants menu', function() {
+      // given
+      groupsPage.navigateTo();
+
+      // when
+      groupsPage.selectGroupByNameLink(1);
+      groupsPage.editGroup.selectUserNavbarItem('Tenants');
+
+      // then
+      groupsPage.editGroupTenants.isActive({ group: 'camunda-admin' });
+      expect(groupsPage.editGroupTenants.subHeader()).to.eventually
+        .eql('camunda BPM Administrators\'s' + ' ' + 'Tenants');
+      expect(groupsPage.editGroupTenants.tenantList().count()).to.eventually.eql(0);
+    });
+
+    it('should add group to tenant - select tenant modal', function() {
+
+      // when
+      groupsPage.editGroupTenants.openAddTenantModal();
+
+      //then
+      expect(groupsPage.editGroupTenants.selectTenantModal.pageHeader()).to.eventually.eql('Select Tenants');
+      expect(groupsPage.editGroupTenants.selectTenantModal.tenantList().count()).to.eventually.eql(2);
+    });
+    
+    it('should add group to tenants', function() {
+      // when
+      groupsPage.editGroupTenants.selectTenantModal.addTenant(0);
+
+      // then
+      expect(groupsPage.editGroupTenants.tenantId(0)).to.eventually.eql('tenantOne');
+      expect(groupsPage.editGroupTenants.tenantList().count()).to.eventually.eql(1);
+    });
+
+    it('should show tenants', function() {
+      // given
+      groupsPage.navigateTo();
+
+      // when
+      groupsPage.selectGroupByNameLink(1);
+      groupsPage.editGroup.selectUserNavbarItem('Tenants');
+
+      // then
+      groupsPage.editGroupTenants.isActive({ group: 'camunda-admin' });
+      expect(groupsPage.editGroupTenants.tenantList().count()).to.eventually.eql(1);
+    });
+
+    it('should remove tenant', function() {
+      // when
+      groupsPage.editGroupTenants.removeTenant(0);
+
+      expect(groupsPage.editGroupTenants.tenantList().count()).to.eventually.eql(0);
+    });
   });
 
   describe('Pagination', function () {

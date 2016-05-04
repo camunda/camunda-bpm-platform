@@ -3,18 +3,20 @@
 var angular = require('camunda-commons-ui/vendor/angular');
 
   module.exports = [
-            '$scope', '$q', '$location', 'Uri', 'Notifications', 'GroupMembershipResource', 'GroupResource', '$modalInstance', 'user', 'userId', 'groupIdList',
-    function($scope,   $q,   $location,   Uri,   Notifications,   GroupMembershipResource,   GroupResource,   $modalInstance,   user,   userId,   groupIdList) {
-
+            '$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI', '$modalInstance', 'member', 'memberId', 'idList',
+    function($scope,   $q,   $location,   Uri,   Notifications,   camAPI,   $modalInstance,   member,   memberId,   idList) {
+      
+    var GroupResource = camAPI.resource('group');
+      
     var BEFORE_CREATE = 'beforeCreate',
         PERFORM_CREATE = 'performCancel',
         CREATE_SUCCESS = 'SUCCESS',
         CREATE_FAILED = 'FAILED',
         LOADING_FAILED = 'loadingFailed';
 
-    $scope.user = user;
-    $scope.groupIdList = groupIdList;
-    $scope.userId = userId;
+    $scope.user = member;
+    $scope.groupIdList = idList;
+    $scope.userId = memberId;
 
     $scope.$on('$routeChangeStart', function () {
       $modalInstance.close($scope.status);
@@ -23,11 +25,12 @@ var angular = require('camunda-commons-ui/vendor/angular');
     function loadAllGroups () {
       var deferred = $q.defer();
 
-      GroupResource.query().$promise.then(function (response) {
-        // deferred.resolve(response.data);
-        deferred.resolve(response);
-      }, function (error) {
-        deferred.reject(error.data);
+      GroupResource.list(function(err, res) {
+        if( err === null ) {
+          deferred.resolve(res);
+        } else {
+          deferred.reject(err.data);
+        }
       });
 
       return deferred.promise;
@@ -44,12 +47,15 @@ var angular = require('camunda-commons-ui/vendor/angular');
       $scope.status = BEFORE_CREATE;
     }, function (error) {
       $scope.status = LOADING_FAILED;
-      Notifications.addError({'status': 'Failed', 'message': 'Loading of groups failed: ' + error.message, 'exclusive': ['type']});
+      Notifications.addError({
+        'status': 'Failed',
+        'message': 'Loading of groups failed: ' + error.message,
+        'exclusive': ['type']
+      });
     });
 
     $scope.createGroupMemberships = function () {
       $scope.status = PERFORM_CREATE;
-
 
       var selectedGroupIds = [];
       angular.forEach($scope.availableGroups, function(group){
@@ -65,15 +71,16 @@ var angular = require('camunda-commons-ui/vendor/angular');
                                 .replace(/\//g, '%2F')
                                 .replace(/\\/g, '%5C');
 
-        GroupMembershipResource.create({'groupId': encodedGroupId, 'userId': $scope.userId}).$promise.then(function () {
+        GroupResource.createMember({ id: encodedGroupId, userId: $scope.userId }, function(err, res) {
           completeCount++;
-          if(completeCount == selectedGroupIds.length) {
-            deferred.resolve();
-          }
-        }, function () {
-          completeCount++;
-          if(completeCount == selectedGroupIds.length) {
-            deferred.reject();
+          if( err === null ) {
+            if(completeCount == selectedGroupIds.length) {
+              deferred.resolve();
+            }
+          } else {
+            if( completeCount == selectedGroupIds.length ) {
+              deferred.reject();
+            }
           }
         });
 
@@ -83,7 +90,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
         $scope.status = CREATE_SUCCESS;
       }, function (error) {
         $scope.status = CREATE_FAILED;
-        Notifications.addError({'status': 'Failed', 'message': 'Creating group memberships failed: ' + error.message, 'exclusive': ['type']});
+        Notifications.addError({
+          'status': 'Failed',
+          'message': 'Creating group memberships failed: ' + error.message,
+          'exclusive': ['type']
+        });
       });
 
     };

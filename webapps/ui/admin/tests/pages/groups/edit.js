@@ -44,6 +44,7 @@ module.exports = Page.extend({
   selectUserNavbarItem: function(navbarItem) {
     var index = [
       'Group',
+      'Tenants',
       'Users'
     ];
     var item;
