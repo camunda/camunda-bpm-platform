@@ -236,4 +236,37 @@ public class MigrationUserTaskTest {
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
+  @Test
+  public void testMigrateWithSubTask() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    Task task = rule.getTaskService().createTaskQuery().singleResult();
+    Task subTask = rule.getTaskService().newTask();
+    subTask.setParentTaskId(task.getId());
+    rule.getTaskService().saveTask(subTask);
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then the sub task properties have not been updated (i.e. subtask should not reference the process instance/definition now)
+    Task subTaskAfterMigration = rule.getTaskService().createTaskQuery().taskId(subTask.getId()).singleResult();
+    Assert.assertNull(subTaskAfterMigration.getProcessDefinitionId());
+    Assert.assertNull(subTaskAfterMigration.getProcessInstanceId());
+
+    // the tasks can be completed and the process can be ended
+    rule.getTaskService().complete(subTask.getId());
+    rule.getTaskService().complete(task.getId());
+    testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
+
+    rule.getHistoryService().deleteHistoricTaskInstance(subTaskAfterMigration.getId());
+  }
+
 }

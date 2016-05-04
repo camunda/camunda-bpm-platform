@@ -15,19 +15,26 @@ package org.camunda.bpm.engine.test.api.runtime.migration.history;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,11 +54,13 @@ public class MigrationHistoricTaskInstanceTest {
 
   protected RuntimeService runtimeService;
   protected HistoryService historyService;
+  protected TaskService taskService;
 
   @Before
   public void initServices() {
     historyService = rule.getHistoryService();
     runtimeService = rule.getRuntimeService();
+    taskService = rule.getTaskService();
   }
 
   @Test
@@ -68,7 +77,7 @@ public class MigrationHistoricTaskInstanceTest {
         .mapActivities("userTask", "userTask2")
         .build();
 
-    runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
 
     HistoricTaskInstanceQuery sourceHistoryTaskInstanceQuery =
         historyService.createHistoricTaskInstanceQuery()
@@ -76,6 +85,8 @@ public class MigrationHistoricTaskInstanceTest {
     HistoricTaskInstanceQuery targetHistoryTaskInstanceQuery =
         historyService.createHistoricTaskInstanceQuery()
           .processDefinitionId(targetProcessDefinition.getId());
+
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
 
     //when
     assertEquals(1, sourceHistoryTaskInstanceQuery.count());
@@ -92,5 +103,40 @@ public class MigrationHistoricTaskInstanceTest {
     HistoricTaskInstance instance = targetHistoryTaskInstanceQuery.singleResult();
     assertEquals(targetProcessDefinition.getKey(), instance.getProcessDefinitionKey());
     assertEquals(targetProcessDefinition.getId(), instance.getProcessDefinitionId());
+    assertEquals(activityInstance.getActivityInstances("userTask")[0].getId(), instance.getActivityInstanceId());
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  public void testMigrateWithSubTask() {
+    //given
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities()
+        .build();
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    Task subTask = taskService.newTask();
+    subTask.setParentTaskId(task.getId());
+    taskService.saveTask(subTask);
+
+    // when
+    runtimeService.newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .execute();
+
+    // then the historic sub task instance is still the same
+    HistoricTaskInstance historicSubTaskAfterMigration = historyService
+        .createHistoricTaskInstanceQuery().taskId(subTask.getId()).singleResult();
+
+    Assert.assertNotNull(historicSubTaskAfterMigration);
+    Assert.assertNull(historicSubTaskAfterMigration.getProcessDefinitionId());
+    Assert.assertNull(historicSubTaskAfterMigration.getProcessDefinitionKey());
+    Assert.assertNull(historicSubTaskAfterMigration.getExecutionId());
+    Assert.assertNull(historicSubTaskAfterMigration.getActivityInstanceId());
   }
 }

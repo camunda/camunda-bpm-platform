@@ -72,7 +72,7 @@ public class MigratingUserTaskInstance implements MigratingInstance {
 
   @Override
   public void migrateState() {
-    userTask.setProcessDefinitionId(migratingActivityInstance.targetScope.getProcessDefinition().getId());
+    userTask.setProcessDefinitionId(migratingActivityInstance.getTargetScope().getProcessDefinition().getId());
 
     HistoryEventProducer historyEventProducer = Context.getProcessEngineConfiguration().getHistoryEventProducer();
     HistoryEvent historyEvent = historyEventProducer.createTaskInstanceUpdateEvt(userTask);
