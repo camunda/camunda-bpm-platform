@@ -100,12 +100,8 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     executeAvailableJobs();
   }
 
-  private void startProcessInstancesWithTenantId(String processDefinitionKey, String tenantId, int numOfInstances) {
-    for (int i = 0; i < numOfInstances; i++) {
-      ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 1000));
-      runtimeService.createProcessInstanceByKey(processDefinitionKey).processDefinitionTenantId(tenantId).execute();
-    }
-
+  private void startProcessInstanceWithTenantId(String processDefinitionKey, String tenantId) {
+    runtimeService.createProcessInstanceByKey(processDefinitionKey).processDefinitionTenantId(tenantId).execute();
     executeAvailableJobs();
   }
 
@@ -3290,8 +3286,8 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
     deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
 
-    startProcessInstancesWithTenantId("userTaskProcess", TENANT_ONE, 3);
-    startProcessInstancesWithTenantId("userTaskProcess", TENANT_TWO, 3);
+    startProcessInstanceWithTenantId("userTaskProcess", TENANT_ONE);
+    startProcessInstanceWithTenantId("userTaskProcess", TENANT_TWO);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
     String[] activityIds = {"theUserTask"};
@@ -3309,8 +3305,8 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
     deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
 
-    startProcessInstancesWithTenantId("userTaskProcess", TENANT_ONE, 3);
-    startProcessInstancesWithTenantId("userTaskProcess", TENANT_TWO, 3);
+    startProcessInstanceWithTenantId("userTaskProcess", TENANT_ONE);
+    startProcessInstanceWithTenantId("userTaskProcess", TENANT_TWO);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
     String[] activityIds = {"theUserTask"};
@@ -3320,7 +3316,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
     assertThat(result).isNotNull();
-    assertThat(result.getCount()).isEqualTo(3);
+    assertThat(result.getCount()).isEqualTo(1);
   }
 
   @Test
@@ -3328,8 +3324,8 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
     deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
 
-    startProcessInstancesWithTenantId("userTaskProcess", TENANT_ONE, 3);
-    startProcessInstancesWithTenantId("userTaskProcess", TENANT_TWO, 3);
+    startProcessInstanceWithTenantId("userTaskProcess", TENANT_ONE);
+    startProcessInstanceWithTenantId("userTaskProcess", TENANT_TWO);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
     String[] activityIds = {"theUserTask"};
@@ -3340,7 +3336,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
     assertThat(result).isNotNull();
-    assertThat(result.getCount()).isEqualTo(6);
+    assertThat(result.getCount()).isEqualTo(2);
   }
 
   @Test
@@ -3348,8 +3344,8 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     deployForTenant(TENANT_ONE, "processes/failing-process.bpmn");
     deployForTenant(TENANT_TWO, "processes/failing-process.bpmn");
 
-    startProcessInstancesWithTenantId("FailingProcess", TENANT_ONE, 1);
-    startProcessInstancesWithTenantId("FailingProcess", TENANT_TWO, 1);
+    startProcessInstanceWithTenantId("FailingProcess", TENANT_ONE);
+    startProcessInstanceWithTenantId("FailingProcess", TENANT_TWO);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
     String[] activityIds = {"ServiceTask_1"};
@@ -3367,8 +3363,8 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     deployForTenant(TENANT_ONE, "processes/failing-process.bpmn");
     deployForTenant(TENANT_TWO, "processes/failing-process.bpmn");
 
-    startProcessInstancesWithTenantId("FailingProcess", TENANT_ONE, 1);
-    startProcessInstancesWithTenantId("FailingProcess", TENANT_TWO, 1);
+    startProcessInstanceWithTenantId("FailingProcess", TENANT_ONE);
+    startProcessInstanceWithTenantId("FailingProcess", TENANT_TWO);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
     String[] activityIds = {"ServiceTask_1"};
@@ -3394,8 +3390,8 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     deployForTenant(TENANT_ONE, "processes/failing-process.bpmn");
     deployForTenant(TENANT_TWO, "processes/failing-process.bpmn");
 
-    startProcessInstancesWithTenantId("FailingProcess", TENANT_ONE, 1);
-    startProcessInstancesWithTenantId("FailingProcess", TENANT_TWO, 1);
+    startProcessInstanceWithTenantId("FailingProcess", TENANT_ONE);
+    startProcessInstanceWithTenantId("FailingProcess", TENANT_TWO);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
     String[] activityIds = {"ServiceTask_1"};
