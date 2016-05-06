@@ -400,6 +400,7 @@ describe('Admin Authorizations Spec', function() {
           'READ_INSTANCE',
           'UPDATE_INSTANCE',
           'DELETE_INSTANCE',
+          'MIGRATE_INSTANCE',
           'READ_TASK',
           'UPDATE_TASK',
           'TASK_ASSIGN',

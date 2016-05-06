@@ -50,7 +50,7 @@ var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization
           3: [ 'CREATE', 'DELETE' ],
           4: [ 'READ', 'UPDATE', 'CREATE', 'DELETE' ],
           5: [ 'READ', 'UPDATE', 'DELETE' ],
-          6: [ 'READ', 'CREATE_INSTANCE', 'READ_INSTANCE', 'UPDATE_INSTANCE', 'DELETE_INSTANCE', 'READ_TASK', 'UPDATE_TASK', 'TASK_ASSIGN', 'TASK_WORK', 'READ_HISTORY', 'DELETE_HISTORY' ],
+          6: [ 'READ', 'CREATE_INSTANCE', 'READ_INSTANCE', 'UPDATE_INSTANCE', 'DELETE_INSTANCE', 'MIGRATE_INSTANCE', 'READ_TASK', 'UPDATE_TASK', 'TASK_ASSIGN', 'TASK_WORK', 'READ_HISTORY', 'DELETE_HISTORY' ],
           7: [ 'CREATE', 'READ', 'UPDATE', 'DELETE', 'TASK_ASSIGN', 'TASK_WORK' ],
           8: [ 'CREATE', 'READ', 'UPDATE', 'DELETE' ],
           9: [ 'CREATE', 'READ', 'DELETE' ],
