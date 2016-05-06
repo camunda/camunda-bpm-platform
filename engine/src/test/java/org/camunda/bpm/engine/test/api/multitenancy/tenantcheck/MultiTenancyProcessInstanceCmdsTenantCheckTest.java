@@ -20,7 +20,7 @@ import org.junit.rules.RuleChain;
  * @author Deivarayan Azhagappan
  *
  */
-public class MultiTenancyProcessInstanceTenantCheckTest {
+public class MultiTenancyProcessInstanceCmdsTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";

@@ -22,7 +22,7 @@ import org.junit.rules.RuleChain;
  *
  */
 
-public class MultiTenancyTaskVariableTenantCheckTest {
+public class MultiTenancyTaskVariableCmdsTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";

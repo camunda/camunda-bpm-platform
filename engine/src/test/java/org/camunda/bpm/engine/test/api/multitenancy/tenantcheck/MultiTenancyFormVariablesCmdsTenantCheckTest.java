@@ -26,7 +26,7 @@ import org.junit.rules.RuleChain;
  *
  */
 
-public class MultiTenancyFormVariablesTenantCheckTest {
+public class MultiTenancyFormVariablesCmdsTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
