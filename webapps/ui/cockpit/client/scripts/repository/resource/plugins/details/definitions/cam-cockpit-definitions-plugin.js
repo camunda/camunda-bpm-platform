@@ -60,7 +60,7 @@ var template = fs.readFileSync(__dirname + '/cam-cockpit-definitions-plugin.html
           }
 
           definition.instances.$loaded = true;
-          definition.instances.count = result;
+          definition.instances.count = result.count || '0';
 
           var phase = $scope.$root.$$phase;
           if(phase !== '$apply' && phase !== '$digest') {
