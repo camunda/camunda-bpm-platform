@@ -33,7 +33,7 @@
             <span class="glyphicon glyphicon-refresh animate-spin"></span>&nbsp;Loading…
           </span>
           <span ng-if="definition.instances.$loaded">
-            {{ (definition.instances.count.count || definition.instances.count) }}
+            {{ definition.instances.count }}
           </span>
           <span ng-if="definition.instances.$error">
             Could not load instances count.
