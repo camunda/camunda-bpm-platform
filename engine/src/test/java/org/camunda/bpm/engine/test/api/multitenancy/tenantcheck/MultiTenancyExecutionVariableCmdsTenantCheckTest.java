@@ -171,8 +171,8 @@ public class MultiTenancyExecutionVariableCmdsTenantCheckTest {
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
     
     // then
-    engineRule.getRuntimeService().setVariable(processInstanceId, VARIABLE_1, VARIABLE_VALUE_1);
-    assertEquals(2, engineRule.getRuntimeService().getVariables(processInstanceId).size());
+    engineRule.getRuntimeService().setVariable(processInstanceId, "newVariable", "newValue");
+    assertEquals(3, engineRule.getRuntimeService().getVariables(processInstanceId).size());
   }
   
   @Test
@@ -183,7 +183,7 @@ public class MultiTenancyExecutionVariableCmdsTenantCheckTest {
     // then
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot update the process instance because it belongs to no authenticated tenant:");
-    engineRule.getRuntimeService().setVariable(processInstanceId, VARIABLE_1, VARIABLE_VALUE_1);
+    engineRule.getRuntimeService().setVariable(processInstanceId, "newVariable", "newValue");
     
   }
   
@@ -193,8 +193,8 @@ public class MultiTenancyExecutionVariableCmdsTenantCheckTest {
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
-    engineRule.getRuntimeService().setVariable(processInstanceId, VARIABLE_1, VARIABLE_VALUE_1);
-    assertEquals(2, engineRule.getRuntimeService().getVariables(processInstanceId).size());
+    engineRule.getRuntimeService().setVariable(processInstanceId, "newVariable", "newValue");
+    assertEquals(3, engineRule.getRuntimeService().getVariables(processInstanceId).size());
   }
 
   // remove execution variable

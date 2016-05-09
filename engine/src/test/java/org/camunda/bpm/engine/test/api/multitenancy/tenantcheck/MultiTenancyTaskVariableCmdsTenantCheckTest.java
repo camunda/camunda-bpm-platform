@@ -170,9 +170,9 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
   public void setTaskVariableWithUserAndAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
-    engineRule.getTaskService().setVariable(taskId, VARIABLE_1, VARIABLE_VALUE_1);
+    engineRule.getTaskService().setVariable(taskId, "newVariable", "newValue");
     
-    assertEquals(2, engineRule.getTaskService().getVariables(taskId).size());
+    assertEquals(3, engineRule.getTaskService().getVariables(taskId).size());
   }
   
   @Test
@@ -182,7 +182,7 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
 
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot update the task because it belongs to no authenticated tenant:");
-    engineRule.getTaskService().setVariable(taskId, VARIABLE_1, VARIABLE_VALUE_1);
+    engineRule.getTaskService().setVariable(taskId, "newVariable", "newValue");
     
   }
   
@@ -192,8 +192,8 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
     
-    engineRule.getTaskService().setVariable(taskId, VARIABLE_1, VARIABLE_VALUE_1);
-    assertEquals(2, engineRule.getTaskService().getVariables(taskId).size());
+    engineRule.getTaskService().setVariable(taskId, "newVariable", "newValue");
+    assertEquals(3, engineRule.getTaskService().getVariables(taskId).size());
 
   }
   
