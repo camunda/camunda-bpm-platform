@@ -12,10 +12,11 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration.history;
 
-import static org.junit.Assert.assertEquals;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -43,7 +45,6 @@ import org.junit.rules.RuleChain;
  * @author Thorben Lindhauer
  *
  */
-@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class MigrationHistoricVariablesTest {
 
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
@@ -88,6 +89,7 @@ public class MigrationHistoricVariablesTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void noHistoryUpdateOnSameStructureMigration() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ONE_BOUNDARY_TASK);
@@ -117,6 +119,7 @@ public class MigrationHistoricVariablesTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void noHistoryUpdateOnAddScopeMigration() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CONCURRENT_BOUNDARY_TASKS);
@@ -178,5 +181,35 @@ public class MigrationHistoricVariablesTest {
     assertEquals(targetDefinition.getId(), migratedInstance.getProcessDefinitionId());
     assertEquals(instance.getActivityInstanceId(), migratedInstance.getActivityInstanceId());
     assertEquals(instance.getExecutionId(), migratedInstance.getExecutionId());
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  public void testMigrateHistoryVariableInstanceMultiInstance() {
+    //given
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_SUBPROCESS_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_SUBPROCESS_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceDefinition.getId());
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    //when
+    runtimeService.newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .execute();
+
+    //then
+    List<HistoricVariableInstance> migratedVariables = historyService.createHistoricVariableInstanceQuery().list();
+    Assert.assertEquals(6, migratedVariables.size()); // 3 loop counter + nrOfInstance + nrOfActiveInstances + nrOfCompletedInstances
+
+    for (HistoricVariableInstance variable : migratedVariables) {
+      assertEquals(targetDefinition.getKey(), variable.getProcessDefinitionKey());
+      assertEquals(targetDefinition.getId(), variable.getProcessDefinitionId());
+
+    }
   }
 }
