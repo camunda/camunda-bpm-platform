@@ -100,6 +100,7 @@ public class CommandContext {
 
   protected boolean authorizationCheckEnabled = true;
   protected boolean userOperationLogEnabled = true;
+  protected boolean tenantCheckEnabled = true;
 
   protected TransactionContext transactionContext;
   protected Map<Class< ? >, SessionFactory> sessionFactories;
@@ -638,4 +639,21 @@ public class CommandContext {
   public void setLogUserOperationEnabled(boolean userOperationLogEnabled) {
     this.userOperationLogEnabled = userOperationLogEnabled;
   }
+
+  public void enableTenantCheck() {
+    tenantCheckEnabled = true;
+  }
+
+  public void disableTenantCheck() {
+    tenantCheckEnabled = false;
+  }
+
+  public void setTenantCheckEnabled(boolean tenantCheckEnabled) {
+    this.tenantCheckEnabled = tenantCheckEnabled;
+  }
+
+  public boolean isTenantCheckEnabled() {
+    return tenantCheckEnabled;
+  }
+
 }
