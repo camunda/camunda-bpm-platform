@@ -79,6 +79,38 @@ public class DefaultTaskPermissionsCfgTest {
   }
 
   @Test
+  public void shouldThrowExceptionOnNullPermissionName() {
+    TestProcessEngineCfg testProcessEngineCfg = new TestProcessEngineCfg();
+
+    // given
+    testProcessEngineCfg.setDefaultTaskPermissionForUser(null);
+
+    // if
+    try {
+      testProcessEngineCfg.initDefaultTaskPermission();
+      fail("Exception expected");
+
+    } catch(ProcessEngineException e) {
+      String expectedExceptionMessage = "Invalid value 'null' for configuration property 'defaultTaskPermissionForUser'.";
+      assertThat(e.getMessage(), containsString(expectedExceptionMessage));
+    }
+  }
+
+  @Test
+  public void shouldNotInitIfAlreadySet() {
+    TestProcessEngineCfg testProcessEngineCfg = new TestProcessEngineCfg();
+
+    // given
+    testProcessEngineCfg.setDefaultUserPermissionForTask(Permissions.ALL);
+
+    // if
+    testProcessEngineCfg.initDefaultTaskPermission();
+
+    // then
+    assertEquals(Permissions.ALL, testProcessEngineCfg.getDefaultUserPermissionForTask());
+  }
+
+  @Test
   public void shouldInitTaskPermission() {
     ProcessEngine engine = null;
     try {
