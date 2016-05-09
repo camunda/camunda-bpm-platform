@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
@@ -203,30 +204,29 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     fireHistoricIncidentEvent(eventType);
   }
 
-  protected void fireHistoricIncidentEvent(HistoryEventType eventType) {
+  protected void fireHistoricIncidentEvent(final HistoryEventType eventType) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
 
     HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
     if(historyLevel.isHistoryEventProduced(eventType, this)) {
 
-      final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
 
-      HistoryEvent event = null;
-      if (HistoryEvent.INCIDENT_CREATE.equals(eventType.getEventName())) {
-        event = eventProducer.createHistoricIncidentCreateEvt(this);
+          HistoryEvent event = null;
+          if (HistoryEvent.INCIDENT_CREATE.equals(eventType.getEventName())) {
+            event = producer.createHistoricIncidentCreateEvt(IncidentEntity.this);
 
-      } else if (HistoryEvent.INCIDENT_RESOLVE.equals(eventType.getEventName())) {
-        event = eventProducer.createHistoricIncidentResolveEvt(this);
+          } else if (HistoryEvent.INCIDENT_RESOLVE.equals(eventType.getEventName())) {
+            event = producer.createHistoricIncidentResolveEvt(IncidentEntity.this);
 
-      } else if (HistoryEvent.INCIDENT_DELETE.equals(eventType.getEventName())) {
-        event = eventProducer.createHistoricIncidentDeleteEvt(this);
-
-      } else {
-        return;
-      }
-
-      eventHandler.handleEvent(event);
+          } else if (HistoryEvent.INCIDENT_DELETE.equals(eventType.getEventName())) {
+            event = producer.createHistoricIncidentDeleteEvt(IncidentEntity.this);
+          }
+          return event;
+        }
+      });
     }
   }
 

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,9 +21,9 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.task.IdentityLink;
 
@@ -33,38 +33,38 @@ import org.camunda.bpm.engine.task.IdentityLink;
  * @author Deivarayan Azhagappan
  */
 public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity {
-  
+
   private static final long serialVersionUID = 1L;
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
-  
+
   protected String id;
-  
+
   protected String type;
-  
+
   protected String userId;
-  
+
   protected String groupId;
-  
+
   protected String taskId;
-  
+
   protected String processDefId;
-  
+
   protected String tenantId;
-  
+
   protected TaskEntity task;
-  
+
   protected ProcessDefinitionEntity processDef;
-  
+
   public Object getPersistentState() {
     return this.type;
   }
-  
+
   public static IdentityLinkEntity createAndInsert() {
     IdentityLinkEntity identityLinkEntity = new IdentityLinkEntity();
     identityLinkEntity.insert();
     return identityLinkEntity;
   }
-  
+
   public static IdentityLinkEntity newIdentityLink() {
     IdentityLinkEntity identityLinkEntity = new IdentityLinkEntity();
      return identityLinkEntity;
@@ -85,27 +85,27 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
       .delete(this);
     fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_DELETE);
   }
-  
+
   public boolean isUser() {
     return userId != null;
   }
-  
+
   public boolean isGroup() {
     return groupId != null;
   }
-  
+
   public String getId() {
     return id;
   }
-  
+
   public void setId(String id) {
     this.id = id;
   }
-  
+
   public String getType() {
     return type;
   }
-  
+
   public void setType(String type) {
     this.type = type;
   }
@@ -113,25 +113,25 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
   public String getUserId() {
     return userId;
   }
-  
+
   public void setUserId(String userId) {
     if (this.groupId != null && userId != null) {
       throw LOG.taskIsAlreadyAssignedException("userId", "groupId");
     }
     this.userId = userId;
   }
-  
+
   public String getGroupId() {
     return groupId;
   }
-  
+
   public void setGroupId(String groupId) {
     if (this.userId != null && groupId != null) {
       throw LOG.taskIsAlreadyAssignedException("groupId", "userId");
     }
     this.groupId = groupId;
   }
-  
+
   public String getTaskId() {
     return taskId;
   }
@@ -139,11 +139,11 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
   void setTaskId(String taskId) {
     this.taskId = taskId;
   }
-    
+
   public String getProcessDefId() {
     return processDefId;
   }
-  
+
   public void setProcessDefId(String processDefId) {
     this.processDefId = processDefId;
   }
@@ -151,11 +151,11 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
   public String getTenantId() {
     return tenantId;
   }
-  
+
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
   }
-  
+
   public TaskEntity getTask() {
     if ( (task==null) && (taskId!=null) ) {
       this.task = Context
@@ -165,7 +165,7 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
     }
     return task;
   }
-  
+
   public void setTask(TaskEntity task) {
     this.task = task;
     this.taskId = task.getId();
@@ -180,31 +180,31 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
     }
     return processDef;
   }
-  
+
   public void setProcessDef(ProcessDefinitionEntity processDef) {
     this.processDef = processDef;
     this.processDefId = processDef.getId();
   }
-  
-  public void fireHistoricIdentityLinkEvent(HistoryEventType eventType) {
+
+  public void fireHistoricIdentityLinkEvent(final HistoryEventType eventType) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
 
     HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
     if(historyLevel.isHistoryEventProduced(eventType, this)) {
 
-      final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          HistoryEvent event = null;
+          if (HistoryEvent.IDENTITY_LINK_ADD.equals(eventType.getEventName())) {
+            event = producer.createHistoricIdentityLinkAddEvent(IdentityLinkEntity.this);
+          } else if (HistoryEvent.IDENTITY_LINK_DELETE.equals(eventType.getEventName())) {
+            event = producer.createHistoricIdentityLinkDeleteEvent(IdentityLinkEntity.this);
+          }
+          return event;
+        }
+      });
 
-      HistoryEvent event = null;
-      if (HistoryEvent.IDENTITY_LINK_ADD.equals(eventType.getEventName())) {
-        event = eventProducer.createHistoricIdentityLinkAddEvent(this);
-      } else if (HistoryEvent.IDENTITY_LINK_DELETE.equals(eventType.getEventName())) {
-        event = eventProducer.createHistoricIdentityLinkDeleteEvent(this);
-      }
-      
-      if(event != null) {
-        eventHandler.handleEvent(event);
-      }
     }
   }
   @Override

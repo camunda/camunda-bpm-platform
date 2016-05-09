@@ -252,4 +252,5 @@ public class MigrationHistoricActivityInstanceTest {
     Assert.assertEquals(processDefinition.getKey(), activityInstance.getProcessDefinitionKey());
     Assert.assertEquals(activityId, activityInstance.getActivityId());
   }
+
 }

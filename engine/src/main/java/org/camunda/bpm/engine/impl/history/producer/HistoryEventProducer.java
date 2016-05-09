@@ -42,7 +42,7 @@ public interface HistoryEventProducer {
   // Process instances //////////////////////////////////////
 
   /**
-   * Creates the history event fired when an process instances is <strong>created</strong>.
+   * Creates the history event fired when a process instances is <strong>created</strong>.
    *
    * @param execution the current execution.
    * @return the history event
@@ -52,13 +52,21 @@ public interface HistoryEventProducer {
   /**
    * Creates the history event fired when a process instance is <strong>updated</strong>.
    *
-   * @param processExecution the current case execution
+   * @param processExecution the process instance
    * @return the created history event
    */
   HistoryEvent createProcessInstanceUpdateEvt(DelegateExecution execution);
 
   /**
-   * Creates the history event fired when a process instances is <strong>ended</strong>.
+   * Creates the history event fired when a process instance is <strong>migrated</strong>.
+   *
+   * @param processExecution the process instance
+   * @return the created history event
+   */
+  HistoryEvent createProcessInstanceMigrateEvt(DelegateExecution execution);
+
+  /**
+   * Creates the history event fired when a process instance is <strong>ended</strong>.
    *
    * @param execution the current execution.
    * @return the history event
@@ -68,7 +76,7 @@ public interface HistoryEventProducer {
   // Activity instances /////////////////////////////////////
 
   /**
-   * Creates the history event fired when an activity instances is <strong>started</strong>.
+   * Creates the history event fired when an activity instance is <strong>started</strong>.
    *
    * @param execution the current execution.
    * @return the history event
@@ -76,7 +84,7 @@ public interface HistoryEventProducer {
   HistoryEvent createActivityInstanceStartEvt(DelegateExecution execution);
 
   /**
-   * Creates the history event fired when an activity instances is <strong>updated</strong>.
+   * Creates the history event fired when an activity instance is <strong>updated</strong>.
    *
    * @param execution the current execution.
    * @return the history event
@@ -84,7 +92,7 @@ public interface HistoryEventProducer {
   HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution);
 
   /**
-   * Creates the history event fired when an activity instances is <strong>updated</strong>.
+   * Creates the history event fired when an activity instance is <strong>updated</strong>.
    *
    * @param execution the current execution.
    * @param task the task association that is currently updated. (May be null in case there is not task associated.)
@@ -93,15 +101,15 @@ public interface HistoryEventProducer {
   HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution, DelegateTask task);
 
   /**
-   * Creates the history event which is fired when an activity instance is updated during a migration.
+   * Creates the history event which is fired when an activity instance is migrated.
    *
    * @param actInstance the migrated activity instance which contains the new id's
    * @return the created history event
    */
-  HistoryEvent createActivityInstanceUpdateEvt(MigratingActivityInstance actInstance);
+  HistoryEvent createActivityInstanceMigrateEvt(MigratingActivityInstance actInstance);
 
   /**
-   * Creates the history event fired when an activity instances is <strong>ended</strong>.
+   * Creates the history event fired when an activity instance is <strong>ended</strong>.
    *
    * @param execution the current execution.
    * @return the history event
@@ -112,7 +120,7 @@ public interface HistoryEventProducer {
   // Task Instances /////////////////////////////////////////
 
   /**
-   * Creates the history event fired when a task instances is <strong>created</strong>.
+   * Creates the history event fired when a task instance is <strong>created</strong>.
    *
    * @param task the task
    * @return the history event
@@ -120,12 +128,20 @@ public interface HistoryEventProducer {
   HistoryEvent createTaskInstanceCreateEvt(DelegateTask task);
 
   /**
-   * Creates the history event fired when a task instances is <strong>updated</strong>.
+   * Creates the history event fired when a task instance is <strong>updated</strong>.
    *
    * @param task the task
    * @return the history event
    */
   HistoryEvent createTaskInstanceUpdateEvt(DelegateTask task);
+
+  /**
+   * Creates the history event fired when a task instance is <strong>migrated</strong>.
+   *
+   * @param task the task
+   * @return the history event
+   */
+  HistoryEvent createTaskInstanceMigrateEvt(DelegateTask task);
 
   /**
    * Creates the history event fired when a task instances is <strong>completed</strong>.
@@ -167,6 +183,15 @@ public interface HistoryEventProducer {
    * @return the history event
    */
   HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope);
+
+  /**
+   * Creates the history event fired when a variable is <strong>migrated</strong>.
+   *
+   * @param variableInstance the runtime variable instance
+   * @param the scope to which the variable is linked
+   * @return the history event
+   */
+  HistoryEvent createHistoricVariableMigrateEvt(VariableInstanceEntity variableInstance);
 
   /**
    * Creates the history event fired when a variable is <strong>deleted</strong>.

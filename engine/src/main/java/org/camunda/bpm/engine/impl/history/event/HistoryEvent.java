@@ -79,9 +79,9 @@ public class HistoryEvent implements Serializable, DbEntity {
   public static final String INCIDENT_RESOLVE = HistoryEventTypes.INCIDENT_RESOLVE.getEventName();
 
   public static final String IDENTITY_LINK_ADD = HistoryEventTypes.IDENTITY_LINK_ADD.getEventName();
-  
+
   public static final String IDENTITY_LINK_DELETE = HistoryEventTypes.IDENTITY_LINK_DELETE.getEventName();
-  
+
   /** each {@link HistoryEvent} has a unique id */
   protected String id;
 
@@ -212,6 +212,12 @@ public class HistoryEvent implements Serializable, DbEntity {
   public Object getPersistentState() {
     // events are immutable
     return HistoryEvent.class;
+  }
+
+  // state inspection
+
+  public boolean isEventOfType(HistoryEventType type) {
+    return type.getEventName().equals(eventType);
   }
 
   @Override

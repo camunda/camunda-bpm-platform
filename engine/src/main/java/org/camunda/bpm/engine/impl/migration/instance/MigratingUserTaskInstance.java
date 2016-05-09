@@ -14,8 +14,10 @@ package org.camunda.bpm.engine.impl.migration.instance;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -74,9 +76,19 @@ public class MigratingUserTaskInstance implements MigratingInstance {
   public void migrateState() {
     userTask.setProcessDefinitionId(migratingActivityInstance.getTargetScope().getProcessDefinition().getId());
 
-    HistoryEventProducer historyEventProducer = Context.getProcessEngineConfiguration().getHistoryEventProducer();
-    HistoryEvent historyEvent = historyEventProducer.createTaskInstanceUpdateEvt(userTask);
-    HistoryEventHandler historyEventHandler = Context.getProcessEngineConfiguration().getHistoryEventHandler();
-    historyEventHandler.handleEvent(historyEvent);
+    migrateHistory();
+  }
+
+  protected void migrateHistory() {
+    HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.TASK_INSTANCE_MIGRATE, this)) {
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createTaskInstanceMigrateEvt(userTask);
+        }
+      });
+    }
   }
 }

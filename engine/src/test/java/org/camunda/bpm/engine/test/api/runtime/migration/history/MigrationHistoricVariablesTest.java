@@ -12,10 +12,16 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+
+import java.util.Arrays;
+
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -141,5 +147,36 @@ public class MigrationHistoricVariablesTest {
 
     // and no additional historic details
     Assert.assertEquals(1, historyService.createHistoricDetailQuery().count());
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  public void testMigrateHistoryVariableInstance() {
+    //given
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
+        .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceDefinition.getId());
+
+    runtimeService.setVariable(processInstance.getId(), "test", 3537);
+    HistoricVariableInstance instance = historyService.createHistoricVariableInstanceQuery().singleResult();
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    //when
+    runtimeService.newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .execute();
+
+    //then
+    HistoricVariableInstance migratedInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    assertEquals(targetDefinition.getKey(), migratedInstance.getProcessDefinitionKey());
+    assertEquals(targetDefinition.getId(), migratedInstance.getProcessDefinitionId());
+    assertEquals(instance.getActivityInstanceId(), migratedInstance.getActivityInstanceId());
+    assertEquals(instance.getExecutionId(), migratedInstance.getExecutionId());
   }
 }

@@ -20,8 +20,10 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -263,15 +265,40 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
   }
 
   protected void migrateHistory(DelegateExecution execution) {
-    HistoryEventProducer historyEventProducer = Context.getProcessEngineConfiguration().getHistoryEventProducer();
-    HistoryEventHandler historyEventHandler = Context.getProcessEngineConfiguration().getHistoryEventHandler();
-    HistoryEvent historyEvent;
-    if (activityInstance.getId().equalsIgnoreCase(activityInstance.getProcessInstanceId())) {
-      historyEvent = historyEventProducer.createProcessInstanceUpdateEvt(execution);
-    } else {
-      historyEvent = historyEventProducer.createActivityInstanceUpdateEvt(this);
+    if (activityInstance.getId().equals(activityInstance.getProcessInstanceId())) {
+      migrateProcessInstanceHistory(execution);
     }
-    historyEventHandler.handleEvent(historyEvent);
+    else {
+      migrateActivityInstanceHistory(execution);
+    }
+  }
+
+  protected void migrateProcessInstanceHistory(final DelegateExecution execution) {
+    HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    if (!historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_MIGRATE, this)) {
+      return;
+    }
+
+    HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+      @Override
+      public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+        return producer.createProcessInstanceUpdateEvt(execution);
+      }
+    });
+  }
+
+  protected void migrateActivityInstanceHistory(final DelegateExecution execution) {
+    HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    if (!historyLevel.isHistoryEventProduced(HistoryEventTypes.ACTIVITY_INSTANCE_MIGRATE, this)) {
+      return;
+    }
+
+    HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+      @Override
+      public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+        return producer.createActivityInstanceMigrateEvt(MigratingActivityInstance.this);
+      }
+    });
   }
 
   public ExecutionEntity createAttachableExecution() {

@@ -55,6 +55,7 @@ import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
@@ -349,14 +350,14 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     HistoryLevel historyLevel = configuration.getHistoryLevel();
     if (historyLevel.isHistoryEventProduced(HistoryEventTypes.ACTIVITY_INSTANCE_UPDATE, this)) {
-
-      final HistoryEventProducer eventFactory = configuration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
-
       // publish update event for current activity instance (containing the id
       // of the sub process/case)
-      HistoryEvent haie = eventFactory.createActivityInstanceUpdateEvt(this);
-      eventHandler.handleEvent(haie);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createActivityInstanceUpdateEvt(ExecutionEntity.this);
+        }
+      });
     }
   }
 
@@ -475,12 +476,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     // ParseListener
     if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_START, processInstance)) {
 
-      final HistoryEventProducer eventFactory = configuration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
-
-      // publish event for historic process instance start
-      HistoryEvent pise = eventFactory.createProcessInstanceStartEvt(processInstance);
-      eventHandler.handleEvent(pise);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createProcessInstanceStartEvt(processInstance);
+        }
+      });
     }
   }
 

@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.migration;
 
+
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -27,9 +28,6 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
-import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstanceBranch;
@@ -64,7 +62,7 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
  *   <li>Migrate and create activity instances. Creation invokes execution listeners
  *       and io mappings. This is performed in a top-down fashion in the activity instance tree and
  *       ensures that the "upstream" tree is always consistent with respect to the new process definition.
- *
+ * </ol>
  * @author Thorben Lindhauer
  */
 public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
@@ -118,7 +116,7 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
   public Void migrateProcessInstance(CommandContext commandContext, String processInstanceId, MigrationPlan migrationPlan, ProcessDefinitionEntity targetProcessDefinition) {
     ensureNotNull(BadUserRequestException.class, "Process instance id cannot be null", "process instance id", processInstanceId);
 
-    ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+    final ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
 
     ensureProcessInstanceExist(processInstanceId, processInstance);
     ensureSameProcessDefinition(processInstance, migrationPlan.getSourceProcessDefinitionId());
@@ -139,12 +137,6 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
     deleteUnmappedActivityInstances(migratingProcessInstance);
 
     migrateProcessInstance(migratingProcessInstance);
-
-    //Create historic event for migration of process instance
-    HistoryEventProducer historyEventProducter = Context.getProcessEngineConfiguration().getHistoryEventProducer();
-    HistoryEventHandler historyEventHandler = Context.getProcessEngineConfiguration().getHistoryEventHandler();
-    HistoryEvent migrateProcessInstanceEvent = historyEventProducter.createProcessInstanceUpdateEvt(processInstance);
-    historyEventHandler.handleEvent(migrateProcessInstanceEvent);
 
     return null;
   }

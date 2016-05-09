@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
@@ -30,39 +31,42 @@ public class VariableInstanceHistoryListener implements VariableInstanceLifecycl
   public static final VariableInstanceHistoryListener INSTANCE = new VariableInstanceHistoryListener();
 
   @Override
-  public void onCreate(VariableInstanceEntity variableInstance, AbstractVariableScope sourceScope) {
+  public void onCreate(final VariableInstanceEntity variableInstance, final AbstractVariableScope sourceScope) {
     if (getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_CREATE, variableInstance)) {
-      HistoryEvent evt = getHistoryEventProducer().createHistoricVariableCreateEvt(variableInstance, sourceScope);
-      getHistoryEventHandler().handleEvent(evt);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createHistoricVariableCreateEvt(variableInstance, sourceScope);
+        }
+      });
     }
   }
 
   @Override
-  public void onDelete(VariableInstanceEntity variableInstance, AbstractVariableScope sourceScope) {
+  public void onDelete(final VariableInstanceEntity variableInstance, final AbstractVariableScope sourceScope) {
     if (getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_DELETE, variableInstance)) {
-      HistoryEvent evt = getHistoryEventProducer().createHistoricVariableDeleteEvt(variableInstance, sourceScope);
-      getHistoryEventHandler().handleEvent(evt);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createHistoricVariableDeleteEvt(variableInstance, sourceScope);
+        }
+      });
     }
   }
 
   @Override
-  public void onUpdate(VariableInstanceEntity variableInstance, AbstractVariableScope sourceScope) {
+  public void onUpdate(final VariableInstanceEntity variableInstance, final AbstractVariableScope sourceScope) {
     if (getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_UPDATE, variableInstance)) {
-      HistoryEvent evt = getHistoryEventProducer().createHistoricVariableUpdateEvt(variableInstance, sourceScope);
-      getHistoryEventHandler().handleEvent(evt);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createHistoricVariableUpdateEvt(variableInstance, sourceScope);
+        }
+      });
     }
   }
 
   protected HistoryLevel getHistoryLevel() {
     return Context.getProcessEngineConfiguration().getHistoryLevel();
   }
-
-  protected HistoryEventProducer getHistoryEventProducer() {
-    return Context.getProcessEngineConfiguration().getHistoryEventProducer();
-  }
-
-  protected HistoryEventHandler getHistoryEventHandler() {
-    return Context.getProcessEngineConfiguration().getHistoryEventHandler();
-  }
-
 }

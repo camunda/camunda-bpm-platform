@@ -113,12 +113,14 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   }
 
   public Object getPersistentState() {
-    List<Object> state = new ArrayList<Object>(5);
+    List<Object> state = new ArrayList<Object>(8);
     state.add(getSerializerName());
     state.add(textValue);
     state.add(textValue2);
     state.add(doubleValue);
     state.add(longValue);
+    state.add(processDefinitionId);
+    state.add(processDefinitionKey);
     state.add(getByteArrayId());
     return state;
   }

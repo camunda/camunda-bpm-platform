@@ -476,6 +476,19 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return evt;
   }
 
+  @Override
+  public HistoryEvent createProcessInstanceMigrateEvt(DelegateExecution execution) {
+    final ExecutionEntity executionEntity = (ExecutionEntity) execution;
+
+    // create event instance
+    HistoricProcessInstanceEventEntity evt = newProcessInstanceEventEntity(executionEntity);
+
+    // initialize event
+    initProcessInstanceEvent(evt, executionEntity, HistoryEventTypes.PROCESS_INSTANCE_MIGRATE);
+
+    return evt;
+  }
+
   public HistoryEvent createProcessInstanceEndEvt(DelegateExecution execution) {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
@@ -543,13 +556,13 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   }
 
   @Override
-  public HistoryEvent createActivityInstanceUpdateEvt(MigratingActivityInstance actInstance) {
+  public HistoryEvent createActivityInstanceMigrateEvt(MigratingActivityInstance actInstance) {
 
     // create event instance
     HistoricActivityInstanceEventEntity evt = loadActivityInstanceEventEntity(actInstance.resolveRepresentativeExecution());
 
     // initialize event
-    initActivityInstanceEvent(evt, actInstance, HistoryEventTypes.ACTIVITY_INSTANCE_UPDATE);
+    initActivityInstanceEvent(evt, actInstance, HistoryEventTypes.ACTIVITY_INSTANCE_MIGRATE);
 
     return evt;
   }
@@ -593,6 +606,17 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     // initialize event
     initTaskInstanceEvent(evt, (TaskEntity) task, HistoryEventTypes.TASK_INSTANCE_UPDATE);
+
+    return evt;
+  }
+
+  @Override
+  public HistoryEvent createTaskInstanceMigrateEvt(DelegateTask task) {
+    // create event instance
+    HistoricTaskInstanceEventEntity evt = loadTaskInstanceEvent(task);
+
+    // initialize event
+    initTaskInstanceEvent(evt, (TaskEntity) task, HistoryEventTypes.TASK_INSTANCE_MIGRATE);
 
     return evt;
   }
@@ -650,6 +674,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope) {
     return createHistoricVariableEvent(variableInstance, sourceVariableScope, HistoryEventTypes.VARIABLE_INSTANCE_UPDATE);
+  }
+
+  @Override
+  public HistoryEvent createHistoricVariableMigrateEvt(VariableInstanceEntity variableInstance) {
+    return createHistoricVariableEvent(variableInstance, null, HistoryEventTypes.VARIABLE_INSTANCE_MIGRATE);
   }
 
   // form Properties ///////////////////////////
