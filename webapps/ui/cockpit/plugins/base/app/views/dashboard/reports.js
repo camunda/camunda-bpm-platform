@@ -18,6 +18,18 @@ module.exports = [ 'ViewsProvider', function (ViewsProvider) {
         component: 'cockpit.report'
       });
     }],
+    access: [
+      'Views',
+    function (
+      Views
+    ) {
+      return function (cb) {
+        var reportPlugins = Views.getProviders({
+          component: 'cockpit.report'
+        });
+        cb(null, !!reportPlugins.length);
+      };
+    }],
 
     priority: 0
   });

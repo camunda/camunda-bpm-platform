@@ -2,7 +2,7 @@
 <div class="ctn-view dashboard container-fluid">
   <div class="sections row">
     <section ng-repeat="plugin in dashboardPlugins"
-             ng-if="!plugin.noDashboardSection"
+             ng-if="!plugin.noDashboardSection && plugin.accessible"
              class="col-sm-4">
       <header>
         <h1 class="section-title">

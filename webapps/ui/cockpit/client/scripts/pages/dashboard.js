@@ -5,10 +5,12 @@ var template = fs.readFileSync(__dirname + '/dashboard.html', 'utf8');
 
 var Controller = [
   '$scope',
+  '$injector',
   'Views',
   'page',
 function (
   $scope,
+  $injector,
   Views,
   page
 ) {
@@ -16,6 +18,24 @@ function (
 
   $scope.dashboardPlugins = Views.getProviders({
     component: 'cockpit.dashboard.section'
+  })
+  .map(function (plugin) {
+    if (angular.isArray(plugin.access)) {
+      var fn = $injector.invoke(plugin.access);
+
+      fn(function (err, access) {
+        if (err) { throw err; }
+
+        plugin.accessible = access;
+      });
+    }
+
+    // accessible by default in case there's no callback
+    else {
+      plugin.accessible = true;
+    }
+
+    return plugin;
   });
 
   // old plugins are still shown on the dashboard
