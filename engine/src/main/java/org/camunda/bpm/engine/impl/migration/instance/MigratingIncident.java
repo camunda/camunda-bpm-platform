@@ -41,8 +41,8 @@ public class MigratingIncident implements MigratingInstance {
   }
 
   @Override
-  public void attachState(MigratingTransitionInstance targetTranisitionInstance) {
-    attachTo(targetTranisitionInstance.resolveRepresentativeExecution());
+  public void attachState(MigratingTransitionInstance targetTransitionInstance) {
+    attachTo(targetTransitionInstance.resolveRepresentativeExecution());
   }
 
   public void migrateState() {

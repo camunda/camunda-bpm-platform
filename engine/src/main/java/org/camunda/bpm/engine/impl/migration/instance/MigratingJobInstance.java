@@ -70,11 +70,11 @@ public abstract class MigratingJobInstance implements MigratingInstance, Removin
     }
   }
 
-  public void attachState(MigratingTransitionInstance targetTranisitionInstance) {
-    attachTo(targetTranisitionInstance.resolveRepresentativeExecution());
+  public void attachState(MigratingTransitionInstance targetTransitionInstance) {
+    attachTo(targetTransitionInstance.resolveRepresentativeExecution());
 
     for (MigratingInstance dependentInstance : migratingDependentInstances) {
-      dependentInstance.attachState(targetTranisitionInstance);
+      dependentInstance.attachState(targetTransitionInstance);
     }
   }
 

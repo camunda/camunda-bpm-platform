@@ -99,7 +99,7 @@ public class MigratingTransitionInstance extends MigratingProcessElementInstance
   }
 
   @Override
-  public void attachState(MigratingTransitionInstance targetTranisitionInstance) {
+  public void attachState(MigratingTransitionInstance targetTransitionInstance) {
 
     throw MIGRATION_LOGGER.cannotAttachToTransitionInstance(this);
   }

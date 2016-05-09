@@ -64,7 +64,7 @@ public class MigratingEventSubscriptionInstance implements MigratingInstance, Re
   }
 
   @Override
-  public void attachState(MigratingTransitionInstance targetTranisitionInstance) {
+  public void attachState(MigratingTransitionInstance targetTransitionInstance) {
     throw MIGRATION_LOGGER.cannotAttachToTransitionInstance(this);
   }
 

@@ -39,7 +39,7 @@ public interface MigratingInstance {
    * Restoration should restore the state that was detached
    * before.
    */
-  void attachState(MigratingTransitionInstance targetTranisitionInstance);
+  void attachState(MigratingTransitionInstance targetTransitionInstance);
 
   /**
    * Migrate state from the source process definition
