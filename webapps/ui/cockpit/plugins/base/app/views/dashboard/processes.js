@@ -73,10 +73,10 @@ function (
           return 'No';
         }
         if (count >= 1000000) {
-          return Math.round(count / 1000000) + 'M';
+          return Math.round(count / 1000000) + 'm';
         }
         if (count >= 1000) {
-          return Math.round(count / 1000) + 'K';
+          return Math.round(count / 1000) + 'k';
         }
         return count;
       };
