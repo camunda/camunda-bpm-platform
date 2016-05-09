@@ -403,7 +403,13 @@ alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_RCAUSE 
     foreign key (ROOT_CAUSE_INCIDENT_ID_) 
     references ACT_RU_INCIDENT (ID_);
-    
+
+create index ACT_IDX_INCIDENT_JOB_DEF on ACT_RU_INCIDENT(JOB_DEF_ID_);
+alter table ACT_RU_INCIDENT
+    add constraint ACT_FK_INC_JOB_DEF
+    foreign key (JOB_DEF_ID_)
+    references ACT_RU_JOBDEF (ID_);
+
 alter table ACT_RU_EXT_TASK
     add constraint ACT_FK_EXT_TASK_EXE 
     foreign key (EXECUTION_ID_) 

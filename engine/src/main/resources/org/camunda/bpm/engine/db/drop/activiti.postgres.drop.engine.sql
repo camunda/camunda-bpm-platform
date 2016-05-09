@@ -85,6 +85,9 @@ alter table ACT_RU_INCIDENT
 alter table ACT_RU_INCIDENT
     drop constraint ACT_FK_INC_RCAUSE;
 
+alter table ACT_RU_INCIDENT
+    drop constraint ACT_FK_INC_JOB_DEF;
+
 alter table ACT_RU_AUTHORIZATION
     drop constraint ACT_UNIQ_AUTH_GROUP;
 
@@ -116,6 +119,7 @@ drop index ACT_IDX_INC_EXID;
 drop index ACT_IDX_INC_PROCDEFID;
 drop index ACT_IDX_INC_PROCINSTID;
 drop index ACT_IDX_INC_ROOTCAUSEINCID;
+drop index ACT_IDX_INC_JOB_DEF;
 drop index ACT_IDX_AUTH_RESOURCE_ID;
 drop index ACT_IDX_EXT_TASK_EXEC;
 

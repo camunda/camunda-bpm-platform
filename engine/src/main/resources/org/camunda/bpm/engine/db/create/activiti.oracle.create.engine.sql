@@ -416,6 +416,12 @@ alter table ACT_RU_INCIDENT
     foreign key (ROOT_CAUSE_INCIDENT_ID_) 
     references ACT_RU_INCIDENT (ID_); 
 
+create index ACT_IDX_INC_JOB_DEF on ACT_RU_INCIDENT(JOB_DEF_ID_);
+alter table ACT_RU_INCIDENT
+    add constraint ACT_FK_INC_JOB_DEF
+    foreign key (JOB_DEF_ID_)
+    references ACT_RU_JOBDEF (ID_);
+
 -- see http://stackoverflow.com/questions/675398/how-can-i-constrain-multiple-columns-to-prevent-duplicates-but-ignore-null-value
 create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION
    (case when USER_ID_ is null then null else TYPE_ end,

@@ -70,7 +70,10 @@ alter table ACT_RU_INCIDENT
 
 alter table ACT_RU_INCIDENT
     drop foreign key ACT_FK_INC_RCAUSE;
-    
+
+alter table ACT_RU_INCIDENT
+    drop foreign key ACT_FK_INC_JOB_DEF;
+
 alter table ACT_RU_EXT_TASK
     drop foreign key ACT_FK_EXT_TASK_EXE;
 
@@ -99,6 +102,7 @@ drop index ACT_IDX_INCIDENT_PROCINST;
 drop index ACT_IDX_INCIDENT_PROC_DEF_ID;
 drop index ACT_IDX_INCIDENT_CAUSE;
 drop index ACT_IDX_INCIDENT_ROOT_CAUSE;
+drop index ACT_IDX_INC_JOB_DEF;
 drop index ACT_IDX_JOB_EXCEPTION_STACK;
 drop index ACT_IDX_VARIABLE_BA;
 drop index ACT_IDX_VARIABLE_EXEC;

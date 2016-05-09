@@ -299,5 +299,11 @@ create index ACT_IDX_HI_OP_LOG_PROCDEF on ACT_HI_OP_LOG(PROC_DEF_ID_);
 ALTER TABLE ACT_RU_INCIDENT
   ADD JOB_DEF_ID_ nvarchar(64);
 
+create index ACT_IDX_INCIDENT_JOB_DEF on ACT_RU_INCIDENT(JOB_DEF_ID_);
+alter table ACT_RU_INCIDENT
+    add constraint ACT_FK_INC_JOB_DEF
+    foreign key (JOB_DEF_ID_)
+    references ACT_RU_JOBDEF (ID_);
+
 ALTER TABLE ACT_HI_INCIDENT
   ADD JOB_DEF_ID_ nvarchar(64);
