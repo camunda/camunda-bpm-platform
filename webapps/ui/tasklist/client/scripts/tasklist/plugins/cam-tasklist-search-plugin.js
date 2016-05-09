@@ -10,8 +10,8 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
   var searchConfig = JSON.parse(searchConfigJSON);
 
-  var parseValue = function(value) {
-    if(!isNaN(value) && value.trim() !== '') {
+  var parseValue = function(value, enforceString) {
+    if(!isNaN(value) && value.trim() !== '' && !enforceString) {
       // value must be transformed to number
       return +value;
     }
@@ -43,7 +43,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
     if (search.basic) {
       return true;
     }
-    return sanitizeValue(parseValue(search.value.value), search.operator.value.key);
+    return sanitizeValue(parseValue(search.value.value, search.enforceString), search.operator.value.key);
   };
 
   var sanitizeProperty = function(search, type, operator, value) {

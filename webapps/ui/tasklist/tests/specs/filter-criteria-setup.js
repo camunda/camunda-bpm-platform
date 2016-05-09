@@ -72,7 +72,8 @@ module.exports = {
       }]),
 
       operation('process-definition', 'start', [{
-        key: 'user-tasks'
+        key: 'user-tasks',
+        businessKey: 123
       }]),
 
       operation('task', 'create', [{
