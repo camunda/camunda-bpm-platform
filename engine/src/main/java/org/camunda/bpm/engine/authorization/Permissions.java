@@ -113,14 +113,4 @@ public enum Permissions implements Permission {
     return permission;
   }
 
-  public static Permission nameToPermission(String name) {
-    
-    try {
-      Permission permission = valueOf(name);
-      return permission;
-    } catch(Exception e) {
-      return null;
-    }
-  }
-
 }

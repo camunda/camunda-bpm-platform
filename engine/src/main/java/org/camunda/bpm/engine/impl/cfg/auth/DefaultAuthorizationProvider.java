@@ -241,7 +241,7 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     // create (or update) an authorization for the given group
     // whenever a new user identity link will be added
     String taskId = task.getId();
-    
+
     // fetch existing authorization
     AuthorizationEntity authorization = getGrantAuthorizationByGroupId(groupId, TASK, taskId);
 
@@ -325,11 +325,9 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     return authorization;
   }
 
-  public Permission getDefaultUserPermissionForTask() {
-    
-    // get the default task assignee permission
+  protected Permission getDefaultUserPermissionForTask() {
     return Context
-    .getProcessEngineConfiguration()
-    .getDefaultUserPermissionForTask();
+      .getProcessEngineConfiguration()
+      .getDefaultUserPermissionForTask();
   }
 }

@@ -659,7 +659,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initMigratingActivityInstanceValidators();
     initMigratingTransitionInstanceValidators();
     initCommandCheckers();
-    initDefaultTaskPermissionValidator(); 
+    initDefaultTaskPermission();
     invokePostInit();
   }
 
@@ -1819,6 +1819,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
+  protected void initDefaultTaskPermission() {
+    if(defaultUserPermissionForTask == null) {
+      if(Permissions.UPDATE.getName().equals(defaultTaskPermissionForUser)) {
+        defaultUserPermissionForTask = Permissions.UPDATE;
+      }
+      else if(Permissions.TASK_WORK.getName().equals(defaultTaskPermissionForUser)) {
+        defaultUserPermissionForTask = Permissions.TASK_WORK;
+      }
+      else {
+        throw LOG.invalidConfigDefaultTaskPermissionForUser(defaultTaskPermissionForUser, new String[] { Permissions.UPDATE.getName(), Permissions.TASK_WORK.getName()});
+      }
+    }
+  }
+
   // getters and setters //////////////////////////////////////////////////////
 
   @Override
@@ -2194,7 +2208,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.defaultUserPermissionForTask = defaultUserPermissionForTask;
     return this;
   }
-  
+
   public Map<String, JobHandler> getJobHandlers() {
     return jobHandlers;
   }
@@ -3293,26 +3307,4 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.commandCheckers = commandCheckers;
   }
 
-  public Permission taskUserPermissionInputToPermission() {
-    return Permissions.nameToPermission(getDefaultTaskPermissionForUser());
-  }
-  
-  protected void initDefaultTaskPermissionValidator() {
-
-    String localDefaultTaskUserPermission = getDefaultTaskPermissionForUser();
-    if(localDefaultTaskUserPermission == null) {
-      throw new ProcessEngineException("Default task assignee permission is null");
-    }
-    
-    Permission localDefaultPermissionForTaskUser = taskUserPermissionInputToPermission();
-    if(localDefaultPermissionForTaskUser == null) {
-      throw new ProcessEngineException("Permission '"+ localDefaultTaskUserPermission + "' is invalid");
-    }
-
-    if(localDefaultPermissionForTaskUser != Permissions.UPDATE && localDefaultPermissionForTaskUser !=  Permissions.TASK_WORK) {
-      throw new ProcessEngineException("defaultTaskPermissionForUser is neither UPDATE nor TASK_WORK");
-    }
-
-    setDefaultUserPermissionForTask(localDefaultPermissionForTaskUser); 
-  }
 }
