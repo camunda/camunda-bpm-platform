@@ -24,19 +24,19 @@
                        type="success"
                        ng-if="ctrl.getProgressAbsolute(batch, 'success') > 0"
                        class="jobs jobs-success">
-                    <div tooltip="Completed Jobs">{{ctrl.getProgressAbsolute(batch, 'success')}}</div>
+                    <div tooltip="Completed Jobs">{{ctrl.getProgressPercentage(batch, 'success')}}%</div>
                   </bar>
                   <bar value="ctrl.getProgressPercentage(batch, 'failed')"
                        type="warning"
                        ng-if="ctrl.getProgressAbsolute(batch, 'failed') > 0"
                        class="jobs jobs-failed">
-                    <div tooltip="Failed Jobs">{{ctrl.getProgressAbsolute(batch, 'failed')}}</div>
+                    <div tooltip="Failed Jobs">{{ctrl.getProgressPercentage(batch, 'failed')}}%</div>
                   </bar>
                   <bar value="ctrl.getProgressPercentage(batch, 'remaining')"
                        type="info"
                        ng-if="ctrl.getProgressAbsolute(batch, 'remaining') > 0"
                        class="jobs jobs-remaining">
-                     <div tooltip="Remaining Jobs">{{ctrl.getProgressAbsolute(batch, 'remaining')}}</div>
+                     <div tooltip="Remaining Jobs">{{ctrl.getProgressPercentage(batch, 'remaining')}}%</div>
                   </bar>
                 </progress>
               </td>
