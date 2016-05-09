@@ -62,7 +62,7 @@
           cam-if-logged-in
           ng-controller="camHeaderViewsCtrl">
         <li ng-repeat="actionProvider in navbarActions"
-            ng-if="actionProvider.pagePath"
+            ng-if="actionProvider.pagePath && actionProvider.accessible"
             ng-class="activeClass(actionProvider)">
           <a ng-href="{{ actionProvider.pagePath }}">{{ actionProvider.label }}</a>
         </li>
