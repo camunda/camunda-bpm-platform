@@ -46,7 +46,6 @@ public class BatchMigrationHelper {
   public ProcessDefinition sourceProcessDefinition;
   public ProcessDefinition targetProcessDefinition;
 
-
   public BatchMigrationHelper(ProcessEngineRule engineRule, MigrationTestRule migrationRule) {
     this.engineRule = engineRule;
     this.migrationRule = migrationRule;
@@ -54,6 +53,14 @@ public class BatchMigrationHelper {
 
   public BatchMigrationHelper(ProcessEngineRule engineRule) {
     this(engineRule, null);
+  }
+
+  public ProcessDefinition getSourceProcessDefinition() {
+    return sourceProcessDefinition;
+  }
+
+  public ProcessDefinition getTargetProcessDefinition() {
+    return targetProcessDefinition;
   }
 
   public Batch createMigrationBatchWithSize(int batchSize) {

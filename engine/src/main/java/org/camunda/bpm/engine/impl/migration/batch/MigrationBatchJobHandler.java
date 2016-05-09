@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
@@ -80,6 +81,7 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
 
     MigrationBatchConfiguration configuration = readConfiguration(batch.getConfigurationBytes());
     MigrationPlan migrationPlan = configuration.getMigrationPlan();
+    String sourceDeploymentId = getProcessDefinition(commandContext, migrationPlan.getSourceProcessDefinitionId()).getDeploymentId();
 
     int batchJobsPerSeed = batch.getBatchJobsPerSeed();
     int invocationsPerBatchJob = batch.getInvocationsPerBatchJob();
@@ -98,8 +100,9 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
       MigrationBatchConfiguration jobConfiguration = MigrationBatchConfiguration
           .create(migrationPlan, idsForJob, configuration.isSkipCustomListeners(), configuration.isSkipIoMappings());
       ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);
-      JobEntity job = createBatchJob(batch, configurationEntity);
 
+      JobEntity job = createBatchJob(batch, configurationEntity);
+      job.setDeploymentId(sourceDeploymentId);
       jobManager.insertAndHintJobExecutor(job);
 
       idsForJob.clear();
@@ -180,6 +183,12 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
       Context.getCommandContext().getByteArrayManager()
         .deleteByteArrayById(byteArrayId);
     }
+  }
+
+  protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext, String processDefinitionId) {
+    return commandContext.getProcessEngineConfiguration()
+      .getDeploymentCache()
+      .findDeployedProcessDefinitionById(processDefinitionId);
   }
 
 }

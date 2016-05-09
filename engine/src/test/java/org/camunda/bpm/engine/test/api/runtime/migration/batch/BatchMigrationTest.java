@@ -234,6 +234,7 @@ public class BatchMigrationTest {
     Batch batch = helper.migrateProcessInstancesAsync(20);
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
     JobDefinition migrationJobDefinition = helper.getMigrationJobDefinition(batch);
+    String sourceDeploymentId = helper.getSourceProcessDefinition().getDeploymentId();
 
     // when
     helper.executeSeedJob(batch);
@@ -245,7 +246,7 @@ public class BatchMigrationTest {
     for (Job migrationJob : migrationJobs) {
       assertEquals(migrationJobDefinition.getId(), migrationJob.getJobDefinitionId());
       assertNull(migrationJob.getDuedate());
-      assertNull(migrationJob.getDeploymentId());
+      assertEquals(sourceDeploymentId, migrationJob.getDeploymentId());
       assertNull(migrationJob.getProcessDefinitionId());
       assertNull(migrationJob.getProcessDefinitionKey());
       assertNull(migrationJob.getProcessInstanceId());

@@ -224,6 +224,8 @@ public class BatchMigrationHistoryTest {
     Batch batch = helper.migrateProcessInstancesAsync(1);
     helper.executeSeedJob(batch);
 
+    String sourceDeploymentId = helper.getSourceProcessDefinition().getDeploymentId();
+
     // when
     Date executionDate = helper.addSecondsToClock(12);
     helper.executeMigrationJobs(batch);
@@ -236,7 +238,7 @@ public class BatchMigrationHistoryTest {
     assertEquals(Batch.TYPE_PROCESS_INSTANCE_MIGRATION, jobLog.getJobDefinitionType());
     assertEquals(batch.getId(), jobLog.getJobDefinitionConfiguration());
     assertEquals(START_DATE, jobLog.getTimestamp());
-    assertNull(jobLog.getDeploymentId());
+    assertEquals(sourceDeploymentId, jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
     assertNull(jobLog.getJobDueDate());
@@ -248,7 +250,7 @@ public class BatchMigrationHistoryTest {
     assertEquals(Batch.TYPE_PROCESS_INSTANCE_MIGRATION, jobLog.getJobDefinitionType());
     assertEquals(batch.getId(), jobLog.getJobDefinitionConfiguration());
     assertEquals(executionDate, jobLog.getTimestamp());
-    assertNull(jobLog.getDeploymentId());
+    assertEquals(sourceDeploymentId, jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
     assertNull(jobLog.getJobDueDate());
