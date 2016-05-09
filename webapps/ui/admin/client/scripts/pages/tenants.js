@@ -6,7 +6,7 @@ var template = fs.readFileSync(__dirname + '/tenants.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  var Controller = ['$scope', '$location', 'search', 'camAPI', 'page', function ($scope, $location, search, camAPI, pageService) {
+  var Controller = ['$scope', '$location', '$timeout', 'search', 'camAPI', 'page', function ($scope, $location, $timeout, search, camAPI, pageService) {
 
     var TenantResource = camAPI.resource('tenant');
     
@@ -38,8 +38,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
       $scope.loadingState = 'LOADING';
       TenantResource.list(pagingParams, function(err, res) {
-        $scope.tenantList = res;
-        $scope.loadingState = res.length ? 'LOADED' : 'EMPTY';
+        $timeout(function() {
+          $scope.tenantList = res;
+          $scope.loadingState = res.length ? 'LOADED' : 'EMPTY';
+        });
+
       });
 
       TenantResource.count(function(err, res) {
