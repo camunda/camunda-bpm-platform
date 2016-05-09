@@ -184,6 +184,17 @@ describe('Tasklist Filter Criteria Spec', function() {
         expect(dashboardPage.taskList.taskName(0)).to.eventually.eql('User Task 1');
       });
 
+      it('should add business key criterion and validate results', function() {
+
+        // when
+        editModalPage.addCriterion('Process Instance', 'Business Key', 123);
+        editModalPage.saveFilter();
+
+        // then
+        expect(dashboardPage.taskList.taskList().count()).to.eventually.eql(1);
+        expect(dashboardPage.taskList.taskName(0)).to.eventually.eql('User Task 1');
+      });
+
     });
 
 
