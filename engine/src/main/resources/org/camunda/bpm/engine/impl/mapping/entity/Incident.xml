@@ -188,7 +188,8 @@
       REV_ = #{revisionNext, jdbcType=INTEGER},
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
-      ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR}
+      ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
+      JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
     </set>
     <where>
       ID_ = #{id, jdbcType=VARCHAR}

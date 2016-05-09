@@ -21,10 +21,15 @@ public class MigratingIncident implements MigratingInstance {
 
   protected IncidentEntity incident;
   protected ScopeImpl targetScope;
+  protected String targetJobDefinitionId;
 
   public MigratingIncident(IncidentEntity incident, ScopeImpl targetScope) {
     this.incident = incident;
     this.targetScope = targetScope;
+  }
+
+  public void setTargetJobDefinitionId(String targetJobDefinitionId) {
+    this.targetJobDefinitionId = targetJobDefinitionId;
   }
 
   @Override
@@ -48,6 +53,7 @@ public class MigratingIncident implements MigratingInstance {
   public void migrateState() {
     incident.setActivityId(targetScope.getId());
     incident.setProcessDefinitionId(targetScope.getProcessDefinition().getId());
+    incident.setJobDefinitionId(targetJobDefinitionId);
   }
 
   public void migrateDependentEntities() {
@@ -57,5 +63,4 @@ public class MigratingIncident implements MigratingInstance {
   protected void attachTo(ExecutionEntity execution) {
     incident.setExecution(execution);
   }
-
 }

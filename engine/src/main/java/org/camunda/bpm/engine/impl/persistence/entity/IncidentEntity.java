@@ -398,6 +398,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     persistentState.put("executionId", executionId);
     persistentState.put("processDefinitionId", processDefinitionId);
     persistentState.put("activityId", activityId);
+    persistentState.put("jobDefinitionId", jobDefinitionId);
     return persistentState;
   }
 

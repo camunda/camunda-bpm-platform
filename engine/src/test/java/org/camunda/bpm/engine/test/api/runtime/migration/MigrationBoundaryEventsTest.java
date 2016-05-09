@@ -1656,9 +1656,10 @@ public class MigrationBoundaryEventsTest {
     assertEquals(incidentBeforeMigration.getId(), incidentAfterMigration.getId());
     assertEquals(jobAfterMigration.getId(), incidentAfterMigration.getConfiguration());
 
-    // and the activity and process definition references were updated
+    // and the activity, process definition and job definition references were updated
     assertEquals("newBoundary", incidentAfterMigration.getActivityId());
     assertEquals(targetProcessDefinition.getId(), incidentAfterMigration.getProcessDefinitionId());
+    assertEquals(jobAfterMigration.getJobDefinitionId(), incidentAfterMigration.getJobDefinitionId());
   }
 
   @Test

@@ -116,6 +116,10 @@ public abstract class MigratingJobInstance implements MigratingInstance, Removin
     return targetScope;
   }
 
+  public JobDefinitionEntity getTargetJobDefinitionEntity() {
+    return targetJobDefinitionEntity;
+  }
+
   protected abstract void migrateJobHandlerConfiguration();
 
 }

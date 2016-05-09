@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.impl.migration.instance.MigratingExternalTaskInsta
 import org.camunda.bpm.engine.impl.migration.instance.MigratingIncident;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingJobInstance;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 
 /**
  * @author Thorben Lindhauer
@@ -42,6 +43,10 @@ public class IncidentInstanceHandler implements MigratingInstanceParseHandler<In
     parseContext.consume(incident);
     if (owningInstance != null && owningInstance.migrates()) {
       MigratingIncident migratingIncident = new MigratingIncident(incident, owningInstance.getTargetScope());
+      JobDefinitionEntity targetJobDefinitionEntity = owningInstance.getTargetJobDefinitionEntity();
+      if (targetJobDefinitionEntity != null) {
+        migratingIncident.setTargetJobDefinitionId(targetJobDefinitionEntity.getId());
+      }
       owningInstance.addMigratingDependentInstance(migratingIncident);
     }
   }
