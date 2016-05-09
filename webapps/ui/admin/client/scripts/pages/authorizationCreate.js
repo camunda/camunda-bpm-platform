@@ -3,12 +3,7 @@
 var CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk');
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  module.exports = [ '$scope', '$q', '$location', 'Uri', 'Notifications', 'AuthorizationResource', function AuthorizationCreateController ($scope, $q, $location, Uri, Notifications, AuthorizationResource) {
-
-    var authorizationService = new CamSDK.Client({
-      apiUri: Uri.appUri('engine://'),
-      engine: Uri.appUri(':engine')
-    }).resource('authorization');
+  module.exports = [ '$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI', function AuthorizationCreateController ($scope, $q, $location, Uri, Notifications, camAPI) {
 
     $scope.addNewAuthorization = function() {
       $scope.authorizations = $scope.authorizations || [];
@@ -85,7 +80,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       delete authorization.identityId;
       delete authorization.identityType;
 
-      authorizationService.save(query, function(err, result) {
+      camAPI.save(query, function(err, result) {
         if(!!err) {
           Notifications.addError({
             status: 'Could not ' + (query.id ? 'update' : 'create') + ' authorization',
