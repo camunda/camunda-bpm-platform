@@ -119,6 +119,10 @@ Batch.prototype.getProgressPercentage = function(batch, type) {
   }
 };
 
+Batch.prototype.getProgressRoundedPercentage = function(batch, type) {
+  return Math.round(this.getProgressPercentage(batch, type));
+};
+
 Batch.prototype.getProgressAbsolute = function(batch, type) {
   switch(type) {
     case 'success': return batch.completedJobs;
