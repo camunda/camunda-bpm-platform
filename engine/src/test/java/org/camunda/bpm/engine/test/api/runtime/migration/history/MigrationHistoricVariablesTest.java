@@ -13,12 +13,14 @@
 package org.camunda.bpm.engine.test.api.runtime.migration.history;
 
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
@@ -35,6 +37,7 @@ import org.junit.rules.RuleChain;
  * @author Thorben Lindhauer
  *
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class MigrationHistoricVariablesTest {
 
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
