@@ -1076,6 +1076,9 @@ public interface ManagementService {
    * If cascade is set to true the historic batch instances and the
    * historic jobs logs are also removed.
    *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#BATCH}
+   *
    * @since 7.5
    */
   void deleteBatch(String batchId, boolean cascade);

@@ -18,33 +18,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.junit.Assert;
-import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class AuthorizationTestRule extends TestWatcher {
-
-  protected ProcessEngineRule engineRule;
+public class AuthorizationTestRule extends AuthorizationTestBaseRule {
 
   protected AuthorizationExceptionInterceptor interceptor;
   protected CommandExecutor replacedCommandExecutor;
 
   protected AuthorizationScenarioInstance scenarioInstance;
 
-  protected List<User> users = new ArrayList<User>();
-  protected List<Group> groups = new ArrayList<Group>();
-
   public AuthorizationTestRule(ProcessEngineRule engineRule) {
-    this.engineRule = engineRule;
+    super(engineRule);
     this.interceptor = new AuthorizationExceptionInterceptor();
   }
 
@@ -57,13 +49,6 @@ public class AuthorizationTestRule extends TestWatcher {
     scenarioInstance = new AuthorizationScenarioInstance(scenario, engineRule.getAuthorizationService(), resourceBindings);
     enableAuthorization(userId);
     interceptor.activate();
-  }
-
-  public void enableAuthorization(String userId) {
-    engineRule.getProcessEngine().getProcessEngineConfiguration().setAuthorizationEnabled(true);
-    if (userId != null) {
-      engineRule.getIdentityService().setAuthenticatedUserId(userId);
-    }
   }
 
   /**
@@ -94,11 +79,6 @@ public class AuthorizationTestRule extends TestWatcher {
     return interceptor.getLastException() != null;
   }
 
-  public void disableAuthorization() {
-    engineRule.getProcessEngine().getProcessEngineConfiguration().setAuthorizationEnabled(false);
-    engineRule.getIdentityService().clearAuthentication();
-  }
-
   protected void starting(Description description) {
     ProcessEngineConfigurationImpl engineConfiguration =
         (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
@@ -111,15 +91,13 @@ public class AuthorizationTestRule extends TestWatcher {
   }
 
   protected void finished(Description description) {
-    engineRule.getIdentityService().clearAuthentication();
+    super.finished(description);
 
     ProcessEngineConfigurationImpl engineConfiguration =
         (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
 
     engineConfiguration.getCommandInterceptorsTxRequired().get(0).setNext(interceptor.getNext());
     interceptor.setNext(null);
-
-    super.finished(description);
   }
 
   public static Collection<AuthorizationScenario[]> asParameters(AuthorizationScenario... scenarios) {
@@ -129,29 +107,6 @@ public class AuthorizationTestRule extends TestWatcher {
     }
 
     return scenarioList;
-  }
-
-  public void createUserAndGroup(String userId, String groupId) {
-
-    User user = engineRule.getIdentityService().newUser(userId);
-    engineRule.getIdentityService().saveUser(user);
-    users.add(user);
-
-    Group group = engineRule.getIdentityService().newGroup(groupId);
-    engineRule.getIdentityService().saveGroup(group);
-    groups.add(group);
-  }
-
-  public void deleteUsersAndGroups() {
-    for (User user : users) {
-      engineRule.getIdentityService().deleteUser(user.getId());
-    }
-    users.clear();
-
-    for (Group group : groups) {
-      engineRule.getIdentityService().deleteGroup(group.getId());
-    }
-    groups.clear();
   }
 
   public AuthorizationScenarioInstanceBuilder init(AuthorizationScenario scenario) {

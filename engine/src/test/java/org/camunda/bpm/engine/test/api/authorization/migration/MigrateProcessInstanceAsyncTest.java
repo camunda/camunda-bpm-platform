@@ -68,12 +68,14 @@ public class MigrateProcessInstanceAsyncTest {
     return AuthorizationTestRule.asParameters(
       scenario()
         .withAuthorizations(
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
           grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ))
         .failsDueToRequired(
           grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE),
           grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE)),
       scenario()
         .withAuthorizations(
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
           grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
           grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE))
         .failsDueToRequired(
@@ -81,6 +83,7 @@ public class MigrateProcessInstanceAsyncTest {
           grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE)),
       scenario()
         .withAuthorizations(
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
           grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
           grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE))
         .failsDueToRequired(
@@ -88,15 +91,22 @@ public class MigrateProcessInstanceAsyncTest {
           grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE)),
       scenario()
         .withAuthorizations(
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
           grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
           grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE),
           grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE))
         .succeeds(),
       scenario()
         .withAuthorizations(
+          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
           grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
           grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.MIGRATE_INSTANCE))
-        .succeeds());
+        .succeeds(),
+      scenario()
+         .withAuthorizations(
+           grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ))
+         .failsDueToRequired(
+           grant(Resources.BATCH, "*", "userId", Permissions.CREATE)));
   }
 
   @Before

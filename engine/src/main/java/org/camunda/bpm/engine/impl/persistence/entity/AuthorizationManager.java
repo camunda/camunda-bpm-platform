@@ -25,6 +25,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
 import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
+import static org.camunda.bpm.engine.authorization.Resources.BATCH;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
@@ -73,6 +74,9 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.UserOperationLogQueryImpl;
 import org.camunda.bpm.engine.impl.VariableInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.batch.BatchQueryImpl;
+import org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl;
+import org.camunda.bpm.engine.impl.batch.history.HistoricBatchQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
 import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
@@ -81,6 +85,7 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -818,6 +823,12 @@ public class AuthorizationManager extends AbstractManager {
     configureQuery(query, PROCESS_DEFINITION, "SELF.PROC_DEF_KEY_", READ_HISTORY);
   }
 
+  // batch
+
+  public void configureHistoricBatchQuery(HistoricBatchQueryImpl query) {
+    configureQuery(query, BATCH, "RES.ID_", READ_HISTORY);
+  }
+
   /* STATISTICS QUERY */
 
   public void configureDeploymentStatisticsQuery(DeploymentStatisticsQueryImpl query) {
@@ -974,6 +985,16 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureDecisionDefinitionQuery(DecisionDefinitionQueryImpl query) {
     configureQuery(query, DECISION_DEFINITION, "RES.KEY_");
+  }
+
+  public void configureBatchQuery(BatchQueryImpl query) {
+    configureQuery(query);
+    addPermissionCheck(query, BATCH, "RES.ID_", READ);
+  }
+
+  public void configureBatchStatisticsQuery(BatchStatisticsQueryImpl query) {
+    configureQuery(query);
+    addPermissionCheck(query, BATCH, "RES.ID_", READ);
   }
 
   public List<String> filterAuthenticatedGroupIds(List<String> authenticatedGroupIds) {

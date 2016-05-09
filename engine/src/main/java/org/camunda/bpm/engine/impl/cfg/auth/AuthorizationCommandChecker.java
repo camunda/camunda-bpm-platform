@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.cfg.auth;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
@@ -23,6 +24,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.TASK_ASSIGN;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
+import static org.camunda.bpm.engine.authorization.Resources.BATCH;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
@@ -274,10 +276,12 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkDeleteBatch(BatchEntity batch) {
+    getAuthorizationManager().checkAuthorization(DELETE, BATCH, batch.getId());
   }
 
   @Override
   public void checkDeleteHistoricBatch(HistoricBatchEntity batch) {
+    getAuthorizationManager().checkAuthorization(DELETE_HISTORY, BATCH, batch.getId());
   }
 
   /* DEPLOYMENT */

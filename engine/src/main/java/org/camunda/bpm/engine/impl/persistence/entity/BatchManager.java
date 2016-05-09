@@ -42,7 +42,7 @@ public class BatchManager extends AbstractManager {
   }
 
   protected void configureQuery(BatchQueryImpl batchQuery) {
-    // TODO: authorization
+    getAuthorizationManager().configureBatchQuery(batchQuery);
     getTenantManager().configureQuery(batchQuery);
   }
 

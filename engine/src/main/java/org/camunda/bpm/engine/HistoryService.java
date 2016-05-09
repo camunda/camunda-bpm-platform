@@ -90,7 +90,7 @@ public interface HistoryService {
 
   /** Creates a new programmatic query to search for {@link HistoricIdentityLinkLog historic identity links}. */
   HistoricIdentityLinkLogQuery createHistoricIdentityLinkLogQuery();
-  
+
   /** Creates a new programmatic query to search for {@link HistoricCaseInstance}s. */
   HistoricCaseInstanceQuery createHistoricCaseInstanceQuery();
 
@@ -221,6 +221,9 @@ public interface HistoryService {
    * Deletes a historic batch instance. All corresponding historic job logs are deleted as well;
    *
    * @since 7.5
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#BATCH}
    */
   void deleteHistoricBatch(String id);
 

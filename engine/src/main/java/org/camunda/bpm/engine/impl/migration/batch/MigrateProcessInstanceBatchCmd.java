@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
@@ -73,6 +75,15 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
     batch.createSeedJob();
 
     return batch;
+  }
+
+  @Override
+  protected void checkAuthorizations(CommandContext commandContext, ProcessDefinitionEntity sourceDefinition, ProcessDefinitionEntity targetDefinition,
+      Collection<String> processInstanceIds) {
+
+    commandContext.getAuthorizationManager().checkAuthorization(Permissions.CREATE, Resources.BATCH);
+
+    super.checkAuthorizations(commandContext, sourceDefinition, targetDefinition, processInstanceIds);
   }
 
   protected BatchEntity createBatch(CommandContext commandContext,

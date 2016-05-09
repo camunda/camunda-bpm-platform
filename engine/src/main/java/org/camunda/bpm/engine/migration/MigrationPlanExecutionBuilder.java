@@ -53,8 +53,10 @@ public interface MigrationPlanExecutionBuilder {
    * @throws MigratingProcessInstanceValidationException if the migration plan contains
    *  instructions that are not applicable to any of the process instances
    * @throws AuthorizationException
-   *         if the user has no {@link Permissions#MIGRATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
-   *         for both, source and target process definition.
+   *   if the user has not all of the following permissions
+   *   <ul>
+   *     <li>{@link Permissions#MIGRATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION} for source and target</li>
+   *   </ul>
    */
   void execute();
 
@@ -65,8 +67,11 @@ public interface MigrationPlanExecutionBuilder {
    * @return the batch which executes the migration asynchronously.
    *
    * @throws AuthorizationException
-   *         if the user has no {@link Permissions#MIGRATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
-   *         for both, source and target process definition.
+   *   if the user has not all of the following permissions
+   *   <ul>
+   *     <li>{@link Permissions#MIGRATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION} for source and target</li>
+   *     <li>{@link Permissions#CREATE} permission on {@link Resources#BATCH}</li>
+   *   </ul>
    */
   Batch executeAsync();
 }

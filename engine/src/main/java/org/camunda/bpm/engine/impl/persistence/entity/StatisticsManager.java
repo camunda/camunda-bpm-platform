@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl;
+import org.camunda.bpm.engine.impl.batch.BatchQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
@@ -78,7 +79,7 @@ public class StatisticsManager extends AbstractManager {
   }
 
   protected void configureQuery(BatchStatisticsQueryImpl batchQuery) {
-    // TODO: authorization
+    getAuthorizationManager().configureBatchStatisticsQuery(batchQuery);
     getTenantManager().configureQuery(batchQuery);
   }
 

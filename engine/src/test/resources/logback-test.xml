@@ -18,6 +18,8 @@
 
   <logger name="org.camunda.bpm.engine.test" level="debug" />
   
+  <logger name="org.camunda.bpm.engine.impl.batch.BatchEntity" level="debug" />
+  
 <!--
   <logger name="org.camunda.bpm.engine.impl.persistence.entity" level="debug" />
   <logger name="org.camunda.bpm.engine.history" level="debug" />

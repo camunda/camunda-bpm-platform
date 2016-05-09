@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
@@ -43,7 +42,7 @@ public class HistoricBatchManager extends AbstractManager {
   }
 
   protected void configureQuery(HistoricBatchQueryImpl query) {
-    // TODO: authorization
+    getAuthorizationManager().configureHistoricBatchQuery(query);
     getTenantManager().configureQuery(query);
   }
 
