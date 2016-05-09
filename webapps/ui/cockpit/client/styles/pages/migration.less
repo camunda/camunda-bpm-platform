@@ -28,9 +28,8 @@
   }
 
   footer {
-    padding-top: (@grid-gutter-width * 0.5);
     padding-bottom: (@grid-gutter-width * 0.5);
-    line-height: 36px;
+    height: @input-height-base + (@grid-gutter-width * 0.5);
 
     position: absolute;
     bottom: 0;
@@ -94,7 +93,7 @@
   .target-column {
     position: absolute;
     width: 50%;
-    height: 100%;//~"calc(100% - 64px)";
+    height: 100%;
     bottom: 0;
   }
 
