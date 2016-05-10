@@ -37,6 +37,13 @@ public class ProcessInstanceSnapshotBuilder {
     this.snapshot = new ProcessInstanceSnapshot(processInstance.getId(), processInstance.getProcessDefinitionId());
   }
 
+  public ProcessInstanceSnapshotBuilder deploymentId() {
+    String deploymentId = processEngine.getRepositoryService().getProcessDefinition(snapshot.getProcessDefinitionId()).getDeploymentId();
+    snapshot.setDeploymentId(deploymentId);
+
+    return this;
+  }
+
   public ProcessInstanceSnapshotBuilder activityTree() {
     ActivityInstance activityInstance = processEngine.getRuntimeService().getActivityInstance(processInstanceId);
     snapshot.setActivityTree(activityInstance);
@@ -89,6 +96,7 @@ public class ProcessInstanceSnapshotBuilder {
   }
 
   public ProcessInstanceSnapshot full() {
+    deploymentId();
     activityTree();
     executionTree();
     tasks();

@@ -36,6 +36,7 @@ public class ProcessInstanceSnapshot {
 
   protected String processInstanceId;
   protected String processDefinitionId;
+  protected String deploymentId;
   protected ActivityInstance activityTree;
   protected ExecutionTree executionTree;
   protected List<EventSubscription> eventSubscriptions;
@@ -59,6 +60,14 @@ public class ProcessInstanceSnapshot {
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
+  }
+
+  public void setDeploymentId(String deploymentId) {
+    this.deploymentId = deploymentId;
+  }
+
+  public String getDeploymentId() {
+    return deploymentId;
   }
 
   public void setProcessDefinitionId(String processDefinitionId) {

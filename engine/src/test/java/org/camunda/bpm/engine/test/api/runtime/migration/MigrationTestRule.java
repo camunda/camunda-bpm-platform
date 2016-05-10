@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
@@ -113,8 +114,13 @@ public class MigrationTestRule extends ProcessEngineTestRule {
   public void migrateProcessInstance(MigrationPlan migrationPlan, ProcessInstance processInstance) {
     snapshotBeforeMigration = takeFullProcessInstanceSnapshot(processInstance);
 
-    processEngine.getRuntimeService()
+    RuntimeService runtimeService = processEngine.getRuntimeService();
+
+    runtimeService
       .newMigration(migrationPlan).processInstanceIds(Collections.singletonList(snapshotBeforeMigration.getProcessInstanceId())).execute();
+
+    // fetch updated process instance
+    processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
 
     snapshotAfterMigration = takeFullProcessInstanceSnapshot(processInstance);
   }
@@ -256,6 +262,8 @@ public class MigrationTestRule extends ProcessEngineTestRule {
     assertEquals(jobBefore.getId(), jobAfter.getId());
     assertEquals("Expected that job is assigned to job definition '" + jobDefinitionAfter.getId() + "' after migration",
         jobDefinitionAfter.getId(), jobAfter.getJobDefinitionId());
+    assertEquals("Expected that job is assigned to deployment '" + snapshotAfterMigration.getDeploymentId() + "' after migration",
+        snapshotAfterMigration.getDeploymentId(), jobAfter.getDeploymentId());
     assertEquals(dueDateAfter, jobAfter.getDuedate());
     assertEquals(((JobEntity) jobBefore).getType(), ((JobEntity) jobAfter).getType());
     assertEquals(jobBefore.getPriority(), jobAfter.getPriority());
