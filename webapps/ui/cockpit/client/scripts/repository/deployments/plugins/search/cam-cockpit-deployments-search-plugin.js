@@ -16,7 +16,10 @@ var angular = require('camunda-commons-ui/vendor/angular');
   ) {
 
     var parseValue = function(value, enforceString) {
-      if(!isNaN(value) && value.trim() !== '' && !enforceString) {
+      if(enforceString) {
+        return '' + value;
+      }
+      if(!isNaN(value) && value.trim() !== '') {
         // value must be transformed to number
         return +value;
       }
