@@ -23,18 +23,21 @@ function (
     },
     controller: [
       '$scope',
+      '$filter',
       'Data',
       'dataDepend',
       'Views',
       'camAPI',
     function(
       $scope,
+      $filter,
       Data,
       dataDepend,
       Views,
       camAPI
     ) {
       var processData = $scope.processData = dataDepend.create($scope);
+      var abbreviate = $filter('abbreviateNumber');
 
       Data.instantiateProviders('cockpit.dashboard.data', {
         $scope: $scope,
@@ -72,13 +75,7 @@ function (
         if (!count) {
           return 'No';
         }
-        if (count >= 1000000) {
-          return Math.round(count / 1000000) + 'm';
-        }
-        if (count >= 1000) {
-          return Math.round(count / 1000) + 'k';
-        }
-        return count;
+        return abbreviate(count);
       };
       $scope.loadingState = 'LOADING';
       // should I mention how much I love AngularJS?
