@@ -1,97 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>Welcome to the Camunda BPM platform</title>
-    
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="author" content="camunda.org community" />
-    
-    <link rel="shortcut icon" href="assets/img/favicon.ico" />
-    
-    <!-- loads all stylesheets -->
-    <link href="assets/css/app.css" rel="stylesheet" />
-    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="assets/css/bootstrap-responsive.min.css" rel="stylesheet" />
+<html lang=en>
+<head>
+  <meta charset=utf-8>
+  <meta http-equiv=X-UA-Compatible content="IE=edge">
+  <meta name=viewport content="width=device-width,initial-scale=1">
+  <meta name="author" content="camunda.org community" />
 
-    <!-- For IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-     
-    <base app-base="." />
-  </head>
-  <body ng-controller="DefaultController" >
-    <div class="wrapper wrapper-dark">
-      <div class="clearer"> </div>
-        <div class="container" >
-          <div class="center center-custom"> 
-            <i class="camunda-icon"></i><p> <h1>Camunda BPM platform</h1></p>
-            <p>
-              <strong>Congratulations!</strong> you have successfully installed the Camunda BPM platform.<br />
-              Read our <strong><a href="http://docs.camunda.org/latest/guides/getting-started-guides/" target="_blank">Getting Started Tutorials</a></strong> 
-              or jump right into our <strong><a href="/camunda-invoice/" target="_blank">Invoice Example</a></strong>.<br />
-              You can use the following credentials for all applications:
-            </p>
-            <h3>
-              User: <strong>demo</strong><br />
-              Password: <strong>demo</strong>
-            </h3>
-          </div>
-          <div class="welcome-container">
-            <div class="row">
-              <div class="span4 center">
-                <a href="/camunda/app/tasklist/default/#/login" target="_blank">
-                  <img src="assets/img/tasklist.png" class="preview">
-                </a>
-              </div>
-              <div class="span4 center">
-                <a href="/camunda/app/cockpit/default/#/login" target="_blank">
-                  <img src="assets/img/cockpit.png" class="preview">
-                </a>
-              </div>
-              <div class="span4 center">
-                <a href="/camunda/app/admin/default/#/login" target="_blank">
-                  <img src="assets/img/admin.png" class="preview">
-                </a>
-              </div>
-            </div>
-            <div class="row row-white">
-              <div class="span4 center">
-                <h2>Camunda Tasklist</h2>
-                <p>
-                  Human Workflow Management.
-                </p>
-                <p>
-                  <a href="/camunda/app/tasklist/default/#/login" class="btn" target="_blank">Open Tasklist &gt;&gt;</a>
-                </p>
-              </div>
-              <div class="span4 center">
-                <h2>Camunda Cockpit</h2>                
-                <p>
-                  Operations &amp; Monitoring.
-                </p>
-                <p>
-                  <a href="/camunda/app/cockpit/default/#/login" class="btn" target="_blank">Open Cockpit &gt;&gt;</a>
-                </p>                
-              </div>
-              <div class="span4 center">
-                <h2>Camunda Admin</h2>                
-                <p>
-                  User Management.
-                </p>
-                <p>
-                  <a href="/camunda/app/admin/default/#/login" class="btn" target="_blank">Open Admin &gt;&gt;</a>
-                </p>               
-              </div>
-            </div>
-          </div>
-        </div>
-      <div class="push-down"> </div> 
+  <title>Welcome to the Camunda BPM platform</title>
+
+  <base app-base="." />
+
+
+  <link rel="stylesheet" href="./assets/css/styles.min.css">
+
+
+  <link rel="shortcut icon" href="assets/img/favicon.ico" />
+
+
+  <style type="text/css">
+
+  </style>
+</head>
+<body>
+  <header class="cam-brand-header">
+    <div class="container">
+      <a class="navbar-brand" href="./index.html" title="Camunda BPM platform">
+        <span class="brand-logo"></span>
+        <span class="brand-name">Camunda BPM platform</span>
+      </a>
     </div>
-    <!-- footer -->
-    <footer class="footer">
-    </footer>
-  </body>
-</html>
+  </header>
 
+  <div class="page-body container">
+    <div class="row" style="margin-top: 20px;">
+      <div class="col-md-8 col-md-offset-2">
+        <p class="text-center">
+          <strong>Congratulations!</strong> you have successfully installed the Camunda BPM platform.<br />
+          Read our <strong><a href="http://docs.camunda.org/latest/guides/getting-started-guides/" target="_blank">Getting Started Tutorials</a></strong>
+          or jump right into our <strong><a href="/camunda-invoice/" target="_blank">Invoice Example</a></strong>.<br />
+          You can use the following credentials for all applications:
+        </p>
+
+        <div class="h4 text-center">
+          <strong>User:</strong>
+          <span>demo</span>
+        </div>
+        <div class="h4 text-center">
+          <strong>Password:</strong>
+          <span>demo</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top: 20px;">
+      <div class="col-sm-4 text-center" style="margin-bottom: 20px;">
+        <h2>Camunda Tasklist</h2>
+
+        <a href="/camunda/app/tasklist/default/#login" target="_blank">
+          <img src="./assets/img/tasklist.png" class="img-thumbnail" />
+        </a>
+
+        <p>
+          Human Workflow Management.
+        </p>
+        <p>
+          <a href="/camunda/app/tasklist/default/#/login" class="btn btn-default" target="_blank">Open Tasklist &raquo;</a>
+        </p>
+      </div>
+
+
+      <div class="col-sm-4 text-center" style="margin-bottom: 20px;">
+        <h2>Camunda Cockpit</h2>
+
+        <a href="/camunda/app/cockpit/default/#login" target="_blank">
+          <img src="./assets/img/cockpit.png" class="img-thumbnail" />
+        </a>
+
+        <p>
+          Operations &amp; Monitoring.
+        </p>
+        <p>
+          <a href="/camunda/app/cockpit/default/#/login" class="btn btn-default" target="_blank">Open Cockpit &raquo;</a>
+        </p>
+      </div>
+
+
+      <div class="col-sm-4 text-center" style="margin-bottom: 20px;">
+        <h2>Camunda Admin</h2>
+
+        <a href="/camunda/app/admin/default/#login" target="_blank">
+          <img src="./assets/img/admin.png" class="img-thumbnail" />
+        </a>
+
+        <p>
+          User Management.
+        </p>
+        <p>
+          <a href="/camunda/app/admin/default/#/login" class="btn btn-default" target="_blank">Open Admin &raquo;</a>
+        </p>
+      </div>
+    </div>
+
+    <div class="row" style="margin-bottom: 20px;">
+      <div class="col-md-8 col-md-offset-2 text-center">
+        <a class="h3" href="https://docs.camunda.org/manual/latest/modeler/camunda-modeler/" target="_blank">Camunda Modeler</a>
+        <p>
+          Camunda Modeler is a desktop application for modeling BPMN and DMN.<br/>
+          It allows you to model files located directly on your local file system.
+        </p>
+        <a class="btn btn-default" href="https://docs.camunda.org/manual/latest/modeler/camunda-modeler/" target="_blank">More about Modeler &raquo;</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="cam-brand-footer">
+  </footer>
+</body>
+</html>
