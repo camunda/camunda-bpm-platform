@@ -2,45 +2,49 @@
 
 var commentLineExp =  /^[\s]*<!-- (\/|#) (CE|EE)/;
 
-function distFileProcessing(content, srcpath) {
-  // removes the template comments
-  content = content
-            .split('\n').filter(function(line) {
-              return !commentLineExp.test(line);
-            }).join('\n');
-
-  // var date = new Date();
-  // var cacheBuster = [date.getFullYear(), date.getMonth(), date.getDate()].join('-');
-  // content = content
-  //           .replace(/\/\* cache-busting /, '/* cache-busting */')
-  //           .replace(/CACHE_BUSTER/g, requireConfExp.test(srcpath) ? '\''+ cacheBuster +'\'' : cacheBuster);
-
-  return content;
-}
-
-function devFileProcessing(content, srcpath) {
-  /* jshint validthis: true */
-  var liveReloadPort = this.config.get('pkg.gruntConfig.livereloadPort');
-  /* jshint validthis: false */
-
-  content = content
-            .replace(/\/\* live-reload/, '/* live-reload */')
-            .replace(/LIVERELOAD_PORT/g, liveReloadPort);
-
-  // content = content
-  //           .replace(/\/\* cache-busting/, '/* cache-busting */')
-  //           .replace(/CACHE_BUSTER/g, (new Date()).getTime());
-
-  return content;
-}
-
 module.exports = function(config, copyConf) {
   var grunt = config.grunt;
 
+  var path = require('path');
+  var now = (new Date()).getTime();
+  var version = grunt.file.readJSON(path.resolve(__dirname, '../../../../package.json')).version;
+  version = (version.indexOf('-SNAPSHOT') > -1 ? (version +'-'+ now) : version);
+
+  function prod () {
+    return grunt.config('buildMode') === 'prod';
+  }
+
+  function cacheBust(content, srcpath) {
+    if (srcpath.slice(-4) !== 'html') { return content; }
+    return content.split('$GRUNT_CACHE_BUST').join(prod() ? version : now);
+  }
+
+
+  function distFileProcessing(content, srcpath) {
+    // removes the template comments
+    content = content
+              .split('\n').filter(function(line) {
+                return !commentLineExp.test(line);
+              }).join('\n');
+
+    return content;
+  }
+
+  function devFileProcessing(content, srcpath) {
+    var liveReloadPort = grunt.config.get('pkg.gruntConfig.livereloadPort');
+
+    content = content
+              .replace(/\/\* live-reload/, '/* live-reload */')
+              .replace(/LIVERELOAD_PORT/g, liveReloadPort);
+
+    return content;
+  }
+
   copyConf.admin_index = {
     options: {
-      process: function() {
-        return devFileProcessing.apply(grunt, arguments);
+      process: function(content, srcpath) {
+        content = cacheBust(content, srcpath);
+        return devFileProcessing(content, srcpath);
       }
     },
     files: [
@@ -58,8 +62,9 @@ module.exports = function(config, copyConf) {
 
   copyConf.admin_dist = {
       options: {
-        process: function() {
-          return distFileProcessing.apply(grunt, arguments);
+        process: function(content, srcpath) {
+          content = cacheBust(content, srcpath);
+          return distFileProcessing(content, srcpath);
         }
       },
       files: [

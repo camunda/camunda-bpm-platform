@@ -32,11 +32,11 @@
 
 
     <!-- styles -->
-    <link href="$APP_ROOT/app/admin/styles/styles.css"
+    <link href="$APP_ROOT/app/admin/styles/styles.css?bust=$GRUNT_CACHE_BUST"
           rel="stylesheet" />
     <link rel="stylesheet"
           type="text/css"
-          href="$APP_ROOT/app/admin/styles/user-styles.css">
+          href="$APP_ROOT/app/admin/styles/user-styles.css?bust=$GRUNT_CACHE_BUST">
 
     <!-- favicon -->
     <link rel="shortcut icon"
@@ -126,7 +126,13 @@
     </script><![endif]-->
 
     <script type="application/javascript"
-            src="$APP_ROOT/lib/require.js"
-            data-main="$APP_ROOT/app/admin/camunda-admin-bootstrap"></script>
+            src="$APP_ROOT/lib/require.js"></script>
+    <script type="text/javascript">
+require.config({
+  baseUrl: '$APP_ROOT/app/admin',
+  urlArgs: 'bust=$GRUNT_CACHE_BUST'
+});
+require(['$APP_ROOT/app/admin/camunda-admin-bootstrap.js'], function () {});
+    </script>
   </body>
 </html>

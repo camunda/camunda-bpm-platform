@@ -2,10 +2,20 @@ module.exports = function(config, copyConf) {
   'use strict';
   var grunt = config.grunt;
   var productionRemoveExp = /<!-- #production-remove([\s\S.]*)\/production-remove -->/igm;
+
+  var path = require('path');
+  var now = (new Date()).getTime();
+  var version = grunt.file.readJSON(path.resolve(__dirname, '../../../../package.json')).version;
+  version = (version.indexOf('-SNAPSHOT') > -1 ? (version +'-'+ now) : version);
+
   function prod () {
     return grunt.config('buildMode') === 'prod';
   }
 
+  function cacheBust(content, srcpath) {
+    if (srcpath.slice(-4) !== 'html') { return content; }
+    return content.split('$GRUNT_CACHE_BUST').join(prod() ? version : now);
+  }
 
   function productionRemove(content) {
     if (!prod()) { return content; }
@@ -42,7 +52,7 @@ module.exports = function(config, copyConf) {
 
 
   function copyReplace(content, srcpath) {
-
+    content = cacheBust(content, srcpath);
     content = productionRemove(content, srcpath);
     content = appConf(content, srcpath);
     content = livereloadPort(content, srcpath);
