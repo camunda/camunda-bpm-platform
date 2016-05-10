@@ -66,6 +66,8 @@ public enum HistoryEventTypes implements HistoryEventType {
 
   /** fired when an incident is created. */
   INCIDENT_CREATE("incident", "create"),
+  /** fired when an incident is migrated. */
+  INCIDENT_MIGRATE("incident", "migrate"),
   /** fired when an incident is deleted. */
   INCIDENT_DELETE("incident", "delete"),
   /** fired when an incident is resolved. */

@@ -726,6 +726,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return createHistoricIncidentEvt(incident, HistoryEventTypes.INCIDENT_DELETE);
   }
 
+  public HistoryEvent createHistoricIncidentMigrateEvt(Incident incident) {
+    return createHistoricIncidentEvt(incident, HistoryEventTypes.INCIDENT_MIGRATE);
+  }
+
   protected HistoryEvent createHistoricIncidentEvt(Incident incident, HistoryEventTypes eventType) {
     // create event
     HistoricIncidentEventEntity evt = loadIncidentEvent(incident);

@@ -51,7 +51,12 @@
       ${prefix}ACT_HI_INCIDENT
     set
       END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
-      INCIDENT_STATE_ = #{incidentState, jdbcType=INTEGER}
+      INCIDENT_STATE_ = #{incidentState, jdbcType=INTEGER},
+      PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+      ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
+      JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
     where
       ID_ = #{id, jdbcType=VARCHAR}
   </update>

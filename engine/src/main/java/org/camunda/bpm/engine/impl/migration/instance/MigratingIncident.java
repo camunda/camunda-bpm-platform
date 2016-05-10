@@ -13,6 +13,12 @@
 
 package org.camunda.bpm.engine.impl.migration.instance;
 
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -54,6 +60,21 @@ public class MigratingIncident implements MigratingInstance {
     incident.setActivityId(targetScope.getId());
     incident.setProcessDefinitionId(targetScope.getProcessDefinition().getId());
     incident.setJobDefinitionId(targetJobDefinitionId);
+
+    migrateHistory();
+  }
+
+  protected void migrateHistory() {
+    HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_MIGRATE, this)) {
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createHistoricIncidentMigrateEvt(incident);
+        }
+      });
+    }
   }
 
   public void migrateDependentEntities() {

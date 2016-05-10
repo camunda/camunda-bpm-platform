@@ -223,6 +223,8 @@ public interface HistoryEventProducer {
 
   HistoryEvent createHistoricIncidentDeleteEvt(Incident incident);
 
+  HistoryEvent createHistoricIncidentMigrateEvt(Incident incident);
+
   // Job Log ///////////////////////////////////////////
 
   /**
