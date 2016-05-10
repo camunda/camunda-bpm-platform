@@ -29,10 +29,8 @@
     <h4 class="name"
         tooltip="{{ filter.properties.description }}"
         tooltip-placement="top">
-      <a href>
-        <span class="color-pill"
-              ng-style="{'background-color': filter.properties.color}"></span>
-
+      <a href
+         ng-style="{color: filter.properties.color}">
         {{ filter.name }}
 
         <span ng-show="isFocused(filter)"
