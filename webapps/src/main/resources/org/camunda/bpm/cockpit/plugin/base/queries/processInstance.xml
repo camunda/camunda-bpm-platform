@@ -93,6 +93,12 @@
       ${prefix}ACT_RE_PROCDEF P
     on
       RES.PROC_DEF_ID_ = P.ID_
+
+      <if test="!authCheck.revokeAuthorizationCheckEnabled">
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+        AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_INST_ID_, P.KEY_, '*'))
+      </if>
+
     </if>
 
     <where>
@@ -244,6 +250,11 @@
         ${prefix}ACT_RE_PROCDEF PROCDEF
     on
         EXEC1.PROC_DEF_ID_ = PROCDEF.ID_
+    </if>
+
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_INST_ID_, EXEC1.PROC_INST_ID_, PROCDEF.KEY_, '*'))
     </if>
 
     <where>

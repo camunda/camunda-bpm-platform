@@ -74,6 +74,11 @@
               RES.PROC_DEF_ID_ = PROCDEF.ID_
           </if>
 
+          <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+            AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_INST_ID_, PROCDEF.KEY_, '*'))
+          </if>
+
           <where>
             <!-- processInstanceIds -->
             <if test="processInstanceIdIn != null &amp;&amp; processInstanceIdIn.length > 0">
