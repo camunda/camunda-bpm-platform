@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.authorization.Groups;
-import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
@@ -740,20 +739,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   protected String createDeployment(String name) {
     return createDeployment(name, FIRST_RESOURCE, SECOND_RESOURCE).getId();
-  }
-
-  @Override
-  protected Group createGroup(String groupId) {
-    disableAuthorization();
-    Group group = super.createGroup(groupId);
-    enableAuthorization();
-    return group;
-  }
-
-  protected void createMembership(String userId, String groupId) {
-    disableAuthorization();
-    identityService.createMembership(userId, groupId);
-    enableAuthorization();
   }
 
   protected void registerProcessApplication(String deploymentId, ProcessApplicationReference reference) {
