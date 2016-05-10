@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
-public class MultiTenancyMessageEventReceivedTest {
+public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
