@@ -22,7 +22,6 @@ import org.junit.rules.RuleChain;
 public class MultiTenancyActivityCmdsTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
-  protected static final String TENANT_TWO = "tenant2";
 
   protected static final String PROCESS_DEFINITION_KEY = "oneTaskProcess";
 
@@ -36,7 +35,7 @@ public class MultiTenancyActivityCmdsTenantCheckTest {
 
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
-  protected static String processInstanceId;
+  protected String processInstanceId;
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -55,7 +54,7 @@ public class MultiTenancyActivityCmdsTenantCheckTest {
   }
 
   @Test
-  public void getActivityInstanceForUserAndAuthenticatedTenant() {
+  public void getActivityInstanceWithAuthenticatedTenant() {
 
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
     
@@ -64,18 +63,18 @@ public class MultiTenancyActivityCmdsTenantCheckTest {
   }
 
   @Test
-  public void getActivityInstanceForUserAndNoAuthenticatedTenant() {
+  public void getActivityInstanceWithNoAuthenticatedTenant() {
 
     engineRule.getIdentityService().setAuthentication("aUserId", null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the process instance because it belongs to no authenticated tenant:");
+    thrown.expectMessage("Cannot read the process instance because it belongs to no authenticated tenant.");
     engineRule.getRuntimeService().getActivityInstance(processInstanceId);
     
   }
 
   @Test
-  public void getActivityInstanceForUserAndDisabledTenantCheck() {
+  public void getActivityInstanceWithDisabledTenantCheck() {
 
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
@@ -86,7 +85,7 @@ public class MultiTenancyActivityCmdsTenantCheckTest {
 
   // get active activity id
   @Test
-  public void getActivityIdsForUserAndAuthenticatedTenant() {
+  public void getActivityIdsWithAuthenticatedTenant() {
 
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
 
@@ -96,19 +95,19 @@ public class MultiTenancyActivityCmdsTenantCheckTest {
   }
 
   @Test
-  public void getActivityIdsForUserAndNoAuthenticatedTenant() {
+  public void getActivityIdsWithNoAuthenticatedTenant() {
 
     engineRule.getIdentityService().setAuthentication("aUserId", null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the process instance because it belongs to no authenticated tenant:");
+    thrown.expectMessage("Cannot read the process instance because it belongs to no authenticated tenant.");
     // when
     engineRule.getRuntimeService().getActiveActivityIds(processInstanceId);
 
   }
 
   @Test
-  public void getActivityIdsForUserAndDisabledTenantCheck() {
+  public void getActivityIdsWithDisabledTenantCheck() {
 
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);

@@ -23,7 +23,6 @@ import org.junit.rules.RuleChain;
 public class MultiTenancyExecutionVariableCmdsTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
-  protected static final String TENANT_TWO = "tenant2";
   
   protected static final String VARIABLE_1 = "testVariable1";
   protected static final String VARIABLE_2 = "testVariable2";
@@ -43,7 +42,7 @@ public class MultiTenancyExecutionVariableCmdsTenantCheckTest {
 
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
-  protected static String processInstanceId;
+  protected String processInstanceId;
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -61,12 +60,12 @@ public class MultiTenancyExecutionVariableCmdsTenantCheckTest {
     .startProcessInstanceByKey(PROCESS_DEFINITION_KEY, 
          Variables.createVariables()
          .putValue(VARIABLE_1, VARIABLE_VALUE_1)
-         .putValue(VARIABLE_VALUE_2, VARIABLE_VALUE_2))
+         .putValue(VARIABLE_2, VARIABLE_VALUE_2))
     .getId();
   }
 
   @Test
-  public void getExecutionVariableWithUserAndAuthenticatedTenant() {
+  public void getExecutionVariableWithAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
     
@@ -75,19 +74,19 @@ public class MultiTenancyExecutionVariableCmdsTenantCheckTest {
   }
   
   @Test
-  public void getExecutionVariableWithUserAndNoAuthenticatedTenant() {
+  public void getExecutionVariableWithNoAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
        
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the process instance because it belongs to no authenticated tenant:");
+    thrown.expectMessage("Cannot read the process instance because it belongs to no authenticated tenant.");
     engineRule.getRuntimeService().getVariable(processInstanceId, VARIABLE_1);
     
   }
 
   @Test
-  public void getExecutionVariableWithUserAndDisabledTenantCheck() {
+  public void getExecutionVariableWithDisabledTenantCheck() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
@@ -99,7 +98,7 @@ public class MultiTenancyExecutionVariableCmdsTenantCheckTest {
 
   // get typed execution variable
   @Test
-  public void getExecutionVariableTypedWithUserAndAuthenticatedTenant() {
+  public void getExecutionVariableTypedWithAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
 
@@ -108,18 +107,18 @@ public class MultiTenancyExecutionVariableCmdsTenantCheckTest {
   }
 
   @Test
-  public void getExecutionVariableTypedWithUserAndNoAuthenticatedTenant() {
+  public void getExecutionVariableTypedWithNoAuthenticatedTenant() {
   
     engineRule.getIdentityService().setAuthentication("aUserId", null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the process instance because it belongs to no authenticated tenant:");
+    thrown.expectMessage("Cannot read the process instance because it belongs to no authenticated tenant.");
     // then
     engineRule.getRuntimeService().getVariableTyped(processInstanceId, VARIABLE_1);
   }
 
   @Test
-  public void getExecutionVariableTypedWithUserAnDisabledTenantCheck() {
+  public void getExecutionVariableTypedWithDisabledTenantCheck() {
   
     engineRule.getIdentityService().setAuthentication("aUserId", null);
 
@@ -133,7 +132,7 @@ public class MultiTenancyExecutionVariableCmdsTenantCheckTest {
 
   // get execution variables
   @Test
-  public void getExecutionVariablesWithUserAndAuthenticatedTenant() {
+  public void getExecutionVariablesWithAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
     
@@ -142,19 +141,19 @@ public class MultiTenancyExecutionVariableCmdsTenantCheckTest {
   }
   
   @Test
-  public void getExecutionVariablesWithUserAndNoAuthenticatedTenant() {
+  public void getExecutionVariablesWithNoAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
        
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the process instance because it belongs to no authenticated tenant:");
+    thrown.expectMessage("Cannot read the process instance because it belongs to no authenticated tenant.");
     engineRule.getRuntimeService().getVariables(processInstanceId).size();
     
   }
   
   @Test
-  public void getExecutionVariablesWithUserAndDisabledTenantCheck() {
+  public void getExecutionVariablesWithDisabledTenantCheck() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
@@ -166,7 +165,7 @@ public class MultiTenancyExecutionVariableCmdsTenantCheckTest {
 
   // set execution variable
   @Test
-  public void setExecutionVariableWithUserAndAuthenticatedTenant() {
+  public void setExecutionVariableWithAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
     
@@ -176,19 +175,19 @@ public class MultiTenancyExecutionVariableCmdsTenantCheckTest {
   }
   
   @Test
-  public void setExecutionVariableWithUserAndNoAuthenticatedTenant() {
+  public void setExecutionVariableWithNoAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process instance because it belongs to no authenticated tenant:");
+    thrown.expectMessage("Cannot update the process instance because it belongs to no authenticated tenant.");
     engineRule.getRuntimeService().setVariable(processInstanceId, "newVariable", "newValue");
     
   }
   
   @Test
-  public void setExecutionVariableWithUserAndDisabledTenantCheck() {
+  public void setExecutionVariableWithDisabledTenantCheck() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     
@@ -199,7 +198,7 @@ public class MultiTenancyExecutionVariableCmdsTenantCheckTest {
 
   // remove execution variable
   @Test
-  public void removeExecutionVariableWithUserAndAuthenticatedTenant() {
+  public void removeExecutionVariableWithAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
     engineRule.getRuntimeService().removeVariable(processInstanceId, VARIABLE_1);
@@ -209,19 +208,19 @@ public class MultiTenancyExecutionVariableCmdsTenantCheckTest {
   }
   
   @Test
-  public void removeExecutionVariableWithUserAndNoAuthenticatedTenant() {
+  public void removeExecutionVariableWithNoAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process instance because it belongs to no authenticated tenant:");
+    thrown.expectMessage("Cannot update the process instance because it belongs to no authenticated tenant.");
     engineRule.getRuntimeService().removeVariable(processInstanceId, VARIABLE_1);
     
   }
   
   @Test
-  public void removeExecutionVariableWithUserAndDisabledTenantCheck() {
+  public void removeExecutionVariableWithDisabledTenantCheck() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);

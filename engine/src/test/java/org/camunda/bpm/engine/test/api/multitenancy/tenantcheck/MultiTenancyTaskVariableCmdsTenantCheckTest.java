@@ -25,7 +25,6 @@ import org.junit.rules.RuleChain;
 public class MultiTenancyTaskVariableCmdsTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
-  protected static final String TENANT_TWO = "tenant2";
   
   protected static final String VARIABLE_1 = "testVariable1";
   protected static final String VARIABLE_2 = "testVariable2";
@@ -48,7 +47,7 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-  protected static String taskId;
+  protected String taskId;
 
   @Rule
   public ExpectedException thrown= ExpectedException.none();
@@ -63,7 +62,7 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
     .startProcessInstanceByKey(PROCESS_DEFINITION_KEY, 
          Variables.createVariables()
          .putValue(VARIABLE_1, VARIABLE_VALUE_1)
-         .putValue(VARIABLE_VALUE_2, VARIABLE_VALUE_2))
+         .putValue(VARIABLE_2, VARIABLE_VALUE_2))
     .getId();
  
     taskId = engineRule.getTaskService().createTaskQuery().singleResult().getId();
@@ -72,7 +71,7 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
 
   // get task variable
   @Test
-  public void getTaskVariableWithUserAndAuthenticatedTenant() {
+  public void getTaskVariableWithAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
 
@@ -80,19 +79,19 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
   }
   
   @Test
-  public void getTaskVariableWithUserAndNoAuthenticatedTenant() {
+  public void getTaskVariableWithNoAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the task because it belongs to no authenticated tenant:");
-    assertEquals(VARIABLE_VALUE_1, engineRule.getTaskService().getVariable(taskId, VARIABLE_1));
+    thrown.expectMessage("Cannot read the task because it belongs to no authenticated tenant.");
+    engineRule.getTaskService().getVariable(taskId, VARIABLE_1);
   }
 
   
   @Test
-  public void getTaskVariableWithNoUserAndDisabledTenantCheck() {
+  public void getTaskVariableWithDisabledTenantCheck() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
@@ -103,7 +102,7 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
   
   // get task variable typed
   @Test
-  public void getTaskVariableTypedWithUserAndAuthenticatedTenant() {
+  public void getTaskVariableTypedWithAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
 
@@ -113,18 +112,18 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
   }
 
   @Test
-  public void getTaskVariableTypedWithUserAndNoAuthenticatedTenant() {
+  public void getTaskVariableTypedWithNoAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the task because it belongs to no authenticated tenant:");
-    assertEquals(VARIABLE_VALUE_1, engineRule.getTaskService().getVariableTyped(taskId, VARIABLE_1).getValue());
+    thrown.expectMessage("Cannot read the task because it belongs to no authenticated tenant.");
+    engineRule.getTaskService().getVariableTyped(taskId, VARIABLE_1).getValue();
   }
 
   @Test
-  public void getTaskVariableTypedWithUserAndDisableTenantCheck() {
+  public void getTaskVariableTypedWithDisableTenantCheck() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
@@ -135,7 +134,7 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
   
   // get task variables
   @Test
-  public void getTaskVariablesWithUserAndAuthenticatedTenant() {
+  public void getTaskVariablesWithAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
     
@@ -144,19 +143,19 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
   }
   
   @Test
-  public void getTaskVariablesWithUserAndNoAuthenticatedTenant() {
+  public void getTaskVariablesWithNoAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
        
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the task because it belongs to no authenticated tenant:");
-    assertEquals(2, engineRule.getTaskService().getVariables(taskId).size());
+    thrown.expectMessage("Cannot read the task because it belongs to no authenticated tenant.");
+    engineRule.getTaskService().getVariables(taskId).size();
     
   }
   
   @Test
-  public void getTaskVariablesWithUserAndDisabledTenantCheck() {
+  public void getTaskVariablesWithDisabledTenantCheck() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
@@ -167,7 +166,7 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
   
   // set variable test
   @Test
-  public void setTaskVariableWithUserAndAuthenticatedTenant() {
+  public void setTaskVariableWithAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
     engineRule.getTaskService().setVariable(taskId, "newVariable", "newValue");
@@ -176,18 +175,18 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
   }
   
   @Test
-  public void setTaskVariableWithUserAndNoAuthenticatedTenant() {
+  public void setTaskVariableWithNoAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the task because it belongs to no authenticated tenant:");
+    thrown.expectMessage("Cannot update the task because it belongs to no authenticated tenant.");
     engineRule.getTaskService().setVariable(taskId, "newVariable", "newValue");
     
   }
   
   @Test
-  public void setTaskVariableWithNoUserAndDisabledTenantCheck() {
+  public void setTaskVariableWithDisabledTenantCheck() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
@@ -199,7 +198,7 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
   
   // remove variable test
   @Test
-  public void removeTaskVariableWithUserAndAuthenticatedTenant() {
+  public void removeTaskVariableWithAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
     engineRule.getTaskService().removeVariable(taskId, VARIABLE_1);
@@ -208,18 +207,18 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
   }
   
   @Test
-  public void removeTaskVariablesWithUserAndNoAuthenticatedTenant() {
+  public void removeTaskVariablesWithNoAuthenticatedTenant() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the task because it belongs to no authenticated tenant:");
+    thrown.expectMessage("Cannot update the task because it belongs to no authenticated tenant.");
     engineRule.getTaskService().removeVariable(taskId, VARIABLE_1);
   }
   
   @Test
-  public void removeTaskVariablesWithUserAndDisabledTenantCheck() {
+  public void removeTaskVariablesWithDisabledTenantCheck() {
     
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
