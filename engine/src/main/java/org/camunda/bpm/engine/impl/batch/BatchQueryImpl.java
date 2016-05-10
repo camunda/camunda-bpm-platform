@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.BatchQueryProperty;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 
 public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements BatchQuery {
 
@@ -33,6 +34,7 @@ public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements 
   protected String type;
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
+  protected SuspensionState suspensionState;
 
   public BatchQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -77,6 +79,20 @@ public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements 
     this.tenantIds = null;
     isTenantIdSet = true;
     return this;
+  }
+
+  public BatchQuery active() {
+    this.suspensionState = SuspensionState.ACTIVE;
+    return this;
+  }
+
+  public BatchQuery suspended() {
+    this.suspensionState = SuspensionState.SUSPENDED;
+    return this;
+  }
+
+  public SuspensionState getSuspensionState() {
+    return suspensionState;
   }
 
   public BatchQuery orderById() {

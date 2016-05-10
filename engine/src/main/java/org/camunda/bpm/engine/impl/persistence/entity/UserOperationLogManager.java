@@ -308,4 +308,18 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     return Context.getCommandContext().isUserOperationLogEnabled();
   }
 
+  public void logBatchOperation(String operation, String batchId, PropertyChange propertyChange) {
+    if(isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+        UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.BATCH)
+          .batchId(batchId)
+          .propertyChanges(propertyChange);
+
+      context.addEntry(entryBuilder.create());
+
+      fireUserOperationLog(context);
+    }
+  }
+
 }

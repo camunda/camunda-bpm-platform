@@ -182,6 +182,18 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  public void checkSuspendBatch(BatchEntity batch) {
+    if (batch != null && !getTenantManager().isAuthenticatedTenant(batch.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("suspend batch");
+    }
+  }
+
+  public void checkActivateBatch(BatchEntity batch) {
+    if (batch != null && !getTenantManager().isAuthenticatedTenant(batch.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("activate batch");
+    }
+  }
+
   @Override
   public void checkCreateDeployment() {
   }

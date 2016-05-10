@@ -272,6 +272,7 @@ create table ACT_RU_BATCH (
   SEED_JOB_DEF_ID_ nvarchar(64),
   BATCH_JOB_DEF_ID_ nvarchar(64),
   MONITOR_JOB_DEF_ID_ nvarchar(64),
+  SUSPENSION_STATE_ tinyint,
   CONFIGURATION_ nvarchar(255),
   TENANT_ID_ nvarchar(64),
   primary key (ID_)

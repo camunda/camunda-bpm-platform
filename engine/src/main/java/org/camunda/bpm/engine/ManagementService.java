@@ -22,6 +22,7 @@ import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchQuery;
 import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -1071,6 +1072,44 @@ public interface ManagementService {
   BatchQuery createBatchQuery();
 
   /**
+   * <p>
+   *   Suspends the {@link Batch} with the given id immediately.
+   * </p>
+   *
+   * <p>
+   *   <strong>Note:</strong> All {@link JobDefinition}s and {@link Job}s
+   *   related to the provided batch will be suspended.
+   * </p>
+   *
+   * @throws BadUserRequestException
+   *          If no such batch can be found.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#BATCH}.
+   *
+   * @since 7.5
+   */
+  void suspendBatchById(String batchId);
+
+  /**
+   * <p>
+   *   Activates the {@link Batch} with the given id immediately.
+   * </p>
+   *
+   * <p>
+   *   <strong>Note:</strong> All {@link JobDefinition}s and {@link Job}s
+   *   related to the provided batch will be activated.
+   * </p>
+   *
+   * @throws BadUserRequestException
+   *          If no such batch can be found.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#BATCH}.
+   *
+   * @since 7.5
+   */
+  void activateBatchById(String batchId);
+
+  /**
    * Deletes a batch instance and the corresponding job definitions.
    *
    * If cascade is set to true the historic batch instances and the
@@ -1085,6 +1124,8 @@ public interface ManagementService {
 
   /**
    * Query for the statistics of the batch execution jobs of a batch.
+   *
+   * @since 7.5
    */
   BatchStatisticsQuery createBatchStatisticsQuery();
 

@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.batch;
 
+import org.camunda.bpm.engine.ManagementService;
+
 /**
  * <p>A batch represents a number of jobs which
  * execute a number of commands asynchronously.
@@ -80,5 +82,24 @@ public interface Batch {
    * @return the batch's tenant id or null
    */
   String getTenantId();
+
+  /**
+   * <p>
+   *   Indicates whether this batch is suspended. If a batch is suspended,
+   *   the batch jobs will not be acquired by the job executor.
+   * </p>
+   *
+   * <p>
+   *   <strong>Note:</strong> It is still possible to manually suspend and activate
+   *   jobs and job definitions using the {@link ManagementService}, which will
+   *   not change the suspension state of the batch.
+   * </p>
+   *
+   * @return true if this batch is currently suspended, false otherwise
+   *
+   * @see ManagementService#suspendBatchById(String)
+   * @see ManagementService#activateBatchById(String)
+   */
+  boolean isSuspended();
 
 }

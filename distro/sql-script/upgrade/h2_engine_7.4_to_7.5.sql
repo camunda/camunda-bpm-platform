@@ -223,6 +223,7 @@ create table ACT_RU_BATCH (
   SEED_JOB_DEF_ID_ varchar(64),
   BATCH_JOB_DEF_ID_ varchar(64),
   MONITOR_JOB_DEF_ID_ varchar(64),
+  SUSPENSION_STATE_ integer,
   CONFIGURATION_ varchar(255),
   TENANT_ID_ varchar(64),
   primary key (ID_)
@@ -307,3 +308,7 @@ alter table ACT_RU_INCIDENT
 
 ALTER TABLE ACT_HI_INCIDENT
   ADD JOB_DEF_ID_ varchar(64);
+
+-- BATCH_ID_ on ACT_HI_OP_LOG --
+ALTER TABLE ACT_HI_OP_LOG
+  ADD BATCH_ID_ varchar(64);

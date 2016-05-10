@@ -29,9 +29,10 @@ import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION
 import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Resources.TASK;
+
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
-import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
@@ -282,6 +283,14 @@ public class AuthorizationCommandChecker implements CommandChecker {
   @Override
   public void checkDeleteHistoricBatch(HistoricBatchEntity batch) {
     getAuthorizationManager().checkAuthorization(DELETE_HISTORY, BATCH, batch.getId());
+  }
+
+  public void checkSuspendBatch(BatchEntity batch) {
+    getAuthorizationManager().checkAuthorization(UPDATE, BATCH, batch.getId());
+  }
+
+  public void checkActivateBatch(BatchEntity batch) {
+    getAuthorizationManager().checkAuthorization(UPDATE, BATCH, batch.getId());
   }
 
   /* DEPLOYMENT */

@@ -201,4 +201,76 @@ public class MultiTenancyBatchTest {
     }
   }
 
+  @Test
+  public void testSuspendBatch() {
+    // given
+    Batch batch = batchHelper.migrateProcessInstanceAsync(tenant1Definition, tenant1Definition);
+
+    // when
+    identityService.setAuthentication("user", null, singletonList(TENANT_ONE));
+    managementService.suspendBatchById(batch.getId());
+    identityService.clearAuthentication();
+
+    // then
+    batch = managementService.createBatchQuery().batchId(batch.getId()).singleResult();
+    Assert.assertTrue(batch.isSuspended());
+  }
+
+  @Test
+  public void testSuspendBatchFailsWithWrongTenant() {
+    // given
+    Batch batch = batchHelper.migrateProcessInstanceAsync(tenant2Definition, tenant2Definition);
+
+    // when
+    identityService.setAuthentication("user", null, singletonList(TENANT_ONE));
+    try {
+      managementService.suspendBatchById(batch.getId());
+      Assert.fail("exception expected");
+    }
+    catch (ProcessEngineException e) {
+      // then
+      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Cannot suspend batch because it belongs to no authenticated tenant"));
+    }
+    finally {
+      identityService.clearAuthentication();
+    }
+  }
+
+  @Test
+  public void testActivateBatch() {
+    // given
+    Batch batch = batchHelper.migrateProcessInstanceAsync(tenant1Definition, tenant1Definition);
+    managementService.suspendBatchById(batch.getId());
+
+    // when
+    identityService.setAuthentication("user", null, singletonList(TENANT_ONE));
+    managementService.activateBatchById(batch.getId());
+    identityService.clearAuthentication();
+
+    // then
+    batch = managementService.createBatchQuery().batchId(batch.getId()).singleResult();
+    Assert.assertFalse(batch.isSuspended());
+  }
+
+  @Test
+  public void testActivateBatchFailsWithWrongTenant() {
+    // given
+    Batch batch = batchHelper.migrateProcessInstanceAsync(tenant2Definition, tenant2Definition);
+    managementService.suspendBatchById(batch.getId());
+
+    // when
+    identityService.setAuthentication("user", null, singletonList(TENANT_ONE));
+    try {
+      managementService.activateBatchById(batch.getId());
+      Assert.fail("exception expected");
+    }
+    catch (ProcessEngineException e) {
+      // then
+      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Cannot activate batch because it belongs to no authenticated tenant"));
+    }
+    finally {
+      identityService.clearAuthentication();
+    }
+  }
+
 }

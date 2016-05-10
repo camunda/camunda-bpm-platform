@@ -179,6 +179,7 @@ create table ACT_HI_OP_LOG (
     TASK_ID_ varchar(64),
     JOB_ID_ varchar(64),
     JOB_DEF_ID_ varchar(64),
+    BATCH_ID_ varchar(64),
     USER_ID_ varchar(255),
     TIMESTAMP_ timestamp not null,
     OPERATION_TYPE_ varchar(64),

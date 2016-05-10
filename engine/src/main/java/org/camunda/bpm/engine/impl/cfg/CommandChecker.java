@@ -111,7 +111,20 @@ public interface CommandChecker {
    */
   void checkDeleteBatch(BatchEntity batch);
 
+  /**
+   * Check if it is allowed to delete a historic batch
+   */
   void checkDeleteHistoricBatch(HistoricBatchEntity batch);
+
+  /**
+   * Check if it is allowed to suspend a batch
+   */
+  void checkSuspendBatch(BatchEntity batch);
+
+  /**
+   * Check if it is allowed to activate a batch
+   */
+  void checkActivateBatch(BatchEntity batch);
 
   /**
    * Checks if it is allowed to create a deployment.

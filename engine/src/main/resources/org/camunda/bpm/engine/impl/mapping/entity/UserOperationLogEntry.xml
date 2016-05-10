@@ -34,6 +34,7 @@
         TASK_ID_,
         JOB_ID_,
         JOB_DEF_ID_,
+        BATCH_ID_,
         USER_ID_,
         TIMESTAMP_,
         OPERATION_ID_ ,
@@ -56,6 +57,7 @@
         #{taskId ,jdbcType=VARCHAR},
         #{jobId, jdbcType=VARCHAR},
         #{jobDefinitionId, jdbcType=VARCHAR},
+        #{batchId, jdbcType=VARCHAR},
         #{userId ,jdbcType=VARCHAR},
         #{timestamp ,jdbcType=TIMESTAMP},
         #{operationId ,jdbcType=VARCHAR},
@@ -89,6 +91,7 @@
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="jobId" column="JOB_ID_" jdbcType="VARCHAR" />
     <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="batchId" column="BATCH_ID_" jdbcType="VARCHAR" />
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
     <result property="timestamp" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
     <result property="operationId" column="OPERATION_ID_" jdbcType="VARCHAR" />
@@ -169,6 +172,9 @@
       </if>
       <if test="jobDefinitionId != null">
         and RES.JOB_DEF_ID_ = #{jobDefinitionId}
+      </if>
+      <if test="batchId != null">
+        and RES.BATCH_ID_ = #{batchId}
       </if>
       <if test="userId != null">
         and RES.USER_ID_ = #{userId}

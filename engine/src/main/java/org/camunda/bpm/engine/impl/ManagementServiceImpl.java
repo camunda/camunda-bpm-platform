@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.impl.batch.BatchQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.batch.DeleteBatchCmd;
+import org.camunda.bpm.engine.impl.cmd.ActivateBatchCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteJobCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteMetricsCmd;
 import org.camunda.bpm.engine.impl.cmd.DeletePropertyCmd;
@@ -45,6 +46,7 @@ import org.camunda.bpm.engine.impl.cmd.SetJobDuedateCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobPriorityCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
 import org.camunda.bpm.engine.impl.cmd.SetPropertyCmd;
+import org.camunda.bpm.engine.impl.cmd.SuspendBatchCmd;
 import org.camunda.bpm.engine.impl.cmd.UnregisterDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.UnregisterProcessApplicationCmd;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -432,6 +434,15 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public void deleteBatch(String batchId, boolean cascade) {
     commandExecutor.execute(new DeleteBatchCmd(batchId, cascade));
+  }
+
+  public void suspendBatchById(String batchId) {
+    commandExecutor.execute(new SuspendBatchCmd(batchId));
+  }
+
+  public void activateBatchById(String batchId) {
+    commandExecutor.execute(new ActivateBatchCmd(batchId));
+
   }
 
   public BatchStatisticsQuery createBatchStatisticsQuery() {

@@ -76,6 +76,9 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
   /** Query entries which are existing for the job definition. */
   UserOperationLogQuery jobDefinitionId(String jobDefinitionId);
 
+  /** Query entries which are existing for the batch. */
+  UserOperationLogQuery batchId(String batchId);
+
   /** Query entries which are existing for the user. */
   UserOperationLogQuery userId(String userId);
 
@@ -97,5 +100,4 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
 
   /** Order by time stamp (needs to be followed by {@link #asc()} or {@link #desc()}). */
   UserOperationLogQuery orderByTimestamp();
-
 }

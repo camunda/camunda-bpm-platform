@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.Nameable;
+import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.persistence.entity.util.ByteArrayField;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
@@ -51,6 +52,8 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
   protected ByteArrayField configuration = new ByteArrayField(this);
 
   protected String tenantId;
+
+  protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
   protected int revision;
 
@@ -153,6 +156,18 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
     this.configuration.setByteArrayId(configuration);
   }
 
+  public void setSuspensionState(int state) {
+    this.suspensionState = state;
+  }
+
+  public int getSuspensionState() {
+    return suspensionState;
+  }
+
+  public boolean isSuspended() {
+    return suspensionState == SuspensionState.SUSPENDED.getStateCode();
+  }
+
   public void setRevision(int revision) {
     this.revision = revision;
 
@@ -212,6 +227,7 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
   public Object getPersistentState() {
     HashMap<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("jobsCreated", jobsCreated);
+    persistentState.put("suspensionState", suspensionState);
     return persistentState;
   }
 

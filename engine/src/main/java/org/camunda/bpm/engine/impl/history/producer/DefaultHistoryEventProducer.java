@@ -303,6 +303,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setTaskId(contextEntry.getTaskId());
     evt.setJobId(contextEntry.getJobId());
     evt.setJobDefinitionId(contextEntry.getJobDefinitionId());
+    evt.setBatchId(contextEntry.getBatchId());
     evt.setTimestamp(ClockUtil.getCurrentTime());
 
     // init property value

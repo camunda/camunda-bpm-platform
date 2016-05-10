@@ -34,6 +34,12 @@ public interface BatchQuery extends Query<BatchQuery, Batch> {
   /** Only selects batches which have no tenant id. */
   BatchQuery withoutTenantId();
 
+  /** Only selects batches which are active **/
+  BatchQuery active();
+
+  /** Only selects batches which are suspended **/
+  BatchQuery suspended();
+
   /**
    * Returns batches sorted by id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
    */

@@ -157,4 +157,10 @@ public class UserOperationLogContextEntryBuilder {
     entry.setDeploymentId(deploymentId);
     return this;
   }
+
+  public UserOperationLogContextEntryBuilder batchId(String batchId) {
+    entry.setBatchId(batchId);
+    return this;
+  }
+
 }

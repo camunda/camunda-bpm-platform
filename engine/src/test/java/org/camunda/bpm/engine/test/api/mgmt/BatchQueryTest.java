@@ -108,6 +108,7 @@ public class BatchQueryTest {
     Assert.assertEquals(batch.getInvocationsPerBatchJob(), resultBatch.getInvocationsPerBatchJob());
     Assert.assertEquals(batch.getTotalJobs(), resultBatch.getTotalJobs());
     Assert.assertEquals(batch.getJobsCreated(), resultBatch.getJobsCreated());
+    Assert.assertEquals(batch.isSuspended(), resultBatch.isSuspended());
   }
 
   @Test

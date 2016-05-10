@@ -38,6 +38,7 @@ public class UserOperationLogContextEntry {
   protected List<PropertyChange> propertyChanges;
   protected String jobDefinitionId;
   protected String jobId;
+  protected String batchId;
 
   public UserOperationLogContextEntry(String operationType, String entityType) {
     this.operationType = operationType;
@@ -155,4 +156,13 @@ public class UserOperationLogContextEntry {
   public void setJobId(String jobId) {
     this.jobId = jobId;
   }
+
+  public String getBatchId() {
+    return batchId;
+  }
+
+  public void setBatchId(String batchId) {
+    this.batchId = batchId;
+  }
+
 }

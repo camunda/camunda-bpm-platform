@@ -108,6 +108,9 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_REMOVE_VARIABLE = "RemoveVariable";
   public static String OPERATION_TYPE_MODIFY_VARIABLE = "ModifyVariable";
 
+  public static String OPERATION_TYPE_SUSPEND_BATCH = "SuspendBatch";
+  public static String OPERATION_TYPE_ACTIVATE_BATCH = "ActivateBatch";
+
 
   /** The unique identifier of this log entry. */
   String getId();
@@ -147,6 +150,9 @@ public interface UserOperationLogEntry {
   /** Job definition reference. */
   String getJobDefinitionId();
 
+  /** Batch reference. */
+  String getBatchId();
+
   /** The User who performed the operation */
   String getUserId();
 
@@ -183,5 +189,4 @@ public interface UserOperationLogEntry {
 
   /** The new value of the property. */
   String getNewValue();
-
 }
