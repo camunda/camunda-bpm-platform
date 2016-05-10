@@ -32,11 +32,11 @@
 
 
     <!-- styles -->
-    <link href="$APP_ROOT/app/cockpit/styles/styles.css"
+    <link href="$APP_ROOT/app/cockpit/styles/styles.css?bust=$GRUNT_CACHE_BUST"
           rel="stylesheet" />
     <link rel="stylesheet"
           type="text/css"
-          href="$APP_ROOT/app/cockpit/styles/user-styles.css">
+          href="$APP_ROOT/app/cockpit/styles/user-styles.css?bust=$GRUNT_CACHE_BUST">
 
     <!-- favicon -->
     <link rel="shortcut icon"
@@ -98,8 +98,15 @@
       };
     </script>
 
-    <script type="application/javascript" data-main="$APP_ROOT/app/cockpit/camunda-cockpit-bootstrap" src="$APP_ROOT/lib/require.js"></script>
-
+    <script type="application/javascript"
+            src="$APP_ROOT/lib/require.js"></script>
+    <script type="text/javascript">
+require.config({
+  baseUrl: '$APP_ROOT/app/cockpit',
+  urlArgs: 'bust=$GRUNT_CACHE_BUST'
+});
+require(['$APP_ROOT/app/cockpit/camunda-cockpit-bootstrap.js'], function () {});
+    </script>
 
     <!--[if lte IE 9]>
     <script type="text/javascript"

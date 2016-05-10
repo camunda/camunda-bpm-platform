@@ -6,36 +6,38 @@ var requireConfExp =  /require-conf.js$/;
 module.exports = function(config, copyConf) {
   var grunt = config.grunt;
 
+  var path = require('path');
+  var now = (new Date()).getTime();
+  var version = grunt.file.readJSON(path.resolve(__dirname, '../../../../package.json')).version;
+  version = (version.indexOf('-SNAPSHOT') > -1 ? (version +'-'+ now) : version);
+
+
+  function prod () {
+    return grunt.config('buildMode') === 'prod';
+  }
+
+  function cacheBust(content, srcpath) {
+    if (srcpath.slice(-4) !== 'html') { return content; }
+    return content.split('$GRUNT_CACHE_BUST').join(prod() ? version : now);
+  }
+
   function fileProcessing(content, srcpath) {
-    if(grunt.config('buildMode') === 'prod') {
+    if(prod()) {
       // removes the template comments
       content = content
                 .split('\n').filter(function(line) {
                   return !commentLineExp.test(line);
                 }).join('\n');
-
-      var date = new Date();
-      var cacheBuster = [date.getFullYear(), date.getMonth(), date.getDate()].join('-');
-      content = content
-                .replace(/\/\* cache-busting /, '/* cache-busting */')
-                .replace(/CACHE_BUSTER/g, requireConfExp.test(srcpath) ? '\''+ cacheBuster +'\'' : cacheBuster);
-
-      return content;
     }
-    else {
-      content = content
-                .replace(/\/\* cache-busting/, '/* cache-busting */')
-                .replace(/CACHE_BUSTER/g, (new Date()).getTime());
 
-      return content;
-    }
+    content = cacheBust(content, srcpath);
+
+    return content;
   }
 
   copyConf.cockpit_index = {
       options: {
-        process: function() {
-          return fileProcessing.apply(grunt, arguments);
-        }
+        process: fileProcessing
       },
       files: [
         {
@@ -51,10 +53,6 @@ module.exports = function(config, copyConf) {
   };
 
   copyConf.cockpit_assets = {
-      process: function(content, srcpath) {
-        grunt.log.ok('Copy '+ srcpath);
-        return content;
-      },
       files: [
         // custom styles and/or other css files
         {
