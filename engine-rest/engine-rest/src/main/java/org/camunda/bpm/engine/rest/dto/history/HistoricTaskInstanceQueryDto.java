@@ -127,7 +127,10 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected String caseDefinitionName;
   protected String caseInstanceId;
   protected String caseExecutionId;
-
+  protected String taskInvolvedUser;
+  protected String taskInvolvedGroup;
+  protected String taskHadCandidateUser;
+  protected String taskHadCandidateGroup;
   protected List<VariableQueryParameterDto> taskVariables;
   protected List<VariableQueryParameterDto> processVariables;
 
@@ -327,6 +330,26 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam("taskInvolvedUser")
+  public void setTaskInvolvedUser(String taskInvolvedUser) {
+    this.taskInvolvedUser = taskInvolvedUser;
+  }
+
+  @CamundaQueryParam("taskInvolvedGroup")
+  public void setTaskInvolvedGroup(String taskInvolvedGroup) {
+    this.taskInvolvedGroup = taskInvolvedGroup;
+  }
+
+  @CamundaQueryParam("taskHadCandidateUser")
+  public void setTaskHadCandidateUser(String taskHadCandidateUser) {
+    this.taskHadCandidateUser = taskHadCandidateUser;
+  }
+
+  @CamundaQueryParam("taskHadCandidateGroup")
+  public void setTaskHadCandidateGroup(String taskHadCandidateGroup) {
+    this.taskHadCandidateGroup = taskHadCandidateGroup;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -447,7 +470,18 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
     }
-
+    if(taskInvolvedUser != null){
+      query.taskInvolvedUser(taskInvolvedUser);
+    }
+    if(taskInvolvedGroup != null){
+      query.taskInvolvedGroup(taskInvolvedGroup);
+    }
+    if(taskHadCandidateUser != null){
+      query.taskHadCandidateUser(taskHadCandidateUser);
+    }
+    if(taskHadCandidateGroup != null){
+      query.taskHadCandidateGroup(taskHadCandidateGroup);
+    }
     if (taskVariables != null) {
       for (VariableQueryParameterDto variableQueryParam : taskVariables) {
         String variableName = variableQueryParam.getName();

@@ -17,7 +17,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
@@ -27,7 +30,10 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -40,7 +46,7 @@ public class MigrationBoundaryEventsTest {
   public static final String TIMER_DATE = "2016-02-11T12:13:14Z";
   public static final String NEW_TIMER_DATE = "2018-02-11T12:13:14Z";
 
-  protected ProcessEngineRule rule = new ProcessEngineRule(true);
+  protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule
@@ -58,8 +64,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -90,8 +96,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -124,8 +130,8 @@ public class MigrationBoundaryEventsTest {
         .endEvent()
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -161,8 +167,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -193,8 +199,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -223,8 +229,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -257,8 +263,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -289,8 +295,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -323,8 +329,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -355,8 +361,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -388,8 +394,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -419,8 +425,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -452,8 +458,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -482,8 +488,8 @@ public class MigrationBoundaryEventsTest {
       .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -517,8 +523,8 @@ public class MigrationBoundaryEventsTest {
       .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -551,8 +557,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -583,8 +589,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -617,8 +623,8 @@ public class MigrationBoundaryEventsTest {
         .endEvent()
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -654,8 +660,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -686,8 +692,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -716,8 +722,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -750,8 +756,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -782,8 +788,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -816,8 +822,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -848,8 +854,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -881,8 +887,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -912,8 +918,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -945,8 +951,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -975,8 +981,8 @@ public class MigrationBoundaryEventsTest {
       .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1010,8 +1016,8 @@ public class MigrationBoundaryEventsTest {
       .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1044,8 +1050,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1076,8 +1082,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1110,8 +1116,8 @@ public class MigrationBoundaryEventsTest {
         .endEvent()
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1143,8 +1149,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1175,8 +1181,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1205,8 +1211,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1239,8 +1245,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1271,8 +1277,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1305,8 +1311,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1337,8 +1343,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1370,8 +1376,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1401,8 +1407,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1434,8 +1440,8 @@ public class MigrationBoundaryEventsTest {
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1464,8 +1470,8 @@ public class MigrationBoundaryEventsTest {
       .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1499,8 +1505,8 @@ public class MigrationBoundaryEventsTest {
       .done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
       .changeElementId("boundary", "newBoundary");
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1539,8 +1545,8 @@ public class MigrationBoundaryEventsTest {
         .boundaryEvent("signalBoundary2").signal(SIGNAL_NAME)
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1583,8 +1589,8 @@ public class MigrationBoundaryEventsTest {
         .boundaryEvent("boundary").signal(SIGNAL_NAME)
       .done();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1618,8 +1624,8 @@ public class MigrationBoundaryEventsTest {
       .changeElementId("userTask", "newUserTask")
       .changeElementId("boundary", "newBoundary");
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
 
@@ -1630,7 +1636,6 @@ public class MigrationBoundaryEventsTest {
     // if the timer job is triggered the failing delegate fails and an incident is created
     executeJob(jobBeforeMigration);
     Incident incidentBeforeMigration = rule.getRuntimeService().createIncidentQuery().singleResult();
-    assertEquals("userTask", incidentBeforeMigration.getActivityId());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -1651,9 +1656,133 @@ public class MigrationBoundaryEventsTest {
     assertEquals(incidentBeforeMigration.getId(), incidentAfterMigration.getId());
     assertEquals(jobAfterMigration.getId(), incidentAfterMigration.getConfiguration());
 
-    // and the activity and process definition references were updated
-    assertEquals("newUserTask", incidentAfterMigration.getActivityId());
+    // and the activity, process definition and job definition references were updated
+    assertEquals("newBoundary", incidentAfterMigration.getActivityId());
     assertEquals(targetProcessDefinition.getId(), incidentAfterMigration.getProcessDefinitionId());
+    assertEquals(jobAfterMigration.getJobDefinitionId(), incidentAfterMigration.getJobDefinitionId());
+  }
+
+  @Test
+  public void testUpdateEventMessage() {
+    // given
+    BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
+    BpmnModelInstance targetProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").message("new" + MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .mapActivities("boundary", "boundary").updateEventTrigger()
+      .build();
+
+    // when
+    testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    testHelper.assertEventSubscriptionMigrated(
+        "boundary", MESSAGE_NAME,
+        "boundary", "new" + MESSAGE_NAME);
+
+    // and it is possible to successfully complete the migrated instance
+    rule.getRuntimeService().correlateMessage("new" + MESSAGE_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
+  }
+
+  @Test
+  public void testUpdateEventSignal() {
+    // given
+    BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
+    BpmnModelInstance targetProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal("new" + SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .mapActivities("boundary", "boundary").updateEventTrigger()
+      .build();
+
+    // when
+    testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    testHelper.assertEventSubscriptionMigrated(
+        "boundary", SIGNAL_NAME,
+        "boundary", "new" + SIGNAL_NAME);
+
+    // and it is possible to successfully complete the migrated instance
+    rule.getRuntimeService().signalEventReceived("new" + SIGNAL_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
+  }
+
+  @Test
+  public void testUpdateEventTimer() {
+    // given
+    ClockTestUtil.setClockToDateWithoutMilliseconds();
+
+    BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
+    BpmnModelInstance targetProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder("userTask")
+        .boundaryEvent("boundary").timerWithDuration("PT50M")
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .mapActivities("boundary", "boundary").updateEventTrigger()
+      .build();
+
+    // when
+    testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    Date newDueDate = new DateTime(ClockUtil.getCurrentTime()).plusMinutes(50).toDate();
+    testHelper.assertJobMigrated(
+        testHelper.snapshotBeforeMigration.getJobs().get(0),
+        "boundary",
+        newDueDate);
+
+    // and it is possible to successfully complete the migrated instance
+    Job jobAfterMigration = testHelper.snapshotAfterMigration.getJobs().get(0);
+    rule.getManagementService().executeJob(jobAfterMigration.getId());
+
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
   protected void executeJob(Job job) {

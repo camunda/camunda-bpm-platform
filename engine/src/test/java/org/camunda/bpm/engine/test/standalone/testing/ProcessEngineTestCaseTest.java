@@ -13,11 +13,15 @@
 
 package org.camunda.bpm.engine.test.standalone.testing;
 
-import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineTestCase;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.hamcrest.CoreMatchers;
 
 
 /**
@@ -35,18 +39,33 @@ public class ProcessEngineTestCaseTest extends ProcessEngineTestCase {
 
     taskService.complete(task.getId());
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-
-    ProcessEngineConfigurationImpl configuration = ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration();
-
-    if (configuration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      assertEquals(1, historyService.createHistoricProcessInstanceQuery().count());
-    }
   }
 
-  protected void tearDown() throws Exception {
-    super.tearDown();
-    processEngine.close();
-    processEngine = null;
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  public void testRequiredHistoryLevelAudit() {
+
+    assertThat(currentHistoryLevel(),
+        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
+        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  public void testRequiredHistoryLevelActivity() {
+
+    assertThat(currentHistoryLevel(),
+        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
+        .or(is(ProcessEngineConfiguration.HISTORY_AUDIT))
+        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testRequiredHistoryLevelFull() {
+
+    assertThat(currentHistoryLevel(), is(ProcessEngineConfiguration.HISTORY_FULL));
+  }
+
+  protected String currentHistoryLevel() {
+    return processEngine.getProcessEngineConfiguration().getHistory();
   }
 
 }

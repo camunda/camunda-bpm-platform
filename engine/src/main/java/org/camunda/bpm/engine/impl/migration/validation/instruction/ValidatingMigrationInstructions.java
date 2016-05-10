@@ -13,13 +13,16 @@
 package org.camunda.bpm.engine.impl.migration.validation.instruction;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.migration.MigrationInstruction;
 
 /**
  * @author Thorben Lindhauer
@@ -27,11 +30,11 @@ import org.camunda.bpm.engine.impl.util.CollectionUtil;
  */
 public class ValidatingMigrationInstructions {
 
-  protected List<ValidatingMigrationInstruction> instructions;
+  protected Collection<ValidatingMigrationInstruction> instructions;
   protected Map<ScopeImpl, List<ValidatingMigrationInstruction>> instructionsBySourceScope;
   protected Map<ScopeImpl, List<ValidatingMigrationInstruction>> instructionsByTargetScope;
 
-  public ValidatingMigrationInstructions(List<ValidatingMigrationInstruction> instructions) {
+  public ValidatingMigrationInstructions(Collection<ValidatingMigrationInstruction> instructions) {
     this.instructions = instructions;
     instructionsBySourceScope = new HashMap<ScopeImpl, List<ValidatingMigrationInstruction>>();
     instructionsByTargetScope = new HashMap<ScopeImpl, List<ValidatingMigrationInstruction>>();
@@ -42,12 +45,18 @@ public class ValidatingMigrationInstructions {
   }
 
   public ValidatingMigrationInstructions() {
-    this(new ArrayList<ValidatingMigrationInstruction>());
+    this(new HashSet<ValidatingMigrationInstruction>());
   }
 
   public void addInstruction(ValidatingMigrationInstruction instruction) {
     instructions.add(instruction);
     indexInstruction(instruction);
+  }
+
+  public void addAll(ValidatingMigrationInstructions other) {
+    for (ValidatingMigrationInstruction instruction : other.instructions) {
+      addInstruction(instruction);
+    }
   }
 
   protected void indexInstruction(ValidatingMigrationInstruction instruction) {
@@ -56,7 +65,7 @@ public class ValidatingMigrationInstructions {
   }
 
   public List<ValidatingMigrationInstruction> getInstructions() {
-    return instructions;
+    return new ArrayList<ValidatingMigrationInstruction>(instructions);
   }
 
   public List<ValidatingMigrationInstruction> getInstructionsBySourceScope(ScopeImpl scope) {
@@ -79,5 +88,49 @@ public class ValidatingMigrationInstructions {
     else {
       return instructions;
     }
+  }
+
+  public void filterWith(List<MigrationInstructionValidator> validators) {
+    List<ValidatingMigrationInstruction> validInstructions = new ArrayList<ValidatingMigrationInstruction>();
+
+    for (ValidatingMigrationInstruction instruction : instructions) {
+      if (isValidInstruction(instruction, this, validators)) {
+        validInstructions.add(instruction);
+      }
+    }
+
+    instructionsBySourceScope.clear();
+    instructionsByTargetScope.clear();
+    instructions.clear();
+
+    for (ValidatingMigrationInstruction validInstruction : validInstructions) {
+      addInstruction(validInstruction);
+    }
+  }
+
+  public List<MigrationInstruction> asMigrationInstructions() {
+    List<MigrationInstruction> instructions = new ArrayList<MigrationInstruction>();
+
+    for (ValidatingMigrationInstruction instruction : this.instructions) {
+      instructions.add(instruction.toMigrationInstruction());
+    }
+
+    return instructions;
+  }
+
+  public boolean contains(ValidatingMigrationInstruction instruction) {
+    return instructions.contains(instruction);
+  }
+
+  protected boolean isValidInstruction(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, List<MigrationInstructionValidator> migrationInstructionValidators) {
+    return !validateInstruction(instruction, instructions, migrationInstructionValidators).hasFailures();
+  }
+
+  protected MigrationInstructionValidationReportImpl validateInstruction(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, List<MigrationInstructionValidator> migrationInstructionValidators) {
+    MigrationInstructionValidationReportImpl validationReport = new MigrationInstructionValidationReportImpl(instruction.toMigrationInstruction());
+    for (MigrationInstructionValidator migrationInstructionValidator : migrationInstructionValidators) {
+      migrationInstructionValidator.validate(instruction, instructions, validationReport);
+    }
+    return validationReport;
   }
 }

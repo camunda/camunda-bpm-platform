@@ -20,6 +20,8 @@ import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.Tenant;
+import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
@@ -29,6 +31,7 @@ import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TenantEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 
 /**
@@ -105,20 +108,45 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
     return getDbEntityManager().selectList("selectGroupByQueryCriteria", query);
   }
 
+  //tenants //////////////////////////////////////////
+
+  public TenantEntity findTenantById(String tenantId) {
+    checkAuthorization(Permissions.READ, Resources.TENANT, tenantId);
+    return getDbEntityManager().selectById(TenantEntity.class, tenantId);
+  }
+
+  public TenantQuery createTenantQuery() {
+    return new DbTenantQueryImpl(Context.getProcessEngineConfiguration().getCommandExecutorTxRequired());
+  }
+
+  public TenantQuery createTenantQuery(CommandContext commandContext) {
+    return new DbTenantQueryImpl();
+  }
+
+  public long findTenantCountByQueryCriteria(DbTenantQueryImpl query) {
+    configureQuery(query, Resources.TENANT);
+    return (Long) getDbEntityManager().selectOne("selectTenantCountByQueryCriteria", query);
+  }
+
+  public List<Tenant> findTenantByQueryCriteria(DbTenantQueryImpl query) {
+    configureQuery(query, Resources.TENANT);
+    return getDbEntityManager().selectList("selectTenantByQueryCriteria", query);
+  }
 
   //authorizations ////////////////////////////////////////////////////
 
+  @Override
   protected void configureQuery(@SuppressWarnings("rawtypes") AbstractQuery query, Resource resource) {
     Context.getCommandContext()
       .getAuthorizationManager()
       .configureQuery(query, resource);
   }
 
+  @Override
   protected void checkAuthorization(Permission permission, Resource resource, String resourceId) {
     Context.getCommandContext()
       .getAuthorizationManager()
       .checkAuthorization(permission, resource, resourceId);
  }
-
 
 }

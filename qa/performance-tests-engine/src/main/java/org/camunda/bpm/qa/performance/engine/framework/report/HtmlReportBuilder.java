@@ -107,7 +107,7 @@ public class HtmlReportBuilder {
                   .endElement();
      }
 
-     if(jsonSourceFileName != null && jsonSourceFileName != null) {
+     if(jsonSourceFileName != null) {
         sourceRow.startElement(new HtmlElementWriter("span").textContent("&nbsp;|&nbsp;")).endElement();
      }
 

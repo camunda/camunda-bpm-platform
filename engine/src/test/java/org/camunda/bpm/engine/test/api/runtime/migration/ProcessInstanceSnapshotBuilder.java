@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 
@@ -34,6 +35,13 @@ public class ProcessInstanceSnapshotBuilder {
     this.processEngine = processEngine;
     this.processInstanceId = processInstance.getId();
     this.snapshot = new ProcessInstanceSnapshot(processInstance.getId(), processInstance.getProcessDefinitionId());
+  }
+
+  public ProcessInstanceSnapshotBuilder deploymentId() {
+    String deploymentId = processEngine.getRepositoryService().getProcessDefinition(snapshot.getProcessDefinitionId()).getDeploymentId();
+    snapshot.setDeploymentId(deploymentId);
+
+    return this;
   }
 
   public ProcessInstanceSnapshotBuilder activityTree() {
@@ -76,16 +84,25 @@ public class ProcessInstanceSnapshotBuilder {
     return this;
   }
 
+  public ProcessInstanceSnapshotBuilder variables() {
+    List<VariableInstance> variables = processEngine.getRuntimeService().createVariableInstanceQuery().processInstanceIdIn(processInstanceId).list();
+    snapshot.setVariables(variables);
+
+    return this;
+  }
+
   public ProcessInstanceSnapshot build() {
     return snapshot;
   }
 
   public ProcessInstanceSnapshot full() {
+    deploymentId();
     activityTree();
     executionTree();
     tasks();
     eventSubscriptions();
     jobs();
+    variables();
 
     return build();
   }

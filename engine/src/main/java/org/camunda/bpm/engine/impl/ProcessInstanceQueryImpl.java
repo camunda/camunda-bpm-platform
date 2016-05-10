@@ -17,9 +17,11 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
@@ -226,6 +228,25 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return commandContext
       .getExecutionManager()
       .findProcessInstanceByQueryCriteria(this, page);
+  }
+
+  public List<String> listIds() {
+    this.resultType = ResultType.LIST;
+    return evaluateExpressionsAndExecuteIdsList(Context.getCommandContext());
+  }
+
+  public List<String> evaluateExpressionsAndExecuteIdsList(CommandContext commandContext) {
+    validate();
+    evaluateExpressions();
+    return !hasExcludingConditions() ? executeIdsList(commandContext) : new ArrayList<String>();
+  }
+
+  public List<String> executeIdsList(CommandContext commandContext) {
+    checkQueryOk();
+    ensureVariablesInitialized();
+    return commandContext
+      .getExecutionManager()
+      .findProcessInstanceIdsByQueryCriteria(this);
   }
 
   //getters /////////////////////////////////////////////////////////////////

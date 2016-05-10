@@ -14,15 +14,26 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 
 /**
  * @author Tom Baeyens
  */
-public interface JobHandler {
+public interface JobHandler<T extends JobHandlerConfiguration> {
 
   String getType();
 
-  void execute(String configuration, CoreExecution context, CommandContext commandContext, String tenantId);
+  void execute(T configuration, CoreExecution execution, CommandContext commandContext, String tenantId);
+
+  T newConfiguration(String canonicalString);
+
+  /**
+   * Clean up before job is deleted. Like removing of auxiliary entities specific for this job handler.
+   *
+   * @param configuration the job handler configuration
+   * @param jobEntity the job entity to be deleted
+   */
+  void onDelete(T configuration, JobEntity jobEntity);
 
 }

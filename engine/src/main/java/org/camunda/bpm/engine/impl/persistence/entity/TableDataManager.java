@@ -96,7 +96,7 @@ public class TableDataManager extends AbstractManager {
 
     persistentObjectToTableNameMap.put(HistoricCaseInstanceEntity.class, "ACT_HI_CASEINST");
     persistentObjectToTableNameMap.put(HistoricCaseActivityInstanceEntity.class, "ACT_HI_CASEACTINST");
-
+    persistentObjectToTableNameMap.put(HistoricIdentityLinkLogEntity.class, "ACT_HI_IDENTITYLINK");
     // a couple of stuff goes to the same table
     persistentObjectToTableNameMap.put(HistoricFormPropertyEntity.class, "ACT_HI_DETAIL");
     persistentObjectToTableNameMap.put(HistoricVariableInstanceEntity.class, "ACT_HI_DETAIL");

@@ -12,54 +12,59 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
 import org.camunda.bpm.engine.test.jobexecutor.RecordingAcquireJobsRunnable.RecordedWaitEvent;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class JobAcquisitionBackoffIdleTest extends AbstractProcessEngineTestCase {
-
-  protected ControllableJobExecutor jobExecutor;
-
-  protected ThreadControl acquisitionThread;
+public class JobAcquisitionBackoffIdleTest {
 
   public static final int BASE_IDLE_WAIT_TIME = 5000;
   public static final int MAX_IDLE_WAIT_TIME = 30000;
 
-  @Override
-  protected void initializeProcessEngine() {
-    jobExecutor = new ControllableJobExecutor();
-    jobExecutor.setMaxJobsPerAcquisition(1);
-    jobExecutor.setWaitTimeInMillis(BASE_IDLE_WAIT_TIME);
-    jobExecutor.setMaxWait(MAX_IDLE_WAIT_TIME);
-    acquisitionThread = jobExecutor.getAcquisitionThreadControl();
+  protected ControllableJobExecutor jobExecutor;
+  protected ThreadControl acquisitionThread;
 
-    ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl)
-        ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("camunda.cfg.xml");
-    engineConfiguration.setJobExecutor(jobExecutor);
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      jobExecutor = new ControllableJobExecutor();
+      jobExecutor.setMaxJobsPerAcquisition(1);
+      jobExecutor.setWaitTimeInMillis(BASE_IDLE_WAIT_TIME);
+      jobExecutor.setMaxWait(MAX_IDLE_WAIT_TIME);
+      acquisitionThread = jobExecutor.getAcquisitionThreadControl();
 
-    processEngine = engineConfiguration
-        .buildProcessEngine();
-  }
+      return configuration.setJobExecutor(jobExecutor);
+    }
+  };
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
 
-  @Override
-  protected void closeDownProcessEngine() {
-    super.closeDownProcessEngine();
-    processEngine.close();
-    processEngine = null;
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule);
+
+  @After
+  public void shutdownJobExecutor() {
+    jobExecutor.shutdown();
   }
 
   /**
    * CAM-5073
    */
+  @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")
   public void testIdlingAfterConcurrentJobAddedNotification() {
     // start job acquisition - waiting before acquiring jobs
@@ -70,7 +75,7 @@ public class JobAcquisitionBackoffIdleTest extends AbstractProcessEngineTestCase
     acquisitionThread.makeContinueAndWaitForSync();
 
     // issue a message added notification
-    runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
+    engineRule.getRuntimeService().startProcessInstanceByKey("simpleAsyncProcess");
 
     // complete job acquisition - trigger re-configuration
     // => due to the hint, the job executor should not become idle
@@ -121,4 +126,5 @@ public class JobAcquisitionBackoffIdleTest extends AbstractProcessEngineTestCase
     // discard wait event if successfully asserted
     waitEvents.clear();
   }
+
 }

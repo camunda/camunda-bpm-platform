@@ -62,6 +62,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   protected boolean hasStartFormKey;
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
   protected String tenantId;
+  protected String versionTag;
   protected boolean isIdentityLinksInitialized = false;
   protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
   protected Set<Expression> candidateStarterUserIdExpressions = new HashSet<Expression>();
@@ -147,12 +148,14 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   }
 
   public IdentityLinkEntity addIdentityLink(String userId, String groupId) {
-    IdentityLinkEntity identityLinkEntity = IdentityLinkEntity.createAndInsert();
+    IdentityLinkEntity identityLinkEntity = IdentityLinkEntity.newIdentityLink();
     getIdentityLinks().add(identityLinkEntity);
     identityLinkEntity.setProcessDef(this);
     identityLinkEntity.setUserId(userId);
     identityLinkEntity.setGroupId(groupId);
     identityLinkEntity.setType(IdentityLinkType.CANDIDATE);
+    identityLinkEntity.setTenantId(getTenantId());
+    identityLinkEntity.insert();
     return identityLinkEntity;
   }
 
@@ -163,10 +166,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
       .findIdentityLinkByProcessDefinitionUserAndGroup(id, userId, groupId);
 
     for (IdentityLinkEntity identityLink: identityLinks) {
-      Context
-        .getCommandContext()
-        .getDbEntityManager()
-        .delete(identityLink);
+      identityLink.delete();
     }
   }
 
@@ -439,4 +439,11 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     this.tenantId = tenantId;
   }
 
+  public String getVersionTag() {
+    return versionTag;
+  }
+
+  public void setVersionTag(String versionTag) {
+    this.versionTag = versionTag;
+  }
 }

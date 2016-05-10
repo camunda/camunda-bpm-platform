@@ -186,7 +186,7 @@
       </security-service>
       <transaction-service tx-log-dir="${com.sun.aas.instanceRoot}/logs"></transaction-service>
       <java-config debug-options="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=9009" system-classpath="" classpath-suffix="">
-        <jvm-options>-XX:MaxPermSize=256m</jvm-options>
+        <jvm-options>-XX:MaxPermSize=320m</jvm-options>
         <jvm-options>-client</jvm-options>
         <jvm-options>-Djava.awt.headless=true</jvm-options>
         <jvm-options>-Djavax.management.builder.initial=com.sun.enterprise.v3.admin.AppServerMBeanServerBuilder</jvm-options>

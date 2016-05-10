@@ -13,13 +13,15 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 
+import java.util.Collections;
 import java.util.List;
+
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
@@ -44,8 +46,8 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
     ExecutionManager executionManager = commandContext.getExecutionManager();
     ExecutionEntity processInstance = executionManager.findExecutionById(processInstanceId);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateProcessInstance(processInstance);
+    
+    checkUpdateProcessInstance(processInstance, commandContext);
 
     processInstance.setPreserveScope(true);
 
@@ -65,7 +67,7 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
     if (!processInstance.hasChildren()) {
       if (processInstance.getActivity() == null) {
         // process instance was cancelled
-        authorizationManager.checkDeleteProcessInstance(processInstance);
+        checkDeleteProcessInstance(processInstance, commandContext);
         processInstance.deleteCascade("Cancellation due to process instance modification", builder.isSkipCustomListeners(), builder.isSkipIoMappings());
       }
       else if (processInstance.isEnded()) {
@@ -74,12 +76,28 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
       }
     }
 
-    commandContext.getOperationLogManager().logProcessInstanceOperation(getLogEntryOperation(), processInstanceId, null, null, PropertyChange.EMPTY_CHANGE);
+    commandContext.getOperationLogManager().logProcessInstanceOperation(getLogEntryOperation(),
+        processInstanceId,
+        null,
+        null,
+        Collections.singletonList(PropertyChange.EMPTY_CHANGE));
 
     return null;
   }
 
   protected String getLogEntryOperation() {
     return UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE;
+  }
+
+  protected void checkUpdateProcessInstance(ExecutionEntity execution, CommandContext commandContext) {
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkUpdateProcessInstance(execution);
+    }
+  }
+
+  protected void checkDeleteProcessInstance(ExecutionEntity execution, CommandContext commandContext) {
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkDeleteProcessInstance(execution);
+    }
   }
 }

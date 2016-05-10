@@ -50,7 +50,6 @@ public class CmmnCaseDefinition extends CmmnActivity {
     // get the case plan model as "initial" activity
     CmmnActivity casePlanModel = getActivities().get(0);
 
-
     // set the case plan model activity
     caseInstance.setActivity(casePlanModel);
 

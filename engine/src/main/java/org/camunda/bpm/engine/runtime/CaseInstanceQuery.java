@@ -214,6 +214,12 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
    */
   CaseInstanceQuery variableValueLike(String name, String value);
 
+  /** Only select case instances with one of the given tenant ids. */
+  CaseInstanceQuery tenantIdIn(String... tenantIds);
+
+  /** Only select case instances which have no tenant id. */
+  CaseInstanceQuery withoutTenantId();
+
   //ordering /////////////////////////////////////////////////////////////////
 
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
@@ -224,5 +230,11 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
 
   /** Order by case definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   CaseInstanceQuery orderByCaseDefinitionId();
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of case instances without tenant id is database-specific.
+   */
+  CaseInstanceQuery orderByTenantId();
 
 }

@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
@@ -32,6 +31,7 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.query.Query;
@@ -56,7 +56,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
   protected String groupId = "accounting";
   protected User user;
   protected Group group;
-
+  
   protected static final String VARIABLE_NAME = "aVariableName";
   protected static final String VARIABLE_VALUE = "aVariableValue";
 
@@ -610,10 +610,17 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  public Permission getDefaultTaskPermissionForUser() {
+    // get the default task assignee permission
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine
+      .getProcessEngineConfiguration();
+    
+    return processEngineConfiguration.getDefaultUserPermissionForTask();
+  }
+
   // helper ////////////////////////////////////////////////////////////////////
 
   protected VariableMap getVariables() {
     return Variables.createVariables().putValue(VARIABLE_NAME, VARIABLE_VALUE);
   }
-
 }

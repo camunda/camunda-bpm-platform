@@ -16,10 +16,16 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  * @author Daniel Meyer
@@ -186,6 +192,56 @@ public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTestCase{
     assertThat(variableInstance.getTenantId(), is(tenant1));
 
     deleteTasks(task);
+  }
+
+  public void testGetIdentityLinkWithTenantIdForCandidateUsers() {
+
+    // given
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
+    .startEvent()
+    .userTask("task").camundaCandidateUsers("aUserId")
+    .endEvent()
+    .done();
+    
+    deploymentForTenant("tenant", oneTaskProcess);
+    
+    ProcessInstance tenantProcessInstance = runtimeService.createProcessInstanceByKey("testProcess")
+    .processDefinitionTenantId("tenant")
+    .execute();
+    
+    Task tenantTask = taskService
+        .createTaskQuery()
+        .processInstanceId(tenantProcessInstance.getId())
+        .singleResult();
+    
+    List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(tenantTask.getId());
+    assertEquals(identityLinks.size(),1);
+    assertEquals(identityLinks.get(0).getTenantId(), "tenant");
+  }
+
+  public void testGetIdentityLinkWithTenantIdForCandidateGroup() {
+
+    // given
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
+    .startEvent()
+    .userTask("task").camundaCandidateGroups("aGroupId")
+    .endEvent()
+    .done();
+    
+    deploymentForTenant("tenant", oneTaskProcess);
+    
+    ProcessInstance tenantProcessInstance = runtimeService.createProcessInstanceByKey("testProcess")
+    .processDefinitionTenantId("tenant")
+    .execute();
+
+    Task tenantTask = taskService
+        .createTaskQuery()
+        .processInstanceId(tenantProcessInstance.getId())
+        .singleResult();
+    
+    List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(tenantTask.getId());
+    assertEquals(identityLinks.size(),1);
+    assertEquals(identityLinks.get(0).getTenantId(), "tenant");
   }
 
   protected void deleteTasks(Task... tasks) {

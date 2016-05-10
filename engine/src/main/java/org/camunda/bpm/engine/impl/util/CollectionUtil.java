@@ -54,6 +54,13 @@ public class CollectionUtil {
     return result;
   }
 
+  public static <T> Set<T> asHashSet(T... elements) {
+    Set<T> set = new HashSet<T>();
+    Collections.addAll(set, elements);
+
+    return set;
+  }
+
   public static <S, T> void addToMapOfLists(Map<S, List<T>> map, S key, T value) {
     List<T> list = map.get(key);
     if (list == null) {

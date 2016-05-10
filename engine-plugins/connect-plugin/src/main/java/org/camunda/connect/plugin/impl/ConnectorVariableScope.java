@@ -12,14 +12,20 @@
  */
 package org.camunda.connect.plugin.impl;
 
-import java.lang.Object;import java.lang.String;import java.util.Map;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
-import org.camunda.connect.spi.ConnectorRequest;
-import org.camunda.connect.spi.ConnectorResponse;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableInstance;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
+import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableInstance.SimpleVariableInstanceFactory;
+import org.camunda.connect.spi.ConnectorRequest;
+import org.camunda.connect.spi.ConnectorResponse;
 
 /**
  * Exposes a connector request as variableScope.
@@ -33,19 +39,29 @@ public class ConnectorVariableScope extends AbstractVariableScope {
 
   protected AbstractVariableScope parent;
 
-  protected ConnectorVariableStore variableStore;
+  protected VariableStore<SimpleVariableInstance> variableStore;
 
   public ConnectorVariableScope(AbstractVariableScope parent) {
     this.parent = parent;
-    this.variableStore = new ConnectorVariableStore();
+    this.variableStore = new VariableStore<SimpleVariableInstance>();
   }
 
   public String getVariableScopeKey() {
     return "connector";
   }
 
-  protected CoreVariableStore getVariableStore() {
-    return variableStore;
+  protected VariableStore<CoreVariableInstance> getVariableStore() {
+    return (VariableStore) variableStore;
+  }
+
+  @Override
+  protected VariableInstanceFactory<CoreVariableInstance> getVariableInstanceFactory() {
+    return (VariableInstanceFactory) SimpleVariableInstanceFactory.INSTANCE;
+  }
+
+  @Override
+  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners(AbstractVariableScope sourceScope) {
+    return Collections.emptyList();
   }
 
   public AbstractVariableScope getParentVariableScope() {
@@ -53,7 +69,7 @@ public class ConnectorVariableScope extends AbstractVariableScope {
   }
 
   public void writeToRequest(ConnectorRequest<?> request) {
-    for (CoreVariableInstance variable : variableStore.getVariableInstancesValues()) {
+    for (CoreVariableInstance variable : variableStore.getVariables()) {
       request.setRequestParameter(variable.getName(), variable.getTypedValue(true).getValue());
     }
   }

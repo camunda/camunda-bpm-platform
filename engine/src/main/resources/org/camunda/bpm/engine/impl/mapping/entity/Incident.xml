@@ -26,6 +26,7 @@
       ROOT_CAUSE_INCIDENT_ID_, 
       CONFIGURATION_, 
       TENANT_ID_,
+      JOB_DEF_ID_,
       REV_)
     values (
       #{id ,jdbcType=VARCHAR},
@@ -40,6 +41,7 @@
       #{rootCauseIncidentId ,jdbcType=VARCHAR},
       #{configuration, jdbcType=VARCHAR},
       #{tenantId, jdbcType=VARCHAR},
+      #{jobDefinitionId, jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -59,6 +61,7 @@
     <result property="rootCauseIncidentId" column="ROOT_CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
     <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
   </resultMap>
   
@@ -103,7 +106,7 @@
   <sql id="selectIncidentByQueryCriteriaSql">
     from ${prefix}ACT_RU_INCIDENT RES
 
-    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       left join ${prefix}ACT_RE_PROCDEF PROCDEF
       on RES.PROC_DEF_ID_ = PROCDEF.ID_
     </if>
@@ -147,8 +150,15 @@
           #{tenantId}
         </foreach>
       </if>
+      <if test="jobDefinitionIds != null &amp;&amp; jobDefinitionIds.length > 0">
+        and RES.JOB_DEF_ID_ in
+        <foreach item="jobDefinitionId" index="index" collection="jobDefinitionIds"
+                 open="(" separator="," close=")">
+          #{jobDefinitionId}
+        </foreach>
+      </if>
 
-      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
         AND
           ( CASE
 
@@ -156,12 +166,18 @@
               <!-- incident exists in context of a process instance -->
               RES.PROC_DEF_ID_ is not null
             THEN
-              (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
+              (
+              <bind name="authUserId" value="authCheck.authUserId" />
+              <bind name="authGroupIds" value="authCheck.authGroupIds" />
+              <bind name="permissionChecks" value="authCheck.permissionChecks" />
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
 
             ELSE
               1
           END ) = 1
       </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 
     </where>
   </sql>
@@ -172,7 +188,8 @@
       REV_ = #{revisionNext, jdbcType=INTEGER},
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
-      ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR}
+      ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
+      JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
     </set>
     <where>
       ID_ = #{id, jdbcType=VARCHAR}

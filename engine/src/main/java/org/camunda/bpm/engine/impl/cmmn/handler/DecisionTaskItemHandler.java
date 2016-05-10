@@ -89,6 +89,12 @@ public class DecisionTaskItemHandler extends CallingTaskItemHandler {
     return definition.getCamundaDecisionVersion();
   }
 
+  protected String getTenantId(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    DecisionTask definition = getDefinition(element);
+    return definition.getCamundaDecisionTenantId();
+  }
+
+
   protected DecisionTask getDefinition(CmmnElement element) {
     return (DecisionTask) super.getDefinition(element);
   }

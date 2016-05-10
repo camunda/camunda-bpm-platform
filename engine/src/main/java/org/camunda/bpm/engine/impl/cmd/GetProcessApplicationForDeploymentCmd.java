@@ -30,7 +30,7 @@ public class GetProcessApplicationForDeploymentCmd implements Command<String> {
   }
 
   public String execute(CommandContext commandContext) {
-    commandContext.getAuthorizationManager().isCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdmin();
 
     ProcessApplicationReference reference = Context.getProcessEngineConfiguration()
       .getProcessApplicationManager()

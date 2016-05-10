@@ -21,10 +21,12 @@ public class ValidatingMigrationInstructionImpl implements ValidatingMigrationIn
 
   protected ActivityImpl sourceActivity;
   protected ActivityImpl targetActivity;
+  protected boolean updateEventTrigger = false;
 
-  public ValidatingMigrationInstructionImpl(ActivityImpl sourceActivity, ActivityImpl targetActivity) {
+  public ValidatingMigrationInstructionImpl(ActivityImpl sourceActivity, ActivityImpl targetActivity, boolean updateEventTrigger) {
     this.sourceActivity = sourceActivity;
     this.targetActivity = targetActivity;
+    this.updateEventTrigger = updateEventTrigger;
   }
 
   public ActivityImpl getSourceActivity() {
@@ -35,8 +37,13 @@ public class ValidatingMigrationInstructionImpl implements ValidatingMigrationIn
     return targetActivity;
   }
 
+  @Override
+  public boolean isUpdateEventTrigger() {
+    return updateEventTrigger;
+  }
+
   public MigrationInstruction toMigrationInstruction() {
-    return new MigrationInstructionImpl(sourceActivity.getId(), targetActivity.getId());
+    return new MigrationInstructionImpl(sourceActivity.getId(), targetActivity.getId(), updateEventTrigger);
   }
 
   public String toString() {

@@ -1,16 +1,19 @@
 package org.camunda.bpm.engine.rest.standalone;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.any;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.Filter;
@@ -24,6 +27,8 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.Tenant;
+import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
@@ -53,7 +58,8 @@ public class AuthenticationFilterPathMatchingTest extends AbstractRestServiceTes
   protected RepositoryService repositoryServiceMock;
 
   protected User userMock;
-  protected List<Group> groupMocks;
+  protected List<String> groupIds;
+  protected List<String> tenantIds;
 
   protected Filter authenticationFilter;
 
@@ -107,9 +113,14 @@ public class AuthenticationFilterPathMatchingTest extends AbstractRestServiceTes
     when(currentEngine.getAuthorizationService()).thenReturn(authorizationServiceMock);
     when(currentEngine.getIdentityService()).thenReturn(identityServiceMock);
 
-    // group and user for authentication
+    // for authentication
     userMock = MockProvider.createMockUser();
-    groupMocks = MockProvider.createMockGroups();
+
+    List<Group> groupMocks = MockProvider.createMockGroups();
+    groupIds = setupGroupQueryMock(groupMocks);
+
+    List<Tenant> tenantMocks = Collections.singletonList(MockProvider.createMockTenant());
+    tenantIds = setupTenantQueryMock(tenantMocks);
 
     GroupQuery mockGroupQuery = mock(GroupQuery.class);
 
@@ -118,6 +129,35 @@ public class AuthenticationFilterPathMatchingTest extends AbstractRestServiceTes
     when(mockGroupQuery.list()).thenReturn(groupMocks);
 
     setupFilter();
+  }
+
+  protected List<String> setupGroupQueryMock(List<Group> groups) {
+    GroupQuery mockGroupQuery = mock(GroupQuery.class);
+
+    when(identityServiceMock.createGroupQuery()).thenReturn(mockGroupQuery);
+    when(mockGroupQuery.groupMember(anyString())).thenReturn(mockGroupQuery);
+    when(mockGroupQuery.list()).thenReturn(groups);
+
+    List<String> groupIds = new ArrayList<String>();
+    for (Group groupMock : groups) {
+      groupIds.add(groupMock.getId());
+    }
+    return groupIds;
+  }
+
+  protected List<String> setupTenantQueryMock(List<Tenant> tenants) {
+    TenantQuery mockTenantQuery = mock(TenantQuery.class);
+
+    when(identityServiceMock.createTenantQuery()).thenReturn(mockTenantQuery);
+    when(mockTenantQuery.userMember(anyString())).thenReturn(mockTenantQuery);
+    when(mockTenantQuery.includingGroupsOfUser(anyBoolean())).thenReturn(mockTenantQuery);
+    when(mockTenantQuery.list()).thenReturn(tenants);
+
+    List<String> tenantIds = new ArrayList<String>();
+    for(Tenant tenant: tenants) {
+      tenantIds.add(tenant.getId());
+    }
+    return tenantIds;
   }
 
   protected void setupFilter() throws ServletException {
@@ -151,15 +191,11 @@ public class AuthenticationFilterPathMatchingTest extends AbstractRestServiceTes
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
     if (authenticationExpected) {
-      List<String> groups = new ArrayList<String>();
-      for (Group groupMock : groupMocks) {
-        groups.add(groupMock.getId());
-      }
-
-      verify(identityServiceMock).setAuthentication(MockProvider.EXAMPLE_USER_ID, groups);
+      verify(identityServiceMock).setAuthentication(MockProvider.EXAMPLE_USER_ID, groupIds, tenantIds);
       verify(identityServiceMock).clearAuthentication();
+
     } else {
-      verify(identityServiceMock, never()).setAuthentication(any(String.class), any(List.class));
+      verify(identityServiceMock, never()).setAuthentication(any(String.class), anyListOf(String.class), anyListOf(String.class));
       verify(identityServiceMock, never()).clearAuthentication();
     }
   }

@@ -15,18 +15,11 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIPTION;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_NAME;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REMOVE;
-
-import java.util.Locale;
-
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.jboss.as.controller.AbstractRemoveStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.descriptions.DescriptionProvider;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
 
@@ -35,24 +28,15 @@ import org.jboss.dmr.ModelNode;
  * Provides the description and the implementation of the process-engine#remove operation.
  * 
  * @author Daniel Meyer
+ * @author Christian Lipphardt
  */
-public class JobAcquisitionRemove extends AbstractRemoveStepHandler implements DescriptionProvider {
+public class JobAcquisitionRemove extends AbstractRemoveStepHandler {
 
   public static final JobAcquisitionRemove INSTANCE = new JobAcquisitionRemove();
 
-  public ModelNode getModelDescription(Locale locale) {
-    ModelNode node = new ModelNode();
-    node.get(DESCRIPTION).set("Removes a job acquisition");
-    node.get(OPERATION_NAME).set(REMOVE);
-    return node;
-  }
-
   protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
-    
     String jobAcquisitionName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
-    
     context.removeService(ServiceNames.forMscRuntimeContainerJobExecutorService(jobAcquisitionName));
-   
   }
 
 }

@@ -19,6 +19,7 @@ import java.util.List;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
+import org.camunda.bpm.engine.migration.MigrationInstructionBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 
 public class MigrationPlanDto {
@@ -58,9 +59,11 @@ public class MigrationPlanDto {
     dto.setTargetProcessDefinitionId(migrationPlan.getTargetProcessDefinitionId());
 
     ArrayList<MigrationInstructionDto> instructionDtos = new ArrayList<MigrationInstructionDto>();
-    for (MigrationInstruction migrationInstruction : migrationPlan.getInstructions()) {
-      MigrationInstructionDto migrationInstructionDto = MigrationInstructionDto.from(migrationInstruction);
-      instructionDtos.add(migrationInstructionDto);
+    if (migrationPlan.getInstructions() != null) {
+      for (MigrationInstruction migrationInstruction : migrationPlan.getInstructions()) {
+        MigrationInstructionDto migrationInstructionDto = MigrationInstructionDto.from(migrationInstruction);
+        instructionDtos.add(migrationInstructionDto);
+      }
     }
     dto.setInstructions(instructionDtos);
 
@@ -70,8 +73,15 @@ public class MigrationPlanDto {
   public static MigrationPlan toMigrationPlan(ProcessEngine processEngine, MigrationPlanDto migrationPlanDto) {
     MigrationPlanBuilder migrationPlanBuilder = processEngine.getRuntimeService().createMigrationPlan(migrationPlanDto.getSourceProcessDefinitionId(), migrationPlanDto.getTargetProcessDefinitionId());
 
-    for (MigrationInstructionDto migrationInstructionDto : migrationPlanDto.getInstructions()) {
-      migrationPlanBuilder.mapActivities(migrationInstructionDto.getSourceActivityIds().get(0), migrationInstructionDto.getTargetActivityIds().get(0));
+    if (migrationPlanDto.getInstructions() != null) {
+      for (MigrationInstructionDto migrationInstructionDto : migrationPlanDto.getInstructions()) {
+        MigrationInstructionBuilder migrationInstructionBuilder = migrationPlanBuilder.mapActivities(migrationInstructionDto.getSourceActivityIds().get(0), migrationInstructionDto.getTargetActivityIds().get(0));
+        if (Boolean.TRUE.equals(migrationInstructionDto.isUpdateEventTrigger())) {
+          migrationInstructionBuilder = migrationInstructionBuilder.updateEventTrigger();
+        }
+
+        migrationPlanBuilder = migrationInstructionBuilder;
+      }
     }
 
     return migrationPlanBuilder.build();

@@ -24,6 +24,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
@@ -33,6 +34,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 
 /**
@@ -226,6 +228,56 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertNotNull(historicProcessInstance.getEndTime());
   }
 
+  @Deployment
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testHistoricProcessInstanceQueryWithIncidents() {
+    // start instance with incidents
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("Process_1");
+    executeAvailableJobs();
+
+    // start instance without incidents
+    runtimeService.startProcessInstanceByKey("Process_1");
+
+    assertEquals(2, historyService.createHistoricProcessInstanceQuery().count());
+    assertEquals(2, historyService.createHistoricProcessInstanceQuery().list().size());
+
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().withIncidents().count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().withIncidents().list().size());
+
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessageLike("Unknown property used%").count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessageLike("Unknown property used%").list().size());
+
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().incidentMessageLike("Unknown message%").count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().incidentMessageLike("Unknown message%").list().size());
+
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown property used in expression: ${incidentTrigger1}. Cause: Cannot resolve identifier 'incidentTrigger1'").count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown property used in expression: ${incidentTrigger1}. Cause: Cannot resolve identifier 'incidentTrigger1'").list().size());
+
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown property used in expression: ${incidentTrigger2}. Cause: Cannot resolve identifier 'incidentTrigger2'").count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown property used in expression: ${incidentTrigger2}. Cause: Cannot resolve identifier 'incidentTrigger2'").list().size());
+
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown message").count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown message").list().size());
+  }
+
+  public void testHistoricProcessInstanceQueryWithIncidentMessageNull() {
+    try {
+      historyService.createHistoricProcessInstanceQuery().incidentMessage(null).count();
+      fail("incidentMessage with null value is not allowed");
+    } catch( NullValueException nex ) {
+      // expected
+    }
+  }
+
+  public void testHistoricProcessInstanceQueryWithIncidentMessageLikeNull() {
+    try {
+      historyService.createHistoricProcessInstanceQuery().incidentMessageLike(null).count();
+      fail("incidentMessageLike with null value is not allowed");
+    } catch( NullValueException nex ) {
+      // expected
+    }
+  }
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testHistoricProcessInstanceQuery() {
     Calendar startTime = Calendar.getInstance();
@@ -291,6 +343,15 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().finishedAfter(hourAgo.getTime()).count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().finishedAfter(hourFromNow.getTime()).count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().finishedAfter(hourFromNow.getTime()).finishedBefore(hourAgo.getTime()).count());
+
+    // No incidents should are created
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().withIncidents().count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().incidentMessageLike("Unknown property used%").count());
+    assertEquals(0, historyService
+                      .createHistoricProcessInstanceQuery()
+                      .incidentMessage("Unknown property used in expression: #{failing}. Cause: Cannot resolve identifier 'failing'")
+                      .count()
+    );
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})

@@ -115,13 +115,12 @@ public class VariableValueDto {
         return ((SerializableValueType) valueType).createValueFromSerialized((String) value, valueInfo);
       }
       else if(valueType instanceof FileValueType) {
-        TypedValue typedValue = valueType.createValue(value, valueInfo);
-        if (typedValue instanceof FileValue && value instanceof String) {
-          return fileValueWithDecodedString((FileValue) typedValue, (String) value);
-        } else {
-          return typedValue;
+
+        if (value instanceof String) {
+          value = Base64.decodeBase64((String) value);
         }
 
+        return valueType.createValue(value, valueInfo);
       } else {
         return valueType.createValue(value, valueInfo);
       }

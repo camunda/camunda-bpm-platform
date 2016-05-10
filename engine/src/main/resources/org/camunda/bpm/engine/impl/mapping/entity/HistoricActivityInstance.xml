@@ -70,7 +70,13 @@
     UPDATE
         ${prefix}ACT_HI_ACTINST
     SET
-      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+      PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      ACT_ID_ = #{activityId, jdbcType=VARCHAR},
+      ACT_NAME_ = #{activityName, jdbcType=VARCHAR},
+      ACT_TYPE_ = #{activityType, jdbcType=VARCHAR},
+      PARENT_ACT_INST_ID_ = #{parentActivityInstanceId, jdbcType=VARCHAR}
       <if test="eventType == 'update'">
         , ASSIGNEE_ = #{taskAssignee, jdbcType=VARCHAR}
         , TASK_ID_ = #{taskId, jdbcType=VARCHAR}
@@ -130,7 +136,7 @@
   <select id="selectHistoricActivityInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="historicActivityInstanceResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select RES.*
     ${limitBetween}
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
     ${orderBy}
@@ -145,17 +151,14 @@
   <sql id="selectHistoricActivityInstancesByQueryCriteriaSql">
     from ${prefix}ACT_HI_ACTINST RES
 
-    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       INNER JOIN (
         SELECT
             DISTINCT SELF.PROC_DEF_KEY_ AS KEY_
         FROM
             ${prefix}ACT_HI_ACTINST SELF
         WHERE
-            1 = (
-                <bind name="permCheck" value="permissionChecks.atomicChecks[0]" />
-                <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck" />
-            )
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
       ) AUTH
       ON AUTH.KEY_ = RES.PROC_DEF_KEY_
     </if>
@@ -213,6 +216,8 @@
           #{tenantId}
         </foreach>
       </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 
     </where>
   </sql>

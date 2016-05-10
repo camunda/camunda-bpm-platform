@@ -31,14 +31,19 @@ public class BatchManager extends AbstractManager {
   }
 
   public long findBatchCountByQueryCriteria(BatchQueryImpl batchQuery) {
-    // TODO: authorization
+    configureQuery(batchQuery);
     return (Long) getDbEntityManager().selectOne("selectBatchCountByQueryCriteria", batchQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<Batch> findBatchesByQueryCriteria(BatchQueryImpl batchQuery, Page page) {
-    // TODO: authorization
+    configureQuery(batchQuery);
     return getDbEntityManager().selectList("selectBatchesByQueryCriteria", batchQuery, page);
+  }
+
+  protected void configureQuery(BatchQueryImpl batchQuery) {
+    // TODO: authorization
+    getTenantManager().configureQuery(batchQuery);
   }
 
 }

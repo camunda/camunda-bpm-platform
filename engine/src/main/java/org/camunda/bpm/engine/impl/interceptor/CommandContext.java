@@ -64,6 +64,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricBatchManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
@@ -83,6 +84,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
@@ -98,6 +100,7 @@ public class CommandContext {
 
   protected boolean authorizationCheckEnabled = true;
   protected boolean userOperationLogEnabled = true;
+  protected boolean tenantCheckEnabled = true;
 
   protected TransactionContext transactionContext;
   protected Map<Class< ? >, SessionFactory> sessionFactories;
@@ -423,6 +426,10 @@ public class CommandContext {
     return getSession(HistoricIncidentManager.class);
   }
 
+  public HistoricIdentityLinkLogManager getHistoricIdentityLinkManager() {
+    return getSession(HistoricIdentityLinkLogManager.class);
+  }
+
   public JobManager getJobManager() {
     return getSession(JobManager.class);
   }
@@ -497,6 +504,10 @@ public class CommandContext {
 
   public WritableIdentityProvider getWritableIdentityProvider() {
     return getSession(WritableIdentityProvider.class);
+  }
+
+  public TenantManager getTenantManager() {
+    return getSession(TenantManager.class);
   }
 
   // CMMN /////////////////////////////////////////////////////////////////////
@@ -628,4 +639,21 @@ public class CommandContext {
   public void setLogUserOperationEnabled(boolean userOperationLogEnabled) {
     this.userOperationLogEnabled = userOperationLogEnabled;
   }
+
+  public void enableTenantCheck() {
+    tenantCheckEnabled = true;
+  }
+
+  public void disableTenantCheck() {
+    tenantCheckEnabled = false;
+  }
+
+  public void setTenantCheckEnabled(boolean tenantCheckEnabled) {
+    this.tenantCheckEnabled = tenantCheckEnabled;
+  }
+
+  public boolean isTenantCheckEnabled() {
+    return tenantCheckEnabled;
+  }
+
 }

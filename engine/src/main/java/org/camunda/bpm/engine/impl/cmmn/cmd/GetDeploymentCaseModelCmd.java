@@ -16,7 +16,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.concurrent.Callable;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -37,7 +39,7 @@ public class GetDeploymentCaseModelCmd implements Command<InputStream>, Serializ
     this.caseDefinitionId = caseDefinitionId;
   }
 
-  public InputStream execute(CommandContext commandContext) {
+  public InputStream execute(final CommandContext commandContext) {
     ensureNotNull("caseDefinitionId", caseDefinitionId);
 
     CaseDefinitionEntity caseDefinition = Context
@@ -45,12 +47,18 @@ public class GetDeploymentCaseModelCmd implements Command<InputStream>, Serializ
             .getDeploymentCache()
             .findDeployedCaseDefinitionById(caseDefinitionId);
 
-    String deploymentId = caseDefinition.getDeploymentId();
-    String resourceName = caseDefinition.getResourceName();
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadCaseDefinition(caseDefinition);
+    }
 
-    InputStream inputStream =
-            new GetDeploymentResourceCmd(deploymentId, resourceName)
-            .execute(commandContext);
+    final String deploymentId = caseDefinition.getDeploymentId();
+    final String resourceName = caseDefinition.getResourceName();
+
+    InputStream inputStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
+      public InputStream call() throws Exception {
+        return new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
+      }
+    });
 
     return inputStream;
   }

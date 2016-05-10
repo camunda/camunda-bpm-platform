@@ -13,14 +13,15 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.escalation;
 
-import static org.junit.Assert.fail;
-
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.junit.Assert.fail;
+
+import junit.framework.AssertionFailedError;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,8 +29,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-
-import junit.framework.AssertionFailedError;
 
 /**
  * Parse an invalid process definition and assert the error message.
@@ -71,7 +70,7 @@ public class EscalationEventParseInvalidProcessTest {
   public String expectedErrorMessage;
 
   @Rule
-  public ProcessEngineRule rule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine());
+  public ProcessEngineRule rule = new ProvidedProcessEngineRule();
 
   protected RepositoryService repositoryService;
 

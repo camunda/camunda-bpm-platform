@@ -105,7 +105,7 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
   public List<LockedExternalTaskDto> fetchAndLock(FetchExternalTasksDto fetchingDto) {
     ExternalTaskQueryBuilder fetchBuilder = processEngine
       .getExternalTaskService()
-      .fetchAndLock(fetchingDto.getMaxTasks(), fetchingDto.getWorkerId());
+      .fetchAndLock(fetchingDto.getMaxTasks(), fetchingDto.getWorkerId(), fetchingDto.isUsePriority());
 
     if (fetchingDto.getTopics() != null) {
       for (FetchExternalTaskTopicDto topicDto : fetchingDto.getTopics()) {

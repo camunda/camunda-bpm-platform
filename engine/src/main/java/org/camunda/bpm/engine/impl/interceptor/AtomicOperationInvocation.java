@@ -81,7 +81,7 @@ public class AtomicOperationInvocation {
         operation.execute(execution);
       }
       else {
-        execution.scheduleAtomicOperationAsync(operation);
+        execution.scheduleAtomicOperationAsync(this);
       }
     } finally {
       Context.removeExecutionContext();

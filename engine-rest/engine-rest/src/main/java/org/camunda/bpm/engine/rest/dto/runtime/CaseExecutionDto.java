@@ -29,6 +29,7 @@ public class CaseExecutionDto {
   protected String activityType;
   protected String activityDescription;
   protected String parentId;
+  protected String tenantId;
   protected boolean required;
   protected boolean enabled;
   protected boolean active;
@@ -66,6 +67,10 @@ public class CaseExecutionDto {
     return parentId;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
   public boolean isRequired() {
     return required;
   }
@@ -93,6 +98,7 @@ public class CaseExecutionDto {
     dto.activityType = caseExecution.getActivityType();
     dto.activityDescription = caseExecution.getActivityDescription();
     dto.parentId = caseExecution.getParentId();
+    dto.tenantId = caseExecution.getTenantId();
     dto.required = caseExecution.isRequired();
     dto.active = caseExecution.isActive();
     dto.enabled = caseExecution.isEnabled();

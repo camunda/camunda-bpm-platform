@@ -25,6 +25,8 @@ public enum HistoryEventTypes implements HistoryEventType {
   PROCESS_INSTANCE_START("process-instance", "start"),
   /** fired when a process instance is updated */
   PROCESS_INSTANCE_UPDATE("process-instance-update", "update"),
+  /** fired when a process instance is migrated */
+  PROCESS_INSTANCE_MIGRATE("process-instance", "migrate"),
   /** fired when a process instance is ended. */
   PROCESS_INSTANCE_END("process-instance", "end"),
 
@@ -32,6 +34,8 @@ public enum HistoryEventTypes implements HistoryEventType {
   ACTIVITY_INSTANCE_START("activity-instance", "start"),
   /** fired when an activity instance is updated. */
   ACTIVITY_INSTANCE_UPDATE("activity-instance", "update"),
+  /** fired when an activity instance is migrated. */
+  ACTIVITY_INSTANCE_MIGRATE("activity-instance", "migrate"),
   /** fired when an activity instance is ended. */
   ACTIVITY_INSTANCE_END("activity-instance", "end"),
 
@@ -39,6 +43,8 @@ public enum HistoryEventTypes implements HistoryEventType {
   TASK_INSTANCE_CREATE("task-instance", "create"),
   /** fired when a task instance is updated. */
   TASK_INSTANCE_UPDATE("task-instance", "update"),
+  /** fired when a task instance is migrated. */
+  TASK_INSTANCE_MIGRATE("task-instance", "migrate"),
   /** fired when a task instance is completed. */
   TASK_INSTANCE_COMPLETE("task-instance", "complete"),
   /** fired when a task instance is deleted. */
@@ -48,6 +54,8 @@ public enum HistoryEventTypes implements HistoryEventType {
   VARIABLE_INSTANCE_CREATE("variable-instance", "create"),
   /** fired when a variable instance is updated. */
   VARIABLE_INSTANCE_UPDATE("variable-instance", "update"),
+  /** fired when a variable instance is migrated. */
+  VARIABLE_INSTANCE_MIGRATE("variable-instance", "migrate"),
   /** fired when a variable instance is updated. */
   VARIABLE_INSTANCE_UPDATE_DETAIL("variable-instance", "update-detail"),
   /** fired when a variable instance is deleted. */
@@ -124,7 +132,21 @@ public enum HistoryEventTypes implements HistoryEventType {
    *
    * @since 7.5
    */
-  BATCH_END("batch", "end");
+  BATCH_END("batch", "end"),
+
+  /**
+   * fired when an identity link is added
+   *
+   * @since 7.5
+   */
+  IDENTITY_LINK_ADD("identity-link-add", "add-identity-link"),
+
+  /**
+   * fired when an identity link is removed
+   *
+   * @since 7.5
+   */
+  IDENTITY_LINK_DELETE("identity-link-delete", "delete-identity-link");
 
   private HistoryEventTypes(String entityType, String eventName) {
     this.entityType = eventName;

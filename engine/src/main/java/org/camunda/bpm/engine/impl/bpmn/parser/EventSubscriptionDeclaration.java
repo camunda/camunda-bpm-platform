@@ -15,9 +15,10 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.event.SignalEventHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.EventSubscriptionJobDeclaration;
@@ -107,6 +108,8 @@ public class EventSubscriptionDeclaration implements Serializable {
     }
   }
 
+
+
   /**
    * Creates and inserts a subscription entity depending on the message type of this declaration.
    * @param execution
@@ -134,14 +137,17 @@ public class EventSubscriptionDeclaration implements Serializable {
     return eventSubscriptionEntity;
   }
 
-  @SuppressWarnings("unchecked")
-  public static List<EventSubscriptionDeclaration> getDeclarationsForScope(PvmScope scope) {
-    Object result = scope.getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
-    if (result != null) {
-      return (List<EventSubscriptionDeclaration>) result;
-    } else {
-      return Collections.emptyList();
+  public void updateSubscription(EventSubscriptionEntity eventSubscription) {
+    eventSubscription.setEventName(eventName);
+    eventSubscription.setActivityId(activityId);
+  }
+
+  public static Map<String, EventSubscriptionDeclaration> getDeclarationsForScope(PvmScope scope) {
+    if (scope == null) {
+      return Collections.emptyMap();
     }
+
+    return scope.getProperties().get(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS);
   }
 
 }

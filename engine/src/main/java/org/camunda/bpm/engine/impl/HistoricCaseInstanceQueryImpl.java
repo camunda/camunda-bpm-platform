@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmptyString;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
 
 import java.util.Date;
@@ -56,6 +57,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   protected Date closedBefore;
   protected Date closedAfter;
   protected String caseDefinitionKey;
+  protected String[] tenantIds;
 
   public HistoricCaseInstanceQueryImpl() {
   }
@@ -167,6 +169,12 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     return this;
   }
 
+  public HistoricCaseInstanceQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   public HistoricCaseInstanceQuery active() {
     ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state);
     this.state = CaseExecutionState.ACTIVE.getStateCode();
@@ -230,6 +238,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
   public HistoricCaseInstanceQuery orderByCaseInstanceId() {
     return orderBy(HistoricCaseInstanceQueryProperty.PROCESS_INSTANCE_ID_);
+  }
+
+  public HistoricCaseInstanceQuery orderByTenantId() {
+    return orderBy(HistoricCaseInstanceQueryProperty.TENANT_ID);
   }
 
   public long executeCount(CommandContext commandContext) {

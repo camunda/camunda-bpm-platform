@@ -23,12 +23,16 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 /**
  * @author Thorben Lindhauer
@@ -58,14 +62,16 @@ public class JobExecutorShutdownTest {
       .endEvent()
       .done();
 
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+    @Override
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      return configuration.setJobExecutor(buildControllableJobExecutor());
+    }
+  };
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
 
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule(
-      ((ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-          .createProcessEngineConfigurationFromResource("camunda.cfg.xml"))
-          .setJobExecutor(buildControllableJobExecutor())
-          .buildProcessEngine()
-      );
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule);
 
   protected ControllableJobExecutor jobExecutor;
   protected ThreadControl acquisitionThread;
@@ -74,7 +80,7 @@ public class JobExecutorShutdownTest {
   protected static ControllableJobExecutor buildControllableJobExecutor() {
     ControllableJobExecutor jobExecutor = new ControllableJobExecutor();
     jobExecutor.setMaxJobsPerAcquisition(2);
-    jobExecutor.proceeedAndWaitOnShutdown(false);
+    jobExecutor.proceedAndWaitOnShutdown(false);
     return jobExecutor;
   }
 
@@ -85,6 +91,11 @@ public class JobExecutorShutdownTest {
     jobExecutor.setMaxJobsPerAcquisition(2);
     acquisitionThread = jobExecutor.getAcquisitionThreadControl();
     executionThread = jobExecutor.getExecutionThreadControl();
+  }
+
+  @After
+  public void shutdownJobExecutor() {
+    jobExecutor.shutdown();
   }
 
   @Test

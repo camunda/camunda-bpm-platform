@@ -59,6 +59,8 @@ import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateTenantBuilder;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.SerializableValueType;
@@ -109,6 +111,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   private RuntimeServiceImpl runtimeServiceMock;
 
+  private UpdateProcessInstanceSuspensionStateTenantBuilder mockUpdateSuspensionStateBuilder;
+  private UpdateProcessInstanceSuspensionStateSelectBuilder mockUpdateSuspensionStateSelectBuilder;
+
   @Before
   public void setUpRuntimeData() {
     runtimeServiceMock = mock(RuntimeServiceImpl.class);
@@ -119,6 +124,14 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     // activity instances
     when(runtimeServiceMock.getActivityInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_ACTIVITY_INSTANCE);
+
+    mockUpdateSuspensionStateSelectBuilder = mock(UpdateProcessInstanceSuspensionStateSelectBuilder.class);
+    when(runtimeServiceMock.updateProcessInstanceSuspensionState()).thenReturn(mockUpdateSuspensionStateSelectBuilder);
+
+    mockUpdateSuspensionStateBuilder = mock(UpdateProcessInstanceSuspensionStateTenantBuilder.class);
+    when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceId(anyString())).thenReturn(mockUpdateSuspensionStateBuilder);
+    when(mockUpdateSuspensionStateSelectBuilder.byProcessDefinitionId(anyString())).thenReturn(mockUpdateSuspensionStateBuilder);
+    when(mockUpdateSuspensionStateSelectBuilder.byProcessDefinitionKey(anyString())).thenReturn(mockUpdateSuspensionStateBuilder);
 
     // runtime service
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
@@ -1545,7 +1558,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(SINGLE_PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(runtimeServiceMock).activateProcessInstanceById(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceId(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    verify(mockUpdateSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -1556,8 +1570,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String expectedMessage = "expectedMessage";
 
     doThrow(new ProcessEngineException(expectedMessage))
-      .when(runtimeServiceMock)
-      .activateProcessInstanceById(eq(MockProvider.EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID));
+      .when(mockUpdateSuspensionStateBuilder)
+      .activate();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID)
@@ -1580,8 +1594,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String message = "expectedMessage";
 
     doThrow(new AuthorizationException(message))
-      .when(runtimeServiceMock)
-      .activateProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+      .when(mockUpdateSuspensionStateBuilder)
+      .activate();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
@@ -1611,7 +1625,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(SINGLE_PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(runtimeServiceMock).suspendProcessInstanceById(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceId(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    verify(mockUpdateSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -1622,8 +1637,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String expectedMessage = "expectedMessage";
 
     doThrow(new ProcessEngineException(expectedMessage))
-      .when(runtimeServiceMock)
-      .suspendProcessInstanceById(eq(MockProvider.EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID));
+      .when(mockUpdateSuspensionStateBuilder)
+      .suspend();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID)
@@ -1668,8 +1683,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String message = "expectedMessage";
 
     doThrow(new AuthorizationException(message))
-      .when(runtimeServiceMock)
-      .suspendProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+      .when(mockUpdateSuspensionStateBuilder)
+      .suspend();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
@@ -1699,7 +1714,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(runtimeServiceMock).activateProcessInstanceByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockUpdateSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -1710,8 +1726,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     String expectedException = "expectedException";
     doThrow(new ProcessEngineException(expectedException))
-      .when(runtimeServiceMock)
-      .activateProcessInstanceByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+      .when(mockUpdateSuspensionStateBuilder)
+      .activate();
 
     given()
       .contentType(ContentType.JSON)
@@ -1734,8 +1750,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String message = "expectedMessage";
 
     doThrow(new AuthorizationException(message))
-      .when(runtimeServiceMock)
-      .activateProcessInstanceByProcessDefinitionKey(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY));
+      .when(mockUpdateSuspensionStateBuilder)
+      .activate();
 
     given()
       .contentType(ContentType.JSON)
@@ -1764,7 +1780,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(runtimeServiceMock).suspendProcessInstanceByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockUpdateSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -1775,8 +1792,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     String expectedException = "expectedException";
     doThrow(new ProcessEngineException(expectedException))
-      .when(runtimeServiceMock)
-      .suspendProcessInstanceByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+      .when(mockUpdateSuspensionStateBuilder)
+      .suspend();
 
     given()
       .contentType(ContentType.JSON)
@@ -1799,8 +1816,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String message = "expectedMessage";
 
     doThrow(new AuthorizationException(message))
-      .when(runtimeServiceMock)
-      .suspendProcessInstanceByProcessDefinitionKey(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY));
+      .when(mockUpdateSuspensionStateBuilder)
+      .suspend();
 
     given()
       .contentType(ContentType.JSON)
@@ -1812,6 +1829,90 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body("message", equalTo(message))
     .when()
     .put(PROCESS_INSTANCE_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testActivateProcessInstanceByProcessDefinitionKeyAndTenantId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_INSTANCE_SUSPENDED_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockUpdateSuspensionStateBuilder).processDefinitionTenantId(MockProvider.EXAMPLE_TENANT_ID);
+    verify(mockUpdateSuspensionStateBuilder).activate();
+  }
+
+  @Test
+  public void testActivateProcessInstanceByProcessDefinitionKeyWithoutTenantId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionWithoutTenantId", true);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_INSTANCE_SUSPENDED_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockUpdateSuspensionStateBuilder).processDefinitionWithoutTenantId();
+    verify(mockUpdateSuspensionStateBuilder).activate();
+  }
+
+  @Test
+  public void testSuspendProcessInstanceByProcessDefinitionKeyAndTenantId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_INSTANCE_SUSPENDED_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockUpdateSuspensionStateBuilder).processDefinitionTenantId(MockProvider.EXAMPLE_TENANT_ID);
+    verify(mockUpdateSuspensionStateBuilder).suspend();
+  }
+
+  @Test
+  public void testSuspendProcessInstanceByProcessDefinitionKeyWithoutTenantId() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    params.put("processDefinitionWithoutTenantId", true);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_INSTANCE_SUSPENDED_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    verify(mockUpdateSuspensionStateBuilder).processDefinitionWithoutTenantId();
+    verify(mockUpdateSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -1829,7 +1930,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(runtimeServiceMock).activateProcessInstanceByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(mockUpdateSuspensionStateBuilder).activate();
   }
 
   @Test
@@ -1840,8 +1942,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     String expectedException = "expectedException";
     doThrow(new ProcessEngineException(expectedException))
-      .when(runtimeServiceMock)
-      .activateProcessInstanceByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+      .when(mockUpdateSuspensionStateBuilder)
+      .activate();
 
     given()
       .contentType(ContentType.JSON)
@@ -1864,8 +1966,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String message = "expectedMessage";
 
     doThrow(new AuthorizationException(message))
-      .when(runtimeServiceMock)
-      .activateProcessInstanceByProcessDefinitionId(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+      .when(mockUpdateSuspensionStateBuilder)
+      .activate();
 
     given()
       .contentType(ContentType.JSON)
@@ -1894,7 +1996,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(runtimeServiceMock).suspendProcessInstanceByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(mockUpdateSuspensionStateBuilder).suspend();
   }
 
   @Test
@@ -1905,8 +2008,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     String expectedException = "expectedException";
     doThrow(new ProcessEngineException(expectedException))
-      .when(runtimeServiceMock)
-      .suspendProcessInstanceByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+      .when(mockUpdateSuspensionStateBuilder)
+      .suspend();
 
     given()
       .contentType(ContentType.JSON)
@@ -1929,8 +2032,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String message = "expectedMessage";
 
     doThrow(new AuthorizationException(message))
-      .when(runtimeServiceMock)
-      .suspendProcessInstanceByProcessDefinitionId(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+      .when(mockUpdateSuspensionStateBuilder)
+      .suspend();
 
     given()
       .contentType(ContentType.JSON)

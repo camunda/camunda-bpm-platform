@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.test.api.authorization;
 
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
@@ -61,7 +62,19 @@ public class MyResourceAuthorizationProvider implements ResourceAuthorizationPro
     return null;
   }
 
+  public AuthorizationEntity[] newTenant(Tenant tenant) {
+    return null;
+  }
+
   public AuthorizationEntity[] groupMembershipCreated(String groupId, String userId) {
+    return null;
+  }
+
+  public AuthorizationEntity[] tenantMembershipCreated(Tenant tenant, User user) {
+    return null;
+  }
+
+  public AuthorizationEntity[] tenantMembershipCreated(Tenant tenant, Group group) {
     return null;
   }
 

@@ -54,6 +54,7 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   protected Boolean ended;
   protected Integer caseActivityInstanceState;
   protected Boolean required;
+  protected String[] tenantIds;
 
   public HistoricCaseActivityInstanceQueryImpl() {
   }
@@ -199,6 +200,12 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
     return this;
   }
 
+  public HistoricCaseActivityInstanceQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   @Override
   protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions()
@@ -256,6 +263,10 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   public HistoricCaseActivityInstanceQuery orderByCaseDefinitionId() {
     orderBy(HistoricCaseActivityInstanceQueryProperty.CASE_DEFINITION_ID);
     return this;
+  }
+
+  public HistoricCaseActivityInstanceQuery orderByTenantId() {
+    return orderBy(HistoricCaseActivityInstanceQueryProperty.TENANT_ID);
   }
 
   // getter

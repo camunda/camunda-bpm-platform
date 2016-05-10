@@ -13,15 +13,20 @@
 
 package org.camunda.bpm.engine.impl.db;
 
+import java.io.Serializable;
 
 /**
  * @author Daniel Meyer
  */
-public class ListQueryParameterObject extends AuthorizationCheck {
+public class ListQueryParameterObject implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
   public static final String DEFAULT_ORDER_BY = "RES.ID_ asc";
+
+  protected AuthorizationCheck authCheck = new AuthorizationCheck();
+
+  protected TenantCheck tenantCheck = new TenantCheck();
 
   protected int maxResults = Integer.MAX_VALUE;
   protected int firstResult = 0;
@@ -93,6 +98,22 @@ public class ListQueryParameterObject extends AuthorizationCheck {
 
   public void setOrderBy(String orderBy) {
     this.orderBy = orderBy;
+  }
+
+  public AuthorizationCheck getAuthCheck() {
+    return authCheck;
+  }
+
+  public void setAuthCheck(AuthorizationCheck authCheck) {
+    this.authCheck = authCheck;
+  }
+
+  public TenantCheck getTenantCheck() {
+    return tenantCheck;
+  }
+
+  public void setTenantCheck(TenantCheck tenantCheck) {
+    this.tenantCheck = tenantCheck;
   }
 
 }

@@ -31,6 +31,8 @@ public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements 
 
   protected String batchId;
   protected String type;
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
 
   public BatchQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -56,8 +58,34 @@ public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements 
     return type;
   }
 
+  public BatchQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public String[] getTenantIds() {
+    return tenantIds;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
+
+  public BatchQuery withoutTenantId() {
+    this.tenantIds = null;
+    isTenantIdSet = true;
+    return this;
+  }
+
   public BatchQuery orderById() {
     return orderBy(BatchQueryProperty.ID);
+  }
+
+  @Override
+  public BatchQuery orderByTenantId() {
+    return orderBy(BatchQueryProperty.TENANT_ID);
   }
 
   public long executeCount(CommandContext commandContext) {

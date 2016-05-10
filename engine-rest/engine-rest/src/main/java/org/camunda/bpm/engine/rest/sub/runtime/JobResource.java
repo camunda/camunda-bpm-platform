@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.sub.runtime;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -22,7 +23,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDuedateDto;
-import org.camunda.bpm.engine.rest.dto.runtime.JobPriorityDto;
+import org.camunda.bpm.engine.rest.dto.runtime.PriorityDto;
 import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
 
@@ -59,6 +60,9 @@ public interface JobResource {
   @PUT
   @Path("/priority")
   @Consumes(MediaType.APPLICATION_JSON)
-  void setJobPriority(JobPriorityDto dto);
+  void setJobPriority(PriorityDto dto);
+
+  @DELETE
+  void deleteJob();
 
 }

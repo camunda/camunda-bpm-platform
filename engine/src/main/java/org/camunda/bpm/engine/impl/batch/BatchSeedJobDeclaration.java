@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.batch;
 
+import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler.BatchSeedJobConfiguration;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
@@ -37,8 +39,8 @@ public class BatchSeedJobDeclaration extends JobDeclaration<BatchEntity, Message
   }
 
   @Override
-  protected String resolveJobHandlerConfiguration(BatchEntity batch) {
-    return batch.getId();
+  protected JobHandlerConfiguration resolveJobHandlerConfiguration(BatchEntity batch) {
+    return new BatchSeedJobConfiguration(batch.getId());
   }
 
   @Override

@@ -16,15 +16,19 @@ package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class MultiTenancyHistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
 
   protected static final String BPMN = "org/camunda/bpm/engine/test/api/multitenancy/failingTask.bpmn";
@@ -112,6 +116,42 @@ public class MultiTenancyHistoricJobLogQueryTest extends PluggableProcessEngineT
     assertThat(historicJobLogs.get(1).getTenantId(), is(TENANT_TWO));
     assertThat(historicJobLogs.get(2).getTenantId(), is(TENANT_ONE));
     assertThat(historicJobLogs.get(3).getTenantId(), is(TENANT_ONE));
+  }
+
+  public void testQueryNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
+    assertThat(query.count(), is(0L));
+  }
+
+  public void testQueryAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
+
+    assertThat(query.count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count(), is(2L));
+  }
+
+  public void testQueryAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
+
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
+
+    assertThat(query.count(), is(4L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(2L));
+  }
+
+  public void testQueryDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
+    assertThat(query.count(), is(4L));
   }
 
   protected void startProcessInstanceAndExecuteFailingJobForTenant(String tenant) {

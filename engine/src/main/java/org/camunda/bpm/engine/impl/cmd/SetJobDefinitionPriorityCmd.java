@@ -18,12 +18,12 @@ import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntry;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntryBuilder;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
@@ -74,13 +74,15 @@ public class SetJobDefinitionPriorityCmd implements Command<Void> {
   }
 
   protected void checkAuthorization(CommandContext commandContext, JobDefinitionEntity jobDefinition) {
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
 
     String processDefinitionKey = jobDefinition.getProcessDefinitionKey();
-    authorizationManager.checkUpdateProcessDefinitionByKey(processDefinitionKey);
 
-    if (cascade) {
-      authorizationManager.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkUpdateProcessDefinitionByKey(processDefinitionKey);
+
+      if (cascade) {
+        checker.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
+      }
     }
   }
 

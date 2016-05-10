@@ -22,7 +22,8 @@
         ROOT_CAUSE_INCIDENT_ID_,
         CONFIGURATION_,
         INCIDENT_STATE_,
-        TENANT_ID_
+        TENANT_ID_,
+        JOB_DEF_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{processDefinitionKey, jdbcType=VARCHAR},
@@ -38,7 +39,8 @@
         #{rootCauseIncidentId ,jdbcType=VARCHAR},
         #{configuration, jdbcType=VARCHAR},
         #{incidentState, jdbcType=INTEGER},
-        #{tenantId, jdbcType=VARCHAR}
+        #{tenantId, jdbcType=VARCHAR},
+        #{jobDefinitionId, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -68,6 +70,10 @@
     delete from ${prefix}ACT_HI_INCIDENT where PROC_DEF_ID_ = #{processDefinitionId} and PROC_INST_ID_ is null
   </delete>
 
+  <delete id="deleteHistoricIncidentsByJobDefinitionId">
+    delete from ${prefix}ACT_HI_INCIDENT where JOB_DEF_ID_ = #{jobDefinitionId}
+  </delete>
+
   <!-- HISTORIC INCIDENT RESULTMAP -->
 
   <resultMap id="historicIncidentResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity">
@@ -86,6 +92,7 @@
     <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
     <result property="incidentState" column="INCIDENT_STATE_" jdbcType="INTEGER" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- HISTORIC INCIDENT SELECT -->
@@ -108,17 +115,14 @@
   <sql id="selectHistoricIncidentByQueryCriteriaSql">
     from ${prefix}ACT_HI_INCIDENT RES
 
-    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       LEFT JOIN (
         SELECT
             DISTINCT SELF.PROC_DEF_KEY_ AS KEY_
         FROM
             ${prefix}ACT_HI_INCIDENT SELF
         WHERE
-            1 = (
-                <bind name="permCheck" value="permissionChecks.atomicChecks[0]" />
-                <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck" />
-            )
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
       ) AUTH
       ON AUTH.KEY_ = RES.PROC_DEF_KEY_
     </if>
@@ -164,11 +168,20 @@
           #{tenantId}
         </foreach>
       </if>
+      <if test="jobDefinitionIds != null &amp;&amp; jobDefinitionIds.length > 0">
+        and RES.JOB_DEF_ID_ in
+        <foreach item="jobDefinitionId" index="index" collection="jobDefinitionIds"
+                 open="(" separator="," close=")">
+          #{jobDefinitionId}
+        </foreach>
+      </if>
 
-      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
         <!-- incident exists in context of a process definition -->
         and ((RES.PROC_DEF_ID_ is not null and AUTH.KEY_ is not null) or RES.PROC_DEF_ID_ is null)
       </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 
     </where>
   </sql>

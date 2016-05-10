@@ -13,7 +13,9 @@
 
 package org.camunda.bpm.engine.impl.migration.instance;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
+import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -21,22 +23,36 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 public class MigratingEventSubscriptionInstance implements MigratingInstance, RemovingInstance, EmergingInstance {
 
+  public static final MigrationLogger MIGRATION_LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
+
   protected EventSubscriptionEntity eventSubscriptionEntity;
   protected ScopeImpl targetScope;
+  protected boolean updateEvent;
+  protected EventSubscriptionDeclaration targetDeclaration;
 
   protected EventSubscriptionDeclaration eventSubscriptionDeclaration;
 
-  public MigratingEventSubscriptionInstance(EventSubscriptionEntity eventSubscriptionEntity, ScopeImpl targetScope) {
+  public MigratingEventSubscriptionInstance(EventSubscriptionEntity eventSubscriptionEntity,
+      ScopeImpl targetScope,
+      boolean updateEvent,
+      EventSubscriptionDeclaration targetDeclaration) {
     this.eventSubscriptionEntity = eventSubscriptionEntity;
     this.targetScope = targetScope;
+    this.updateEvent = updateEvent;
+    this.targetDeclaration = targetDeclaration;
   }
 
   public MigratingEventSubscriptionInstance(EventSubscriptionEntity eventSubscriptionEntity) {
-    this(eventSubscriptionEntity, null);
+    this(eventSubscriptionEntity, null, false, null);
   }
 
   public MigratingEventSubscriptionInstance(EventSubscriptionDeclaration eventSubscriptionDeclaration) {
     this.eventSubscriptionDeclaration = eventSubscriptionDeclaration;
+  }
+
+  @Override
+  public boolean isDetached() {
+    return eventSubscriptionEntity.getExecutionId() == null;
   }
 
   public void detachState() {
@@ -47,7 +63,15 @@ public class MigratingEventSubscriptionInstance implements MigratingInstance, Re
     eventSubscriptionEntity.setExecution(newOwningInstance.resolveRepresentativeExecution());
   }
 
+  @Override
+  public void attachState(MigratingTransitionInstance targetTransitionInstance) {
+    throw MIGRATION_LOGGER.cannotAttachToTransitionInstance(this);
+  }
+
   public void migrateState() {
+    if (updateEvent) {
+      targetDeclaration.updateSubscription(eventSubscriptionEntity);
+    }
     eventSubscriptionEntity.setActivity((ActivityImpl) targetScope);
   }
 

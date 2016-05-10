@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,7 +37,7 @@ import org.junit.rules.RuleChain;
  */
 public class MigrationRemoveMultiInstanceTest {
 
-  protected ProcessEngineRule rule = new ProcessEngineRule(true);
+  protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule
@@ -45,8 +46,8 @@ public class MigrationRemoveMultiInstanceTest {
   @Test
   public void testRemoveParallelMultiInstanceBody() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -90,8 +91,8 @@ public class MigrationRemoveMultiInstanceTest {
   @Test
   public void testRemoveParallelMultiInstanceBodyVariables() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -101,15 +102,23 @@ public class MigrationRemoveMultiInstanceTest {
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
-    // then all MI variables are gone
-    Assert.assertEquals(0, rule.getRuntimeService().createVariableInstanceQuery().count());
+    // then
+    Assert.assertEquals(0, rule.getRuntimeService().createVariableInstanceQuery().variableName("nrOfInstances").count());
+
+    // the MI body variables are gone
+    Assert.assertEquals(0, rule.getRuntimeService().createVariableInstanceQuery().variableName("nrOfInstances").count());
+    Assert.assertEquals(0, rule.getRuntimeService().createVariableInstanceQuery().variableName("nrOfActiveInstances").count());
+    Assert.assertEquals(0, rule.getRuntimeService().createVariableInstanceQuery().variableName("nrOfCompletedInstances").count());
+
+    // and the loop counters are still there (because they logically belong to the inner activity instances)
+    Assert.assertEquals(3, rule.getRuntimeService().createVariableInstanceQuery().variableName("loopCounter").count());
   }
 
   @Test
   public void testRemoveParallelMultiInstanceBodyScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MultiInstanceProcessModels.PAR_MI_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -162,8 +171,8 @@ public class MigrationRemoveMultiInstanceTest {
   @Test
   public void testRemoveParallelMultiInstanceBodyOneInstanceFinished() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -209,8 +218,8 @@ public class MigrationRemoveMultiInstanceTest {
   @Test
   public void testRemoveSequentialMultiInstanceBody() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -243,8 +252,8 @@ public class MigrationRemoveMultiInstanceTest {
   @Test
   public void testRemoveSequentialMultiInstanceBodyVariables() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -261,8 +270,8 @@ public class MigrationRemoveMultiInstanceTest {
   @Test
   public void testRemovSequentialMultiInstanceBodyScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(MultiInstanceProcessModels.SEQ_MI_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())

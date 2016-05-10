@@ -12,14 +12,17 @@
  */
 package org.camunda.bpm.engine.rest.dto.management;
 
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
-import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import java.util.Date;
 
 import javax.ws.rs.core.Response.Status;
-import java.util.Date;
+
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateBuilder;
+import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateSelectBuilder;
+import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateTenantBuilder;
+import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 /**
  * @author roman.smirnov
@@ -31,6 +34,9 @@ public class JobDefinitionSuspensionStateDto extends SuspensionStateDto {
   private String jobDefinitionId;
   private String processDefinitionId;
   private String processDefinitionKey;
+
+  private String processDefinitionTenantId;
+  private boolean processDefinitionWithoutTenantId;
 
   public String getJobDefinitionId() {
     return jobDefinitionId;
@@ -56,6 +62,15 @@ public class JobDefinitionSuspensionStateDto extends SuspensionStateDto {
     this.processDefinitionKey = processDefinitionKey;
   }
 
+  public void setProcessDefinitionTenantId(String processDefinitionTenantId) {
+    this.processDefinitionTenantId = processDefinitionTenantId;
+  }
+
+  public void setProcessDefinitionWithoutTenantId(boolean processDefinitionWithoutTenantId) {
+    this.processDefinitionWithoutTenantId = processDefinitionWithoutTenantId;
+  }
+
+  @Override
   public void updateSuspensionState(ProcessEngine engine) {
     int params = (jobDefinitionId != null ? 1 : 0)
                + (processDefinitionId != null ? 1 : 0)
@@ -64,43 +79,49 @@ public class JobDefinitionSuspensionStateDto extends SuspensionStateDto {
     if (params > 1) {
       String message = "Only one of jobDefinitionId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
-    }
 
-    ManagementService managementService = engine.getManagementService();
-
-    Date delayedExecutionDate = null;
-    if (executionDate != null && !executionDate.equals("")) {
-      delayedExecutionDate = DateTimeUtil.parseDate(executionDate);
-    }
-
-    if (jobDefinitionId != null) {
-      // activate/suspend job definition by id
-      if (getSuspended()) {
-        managementService.suspendJobDefinitionById(jobDefinitionId, includeJobs, delayedExecutionDate);
-      } else {
-        managementService.activateJobDefinitionById(jobDefinitionId, includeJobs, delayedExecutionDate);
-      }
-    } else
-
-    if (processDefinitionId != null) {
-      // activate/suspend job definition by process definition id
-      if (getSuspended()) {
-        managementService.suspendJobDefinitionByProcessDefinitionId(processDefinitionId, includeJobs, delayedExecutionDate);
-      } else {
-        managementService.activateJobDefinitionByProcessDefinitionId(processDefinitionId, includeJobs, delayedExecutionDate);
-      }
-    } else
-
-    if (processDefinitionKey != null) {
-      // activate/suspend job definition by process definition key
-      if (getSuspended()) {
-        managementService.suspendJobDefinitionByProcessDefinitionKey(processDefinitionKey, includeJobs, delayedExecutionDate);
-      } else {
-        managementService.activateJobDefinitionByProcessDefinitionKey(processDefinitionKey, includeJobs, delayedExecutionDate);
-      }
-    } else {
+    } else if (params == 0) {
       String message = "Either jobDefinitionId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
+    }
+
+    UpdateJobDefinitionSuspensionStateBuilder updateSuspensionStateBuilder = createUpdateSuspensionStateBuilder(engine);
+
+    if (executionDate != null && !executionDate.equals("")) {
+      Date delayedExecutionDate = DateTimeUtil.parseDate(executionDate);
+
+      updateSuspensionStateBuilder.executionDate(delayedExecutionDate);
+    }
+
+    updateSuspensionStateBuilder.includeJobs(includeJobs);
+
+    if (getSuspended()) {
+      updateSuspensionStateBuilder.suspend();
+    } else {
+      updateSuspensionStateBuilder.activate();
+    }
+  }
+
+  protected UpdateJobDefinitionSuspensionStateBuilder createUpdateSuspensionStateBuilder(ProcessEngine engine) {
+    UpdateJobDefinitionSuspensionStateSelectBuilder selectBuilder = engine.getManagementService().updateJobDefinitionSuspensionState();
+
+    if (jobDefinitionId != null) {
+      return selectBuilder.byJobDefinitionId(jobDefinitionId);
+
+    } else if (processDefinitionId != null) {
+      return selectBuilder.byProcessDefinitionId(processDefinitionId);
+
+    } else {
+      UpdateJobDefinitionSuspensionStateTenantBuilder tenantBuilder = selectBuilder.byProcessDefinitionKey(processDefinitionKey);
+
+      if (processDefinitionTenantId != null) {
+        tenantBuilder.processDefinitionTenantId(processDefinitionTenantId);
+
+      } else if (processDefinitionWithoutTenantId) {
+        tenantBuilder.processDefinitionWithoutTenantId();
+      }
+
+      return tenantBuilder;
     }
   }
 

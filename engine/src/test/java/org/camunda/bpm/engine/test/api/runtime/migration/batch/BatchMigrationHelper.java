@@ -14,18 +14,21 @@
 package org.camunda.bpm.engine.test.api.runtime.migration.batch;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
-import org.camunda.bpm.engine.impl.migration.batch.MigrationBatchJobHandler;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -43,16 +46,39 @@ public class BatchMigrationHelper {
   public ProcessDefinition sourceProcessDefinition;
   public ProcessDefinition targetProcessDefinition;
 
-
   public BatchMigrationHelper(ProcessEngineRule engineRule, MigrationTestRule migrationRule) {
     this.engineRule = engineRule;
     this.migrationRule = migrationRule;
   }
 
-  public Batch migrateProcessInstancesAsync(int numberOfProcessInstances) {
-    sourceProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
-    targetProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+  public BatchMigrationHelper(ProcessEngineRule engineRule) {
+    this(engineRule, null);
+  }
 
+  public ProcessDefinition getSourceProcessDefinition() {
+    return sourceProcessDefinition;
+  }
+
+  public ProcessDefinition getTargetProcessDefinition() {
+    return targetProcessDefinition;
+  }
+
+  public Batch createMigrationBatchWithSize(int batchSize) {
+    int invocationsPerBatchJob = ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration()).getInvocationsPerBatchJob();
+    return migrateProcessInstancesAsync(invocationsPerBatchJob * batchSize);
+  }
+
+  public Batch migrateProcessInstancesAsync(int numberOfProcessInstances) {
+    sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    targetProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    return migrateProcessInstancesAsync(numberOfProcessInstances, sourceProcessDefinition, targetProcessDefinition);
+  }
+
+  public Batch migrateProcessInstanceAsync(ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition) {
+    return migrateProcessInstancesAsync(1, sourceProcessDefinition, targetProcessDefinition);
+  }
+
+  public Batch migrateProcessInstancesAsync(int numberOfProcessInstances, ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition) {
     RuntimeService runtimeService = engineRule.getRuntimeService();
 
     List<String> processInstanceIds = new ArrayList<String>(numberOfProcessInstances);
@@ -135,6 +161,53 @@ public class BatchMigrationHelper {
     }
   }
 
+  public void completeBatch(Batch batch) {
+    completeSeedJobs(batch);
+    completeMigrationJobs(batch);
+    completeMonitorJobs(batch);
+  }
+
+  public void completeSeedJobs(Batch batch) {
+    while (getSeedJob(batch) != null) {
+      executeSeedJob(batch);
+    }
+  }
+
+  public void completeMigrationJobs(Batch batch) {
+    while (!getMigrationJobs(batch).isEmpty()) {
+      executeMigrationJobs(batch);
+    }
+  }
+
+  public void completeMigrationJobs(Batch batch, int count) {
+    List<Job> migrationJobs = getMigrationJobs(batch);
+    assertTrue(migrationJobs.size() >= count);
+    for (int i = 0; i < count; i++) {
+      executeJob(migrationJobs.get(i));
+    }
+  }
+
+  public void failMigrationJobs(Batch batch, int count) {
+    setRetries(batch, count, 0);
+  }
+
+  public void setRetries(Batch batch, int count, int retries) {
+    List<Job> migrationJobs = getMigrationJobs(batch);
+    assertTrue(migrationJobs.size() >= count);
+
+    ManagementService managementService = engineRule.getManagementService();
+    for (int i = 0; i < count; i++) {
+      managementService.setJobRetries(migrationJobs.get(i).getId(), retries);
+    }
+
+  }
+
+  public void completeMonitorJobs(Batch batch) {
+    while (getMonitorJob(batch) != null) {
+      executeMonitorJob(batch);
+    }
+  }
+
   public HistoricBatch getHistoricBatch(Batch batch) {
     return engineRule.getHistoryService()
       .createHistoricBatchQuery()
@@ -155,6 +228,16 @@ public class BatchMigrationHelper {
     return engineRule.getHistoryService()
       .createHistoricJobLogQuery()
       .jobDefinitionId(batch.getMonitorJobDefinitionId())
+      .orderPartiallyByOccurrence()
+      .asc()
+      .list();
+  }
+
+  public List<HistoricJobLog> getHistoricMonitorJobLog(Batch batch, Job monitorJob) {
+    return engineRule.getHistoryService()
+      .createHistoricJobLogQuery()
+      .jobDefinitionId(batch.getMonitorJobDefinitionId())
+      .jobId(monitorJob.getId())
       .orderPartiallyByOccurrence()
       .asc()
       .list();
@@ -187,6 +270,24 @@ public class BatchMigrationHelper {
     Date newDate = addSeconds(ClockUtil.getCurrentTime(), seconds);
     ClockUtil.setCurrentTime(newDate);
     return newDate;
+  }
+
+  /**
+   * Remove all batches and historic batches. Usually called in {@link org.junit.After} method.
+   */
+  public void removeAllRunningAndHistoricBatches() {
+    HistoryService historyService = engineRule.getHistoryService();
+    ManagementService managementService = engineRule.getManagementService();
+
+    for (Batch batch : managementService.createBatchQuery().list()) {
+      managementService.deleteBatch(batch.getId(), true);
+    }
+
+    // remove history of completed batches
+    for (HistoricBatch historicBatch : historyService.createHistoricBatchQuery().list()) {
+      historyService.deleteHistoricBatch(historicBatch.getId());
+    }
+
   }
 
 }

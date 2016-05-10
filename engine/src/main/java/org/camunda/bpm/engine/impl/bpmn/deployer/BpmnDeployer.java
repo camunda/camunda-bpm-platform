@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.diagram.ProcessDiagramGenerator;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
@@ -283,14 +284,10 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     }
   }
 
-  @SuppressWarnings("unchecked")
   protected void addEventSubscriptions(ProcessDefinitionEntity processDefinition) {
-    List<EventSubscriptionDeclaration> messageEventDefinitions = (List<EventSubscriptionDeclaration>) processDefinition
-        .getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
-    if (messageEventDefinitions != null) {
-      for (EventSubscriptionDeclaration messageEventDefinition : messageEventDefinitions) {
-        addEventSubscription(processDefinition, messageEventDefinition);
-      }
+    Map<String, EventSubscriptionDeclaration> eventDefinitions = processDefinition.getProperties().get(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS);
+    for (EventSubscriptionDeclaration messageEventDefinition : eventDefinitions.values()) {
+      addEventSubscription(processDefinition, messageEventDefinition);
     }
   }
 
@@ -425,7 +422,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
           identityLink.setGroupId(expr.toString());
         }
         identityLink.setType(IdentityLinkType.CANDIDATE);
-        dbEntityManager.insert(identityLink);
+        identityLink.insert();
       }
     }
   }

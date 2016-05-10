@@ -12,24 +12,32 @@
  */
 package org.camunda.bpm.engine.rest.security.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.rest.dto.ExceptionDto;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.impl.NamedProcessEngineRestServiceImpl;
-import org.camunda.bpm.engine.rest.util.EngineUtil;
-
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
+
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.Tenant;
+import org.camunda.bpm.engine.rest.dto.ExceptionDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.impl.NamedProcessEngineRestServiceImpl;
+import org.camunda.bpm.engine.rest.util.EngineUtil;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * <p>
@@ -154,19 +162,35 @@ public class ProcessEngineAuthenticationFilter implements Filter {
   }
 
   protected void setAuthenticatedUser(ProcessEngine engine, String userId) {
-    // get user's groups
-    final List<Group> groupList = engine.getIdentityService().createGroupQuery()
+    List<String> groupIds = getGroupsOfUser(engine, userId);
+    List<String> tenantIds = getTenantsOfUser(engine, userId);
+
+    engine.getIdentityService().setAuthentication(userId, groupIds, tenantIds);
+  }
+
+  protected List<String> getGroupsOfUser(ProcessEngine engine, String userId) {
+    List<Group> groups = engine.getIdentityService().createGroupQuery()
       .groupMember(userId)
       .list();
 
-    // transform into array of strings:
     List<String> groupIds = new ArrayList<String>();
-
-    for (Group group : groupList) {
+    for (Group group : groups) {
       groupIds.add(group.getId());
     }
+    return groupIds;
+  }
 
-    engine.getIdentityService().setAuthentication(userId, groupIds);
+  protected List<String> getTenantsOfUser(ProcessEngine engine, String userId) {
+    List<Tenant> tenants = engine.getIdentityService().createTenantQuery()
+      .userMember(userId)
+      .includingGroupsOfUser(true)
+      .list();
+
+    List<String> tenantIds = new ArrayList<String>();
+    for(Tenant tenant : tenants) {
+      tenantIds.add(tenant.getId());
+    }
+    return tenantIds;
   }
 
   protected void clearAuthentication(ProcessEngine engine) {

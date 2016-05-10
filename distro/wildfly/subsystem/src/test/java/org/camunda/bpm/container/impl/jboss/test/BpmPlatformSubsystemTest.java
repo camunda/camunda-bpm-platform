@@ -23,8 +23,7 @@ import java.io.IOException;
 
 
 /**
- *
- * @author christian.lipphardt@camunda.com
+ * @author Christian Lipphardt
  */
 public class BpmPlatformSubsystemTest extends AbstractSubsystemBaseTest {
 
@@ -35,10 +34,7 @@ public class BpmPlatformSubsystemTest extends AbstractSubsystemBaseTest {
   @Override
   protected String getSubsystemXml() throws IOException {
     try {
-//      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_PROCESS_ENGINES_ELEMENT_ONLY);
-//      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_ENGINES);
-      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_ENGINES_PROPERTIES_PLUGINS);
-//      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_DUPLICATE_ENGINE_NAMES);
+      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_ALL_OPTIONS);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -46,4 +42,10 @@ public class BpmPlatformSubsystemTest extends AbstractSubsystemBaseTest {
     return null;
   }
 
+  /**
+   * Method is only used by WF-10 to validate the subsystem schema. Isn't executed when running WF8.
+   */
+  protected String getSubsystemXsdPath() throws Exception {
+    return "schema/foxEngineSubsystem_1_1.xsd";
+  }
 }

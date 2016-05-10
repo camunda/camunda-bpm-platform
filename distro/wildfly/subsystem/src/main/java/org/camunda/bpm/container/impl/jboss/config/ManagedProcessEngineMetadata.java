@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.container.impl.jboss.config;
 
+import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
+import org.camunda.bpm.engine.ProcessEngineException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
-import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * @author Daniel Meyer

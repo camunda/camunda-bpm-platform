@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.impl.cmd.AbstractSetJobDefinitionStateCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendJobDefinitionCmd;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
 
 /**
  * @author roman.smirnov
@@ -27,31 +26,10 @@ public class TimerSuspendJobDefinitionHandler extends TimerChangeJobDefinitionSu
     return TYPE;
   }
 
-  protected AbstractSetJobDefinitionStateCmd getCommand(String configuration) {
-    JSONObject config = new JSONObject(configuration);
+  @Override
+  protected AbstractSetJobDefinitionStateCmd getCommand(JobDefinitionSuspensionStateConfiguration configuration) {
 
-    boolean activateJobs = getIncludeJobs(config);
-
-    SuspendJobDefinitionCmd cmd = null;
-
-    String by = getBy(config);
-
-    if (by.equals(JOB_HANDLER_CFG_JOB_DEFINITION_ID)) {
-      String jobDefinitionId = getJobDefinitionId(config);
-      cmd = new SuspendJobDefinitionCmd(jobDefinitionId, null, null, activateJobs, null);
-    } else
-
-    if (by.equals(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID)) {
-      String processDefinitionId = getProcessDefinitionId(config);
-      cmd = new SuspendJobDefinitionCmd(null, processDefinitionId, null, activateJobs, null);
-    } else
-
-    if (by.equals(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY)) {
-      String processDefinitionKey = getProcessDefinitionKey(config);
-      cmd = new SuspendJobDefinitionCmd(null, null, processDefinitionKey, activateJobs, null);
-    }
-
-    return cmd;
+    return new SuspendJobDefinitionCmd(configuration.createBuilder());
   }
 
 }

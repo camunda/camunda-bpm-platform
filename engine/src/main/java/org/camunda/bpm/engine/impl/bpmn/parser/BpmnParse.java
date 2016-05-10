@@ -22,9 +22,11 @@ import java.net.URL;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +74,6 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.TaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ThrowEscalationEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.TransactionActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.listener.ClassDelegateExecutionListener;
@@ -162,6 +163,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
  * @author Saeid Mirzaei
  * @author Nico Rehwaldt
  * @author Ronny Bräunlich
+ * @author Christopher Zell
  */
 public class BpmnParse extends Parse {
 
@@ -181,12 +183,12 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_START_TIMER = "timerStart";
   public static final String PROPERTYNAME_COMPENSATION_HANDLER_ID = "compensationHandler";
   public static final String PROPERTYNAME_IS_FOR_COMPENSATION = "isForCompensation";
-  public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION = "eventDefinitions";
   public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_JOB_DECLARATION = "eventJobDeclarations";
   public static final String PROPERTYNAME_TRIGGERED_BY_EVENT = "triggeredByEvent";
   public static final String PROPERTYNAME_THROWS_COMPENSATION = "throwsCompensation";
   public static final String PROPERTYNAME_CONSUMES_COMPENSATION = "consumesCompensation";
   public static final String PROPERTYNAME_JOB_PRIORITY = "jobPriority";
+  public static final String PROPERTYNAME_TASK_PRIORITY = "taskPriority";
 
   /**
    * @deprecated use {@link BpmnProperties#TYPE}
@@ -568,7 +570,11 @@ public class BpmnParse extends Parse {
     processDefinition.setProperty(PROPERTYNAME_DOCUMENTATION, parseDocumentation(processElement));
     processDefinition.setTaskDefinitions(new HashMap<String, TaskDefinition>());
     processDefinition.setDeploymentId(deployment.getId());
-    processDefinition.setProperty(PROPERTYNAME_JOB_PRIORITY, parseJobPriority(processElement));
+    processDefinition.setProperty(PROPERTYNAME_JOB_PRIORITY, parsePriority(processElement, PROPERTYNAME_JOB_PRIORITY));
+    processDefinition.setProperty(PROPERTYNAME_TASK_PRIORITY, parsePriority(processElement, PROPERTYNAME_TASK_PRIORITY));
+    processDefinition.setVersionTag(
+      processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "versionTag")
+    );
 
     LOG.parsingElement("process", processDefinition.getKey());
 
@@ -584,6 +590,11 @@ public class BpmnParse extends Parse {
     // now we have parsed anything we can validate some stuff
     validateActivities(processDefinition.getActivities());
 
+    //unregister delegates
+    for (ActivityImpl activity : processDefinition.getActivities()) {
+      activity.setDelegateAsyncAfterUpdate(null);
+      activity.setDelegateAsyncBeforeUpdate(null);
+    }
     return processDefinition;
   }
 
@@ -911,14 +922,14 @@ public class BpmnParse extends Parse {
     if (timerEventDefinition != null) {
       parseTimerStartEventDefinition(timerEventDefinition, startEventActivity, processDefinition);
     } else if (messageEventDefinition != null) {
-      startEventActivity.getProperties().set(BpmnProperties.TYPE, "messageStartEvent");
+      startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_MESSAGE);
 
       EventSubscriptionDeclaration messageDefinition = parseMessageEventDefinition(messageEventDefinition);
       messageDefinition.setActivityId(startEventActivity.getId());
       messageDefinition.setStartEvent(true);
       addEventSubscriptionDeclaration(messageDefinition, processDefinition, startEventElement);
     } else if (signalEventDefinition != null){
-      startEventActivity.getProperties().set(BpmnProperties.TYPE, "signalStartEvent");
+      startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_SIGNAL);
       startEventActivity.setEventScope(scope);
 
       parseSignalCatchEventDefinition(signalEventDefinition, startEventActivity, true);
@@ -990,13 +1001,13 @@ public class BpmnParse extends Parse {
         parseErrorStartEventDefinition(errorEventDefinition, startEventActivity);
 
       } else if (messageEventDefinition != null) {
-        startEventActivity.getProperties().set(BpmnProperties.TYPE, "messageStartEvent");
+        startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_MESSAGE);
 
         EventSubscriptionDeclaration eventSubscriptionDeclaration = parseMessageEventDefinition(messageEventDefinition);
         parseEventDefinitionForSubprocess(eventSubscriptionDeclaration, startEventActivity, messageEventDefinition);
 
       } else if (signalEventDefinition != null) {
-        startEventActivity.getProperties().set(BpmnProperties.TYPE, "signalStartEvent");
+        startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_SIGNAL);
 
         EventSubscriptionDeclaration eventSubscriptionDeclaration = parseSignalEventDefinition(signalEventDefinition);
         parseEventDefinitionForSubprocess(eventSubscriptionDeclaration, startEventActivity, signalEventDefinition);
@@ -1008,7 +1019,7 @@ public class BpmnParse extends Parse {
         parseCompensationEventSubprocess(startEventActivity, startEventElement, scopeActivity, compensateEventDefinition);
 
       } else if (escalationEventDefinitionElement != null) {
-        startEventActivity.getProperties().set(BpmnProperties.TYPE, "escalationStartEvent");
+        startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_ESCALATION);
 
         EscalationEventDefinition escalationEventDefinition = createEscalationEventDefinitionForEscalationHandler(escalationEventDefinitionElement, scopeActivity, isInterrupting);
         addEscalationEventDefinition(startEventActivity.getEventScope(), escalationEventDefinition, escalationEventDefinitionElement);
@@ -1048,7 +1059,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseCompensationEventSubprocess(ActivityImpl startEventActivity, Element startEventElement, ActivityImpl scopeActivity, Element compensateEventDefinition) {
-    startEventActivity.getProperties().set(BpmnProperties.TYPE, "compensationStartEvent");
+    startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_COMPENSATION);
     scopeActivity.setProperty(PROPERTYNAME_IS_FOR_COMPENSATION, Boolean.TRUE);
 
     if (scopeActivity.getFlowScope() instanceof ProcessDefinitionEntity) {
@@ -1074,7 +1085,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseErrorStartEventDefinition(Element errorEventDefinition, ActivityImpl startEventActivity) {
-    startEventActivity.getProperties().set(BpmnProperties.TYPE, "errorStartEvent");
+    startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_ERROR);
     String errorRef = errorEventDefinition.attribute("errorRef");
     Error error = null;
     // the error event definition executes the event subprocess activity which
@@ -1126,36 +1137,32 @@ public class BpmnParse extends Parse {
       addError("Cannot have a message event subscription with an empty or missing name", element);
     }
 
-    List<EventSubscriptionDeclaration> eventDefinitions = (List<EventSubscriptionDeclaration>) scope.getProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
-    if (eventDefinitions == null) {
-      eventDefinitions = new ArrayList<EventSubscriptionDeclaration>();
-      scope.setProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION, eventDefinitions);
-    } else {
+    Map<String, EventSubscriptionDeclaration> eventDefinitions = scope.getProperties().get(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS);
 
-      // if this is a message event, validate that it is the only one with the provided name for this scope
-      if(hasMultipleMessageEventDefinitionsWithSameName(subscription, eventDefinitions)){
-        addError("Cannot have more than one message event subscription with name '" + subscription.getEventName() + "' for scope '" + scope.getId() + "'",
-            element);
-      }
-
-      // if this is a signal event, validate that it is the only one with the provided name for this scope
-      if(hasMultipleSignalEventDefinitionsWithSameName(subscription, eventDefinitions)){
-        addError("Cannot have more than one signal event subscription with name '" + subscription.getEventName() + "' for scope '" + scope.getId() + "'",
-            element);
-      }
+    // if this is a message event, validate that it is the only one with the provided name for this scope
+    if(hasMultipleMessageEventDefinitionsWithSameName(subscription, eventDefinitions.values())){
+      addError("Cannot have more than one message event subscription with name '" + subscription.getEventName() + "' for scope '" + scope.getId() + "'",
+          element);
     }
-    eventDefinitions.add(subscription);
+
+    // if this is a signal event, validate that it is the only one with the provided name for this scope
+    if(hasMultipleSignalEventDefinitionsWithSameName(subscription, eventDefinitions.values())){
+      addError("Cannot have more than one signal event subscription with name '" + subscription.getEventName() + "' for scope '" + scope.getId() + "'",
+          element);
+    }
+
+    scope.getProperties().putMapEntry(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS, subscription.getActivityId(), subscription);
   }
 
-  protected boolean hasMultipleMessageEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, List<EventSubscriptionDeclaration> eventDefinitions) {
+  protected boolean hasMultipleMessageEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, Collection<EventSubscriptionDeclaration> eventDefinitions) {
     return hasMultipleEventDefinitionsWithSameName(subscription, eventDefinitions, "message");
   }
 
-  protected boolean hasMultipleSignalEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, List<EventSubscriptionDeclaration> eventDefinitions) {
+  protected boolean hasMultipleSignalEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, Collection<EventSubscriptionDeclaration> eventDefinitions) {
     return hasMultipleEventDefinitionsWithSameName(subscription, eventDefinitions, "signal");
   }
 
-  protected boolean hasMultipleEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, List<EventSubscriptionDeclaration> eventDefinitions, String eventType) {
+  protected boolean hasMultipleEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, Collection<EventSubscriptionDeclaration> eventDefinitions, String eventType) {
     if (subscription.getEventType().equals(eventType)) {
       for (EventSubscriptionDeclaration eventDefinition : eventDefinitions) {
         if (eventDefinition.getEventType().equals(eventType) && eventDefinition.getEventName().equals(subscription.getEventName())
@@ -1410,7 +1417,7 @@ public class BpmnParse extends Parse {
 
   protected void parseIntermediateMessageEventDefinition(Element messageEventDefinition, ActivityImpl nestedActivity) {
 
-    nestedActivity.getProperties().set(BpmnProperties.TYPE, "intermediateMessageCatch");
+    nestedActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_MESSAGE);
 
     EventSubscriptionDeclaration messageDefinition = parseMessageEventDefinition(messageEventDefinition);
     messageDefinition.setActivityId(nestedActivity.getId());
@@ -1601,6 +1608,7 @@ public class BpmnParse extends Parse {
 
       id = getIdForMiBody(id);
       ActivityImpl miBodyScope = scope.createActivity(id);
+      setActivityAsyncDelegates(miBodyScope);
       miBodyScope.setProperty(PROPERTYNAME_TYPE, ActivityTypes.MULTI_INSTANCE_BODY);
       miBodyScope.setScope(true);
 
@@ -1705,14 +1713,120 @@ public class BpmnParse extends Parse {
     activity.setProperty("default", activityElement.attribute("default"));
     activity.getProperties().set(BpmnProperties.TYPE, activityElement.getTagName());
     activity.setProperty("line", activityElement.getLine());
-
-    activity.setProperty(PROPERTYNAME_JOB_PRIORITY, parseJobPriority(activityElement));
+    setActivityAsyncDelegates(activity);
+    activity.setProperty(PROPERTYNAME_JOB_PRIORITY, parsePriority(activityElement, PROPERTYNAME_JOB_PRIORITY));
 
     if (isCompensationHandler(activityElement)) {
       activity.setProperty(PROPERTYNAME_IS_FOR_COMPENSATION, true);
     }
 
     return activity;
+  }
+
+  /**
+   * Sets the delegates for the activity, which will be called
+   * if the attribute asyncAfter or asyncBefore was changed.
+   *
+   * @param activity the activity which gets the delegates
+   */
+  protected void setActivityAsyncDelegates(final ActivityImpl activity) {
+    activity.setDelegateAsyncAfterUpdate(new ActivityImpl.AsyncAfterUpdate() {
+      @Override
+      public void updateAsyncAfter(boolean asyncAfter, boolean exclusive) {
+        if (asyncAfter) {
+          addMessageJobDeclaration(new AsyncAfterMessageJobDeclaration(), activity, exclusive);
+        } else {
+          removeMessageJobDeclarationWithJobConfiguration(activity, MessageJobDeclaration.ASYNC_AFTER);
+        }
+      }
+    });
+
+    activity.setDelegateAsyncBeforeUpdate(new ActivityImpl.AsyncBeforeUpdate() {
+      @Override
+      public void updateAsyncBefore(boolean asyncBefore, boolean exclusive) {
+        if (asyncBefore) {
+          addMessageJobDeclaration(new AsyncBeforeMessageJobDeclaration(), activity, exclusive);
+        } else {
+          removeMessageJobDeclarationWithJobConfiguration(activity, MessageJobDeclaration.ASYNC_BEFORE);
+        }
+      }
+    });
+  }
+
+  /**
+   * Adds the new message job declaration to existing declarations.
+   * There will be executed an existing check before the adding is executed.
+   *
+   * @param messageJobDeclaration the new message job declaration
+   * @param activity the corresponding activity
+   * @param exclusive the flag which indicates if the async should be exclusive
+   */
+  protected void addMessageJobDeclaration(MessageJobDeclaration messageJobDeclaration, ActivityImpl activity, boolean exclusive) {
+    ProcessDefinition procDef = (ProcessDefinition) activity.getProcessDefinition();
+    if (!exists(messageJobDeclaration, procDef.getKey(), activity.getActivityId())) {
+      messageJobDeclaration.setExclusive(exclusive);
+      messageJobDeclaration.setActivity(activity);
+      messageJobDeclaration.setJobPriorityProvider((ParameterValueProvider) activity.getProperty(PROPERTYNAME_JOB_PRIORITY));
+
+      addMessageJobDeclarationToActivity(messageJobDeclaration, activity);
+      addJobDeclarationToProcessDefinition(messageJobDeclaration, procDef);
+    }
+  }
+
+  /**
+   * Checks whether the message declaration already exists.
+   *
+   * @param msgJobdecl the message job declaration which is searched
+   * @param procDefKey the corresponding process definition key
+   * @param activityId the corresponding activity id
+   * @return true if the message job declaration exists, false otherwise
+   */
+  protected boolean exists(MessageJobDeclaration msgJobdecl, String procDefKey, String activityId) {
+    boolean exist = false;
+    List<JobDeclaration<?, ?>> declarations = jobDeclarations.get(procDefKey);
+    if (declarations != null) {
+      for (int i = 0; i < declarations.size() && !exist; i++) {
+        JobDeclaration<?, ?> decl = declarations.get(i);
+        if (decl.getActivityId().equals(activityId) &&
+            decl.getJobConfiguration().equalsIgnoreCase(msgJobdecl.getJobConfiguration())) {
+          exist = true;
+        }
+      }
+    }
+    return exist;
+  }
+
+  /**
+   * Removes a job declaration which belongs to the given activity and has the given job configuration.
+   *
+   * @param activity the activity of the job declaration
+   * @param jobConfiguration  the job configuration of the declaration
+   */
+  protected void removeMessageJobDeclarationWithJobConfiguration(ActivityImpl activity, String jobConfiguration) {
+    List<MessageJobDeclaration> messageJobDeclarations = (List<MessageJobDeclaration>) activity.getProperty(PROPERTYNAME_MESSAGE_JOB_DECLARATION);
+    if (messageJobDeclarations != null) {
+      Iterator<MessageJobDeclaration> iter = messageJobDeclarations.iterator();
+      while (iter.hasNext()) {
+        MessageJobDeclaration msgDecl = iter.next();
+        if (msgDecl.getJobConfiguration().equalsIgnoreCase(jobConfiguration)
+          && msgDecl.getActivityId().equalsIgnoreCase(activity.getActivityId())) {
+          iter.remove();
+        }
+      }
+    }
+
+    ProcessDefinition procDef = (ProcessDefinition) activity.getProcessDefinition();
+    List<JobDeclaration<?, ?>> declarations = jobDeclarations.get(procDef.getKey());
+    if (declarations != null) {
+      Iterator<JobDeclaration<?, ?>> iter = declarations.iterator();
+      while (iter.hasNext()) {
+        JobDeclaration<?, ?> jobDcl = iter.next();
+        if (jobDcl.getJobConfiguration().equalsIgnoreCase(jobConfiguration)
+            && jobDcl.getActivityId().equalsIgnoreCase(activity.getActivityId())) {
+          iter.remove();
+        }
+      }
+    }
   }
 
   public String parseDocumentation(Element element) {
@@ -2072,47 +2186,25 @@ public class BpmnParse extends Parse {
     boolean exclusive = isExclusive(element);
 
     // set properties on activity
-    activity.setAsyncBefore(isAsyncBefore);
-    activity.setAsyncAfter(isAsyncAfter);
-
-    if (isAsyncBefore) {
-
-      MessageJobDeclaration messageJobDeclaration = new AsyncBeforeMessageJobDeclaration();
-      messageJobDeclaration.setExclusive(exclusive);
-      messageJobDeclaration.setActivity(activity);
-      messageJobDeclaration.setJobPriorityProvider((ParameterValueProvider) activity.getProperty(PROPERTYNAME_JOB_PRIORITY));
-
-      addMessageJobDeclarationToActivity(messageJobDeclaration, activity);
-      addJobDeclarationToProcessDefinition(messageJobDeclaration, activity.getProcessDefinition());
-    }
-
-    if (isAsyncAfter) {
-
-      MessageJobDeclaration messageJobDeclaration = new AsyncAfterMessageJobDeclaration();
-      messageJobDeclaration.setExclusive(exclusive);
-      messageJobDeclaration.setActivity(activity);
-      messageJobDeclaration.setJobPriorityProvider((ParameterValueProvider) activity.getProperty(PROPERTYNAME_JOB_PRIORITY));
-
-      addMessageJobDeclarationToActivity(messageJobDeclaration, activity);
-      addJobDeclarationToProcessDefinition(messageJobDeclaration, activity.getProcessDefinition());
-    }
+    activity.setAsyncBefore(isAsyncBefore, exclusive);
+    activity.setAsyncAfter(isAsyncAfter, exclusive);
   }
 
-  protected ParameterValueProvider parseJobPriority(Element element) {
-    String priorityAttribute = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "jobPriority");
+  protected ParameterValueProvider parsePriority(Element element, String priorityAttribute) {
+    String priorityAttributeValue = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, priorityAttribute);
 
-    if (priorityAttribute == null) {
+    if (priorityAttributeValue == null) {
       return null;
 
     } else {
-      Object value = priorityAttribute;
-      if (!StringUtil.isExpression(priorityAttribute)) {
+      Object value = priorityAttributeValue;
+      if (!StringUtil.isExpression(priorityAttributeValue)) {
         // constant values must be valid integers
         try {
-          value = Integer.parseInt(priorityAttribute);
+          value = Integer.parseInt(priorityAttributeValue);
 
         } catch (NumberFormatException e) {
-          addError("Value '" + priorityAttribute + "' for attribute 'jobPriority' is not a valid number", element);
+          addError("Value '" + priorityAttributeValue + "' for attribute '" + priorityAttribute + "' is not a valid number", element);
         }
       }
 
@@ -2130,9 +2222,8 @@ public class BpmnParse extends Parse {
     messageJobDeclarations.add(messageJobDeclaration);
   }
 
-  protected void addJobDeclarationToProcessDefinition(JobDeclaration<?, ?> jobDeclaration, ProcessDefinitionImpl processDefinition) {
-    ProcessDefinition definition = (ProcessDefinition) processDefinition;
-    String key = definition.getKey();
+  protected void addJobDeclarationToProcessDefinition(JobDeclaration<?, ?> jobDeclaration, ProcessDefinition processDefinition) {
+    String key = processDefinition.getKey();
 
     List<JobDeclaration<?, ?>> containingJobDeclarations = jobDeclarations.get(key);
     if (containingJobDeclarations == null) {
@@ -2194,12 +2285,12 @@ public class BpmnParse extends Parse {
     activity.setScope(true);
 
     String topicName = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "topic");
-
     if (topicName == null) {
       addError("External tasks must specify a 'topic' attribute in the camunda namespace", serviceTaskElement);
     }
 
-    activity.setActivityBehavior(new ExternalTaskActivityBehavior(topicName));
+    ParameterValueProvider provider = parsePriority(serviceTaskElement, PROPERTYNAME_TASK_PRIORITY);
+    activity.setActivityBehavior(new ExternalTaskActivityBehavior(topicName, provider));
   }
 
   protected void validateFieldDeclarationsForEmail(Element serviceTaskElement, List<FieldDeclaration> fieldDeclarations) {
@@ -2357,6 +2448,7 @@ public class BpmnParse extends Parse {
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseTask(taskElement, scope, activity);
     }
+//    createMessageJobDeclForAsyncActivity(activity, true);
     return activity;
   }
 
@@ -2390,6 +2482,7 @@ public class BpmnParse extends Parse {
 
     if (receiveTaskElement.attribute("messageRef") != null) {
       activity.setScope(true);
+      activity.setEventScope(activity);
       EventSubscriptionDeclaration declaration = parseMessageEventDefinition(receiveTaskElement);
       declaration.setActivityId(activity.getActivityId());
       declaration.setEventScopeActivityId(activity.getActivityId());
@@ -2983,9 +3076,9 @@ public class BpmnParse extends Parse {
 
   @SuppressWarnings("unchecked")
   protected void parseTimerStartEventDefinition(Element timerEventDefinition, ActivityImpl timerActivity, ProcessDefinitionEntity processDefinition) {
-    timerActivity.getProperties().set(BpmnProperties.TYPE, "startTimerEvent");
+    timerActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_TIMER);
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerStartEventJobHandler.TYPE);
-    timerDeclaration.setJobHandlerConfiguration(processDefinition.getKey());
+    timerDeclaration.setRawJobHandlerConfiguration(processDefinition.getKey());
 
     List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) processDefinition.getProperty(PROPERTYNAME_START_TIMER);
     if (timerDeclarations == null) {
@@ -2997,13 +3090,13 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseTimerStartEventDefinitionForEventSubprocess(Element timerEventDefinition, ActivityImpl timerActivity, boolean interrupting) {
-    timerActivity.getProperties().set(BpmnProperties.TYPE, "startTimerEvent");
+    timerActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_TIMER);
 
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerStartEventSubprocessJobHandler.TYPE);
 
     timerDeclaration.setActivity(timerActivity);
     timerDeclaration.setEventScopeActivityId(timerActivity.getEventScope().getId());
-    timerDeclaration.setJobHandlerConfiguration(timerActivity.getFlowScope().getId());
+    timerDeclaration.setRawJobHandlerConfiguration(timerActivity.getFlowScope().getId());
     timerDeclaration.setInterruptingTimer(interrupting);
 
     if (interrupting) {
@@ -3067,7 +3160,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseIntermediateTimerEventDefinition(Element timerEventDefinition, ActivityImpl timerActivity) {
-    timerActivity.getProperties().set(BpmnProperties.TYPE, "intermediateTimer");
+    timerActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_TIMER);
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerCatchIntermediateEventJobHandler.TYPE);
 
     Element timeCycleElement = timerEventDefinition.element("timeCycle");
@@ -3104,14 +3197,14 @@ public class BpmnParse extends Parse {
     // Parse the timer declaration
     // TODO move the timer declaration into the bpmn activity or next to the TimerSession
     TimerDeclarationImpl timerDeclaration = new TimerDeclarationImpl(expression, type, jobHandlerType);
-    timerDeclaration.setJobHandlerConfiguration(timerActivity.getId());
+    timerDeclaration.setRawJobHandlerConfiguration(timerActivity.getId());
     timerDeclaration.setExclusive("true".equals(timerEventDefinition.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "exclusive", String.valueOf(JobEntity.DEFAULT_EXCLUSIVE))));
     if(timerActivity.getId() == null) {
       addError("Attribute \"id\" is required!",timerEventDefinition);
     }
     timerDeclaration.setActivity(timerActivity);
     timerDeclaration.setJobConfiguration(type.toString() + ": " + expression.getExpressionText());
-    addJobDeclarationToProcessDefinition(timerDeclaration, timerActivity.getProcessDefinition());
+    addJobDeclarationToProcessDefinition(timerDeclaration, (ProcessDefinition) timerActivity.getProcessDefinition());
 
     timerDeclaration.setJobPriorityProvider((ParameterValueProvider) timerActivity.getProperty(PROPERTYNAME_JOB_PRIORITY));
 
@@ -3241,11 +3334,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void addTimerDeclaration(ScopeImpl scope, TimerDeclarationImpl timerDeclaration) {
-    if (!scope.getProperties().contains(BpmnProperties.TIMER_DECLARATIONS)) {
-      scope.getProperties().set(BpmnProperties.TIMER_DECLARATIONS, new ArrayList<TimerDeclarationImpl>());
-    }
-    List<TimerDeclarationImpl> timerDeclarations = scope.getProperties().get(BpmnProperties.TIMER_DECLARATIONS);
-    timerDeclarations.add(timerDeclaration);
+    scope.getProperties().putMapEntry(BpmnProperties.TIMER_DECLARATIONS, timerDeclaration.getActivityId(), timerDeclaration);
   }
 
   @SuppressWarnings("unchecked")
@@ -3299,7 +3388,7 @@ public class BpmnParse extends Parse {
 
     activity.setScope(true);
     activity.setSubProcessScope(true);
-    activity.setActivityBehavior(new TransactionActivityBehavior());
+    activity.setActivityBehavior(new SubProcessActivityBehavior());
     activity.setProperty(PROPERTYNAME_TRIGGERED_BY_EVENT, false);
     parseScope(transactionElement, activity);
 

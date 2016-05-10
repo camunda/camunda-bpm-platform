@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Assert;
@@ -42,7 +43,7 @@ import org.junit.rules.RuleChain;
  */
 public class BatchQueryTest {
 
-  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
   protected BatchMigrationHelper helper = new BatchMigrationHelper(engineRule, migrationRule);
 
@@ -62,9 +63,7 @@ public class BatchQueryTest {
 
   @After
   public void removeBatches() {
-    for (Batch batch : managementService.createBatchQuery().list()) {
-      managementService.deleteBatch(batch.getId(), true);
-    }
+    helper.removeAllRunningAndHistoricBatches();
   }
 
   @Test
@@ -107,7 +106,8 @@ public class BatchQueryTest {
     Assert.assertEquals(batch.getType(), resultBatch.getType());
     Assert.assertEquals(batch.getBatchJobsPerSeed(), resultBatch.getBatchJobsPerSeed());
     Assert.assertEquals(batch.getInvocationsPerBatchJob(), resultBatch.getInvocationsPerBatchJob());
-    Assert.assertEquals(batch.getSize(), resultBatch.getSize());
+    Assert.assertEquals(batch.getTotalJobs(), resultBatch.getTotalJobs());
+    Assert.assertEquals(batch.getJobsCreated(), resultBatch.getJobsCreated());
   }
 
   @Test

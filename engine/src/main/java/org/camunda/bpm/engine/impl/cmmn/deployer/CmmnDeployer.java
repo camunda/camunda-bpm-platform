@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.deployer;
 
+import java.util.HashMap;
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
@@ -21,7 +24,6 @@ import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.core.model.PropertyMapKey;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerJobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
@@ -29,11 +31,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.management.JobDefinition;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * {@link Deployer} responsible to parse CMMN 1.0 XML files and create the
@@ -62,14 +59,14 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
   protected List<CaseDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource, Properties properties) {
     CmmnTransform cmmnTransform = transformer.createTransform();
 
-    List<CaseDefinitionEntity> defList=cmmnTransform.deployment(deployment).resource(resource).transform();
-    //
+    List<CaseDefinitionEntity> definitions = cmmnTransform.deployment(deployment).resource(resource).transform();
+
     if(!properties.contains(JOB_DECLARATIONS_PROPERTY)){
       properties.set(JOB_DECLARATIONS_PROPERTY, new HashMap<String, List<JobDeclaration<?, ?>>>());
     }
     properties.get(JOB_DECLARATIONS_PROPERTY).putAll(cmmnTransform.getJobDeclarations());
 
-    return defList;
+    return definitions;
   }
 
   @Override
@@ -99,7 +96,9 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
   @Override
   protected void definitionAddedToDeploymentCache(DeploymentEntity deployment, CaseDefinitionEntity definition, Properties properties) {
     List<JobDeclaration<?, ?>> declarations = properties.get(JOB_DECLARATIONS_PROPERTY).get(definition.getKey());
-    if(declarations!=null && !declarations.isEmpty())updateJobDeclarations(declarations, definition, deployment.isNew());
+    if(declarations != null && !declarations.isEmpty()) {
+      updateJobDeclarations(declarations, definition, deployment.isNew());
+    }
   }
 
   protected void updateJobDeclarations(List<JobDeclaration<?, ?>> jobDeclarations, CaseDefinitionEntity definition, boolean isNewDeployment) {
@@ -137,13 +136,16 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
   }
 
   protected void createJobDefinition(CaseDefinitionEntity definition, JobDeclaration<?,?> jobDeclaration) {
-    final JobDefinitionManager jobDefinitionManager = getJobDefinitionManager();
     JobDefinitionEntity jobDefinitionEntity = new JobDefinitionEntity(jobDeclaration);
+
     jobDefinitionEntity.setCaseDefinitionId(definition.getId());
     jobDefinitionEntity.setCaseDefinitionKey(definition.getKey());
     jobDefinitionEntity.setTenantId(definition.getTenantId());
     jobDefinitionEntity.setActivityId(jobDeclaration.getActivityId());
+
+    JobDefinitionManager jobDefinitionManager = getJobDefinitionManager();
     jobDefinitionManager.insert(jobDefinitionEntity);
+
     jobDeclaration.setJobDefinitionId(jobDefinitionEntity.getId());
   }
 

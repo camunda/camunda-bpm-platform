@@ -47,11 +47,13 @@ public class HistoricCaseActivityInstanceManager extends AbstractHistoricManager
   }
 
   public long findHistoricCaseActivityInstanceCountByQueryCriteria(HistoricCaseActivityInstanceQueryImpl historicCaseActivityInstanceQuery) {
+    configureHistoricCaseActivityInstanceQuery(historicCaseActivityInstanceQuery);
     return (Long) getDbEntityManager().selectOne("selectHistoricCaseActivityInstanceCountByQueryCriteria", historicCaseActivityInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricCaseActivityInstance> findHistoricCaseActivityInstancesByQueryCriteria(HistoricCaseActivityInstanceQueryImpl historicCaseActivityInstanceQuery, Page page) {
+    configureHistoricCaseActivityInstanceQuery(historicCaseActivityInstanceQuery);
     return getDbEntityManager().selectList("selectHistoricCaseActivityInstancesByQueryCriteria", historicCaseActivityInstanceQuery, page);
   }
 
@@ -62,5 +64,9 @@ public class HistoricCaseActivityInstanceManager extends AbstractHistoricManager
 
   public long findHistoricCaseActivityInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
     return (Long) getDbEntityManager().selectOne("selectHistoricCaseActivityInstanceCountByNativeQuery", parameterMap);
+  }
+
+  protected void configureHistoricCaseActivityInstanceQuery(HistoricCaseActivityInstanceQueryImpl query) {
+    getTenantManager().configureQuery(query);
   }
 }

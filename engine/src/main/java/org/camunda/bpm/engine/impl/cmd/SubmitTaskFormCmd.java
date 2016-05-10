@@ -54,7 +54,7 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
     ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateTask(task);
+    authorizationManager.checkTaskWork(task);
 
     TaskDefinition taskDefinition = task.getTaskDefinition();
     if(taskDefinition != null) {

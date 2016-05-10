@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.migration.instance;
 
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
@@ -20,10 +21,20 @@ public class MigratingIncident implements MigratingInstance {
 
   protected IncidentEntity incident;
   protected ScopeImpl targetScope;
+  protected String targetJobDefinitionId;
 
   public MigratingIncident(IncidentEntity incident, ScopeImpl targetScope) {
     this.incident = incident;
     this.targetScope = targetScope;
+  }
+
+  public void setTargetJobDefinitionId(String targetJobDefinitionId) {
+    this.targetJobDefinitionId = targetJobDefinitionId;
+  }
+
+  @Override
+  public boolean isDetached() {
+    return incident.getExecutionId() == null;
   }
 
   public void detachState() {
@@ -31,16 +42,25 @@ public class MigratingIncident implements MigratingInstance {
   }
 
   public void attachState(MigratingActivityInstance newOwningInstance) {
-    incident.setExecution(newOwningInstance.resolveRepresentativeExecution());
+    attachTo(newOwningInstance.resolveRepresentativeExecution());
+  }
+
+  @Override
+  public void attachState(MigratingTransitionInstance targetTransitionInstance) {
+    attachTo(targetTransitionInstance.resolveRepresentativeExecution());
   }
 
   public void migrateState() {
     incident.setActivityId(targetScope.getId());
     incident.setProcessDefinitionId(targetScope.getProcessDefinition().getId());
+    incident.setJobDefinitionId(targetJobDefinitionId);
   }
 
   public void migrateDependentEntities() {
     // nothing to do
   }
 
+  protected void attachTo(ExecutionEntity execution) {
+    incident.setExecution(execution);
+  }
 }

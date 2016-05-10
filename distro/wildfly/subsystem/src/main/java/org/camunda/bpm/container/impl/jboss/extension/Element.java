@@ -15,12 +15,12 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension;
 
+import org.jboss.as.controller.AttributeDefinition;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.jboss.as.controller.AttributeDefinition;
 
 /**
  * An Element.
@@ -33,25 +33,30 @@ public enum Element {
    */
   UNKNOWN((String) null),
 
+  SUBSYSTEM("subsystem"),
+
+  JOB_EXECUTOR(ModelConstants.JOB_EXECUTOR),
+  THREAD_POOL_NAME(ModelConstants.THREAD_POOL_NAME),
+  CORE_THREADS(ModelConstants.CORE_THREADS),
+  MAX_THREADS(ModelConstants.MAX_THREADS),
+  QUEUE_LENGTH(ModelConstants.QUEUE_LENGTH),
+  KEEPALIVE_TIME(ModelConstants.KEEPALIVE_TIME),
+  ALLOW_CORE_TIMEOUT(ModelConstants.ALLOW_CORE_TIMEOUT),
+  JOB_AQUISITIONS(ModelConstants.JOB_ACQUISITIONS),
+
+  JOB_AQUISITION(ModelConstants.JOB_ACQUISITION),
   PROCESS_ENGINES(ModelConstants.PROCESS_ENGINES),
   PROCESS_ENGINE(ModelConstants.PROCESS_ENGINE),
   CONFIGURATION(ModelConstants.CONFIGURATION),
   DATASOURCE(ModelConstants.DATASOURCE),
   HISTORY_LEVEL(ModelConstants.HISTORY_LEVEL),
-  JOB_EXECUTOR(ModelConstants.JOB_EXECUTOR),
-  JOB_AQUISITIONS(ModelConstants.JOB_ACQUISITIONS),
-  JOB_AQUISITION(ModelConstants.JOB_ACQUISITION),
-
   PLUGINS(ModelConstants.PLUGINS),
   PLUGIN(ModelConstants.PLUGIN),
   PLUGIN_CLASS(ModelConstants.PLUGIN_CLASS),
-  
   @Deprecated
   ACQUISITION_STRATEGY(ModelConstants.ACQUISITION_STRATEGY),
-  
   PROPERTIES(ModelConstants.PROPERTIES),
-  PROPERTY(ModelConstants.PROPERTY),
-  THREAD_POOL_NAME(ModelConstants.THREAD_POOL_NAME);
+  PROPERTY(ModelConstants.PROPERTY);
 
   private final String name;
   private final AttributeDefinition definition;

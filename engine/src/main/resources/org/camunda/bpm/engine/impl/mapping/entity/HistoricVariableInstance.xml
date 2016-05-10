@@ -73,6 +73,8 @@
       REV_ = #{revisionNext, jdbcType=INTEGER},
       VAR_TYPE_ = #{serializerName, jdbcType=VARCHAR},
       BYTEARRAY_ID_ = #{byteArrayId, jdbcType=VARCHAR},
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
       DOUBLE_ = #{doubleValue, jdbcType=DOUBLE},
       LONG_ = #{longValue, jdbcType=BIGINT},
       TEXT_ = #{textValue, jdbcType=VARCHAR},
@@ -178,17 +180,14 @@
   <sql id="selectHistoricVariableInstanceByQueryCriteriaSql">
     from ${prefix}ACT_HI_VARINST RES
 
-    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       LEFT JOIN (
         SELECT
             DISTINCT SELF.PROC_DEF_KEY_ AS KEY_
         FROM
             ${prefix}ACT_HI_VARINST SELF
         WHERE
-            1 = (
-                <bind name="permCheck" value="permissionChecks.atomicChecks[0]" />
-                <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck" />
-            )
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
       ) AUTH
       ON AUTH.KEY_ = RES.PROC_DEF_KEY_
     </if>
@@ -264,9 +263,11 @@
         </if>
       </if>
 
-      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
         and ((RES.EXECUTION_ID_ is not null and AUTH.KEY_ is not null) or RES.EXECUTION_ID_ is null)
       </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 
     </where>
   </sql>

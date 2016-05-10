@@ -7,13 +7,14 @@
   <!-- INSERT IDENTITY LINK -->
   
   <insert id="insertIdentityLink" parameterType="org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkEntity">
-    insert into ${prefix}ACT_RU_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_DEF_ID_, REV_)
+    insert into ${prefix}ACT_RU_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_DEF_ID_, TENANT_ID_, REV_ )
     values (#{id, jdbcType=VARCHAR},
             #{type, jdbcType=VARCHAR},
             #{userId, jdbcType=VARCHAR},
             #{groupId, jdbcType=VARCHAR},
             #{taskId, jdbcType=VARCHAR},
             #{processDefId, jdbcType=VARCHAR},
+            #{tenantId, jdbcType=VARCHAR},
             1
            )
             
@@ -38,7 +39,8 @@
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
     <result property="groupId" column="GROUP_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
-    <result property="processDefId" column="PROCESS_DEF_ID_" jdbcType="VARCHAR" />    
+    <result property="processDefId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- IDENTITY LINK SELECT -->

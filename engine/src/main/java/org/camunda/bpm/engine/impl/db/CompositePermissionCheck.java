@@ -70,4 +70,17 @@ public class CompositePermissionCheck {
     compositeChecks.clear();
     atomicChecks.clear();
   }
+
+  public List<PermissionCheck> getAllPermissionChecks() {
+    List<PermissionCheck> allChecks = new ArrayList<PermissionCheck>();
+
+    allChecks.addAll(atomicChecks);
+
+    for (CompositePermissionCheck compositePermissionCheck : compositeChecks) {
+      allChecks.addAll(compositePermissionCheck.getAllPermissionChecks());
+    }
+
+    return allChecks;
+
+  }
 }

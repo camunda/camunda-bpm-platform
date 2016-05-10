@@ -12,20 +12,20 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.job;
 
+import java.util.Collection;
+
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 
-import java.util.Collection;
-
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,7 +44,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class SetJobPriorityAuthorizationTest {
 
-  public ProcessEngineRule engineRule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine(), true);
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
 
   @Rule

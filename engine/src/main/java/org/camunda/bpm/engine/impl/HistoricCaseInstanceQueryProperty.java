@@ -29,5 +29,6 @@ public interface HistoricCaseInstanceQueryProperty {
   public static final QueryProperty CREATE_TIME = new QueryPropertyImpl("CREATE_TIME_");
   public static final QueryProperty CLOSE_TIME = new QueryPropertyImpl("CLOSE_TIME_");
   public static final QueryProperty DURATION = new QueryPropertyImpl("DURATION_");
+  public static final QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
 
 }

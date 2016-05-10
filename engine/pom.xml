@@ -44,12 +44,12 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-typed-values</artifactId>
@@ -84,7 +84,7 @@
       <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.ant</groupId>
       <artifactId>ant</artifactId>
@@ -433,11 +433,9 @@
                 <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceAuthorizationTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricDetailVariableUpdateQueryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricIncidentQueryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricJobLogQueryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricDecisionInstanceQueryTest.java</exclude>
-                <exclude>**/BatchMigrationHistoryTest.java</exclude>
+                <exclude>**/MigrationHistoryVariablesTest.java</exclude>
+                <exclude>**/HistoricBatchQueryTest.java</exclude>
+                <exclude>**/HistoricIdentityLink*Test*.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -480,12 +478,9 @@
                 <exclude>**/CompensateEventHistoryTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceAuthorizationTest.java</exclude>
                 <exclude>**/HistoricDecisionInstanceTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricVariableInstanceQueryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricDetail*QueryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricIncidentQueryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricJobLogQueryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoricDecisionInstanceQueryTest.java</exclude>
-                <exclude>**/BatchMigrationHistoryTest.java</exclude>
+                <exclude>**/MigrationHistoryVariablesTest.java</exclude>
+                <exclude>**/HistoricBatchQueryTest.java</exclude>
+                <exclude>**/HistoricIdentityLink*Test*.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -527,8 +522,9 @@
                 <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompensateEventHistoryTest.java</exclude>
-                <exclude>**/MultiTenancyHistoric*QueryTest.java</exclude>
-                <exclude>**/BatchMigrationHistoryTest.java</exclude>
+                <exclude>**/MigrationHistoryVariablesTest.java</exclude>
+                <exclude>**/HistoricBatchQueryTest.java</exclude>
+                <exclude>**/HistoricIdentityLink*Test*.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -662,6 +658,13 @@
                 </configuration>
               </execution>
             </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <argLine>-XX:MaxPermSize=192m -Xmx512m</argLine>
+            </configuration>
           </plugin>
         </plugins>
       </build>

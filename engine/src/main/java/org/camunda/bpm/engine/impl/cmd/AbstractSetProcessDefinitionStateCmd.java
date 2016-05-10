@@ -15,14 +15,17 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler.ProcessDefinitionSuspensionStateConfiguration;
+import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
+import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.management.JobDefinition;
 
 /**
@@ -60,21 +63,23 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
 
   @Override
   protected void checkAuthorization(CommandContext commandContext) {
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    if (processDefinitionId != null) {
-      authorizationManager.checkUpdateProcessDefinitionById(processDefinitionId);
 
-      if (includeSubResources) {
-        authorizationManager.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
-      }
-    } else
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      if (processDefinitionId != null) {
+        checker.checkUpdateProcessDefinitionById(processDefinitionId);
 
-    if (processDefinitionKey != null) {
-      authorizationManager.checkUpdateProcessDefinitionByKey(processDefinitionKey);
+        if (includeSubResources) {
+          checker.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
+        }
+      } else
 
-      if (includeSubResources) {
-        authorizationManager.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
-      }
+        if (processDefinitionKey != null) {
+          checker.checkUpdateProcessDefinitionByKey(processDefinitionKey);
+
+          if (includeSubResources) {
+            checker.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
+          }
+        }
     }
   }
 
@@ -94,7 +99,8 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
 
     commandContext.runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
-        AbstractSetJobDefinitionStateCmd jobDefinitionCmd = getSetJobDefinitionStateCmd();
+        UpdateJobDefinitionSuspensionStateBuilderImpl jobDefinitionSuspensionStateBuilder = createJobDefinitionCommandBuilder();
+        AbstractSetJobDefinitionStateCmd jobDefinitionCmd = getSetJobDefinitionStateCmd(jobDefinitionSuspensionStateBuilder);
         jobDefinitionCmd.disableLogUserOperation();
         jobDefinitionCmd.execute(commandContext);
         return null;
@@ -102,24 +108,56 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
     });
   }
 
-  @Override
-  protected String getJobHandlerConfiguration() {
-    String jobConfiguration = null;
+  protected UpdateJobDefinitionSuspensionStateBuilderImpl createJobDefinitionCommandBuilder() {
+    UpdateJobDefinitionSuspensionStateBuilderImpl jobDefinitionBuilder = new UpdateJobDefinitionSuspensionStateBuilderImpl();
 
     if (processDefinitionId != null) {
-      jobConfiguration = TimerChangeProcessDefinitionSuspensionStateJobHandler
-          .createJobHandlerConfigurationByProcessDefinitionId(processDefinitionId, isIncludeSubResources());
+      jobDefinitionBuilder.byProcessDefinitionId(processDefinitionId);
+
+    } else if (processDefinitionKey != null) {
+      jobDefinitionBuilder.byProcessDefinitionKey(processDefinitionKey);
+
+      if (isTenantIdSet && tenantId != null) {
+        jobDefinitionBuilder.processDefinitionTenantId(tenantId);
+
+      } else if (isTenantIdSet) {
+        jobDefinitionBuilder.processDefinitionWithoutTenantId();
+      }
+    }
+    return jobDefinitionBuilder;
+  }
+
+  protected UpdateProcessInstanceSuspensionStateBuilderImpl createProcessInstanceCommandBuilder() {
+    UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceBuilder = new UpdateProcessInstanceSuspensionStateBuilderImpl();
+
+    if (processDefinitionId != null) {
+      processInstanceBuilder.byProcessDefinitionId(processDefinitionId);
+
+    } else if (processDefinitionKey != null) {
+      processInstanceBuilder.byProcessDefinitionKey(processDefinitionKey);
+
+      if (isTenantIdSet && tenantId != null) {
+        processInstanceBuilder.processDefinitionTenantId(tenantId);
+
+      } else if (isTenantIdSet) {
+        processInstanceBuilder.processDefinitionWithoutTenantId();
+      }
+    }
+    return processInstanceBuilder;
+  }
+
+  @Override
+  protected JobHandlerConfiguration getJobHandlerConfiguration() {
+
+    if (processDefinitionId != null) {
+      return ProcessDefinitionSuspensionStateConfiguration.byProcessDefinitionId(processDefinitionId, isIncludeSubResources());
 
     } else if (isTenantIdSet) {
-      jobConfiguration = TimerChangeProcessDefinitionSuspensionStateJobHandler
-          .createJobHandlerConfigurationByProcessDefinitionKeyAndTenantId(processDefinitionKey, tenantId, isIncludeSubResources());
+      return ProcessDefinitionSuspensionStateConfiguration.byProcessDefinitionKeyAndTenantId(processDefinitionKey, tenantId, isIncludeSubResources());
 
     } else {
-      jobConfiguration = TimerChangeProcessDefinitionSuspensionStateJobHandler
-          .createJobHandlerConfigurationByProcessDefinitionKey(processDefinitionKey, isIncludeSubResources());
+      return ProcessDefinitionSuspensionStateConfiguration.byProcessDefinitionKey(processDefinitionKey, isIncludeSubResources());
     }
-
-    return jobConfiguration;
   }
 
   @Override
@@ -141,9 +179,17 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
   /**
    * Subclasses should return the type of the {@link AbstractSetJobDefinitionStateCmd} here.
    * It will be used to suspend or activate the {@link JobDefinition}s.
+   * @param jobDefinitionSuspensionStateBuilder
    */
-  protected abstract AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd();
+  protected abstract AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd(UpdateJobDefinitionSuspensionStateBuilderImpl jobDefinitionSuspensionStateBuilder);
 
   @Override
-  protected abstract AbstractSetProcessInstanceStateCmd getNextCommand();
+  protected AbstractSetProcessInstanceStateCmd getNextCommand() {
+    UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceCommandBuilder = createProcessInstanceCommandBuilder();
+
+    return getNextCommand(processInstanceCommandBuilder);
+  }
+
+  protected abstract AbstractSetProcessInstanceStateCmd getNextCommand(UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceCommandBuilder);
+
 }

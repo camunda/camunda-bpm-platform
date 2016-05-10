@@ -17,9 +17,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -76,9 +76,8 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
     task = taskManager.findTaskById(taskId);
     EnsureUtil.ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateTask(task);
-
+    checkAddIdentityLink(task, commandContext);
+    
     if (IdentityLinkType.ASSIGNEE.equals(type)) {
       task.setAssignee(userId);
     } else if (IdentityLinkType.OWNER.equals(type)) {
@@ -88,6 +87,12 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
     }
 
     return null;
+  }
+
+  protected void checkAddIdentityLink(TaskEntity task, CommandContext commandContext) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkTaskAssign(task);
+    }
   }
 
 }

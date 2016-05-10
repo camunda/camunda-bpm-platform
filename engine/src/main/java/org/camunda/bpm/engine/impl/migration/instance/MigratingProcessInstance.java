@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.migration.instance;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.migration.MigrationLogger;
@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 /**
  * @author Thorben Lindhauer
@@ -32,19 +33,30 @@ public class MigratingProcessInstance {
   protected static final MigrationLogger LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
   protected String processInstanceId;
-  protected Map<String, MigratingActivityInstance> migratingActivityInstances;
+  protected List<MigratingActivityInstance> migratingActivityInstances;
+  protected List<MigratingTransitionInstance> migratingTransitionInstances;
+  protected MigratingActivityInstance rootInstance;
 
   public MigratingProcessInstance(String processInstanceId) {
     this.processInstanceId = processInstanceId;
-    this.migratingActivityInstances = new HashMap<String, MigratingActivityInstance>();
+    this.migratingActivityInstances = new ArrayList<MigratingActivityInstance>();
+    this.migratingTransitionInstances = new ArrayList<MigratingTransitionInstance>();
+  }
+
+  public MigratingActivityInstance getRootInstance() {
+    return rootInstance;
+  }
+
+  public void setRootInstance(MigratingActivityInstance rootInstance) {
+    this.rootInstance = rootInstance;
   }
 
   public Collection<MigratingActivityInstance> getMigratingActivityInstances() {
-    return migratingActivityInstances.values();
+    return migratingActivityInstances;
   }
 
-  public MigratingActivityInstance getMigratingInstance(String activityInstanceId) {
-    return migratingActivityInstances.get(activityInstanceId);
+  public Collection<MigratingTransitionInstance> getMigratingTransitionInstances() {
+    return migratingTransitionInstances;
   }
 
   public String getProcessInstanceId() {
@@ -65,9 +77,32 @@ public class MigratingProcessInstance {
         targetScope,
         scopeExecution);
 
-    migratingActivityInstances.put(activityInstance.getId(), migratingActivityInstance);
+    migratingActivityInstances.add(migratingActivityInstance);
+
+    if (processInstanceId.equals(activityInstance.getId())) {
+      rootInstance = migratingActivityInstance;
+    }
 
     return migratingActivityInstance;
+  }
+
+  public MigratingTransitionInstance addTransitionInstance(
+      MigrationInstruction migrationInstruction,
+      TransitionInstance transitionInstance,
+      ScopeImpl sourceScope,
+      ScopeImpl targetScope,
+      ExecutionEntity asyncExecution) {
+
+    MigratingTransitionInstance migratingTransitionInstance = new MigratingTransitionInstance(
+        transitionInstance,
+        migrationInstruction,
+        sourceScope,
+        targetScope,
+        asyncExecution);
+
+    migratingTransitionInstances.add(migratingTransitionInstance);
+
+    return migratingTransitionInstance;
   }
 
 }

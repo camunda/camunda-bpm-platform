@@ -78,7 +78,7 @@ public class TablePageQueryImpl implements TablePageQuery, Command<TablePage>, S
   }
 
   public TablePage execute(CommandContext commandContext) {
-    commandContext.getAuthorizationManager().isCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdmin();
     return commandContext
       .getTableDataManager()
       .getTablePage(this, firstResult, maxResults);

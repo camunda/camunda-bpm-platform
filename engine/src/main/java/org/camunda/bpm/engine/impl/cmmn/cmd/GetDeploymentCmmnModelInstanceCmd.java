@@ -15,9 +15,13 @@ package org.camunda.bpm.engine.impl.cmmn.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import org.camunda.bpm.engine.exception.cmmn.CmmnModelInstanceNotFoundException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 
 /**
@@ -35,6 +39,15 @@ public class GetDeploymentCmmnModelInstanceCmd implements Command<CmmnModelInsta
 
   public CmmnModelInstance execute(CommandContext commandContext) {
     ensureNotNull("caseDefinitionId", caseDefinitionId);
+
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    final DeploymentCache deploymentCache = configuration.getDeploymentCache();
+
+    CaseDefinitionEntity caseDefinition = deploymentCache.findDeployedCaseDefinitionById(caseDefinitionId);
+
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadCaseDefinition(caseDefinition);
+    }
 
     CmmnModelInstance modelInstance = Context
         .getProcessEngineConfiguration()

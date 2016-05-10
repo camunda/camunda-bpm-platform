@@ -165,6 +165,7 @@ public class DefaultCmmnHistoryEventProducer implements CmmnHistoryEventProducer
     evt.setCaseExecutionId(caseExecutionEntity.getId());
     evt.setBusinessKey(caseExecutionEntity.getBusinessKey());
     evt.setState(caseExecutionEntity.getState());
+    evt.setTenantId(caseExecutionEntity.getTenantId());
   }
 
   protected HistoricCaseActivityInstanceEventEntity newCaseActivityInstanceEventEntity(CaseExecutionEntity caseExecutionEntity) {
@@ -189,6 +190,8 @@ public class DefaultCmmnHistoryEventProducer implements CmmnHistoryEventProducer
     evt.setCaseActivityId(caseExecutionEntity.getActivityId());
     evt.setCaseActivityName(caseExecutionEntity.getActivityName());
     evt.setCaseActivityType(caseExecutionEntity.getActivityType());
+
+    evt.setTenantId(caseExecutionEntity.getTenantId());
   }
 
 }

@@ -15,41 +15,56 @@ package org.camunda.bpm.engine.impl.migration.validation.instruction;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 public class SameEventScopeInstructionValidator implements MigrationInstructionValidator {
 
   public void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, MigrationInstructionValidationReportImpl report) {
+    ActivityImpl sourceActivity = instruction.getSourceActivity();
+
     ScopeImpl sourceEventScope = instruction.getSourceActivity().getEventScope();
     ScopeImpl targetEventScope = instruction.getTargetActivity().getEventScope();
 
-    if (sourceEventScope == null && targetEventScope == null) {
+    if (sourceEventScope == null || sourceEventScope == sourceActivity.getFlowScope()) {
+      // event scopes must only match if the event scopes are not the flow scopes
+      // => validation necessary for boundary events;
+      // => validation not necessary for event subprocesses
       return;
     }
 
     if (targetEventScope == null) {
-      addFailure(instruction, report);
+      report.addFailure("The source activity's event scope (" + sourceEventScope.getId() + ") must be mapped but the "
+          + "target activity has no event scope");
     }
     else {
-      ScopeImpl mappedSourceEventScope = findMappedEventScope(sourceEventScope, instructions);
+      ScopeImpl mappedSourceEventScope = findMappedEventScope(sourceEventScope, instruction, instructions);
       if (mappedSourceEventScope == null || !mappedSourceEventScope.getId().equals(targetEventScope.getId())) {
-        addFailure(instruction, report);
+        report.addFailure("The source activity's event scope (" + sourceEventScope.getId() + ") "
+            + "must be mapped to the target activity's event scope (" + targetEventScope.getId() + ")");
       }
     }
   }
 
-  protected ScopeImpl findMappedEventScope(ScopeImpl sourceEventScope, ValidatingMigrationInstructions instructions) {
+  protected ScopeImpl findMappedEventScope(ScopeImpl sourceEventScope, ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions) {
     if (sourceEventScope != null) {
-      List<ValidatingMigrationInstruction> eventScopeInstructions = instructions.getInstructionsBySourceScope(sourceEventScope);
-      if (eventScopeInstructions.size() > 0) {
-        return eventScopeInstructions.get(0).getTargetActivity();
+      if (sourceEventScope == sourceEventScope.getProcessDefinition()) {
+        return instruction.getTargetActivity().getProcessDefinition();
+      }
+      else {
+        List<ValidatingMigrationInstruction> eventScopeInstructions = instructions.getInstructionsBySourceScope(sourceEventScope);
+        if (eventScopeInstructions.size() > 0) {
+          return eventScopeInstructions.get(0).getTargetActivity();
+        }
       }
     }
     return null;
   }
 
-  protected void addFailure(ValidatingMigrationInstruction instruction, MigrationInstructionValidationReportImpl report) {
-    report.addFailure("Event scope of the activity has changed and wasn't migrated");
+  protected void addFailure(ValidatingMigrationInstruction instruction,
+      MigrationInstructionValidationReportImpl report, String sourceScopeId, String targetScopeId) {
+    report.addFailure("The source activity's event scope (" + sourceScopeId + ") "
+        + "must be mapped to the target activity's event scope (" + targetScopeId + ")");
   }
 
 }

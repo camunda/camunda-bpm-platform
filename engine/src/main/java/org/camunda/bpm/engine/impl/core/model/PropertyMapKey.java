@@ -25,9 +25,19 @@ package org.camunda.bpm.engine.impl.core.model;
 public class PropertyMapKey<K,V> {
 
   protected final String name;
+  protected boolean allowOverwrite = true;
 
   public PropertyMapKey(String name) {
+    this(name, true);
+  }
+
+  public PropertyMapKey(String name, boolean allowOverwrite) {
     this.name = name;
+    this.allowOverwrite = allowOverwrite;
+  }
+
+  public boolean allowsOverwrite() {
+    return allowOverwrite;
   }
 
   public String getName() {

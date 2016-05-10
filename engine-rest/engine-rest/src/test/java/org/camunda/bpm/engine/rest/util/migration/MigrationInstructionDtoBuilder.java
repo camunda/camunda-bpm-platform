@@ -27,12 +27,18 @@ public class MigrationInstructionDtoBuilder {
   }
 
   public MigrationInstructionDtoBuilder migrate(String sourceActivityId, String targetActivityId) {
-    return migrate(Collections.singletonList(sourceActivityId), Collections.singletonList(targetActivityId));
+    return migrate(Collections.singletonList(sourceActivityId), Collections.singletonList(targetActivityId), null);
   }
 
-  public MigrationInstructionDtoBuilder migrate(List<String> sourceActivityId, List<String> targetActivityId) {
+  public MigrationInstructionDtoBuilder migrate(String sourceActivityId, String targetActivityId, Boolean updateEventTrigger) {
+    return migrate(Collections.singletonList(sourceActivityId), Collections.singletonList(targetActivityId), updateEventTrigger);
+  }
+
+  public MigrationInstructionDtoBuilder migrate(List<String> sourceActivityId, List<String> targetActivityId, Boolean updateEventTrigger) {
     migrationInstructionDto.setSourceActivityIds(sourceActivityId);
     migrationInstructionDto.setTargetActivityIds(targetActivityId);
+    migrationInstructionDto.setUpdateEventTrigger(updateEventTrigger);
+
     return this;
   }
 

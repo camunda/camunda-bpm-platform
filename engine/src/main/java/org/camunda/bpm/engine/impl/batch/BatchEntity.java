@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
@@ -38,7 +39,8 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
   protected String id;
   protected String type;
 
-  protected int size;
+  protected int totalJobs;
+  protected int jobsCreated;
   protected int batchJobsPerSeed;
   protected int invocationsPerBatchJob;
 
@@ -79,12 +81,20 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
     this.type = type;
   }
 
-  public int getSize() {
-    return size;
+  public int getTotalJobs() {
+    return totalJobs;
   }
 
-  public void setSize(int size) {
-    this.size = size;
+  public void setTotalJobs(int totalJobs) {
+    this.totalJobs = totalJobs;
+  }
+
+  public int getJobsCreated() {
+    return jobsCreated;
+  }
+
+  public void setJobsCreated(int jobsCreated) {
+    this.jobsCreated = jobsCreated;
   }
 
   public int getBatchJobsPerSeed() {
@@ -201,14 +211,14 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
   @Override
   public Object getPersistentState() {
     HashMap<String, Object> persistentState = new HashMap<String, Object>();
-
-
+    persistentState.put("jobsCreated", jobsCreated);
     return persistentState;
   }
 
   public JobDefinitionEntity createSeedJobDefinition() {
     seedJobDefinition = new JobDefinitionEntity(BATCH_SEED_JOB_DECLARATION);
     seedJobDefinition.setJobConfiguration(id);
+    seedJobDefinition.setTenantId(tenantId);
 
     Context.getCommandContext().getJobDefinitionManager().insert(seedJobDefinition);
 
@@ -220,6 +230,7 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
   public JobDefinitionEntity createMonitorJobDefinition() {
     monitorJobDefinition = new JobDefinitionEntity(BATCH_MONITOR_JOB_DECLARATION);
     monitorJobDefinition.setJobConfiguration(id);
+    monitorJobDefinition.setTenantId(tenantId);
 
     Context.getCommandContext().getJobDefinitionManager().insert(monitorJobDefinition);
 
@@ -231,6 +242,7 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
   public JobDefinitionEntity createBatchJobDefinition() {
     batchJobDefinition = new JobDefinitionEntity(getBatchJobHandler().getJobDeclaration());
     batchJobDefinition.setJobConfiguration(id);
+    batchJobDefinition.setTenantId(tenantId);
 
     Context.getCommandContext().getJobDefinitionManager().insert(batchJobDefinition);
 
@@ -242,7 +254,7 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
   public JobEntity createSeedJob() {
     JobEntity seedJob = BATCH_SEED_JOB_DECLARATION.createJobInstance(this);
 
-    Context.getCommandContext().getJobManager().insertJob(seedJob);
+    Context.getCommandContext().getJobManager().insertAndHintJobExecutor(seedJob);
 
     return seedJob;
   }
@@ -257,17 +269,25 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
     }
   }
 
-  public JobEntity createMonitorJob() {
-    CommandContext commandContext = Context.getCommandContext();
-    int pollTime = commandContext.getProcessEngineConfiguration().getBatchPollTime() * 1000;
-    Date dueDate = new Date(ClockUtil.getCurrentTime().getTime() + pollTime);
-
+  public JobEntity createMonitorJob(boolean setDueDate) {
     // Maybe use an other job declaration
     JobEntity monitorJob = BATCH_MONITOR_JOB_DECLARATION.createJobInstance(this);
-    monitorJob.setDuedate(dueDate);
+    if (setDueDate) {
+      monitorJob.setDuedate(calculateMonitorJobDueDate());
+    }
 
-    commandContext.getJobManager().insertJob(monitorJob);
+    Context.getCommandContext()
+      .getJobManager().insertAndHintJobExecutor(monitorJob);
+
     return monitorJob;
+  }
+
+  protected Date calculateMonitorJobDueDate() {
+    int pollTime = Context.getCommandContext()
+      .getProcessEngineConfiguration()
+      .getBatchPollTime();
+    long dueTime = ClockUtil.getCurrentTime().getTime() + (pollTime * 1000);
+    return new Date(dueTime);
   }
 
   public void deleteMonitorJob() {
@@ -298,6 +318,11 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
     fireHistoricEndEvent();
 
     if (cascadeToHistory) {
+      HistoricIncidentManager historicIncidentManager = commandContext.getHistoricIncidentManager();
+      historicIncidentManager.deleteHistoricIncidentsByJobDefinitionId(seedJobDefinitionId);
+      historicIncidentManager.deleteHistoricIncidentsByJobDefinitionId(monitorJobDefinitionId);
+      historicIncidentManager.deleteHistoricIncidentsByJobDefinitionId(batchJobDefinitionId);
+
       HistoricJobLogManager historicJobLogManager = commandContext.getHistoricJobLogManager();
       historicJobLogManager.deleteHistoricJobLogsByJobDefinitionId(seedJobDefinitionId);
       historicJobLogManager.deleteHistoricJobLogsByJobDefinitionId(monitorJobDefinitionId);
@@ -332,7 +357,8 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
       "batchHandler=" + batchJobHandler +
       ", id='" + id + '\'' +
       ", type='" + type + '\'' +
-      ", size=" + size +
+      ", size=" + totalJobs +
+      ", jobCreated=" + jobsCreated +
       ", batchJobsPerSeed=" + batchJobsPerSeed +
       ", invocationsPerBatchJob=" + invocationsPerBatchJob +
       ", seedJobDefinitionId='" + seedJobDefinitionId + '\'' +

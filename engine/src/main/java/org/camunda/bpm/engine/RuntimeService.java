@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
@@ -39,6 +38,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
@@ -1201,6 +1202,8 @@ public interface RuntimeService {
    * one process instance from the hierarchy will not suspend other
    * process instances from that hierarchy.</p>
    *
+   * <p>Note: for more complex suspend commands use {@link #updateProcessInstanceSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          if no such processInstance can be found.
    * @throws AuthorizationException
@@ -1234,6 +1237,8 @@ public interface RuntimeService {
    * one process instance from the hierarchy will not suspend other
    * process instances from that hierarchy.</p>
    *
+   * <p>Note: for more complex suspend commands use {@link #updateProcessInstanceSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          if no such processInstance can be found.
    * @throws AuthorizationException
@@ -1266,6 +1271,8 @@ public interface RuntimeService {
    * one process instance from the hierarchy will not suspend other
    * process instances from that hierarchy.</p>
    *
+   * <p>Note: for more complex suspend commands use {@link #updateProcessInstanceSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          if no such processInstance can be found.
    * @throws AuthorizationException
@@ -1279,6 +1286,8 @@ public interface RuntimeService {
    * <p>If you have a process instance hierarchy, activating
    * one process instance from the hierarchy will not activate other
    * process instances from that hierarchy.</p>
+   *
+   * <p>Note: for more complex activate commands use {@link #updateProcessInstanceSuspensionState()}.</p>
    *
    * @throws ProcessEngineException
    *          if no such processInstance can be found.
@@ -1295,6 +1304,8 @@ public interface RuntimeService {
    * one process instance from the hierarchy will not activate other
    * process instances from that hierarchy.</p>
    *
+   * <p>Note: for more complex activate commands use {@link #updateProcessInstanceSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          if the process definition id is null
    * @throws AuthorizationException
@@ -1309,12 +1320,25 @@ public interface RuntimeService {
    * one process instance from the hierarchy will not activate other
    * process instances from that hierarchy.</p>
    *
+   * <p>Note: for more complex activate commands use {@link #updateProcessInstanceSuspensionState()}.</p>
+   *
    * @throws ProcessEngineException
    *          if the process definition id is null
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void activateProcessInstanceByProcessDefinitionKey(String processDefinitionKey);
+
+  /**
+   * Activate or suspend process instances using a fluent builder. Specify the
+   * instances by calling one of the <i>by</i> methods, like
+   * <i>byProcessInstanceId</i>. To update the suspension state call
+   * {@link UpdateProcessInstanceSuspensionStateBuilder#activate()} or
+   * {@link UpdateProcessInstanceSuspensionStateBuilder#suspend()}.
+   *
+   * @return the builder to update the suspension state
+   */
+  UpdateProcessInstanceSuspensionStateSelectBuilder updateProcessInstanceSuspensionState();
 
   // Events ////////////////////////////////////////////////////////////////////////
 

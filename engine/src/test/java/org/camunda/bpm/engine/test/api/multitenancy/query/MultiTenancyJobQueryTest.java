@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.api.multitenancy.query;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NullValueException;
@@ -150,6 +151,43 @@ public class MultiTenancyJobQueryTest extends PluggableProcessEngineTestCase {
     assertThat(jobs.size(), is(2));
     assertThat(jobs.get(0).getTenantId(), is(TENANT_TWO));
     assertThat(jobs.get(1).getTenantId(), is(TENANT_ONE));
+  }
+
+  public void testQueryNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    JobQuery query = managementService.createJobQuery();
+    assertThat(query.count(), is(1L));
+  }
+
+  public void testQueryAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    JobQuery query = managementService.createJobQuery();
+
+    assertThat(query.count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeJobsWithoutTenantId().count(), is(2L));
+  }
+
+  public void testQueryAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
+
+    JobQuery query = managementService.createJobQuery();
+
+    assertThat(query.count(), is(3L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.withoutTenantId().count(), is(1L));
+  }
+
+  public void testQueryDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    JobQuery query = managementService.createJobQuery();
+    assertThat(query.count(), is(3L));
   }
 
 }

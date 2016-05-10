@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 
@@ -52,7 +53,7 @@ public class CaseDefinitionManager extends AbstractManager {
    */
   public CaseDefinitionEntity findLatestCaseDefinitionByKey(String caseDefinitionKey) {
     @SuppressWarnings("unchecked")
-    List<CaseDefinitionEntity> caseDefinitions = getDbEntityManager().selectList("selectLatestCaseDefinitionByKey", caseDefinitionKey);
+    List<CaseDefinitionEntity> caseDefinitions = getDbEntityManager().selectList("selectLatestCaseDefinitionByKey", configureParameterizedQuery(caseDefinitionKey));
 
     if (caseDefinitions.isEmpty()) {
       return null;
@@ -107,10 +108,12 @@ public class CaseDefinitionManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<CaseDefinition> findCaseDefinitionsByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery, Page page) {
+    configureCaseDefinitionQuery(caseDefinitionQuery);
     return getDbEntityManager().selectList("selectCaseDefinitionsByQueryCriteria", caseDefinitionQuery, page);
   }
 
   public long findCaseDefinitionCountByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery) {
+    configureCaseDefinitionQuery(caseDefinitionQuery);
     return (Long) getDbEntityManager().selectOne("selectCaseDefinitionCountByQueryCriteria", caseDefinitionQuery);
   }
 
@@ -118,4 +121,13 @@ public class CaseDefinitionManager extends AbstractManager {
   public List<CaseDefinition> findCaseDefinitionByDeploymentId(String deploymentId) {
     return getDbEntityManager().selectList("selectCaseDefinitionByDeploymentId", deploymentId);
   }
+
+  protected void configureCaseDefinitionQuery(CaseDefinitionQueryImpl query) {
+    getTenantManager().configureQuery(query);
+  }
+
+  protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
+    return getTenantManager().configureQuery(parameter);
+  }
+
 }

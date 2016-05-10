@@ -16,10 +16,10 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 
 import org.camunda.bpm.engine.impl.ProcessInstantiationBuilderImpl;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
 public class GetDeployedProcessDefinitionCmd implements Command<ProcessDefinitionEntity> {
@@ -53,8 +53,9 @@ public class GetDeployedProcessDefinitionCmd implements Command<ProcessDefinitio
     ProcessDefinitionEntity processDefinition = find(commandContext);
 
     if (checkReadPermission) {
-      AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-      authorizationManager.checkReadProcessDefinition(processDefinition);
+      for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+        checker.checkReadProcessDefinition(processDefinition);
+      }
     }
 
     return processDefinition;

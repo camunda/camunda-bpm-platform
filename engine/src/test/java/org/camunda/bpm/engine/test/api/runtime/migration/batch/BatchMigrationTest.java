@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration.batch;
 
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
@@ -20,6 +21,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -29,19 +32,32 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.batch.history.HistoricBatch;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateEvent;
+import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateExecutionListener;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,7 +65,7 @@ import org.junit.rules.RuleChain;
 
 public class BatchMigrationTest {
 
-  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
   protected BatchMigrationHelper helper = new BatchMigrationHelper(engineRule, migrationRule);
 
@@ -73,14 +89,7 @@ public class BatchMigrationTest {
 
   @After
   public void removeBatches() {
-    for (Batch batch : managementService.createBatchQuery().list()) {
-      managementService.deleteBatch(batch.getId(), true);
-    }
-
-    // remove history of completed batches
-    for (HistoricBatch historicBatch : historyService.createHistoricBatchQuery().list()) {
-      historyService.deleteHistoricBatch(historicBatch.getId());
-    }
+    helper.removeAllRunningAndHistoricBatches();
   }
 
   @After
@@ -90,16 +99,14 @@ public class BatchMigrationTest {
 
   @Before
   public void storeEngineSettings() {
-    ProcessEngineConfigurationImpl configuration =
-        (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
     defaultBatchJobsPerSeed = configuration.getBatchJobsPerSeed();
     defaultInvocationsPerBatchJob = configuration.getInvocationsPerBatchJob();
   }
 
   @After
   public void restoreEngineSettings() {
-    ProcessEngineConfigurationImpl configuration =
-        (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
     configuration.setBatchJobsPerSeed(defaultBatchJobsPerSeed);
     configuration.setInvocationsPerBatchJob(defaultInvocationsPerBatchJob);
   }
@@ -110,15 +117,14 @@ public class BatchMigrationTest {
     try {
       runtimeService.newMigration(null).processInstanceIds(Collections.singletonList("process")).executeAsync();
       fail("Should not succeed");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("migration plan is null"));
     }
   }
 
   @Test
   public void testNullProcessInstanceIds() {
-    ProcessDefinition testProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition testProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -126,15 +132,14 @@ public class BatchMigrationTest {
     try {
       runtimeService.newMigration(migrationPlan).processInstanceIds(null).executeAsync();
       fail("Should not succeed");
-    }
-    catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("process instance ids is null"));
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("process instance ids is empty"));
     }
   }
 
   @Test
   public void testEmptyProcessInstanceIds() {
-    ProcessDefinition testProcessDefinition = migrationRule.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition testProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -142,8 +147,40 @@ public class BatchMigrationTest {
     try {
       runtimeService.newMigration(migrationPlan).processInstanceIds(Collections.<String>emptyList()).executeAsync();
       fail("Should not succeed");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("process instance ids is empty"));
     }
-    catch (ProcessEngineException e) {
+  }
+
+  @Test
+  public void testNullProcessInstanceQuery() {
+    ProcessDefinition testProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    try {
+      runtimeService.newMigration(migrationPlan).processInstanceQuery(null).executeAsync();
+      fail("Should not succeed");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("process instance ids is empty"));
+    }
+  }
+
+  @Test
+  public void testEmptyProcessInstanceQuery() {
+    ProcessDefinition testProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    ProcessInstanceQuery emptyProcessInstanceQuery = runtimeService.createProcessInstanceQuery();
+    assertEquals(0, emptyProcessInstanceQuery.count());
+
+    try {
+      runtimeService.newMigration(migrationPlan).processInstanceQuery(emptyProcessInstanceQuery).executeAsync();
+      fail("Should not succeed");
+    } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("process instance ids is empty"));
     }
   }
@@ -154,12 +191,7 @@ public class BatchMigrationTest {
     Batch batch = helper.migrateProcessInstancesAsync(15);
 
     // then a batch is created
-    assertNotNull(batch);
-    assertNotNull(batch.getId());
-    assertEquals("instance-migration", batch.getType());
-    assertEquals(15, batch.getSize());
-    assertEquals(10, batch.getBatchJobsPerSeed());
-    assertEquals(1, batch.getInvocationsPerBatchJob());
+    assertBatchCreated(batch, 15);
   }
 
   @Test
@@ -196,9 +228,13 @@ public class BatchMigrationTest {
 
   @Test
   public void testMigrationJobsCreation() {
+    // reduce number of batch jobs per seed to not have to create a lot of instances
+    engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(10);
+
     Batch batch = helper.migrateProcessInstancesAsync(20);
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
     JobDefinition migrationJobDefinition = helper.getMigrationJobDefinition(batch);
+    String sourceDeploymentId = helper.getSourceProcessDefinition().getDeploymentId();
 
     // when
     helper.executeSeedJob(batch);
@@ -210,7 +246,7 @@ public class BatchMigrationTest {
     for (Job migrationJob : migrationJobs) {
       assertEquals(migrationJobDefinition.getId(), migrationJob.getJobDefinitionId());
       assertNull(migrationJob.getDuedate());
-      assertNull(migrationJob.getDeploymentId());
+      assertEquals(sourceDeploymentId, migrationJob.getDeploymentId());
       assertNull(migrationJob.getProcessDefinitionId());
       assertNull(migrationJob.getProcessDefinitionKey());
       assertNull(migrationJob.getProcessInstanceId());
@@ -268,7 +304,10 @@ public class BatchMigrationTest {
 
   @Test
   public void testNumberOfJobsCreatedBySeedJobPerInvocation() {
-    int batchJobsPerSeed = ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration()).getBatchJobsPerSeed();
+    // reduce number of batch jobs per seed to not have to create a lot of instances
+    int batchJobsPerSeed = 10;
+    engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(10);
+
     Batch batch = helper.migrateProcessInstancesAsync(batchJobsPerSeed * 2 + 4);
 
     // when
@@ -294,8 +333,16 @@ public class BatchMigrationTest {
   }
 
   @Test
+  public void testDefaultBatchConfiguration() {
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
+    assertEquals(100, configuration.getBatchJobsPerSeed());
+    assertEquals(1, configuration.getInvocationsPerBatchJob());
+    assertEquals(30, configuration.getBatchPollTime());
+  }
+
+  @Test
   public void testCustomNumberOfJobsCreateBySeedJob() {
-    ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
     configuration.setBatchJobsPerSeed(2);
     configuration.setInvocationsPerBatchJob(5);
 
@@ -305,6 +352,9 @@ public class BatchMigrationTest {
     // then the configuration was saved in the batch job
     assertEquals(2, batch.getBatchJobsPerSeed());
     assertEquals(5, batch.getInvocationsPerBatchJob());
+
+    // and the size was correctly calculated
+    assertEquals(4, batch.getTotalJobs());
 
     // when the seed job is executed
     helper.executeSeedJob(batch);
@@ -326,13 +376,20 @@ public class BatchMigrationTest {
   public void testMonitorJobPollingForCompletion() {
     Batch batch = helper.migrateProcessInstancesAsync(10);
 
-    // when
-    Date createDate = new Date(1457326800000L);
-    ClockUtil.setCurrentTime(createDate);
+    // when the seed job creates the monitor job
+    Date createDate = ClockTestUtil.setClockToDateWithoutMilliseconds();
     helper.executeSeedJob(batch);
 
-    // then the monitor job has a due date of the default batch poll time
+    // then the monitor job has a no due date set
     Job monitorJob = helper.getMonitorJob(batch);
+    assertNotNull(monitorJob);
+    assertNull(monitorJob.getDuedate());
+
+    // when the monitor job is executed
+    helper.executeMonitorJob(batch);
+
+    // then the monitor job has a due date of the default batch poll time
+    monitorJob = helper.getMonitorJob(batch);
     Date dueDate = helper.addSeconds(createDate, 30);
     assertEquals(dueDate, monitorJob.getDuedate());
   }
@@ -390,6 +447,58 @@ public class BatchMigrationTest {
   }
 
   @Test
+  public void testBatchWithFailedSeedJobDeletionWithCascade() {
+    Batch batch = helper.migrateProcessInstancesAsync(2);
+
+    // create incident
+    Job seedJob = helper.getSeedJob(batch);
+    managementService.setJobRetries(seedJob.getId(), 0);
+
+    // when
+    managementService.deleteBatch(batch.getId(), true);
+
+    // then the no historic incidents exists
+    long historicIncidents = historyService.createHistoricIncidentQuery().count();
+    assertEquals(0, historicIncidents);
+  }
+
+  @Test
+  public void testBatchWithFailedMigrationJobDeletionWithCascade() {
+    Batch batch = helper.migrateProcessInstancesAsync(2);
+    helper.executeSeedJob(batch);
+
+    // create incidents
+    List<Job> migrationJobs = helper.getMigrationJobs(batch);
+    for (Job migrationJob : migrationJobs) {
+      managementService.setJobRetries(migrationJob.getId(), 0);
+    }
+
+    // when
+    managementService.deleteBatch(batch.getId(), true);
+
+    // then the no historic incidents exists
+    long historicIncidents = historyService.createHistoricIncidentQuery().count();
+    assertEquals(0, historicIncidents);
+  }
+
+  @Test
+  public void testBatchWithFailedMonitorJobDeletionWithCascade() {
+    Batch batch = helper.migrateProcessInstancesAsync(2);
+    helper.executeSeedJob(batch);
+
+    // create incident
+    Job monitorJob = helper.getMonitorJob(batch);
+    managementService.setJobRetries(monitorJob.getId(), 0);
+
+    // when
+    managementService.deleteBatch(batch.getId(), true);
+
+    // then the no historic incidents exists
+    long historicIncidents = historyService.createHistoricIncidentQuery().count();
+    assertEquals(0, historicIncidents);
+  }
+
+  @Test
   public void testBatchExecutionFailureWithMissingProcessInstance() {
     Batch batch = helper.migrateProcessInstancesAsync(2);
     helper.executeSeedJob(batch);
@@ -413,6 +522,279 @@ public class BatchMigrationTest {
     assertEquals(2, failedJob.getRetries());
     assertThat(failedJob.getExceptionMessage(), startsWith("ENGINE-23003"));
     assertThat(failedJob.getExceptionMessage(), containsString("Process instance '" + deletedProcessInstanceId + "' cannot be migrated"));
+  }
+
+  @Test
+  public void testBatchCreationWithProcessInstanceQuery() {
+    RuntimeService runtimeService = engineRule.getRuntimeService();
+    int processInstanceCount = 15;
+
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    for (int i = 0; i < processInstanceCount; i++) {
+      runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    }
+
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(sourceProcessDefinition.getId());
+    assertEquals(processInstanceCount, sourceProcessInstanceQuery.count());
+
+    // when
+    Batch batch = runtimeService.newMigration(migrationPlan)
+      .processInstanceQuery(sourceProcessInstanceQuery)
+      .executeAsync();
+
+    // then a batch is created
+    assertBatchCreated(batch, processInstanceCount);
+  }
+
+  @Test
+  public void testBatchCreationWithOverlappingProcessInstanceIdsAndQuery() {
+    RuntimeService runtimeService = engineRule.getRuntimeService();
+    int processInstanceCount = 15;
+
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    List<String> processInstanceIds = new ArrayList<String>();
+    for (int i = 0; i < processInstanceCount; i++) {
+      processInstanceIds.add(
+        runtimeService.startProcessInstanceById(sourceProcessDefinition.getId()).getId()
+      );
+    }
+
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(sourceProcessDefinition.getId());
+    assertEquals(processInstanceCount, sourceProcessInstanceQuery.count());
+
+    // when
+    Batch batch = runtimeService.newMigration(migrationPlan)
+      .processInstanceIds(processInstanceIds)
+      .processInstanceQuery(sourceProcessInstanceQuery)
+      .executeAsync();
+
+    // then a batch is created
+    assertBatchCreated(batch, processInstanceCount);
+  }
+
+  @Test
+  public void testListenerInvocationForNewlyCreatedScope() {
+    // given
+    DelegateEvent.clearEvents();
+
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, DelegateExecutionListener.class.getName())
+      .done()
+    );
+
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    Batch batch = engineRule.getRuntimeService().newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .executeAsync();
+    helper.executeSeedJob(batch);
+
+    // when
+    helper.executeMigrationJobs(batch);
+
+    // then
+    List<DelegateEvent> recordedEvents = DelegateEvent.getEvents();
+    assertEquals(1, recordedEvents.size());
+
+    DelegateEvent event = recordedEvents.get(0);
+    assertEquals(targetProcessDefinition.getId(), event.getProcessDefinitionId());
+    assertEquals("subProcess", event.getCurrentActivityId());
+
+    DelegateEvent.clearEvents();
+  }
+
+  @Test
+  public void testSkipListenerInvocationForNewlyCreatedScope() {
+    // given
+    DelegateEvent.clearEvents();
+
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, DelegateExecutionListener.class.getName())
+      .done()
+    );
+
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    Batch batch = engineRule.getRuntimeService().newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .skipCustomListeners()
+      .executeAsync();
+    helper.executeSeedJob(batch);
+
+    // when
+    helper.executeMigrationJobs(batch);
+
+    // then
+    assertEquals(0, DelegateEvent.getEvents().size());
+  }
+
+  @Test
+  public void testIoMappingInvocationForNewlyCreatedScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+      .camundaInputParameter("foo", "bar")
+      .done()
+    );
+
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    Batch batch = engineRule.getRuntimeService().newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .executeAsync();
+    helper.executeSeedJob(batch);
+
+    // when
+    helper.executeMigrationJobs(batch);
+
+    // then
+    VariableInstance inputVariable = engineRule.getRuntimeService().createVariableInstanceQuery().singleResult();
+    Assert.assertNotNull(inputVariable);
+    assertEquals("foo", inputVariable.getName());
+    assertEquals("bar", inputVariable.getValue());
+
+    ActivityInstance activityInstance = engineRule.getRuntimeService().getActivityInstance(processInstance.getId());
+    assertEquals(activityInstance.getActivityInstances("subProcess")[0].getId(), inputVariable.getActivityInstanceId());
+  }
+
+  @Test
+  public void testSkipIoMappingInvocationForNewlyCreatedScope() {
+ // given
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+      .camundaInputParameter("foo", "bar")
+      .done()
+    );
+
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    Batch batch = engineRule.getRuntimeService().newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .skipIoMappings()
+      .executeAsync();
+    helper.executeSeedJob(batch);
+
+    // when
+    helper.executeMigrationJobs(batch);
+
+    // then
+    assertEquals(0, engineRule.getRuntimeService().createVariableInstanceQuery().count());
+  }
+
+  @Test
+  public void testUpdateEventTrigger() {
+    // given
+    String newMessageName = "newMessage";
+
+    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_RECEIVE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(modify(ProcessModels.ONE_RECEIVE_TASK_PROCESS)
+      .renameMessage("Message", newMessageName)
+    );
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .updateEventTriggers()
+      .build();
+
+    Batch batch = runtimeService.newMigration(migrationPlan)
+      .processInstanceIds(Collections.singletonList(processInstance.getId()))
+      .executeAsync();
+
+    helper.executeSeedJob(batch);
+
+    // when
+    helper.executeMigrationJobs(batch);
+
+    // then the message event subscription's event name was changed
+    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+    assertEquals(newMessageName, eventSubscription.getEventName());
+  }
+
+  @Test
+  public void testDeleteBatchJobManually() {
+    // given
+    Batch batch = helper.createMigrationBatchWithSize(1);
+    helper.executeSeedJob(batch);
+
+    JobEntity migrationJob = (JobEntity) helper.getMigrationJobs(batch).get(0);
+    String byteArrayId = migrationJob.getJobHandlerConfigurationRaw();
+
+    ByteArrayEntity byteArrayEntity = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+      .execute(new GetByteArrayCommand(byteArrayId));
+    assertNotNull(byteArrayEntity);
+
+    // when
+    managementService.deleteJob(migrationJob.getId());
+
+    // then
+    byteArrayEntity = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+      .execute(new GetByteArrayCommand(byteArrayId));
+    assertNull(byteArrayEntity);
+  }
+
+  protected void assertBatchCreated(Batch batch, int processInstanceCount) {
+    assertNotNull(batch);
+    assertNotNull(batch.getId());
+    assertEquals("instance-migration", batch.getType());
+    assertEquals(processInstanceCount, batch.getTotalJobs());
+    assertEquals(defaultBatchJobsPerSeed, batch.getBatchJobsPerSeed());
+    assertEquals(defaultInvocationsPerBatchJob, batch.getInvocationsPerBatchJob());
+  }
+
+  public class GetByteArrayCommand implements Command<ByteArrayEntity> {
+
+    protected String byteArrayId;
+
+    public GetByteArrayCommand(String byteArrayId) {
+      this.byteArrayId = byteArrayId;
+    }
+
+    public ByteArrayEntity execute(CommandContext commandContext) {
+      return (ByteArrayEntity) commandContext.getDbEntityManager()
+        .selectOne("selectByteArray", byteArrayId);
+    }
+
   }
 
 }

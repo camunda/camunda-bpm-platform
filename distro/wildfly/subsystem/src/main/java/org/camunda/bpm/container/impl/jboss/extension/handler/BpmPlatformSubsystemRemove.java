@@ -20,14 +20,12 @@ import org.jboss.dmr.ModelNode;
 /**
  * @author Daniel Meyer
  * @author Christian Lipphardt
- *
  */
 public class BpmPlatformSubsystemRemove extends ReloadRequiredRemoveStepHandler {
 
   public static final BpmPlatformSubsystemRemove INSTANCE = new BpmPlatformSubsystemRemove();
 
   private BpmPlatformSubsystemRemove() {
-
   }
 
   protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {

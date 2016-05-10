@@ -24,7 +24,7 @@ public abstract class EmbeddedServerBootstrap {
       propStream = AbstractRestServiceTest.class.getResourceAsStream(PROPERTIES_FILE);
       properties.load(propStream);
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new ServerBootstrapException(e);
     } finally {
       try {
         propStream.close();

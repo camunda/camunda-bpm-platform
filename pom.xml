@@ -55,6 +55,7 @@
         <module>distro/gf31</module>
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
+        <module>distro/webjar</module>
 
         <module>database</module>
         <module>parent</module>
@@ -178,6 +179,8 @@
         <module>javaee/ejb-client</module>
 
         <module>engine-plugins</module>
+
+        <module>distro/webjar</module>
 
         <module>database</module>
         <module>parent</module>

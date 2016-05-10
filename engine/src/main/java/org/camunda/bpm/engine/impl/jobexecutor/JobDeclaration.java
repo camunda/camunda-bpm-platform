@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -44,7 +46,7 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
   protected String jobDefinitionId;
 
   protected String jobHandlerType;
-  protected String jobHandlerConfiguration;
+  protected JobHandlerConfiguration jobHandlerConfiguration;
   protected String jobConfiguration;
 
   protected boolean exclusive = JobEntity.DEFAULT_EXCLUSIVE;
@@ -81,8 +83,11 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
         // if job definition is suspended while creating a job instance,
         // suspend the job instance right away:
         job.setSuspensionState(jobDefinition.getSuspensionState());
+
         job.setProcessDefinitionKey(jobDefinition.getProcessDefinitionKey());
         job.setProcessDefinitionId(jobDefinition.getProcessDefinitionId());
+        job.setCaseDefinitionKey(jobDefinition.getCaseDefinitionKey());
+        job.setCaseDefinitionId(jobDefinition.getCaseDefinitionId());
         job.setTenantId(jobDefinition.getTenantId());
       }
 
@@ -106,6 +111,13 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
           .determinePriority(contextExecution, this);
 
       job.setPriority(priority);
+    }
+
+    if (contextExecution != null) {
+      // in case of shared process definitions, the job definitions have no tenant id.
+      // To distinguish jobs between tenants and enable the tenant check for the job executor,
+      // use the tenant id from the execution.
+      job.setTenantId(contextExecution.getTenantId());
     }
 
     postInitialize(context, job);
@@ -150,21 +162,18 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
     return jobHandlerType;
   }
 
+  protected JobHandler resolveJobHandler() {
+     JobHandler jobHandler = Context.getProcessEngineConfiguration().getJobHandlers().get(jobHandlerType);
+     ensureNotNull("Cannot find job handler '" + jobHandlerType + "' from job '" + this + "'", "jobHandler", jobHandler);
+
+     return jobHandler;
+  }
+
   protected String resolveJobHandlerType(S context) {
     return jobHandlerType;
   }
 
-  public String getJobHandlerConfiguration() {
-    return jobHandlerConfiguration;
-  }
-
-  protected String resolveJobHandlerConfiguration(S context) {
-    return jobHandlerConfiguration;
-  }
-
-  public void setJobHandlerConfiguration(String jobHandlerConfiguration) {
-    this.jobHandlerConfiguration = jobHandlerConfiguration;
-  }
+  protected abstract JobHandlerConfiguration resolveJobHandlerConfiguration(S context);
 
   protected boolean resolveExclusive(S context) {
     return exclusive;
@@ -190,10 +199,6 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
 
   public void setExclusive(boolean exclusive) {
     this.exclusive = exclusive;
-  }
-
-  public void setJobHandlerType(String jobHandlerType) {
-    this.jobHandlerType = jobHandlerType;
   }
 
   public String getActivityId() {

@@ -44,6 +44,9 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
   protected CaseExecutionState state;
   protected Boolean required = false;
 
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
+
   // Not used by end-users, but needed for dynamic ibatis query
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
@@ -91,6 +94,19 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
   public CaseExecutionQuery activityId(String activityId) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
     this.activityId = activityId;
+    return this;
+  }
+
+  public CaseExecutionQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public CaseExecutionQuery withoutTenantId() {
+    this.tenantIds = null;
+    isTenantIdSet = true;
     return this;
   }
 
@@ -169,6 +185,11 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
 
   public CaseExecutionQuery orderByCaseDefinitionId() {
     orderBy(CaseExecutionQueryProperty.CASE_DEFINITION_ID);
+    return this;
+  }
+
+  public CaseExecutionQuery orderByTenantId() {
+    orderBy(CaseExecutionQueryProperty.TENANT_ID);
     return this;
   }
 

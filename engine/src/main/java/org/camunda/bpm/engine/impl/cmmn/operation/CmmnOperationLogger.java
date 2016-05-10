@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
@@ -36,6 +37,11 @@ public class CmmnOperationLogger extends ProcessEngineLogger {
       "Error while completing sub case of case execution '{}'.",
       execution
     ), cause);
+  }
+
+  public BadUserRequestException exceptionCreateCaseInstanceByIdAndTenantId() {
+    return new BadUserRequestException(exceptionMessage(
+        "003", "Cannot specify a tenant-id when create a case instance by case definition id."));
   }
 
 }

@@ -101,5 +101,12 @@ public interface ExternalTask {
    * if the task belongs to no single tenant.
    */
   String getTenantId();
+  
+  /**
+   * Returns the priority of the external task.
+   * 
+   * @return the priority of the external task
+   */
+  long getPriority();
 
 }

@@ -99,9 +99,14 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
     try {
 
-      deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
+      boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, getClass(), getName());
+      // ignore test case when current history level is too low
+      if (hasRequiredHistoryLevel) {
 
-      super.runBare();
+        deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
+
+        super.runBare();
+      }
 
     }
     catch (AssertionFailedError e) {
@@ -118,9 +123,11 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     }
     finally {
 
+      identityService.clearAuthentication();
+      processEngineConfiguration.setTenantCheckEnabled(true);
+
       deleteDeployments();
 
-      identityService.clearAuthentication();
       // only fail if no test failure was recorded
       TestHelper.assertAndEnsureCleanDbAndCache(processEngine, exception == null);
       ClockUtil.reset();
@@ -422,6 +429,12 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().tenantId(tenantId);
 
     return deployment(deploymentBuilder, resources);
+  }
+
+  protected String deploymentForTenant(String tenantId, String classpathResource, BpmnModelInstance modelInstance) {
+    return deployment(repositoryService.createDeployment()
+        .tenantId(tenantId)
+        .addClasspathResource(classpathResource), modelInstance);
   }
 
   protected String deployment(DeploymentBuilder deploymentBuilder, BpmnModelInstance... bpmnModelInstances) {

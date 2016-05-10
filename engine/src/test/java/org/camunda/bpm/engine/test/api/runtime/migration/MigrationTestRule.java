@@ -16,100 +16,44 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.migration.MigrationPlan;
-import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ActivityInstanceAssert.ActivityInstanceAssertThatClause;
 import org.camunda.bpm.engine.test.util.ExecutionAssert;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.junit.Assert;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class MigrationTestRule extends TestWatcher {
-
-  public static final String DEFAULT_BPMN_RESOURCE_NAME = "process.bpmn20.xml";
-
-  protected ProcessEngineRule processEngineRule;
-  protected ProcessEngine processEngine;
+public class MigrationTestRule extends ProcessEngineTestRule {
 
   public ProcessInstanceSnapshot snapshotBeforeMigration;
   public ProcessInstanceSnapshot snapshotAfterMigration;
 
   public MigrationTestRule(ProcessEngineRule processEngineRule) {
-    this.processEngineRule = processEngineRule;
-  }
-
-  @Override
-  protected void starting(Description description) {
-    this.processEngine = processEngineRule.getProcessEngine();
-  }
-
-  @Override
-  protected void finished(Description description) {
-    this.processEngine = null;
-  }
-
-  public void assertProcessEnded(String processInstanceId) {
-    ProcessInstance processInstance = processEngine
-      .getRuntimeService()
-      .createProcessInstanceQuery()
-      .processInstanceId(processInstanceId)
-      .singleResult();
-
-    if (processInstance!=null) {
-      Assert.fail("Process instance with id " + processInstanceId + " is not finished");
-    }
-  }
-
-  public ProcessDefinition findProcessDefinition(String key, int version) {
-    return processEngine.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey(key)
-        .processDefinitionVersion(version)
-        .singleResult();
-  }
-
-  public ProcessDefinition deploy(String name, BpmnModelInstance bpmnModel) {
-    Deployment deployment = processEngine.getRepositoryService()
-      .createDeployment()
-      .addModelInstance(name, bpmnModel)
-      .deploy();
-
-    processEngineRule.manageDeployment(deployment);
-
-    return processEngineRule.getRepositoryService()
-      .createProcessDefinitionQuery()
-      .deploymentId(deployment.getId())
-      .singleResult();
-  }
-
-  /**
-   * Deploys a bpmn model instance and returns its corresponding process definition object
-   */
-  public ProcessDefinition deploy(BpmnModelInstance bpmnModel) {
-    return deploy(DEFAULT_BPMN_RESOURCE_NAME, bpmnModel);
+    super(processEngineRule);
   }
 
   public String getSingleExecutionIdForActivity(ActivityInstance activityInstance, String activityId) {
@@ -128,6 +72,10 @@ public class MigrationTestRule extends TestWatcher {
     return getSingleExecutionIdForActivity(snapshotBeforeMigration.getActivityTree(), activityId);
   }
 
+  public String getSingleExecutionIdForActivityAfterMigration(String activityId) {
+    return getSingleExecutionIdForActivity(snapshotAfterMigration.getActivityTree(), activityId);
+  }
+
   public ActivityInstance getSingleActivityInstance(ActivityInstance tree, String activityId) {
     ActivityInstance[] activityInstances = tree.getActivityInstances(activityId);
     if (activityInstances.length == 1) {
@@ -140,6 +88,10 @@ public class MigrationTestRule extends TestWatcher {
 
   public ActivityInstance getSingleActivityInstanceBeforeMigration(String activityId) {
     return getSingleActivityInstance(snapshotBeforeMigration.getActivityTree(), activityId);
+  }
+
+  public ActivityInstance getSingleActivityInstanceAfterMigration(String activityId) {
+    return getSingleActivityInstance(snapshotAfterMigration.getActivityTree(), activityId);
   }
 
   public ProcessInstanceSnapshot takeFullProcessInstanceSnapshot(ProcessInstance processInstance) {
@@ -162,32 +114,15 @@ public class MigrationTestRule extends TestWatcher {
   public void migrateProcessInstance(MigrationPlan migrationPlan, ProcessInstance processInstance) {
     snapshotBeforeMigration = takeFullProcessInstanceSnapshot(processInstance);
 
-    processEngine.getRuntimeService()
+    RuntimeService runtimeService = processEngine.getRuntimeService();
+
+    runtimeService
       .newMigration(migrationPlan).processInstanceIds(Collections.singletonList(snapshotBeforeMigration.getProcessInstanceId())).execute();
 
+    // fetch updated process instance
+    processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+
     snapshotAfterMigration = takeFullProcessInstanceSnapshot(processInstance);
-  }
-
-  public void completeTask(String taskKey) {
-    TaskService taskService = processEngine.getTaskService();
-    Task task = taskService.createTaskQuery().taskDefinitionKey(taskKey).singleResult();
-    assertNotNull(task);
-    taskService.complete(task.getId());
-  }
-
-  public void completeAnyTask(String taskKey) {
-    TaskService taskService = processEngine.getTaskService();
-    List<Task> tasks = taskService.createTaskQuery().taskDefinitionKey(taskKey).list();
-    assertTrue(!tasks.isEmpty());
-    taskService.complete(tasks.get(0).getId());
-  }
-
-  public void correlateMessage(String messageName) {
-    processEngine.getRuntimeService().createMessageCorrelation(messageName).correlate();
-  }
-
-  public void sendSignal(String signalName) {
-    processEngine.getRuntimeService().signalEventReceived(signalName);
   }
 
   public void triggerTimer() {
@@ -203,14 +138,37 @@ public class MigrationTestRule extends TestWatcher {
     return assertThat(snapshotAfterMigration.getActivityTree());
   }
 
+  public void assertEventSubscriptionsMigrated(String activityIdBefore, String activityIdAfter, String eventName) {
+    List<EventSubscription> eventSubscriptionsBefore = snapshotBeforeMigration.getEventSubscriptionsForActivityIdAndEventName(activityIdAfter, eventName);
+
+    for (EventSubscription eventSubscription : eventSubscriptionsBefore) {
+      assertEventSubscriptionMigrated(eventSubscription, activityIdAfter, eventName);
+    }
+  }
+
+  protected void assertEventSubscriptionMigrated(EventSubscription eventSubscriptionBefore, String activityIdAfter, String eventName) {
+    EventSubscription eventSubscriptionAfter = snapshotAfterMigration.getEventSubscriptionById(eventSubscriptionBefore.getId());
+    assertNotNull("Expected that an event subscription with id '" + eventSubscriptionBefore.getId() + "' "
+        + "exists after migration", eventSubscriptionAfter);
+
+    assertEquals(eventSubscriptionBefore.getEventType(), eventSubscriptionAfter.getEventType());
+    assertEquals(activityIdAfter, eventSubscriptionAfter.getActivityId());
+    assertEquals(eventName, eventSubscriptionAfter.getEventName());
+  }
+
+
   public void assertEventSubscriptionMigrated(String activityIdBefore, String activityIdAfter, String eventName) {
     EventSubscription eventSubscriptionBefore = snapshotBeforeMigration.getEventSubscriptionForActivityIdAndEventName(activityIdBefore, eventName);
     assertNotNull("Expected that an event subscription for activity '" + activityIdBefore + "' exists before migration", eventSubscriptionBefore);
-    EventSubscription eventSubscriptionAfter = snapshotAfterMigration.getEventSubscriptionForActivityIdAndEventName(activityIdAfter, eventName);
-    assertNotNull("Expected that an event subscription for activity '" + activityIdAfter + "' exists after migration", eventSubscriptionAfter);
 
-    assertEquals(eventSubscriptionBefore.getId(), eventSubscriptionAfter.getId());
-    assertEquals(eventSubscriptionBefore.getEventType(), eventSubscriptionAfter.getEventType());
+    assertEventSubscriptionMigrated(eventSubscriptionBefore, activityIdAfter, eventName);
+  }
+
+  public void assertEventSubscriptionMigrated(String activityIdBefore, String eventNameBefore, String activityIdAfter, String eventNameAfter) {
+    EventSubscription eventSubscriptionBefore = snapshotBeforeMigration.getEventSubscriptionForActivityIdAndEventName(activityIdBefore, eventNameBefore);
+    assertNotNull("Expected that an event subscription for activity '" + activityIdBefore + "' exists before migration", eventSubscriptionBefore);
+
+    assertEventSubscriptionMigrated(eventSubscriptionBefore, activityIdAfter, eventNameAfter);
   }
 
   public void assertEventSubscriptionRemoved(String activityId, String eventName) {
@@ -254,6 +212,8 @@ public class MigrationTestRule extends TestWatcher {
     Job jobAfter = snapshotAfterMigration.getJobForDefinitionId(jobDefinitionAfter.getId());
     assertNotNull("Expected that a job for activity '" + activityId + "' exists after migration", jobAfter);
     assertTimerJob(jobAfter);
+    assertEquals(jobDefinitionAfter.getProcessDefinitionId(), jobAfter.getProcessDefinitionId());
+    assertEquals(jobDefinitionAfter.getProcessDefinitionKey(), jobAfter.getProcessDefinitionKey());
 
     for (Job job : snapshotBeforeMigration.getJobs()) {
       if (jobAfter.getId().equals(job.getId())) {
@@ -283,17 +243,30 @@ public class MigrationTestRule extends TestWatcher {
 
     Job jobBefore = snapshotBeforeMigration.getJobForDefinitionId(jobDefinitionBefore.getId());
     assertNotNull("Expected that a timer job for activity '" + activityIdBefore + "' exists before migration", jobBefore);
-    assertTimerJob(jobBefore);
 
-    JobDefinition jobDefinitionAfter = snapshotAfterMigration.getJobDefinitionForActivityIdAndType(activityIdAfter, handlerType);
+    assertJobMigrated(jobBefore, activityIdAfter, jobBefore.getDuedate());
+  }
+
+  public void assertJobMigrated(Job jobBefore, String activityIdAfter) {
+    assertJobMigrated(jobBefore, activityIdAfter, jobBefore.getDuedate());
+  }
+
+  public void assertJobMigrated(Job jobBefore, String activityIdAfter, Date dueDateAfter) {
+
+    Job jobAfter = snapshotAfterMigration.getJobById(jobBefore.getId());
+    assertNotNull("Expected that a job with id '" + jobBefore.getId() + "' exists after migration", jobAfter);
+
+    JobDefinition jobDefinitionAfter = snapshotAfterMigration.getJobDefinitionForActivityIdAndType(activityIdAfter, ((JobEntity) jobBefore).getJobHandlerType());
     assertNotNull("Expected that a job definition for activity '" + activityIdAfter + "' exists after migration", jobDefinitionAfter);
 
-    Job jobAfter = snapshotAfterMigration.getJobForDefinitionId(jobDefinitionAfter.getId());
-    assertNotNull("Expected that a timer job for activity '" + activityIdAfter + "' exists after migration", jobAfter);
-    assertTimerJob(jobAfter);
-
     assertEquals(jobBefore.getId(), jobAfter.getId());
-    assertEquals(jobBefore.getDuedate(), jobAfter.getDuedate());
+    assertEquals("Expected that job is assigned to job definition '" + jobDefinitionAfter.getId() + "' after migration",
+        jobDefinitionAfter.getId(), jobAfter.getJobDefinitionId());
+    assertEquals("Expected that job is assigned to deployment '" + snapshotAfterMigration.getDeploymentId() + "' after migration",
+        snapshotAfterMigration.getDeploymentId(), jobAfter.getDeploymentId());
+    assertEquals(dueDateAfter, jobAfter.getDuedate());
+    assertEquals(((JobEntity) jobBefore).getType(), ((JobEntity) jobAfter).getType());
+    assertEquals(jobBefore.getPriority(), jobAfter.getPriority());
     assertEquals(jobDefinitionAfter.getProcessDefinitionId(), jobAfter.getProcessDefinitionId());
     assertEquals(jobDefinitionAfter.getProcessDefinitionKey(), jobAfter.getProcessDefinitionKey());
   }
@@ -310,12 +283,65 @@ public class MigrationTestRule extends TestWatcher {
     assertJobMigrated(activityIdBefore, activityIdAfter, TimerExecuteNestedActivityJobHandler.TYPE);
   }
 
+  public void assertIntermediateTimerJobCreated(String activityId) {
+    assertJobCreated(activityId, TimerCatchIntermediateEventJobHandler.TYPE);
+  }
+
+  public void assertIntermediateTimerJobRemoved(String activityId) {
+    assertJobRemoved(activityId, TimerCatchIntermediateEventJobHandler.TYPE);
+  }
+
+  public void assertIntermediateTimerJobMigrated(String activityIdBefore, String activityIdAfter) {
+    assertJobMigrated(activityIdBefore, activityIdAfter, TimerCatchIntermediateEventJobHandler.TYPE);
+  }
+
   public void assertEventSubProcessTimerJobCreated(String activityId) {
     assertJobCreated(activityId, TimerStartEventSubprocessJobHandler.TYPE);
   }
 
   public void assertEventSubProcessTimerJobRemoved(String activityId) {
     assertJobRemoved(activityId, TimerStartEventSubprocessJobHandler.TYPE);
+  }
+
+  public void assertVariableMigratedToExecution(VariableInstance variableBefore, String executionId) {
+    assertVariableMigratedToExecution(variableBefore, executionId, variableBefore.getActivityInstanceId());
+  }
+
+  public void assertVariableMigratedToExecution(VariableInstance variableBefore, String executionId, String activityInstanceId) {
+    VariableInstance variableAfter = snapshotAfterMigration.getVariable(variableBefore.getId());
+
+    Assert.assertNotNull("Variable with id " + variableBefore.getId() + " does not exist", variableAfter);
+
+    Assert.assertEquals(activityInstanceId, variableAfter.getActivityInstanceId());
+    Assert.assertEquals(variableBefore.getCaseExecutionId(), variableAfter.getCaseExecutionId());
+    Assert.assertEquals(variableBefore.getCaseInstanceId(), variableAfter.getCaseInstanceId());
+    Assert.assertEquals(variableBefore.getErrorMessage(), variableAfter.getErrorMessage());
+    Assert.assertEquals(executionId, variableAfter.getExecutionId());
+    Assert.assertEquals(variableBefore.getId(), variableAfter.getId());
+    Assert.assertEquals(variableBefore.getName(), variableAfter.getName());
+    Assert.assertEquals(variableBefore.getProcessInstanceId(), variableAfter.getProcessInstanceId());
+    Assert.assertEquals(variableBefore.getTaskId(), variableAfter.getTaskId());
+    Assert.assertEquals(variableBefore.getTenantId(), variableAfter.getTenantId());
+    Assert.assertEquals(variableBefore.getTypeName(), variableAfter.getTypeName());
+    Assert.assertEquals(variableBefore.getValue(), variableAfter.getValue());
+  }
+
+  public void assertSuperExecutionOfCaseInstance(String caseInstanceId, String expectedSuperExecutionId) {
+    CaseExecutionEntity calledInstance = (CaseExecutionEntity) processEngine.getCaseService()
+        .createCaseInstanceQuery()
+        .caseInstanceId(caseInstanceId)
+        .singleResult();
+
+    Assert.assertEquals(expectedSuperExecutionId, calledInstance.getSuperExecutionId());
+  }
+
+  public void assertSuperExecutionOfProcessInstance(String processInstance, String expectedSuperExecutionId) {
+    ExecutionEntity calledInstance = (ExecutionEntity) processEngine.getRuntimeService()
+        .createProcessInstanceQuery()
+        .processInstanceId(processInstance)
+        .singleResult();
+
+    Assert.assertEquals(expectedSuperExecutionId, calledInstance.getSuperExecutionId());
   }
 
 }

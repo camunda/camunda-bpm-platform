@@ -15,10 +15,10 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension;
 
+import org.jboss.as.controller.AttributeDefinition;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.jboss.as.controller.AttributeDefinition;
 
 /**
  * An attribute.
@@ -30,9 +30,9 @@ public enum Attribute {
    * always first
    */
   UNKNOWN((String) null),
-  
-  NAME(ModelConstants.NAME),
-  DEFAULT(ModelConstants.DEFAULT);
+
+  NAME(SubsystemAttributeDefinitons.NAME),
+  DEFAULT(SubsystemAttributeDefinitons.DEFAULT);
 
   private final String name;
   private final AttributeDefinition definition;

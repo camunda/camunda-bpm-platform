@@ -20,11 +20,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
  * @author Bernd Rücker
  *
  */
-public class IntermediateCatchLinkEventActivityBehavior extends IntermediateCatchEventActivityBehavior {
-
-  public IntermediateCatchLinkEventActivityBehavior() {
-    super(false);
-  }
+public class IntermediateCatchLinkEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
   @Override
   public void execute(ActivityExecution execution) throws Exception {

@@ -12,11 +12,14 @@
  */
 package org.camunda.bpm.engine.impl.batch.history;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
+import org.camunda.bpm.engine.impl.HistoricBatchQueryProperty;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -26,18 +29,76 @@ public class HistoricBatchQueryImpl extends AbstractQuery<HistoricBatchQuery, Hi
   private static final long serialVersionUID = 1L;
 
   protected String batchId;
+  protected String type;
+  protected Boolean completed;
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
 
   public HistoricBatchQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
 
   public HistoricBatchQuery batchId(String batchId) {
+    ensureNotNull("Batch id", batchId);
     this.batchId = batchId;
     return this;
   }
 
   public String getBatchId() {
     return batchId;
+  }
+
+  public HistoricBatchQuery type(String type) {
+    ensureNotNull("Type", type);
+    this.type = type;
+    return this;
+  }
+
+  public HistoricBatchQuery completed(boolean completed) {
+    this.completed = completed;
+    return this;
+  }
+
+  public HistoricBatchQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public String[] getTenantIds() {
+    return tenantIds;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
+
+  public HistoricBatchQuery withoutTenantId() {
+    this.tenantIds = null;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public HistoricBatchQuery orderById() {
+    return orderBy(HistoricBatchQueryProperty.ID);
+  }
+
+  public HistoricBatchQuery orderByStartTime() {
+    return orderBy(HistoricBatchQueryProperty.START_TIME);
+  }
+
+  public HistoricBatchQuery orderByEndTime() {
+    return orderBy(HistoricBatchQueryProperty.END_TIME);
+  }
+
+  @Override
+  public HistoricBatchQuery orderByTenantId() {
+    return orderBy(HistoricBatchQueryProperty.TENANT_ID);
   }
 
   @Override

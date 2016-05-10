@@ -68,6 +68,9 @@ alter table ACT_RU_INCIDENT
 alter table ACT_RU_INCIDENT
     drop constraint ACT_FK_INC_RCAUSE;
 
+alter table ACT_RU_INCIDENT
+    drop constraint ACT_FK_INC_JOB_DEF;
+
 alter table ACT_RU_AUTHORIZATION
     drop constraint ACT_UNIQ_AUTH_GROUP;
 
@@ -98,6 +101,7 @@ drop index ACT_IDX_INC_EXID;
 drop index ACT_IDX_INC_PROCDEFID;
 drop index ACT_IDX_INC_PROCINSTID;
 drop index ACT_IDX_INC_ROOTCAUSEINCID;
+drop index ACT_IDX_INC_JOB_DEF;
 
 drop index ACT_IDX_METER_LOG;
 drop index ACT_IDX_AUTH_RESOURCE_ID;
@@ -113,6 +117,7 @@ drop index ACT_IDX_EVENT_SUBSCR_EVT_NAME;
 drop index ACT_IDX_PROCDEF_DEPLOYMENT_ID;
 
 drop index ACT_IDX_EXT_TASK_TENANT_ID;
+drop index ACT_IDX_EXT_TASK_PRIORITY;
 drop index ACT_IDX_INC_TENANT_ID;
 drop index ACT_IDX_JOBDEF_TENANT_ID;
 drop index ACT_IDX_JOB_TENANT_ID;
@@ -127,6 +132,8 @@ drop index ACT_IDX_JOB_JOB_DEF_ID;
 drop index ACT_IDX_BATCH_SEED_JOB_DEF;
 drop index ACT_IDX_BATCH_MONITOR_JOB_DEF;
 drop index ACT_IDX_BATCH_JOB_DEF;
+
+drop index ACT_IDX_PROCDEF_VER_TAG;
 
 drop table ACT_GE_PROPERTY if exists;
 drop table ACT_GE_BYTEARRAY if exists;

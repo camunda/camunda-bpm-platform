@@ -31,6 +31,7 @@ public class MockDefinitionBuilder {
   private boolean suspended = false;
   private boolean startFormKey = false;
   private String tenantId = null;
+  private String versionTag = null;
 
   public MockDefinitionBuilder id(String id) {
     this.id = id;
@@ -92,6 +93,11 @@ public class MockDefinitionBuilder {
     return this;
   }
 
+  public MockDefinitionBuilder versionTag(String versionTag) {
+    this.versionTag = versionTag;
+    return this;
+  }
+
   public ProcessDefinition build() {
     ProcessDefinition mockDefinition = mock(ProcessDefinition.class);
     when(mockDefinition.getId()).thenReturn(id);
@@ -106,6 +112,7 @@ public class MockDefinitionBuilder {
     when(mockDefinition.isSuspended()).thenReturn(suspended);
     when(mockDefinition.hasStartFormKey()).thenReturn(startFormKey);
     when(mockDefinition.getTenantId()).thenReturn(tenantId);
+    when(mockDefinition.getVersionTag()).thenReturn(versionTag);
     return mockDefinition;
   }
 }

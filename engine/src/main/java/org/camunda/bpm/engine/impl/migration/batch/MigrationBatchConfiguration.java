@@ -21,6 +21,8 @@ public class MigrationBatchConfiguration {
 
   protected MigrationPlan migrationPlan;
   protected List<String> processInstanceIds;
+  protected boolean isSkipCustomListeners;
+  protected boolean isSkipIoMappings;
 
   public MigrationPlan getMigrationPlan() {
     return migrationPlan;
@@ -38,5 +40,34 @@ public class MigrationBatchConfiguration {
     this.processInstanceIds = processInstanceIds;
   }
 
+  public boolean isSkipCustomListeners() {
+    return isSkipCustomListeners;
+  }
+
+  public void setSkipCustomListeners(boolean isSkipCustomListeners) {
+    this.isSkipCustomListeners = isSkipCustomListeners;
+  }
+
+  public boolean isSkipIoMappings() {
+    return isSkipIoMappings;
+  }
+
+  public void setSkipIoMappings(boolean isSkipIoMappings) {
+    this.isSkipIoMappings = isSkipIoMappings;
+  }
+
+  public static MigrationBatchConfiguration create(MigrationPlan migrationPlan,
+      List<String> processInstanceIds,
+      boolean skipCustomListeners,
+      boolean skipIoMappings) {
+    MigrationBatchConfiguration configuration = new MigrationBatchConfiguration();
+
+    configuration.migrationPlan = migrationPlan;
+    configuration.processInstanceIds = processInstanceIds;
+    configuration.isSkipCustomListeners = skipCustomListeners;
+    configuration.isSkipIoMappings = skipIoMappings;
+
+    return configuration;
+  }
 
 }

@@ -22,6 +22,7 @@ public class MigrationInstructionDto {
 
   protected List<String> sourceActivityIds;
   protected List<String> targetActivityIds;
+  protected Boolean updateEventTrigger;
 
   public List<String> getSourceActivityIds() {
     return sourceActivityIds;
@@ -39,13 +40,27 @@ public class MigrationInstructionDto {
     this.targetActivityIds = targetActivityIds;
   }
 
+  public void setUpdateEventTrigger(Boolean isUpdateEventTrigger) {
+    this.updateEventTrigger = isUpdateEventTrigger;
+  }
+
+  public Boolean isUpdateEventTrigger() {
+    return updateEventTrigger;
+  }
+
   public static MigrationInstructionDto from(MigrationInstruction migrationInstruction) {
-    MigrationInstructionDto dto = new MigrationInstructionDto();
+    if (migrationInstruction != null) {
+      MigrationInstructionDto dto = new MigrationInstructionDto();
 
-    dto.setSourceActivityIds(Collections.singletonList(migrationInstruction.getSourceActivityId()));
-    dto.setTargetActivityIds(Collections.singletonList(migrationInstruction.getTargetActivityId()));
+      dto.setSourceActivityIds(Collections.singletonList(migrationInstruction.getSourceActivityId()));
+      dto.setTargetActivityIds(Collections.singletonList(migrationInstruction.getTargetActivityId()));
+      dto.setUpdateEventTrigger(migrationInstruction.isUpdateEventTrigger());
 
-    return dto;
+      return dto;
+    }
+    else {
+      return null;
+    }
   }
 
 }

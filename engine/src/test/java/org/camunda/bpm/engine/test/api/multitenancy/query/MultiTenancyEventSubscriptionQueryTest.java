@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.api.multitenancy.query;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NullValueException;
@@ -149,6 +150,42 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
     assertThat(eventSubscriptions.size(), is(2));
     assertThat(eventSubscriptions.get(0).getTenantId(), is(TENANT_TWO));
     assertThat(eventSubscriptions.get(1).getTenantId(), is(TENANT_ONE));
+  }
+
+  public void testQueryNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
+    assertThat(query.count(), is(1L));
+  }
+
+  public void testQueryAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
+
+    assertThat(query.count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeEventSubscriptionsWithoutTenantId().count(), is(2L));
+  }
+
+  public void testQueryAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
+
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
+
+    assertThat(query.count(), is(3L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+  }
+
+  public void testQueryDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
+    assertThat(query.count(), is(3L));
   }
 
 }

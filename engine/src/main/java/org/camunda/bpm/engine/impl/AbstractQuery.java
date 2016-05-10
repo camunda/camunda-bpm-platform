@@ -50,7 +50,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   public static final String SORTORDER_ASC = "asc";
   public static final String SORTORDER_DESC = "desc";
 
-  private static enum ResultType {
+  protected enum ResultType {
     LIST, LIST_PAGE, SINGLE_RESULT, COUNT
   }
   protected transient CommandExecutor commandExecutor;

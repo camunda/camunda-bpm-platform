@@ -606,4 +606,25 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incidentStatistic.getIncidentType());
   }
 
+  public void testProcessDefinitionStatisticsProperties() {
+    String resourceName = "org/camunda/bpm/engine/test/api/mgmt/ProcessDefinitionStatisticsQueryTest.testProcessDefinitionStatisticsProperties.bpmn20.xml";
+    String deploymentId = deploymentForTenant("tenant1", resourceName);
+
+    ProcessDefinitionStatistics processDefinitionStatistics = managementService.createProcessDefinitionStatisticsQuery().singleResult();
+
+    assertEquals("testProcess", processDefinitionStatistics.getKey());
+    assertEquals("process name", processDefinitionStatistics.getName());
+    assertEquals("Examples", processDefinitionStatistics.getCategory());
+    assertEquals(null, processDefinitionStatistics.getDescription()); // it is not parsed for the statistics query
+    assertEquals("tenant1", processDefinitionStatistics.getTenantId());
+    assertEquals("v0.1.0", processDefinitionStatistics.getVersionTag());
+    assertEquals(deploymentId, processDefinitionStatistics.getDeploymentId());
+    assertEquals(resourceName, processDefinitionStatistics.getResourceName());
+    assertEquals(null, processDefinitionStatistics.getDiagramResourceName());
+    assertEquals(1, processDefinitionStatistics.getVersion());
+    assertEquals(0, processDefinitionStatistics.getInstances());
+    assertEquals(0, processDefinitionStatistics.getFailedJobs());
+    assertTrue(processDefinitionStatistics.getIncidentStatistics().isEmpty());
+  }
+
 }

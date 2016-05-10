@@ -15,13 +15,15 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler.EventSubscriptionJobConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 
 /**
  * @author Daniel Meyer
  */
-public class ProcessEventJobHandler implements JobHandler {
+public class ProcessEventJobHandler implements JobHandler<EventSubscriptionJobConfiguration> {
 
   public final static String TYPE = "event";
 
@@ -29,16 +31,45 @@ public class ProcessEventJobHandler implements JobHandler {
     return TYPE;
   }
 
-  public void execute(String configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
+  public void execute(EventSubscriptionJobConfiguration configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
     // lookup subscription:
+    String eventSubscriptionId = configuration.getEventSubscriptionId();
     EventSubscriptionEntity eventSubscription = commandContext.getEventSubscriptionManager()
-      .findEventSubscriptionById(configuration);
+      .findEventSubscriptionById(eventSubscriptionId);
 
     // if event subscription is null, ignore
     if(eventSubscription != null) {
       eventSubscription.eventReceived(null, false);
     }
 
+  }
+
+  @Override
+  public EventSubscriptionJobConfiguration newConfiguration(String canonicalString) {
+    return new EventSubscriptionJobConfiguration(canonicalString);
+  }
+
+  public static class EventSubscriptionJobConfiguration implements JobHandlerConfiguration {
+
+    protected String eventSubscriptionId;
+
+    public EventSubscriptionJobConfiguration(String eventSubscriptionId) {
+      this.eventSubscriptionId = eventSubscriptionId;
+    }
+
+    public String getEventSubscriptionId() {
+      return eventSubscriptionId;
+    }
+
+    @Override
+    public String toCanonicalString() {
+      return eventSubscriptionId;
+    }
+
+  }
+
+  public void onDelete(EventSubscriptionJobConfiguration configuration, JobEntity jobEntity) {
+    // do nothing
   }
 
 }

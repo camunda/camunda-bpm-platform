@@ -24,21 +24,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.authorization.Permission;
-import org.camunda.bpm.engine.authorization.Resource;
-import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.GroupQuery;
-import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.identity.UserQuery;
-import org.camunda.bpm.engine.impl.AbstractQuery;
-import org.camunda.bpm.engine.impl.UserQueryImpl;
-import org.camunda.bpm.engine.impl.UserQueryProperty;
-import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
-import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
-
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -50,6 +35,23 @@ import javax.naming.ldap.Control;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.SortControl;
+
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.Tenant;
+import org.camunda.bpm.engine.identity.TenantQuery;
+import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.identity.UserQuery;
+import org.camunda.bpm.engine.impl.AbstractQuery;
+import org.camunda.bpm.engine.impl.UserQueryImpl;
+import org.camunda.bpm.engine.impl.UserQueryProperty;
+import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
+import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 
 /**
  * <p>LDAP {@link ReadOnlyIdentityProvider}.</p>
@@ -605,5 +607,23 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
         }
     }
     return sb.toString();
+  }
+
+  @Override
+  public TenantQuery createTenantQuery() {
+    // TODO support multi-tenancy - CAM-5876
+    throw new UnsupportedOperationException("Multi-Tenancy is not supported for LDAP plugin.");
+  }
+
+  @Override
+  public TenantQuery createTenantQuery(CommandContext commandContext) {
+    // TODO support multi-tenancy - CAM-5876
+    throw new UnsupportedOperationException("Multi-Tenancy is not supported for LDAP plugin.");
+  }
+
+  @Override
+  public Tenant findTenantById(String id) {
+    // TODO support multi-tenancy - CAM-5876
+    throw new UnsupportedOperationException("Multi-Tenancy is not supported for LDAP plugin.");
   }
 }

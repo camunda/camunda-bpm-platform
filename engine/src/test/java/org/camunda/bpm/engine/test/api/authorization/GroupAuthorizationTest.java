@@ -19,6 +19,7 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -61,11 +62,13 @@ public class GroupAuthorizationTest extends AuthorizationTest {
         AuthorizationManager authorizationManager = spyOnSession(commandContext, AuthorizationManager.class);
 
         TaskQueryImpl taskQuery = (TaskQueryImpl) spy(processEngine.getTaskService().createTaskQuery());
+        AuthorizationCheck authCheck = spy(new AuthorizationCheck());
+        when(taskQuery.getAuthCheck()).thenReturn(authCheck);
 
         taskQuery.list();
 
         verify(authorizationManager).filterAuthenticatedGroupIds(eq(testGroupIds));
-        verify(taskQuery).setAuthGroupIds(eq(Collections.<String>emptyList()));
+        verify(authCheck).setAuthGroupIds(eq(Collections.<String>emptyList()));
 
         return null;
       }
@@ -80,11 +83,13 @@ public class GroupAuthorizationTest extends AuthorizationTest {
         AuthorizationManager authorizationManager = spyOnSession(commandContext, AuthorizationManager.class);
 
         TaskQueryImpl taskQuery = (TaskQueryImpl) spy(processEngine.getTaskService().createTaskQuery());
+        AuthorizationCheck authCheck = spy(new AuthorizationCheck());
+        when(taskQuery.getAuthCheck()).thenReturn(authCheck);
 
         taskQuery.list();
 
         verify(authorizationManager).filterAuthenticatedGroupIds(eq(testGroupIds));
-        verify(taskQuery).setAuthGroupIds(eq(testGroupIds.subList(0, 1)));
+        verify(authCheck).setAuthGroupIds(eq(testGroupIds.subList(0, 1)));
 
         return null;
       }
@@ -101,11 +106,13 @@ public class GroupAuthorizationTest extends AuthorizationTest {
         AuthorizationManager authorizationManager = spyOnSession(commandContext, AuthorizationManager.class);
 
         TaskQueryImpl taskQuery = (TaskQueryImpl) spy(processEngine.getTaskService().createTaskQuery());
+        AuthorizationCheck authCheck = spy(new AuthorizationCheck());
+        when(taskQuery.getAuthCheck()).thenReturn(authCheck);
 
         taskQuery.list();
 
         verify(authorizationManager).filterAuthenticatedGroupIds(eq(testGroupIds));
-        verify(taskQuery).setAuthGroupIds((List<String>) argThat(containsInAnyOrder(testGroupIds.toArray())));
+        verify(authCheck).setAuthGroupIds((List<String>) argThat(containsInAnyOrder(testGroupIds.toArray())));
 
         return null;
       }
@@ -120,11 +127,13 @@ public class GroupAuthorizationTest extends AuthorizationTest {
         AuthorizationManager authorizationManager = spyOnSession(commandContext, AuthorizationManager.class);
 
         TaskQueryImpl taskQuery = (TaskQueryImpl) spy(processEngine.getTaskService().createTaskQuery());
+        AuthorizationCheck authCheck = spy(new AuthorizationCheck());
+        when(taskQuery.getAuthCheck()).thenReturn(authCheck);
 
         taskQuery.list();
 
         verify(authorizationManager).filterAuthenticatedGroupIds(eq((List<String>) null));
-        verify(taskQuery).setAuthGroupIds(eq(Collections.<String>emptyList()));
+        verify(authCheck).setAuthGroupIds(eq(Collections.<String>emptyList()));
 
         return null;
       }

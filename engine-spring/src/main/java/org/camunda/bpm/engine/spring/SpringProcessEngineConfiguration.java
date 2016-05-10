@@ -51,6 +51,7 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
   protected PlatformTransactionManager transactionManager;
   protected String deploymentName = "SpringAutoDeployment";
   protected Resource[] deploymentResources = new Resource[0];
+  protected String deploymentTenantId;
 
 
   public SpringProcessEngineConfiguration() {
@@ -111,7 +112,8 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
       DeploymentBuilder deploymentBuilder = repositoryService
         .createDeployment()
         .enableDuplicateFiltering(false)
-        .name(deploymentName);
+        .name(deploymentName)
+        .tenantId(deploymentTenantId);
 
       for (Resource resource : deploymentResources) {
         String resourceName = null;
@@ -180,5 +182,13 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
 
   public void setDeploymentResources(Resource[] deploymentResources) {
     this.deploymentResources = deploymentResources;
+  }
+
+  public String getDeploymentTenantId() {
+    return deploymentTenantId;
+  }
+
+  public void setDeploymentTenantId(String deploymentTenantId) {
+    this.deploymentTenantId = deploymentTenantId;
   }
 }

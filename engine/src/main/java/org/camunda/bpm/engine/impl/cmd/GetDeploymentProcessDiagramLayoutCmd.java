@@ -19,10 +19,10 @@ import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.diagram.ProcessDiagramLayoutFactory;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.repository.DiagramLayout;
 
@@ -52,8 +52,9 @@ public class GetDeploymentProcessDiagramLayoutCmd implements Command<DiagramLayo
         .getDeploymentCache()
         .findDeployedProcessDefinitionById(processDefinitionId);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadProcessDefinition(processDefinition);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadProcessDefinition(processDefinition);
+    }
 
     InputStream processModelStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
       public InputStream call() throws Exception {

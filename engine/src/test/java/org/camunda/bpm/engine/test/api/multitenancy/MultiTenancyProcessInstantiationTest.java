@@ -18,6 +18,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -228,6 +230,129 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     } catch (BadUserRequestException e) {
       assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
     }
+  }
+
+  public void testStartProcessInstanceByKeyWithoutTenantIdNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    deployment(PROCESS);
+
+    runtimeService.createProcessInstanceByKey("testProcess")
+      .processDefinitionWithoutTenantId()
+      .execute();
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    assertThat(query.count(), is(1L));
+  }
+
+  public void testFailToStartProcessInstanceByKeyNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    deploymentForTenant(TENANT_ONE, PROCESS);
+
+    try {
+      runtimeService.createProcessInstanceByKey("testProcess")
+        .execute();
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("no processes deployed with key 'testProcess'"));
+    }
+  }
+
+  public void testFailToStartProcessInstanceByKeyWithTenantIdNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    deploymentForTenant(TENANT_ONE, PROCESS);
+
+    try {
+      runtimeService.createProcessInstanceByKey("testProcess")
+        .processDefinitionTenantId(TENANT_ONE)
+        .execute();
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("Cannot create an instance of the process definition"));
+    }
+  }
+
+  public void testFailToStartProcessInstanceByIdNoAuthenticatedTenants() {
+    deploymentForTenant(TENANT_ONE, PROCESS);
+
+    ProcessDefinition processDefinition = repositoryService
+      .createProcessDefinitionQuery()
+      .singleResult();
+
+    identityService.setAuthentication("user", null, null);
+
+    try {
+      runtimeService.createProcessInstanceById(processDefinition.getId())
+        .execute();
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("Cannot create an instance of the process definition"));
+    }
+  }
+
+  public void testStartProcessInstanceByKeyWithTenantIdAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    deploymentForTenant(TENANT_ONE, PROCESS);
+    deploymentForTenant(TENANT_TWO, PROCESS);
+
+    runtimeService.createProcessInstanceByKey("testProcess")
+      .processDefinitionTenantId(TENANT_ONE)
+      .execute();
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    assertThat(query.count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
+  public void testStartProcessInstanceByIdAuthenticatedTenant() {
+    deploymentForTenant(TENANT_ONE, PROCESS);
+
+    ProcessDefinition processDefinition = repositoryService
+        .createProcessDefinitionQuery()
+        .singleResult();
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    runtimeService.createProcessInstanceById(processDefinition.getId())
+      .execute();
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    assertThat(query.count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
+  public void testStartProcessInstanceByKeyWithAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    deploymentForTenant(TENANT_ONE, PROCESS);
+    deploymentForTenant(TENANT_TWO, PROCESS);
+
+    runtimeService.createProcessInstanceByKey("testProcess").execute();
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    assertThat(query.count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
+  public void testStartProcessInstanceByKeyWithTenantIdDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    deploymentForTenant(TENANT_ONE, PROCESS);
+
+    runtimeService.createProcessInstanceByKey("testProcess")
+      .processDefinitionTenantId(TENANT_ONE)
+      .execute();
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    assertThat(query.count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
 }

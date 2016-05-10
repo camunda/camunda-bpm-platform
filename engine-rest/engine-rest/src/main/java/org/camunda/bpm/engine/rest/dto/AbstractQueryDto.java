@@ -64,6 +64,7 @@ public abstract class AbstractQueryDto<T extends Query<?, ?>>  extends AbstractS
     super(objectMapper, queryParameters);
   }
 
+
   @CamundaQueryParam("sortBy")
   public void setSortBy(String sortBy) {
     if (!isValidSortByValue(sortBy)) {

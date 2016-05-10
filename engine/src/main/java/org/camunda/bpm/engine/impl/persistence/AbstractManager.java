@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricBatchManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
@@ -56,6 +57,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 
@@ -169,6 +171,10 @@ public abstract class AbstractManager implements Session {
     return getSession(HistoricIncidentManager.class);
   }
 
+  protected HistoricIdentityLinkLogManager getHistoricIdentityLinkManager() {
+    return getSession(HistoricIdentityLinkLogManager.class);
+  }
+  
   protected HistoricJobLogManager getHistoricJobLogManager() {
     return getSession(HistoricJobLogManager.class);
   }
@@ -209,6 +215,10 @@ public abstract class AbstractManager implements Session {
     return getSession(HistoricBatchManager.class);
   }
 
+  protected TenantManager getTenantManager() {
+    return getSession(TenantManager.class);
+  }
+
   public void close() {
   }
 
@@ -233,7 +243,7 @@ public abstract class AbstractManager implements Session {
     getAuthorizationManager().checkAuthorization(permission, resource, resourceId);
   }
 
-  protected boolean isAuthorizationEnabled() {
+  public boolean isAuthorizationEnabled() {
     return Context.getProcessEngineConfiguration().isAuthorizationEnabled();
   }
 

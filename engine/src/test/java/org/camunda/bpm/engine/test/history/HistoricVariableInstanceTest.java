@@ -1506,7 +1506,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment
-  public void FAILING_testForkParallelGatewayTreeCompaction() {
+  public void testForkParallelGatewayTreeCompaction() {
     // given
     runtimeService.startProcessInstanceByKey("process");
 
@@ -1533,7 +1533,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment
-  public void FAILING_testNestedForkParallelGatewayTreeCompaction() {
+  public void testNestedForkParallelGatewayTreeCompaction() {
     // given
     runtimeService.startProcessInstanceByKey("process");
 

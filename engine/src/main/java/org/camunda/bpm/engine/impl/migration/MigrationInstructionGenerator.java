@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.impl.migration;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.migration.validation.activity.MigrationActivityValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstruction;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstructions;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 
@@ -39,6 +39,14 @@ public interface MigrationInstructionGenerator {
   MigrationInstructionGenerator migrationActivityValidators(List<MigrationActivityValidator> migrationActivityValidators);
 
   /**
+   * Sets the list of migration instruction validators currently used by the process engine.
+   * Implementations may use these to restrict the search space.
+   *
+   * @return this
+   */
+  MigrationInstructionGenerator migrationInstructionValidators(List<MigrationInstructionValidator> migrationInstructionValidators);
+
+  /**
    * Generate all migration instructions for mapped activities between two process definitions. A activity can be mapped
    * if the {@link MigrationActivityMatcher} matches it with an activity from the target process definition.
    *
@@ -47,6 +55,7 @@ public interface MigrationInstructionGenerator {
    * @return the list of generated instructions
    */
   ValidatingMigrationInstructions generate(ProcessDefinitionImpl sourceProcessDefinition,
-                                           ProcessDefinitionImpl targetProcessDefinition);
+                                           ProcessDefinitionImpl targetProcessDefinition,
+                                           boolean updateEventTriggers);
 
 }

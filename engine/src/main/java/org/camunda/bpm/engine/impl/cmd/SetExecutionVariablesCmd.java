@@ -16,8 +16,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
@@ -43,8 +43,7 @@ public class SetExecutionVariablesCmd extends AbstractSetVariableCmd {
 
     ensureNotNull("execution " + entityId + " doesn't exist", "execution", execution);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateProcessInstance(execution);
+    checkSetExecutionVariables(execution);
 
     return execution;
   }
@@ -53,6 +52,12 @@ public class SetExecutionVariablesCmd extends AbstractSetVariableCmd {
     ExecutionEntity execution = (ExecutionEntity) scope;
     commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), execution.getId(),
         null, PropertyChange.EMPTY_CHANGE);
+  }
+
+  protected void checkSetExecutionVariables(ExecutionEntity execution) {
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkUpdateProcessInstance(execution);
+    }
   }
 }
 

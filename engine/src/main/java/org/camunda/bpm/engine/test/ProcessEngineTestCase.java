@@ -16,8 +16,6 @@ package org.camunda.bpm.engine.test;
 import java.io.FileNotFoundException;
 import java.util.Date;
 
-import junit.framework.TestCase;
-
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.FilterService;
@@ -33,6 +31,8 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.test.ProcessEngineAssert;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+
+import junit.framework.TestCase;
 
 
 /** Convenience for ProcessEngine and services initialization in the form of a JUnit base class.
@@ -82,6 +82,8 @@ public class ProcessEngineTestCase extends TestCase {
   protected AuthorizationService authorizationService;
   protected CaseService caseService;
 
+  protected boolean skipTest = false;
+
   /** uses 'camunda.cfg.xml' as it's configuration resource */
   public ProcessEngineTestCase() {
   }
@@ -99,7 +101,20 @@ public class ProcessEngineTestCase extends TestCase {
       initializeServices();
     }
 
-    deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
+    boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, getClass(), getName());
+    // ignore test case when current history level is too low
+    skipTest = !hasRequiredHistoryLevel;
+
+    if (!skipTest) {
+      deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
+    }
+  }
+
+  @Override
+  protected void runTest() throws Throwable {
+    if (!skipTest) {
+      super.runTest();
+    }
   }
 
   protected void initializeProcessEngine() {

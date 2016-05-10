@@ -86,6 +86,9 @@
       inner join ${prefix}ACT_ID_MEMBERSHIP M on RES.ID_ = M.GROUP_ID_
       inner join ${prefix}ACT_ID_USER U on M.USER_ID_ = U.ID_
     </if>
+    <if test="tenantId != null">
+      inner join ${prefix}ACT_ID_TENANT_MEMBER TM on RES.ID_ = TM.GROUP_ID_
+    </if>
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
@@ -111,6 +114,9 @@
       </if>
       <if test="procDefId != null">
         and exists (select ID_ from ${prefix} ACT_RU_IDENTITYLINK where PROC_DEF_ID_ = #{procDefId} and GROUP_ID_=RES.ID_ )
+      </if>
+      <if test="tenantId != null">
+        and TM.TENANT_ID_ = #{tenantId}
       </if>
       
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />

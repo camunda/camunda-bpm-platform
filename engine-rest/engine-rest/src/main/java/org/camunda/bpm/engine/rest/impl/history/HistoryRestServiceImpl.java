@@ -12,12 +12,24 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
+import java.util.List;
+
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricActivityStatisticsRestService;
+import org.camunda.bpm.engine.rest.history.HistoricBatchRestService;
 import org.camunda.bpm.engine.rest.history.HistoricCaseActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricCaseInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricDecisionInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricDetailRestService;
+import org.camunda.bpm.engine.rest.history.HistoricIdentityLinkLogRestService;
 import org.camunda.bpm.engine.rest.history.HistoricIncidentRestService;
 import org.camunda.bpm.engine.rest.history.HistoricJobLogRestService;
 import org.camunda.bpm.engine.rest.history.HistoricProcessInstanceRestService;
@@ -26,6 +38,7 @@ import org.camunda.bpm.engine.rest.history.HistoricVariableInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoryRestService;
 import org.camunda.bpm.engine.rest.history.UserOperationLogRestService;
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
+import org.camunda.bpm.engine.rest.sub.batch.BatchResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -75,12 +88,20 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
     return new HistoricIncidentRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
+  public HistoricIdentityLinkLogRestService getIdentityLinkService() {
+    return new HistoricIdentityLinkLogRestServiceImpl(getObjectMapper(), getProcessEngine());
+  }
+
   public HistoricJobLogRestService getJobLogService() {
     return new HistoricJobLogRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
   public HistoricDecisionInstanceRestService getDecisionInstanceService() {
     return new HistoricDecisionInstanceRestServiceImpl(getObjectMapper(), getProcessEngine());
+  }
+
+  public HistoricBatchRestService getBatchService() {
+    return new HistoricBatchRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
 }

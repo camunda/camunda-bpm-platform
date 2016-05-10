@@ -12,6 +12,10 @@
  */
 package org.camunda.bpm.engine.migration;
 
+import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
+
 /**
  * @author Thorben Lindhauer
  *
@@ -23,18 +27,21 @@ public interface MigrationPlanBuilder {
    * process definitions. By default, this is given if two activities are both user tasks, are on the same
    * level of sub process, and have the same id.
    */
-  MigrationPlanBuilder mapEqualActivities();
+  MigrationInstructionsBuilder mapEqualActivities();
 
   /**
    * Adds a migration instruction that maps activity instances of the source activity (of the source process definition)
    * to activity instances of the target activity (of the target process definition)
    */
-  MigrationPlanBuilder mapActivities(String sourceActivityId, String targetActivityId);
+  MigrationInstructionBuilder mapActivities(String sourceActivityId, String targetActivityId);
 
   /**
    * @return a migration plan with all previously specified instructions
    *
    * @throws MigrationPlanValidationException if the migration plan contains instructions that are not valid
+   * @throws AuthorizationException
+   *         if the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}
+   *         for both, source and target process definition.
    */
   MigrationPlan build();
 

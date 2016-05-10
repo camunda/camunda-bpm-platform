@@ -18,13 +18,15 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
 
 
 /**
  * @author Tom Baeyens
  */
-public class TweetExceptionHandler implements JobHandler {
+public class TweetExceptionHandler implements JobHandler<JobHandlerConfiguration> {
 
 private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
@@ -36,13 +38,26 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     return TYPE;
   }
 
-  public void execute(String configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
+  public void execute(JobHandlerConfiguration configuration, CoreExecution execution, CommandContext commandContext, String tenantId) {
     if (exceptionsRemaining.decrementAndGet() >= 0) {
       throw new RuntimeException("exception remaining: "+exceptionsRemaining);
     }
     LOG.info("no more exceptions to throw.");
   }
 
+  @Override
+  public JobHandlerConfiguration newConfiguration(String canonicalString) {
+    return new JobHandlerConfiguration() {
+      @Override
+      public String toCanonicalString() {
+        return null;
+      }
+    };
+  }
+
+  public void onDelete(JobHandlerConfiguration configuration, JobEntity jobEntity) {
+    // do nothing
+  }
 
   public int getExceptionsRemaining() {
     return exceptionsRemaining.get();

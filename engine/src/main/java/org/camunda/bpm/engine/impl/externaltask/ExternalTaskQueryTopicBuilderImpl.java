@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
 /**
  * @author Thorben Lindhauer
+ * @author Christopher Zell
  *
  */
 public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopicBuilder {
@@ -33,21 +34,26 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
 
   protected String workerId;
   protected int maxTasks;
+  /**
+   * Indicates that priority is enabled.
+   */
+  protected boolean usePriority;
 
   protected Map<String, TopicFetchInstruction> instructions;
 
   protected TopicFetchInstruction currentInstruction;
 
-  public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor, String workerId, int maxTasks) {
+  public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor, String workerId, int maxTasks, boolean usePriority) {
     this.commandExecutor = commandExecutor;
     this.workerId = workerId;
     this.maxTasks = maxTasks;
+    this.usePriority = usePriority;
     this.instructions = new HashMap<String, TopicFetchInstruction>();
   }
 
   public List<LockedExternalTask> execute() {
     submitCurrentInstruction();
-    return commandExecutor.execute(new FetchExternalTasksCmd(workerId, maxTasks, instructions));
+    return commandExecutor.execute(new FetchExternalTasksCmd(workerId, maxTasks, instructions, usePriority));
   }
 
   public ExternalTaskQueryTopicBuilder topic(String topicName, long lockDuration) {

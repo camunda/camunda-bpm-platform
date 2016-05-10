@@ -55,7 +55,7 @@ public class ProcessApplicationExecutionListenerTest extends AbstractFoxPlatform
 
     Integer listenerInvocationCount = (Integer) runtimeService.getVariable(processInstance.getId(), ExecutionListenerProcessApplication.LISTENER_INVOCATION_COUNT);
     Assert.assertNotNull(listenerInvocationCount);
-    Assert.assertEquals(4, listenerInvocationCount.intValue());
+    Assert.assertEquals(5, listenerInvocationCount.intValue());
   }
 
 }

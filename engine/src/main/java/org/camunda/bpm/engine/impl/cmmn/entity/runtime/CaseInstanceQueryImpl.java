@@ -45,10 +45,14 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
   protected String superCaseInstanceId;
   protected String subCaseInstanceId;
 
+  protected boolean isTenantIdSet = false;
+  protected String[] tenantIds;
+
   // Not used by end-users, but needed for dynamic ibatis query
   protected Boolean required;
   protected Boolean repeatable;
   protected Boolean repetition;
+
 
   public CaseInstanceQueryImpl() {
   }
@@ -111,6 +115,19 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     return this;
   }
 
+  public CaseInstanceQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  public CaseInstanceQuery withoutTenantId() {
+    tenantIds = null;
+    isTenantIdSet = true;
+    return this;
+  }
+
   public CaseInstanceQuery active() {
     state = CaseExecutionState.ACTIVE;
     return this;
@@ -141,6 +158,11 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
   public CaseInstanceQuery orderByCaseDefinitionId() {
     orderBy(CaseInstanceQueryProperty.CASE_DEFINITION_ID);
+    return this;
+  }
+
+  public CaseInstanceQuery orderByTenantId() {
+    orderBy(CaseInstanceQueryProperty.TENANT_ID);
     return this;
   }
 

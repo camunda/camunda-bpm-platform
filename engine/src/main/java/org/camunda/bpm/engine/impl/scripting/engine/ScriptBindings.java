@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.script.Bindings;
+import javax.script.ScriptEngine;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -54,7 +55,21 @@ public class ScriptBindings implements Bindings {
    * This list contains the keywords for JUEL, Javascript and Groovy.
    */
   protected static final Set<String> UNSTORED_KEYS =
-    new HashSet<String>(Arrays.asList("out", "out:print", "lang:import", "context", "elcontext", "print", "println"));
+    new HashSet<String>(Arrays.asList(
+      "out",
+      "out:print",
+      "lang:import",
+      "context",
+      "elcontext",
+      "print",
+      "println",
+      "S", // Spin Internal Variable
+      "XML", // Spin Internal Variable
+      "JSON", // Spin Internal Variable
+      ScriptEngine.ARGV, // jRuby is only setting this variable and execution instead of exporting any other variables
+      "execution",
+      "__doc__" // do not export python doc string
+      ));
 
   protected List<Resolver> scriptResolvers;
   protected VariableScope variableScope;

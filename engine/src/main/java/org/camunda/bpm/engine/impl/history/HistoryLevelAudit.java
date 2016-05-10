@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.FORM_P
 import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.VARIABLE_INSTANCE_CREATE;
 import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.VARIABLE_INSTANCE_DELETE;
 import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.VARIABLE_INSTANCE_UPDATE;
+import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.VARIABLE_INSTANCE_MIGRATE;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
@@ -39,6 +40,7 @@ public class HistoryLevelAudit extends HistoryLevelActivity {
     return super.isHistoryEventProduced(eventType, entity)
         || VARIABLE_INSTANCE_CREATE == eventType
         || VARIABLE_INSTANCE_UPDATE == eventType
+        || VARIABLE_INSTANCE_MIGRATE == eventType
         || VARIABLE_INSTANCE_DELETE == eventType
 
         || FORM_PROPERTY_UPDATE == eventType

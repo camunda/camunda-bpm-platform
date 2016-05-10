@@ -122,6 +122,21 @@ create table ACT_HI_DETAIL (
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
+create table ACT_HI_IDENTITYLINK (
+    ID_ varchar(64) not null,
+    TIMESTAMP_ timestamp not null,
+    TYPE_ varchar(255),
+    USER_ID_ varchar(255),
+    GROUP_ID_ varchar(255),
+    TASK_ID_ varchar(64),
+    PROC_DEF_ID_ varchar(64),
+    OPERATION_TYPE_ varchar(64),
+    ASSIGNER_ID_ varchar(64),
+    PROC_DEF_KEY_ varchar(255),
+    TENANT_ID_ varchar(64),
+    primary key (ID_)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+
 create table ACT_HI_COMMENT (
     ID_ varchar(64) not null,
     TYPE_ varchar(255),
@@ -192,6 +207,7 @@ create table ACT_HI_INCIDENT (
   CONFIGURATION_ varchar(255),
   INCIDENT_STATE_ integer,
   TENANT_ID_ varchar(64),
+  JOB_DEF_ID_ varchar(64),
   primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
@@ -222,7 +238,7 @@ create table ACT_HI_JOB_LOG (
 create table ACT_HI_BATCH (
     ID_ varchar(64) not null,
     TYPE_ varchar(255),
-    SIZE_ integer,
+    TOTAL_JOBS_ integer,
     JOBS_PER_SEED_ integer,
     INVOCATIONS_PER_JOB_ integer,
     SEED_JOB_DEF_ID_ varchar(64),
@@ -255,7 +271,9 @@ create index ACT_IDX_HI_DETAIL_TIME on ACT_HI_DETAIL(TIME_);
 create index ACT_IDX_HI_DETAIL_NAME on ACT_HI_DETAIL(NAME_);
 create index ACT_IDX_HI_DETAIL_TASK_ID on ACT_HI_DETAIL(TASK_ID_);
 create index ACT_IDX_HI_DETAIL_TENANT_ID on ACT_HI_DETAIL(TENANT_ID_);
-
+create index ACT_IDX_HI_IDENT_LNK_USER on ACT_HI_IDENTITYLINK(USER_ID_);
+create index ACT_IDX_HI_IDENT_LNK_GROUP on ACT_HI_IDENTITYLINK(GROUP_ID_);
+create index ACT_IDX_HI_IDENT_LNK_TENANT_ID on ACT_HI_IDENTITYLINK(TENANT_ID_);
 create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_VARINST(PROC_INST_ID_);
 create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_VARINST(NAME_, VAR_TYPE_);
 create index ACT_IDX_HI_CASEVAR_CASE_INST on ACT_HI_VARINST(CASE_INST_ID_);
@@ -267,3 +285,6 @@ create index ACT_IDX_HI_JOB_LOG_PROCINST on ACT_HI_JOB_LOG(PROCESS_INSTANCE_ID_)
 create index ACT_IDX_HI_JOB_LOG_PROCDEF on ACT_HI_JOB_LOG(PROCESS_DEF_ID_);
 create index ACT_IDX_HI_JOB_LOG_TENANT_ID on ACT_HI_JOB_LOG(TENANT_ID_);
 create index ACT_IDX_HI_JOB_LOG_JOB_DEF_ID on ACT_HI_JOB_LOG(JOB_DEF_ID_);
+
+create index ACT_IDX_HI_OP_LOG_PROCINST on ACT_HI_OP_LOG(PROC_INST_ID_);
+create index ACT_IDX_HI_OP_LOG_PROCDEF on ACT_HI_OP_LOG(PROC_DEF_ID_);

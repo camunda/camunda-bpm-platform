@@ -13,11 +13,6 @@
 
 package org.camunda.bpm.engine.test.api.repository.diagram;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -35,15 +30,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.apache.commons.io.FileUtils;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.bpmn.diagram.ProcessDiagramLayoutFactory;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.DiagramLayout;
 import org.camunda.bpm.engine.repository.DiagramNode;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -79,7 +79,7 @@ public class ProcessDiagramRetrievalTest {
   private static final boolean OVERWRITE_EXPECTED_HTML_FILES = false;
   
   @Rule
-  public ProcessEngineRule activitiRule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine(), true);
+  public ProcessEngineRule activitiRule = new ProvidedProcessEngineRule();
 
   /**
    * Provides a list of parameters for

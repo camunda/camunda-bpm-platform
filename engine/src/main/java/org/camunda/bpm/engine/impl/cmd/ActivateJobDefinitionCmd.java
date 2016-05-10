@@ -11,10 +11,10 @@
  * limitations under the License.
  */package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.Date;
-
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
+import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
+import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 
 /**
@@ -22,22 +22,26 @@ import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
  */
 public class ActivateJobDefinitionCmd extends AbstractSetJobDefinitionStateCmd {
 
-  public ActivateJobDefinitionCmd(String jobDefinitionId, String processDefinitionId, String processDefinitionKey, boolean includeJobs, Date executionDate) {
-    super(jobDefinitionId, processDefinitionId, processDefinitionKey, includeJobs, executionDate);
+  public ActivateJobDefinitionCmd(UpdateJobDefinitionSuspensionStateBuilderImpl builder) {
+    super(builder);
   }
 
+  @Override
   protected SuspensionState getNewSuspensionState() {
     return SuspensionState.ACTIVE;
   }
 
+  @Override
   protected String getDelayedExecutionJobHandlerType() {
     return TimerActivateJobDefinitionHandler.TYPE;
   }
 
-  protected ActivateJobCmd getNextCommand() {
-    return new ActivateJobCmd(null, jobDefinitionId, null, processDefinitionId, processDefinitionKey);
+  @Override
+  protected ActivateJobCmd getNextCommand(UpdateJobSuspensionStateBuilderImpl jobCommandBuilder) {
+    return new ActivateJobCmd(jobCommandBuilder);
   }
 
+  @Override
   protected String getLogEntryOperation() {
     return UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB_DEFINITION;
   }

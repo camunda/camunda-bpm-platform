@@ -23,6 +23,8 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP_MEMBERSHIP;
+import static org.camunda.bpm.engine.authorization.Resources.TENANT;
+import static org.camunda.bpm.engine.authorization.Resources.TENANT_MEMBERSHIP;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestUtil.assertExceptionInfo;
 
@@ -30,12 +32,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TenantEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.junit.Assert;
@@ -61,7 +64,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
     basePerms.setResource(USER);
     basePerms.setResourceId(ANY);
-    basePerms.addPermission(ALL); // add all then remove 'crate'
+    basePerms.addPermission(ALL); // add all then remove 'create'
     basePerms.removePermission(CREATE);
     authorizationService.saveAuthorization(basePerms);
 
@@ -169,7 +172,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
     basePerms.setResource(GROUP);
     basePerms.setResourceId(ANY);
-    basePerms.addPermission(ALL); // add all then remove 'crate'
+    basePerms.addPermission(ALL); // add all then remove 'create'
     basePerms.removePermission(CREATE);
     authorizationService.saveAuthorization(basePerms);
 
@@ -273,6 +276,113 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
   }
 
+  public void testTenantCreateAuthorizations() {
+
+    // add base permission which allows nobody to create tenants:
+    Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
+    basePerms.setResource(TENANT);
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'create'
+    basePerms.removePermission(CREATE);
+    authorizationService.saveAuthorization(basePerms);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(jonny2);
+
+    try {
+      identityService.newTenant("tenant");
+
+      fail("exception expected");
+    } catch (AuthorizationException e) {
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
+      assertEquals(jonny2, e.getUserId());
+      assertExceptionInfo(CREATE.getName(), TENANT.resourceName(), null, info);
+    }
+
+    // circumvent auth check to get new transient userobject
+    Tenant tenant = new TenantEntity("tenant");
+
+    try {
+      identityService.saveTenant(tenant);
+      fail("exception expected");
+
+    } catch (AuthorizationException e) {
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
+      assertEquals(jonny2, e.getUserId());
+      assertExceptionInfo(CREATE.getName(), TENANT.resourceName(), null, info);
+    }
+  }
+
+  public void testTenantDeleteAuthorizations() {
+
+    // create tenant
+    Tenant tenant = new TenantEntity("tenant");
+    identityService.saveTenant(tenant);
+
+    // create global auth
+    Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
+    basePerms.setResource(TENANT);
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL);
+    basePerms.removePermission(DELETE); // revoke delete
+    authorizationService.saveAuthorization(basePerms);
+
+    // turn on authorization
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(jonny2);
+
+    try {
+      identityService.deleteTenant("tenant");
+      fail("exception expected");
+
+    } catch (AuthorizationException e) {
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
+      assertEquals(jonny2, e.getUserId());
+      assertExceptionInfo(DELETE.getName(), TENANT.resourceName(), "tenant", info);
+    }
+  }
+
+  public void testTenantUpdateAuthorizations() {
+
+    // create tenant
+    Tenant tenant = new TenantEntity("tenant");
+    identityService.saveTenant(tenant);
+
+    // create global auth
+    Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
+    basePerms.setResource(TENANT);
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL);
+    basePerms.removePermission(UPDATE); // revoke update
+    authorizationService.saveAuthorization(basePerms);
+
+    // turn on authorization
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(jonny2);
+
+    // fetch user:
+    tenant = identityService.createTenantQuery().singleResult();
+    tenant.setName("newName");
+
+    try {
+      identityService.saveTenant(tenant);
+
+      fail("exception expected");
+    } catch (AuthorizationException e) {
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
+      assertEquals(jonny2, e.getUserId());
+      assertExceptionInfo(UPDATE.getName(), TENANT.resourceName(), "tenant", info);
+    }
+
+    // but I can create a new tenant:
+    Tenant newTenant = identityService.newTenant("newTenant");
+    identityService.saveTenant(newTenant);
+  }
+
   public void testMembershipCreateAuthorizations() {
 
     User jonny1 = identityService.newUser("jonny1");
@@ -332,6 +442,130 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(DELETE.getName(), GROUP_MEMBERSHIP.resourceName(), "group1", info);
+    }
+  }
+
+  public void testTenantUserMembershipCreateAuthorizations() {
+
+    User jonny1 = identityService.newUser("jonny1");
+    identityService.saveUser(jonny1);
+
+    Tenant tenant1 = identityService.newTenant("tenant1");
+    identityService.saveTenant(tenant1);
+
+    // add base permission which allows nobody to create memberships
+    Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
+    basePerms.setResource(TENANT_MEMBERSHIP);
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'create'
+    basePerms.removePermission(CREATE);
+    authorizationService.saveAuthorization(basePerms);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(jonny2);
+
+    try {
+      identityService.createTenantUserMembership("tenant1", "jonny1");
+      fail("exception expected");
+
+    } catch (AuthorizationException e) {
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
+      assertEquals(jonny2, e.getUserId());
+      assertExceptionInfo(CREATE.getName(), TENANT_MEMBERSHIP.resourceName(), "tenant1", info);
+    }
+  }
+
+  public void testTenantGroupMembershipCreateAuthorizations() {
+
+    Group group1 = identityService.newGroup("group1");
+    identityService.saveGroup(group1);
+
+    Tenant tenant1 = identityService.newTenant("tenant1");
+    identityService.saveTenant(tenant1);
+
+    // add base permission which allows nobody to create memberships
+    Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
+    basePerms.setResource(TENANT_MEMBERSHIP);
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'create'
+    basePerms.removePermission(CREATE);
+    authorizationService.saveAuthorization(basePerms);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(jonny2);
+
+    try {
+      identityService.createTenantGroupMembership("tenant1", "group1");
+      fail("exception expected");
+
+    } catch (AuthorizationException e) {
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
+      assertEquals(jonny2, e.getUserId());
+      assertExceptionInfo(CREATE.getName(), TENANT_MEMBERSHIP.resourceName(), "tenant1", info);
+    }
+  }
+
+  public void testTenantUserMembershipDeleteAuthorizations() {
+
+    User jonny1 = identityService.newUser("jonny1");
+    identityService.saveUser(jonny1);
+
+    Tenant tenant1 = identityService.newTenant("tenant1");
+    identityService.saveTenant(tenant1);
+
+    // add base permission which allows nobody to delete memberships
+    Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
+    basePerms.setResource(TENANT_MEMBERSHIP);
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'delete'
+    basePerms.removePermission(DELETE);
+    authorizationService.saveAuthorization(basePerms);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(jonny2);
+
+    try {
+      identityService.deleteTenantUserMembership("tenant1", "jonny1");
+      fail("exception expected");
+
+    } catch (AuthorizationException e) {
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
+      assertEquals(jonny2, e.getUserId());
+      assertExceptionInfo(DELETE.getName(), TENANT_MEMBERSHIP.resourceName(), "tenant1", info);
+    }
+  }
+
+  public void testTenanGroupMembershipDeleteAuthorizations() {
+
+    Group group1 = identityService.newGroup("group1");
+    identityService.saveGroup(group1);
+
+    Tenant tenant1 = identityService.newTenant("tenant1");
+    identityService.saveTenant(tenant1);
+
+    // add base permission which allows nobody to delete memberships
+    Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
+    basePerms.setResource(TENANT_MEMBERSHIP);
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'delete'
+    basePerms.removePermission(DELETE);
+    authorizationService.saveAuthorization(basePerms);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(jonny2);
+
+    try {
+      identityService.deleteTenantGroupMembership("tenant1", "group1");
+      fail("exception expected");
+
+    } catch (AuthorizationException e) {
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
+      assertEquals(jonny2, e.getUserId());
+      assertExceptionInfo(DELETE.getName(), TENANT_MEMBERSHIP.resourceName(), "tenant1", info);
     }
   }
 
@@ -661,12 +895,89 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
   }
 
+  public void testTenantQueryAuthorizations() {
+    // we are jonny2
+    String authUserId = "jonny2";
+    identityService.setAuthenticatedUserId(authUserId);
+
+    // create new user jonny1
+    User jonny1 = identityService.newUser("jonny1");
+    identityService.saveUser(jonny1);
+    // create new tenant
+    Tenant tenant = identityService.newTenant("tenant");
+    identityService.saveTenant(tenant);
+
+    // set base permission for all users (no-one has any permissions on tenants)
+    Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
+    basePerms.setResource(TENANT);
+    basePerms.setResourceId(ANY);
+    authorizationService.saveAuthorization(basePerms);
+
+    // now enable checks
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    // we cannot fetch the tenants
+    assertEquals(0, identityService.createTenantQuery().count());
+
+    // now we add permission for jonny2 to read the tenants:
+    processEngineConfiguration.setAuthorizationEnabled(false);
+    Authorization ourPerms = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    ourPerms.setUserId(authUserId);
+    ourPerms.setResource(TENANT);
+    ourPerms.setResourceId(ANY);
+    ourPerms.addPermission(READ);
+    authorizationService.saveAuthorization(ourPerms);
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    // now we can fetch the tenants
+    assertEquals(1, identityService.createTenantQuery().count());
+
+    // change the base permission:
+    processEngineConfiguration.setAuthorizationEnabled(false);
+    basePerms = authorizationService.createAuthorizationQuery().resourceType(TENANT).userIdIn("*").singleResult();
+    basePerms.addPermission(READ);
+    authorizationService.saveAuthorization(basePerms);
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    // we can still fetch the tenants
+    assertEquals(1, identityService.createTenantQuery().count());
+
+    // revoke permission for jonny2:
+    processEngineConfiguration.setAuthorizationEnabled(false);
+    ourPerms = authorizationService.createAuthorizationQuery().resourceType(TENANT).userIdIn(authUserId).singleResult();
+    ourPerms.removePermission(READ);
+    authorizationService.saveAuthorization(ourPerms);
+
+    Authorization revoke = authorizationService.createNewAuthorization(AUTH_TYPE_REVOKE);
+    revoke.setUserId(authUserId);
+    revoke.setResource(TENANT);
+    revoke.setResourceId(ANY);
+    revoke.removePermission(READ);
+    authorizationService.saveAuthorization(revoke);
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    // now we cannot fetch the tenants
+    assertEquals(0, identityService.createTenantQuery().count());
+
+    // delete our permissions
+    processEngineConfiguration.setAuthorizationEnabled(false);
+    authorizationService.deleteAuthorization(ourPerms.getId());
+    authorizationService.deleteAuthorization(revoke.getId());
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    // now the base permission applies and grants us read access
+    assertEquals(1, identityService.createTenantQuery().count());
+  }
+
   protected void cleanupAfterTest() {
     for (Group group : identityService.createGroupQuery().list()) {
       identityService.deleteGroup(group.getId());
     }
     for (User user : identityService.createUserQuery().list()) {
       identityService.deleteUser(user.getId());
+    }
+    for (Tenant tenant : identityService.createTenantQuery().list()) {
+      identityService.deleteTenant(tenant.getId());
     }
     for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
       authorizationService.deleteAuthorization(authorization.getId());

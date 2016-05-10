@@ -18,17 +18,21 @@ import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecution
 import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateEvent;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateExecutionListener;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -41,7 +45,7 @@ import org.junit.rules.RuleChain;
  */
 public class MigrationRemoveSubprocessTest {
 
-  protected ProcessEngineRule rule = new ProcessEngineRule(true);
+  protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule
@@ -51,8 +55,8 @@ public class MigrationRemoveSubprocessTest {
   public void testRemoveScopeForNonScopeActivity() {
 
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -87,8 +91,8 @@ public class MigrationRemoveSubprocessTest {
   public void testRemoveScopeForScopeActivity() {
 
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SCOPE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -124,8 +128,8 @@ public class MigrationRemoveSubprocessTest {
   public void testRemoveScopeForConcurrentNonScopeActivity() {
 
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -168,8 +172,8 @@ public class MigrationRemoveSubprocessTest {
   public void testRemoveScopeForConcurrentScopeActivity() {
 
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SCOPE_TASKS_SUB_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SCOPE_TASKS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_SCOPE_TASKS_SUB_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_SCOPE_TASKS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -215,8 +219,8 @@ public class MigrationRemoveSubprocessTest {
   public void testRemoveConcurrentScope() {
 
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -259,8 +263,8 @@ public class MigrationRemoveSubprocessTest {
   public void testRemoveConcurrentScope2() {
 
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_TASK_AND_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_TASK_AND_SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -307,8 +311,8 @@ public class MigrationRemoveSubprocessTest {
   public void testRemoveScopeAndMoveToConcurrentActivity() {
 
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_TASK_AND_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_TASK_AND_SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -357,8 +361,8 @@ public class MigrationRemoveSubprocessTest {
   public void testCannotRemoveScopeAndMoveToConcurrentActivity() {
 
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_TASK_AND_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_TASK_AND_SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -382,8 +386,8 @@ public class MigrationRemoveSubprocessTest {
   @Test
   public void testRemoveMultipleScopes() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.DOUBLE_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.DOUBLE_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -421,12 +425,12 @@ public class MigrationRemoveSubprocessTest {
     // given
     DelegateEvent.clearEvents();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.SUBPROCESS_PROCESS)
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
       .activityBuilder("subProcess")
       .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, DelegateExecutionListener.class.getName())
       .done()
     );
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -449,10 +453,101 @@ public class MigrationRemoveSubprocessTest {
   }
 
   @Test
+  public void testSkipListenerInvocationForRemovedScope() {
+    // given
+    DelegateEvent.clearEvents();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, DelegateExecutionListener.class.getName())
+      .done()
+    );
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    // when
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
+    rule.getRuntimeService()
+      .newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .skipCustomListeners()
+      .execute();
+
+    // then
+    List<DelegateEvent> recordedEvents = DelegateEvent.getEvents();
+    assertEquals(0, recordedEvents.size());
+
+    DelegateEvent.clearEvents();
+  }
+
+  @Test
+  public void testIoMappingInvocationForRemovedScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+      .camundaOutputParameter("foo", "bar")
+      .done());
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    // when
+    ProcessInstance processInstance = rule.getRuntimeService()
+      .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
+    rule.getRuntimeService()
+      .newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .execute();
+
+    // then
+    VariableInstance inputVariable = rule.getRuntimeService().createVariableInstanceQuery().singleResult();
+    Assert.assertNotNull(inputVariable);
+    assertEquals("foo", inputVariable.getName());
+    assertEquals("bar", inputVariable.getValue());
+    assertEquals(processInstance.getId(), inputVariable.getActivityInstanceId());
+  }
+
+  @Test
+  public void testSkipIoMappingInvocationForRemovedScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+      .activityBuilder("subProcess")
+      .camundaOutputParameter("foo", "bar")
+      .done());
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    // when
+    ProcessInstance processInstance = rule.getRuntimeService()
+      .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
+    rule.getRuntimeService()
+      .newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .skipIoMappings()
+      .execute();
+
+    // then
+    assertEquals(0, rule.getRuntimeService().createVariableInstanceQuery().count());
+  }
+
+
+  @Test
   public void testCannotRemoveParentScopeAndMoveOutOfGrandParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.TRIPLE_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.TRIPLE_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.TRIPLE_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.TRIPLE_SUBPROCESS_PROCESS);
 
     // subProcess2 is not migrated
     // subProcess 3 is moved out of the subProcess1 scope (by becoming a subProcess1 itself)

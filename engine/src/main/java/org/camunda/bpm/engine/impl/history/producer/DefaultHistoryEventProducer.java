@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
@@ -41,6 +42,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -58,6 +60,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.task.IdentityLink;
 
 /**
  * @author Daniel Meyer
@@ -67,13 +70,14 @@ import org.camunda.bpm.engine.runtime.Job;
 public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected void initActivityInstanceEvent(HistoricActivityInstanceEventEntity evt, ExecutionEntity execution, HistoryEventType eventType) {
-
-    String activityId = execution.getActivityId();
+    PvmScope eventSource = execution.getActivity();
+    if (eventSource == null) {
+      eventSource = (PvmScope) execution.getEventSource();
+    }
     String activityInstanceId = execution.getActivityInstanceId();
 
     String parentActivityInstanceId = null;
     ExecutionEntity parentExecution = execution.getParent();
-    String tenantId = execution.getTenantId();
 
     if (parentExecution != null && CompensationBehavior.isCompensationThrowing(parentExecution)) {
       parentActivityInstanceId = CompensationBehavior.getParentActivityInstanceId(execution);
@@ -82,6 +86,41 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       parentActivityInstanceId = execution.getParentActivityInstanceId();
     }
 
+    initActivityInstanceEvent(evt,
+        execution,
+        eventSource,
+        activityInstanceId,
+        parentActivityInstanceId,
+        eventType);
+  }
+
+  protected void initActivityInstanceEvent(HistoricActivityInstanceEventEntity evt, MigratingActivityInstance migratingActivityInstance, HistoryEventType eventType) {
+    PvmScope eventSource = migratingActivityInstance.getTargetScope();
+    String activityInstanceId = migratingActivityInstance.getActivityInstanceId();
+
+    MigratingActivityInstance parentInstance = migratingActivityInstance.getParent();
+    String parentActivityInstanceId = null;
+    if (parentInstance != null) {
+      parentActivityInstanceId = parentInstance.getActivityInstanceId();
+    }
+
+    ExecutionEntity execution = migratingActivityInstance.resolveRepresentativeExecution();
+
+    initActivityInstanceEvent(evt,
+        execution,
+        eventSource,
+        activityInstanceId,
+        parentActivityInstanceId,
+        eventType);
+  }
+
+  protected void initActivityInstanceEvent(HistoricActivityInstanceEventEntity evt,
+      ExecutionEntity execution,
+      PvmScope eventSource,
+      String activityInstanceId,
+      String parentActivityInstanceId,
+      HistoryEventType eventType) {
+
     evt.setId(activityInstanceId);
     evt.setEventType(eventType.getEventName());
     evt.setActivityInstanceId(activityInstanceId);
@@ -89,25 +128,30 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setProcessDefinitionId(execution.getProcessDefinitionId());
     evt.setProcessInstanceId(execution.getProcessInstanceId());
     evt.setExecutionId(execution.getId());
-    evt.setTenantId(tenantId);
+    evt.setTenantId(execution.getTenantId());
 
     ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
     if (definition != null) {
       evt.setProcessDefinitionKey(definition.getKey());
     }
 
-    PvmScope eventSource = null;
-    if(activityId != null) {
-      eventSource = execution.getActivity();
-    } else {
-      eventSource = (PvmScope) execution.getEventSource();
-    }
-
     evt.setActivityId(eventSource.getId());
     evt.setActivityName((String) eventSource.getProperty("name"));
     evt.setActivityType((String) eventSource.getProperty("type"));
 
+    // update sub process reference
+    ExecutionEntity subProcessInstance = execution.getSubProcessInstance();
+    if (subProcessInstance != null) {
+      evt.setCalledProcessInstanceId(subProcessInstance.getId());
+    }
+
+    // update sub case reference
+    CaseExecutionEntity subCaseInstance = execution.getSubCaseInstance();
+    if (subCaseInstance != null) {
+      evt.setCalledCaseInstanceId(subCaseInstance.getId());
+    }
   }
+
 
   protected void initProcessInstanceEvent(HistoricProcessInstanceEventEntity evt, ExecutionEntity execution, HistoryEventType eventType) {
 
@@ -281,6 +325,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setConfiguration(incident.getConfiguration());
     evt.setIncidentMessage(incident.getIncidentMessage());
     evt.setTenantId(incident.getTenantId());
+    evt.setJobDefinitionId(incident.getJobDefinitionId());
 
     IncidentEntity incidentEntity = (IncidentEntity) incident;
     ProcessDefinitionEntity definition = incidentEntity.getProcessDefinition();
@@ -431,6 +476,19 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return evt;
   }
 
+  @Override
+  public HistoryEvent createProcessInstanceMigrateEvt(DelegateExecution execution) {
+    final ExecutionEntity executionEntity = (ExecutionEntity) execution;
+
+    // create event instance
+    HistoricProcessInstanceEventEntity evt = newProcessInstanceEventEntity(executionEntity);
+
+    // initialize event
+    initProcessInstanceEvent(evt, executionEntity, HistoryEventTypes.PROCESS_INSTANCE_MIGRATE);
+
+    return evt;
+  }
+
   public HistoryEvent createProcessInstanceEndEvt(DelegateExecution execution) {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
@@ -473,6 +531,12 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return evt;
   }
 
+  @Override
+  public HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution) {
+    return createActivityInstanceUpdateEvt(execution, null);
+  }
+
+  @Override
   public HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution, DelegateTask task) {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
@@ -488,20 +552,21 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       evt.setTaskAssignee(task.getAssignee());
     }
 
-    // update sub process reference
-    ExecutionEntity subProcessInstance = executionEntity.getSubProcessInstance();
-    if (subProcessInstance != null) {
-      evt.setCalledProcessInstanceId(subProcessInstance.getId());
-    }
+    return evt;
+  }
 
-    // update sub case reference
-    CaseExecutionEntity subCaseInstance = executionEntity.getSubCaseInstance();
-    if (subCaseInstance != null) {
-      evt.setCalledCaseInstanceId(subCaseInstance.getId());
-    }
+  @Override
+  public HistoryEvent createActivityInstanceMigrateEvt(MigratingActivityInstance actInstance) {
+
+    // create event instance
+    HistoricActivityInstanceEventEntity evt = loadActivityInstanceEventEntity(actInstance.resolveRepresentativeExecution());
+
+    // initialize event
+    initActivityInstanceEvent(evt, actInstance, HistoryEventTypes.ACTIVITY_INSTANCE_MIGRATE);
 
     return evt;
   }
+
 
   public HistoryEvent createActivityInstanceEndEvt(DelegateExecution execution) {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
@@ -541,6 +606,17 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     // initialize event
     initTaskInstanceEvent(evt, (TaskEntity) task, HistoryEventTypes.TASK_INSTANCE_UPDATE);
+
+    return evt;
+  }
+
+  @Override
+  public HistoryEvent createTaskInstanceMigrateEvt(DelegateTask task) {
+    // create event instance
+    HistoricTaskInstanceEventEntity evt = loadTaskInstanceEvent(task);
+
+    // initialize event
+    initTaskInstanceEvent(evt, (TaskEntity) task, HistoryEventTypes.TASK_INSTANCE_MIGRATE);
 
     return evt;
   }
@@ -598,6 +674,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope) {
     return createHistoricVariableEvent(variableInstance, sourceVariableScope, HistoryEventTypes.VARIABLE_INSTANCE_UPDATE);
+  }
+
+  @Override
+  public HistoryEvent createHistoricVariableMigrateEvt(VariableInstanceEntity variableInstance) {
+    return createHistoricVariableEvent(variableInstance, null, HistoryEventTypes.VARIABLE_INSTANCE_MIGRATE);
   }
 
   // form Properties ///////////////////////////
@@ -658,6 +739,75 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return evt;
   }
 
+  // Historic identity link
+  @Override
+  public HistoryEvent createHistoricIdentityLinkAddEvent(IdentityLink identityLink) {
+    return createHistoricIdentityLinkEvt(identityLink, HistoryEventTypes.IDENTITY_LINK_ADD);
+  }
+
+  @Override
+  public HistoryEvent createHistoricIdentityLinkDeleteEvent(IdentityLink identityLink) {
+    return createHistoricIdentityLinkEvt(identityLink, HistoryEventTypes.IDENTITY_LINK_DELETE);
+  }
+
+  protected HistoryEvent createHistoricIdentityLinkEvt(IdentityLink identityLink, HistoryEventTypes eventType) {
+    // create historic identity link event
+    HistoricIdentityLinkLogEventEntity evt = newIdentityLinkEventEntity();
+    // Mapping all the values of identity link to HistoricIdentityLinkEvent
+    initHistoricIdentityLinkEvent(evt, identityLink, eventType);
+    return evt;
+  }
+
+  protected HistoricIdentityLinkLogEventEntity newIdentityLinkEventEntity() {
+    return new HistoricIdentityLinkLogEventEntity();
+  }
+
+  protected void initHistoricIdentityLinkEvent(HistoricIdentityLinkLogEventEntity evt, IdentityLink identityLink, HistoryEventType eventType) {
+
+    if (identityLink.getTaskId() != null) {
+      TaskEntity task = Context
+          .getCommandContext()
+          .getTaskManager()
+          .findTaskById(identityLink.getTaskId());
+
+      evt.setProcessDefinitionId(task.getProcessDefinitionId());
+
+      if (task.getProcessDefinition() != null) {
+        evt.setProcessDefinitionKey(task.getProcessDefinition().getKey());
+      }
+    }
+
+    if (identityLink.getProcessDefId() != null) {
+      evt.setProcessDefinitionId(identityLink.getProcessDefId());
+
+      ProcessDefinitionEntity definition = Context
+          .getProcessEngineConfiguration()
+          .getDeploymentCache()
+          .findProcessDefinitionFromCache(identityLink.getProcessDefId());
+      evt.setProcessDefinitionKey(definition.getKey());
+    }
+
+    evt.setTime(ClockUtil.getCurrentTime());
+    evt.setType(identityLink.getType());
+    evt.setUserId(identityLink.getUserId());
+    evt.setGroupId(identityLink.getGroupId());
+    evt.setTaskId(identityLink.getTaskId());
+    evt.setTenantId(identityLink.getTenantId());
+    // There is a conflict in HistoryEventTypes for 'delete' keyword,
+    // So HistoryEventTypes.IDENTITY_LINK_ADD /
+    // HistoryEventTypes.IDENTITY_LINK_DELETE is provided with the event name
+    // 'add-identity-link' /'delete-identity-link'
+    // and changed to 'add'/'delete' (While inserting it into the database) on
+    // Historic identity link add / delete event
+    String operationType = "add";
+    if (eventType.getEventName().equals(HistoryEventTypes.IDENTITY_LINK_DELETE.getEventName())) {
+      operationType = "delete";
+    }
+
+    evt.setOperationType(operationType);
+    evt.setEventType(eventType.getEventName());
+    evt.setAssignerId(Context.getCommandContext().getAuthenticatedUserId());
+  }
   // Batch
 
   @Override
@@ -675,7 +825,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     event.setId(batch.getId());
     event.setType(batch.getType());
-    event.setSize(batch.getSize());
+    event.setTotalJobs(batch.getTotalJobs());
     event.setBatchJobsPerSeed(batch.getBatchJobsPerSeed());
     event.setInvocationsPerBatchJob(batch.getInvocationsPerBatchJob());
     event.setSeedJobDefinitionId(batch.getSeedJobDefinitionId());
@@ -797,5 +947,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   protected void initSequenceCounter(long sequenceCounter, HistoryEvent event) {
     event.setSequenceCounter(sequenceCounter);
   }
+
+
 
 }

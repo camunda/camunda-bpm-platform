@@ -16,14 +16,13 @@ package org.camunda.bpm.engine.impl.migration.instance;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
-public class MigratingJobInstance implements MigratingInstance, RemovingInstance {
+public abstract class MigratingJobInstance implements MigratingInstance, RemovingInstance {
 
   protected JobEntity jobEntity;
   protected JobDefinitionEntity targetJobDefinitionEntity;
@@ -31,7 +30,8 @@ public class MigratingJobInstance implements MigratingInstance, RemovingInstance
 
   protected List<MigratingInstance> migratingDependentInstances = new ArrayList<MigratingInstance>();
 
-  public MigratingJobInstance(JobEntity jobEntity, JobDefinitionEntity jobDefinitionEntity, ScopeImpl targetScope) {
+  public MigratingJobInstance(JobEntity jobEntity, JobDefinitionEntity jobDefinitionEntity,
+      ScopeImpl targetScope) {
     this.jobEntity = jobEntity;
     this.targetJobDefinitionEntity = jobDefinitionEntity;
     this.targetScope = targetScope;
@@ -49,6 +49,11 @@ public class MigratingJobInstance implements MigratingInstance, RemovingInstance
     migratingDependentInstances.add(migratingInstance);
   }
 
+  @Override
+  public boolean isDetached() {
+    return jobEntity.getExecutionId() == null;
+  }
+
   public void detachState() {
     jobEntity.setExecution(null);
 
@@ -58,19 +63,31 @@ public class MigratingJobInstance implements MigratingInstance, RemovingInstance
   }
 
   public void attachState(MigratingActivityInstance newOwningInstance) {
-    ExecutionEntity newScopeExecution = newOwningInstance.resolveRepresentativeExecution();
-    jobEntity.setExecution(newScopeExecution);
+    attachTo(newOwningInstance.resolveRepresentativeExecution());
 
     for (MigratingInstance dependentInstance : migratingDependentInstances) {
       dependentInstance.attachState(newOwningInstance);
     }
   }
 
+  public void attachState(MigratingTransitionInstance targetTransitionInstance) {
+    attachTo(targetTransitionInstance.resolveRepresentativeExecution());
+
+    for (MigratingInstance dependentInstance : migratingDependentInstances) {
+      dependentInstance.attachState(targetTransitionInstance);
+    }
+  }
+
+  protected void attachTo(ExecutionEntity execution) {
+    jobEntity.setExecution(execution);
+  }
+
   public void migrateState() {
     // update activity reference
     String activityId = targetScope.getId();
     jobEntity.setActivityId(activityId);
-    updateJobConfiguration(activityId);
+    migrateJobHandlerConfiguration();
+
     if (targetJobDefinitionEntity != null) {
       jobEntity.setJobDefinition(targetJobDefinitionEntity);
     }
@@ -79,6 +96,9 @@ public class MigratingJobInstance implements MigratingInstance, RemovingInstance
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) targetScope.getProcessDefinition();
     jobEntity.setProcessDefinitionId(processDefinition.getId());
     jobEntity.setProcessDefinitionKey(processDefinition.getKey());
+
+    // update deployment reference
+    jobEntity.setDeploymentId(processDefinition.getDeploymentId());
   }
 
   public void migrateDependentEntities() {
@@ -99,10 +119,10 @@ public class MigratingJobInstance implements MigratingInstance, RemovingInstance
     return targetScope;
   }
 
-  protected void updateJobConfiguration(String activityId) {
-    String configuration = jobEntity.getJobHandlerConfiguration();
-    configuration = TimerEventJobHandler.updateKeyInConfiguration(configuration, activityId);
-    jobEntity.setJobHandlerConfiguration(configuration);
+  public JobDefinitionEntity getTargetJobDefinitionEntity() {
+    return targetJobDefinitionEntity;
   }
+
+  protected abstract void migrateJobHandlerConfiguration();
 
 }

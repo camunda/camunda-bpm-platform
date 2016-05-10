@@ -19,7 +19,46 @@ import org.camunda.bpm.engine.query.Query;
  */
 public interface HistoricBatchQuery extends Query<HistoricBatchQuery, HistoricBatch> {
 
-  /** Only select historic batch instances for the given batch id. */
+  /**
+   * Only select historic batch instances for the given batch id.
+   */
   HistoricBatchQuery batchId(String batchId);
+
+  /**
+   * Only select historic batches of the given type.
+   */
+  HistoricBatchQuery type(String type);
+
+  /**
+   * Only select historic batches which are completed or not.
+   */
+  HistoricBatchQuery completed(boolean completed);
+
+  /** Only selects historic batches with one of the given tenant ids. */
+  HistoricBatchQuery tenantIdIn(String... tenantIds);
+
+  /** Only selects historic batches which have no tenant id. */
+  HistoricBatchQuery withoutTenantId();
+
+  /**
+   * Returns historic batches sorted by id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   */
+  HistoricBatchQuery orderById();
+
+  /**
+   * Returns historic batches sorted by start time; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   */
+  HistoricBatchQuery orderByStartTime();
+
+  /**
+   * Returns historic batches sorted by end time; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   */
+  HistoricBatchQuery orderByEndTime();
+
+  /**
+   * Returns historic batches sorted by tenant id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   */
+  HistoricBatchQuery orderByTenantId();
+
 
 }

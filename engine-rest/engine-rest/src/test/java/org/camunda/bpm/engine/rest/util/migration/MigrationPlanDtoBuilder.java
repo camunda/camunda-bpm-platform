@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.rest.util.migration;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.rest.dto.migration.MigrationInstructionDto;
@@ -36,6 +35,10 @@ public class MigrationPlanDtoBuilder {
   }
 
   public MigrationPlanDtoBuilder instruction(String sourceActivityId, String targetActivityId) {
+    return instruction(sourceActivityId, targetActivityId, null);
+  }
+
+  public MigrationPlanDtoBuilder instruction(String sourceActivityId, String targetActivityId, Boolean updateEventTrigger) {
     List<MigrationInstructionDto> instructions = migrationPlanDto.getInstructions();
     if (instructions == null) {
       instructions = new ArrayList<MigrationInstructionDto>();
@@ -43,7 +46,7 @@ public class MigrationPlanDtoBuilder {
     }
 
     MigrationInstructionDto migrationInstruction = new MigrationInstructionDtoBuilder()
-      .migrate(sourceActivityId, targetActivityId)
+      .migrate(sourceActivityId, targetActivityId, updateEventTrigger)
       .build();
 
     instructions.add(migrationInstruction);

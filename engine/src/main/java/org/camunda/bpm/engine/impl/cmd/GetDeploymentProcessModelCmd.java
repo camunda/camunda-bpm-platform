@@ -18,10 +18,10 @@ import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
 
@@ -49,8 +49,9 @@ public class GetDeploymentProcessModelCmd implements Command<InputStream>, Seria
             .getDeploymentCache()
             .findDeployedProcessDefinitionById(processDefinitionId);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadProcessDefinition(processDefinition);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadProcessDefinition(processDefinition);
+    }
 
     final String deploymentId = processDefinition.getDeploymentId();
     final String resourceName = processDefinition.getResourceName();

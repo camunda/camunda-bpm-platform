@@ -14,11 +14,9 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.List;
-import java.util.Map;
 
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.VariableInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 
@@ -39,32 +37,42 @@ public class VariableInstanceManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
+  public List<VariableInstanceEntity> findVariableInstancesByProcessInstanceId(String processInstanceId) {
+    return getDbEntityManager().selectList("selectVariablesByProcessInstanceId", processInstanceId);
+  }
+
+  @SuppressWarnings("unchecked")
   public List<VariableInstanceEntity> findVariableInstancesByCaseExecutionId(String caseExecutionId) {
     return getDbEntityManager().selectList("selectVariablesByCaseExecutionId", caseExecutionId);
   }
 
   public void deleteVariableInstanceByTask(TaskEntity task) {
-    Map<String, CoreVariableInstance> variableInstances = task.getVariableInstancesLocal();
-    if (variableInstances!=null) {
-      for (CoreVariableInstance variableInstance: variableInstances.values()) {
-        ((VariableInstanceEntity) variableInstance).delete();
-      }
+    List<VariableInstanceEntity> variableInstances = task.variableStore.getVariables();
+    for (VariableInstanceEntity variableInstance: variableInstances) {
+      variableInstance.delete();
     }
   }
 
   public long findVariableInstanceCountByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery) {
     configureAuthorizationCheck(variableInstanceQuery);
+    configureTenantCheck(variableInstanceQuery);
     return (Long) getDbEntityManager().selectOne("selectVariableInstanceCountByQueryCriteria", variableInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<VariableInstance> findVariableInstanceByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery, Page page) {
     configureAuthorizationCheck(variableInstanceQuery);
+    configureTenantCheck(variableInstanceQuery);
     return getDbEntityManager().selectList("selectVariableInstanceByQueryCriteria", variableInstanceQuery, page);
   }
 
   protected void configureAuthorizationCheck(VariableInstanceQueryImpl query) {
     getAuthorizationManager().configureVariableInstanceQuery(query);
   }
+
+  protected void configureTenantCheck(VariableInstanceQueryImpl query) {
+    getTenantManager().configureQuery(query);
+  }
+
 
 }

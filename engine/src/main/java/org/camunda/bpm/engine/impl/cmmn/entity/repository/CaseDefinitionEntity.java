@@ -208,6 +208,11 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
   @Override
   protected CmmnExecution newCaseInstance() {
     CaseExecutionEntity caseInstance = new CaseExecutionEntity();
+
+    if (tenantId != null) {
+      caseInstance.setTenantId(tenantId);
+    }
+
     Context
         .getCommandContext()
         .getCaseExecutionManager()

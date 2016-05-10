@@ -3,7 +3,7 @@
                   xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
                   xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  targetNamespace="Examples">
+                  targetNamespace="http://www.omg.org/spec/CMMN/20151109/MODEL">
   <case id="case" name="Case">
 
     <casePlanModel id="CasePlanModel_1">

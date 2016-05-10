@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cmmn.execution;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +26,13 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnBehaviorLogger;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
-import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
-import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableStore;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableInstance;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
+import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableInstance.SimpleVariableInstanceFactory;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -63,7 +69,7 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
 
   // variables ////////////////////////////////////////////////////////////////
 
-  protected SimpleVariableStore variableStore = new SimpleVariableStore();
+  protected VariableStore<SimpleVariableInstance> variableStore = new VariableStore<SimpleVariableInstance>();
 
   public CaseExecutionImpl() {
   }
@@ -266,8 +272,18 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
 
   // variables //////////////////////////////////////////////////////////////
 
-  protected CoreVariableStore getVariableStore() {
-    return variableStore;
+  protected VariableStore<CoreVariableInstance> getVariableStore() {
+    return (VariableStore) variableStore;
+  }
+
+  @Override
+  protected VariableInstanceFactory<CoreVariableInstance> getVariableInstanceFactory() {
+    return (VariableInstanceFactory) SimpleVariableInstanceFactory.INSTANCE;
+  }
+
+  @Override
+  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners(AbstractVariableScope sourceScope) {
+    return Collections.emptyList();
   }
 
   // toString /////////////////////////////////////////////////////////////////

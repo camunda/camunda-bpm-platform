@@ -138,6 +138,16 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
    */
   ProcessDefinitionQuery incidentMessageLike(String incidentMessageLike);
 
+  /**
+   * Only selects process definitions with a specific version tag
+   */
+  ProcessDefinitionQuery versionTag(String versionTag);
+
+  /**
+   * Only selects process definitions with a version tag like the given
+   */
+  ProcessDefinitionQuery versionTagLike(String versionTagLike);
+
   // Support for event subscriptions /////////////////////////////////////
 
   /**
@@ -187,5 +197,14 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
    * Note that the ordering of process instances without tenant id is database-specific. */
   ProcessDefinitionQuery orderByTenantId();
+
+  /**
+   * Order by version tag (needs to be followed by {@link #asc()} or {@link #desc()}).
+   *
+   * <strong>Note:</strong> sorting by versionTag is a string based sort.
+   * There is no interpretation of the version which can lead to a sorting like:
+   * v0.1.0 v0.10.0 v0.2.0.
+   */
+  ProcessDefinitionQuery orderByVersionTag();
 
 }

@@ -59,4 +59,10 @@ public interface HistoryRestService {
   @Path(HistoricDecisionInstanceRestService.PATH)
   HistoricDecisionInstanceRestService getDecisionInstanceService();
 
+  @Path(HistoricIdentityLinkLogRestService.PATH)
+  HistoricIdentityLinkLogRestService getIdentityLinkService();
+
+  @Path(HistoricBatchRestService.PATH)
+  HistoricBatchRestService getBatchService();
+
 }

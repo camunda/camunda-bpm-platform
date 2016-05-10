@@ -20,12 +20,20 @@ import org.camunda.bpm.engine.impl.tree.SingleReferenceWalker;
  */
 public class MigratingActivityInstanceWalker extends SingleReferenceWalker<MigratingActivityInstance> {
 
+  protected MigratingActivityInstance parent = null;
+
   public MigratingActivityInstanceWalker(MigratingActivityInstance initialElement) {
     super(initialElement);
+    // determine parent beforehand since it may be removed while walking
+    parent = initialElement.getParent();
   }
 
   @Override
   protected MigratingActivityInstance nextElement() {
-    return getCurrentElement().getParent();
+    MigratingActivityInstance nextElement = parent;
+    if (parent != null) {
+      parent = parent.getParent();
+    }
+    return nextElement;
   }
 }

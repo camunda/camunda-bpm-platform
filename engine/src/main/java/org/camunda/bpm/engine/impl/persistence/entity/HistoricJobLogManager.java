@@ -23,9 +23,9 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -107,52 +107,52 @@ public class HistoricJobLogManager extends AbstractManager {
 
   // fire history events ///////////////////////////////////////////////////////
 
-  public void fireJobCreatedEvent(Job job) {
+  public void fireJobCreatedEvent(final Job job) {
     if (isHistoryEventProduced(HistoryEventTypes.JOB_CREATE, job)) {
-      HistoryEventProducer eventProducer = getHistoryEventProducer();
-      HistoryEvent event = eventProducer.createHistoricJobLogCreateEvt(job);
-      handleEvent(event);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createHistoricJobLogCreateEvt(job);
+        }
+      });
     }
   }
 
-  public void fireJobFailedEvent(Job job, Throwable exception) {
+  public void fireJobFailedEvent(final Job job, final Throwable exception) {
     if (isHistoryEventProduced(HistoryEventTypes.JOB_FAIL, job)) {
-      HistoryEventProducer eventProducer = getHistoryEventProducer();
-      HistoryEvent event = eventProducer.createHistoricJobLogFailedEvt(job, exception);
-      handleEvent(event);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createHistoricJobLogFailedEvt(job, exception);
+        }
+      });
     }
   }
 
-  public void fireJobSuccessfulEvent(Job job) {
+  public void fireJobSuccessfulEvent(final Job job) {
     if (isHistoryEventProduced(HistoryEventTypes.JOB_SUCCESS, job)) {
-      HistoryEventProducer eventProducer = getHistoryEventProducer();
-      HistoryEvent event = eventProducer.createHistoricJobLogSuccessfulEvt(job);
-      handleEvent(event);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createHistoricJobLogSuccessfulEvt(job);
+        }
+      });
     }
   }
 
-  public void fireJobDeletedEvent(Job job) {
+  public void fireJobDeletedEvent(final Job job) {
     if (isHistoryEventProduced(HistoryEventTypes.JOB_DELETE, job)) {
-      HistoryEventProducer eventProducer = getHistoryEventProducer();
-      HistoryEvent event = eventProducer.createHistoricJobLogDeleteEvt(job);
-      handleEvent(event);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createHistoricJobLogDeleteEvt(job);
+        }
+      });
     }
   }
 
-  protected void handleEvent(HistoryEvent event) {
-    HistoryEventHandler eventHandler = getHistoryEventHandler();
-    eventHandler.handleEvent(event);
-  }
 
   // helper /////////////////////////////////////////////////////////
-
-  protected HistoryEventProducer getHistoryEventProducer() {
-    return Context.getProcessEngineConfiguration().getHistoryEventProducer();
-  }
-
-  protected HistoryEventHandler getHistoryEventHandler() {
-    return Context.getProcessEngineConfiguration().getHistoryEventHandler();
-  }
 
   protected boolean isHistoryEventProduced(HistoryEventType eventType, Job job) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();

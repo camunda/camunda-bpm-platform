@@ -14,13 +14,9 @@ package org.camunda.bpm.engine.test.api.form;
 
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
-import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableStore;
 import org.camunda.bpm.engine.impl.form.FormException;
 import org.camunda.bpm.engine.impl.form.handler.FormFieldHandler;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidator;
@@ -33,6 +29,7 @@ import org.camunda.bpm.engine.impl.form.validator.MinValidator;
 import org.camunda.bpm.engine.impl.form.validator.ReadOnlyValidator;
 import org.camunda.bpm.engine.impl.form.validator.RequiredValidator;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.api.runtime.util.TestVariableScope;
 
 /**
  * @author Daniel Meyer
@@ -197,16 +194,4 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  protected static class TestVariableScope extends AbstractVariableScope {
-
-    protected SimpleVariableStore variableStore = new SimpleVariableStore();
-
-    protected CoreVariableStore getVariableStore() {
-      return variableStore;
-    }
-
-    public AbstractVariableScope getParentVariableScope() {
-      return null;
-    }
-  }
 }

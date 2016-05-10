@@ -55,6 +55,12 @@ public interface HistoricCaseActivityInstance {
    /** The corresponding case in case of a case task activity. */
    String getCalledCaseInstanceId();
 
+   /**
+    * The id of the tenant this historic case activity instance belongs to. Can be <code>null</code>
+    * if the historic case activity instance belongs to no single tenant.
+    */
+   String getTenantId();
+
    /** The time when the case activity was created. */
    Date getCreateTime();
 

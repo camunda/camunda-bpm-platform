@@ -21,6 +21,7 @@
     <result property="hasStartFormKey" column="HAS_START_FORM_KEY_" jdbcType="BOOLEAN"/>
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="versionTag" column="VERSION_TAG_" jdbcType="VARCHAR" />
     <collection property="incidentStatistics" javaType="ArrayList" ofType="org.camunda.bpm.engine.impl.persistence.entity.IncidentStatisticsEntity">
       <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
       <result property="incidentCount" column="INCIDENT_COUNT_" jdbcType="INTEGER"/>
@@ -48,6 +49,23 @@
       <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
       <result property="incidentCount" column="INCIDENT_COUNT_" jdbcType="INTEGER"/>
     </collection>
+  </resultMap>
+
+  <resultMap id="batchStatisticsResultMap" type="org.camunda.bpm.engine.impl.batch.BatchStatisticsEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="type" column="TYPE_" jdbcType="VARCHAR" />
+    <result property="totalJobs" column="TOTAL_JOBS_" jdbcType="INTEGER" />
+    <result property="jobsCreated" column="JOBS_CREATED_" jdbcType="INTEGER" />
+    <result property="remainingJobs" column="REMAINING_JOBS_COUNT_" jdbcType="INTEGER" />
+    <result property="failedJobs" column="FAILED_JOBS_COUNT_" jdbcType="INTEGER" />
+    <result property="batchJobsPerSeed" column="JOBS_PER_SEED_" jdbcType="INTEGER" />
+    <result property="invocationsPerBatchJob" column="INVOCATIONS_PER_JOB_" jdbcType="INTEGER" />
+    <result property="seedJobDefinitionId" column="SEED_JOB_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="monitorJobDefinitionId" column="MONITOR_JOB_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="batchJobDefinitionId" column="BATCH_JOB_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- Process Definition Statistics -->  
@@ -153,6 +171,10 @@
           </where>
 
         ) RES
+
+        <where>
+           <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+        </where>
   </sql>
 
   <!-- Deployment statistics -->
@@ -174,6 +196,9 @@
   </select>
 
   <sql id="selectDeploymentStatisticsByQueryCriteriaSql">
+    <bind name="authUserId" value="authCheck.authUserId" />
+    <bind name="authGroupIds" value="authCheck.authGroupIds" />
+  
     from (
             select
                 DEPLOYMENT.*
@@ -204,7 +229,7 @@
                       EXECUTION.ID_ = EXECUTION.PROC_INST_ID_
                       and EXECUTION.PROC_DEF_ID_ = PROCDEF.ID_
 
-                    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
                     and
                         (
                         <foreach item="permCheck" collection="processInstancePermissionChecks" separator=",">
@@ -237,7 +262,7 @@
                   where
                       RETRIES_ = 0
 
-                    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
                     and
                         (
                         <foreach item="permCheck" collection="jobPermissionChecks" separator=",">
@@ -276,7 +301,7 @@
                       and INC.INCIDENT_TYPE_ = #{includeIncidentsForType}
                       </if>
 
-                    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
                     and
                         (
                         <foreach item="permCheck" collection="incidentPermissionChecks" separator=",">
@@ -301,6 +326,10 @@
             </where>
 
           ) RES
+
+          <where>
+             <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+          </where>
   </sql>
 
   <!-- Activity statistics -->
@@ -323,7 +352,10 @@
   </select>
 
   <sql id="selectActivityStatisticsByQueryCriteriaSql">
-      from ( select ACTID.ACT_ID_ as ID_,
+    <bind name="authUserId" value="authCheck.authUserId" />
+    <bind name="authGroupIds" value="authCheck.authGroupIds" />
+    
+    from ( select ACTID.ACT_ID_ as ID_,
         INSTANCE.INSTANCE_COUNT_
       <if test="failedJobsToInclude">
       , JOB.FAILED_JOBS_COUNT_
@@ -345,7 +377,7 @@
                       distinct E.ACT_ID_
                   from
                       ${prefix}ACT_RU_EXECUTION E
-                  <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                  <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
                   inner join
                       ${prefix}ACT_RE_PROCDEF P
                   on
@@ -358,7 +390,7 @@
                         true but no current activity is set -->
                       and E.ACT_ID_ is not null 
 
-                      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
                       and
                           (
                           <foreach item="permCheck" index="index" collection="processInstancePermissionChecks" separator=",">
@@ -384,7 +416,7 @@
                       where
                           JOB.PROCESS_DEF_ID_ = #{processDefinitionId}
                           and JOB.RETRIES_ = 0
-                          <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                          <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
                           and
                               (
                               <foreach item="permCheck" index="index" collection="jobPermissionChecks" separator=",">
@@ -404,7 +436,7 @@
                           distinct I.ACTIVITY_ID_ AS ACT_ID_
                       from
                           ${prefix}ACT_RU_INCIDENT I
-                      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
                       inner join
                           ${prefix}ACT_RE_PROCDEF PROCDEF
                       on
@@ -417,7 +449,7 @@
                           and I.INCIDENT_TYPE_ = #{includeIncidentsForType}
                           </if>
 
-                          <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                          <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
                           and
                               (
                               <foreach item="permCheck" index="index" collection="incidentPermissionChecks" separator=",">
@@ -445,7 +477,7 @@
                    , count(E.PROC_INST_ID_) as INSTANCE_COUNT_
                    from
                     ${prefix}ACT_RU_EXECUTION E
-                  <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                  <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
                   inner join
                       ${prefix}ACT_RE_PROCDEF P
                   on
@@ -455,7 +487,7 @@
                     E.PROC_DEF_ID_ = #{processDefinitionId}
                     and E.IS_ACTIVE_ = ${trueConstant}
                     
-                    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
                     and
                         (
                         <foreach item="permCheck" index="index" collection="processInstancePermissionChecks" separator=",">
@@ -491,7 +523,7 @@
                 where
                     JOB.PROCESS_DEF_ID_ = #{processDefinitionId}
                     and JOB.RETRIES_ = 0
-                    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
                     and
                         (
                         <foreach item="permCheck" index="index" collection="jobPermissionChecks" separator=",">
@@ -522,7 +554,7 @@
                 , count(I.ID_) as INCIDENT_COUNT_
               from
                   ${prefix}ACT_RU_INCIDENT I
-              <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+              <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
               inner join
                   ${prefix}ACT_RE_PROCDEF PROCDEF
               on
@@ -533,7 +565,7 @@
                   <if test="includeIncidentsForType != null">
                   and I.INCIDENT_TYPE_ = #{includeIncidentsForType}
                   </if>
-                  <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                  <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
                   and
                       (
                       <foreach item="permCheck" index="index" collection="incidentPermissionChecks" separator=",">
@@ -553,5 +585,75 @@
         </if>
        ) RES
   </sql>
+
+  <!-- Batch Statistics -->
+  <select id ="selectBatchStatistics" resultMap="batchStatisticsResultMap" parameterType="org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select RES.*
+    ${limitBetween}
+    <include refid="selectBatchStatisticsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id ="selectBatchStatisticsCount" resultType="long" parameterType="org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl">
+    select count(RES.ID_)
+    <include refid="selectBatchStatisticsByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectBatchStatisticsByQueryCriteriaSql">
+    from (
+      select
+        RES.*
+        , JOB.REMAINING_JOBS_COUNT_
+        , JOB.FAILED_JOBS_COUNT_
+      from
+        ${prefix}ACT_RU_BATCH RES
+
+      left outer join
+
+      <!-- Sum all remaining jobs by job definition id -->
+      (
+        select
+          JOB_DEF_ID_
+          , count(ID_) as REMAINING_JOBS_COUNT_
+          , sum(case when RETRIES_ = 0 then 1 else 0 end) as FAILED_JOBS_COUNT_
+        from
+          ${prefix}ACT_RU_JOB JOB
+
+        group by
+          JOB_DEF_ID_
+      ) JOB
+      on
+        RES.BATCH_JOB_DEF_ID_ = JOB.JOB_DEF_ID_
+
+      <where>
+        <if test="batchId != null">
+          RES.ID_ = #{batchId}
+        </if>
+        <if test="type != null">
+          and RES.TYPE_ = #{type}
+        </if>
+        <if test="isTenantIdSet">
+          <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+            and RES.TENANT_ID_ in
+            <foreach item="tenantId" index="index" collection="tenantIds"
+                     open="(" separator="," close=")">
+              #{tenantId}
+            </foreach>
+          </if>
+          <if test="tenantIds == null">
+            and RES.TENANT_ID_ is null
+          </if>
+       </if>
+        
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+      </where>
+
+    ) RES
+
+  </sql>
+
 
 </mapper>

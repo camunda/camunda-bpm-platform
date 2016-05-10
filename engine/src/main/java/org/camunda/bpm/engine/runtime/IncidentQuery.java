@@ -52,6 +52,9 @@ public interface IncidentQuery extends Query<IncidentQuery, Incident> {
   /** Only select incidents that belong to one of the given tenant ids. */
   IncidentQuery tenantIdIn(String... tenantIds);
 
+  /** Only select incidents that belong to one of the given job definition ids. */
+  IncidentQuery jobDefinitionIdIn(String... jobDefinitionIds);
+
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   IncidentQuery orderByIncidentId();
 

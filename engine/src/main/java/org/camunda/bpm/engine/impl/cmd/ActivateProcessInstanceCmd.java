@@ -13,7 +13,9 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
 
 /**
  *
@@ -21,12 +23,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
  */
 public class ActivateProcessInstanceCmd extends AbstractSetProcessInstanceStateCmd {
 
-  public ActivateProcessInstanceCmd(String executionId, String processDefinitionId, String processDefinitionKey) {
-    super(executionId, processDefinitionId, processDefinitionKey, false, null);
-  }
-
-  public ActivateProcessInstanceCmd(String executionId, String processDefinitionId, String processDefinitionKey, boolean isTenantIdSet, String tenantId) {
-    super(executionId, processDefinitionId, processDefinitionKey, isTenantIdSet, tenantId);
+  public ActivateProcessInstanceCmd(UpdateProcessInstanceSuspensionStateBuilderImpl builder) {
+    super(builder);
   }
 
   @Override
@@ -35,8 +33,8 @@ public class ActivateProcessInstanceCmd extends AbstractSetProcessInstanceStateC
   }
 
   @Override
-  protected ActivateJobCmd getNextCommand() {
-    return new ActivateJobCmd(null, null, processInstanceId, processDefinitionId, processDefinitionKey);
+  protected ActivateJobCmd getNextCommand(UpdateJobSuspensionStateBuilderImpl jobCommandBuilder) {
+    return new ActivateJobCmd(jobCommandBuilder);
   }
 
   @Override

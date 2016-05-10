@@ -15,15 +15,17 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
+import java.util.Collections;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+
 
 
 /**
@@ -50,9 +52,7 @@ public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
     ExecutionEntity execution = executionManager.findExecutionById(processInstanceId);
     ensureNotNull(BadUserRequestException.class, "No process instance found for id '" + processInstanceId + "'", "processInstance", execution);
 
-    // check authorization
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkDeleteProcessInstance(execution);
+    checkDeleteProcessInstance(execution, commandContext);
 
     // delete process instance
     commandContext
@@ -62,9 +62,14 @@ public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
     // create user operation log
     commandContext.getOperationLogManager()
       .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, processInstanceId,
-          null, null, PropertyChange.EMPTY_CHANGE);
+          null, null, Collections.singletonList(PropertyChange.EMPTY_CHANGE));
 
     return null;
   }
 
+  protected void checkDeleteProcessInstance(ExecutionEntity execution, CommandContext commandContext) {
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkDeleteProcessInstance(execution);
+    }
+  }
 }

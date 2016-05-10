@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cfg.auth;
 
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -50,12 +51,24 @@ public interface ResourceAuthorizationProvider {
   /**
    * <p>Invoked whenever a new group is created</p>
    *
-   * @param user
-   *          a newly created {@link User}
+   * @param group
+   *          a newly created {@link Group}
    * @return a list of authorizations to be automatically added when a new
-   *         {@link User} is created.
+   *         {@link Group} is created.
    */
   public AuthorizationEntity[] newGroup(Group group);
+
+  /**
+   * <p>
+   * Invoked whenever a new tenant is created
+   * </p>
+   *
+   * @param tenant
+   *          a newly created {@link Tenant}
+   * @return a list of authorizations to be automatically added when a new
+   *         {@link Tenant} is created.
+   */
+  public AuthorizationEntity[] newTenant(Tenant tenant);
 
   /**
    * <p>Invoked whenever a user is added to a group</p>
@@ -69,6 +82,30 @@ public interface ResourceAuthorizationProvider {
    *         {@link User} is created.
    */
   public AuthorizationEntity[] groupMembershipCreated(String groupId, String userId);
+
+  /**
+   * <p>Invoked whenever an user is added to a tenant.</p>
+   *
+   * @param tenant
+   *          the id of the tenant
+   * @param userId
+   *          the id of the user
+   * @return a list of authorizations to be automatically added when a new
+   *         membership is created.
+   */
+  public AuthorizationEntity[] tenantMembershipCreated(Tenant tenant, User user);
+
+  /**
+   * <p>Invoked whenever a group is added to a tenant.</p>
+   *
+   * @param tenant
+   *          the id of the tenant
+   * @param groupId
+   *          the id of the group
+   * @return a list of authorizations to be automatically added when a new
+   *         membership is created.
+   */
+  public AuthorizationEntity[] tenantMembershipCreated(Tenant tenant, Group group);
 
   // Filter ////////////////////////////////////////////////
 

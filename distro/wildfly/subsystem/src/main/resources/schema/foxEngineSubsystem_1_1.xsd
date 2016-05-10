@@ -34,11 +34,15 @@
   
   <xs:complexType name="job-executorType">
     <xs:sequence>
-      <xs:element name="thread-pool-name" minOccurs="1" maxOccurs="1" />
+      <xs:element name="thread-pool-name" minOccurs="0" maxOccurs="1" />
+      <xs:element name="core-threads" minOccurs="1" maxOccurs="1" />
+      <xs:element name="max-threads" minOccurs="1" maxOccurs="1" />
+      <xs:element name="queue-length" minOccurs="1" maxOccurs="1" />
+      <xs:element name="keepalive-time" minOccurs="0" maxOccurs="1" />
+      <xs:element name="allow-core-timeout" minOccurs="0" maxOccurs="1" />
       <xs:element name="job-acquisitions" type="job-acquisitionsType" minOccurs="1" maxOccurs="1" />
     </xs:sequence>
   </xs:complexType>
-  
   <xs:complexType name="job-acquisitionsType">
     <xs:choice minOccurs="0" maxOccurs="unbounded">
       <xs:element name="job-acquisition" type="job-acquisitionType" />
@@ -47,7 +51,7 @@
   
   <xs:complexType name="job-acquisitionType">
     <xs:sequence>
-      <xs:element name="acquisition-strategy" minOccurs="1" maxOccurs="1" />
+      <xs:element name="acquisition-strategy" minOccurs="0" maxOccurs="1" />
       <xs:element name="properties" type="propertiesType" minOccurs="0" maxOccurs="1" />
     </xs:sequence>
     <xs:attribute name="name" use="required" />

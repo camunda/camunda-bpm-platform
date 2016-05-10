@@ -12,24 +12,22 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
 import java.util.Collections;
 
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -38,7 +36,7 @@ import org.junit.rules.RuleChain;
 
 public class MigrationProcessInstanceTest {
 
-  protected ProcessEngineRule rule = new ProcessEngineRule(true);
+  protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule
@@ -64,7 +62,7 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testNullProcessInstanceIds() {
-    ProcessDefinition testProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
       .build();
@@ -74,15 +72,31 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids is null"));
+      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids is empty"));
+    }
+  }
+
+  @Test
+  public void testEmptyProcessInstanceIds() {
+    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    try {
+      runtimeService.newMigration(migrationPlan).processInstanceIds(Collections.<String>emptyList()).execute();
+      fail("Should not be able to migrate");
+    }
+    catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids is empty"));
     }
   }
 
   @Test
   public void testNotMigrateProcessInstanceOfWrongProcessDefinition() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition wrongProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition wrongProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceById(wrongProcessDefinition.getId());
 
@@ -101,8 +115,8 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testNotMigrateUnknownProcessInstance() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapEqualActivities()
@@ -119,8 +133,8 @@ public class MigrationProcessInstanceTest {
 
   @Test
   public void testNotMigrateNullProcessInstance() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapEqualActivities()
@@ -136,51 +150,141 @@ public class MigrationProcessInstanceTest {
   }
 
   @Test
-  public void testNotMigrateProcessInstanceWithAsyncTransition() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.ONE_TASK_PROCESS)
-      .userTaskBuilder("userTask")
-        .camundaAsyncBefore()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+  public void testMigrateProcessInstanceQuery() {
+    int processInstanceCount = 10;
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapEqualActivities()
       .build();
 
+    for(int i = 0; i < processInstanceCount; i++) {
+      runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    }
+
+    ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(sourceProcessDefinition.getId());
+    ProcessInstanceQuery targetProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(targetProcessDefinition.getId());
+
+    assertEquals(processInstanceCount, sourceProcessInstanceQuery.count());
+    assertEquals(0, targetProcessInstanceQuery.count());
+
+
+    runtimeService.newMigration(migrationPlan)
+      .processInstanceQuery(sourceProcessInstanceQuery)
+      .execute();
+
+    assertEquals(0, sourceProcessInstanceQuery.count());
+    assertEquals(processInstanceCount, targetProcessInstanceQuery.count());
+  }
+
+  @Test
+  public void testNullProcessInstanceQuery() {
+    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
     try {
-      testHelper.createProcessInstanceAndMigrate(migrationPlan);
+      runtimeService.newMigration(migrationPlan).processInstanceQuery(null).execute();
       fail("Should not be able to migrate");
     }
-    catch (MigratingProcessInstanceValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasFailures("Process instance contains not migrated jobs")
-        .hasActivityInstanceFailures(sourceProcessDefinition.getId(), "Has active asynchronous child transitions");
+    catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids is empty"));
     }
   }
 
   @Test
-  public void testNotMigrateProcessInstanceWithNestedAsyncTransition() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(modify(ProcessModels.TRIPLE_SUBPROCESS_PROCESS)
-      .userTaskBuilder("userTask")
-      .camundaAsyncBefore()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+  public void testEmptyProcessInstanceQuery() {
+    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    ProcessInstanceQuery emptyProcessInstanceQuery = runtimeService.createProcessInstanceQuery();
+    assertEquals(0, emptyProcessInstanceQuery.count());
+
+    try {
+      runtimeService.newMigration(migrationPlan).processInstanceQuery(emptyProcessInstanceQuery).execute();
+      fail("Should not be able to migrate");
+    }
+    catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids is empty"));
+    }
+  }
+
+  @Test
+  public void testProcessInstanceQueryOfWrongProcessDefinition() {
+    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition wrongProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+
+    runtimeService.startProcessInstanceById(wrongProcessDefinition.getId());
+
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    ProcessInstanceQuery wrongProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(wrongProcessDefinition.getId());
+    assertEquals(1, wrongProcessInstanceQuery.count());
+
+    try {
+      runtimeService.newMigration(migrationPlan).processInstanceQuery(wrongProcessInstanceQuery).execute();
+      fail("Should not be able to migrate");
+    }
+    catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), CoreMatchers.startsWith("ENGINE-23002"));
+    }
+  }
+
+  @Test
+  public void testProcessInstanceIdsAndQuery() {
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapEqualActivities()
       .build();
 
-    try {
-      testHelper.createProcessInstanceAndMigrate(migrationPlan);
-      fail("Should not be able to migrate");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasFailures("Process instance contains not migrated jobs")
-        .hasActivityInstanceFailures("subProcess3", "Has active asynchronous child transitions");
-    }
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+
+    ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance2.getId());
+    ProcessInstanceQuery targetProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(targetProcessDefinition.getId());
+
+    assertEquals(0, targetProcessInstanceQuery.count());
+
+    runtimeService.newMigration(migrationPlan)
+      .processInstanceIds(Collections.singletonList(processInstance1.getId()))
+      .processInstanceQuery(sourceProcessInstanceQuery)
+      .execute();
+
+    assertEquals(2, targetProcessInstanceQuery.count());
+  }
+
+  @Test
+  public void testOverlappingProcessInstanceIdsAndQuery() {
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+
+    ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(sourceProcessDefinition.getId());
+    ProcessInstanceQuery targetProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(targetProcessDefinition.getId());
+
+    assertEquals(0, targetProcessInstanceQuery.count());
+
+    runtimeService.newMigration(migrationPlan)
+      .processInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId()))
+      .processInstanceQuery(sourceProcessInstanceQuery)
+      .execute();
+
+    assertEquals(2, targetProcessInstanceQuery.count());
   }
 
 }

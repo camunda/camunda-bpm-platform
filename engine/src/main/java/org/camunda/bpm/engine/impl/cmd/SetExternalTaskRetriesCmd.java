@@ -12,47 +12,29 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
  * @author Thorben Lindhauer
- *
+ * @author Christopher Zell
  */
-public class SetExternalTaskRetriesCmd implements Command<Void> {
+public class SetExternalTaskRetriesCmd extends ExternalTaskCmd {
 
-  protected String externalTaskId;
   protected int retries;
 
   public SetExternalTaskRetriesCmd(String externalTaskId, int retries) {
-    this.externalTaskId = externalTaskId;
+    super(externalTaskId);
     this.retries = retries;
   }
-
-  public Void execute(CommandContext commandContext) {
-    validateInput();
-
-    ExternalTaskEntity externalTask =
-        commandContext.getExternalTaskManager().findExternalTaskById(externalTaskId);
-
-    EnsureUtil.ensureNotNull(NotFoundException.class, "External task with id '" + externalTaskId + "' not found",
-        "externalTask", externalTask);
-
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateProcessInstanceById(externalTask.getProcessInstanceId());
-
-    externalTask.setRetriesAndManageIncidents(retries);
-
-    return null;
-  }
-
+  
+  @Override
   protected void validateInput() {
-    EnsureUtil.ensureNotNull("externalTaskId", externalTaskId);
     EnsureUtil.ensureGreaterThanOrEqual("retries", retries, 0);
   }
 
+  @Override
+  protected void execute(ExternalTaskEntity externalTask) {
+    externalTask.setRetriesAndManageIncidents(retries);
+  }
 }

@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.runtime.Job;
 
 /**
  * @author Tom Baeyens
+ * @author Deivarayan Azhagappan
  */
 public class DeploymentManager extends AbstractManager {
 
@@ -95,6 +96,9 @@ public class DeploymentManager extends AbstractManager {
         // remove historic incidents which are not referenced to a process instance
         getHistoricIncidentManager().deleteHistoricIncidentsByProcessDefinitionId(processDefinitionId);
 
+        // remove historic identity links which are not reference to a process instance
+        getHistoricIdentityLinkManager().deleteHistoricIdentityLinksLogByProcessDefinitionId(processDefinitionId);
+        
         // remove historic job log entries not related to a process instance
         getHistoricJobLogManager().deleteHistoricJobLogsByProcessDefinitionId(processDefinitionId);
       }

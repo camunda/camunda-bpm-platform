@@ -1,0 +1,17 @@
+<subsystem xmlns="urn:org.camunda.bpm.jboss:1.1">
+  <process-engines>
+    <process-engine name="default">
+      <datasource>java:jboss/datasources/ExampleDS</datasource>
+      <configuration>org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration</configuration>
+    </process-engine>
+  </process-engines>
+  <job-executor>
+    <core-threads>3</core-threads>
+    <max-threads>5</max-threads>
+    <queue-length>10</queue-length>
+    <job-acquisitions>
+      <job-acquisition name="default">
+      </job-acquisition>
+    </job-acquisitions>
+  </job-executor>
+</subsystem>

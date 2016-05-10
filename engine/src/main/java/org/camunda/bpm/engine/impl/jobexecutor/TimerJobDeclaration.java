@@ -32,6 +32,8 @@ public abstract class TimerJobDeclaration<S> extends JobDeclaration<S, TimerEnti
   protected Expression description;
   protected TimerDeclarationType type;
 
+  protected String rawJobHandlerConfiguration;
+
   protected String repeat;
 
   public TimerJobDeclaration(Expression expression, TimerDeclarationType type, String jobHandlerType) {
@@ -93,4 +95,12 @@ public abstract class TimerJobDeclaration<S> extends JobDeclaration<S, TimerEnti
       .schedule(timer);
   }
 
+  public void setRawJobHandlerConfiguration(String rawJobHandlerConfiguration) {
+    this.rawJobHandlerConfiguration = rawJobHandlerConfiguration;
+  }
+
+  @Override
+  protected JobHandlerConfiguration resolveJobHandlerConfiguration(S context) {
+    return resolveJobHandler().newConfiguration(rawJobHandlerConfiguration);
+  }
 }

@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -23,12 +25,13 @@ import org.camunda.bpm.engine.impl.migration.MigrationInstructionGenerator;
 import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanBuilderImpl;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanImpl;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationPlanValidationReportImpl;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidationReportImpl;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationPlanValidationReportImpl;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstruction;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstructionImpl;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMigrationInstructions;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
@@ -52,32 +55,16 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
 
   @Override
   public MigrationPlan execute(CommandContext commandContext) {
-    String sourceProcessDefinitionId = migrationBuilder.getSourceProcessDefinitionId();
-    String targetProcessDefinitionId = migrationBuilder.getTargetProcessDefinitionId();
-    MigrationPlanImpl migrationPlan = new MigrationPlanImpl(sourceProcessDefinitionId, targetProcessDefinitionId);
+    ProcessDefinitionEntity sourceProcessDefinition = getProcessDefinition(commandContext, migrationBuilder.getSourceProcessDefinitionId(), "Source");
+    ProcessDefinitionEntity targetProcessDefinition = getProcessDefinition(commandContext, migrationBuilder.getTargetProcessDefinitionId(), "Target");
 
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "sourceProcessDefinitionId", sourceProcessDefinitionId);
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "targetProcessDefinitionId", targetProcessDefinitionId);
+    checkAuthorization(commandContext, sourceProcessDefinition, targetProcessDefinition);
 
-    ProcessDefinitionImpl sourceProcessDefinition = commandContext.getProcessEngineConfiguration()
-        .getDeploymentCache().findProcessDefinitionFromCache(sourceProcessDefinitionId);
-    ProcessDefinitionImpl targetProcessDefinition = commandContext.getProcessEngineConfiguration()
-        .getDeploymentCache().findProcessDefinitionFromCache(targetProcessDefinitionId);
-
-    EnsureUtil.ensureNotNull(BadUserRequestException.class,
-      "source process definition with id " + sourceProcessDefinitionId + " does not exist",
-      "sourceProcessDefinition",
-      sourceProcessDefinition);
-
-    EnsureUtil.ensureNotNull(BadUserRequestException.class,
-      "target process definition with id " + targetProcessDefinitionId + " does not exist",
-      "targetProcessDefinition",
-      targetProcessDefinition);
-
+    MigrationPlanImpl migrationPlan = new MigrationPlanImpl(sourceProcessDefinition.getId(), targetProcessDefinition.getId());
     List<MigrationInstruction> instructions = new ArrayList<MigrationInstruction>();
 
     if (migrationBuilder.isMapEqualActivities()) {
-      instructions.addAll(generateInstructions(commandContext, sourceProcessDefinition, targetProcessDefinition));
+      instructions.addAll(generateInstructions(commandContext, sourceProcessDefinition, targetProcessDefinition, migrationBuilder.isUpdateEventTriggersForGeneratedInstructions()));
     }
 
     instructions.addAll(migrationBuilder.getExplicitMigrationInstructions());
@@ -88,27 +75,39 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
     return migrationPlan;
   }
 
-  protected List<MigrationInstruction> generateInstructions(CommandContext commandContext, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
+  protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext, String id, String type) {
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, type + " process definition id", id);
+
+    try {
+      return commandContext.getProcessEngineConfiguration()
+        .getDeploymentCache().findDeployedProcessDefinitionById(id);
+    }
+    catch (NullValueException e) {
+      throw LOG.processDefinitionDoesNotExist(id, type);
+    }
+  }
+
+  protected void checkAuthorization(CommandContext commandContext, ProcessDefinitionEntity sourceProcessDefinition, ProcessDefinitionEntity targetProcessDefinition) {
+
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkCreateMigrationPlan(sourceProcessDefinition, targetProcessDefinition);
+    }
+  }
+
+  protected List<MigrationInstruction> generateInstructions(CommandContext commandContext,
+      ProcessDefinitionImpl sourceProcessDefinition,
+      ProcessDefinitionImpl targetProcessDefinition,
+      boolean updateEventTriggers) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
 
     // generate instructions
     MigrationInstructionGenerator migrationInstructionGenerator = processEngineConfiguration.getMigrationInstructionGenerator();
-    ValidatingMigrationInstructions generatedInstructions = migrationInstructionGenerator.generate(sourceProcessDefinition, targetProcessDefinition);
+    ValidatingMigrationInstructions generatedInstructions = migrationInstructionGenerator.generate(sourceProcessDefinition, targetProcessDefinition, updateEventTriggers);
 
     // filter only valid instructions
-    List<MigrationInstructionValidator> migrationInstructionValidators = new ArrayList<MigrationInstructionValidator>(processEngineConfiguration.getMigrationInstructionValidators());
-    List<MigrationInstruction> validInstructions = new ArrayList<MigrationInstruction>();
-    for (ValidatingMigrationInstruction generatedInstruction : generatedInstructions.getInstructions()) {
-      if (isValidInstruction(generatedInstruction, generatedInstructions, migrationInstructionValidators)) {
-        validInstructions.add(generatedInstruction.toMigrationInstruction());
-      }
-    }
+    generatedInstructions.filterWith(processEngineConfiguration.getMigrationInstructionValidators());
 
-    return validInstructions;
-  }
-
-  protected boolean isValidInstruction(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, List<MigrationInstructionValidator> migrationInstructionValidators) {
-    return !validateInstruction(instruction, instructions, migrationInstructionValidators).hasFailures();
+    return generatedInstructions.asMigrationInstructions();
   }
 
   protected void validateMigrationPlan(CommandContext commandContext, MigrationPlanImpl migrationPlan, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
@@ -150,7 +149,7 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
         ActivityImpl targetActivity = targetProcessDefinition.findActivity(migrationInstruction.getTargetActivityId());
 
         if (sourceActivity != null && targetActivity != null) {
-          validatingMigrationInstructions.addInstruction(new ValidatingMigrationInstructionImpl(sourceActivity, targetActivity));
+          validatingMigrationInstructions.addInstruction(new ValidatingMigrationInstructionImpl(sourceActivity, targetActivity, migrationInstruction.isUpdateEventTrigger()));
         }
         else {
           if (sourceActivity == null) {

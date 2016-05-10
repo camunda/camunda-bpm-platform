@@ -15,8 +15,6 @@ package org.camunda.bpm.engine.migration;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingActivityInstanceValidationReport;
-
 /**
  * Collects general failures  and the migrating activity instance validation
  * reports for a migrating process instance.
@@ -45,6 +43,11 @@ public interface MigratingProcessInstanceValidationReport {
   /**
    * @return the list of activity instance validation reports
    */
-  List<MigratingActivityInstanceValidationReport> getReports();
+  List<MigratingActivityInstanceValidationReport> getActivityInstanceReports();
+
+  /**
+   * @return the list of transition instance validation reports
+   */
+  List<MigratingTransitionInstanceValidationReport> getTransitionInstanceReports();
 
 }

@@ -13,16 +13,17 @@
 
 package org.camunda.bpm.engine.impl;
 
+import org.camunda.bpm.engine.batch.BatchQuery;
 import org.camunda.bpm.engine.query.QueryProperty;
-import org.camunda.bpm.engine.runtime.ExecutionQuery;
 
 /**
- * Contains the possible properties that can be used in a {@link ExecutionQuery}.
+ * Contains the possible properties that can be used in a {@link BatchQuery}.
  *
- * @author Joram Barrez
  */
 public interface BatchQueryProperty {
 
-  public static final QueryProperty ID = new QueryPropertyImpl("ID_");
+  QueryProperty ID = new QueryPropertyImpl("ID_");
+
+  QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
 
 }

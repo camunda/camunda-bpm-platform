@@ -41,6 +41,7 @@ public class LockedExternalTaskDto {
   protected String topicName;
   protected String tenantId;
   protected Map<String, VariableValueDto> variables;
+  protected long priority;
 
   public String getActivityId() {
     return activityId;
@@ -88,6 +89,10 @@ public class LockedExternalTaskDto {
     return variables;
   }
 
+  public long getPriority() {
+    return priority;
+  }  
+
   public static LockedExternalTaskDto fromLockedExternalTask(LockedExternalTask task) {
     LockedExternalTaskDto dto = new LockedExternalTaskDto();
     dto.activityId = task.getActivityId();
@@ -104,6 +109,7 @@ public class LockedExternalTaskDto {
     dto.workerId = task.getWorkerId();
     dto.tenantId = task.getTenantId();
     dto.variables = VariableValueDto.fromVariableMap(task.getVariables());
+    dto.priority = task.getPriority();
 
     return dto;
   }

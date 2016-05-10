@@ -126,6 +126,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     commandExecutorSchemaOperations.execute(new SchemaOperationsProcessEngineBuild());
   }
 
+  @Override
   public void close() {
 
     ProcessEngines.unregister(this);
@@ -146,61 +147,74 @@ public class ProcessEngineImpl implements ProcessEngine {
     LOG.processEngineClosed(name);
   }
 
-  // getters and setters //////////////////////////////////////////////////////
-
+  @Override
   public String getName() {
     return name;
   }
+  
+  @Override  
+  public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
+    return processEngineConfiguration;
+  }
 
+  @Override
   public IdentityService getIdentityService() {
     return identityService;
   }
 
+  @Override
   public ManagementService getManagementService() {
     return managementService;
   }
 
+  @Override
   public TaskService getTaskService() {
     return taskService;
   }
 
+  @Override
   public HistoryService getHistoryService() {
     return historicDataService;
   }
 
+  @Override
   public RuntimeService getRuntimeService() {
     return runtimeService;
   }
 
+  @Override
   public RepositoryService getRepositoryService() {
     return repositoryService;
   }
 
+  @Override
   public FormService getFormService() {
     return formService;
   }
 
+  @Override
   public AuthorizationService getAuthorizationService() {
     return authorizationService;
   }
 
+  @Override
   public CaseService getCaseService() {
     return caseService;
   }
 
+  @Override
   public FilterService getFilterService() {
     return filterService;
   }
 
+  @Override
   public ExternalTaskService getExternalTaskService() {
     return externalTaskService;
   }
 
+  @Override
   public DecisionService getDecisionService() {
     return decisionService;
   }
 
-  public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-    return processEngineConfiguration;
-  }
 }

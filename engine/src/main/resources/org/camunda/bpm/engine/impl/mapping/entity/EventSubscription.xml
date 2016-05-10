@@ -66,7 +66,7 @@
   <sql id="selectEventSubscriptionByQueryCriteriaSql">
     from ${prefix}ACT_RU_EVENT_SUBSCR RES
 
-    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       left join ${prefix}ACT_RU_EXECUTION EXECUTION
       on RES.EXECUTION_ID_ = EXECUTION.ID_
 
@@ -111,6 +111,7 @@
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 
     </where>
   </sql>
@@ -122,8 +123,10 @@
     where (EVENT_TYPE_ = 'signal')
       and (EVENT_NAME_ = #{parameter})
       and (EVT.EXECUTION_ID_ is null or EXC.SUSPENSION_STATE_ = 1)
+    <bind name="columnPrefix" value="'EVT.'"/>
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
   </select>
-  
+
   <select id="selectSignalEventSubscriptionsByEventNameAndTenantId" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select EVT.*
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
@@ -138,7 +141,7 @@
         and EVT.TENANT_ID_ is null
       </if>
   </select>
-  
+
   <select id="selectSignalEventSubscriptionsByEventNameAndTenantIdIncludeWithoutTenantId" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select EVT.*
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
@@ -169,7 +172,7 @@
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EXECUTION_ID_ = #{parameter})
   </select>
-  
+
   <select id="selectEventSubscriptionsByProcessInstanceId"  resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select *
     from ${prefix}ACT_RU_EVENT_SUBSCR
@@ -185,7 +188,7 @@
       ${constant.for.update}
     </if>
   </select>
-  
+
   <select id="selectEventSubscriptionsByExecutionAndType_mssql" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select *
     from ${prefix}ACT_RU_EVENT_SUBSCR 
@@ -234,7 +237,7 @@
       ${constant.for.update}
     </if>      
   </select>
-  
+
   <select id="selectEventSubscriptionsByNameAndExecution_mssql"  resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select *
     from ${prefix}ACT_RU_EVENT_SUBSCR
@@ -245,15 +248,16 @@
       and (EVENT_NAME_ = #{parameter.eventName})
       and (EXECUTION_ID_ = #{parameter.executionId})
   </select>
-  
-  <select id="selectMessageStartEventSubscriptionByName" resultMap="eventSubscriptionResultMap" parameterType="string">
+
+  <select id="selectMessageStartEventSubscriptionByName" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select *
-    from ${prefix}ACT_RU_EVENT_SUBSCR
+    from ${prefix}ACT_RU_EVENT_SUBSCR RES
     where (EVENT_TYPE_ = 'message')
-    	and (EVENT_NAME_ = #{parameter})
-    	and EXECUTION_ID_ is null
+        and (EVENT_NAME_ = #{parameter})
+        and EXECUTION_ID_ is null
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
   </select>
-  
+
   <select id="selectMessageStartEventSubscriptionByNameAndTenantId" resultMap="eventSubscriptionResultMap" parameterType="string">
     select *
     from ${prefix}ACT_RU_EVENT_SUBSCR

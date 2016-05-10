@@ -40,7 +40,8 @@ public abstract class TomcatServerBootstrap extends EmbeddedServerBootstrap {
 
     String contextPath = "/" + getContextPath();
 
-    PomEquippedResolveStage resolver = Maven.resolver().loadPomFromFile("pom.xml");
+    PomEquippedResolveStage resolver = Maven.configureResolver()
+      .useLegacyLocalRepo(true).loadPomFromFile("pom.xml");
 
     WebArchive wa = ShrinkWrap.create(WebArchive.class, "rest-test.war").setWebXML(webXmlPath)
         .addAsLibraries(resolver.resolve("org.codehaus.jackson:jackson-jaxrs:1.6.5").withTransitivity().asFile())

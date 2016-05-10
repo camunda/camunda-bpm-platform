@@ -147,6 +147,7 @@ public abstract class ProcessEngineConfiguration {
   protected boolean jobExecutorAcquireByPriority = false;
 
   protected boolean producePrioritizedJobs = true;
+  protected boolean producePrioritizedExternalTasks = true;
 
   /**
    * The flag will be used inside the method "JobManager#send()". It will be used to decide whether to notify the
@@ -198,6 +199,17 @@ public abstract class ProcessEngineConfiguration {
   protected boolean authorizationEnabled = false;
 
   /**
+   * Provides the default task permission for the user related to a task
+   * User can be related to a task in the following ways
+   * - Candidate user
+   * - Part of candidate group
+   * - Assignee
+   * - Owner
+   * The default value is UPDATE.
+   */
+  protected String defaultTaskPermissionForUser = "UPDATE";
+
+  /**
    * <p>The following flag <code>authorizationEnabledForCustomCode</code> will
    * only be taken into account iff <code>authorizationEnabled</code> is set
    * <code>true</code>.</p>
@@ -210,6 +222,13 @@ public abstract class ProcessEngineConfiguration {
    *
    */
   protected boolean authorizationEnabledForCustomCode = false;
+
+  /**
+   * If the value of this flag is set <code>true</code> then the process engine
+   * performs tenant checks to ensure that an authenticated user can only access
+   * data that belongs to one of his tenants.
+   */
+  protected boolean tenantCheckEnabled = true;
 
   protected ValueTypeResolver valueTypeResolver;
 
@@ -603,12 +622,30 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
+  public String getDefaultTaskPermissionForUser() {
+    return defaultTaskPermissionForUser;
+  }
+
+  public ProcessEngineConfiguration setDefaultTaskPermissionForUser(String defaultTaskPermissionForUser) {
+    this.defaultTaskPermissionForUser = defaultTaskPermissionForUser;
+    return this;
+  }
+
   public boolean isAuthorizationEnabledForCustomCode() {
     return authorizationEnabledForCustomCode;
   }
 
   public ProcessEngineConfiguration setAuthorizationEnabledForCustomCode(boolean authorizationEnabledForCustomCode) {
     this.authorizationEnabledForCustomCode = authorizationEnabledForCustomCode;
+    return this;
+  }
+
+  public boolean isTenantCheckEnabled() {
+    return tenantCheckEnabled;
+  }
+
+  public ProcessEngineConfiguration setTenantCheckEnabled(boolean isTenantCheckEnabled) {
+    this.tenantCheckEnabled = isTenantCheckEnabled;
     return this;
   }
 
@@ -645,4 +682,11 @@ public abstract class ProcessEngineConfiguration {
     this.jobExecutorAcquireByPriority = jobExecutorAcquireByPriority;
   }
 
+  public boolean isProducePrioritizedExternalTasks() {
+    return producePrioritizedExternalTasks;
+  }
+
+  public void setProducePrioritizedExternalTasks(boolean producePrioritizedExternalTasks) {
+    this.producePrioritizedExternalTasks = producePrioritizedExternalTasks;
+  }
 }

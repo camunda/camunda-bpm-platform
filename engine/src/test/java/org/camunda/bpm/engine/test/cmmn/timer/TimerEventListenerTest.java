@@ -12,7 +12,8 @@
  */
 package org.camunda.bpm.engine.test.cmmn.timer;
 
-import org.camunda.bpm.engine.impl.jobexecutor.TimerEventListenerJobDeclaration;
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
@@ -20,8 +21,6 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
-
-import java.util.List;
 
 /**
  * @author smirnov

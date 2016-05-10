@@ -14,8 +14,6 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.impl.cmd.AbstractSetProcessDefinitionStateCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendProcessDefinitionCmd;
-import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
 
 /**
  * @author Joram Barrez
@@ -30,13 +28,8 @@ public class TimerSuspendProcessDefinitionHandler extends TimerChangeProcessDefi
   }
 
   @Override
-  protected AbstractSetProcessDefinitionStateCmd getCommand(String configuration) {
-    JSONObject config = new JSONObject(configuration);
-
-    UpdateProcessDefinitionSuspensionStateBuilderImpl builder = createBuilder(config)
-        .includeProcessInstances(getIncludeProcessInstances(config));
-
-    return new SuspendProcessDefinitionCmd(builder);
+  protected AbstractSetProcessDefinitionStateCmd getCommand(ProcessDefinitionSuspensionStateConfiguration configuration) {
+    return new SuspendProcessDefinitionCmd(configuration.createBuilder());
   }
 
 }

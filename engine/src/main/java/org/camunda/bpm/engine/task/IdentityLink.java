@@ -29,6 +29,10 @@ import org.camunda.bpm.engine.identity.UserQuery;
 public interface IdentityLink {
   
   /**
+   * Get the Id of identityLink 
+   */
+   String getId();	
+  /**
    * Returns the type of link.
    * See {@link IdentityLinkType} for the native supported types by the process engine.
    */
@@ -51,4 +55,17 @@ public interface IdentityLink {
    */
   String getTaskId();
 
+  /**
+   * Get the process definition id
+   */
+  public String getProcessDefId();
+  
+  /**
+   * The id of the tenant associated with this identity link.
+   *
+   * @since 7.5
+   * 
+   */
+  public String getTenantId();
+ 
 }

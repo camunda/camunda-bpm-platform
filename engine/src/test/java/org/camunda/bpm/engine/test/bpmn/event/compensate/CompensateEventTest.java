@@ -34,11 +34,14 @@ import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.bpmn.event.compensate.ReadLocalVariableListener.VariableEvent;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.BookFlightService;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.CancelFlightService;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.GetVariablesDelegate;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.SetVariablesDelegate;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
+import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Assert;
 
 /**
  * @author Daniel Meyer
@@ -1026,6 +1029,32 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     // and after completing the concurrent task, the process instance ends successfully
     taskService.complete(concurrentTask.getId());
     assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment
+  public void testLocalVariablesInEndExecutionListener() {
+    // given
+    SetLocalVariableListener setListener = new SetLocalVariableListener("foo", "bar");
+    ReadLocalVariableListener readListener = new ReadLocalVariableListener("foo");
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process",
+      Variables.createVariables()
+        .putValue("setListener", setListener)
+        .putValue("readListener", readListener));
+
+    Task beforeCompensationTask = taskService.createTaskQuery().singleResult();
+
+    // when executing the compensation handler
+    taskService.complete(beforeCompensationTask.getId());
+
+    // then the variable listener has been invoked and was able to read the variable on the end event
+    readListener = (ReadLocalVariableListener) runtimeService.getVariable(processInstance.getId(), "readListener");
+
+    Assert.assertEquals(1, readListener.getVariableEvents().size());
+
+    VariableEvent event = readListener.getVariableEvents().get(0);
+    Assert.assertEquals("foo", event.getVariableName());
+    Assert.assertEquals("bar", event.getVariableValue());
   }
 
   private void completeTask(String taskName) {

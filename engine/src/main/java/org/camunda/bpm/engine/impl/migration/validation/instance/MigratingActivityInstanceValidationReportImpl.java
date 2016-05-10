@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.migration.MigratingActivityInstanceValidationReport;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 
 public class MigratingActivityInstanceValidationReportImpl implements MigratingActivityInstanceValidationReport {

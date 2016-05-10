@@ -29,6 +29,7 @@ public class HistoricCaseActivityInstanceDto {
   private String taskId;
   private String calledProcessInstanceId;
   private String calledCaseInstanceId;
+  private String tenantId;
   private Date createTime;
   private Date endTime;
   private Long durationInMillis;
@@ -82,6 +83,10 @@ public class HistoricCaseActivityInstanceDto {
 
   public String getCalledCaseInstanceId() {
     return calledCaseInstanceId;
+  }
+
+  public String getTenantId() {
+    return tenantId;
   }
 
   public Date getCreateTime() {
@@ -139,6 +144,7 @@ public class HistoricCaseActivityInstanceDto {
     dto.taskId = historicCaseActivityInstance.getTaskId();
     dto.calledProcessInstanceId = historicCaseActivityInstance.getCalledProcessInstanceId();
     dto.calledCaseInstanceId = historicCaseActivityInstance.getCalledCaseInstanceId();
+    dto.tenantId = historicCaseActivityInstance.getTenantId();
     dto.createTime = historicCaseActivityInstance.getCreateTime();
     dto.endTime = historicCaseActivityInstance.getEndTime();
     dto.durationInMillis = historicCaseActivityInstance.getDurationInMillis();

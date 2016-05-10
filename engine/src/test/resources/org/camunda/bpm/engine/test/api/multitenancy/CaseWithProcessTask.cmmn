@@ -5,9 +5,10 @@
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   targetNamespace="Examples">
   <case id="testCase" name="One Process Task Case">
-  
+
     <casePlanModel id="CasePlanModel_1">
       <planItem id="PI_ProcessTask_1" definitionRef="ProcessTask_1" />
+
       <processTask id="ProcessTask_1" name="A Process Task" processRef="testProcess">
         <extensionElements>
           <camunda:in variables="all" />
@@ -15,5 +16,5 @@
       </processTask>
     </casePlanModel>
   </case>
-  
+
 </definitions>

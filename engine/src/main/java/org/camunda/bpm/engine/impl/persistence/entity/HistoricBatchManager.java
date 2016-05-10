@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
@@ -31,14 +32,19 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 public class HistoricBatchManager extends AbstractManager {
 
   public long findBatchCountByQueryCriteria(HistoricBatchQueryImpl historicBatchQuery) {
-    // TODO: authorization
+    configureQuery(historicBatchQuery);
     return (Long) getDbEntityManager().selectOne("selectHistoricBatchCountByQueryCriteria", historicBatchQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricBatch> findBatchesByQueryCriteria(HistoricBatchQueryImpl historicBatchQuery, Page page) {
-    // TODO: authorization
+    configureQuery(historicBatchQuery);
     return getDbEntityManager().selectList("selectHistoricBatchesByQueryCriteria", historicBatchQuery, page);
+  }
+
+  protected void configureQuery(HistoricBatchQueryImpl query) {
+    // TODO: authorization
+    getTenantManager().configureQuery(query);
   }
 
   public HistoricBatchEntity findHistoricBatchById(String batchId) {
@@ -49,31 +55,33 @@ public class HistoricBatchManager extends AbstractManager {
     getDbEntityManager().delete(HistoricBatchEntity.class, "deleteHistoricBatchById", id);
   }
 
-  public void createHistoricBatch(BatchEntity batch) {
+  public void createHistoricBatch(final BatchEntity batch) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
 
     HistoryLevel historyLevel = configuration.getHistoryLevel();
     if(historyLevel.isHistoryEventProduced(HistoryEventTypes.BATCH_START, batch)) {
 
-      final HistoryEventProducer eventProducer = configuration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
-
-      HistoryEvent evt = eventProducer.createBatchStartEvent(batch);
-      eventHandler.handleEvent(evt);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createBatchStartEvent(batch);
+        }
+      });
     }
   }
 
-  public void completeHistoricBatch(BatchEntity batch) {
+  public void completeHistoricBatch(final BatchEntity batch) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
 
     HistoryLevel historyLevel = configuration.getHistoryLevel();
     if(historyLevel.isHistoryEventProduced(HistoryEventTypes.BATCH_END, batch)) {
 
-      final HistoryEventProducer eventProducer = configuration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
-
-      HistoryEvent evt = eventProducer.createBatchEndEvent(batch);
-      eventHandler.handleEvent(evt);
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createBatchEndEvent(batch);
+        }
+      });
     }
   }
 

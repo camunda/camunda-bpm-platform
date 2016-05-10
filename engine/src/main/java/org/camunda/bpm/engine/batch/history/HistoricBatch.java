@@ -30,9 +30,9 @@ public interface HistoricBatch {
   String getType();
 
   /**
-   * @return the number of invocations executed by the batch
+   * @return the number of batch execution jobs required to complete the batch
    */
-  int getSize();
+  int getTotalJobs();
 
   /**
    * @return number of batch jobs created per batch seed job invocation

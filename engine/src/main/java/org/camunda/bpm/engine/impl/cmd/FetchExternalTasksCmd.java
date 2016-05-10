@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
  * @author Thorben Lindhauer
+ * @author Christopher Zell
  *
  */
 public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> {
@@ -42,20 +43,27 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
 
   protected String workerId;
   protected int maxResults;
+  protected boolean usePriority;
   protected Map<String, TopicFetchInstruction> fetchInstructions = new HashMap<String, TopicFetchInstruction>();
 
   public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions) {
+    this(workerId, maxResults, instructions, false);
+  }
+
+  public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions, boolean usePriority) {
     this.workerId = workerId;
     this.maxResults = maxResults;
     this.fetchInstructions = instructions;
+    this.usePriority = usePriority;
   }
 
+  @Override
   public List<LockedExternalTask> execute(CommandContext commandContext) {
     validateInput();
 
     List<ExternalTaskEntity> externalTasks = commandContext
       .getExternalTaskManager()
-      .selectExternalTasksForTopics(fetchInstructions.keySet(), maxResults);
+      .selectExternalTasksForTopics(fetchInstructions.keySet(), maxResults, usePriority);
 
     final List<LockedExternalTask> result = new ArrayList<LockedExternalTask>();
 

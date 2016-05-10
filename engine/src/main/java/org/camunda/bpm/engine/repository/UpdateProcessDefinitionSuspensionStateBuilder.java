@@ -50,26 +50,6 @@ public interface UpdateProcessDefinitionSuspensionStateBuilder {
   UpdateProcessDefinitionSuspensionStateBuilder executionDate(Date executionDate);
 
   /**
-   * Specify that the process definition belongs to no tenant. Can only be used
-   * when the process definition is referenced by <code>key</code> and not by
-   * <code>id</code>.
-   *
-   * @return the builder
-   */
-  UpdateProcessDefinitionSuspensionStateBuilder processDefinitionWithoutTenantId();
-
-  /**
-   * Specify the id of the tenant the process definition belongs to. Can only be
-   * used when the process definition is referenced by <code>key</code> and not
-   * by <code>id</code>.
-   *
-   * @param tenantId
-   *          the id of the tenant
-   * @return the builder
-   */
-  UpdateProcessDefinitionSuspensionStateBuilder processDefinitionTenantId(String tenantId);
-
-  /**
    * Activates the provided process definitions.
    *
    * @throws ProcessEngineException

@@ -33,7 +33,7 @@ public class RegisterProcessApplicationCmd implements Command<ProcessApplication
   }
 
   public ProcessApplicationRegistration execute(CommandContext commandContext) {
-    commandContext.getAuthorizationManager().isCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdmin();
 
     final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     final ProcessApplicationManager processApplicationManager = processEngineConfiguration.getProcessApplicationManager();

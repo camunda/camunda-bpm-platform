@@ -26,6 +26,8 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderHistoricDecisionInstanceContext;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -64,7 +66,13 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     setReferenceToProcessInstance(event, executionEntity);
     // set current time as evaluation time
     event.setEvaluationTime(ClockUtil.getCurrentTime());
-    event.setTenantId(execution.getTenantId());
+
+    DecisionDefinition decisionDefinition = (DecisionDefinition) evaluationEvent.getDecisionTable();
+    String tenantId = execution.getTenantId();
+    if (tenantId == null) {
+      tenantId = provideTenantId(decisionDefinition, event);
+    }
+    event.setTenantId(tenantId);
 
     return event;
   }
@@ -79,8 +87,13 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     setReferenceToCaseInstance(event, executionEntity);
     // set current time as evaluation time
     event.setEvaluationTime(ClockUtil.getCurrentTime());
-    // TODO: set tenant id (using next line) when delegate case execution is extended with it
-    // event.setTenantId(execution.getTenantId();)
+
+    DecisionDefinition decisionDefinition = (DecisionDefinition) evaluationEvent.getDecisionTable();
+    String tenantId = execution.getTenantId();
+    if (tenantId == null) {
+      tenantId = provideTenantId(decisionDefinition, event);
+    }
+    event.setTenantId(tenantId);
 
     return event;
   }
@@ -97,7 +110,12 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     setUserId(event);
 
     DmnDecision decisionTable = evaluationEvent.getDecisionTable();
-    event.setTenantId(((DecisionDefinition) decisionTable).getTenantId());
+
+    String tenantId = ((DecisionDefinition) decisionTable).getTenantId();
+    if (tenantId == null) {
+      tenantId = provideTenantId((DecisionDefinition) decisionTable, event);
+    }
+    event.setTenantId(tenantId);
 
     return event;
   }
@@ -205,6 +223,7 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     event.setProcessDefinitionId(execution.getProcessDefinitionId());
 
     event.setProcessInstanceId(execution.getProcessInstanceId());
+    event.setExecutionId(execution.getId());
 
     event.setActivityId(execution.getActivityId());
     event.setActivityInstanceId(execution.getActivityInstanceId());
@@ -224,6 +243,7 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     event.setCaseDefinitionId(execution.getCaseDefinitionId());
 
     event.setCaseInstanceId(execution.getCaseInstanceId());
+    event.setExecutionId(execution.getId());
 
     event.setActivityId(execution.getActivityId());
     event.setActivityInstanceId(execution.getId());
@@ -242,5 +262,35 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     event.setUserId(Context.getCommandContext().getAuthenticatedUserId());
   }
 
-}
+  protected String provideTenantId(DecisionDefinition decisionDefinition, HistoricDecisionInstanceEntity event) {
+    TenantIdProvider tenantIdProvider = Context.getProcessEngineConfiguration().getTenantIdProvider();
+    String tenantId = null;
 
+    if(tenantIdProvider != null) {
+      TenantIdProviderHistoricDecisionInstanceContext ctx = null;
+
+      if(event.getExecutionId() != null) {
+        ctx = new TenantIdProviderHistoricDecisionInstanceContext(decisionDefinition, getExecution(event));
+      }
+      else if(event.getCaseExecutionId() != null) {
+        ctx = new TenantIdProviderHistoricDecisionInstanceContext(decisionDefinition, getCaseExecution(event));
+      }
+      else {
+        ctx = new TenantIdProviderHistoricDecisionInstanceContext(decisionDefinition);
+      }
+
+      tenantId = tenantIdProvider.provideTenantIdForHistoricDecisionInstance(ctx);
+    }
+
+    return tenantId;
+  }
+
+  protected DelegateExecution getExecution(HistoricDecisionInstanceEntity event) {
+    return Context.getCommandContext().getExecutionManager().findExecutionById(event.getExecutionId());
+  }
+
+  protected DelegateCaseExecution getCaseExecution(HistoricDecisionInstanceEntity event) {
+      return Context.getCommandContext().getCaseExecutionManager().findCaseExecutionById(event.getCaseExecutionId());
+  }
+
+}

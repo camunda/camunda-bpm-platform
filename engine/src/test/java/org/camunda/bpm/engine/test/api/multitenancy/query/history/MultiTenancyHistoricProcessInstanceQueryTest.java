@@ -16,16 +16,20 @@ package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
 
   protected final static String TENANT_ONE = "tenant1";
@@ -112,6 +116,42 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
     assertThat(historicProcessInstances.size(), is(2));
     assertThat(historicProcessInstances.get(0).getTenantId(), is(TENANT_TWO));
     assertThat(historicProcessInstances.get(1).getTenantId(), is(TENANT_ONE));
+  }
+
+  public void testQueryNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+    assertThat(query.count(), is(0L));
+  }
+
+  public void testQueryAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    assertThat(query.count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count(), is(1L));
+  }
+
+  public void testQueryAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    assertThat(query.count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+  }
+
+  public void testQueryDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+    assertThat(query.count(), is(2L));
   }
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant) {

@@ -70,11 +70,11 @@ create table ACT_RU_JOB (
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
     PROCESS_DEF_ID_ varchar(64),
-    PROCESS_DEF_KEY_ varchar(64),
+    PROCESS_DEF_KEY_ varchar(255),
     CASE_EXECUTION_ID_ varchar(64),
     CASE_INSTANCE_ID_ varchar(64),
     CASE_DEF_ID_ varchar(64),
-    CASE_DEF_KEY_ varchar(64),
+    CASE_DEF_KEY_ varchar(255),
     RETRIES_ integer,
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
@@ -120,6 +120,7 @@ create table ACT_RE_PROCDEF (
     HAS_START_FORM_KEY_ smallint check(HAS_START_FORM_KEY_ in (1,0)),
     SUSPENSION_STATE_ integer,
     TENANT_ID_ varchar(64),
+    VERSION_TAG_ varchar(64),
     primary key (ID_)
 );
 
@@ -156,6 +157,7 @@ create table ACT_RU_IDENTITYLINK (
     USER_ID_ varchar(255),
     TASK_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -209,6 +211,7 @@ create table ACT_RU_INCIDENT (
   ROOT_CAUSE_INCIDENT_ID_ varchar(64),
   CONFIGURATION_ varchar(255),
   TENANT_ID_ varchar(64),
+  JOB_DEF_ID_ varchar(64),
   primary key (ID_)
 );
 
@@ -263,6 +266,7 @@ create table ACT_RU_EXT_TASK (
   ACT_ID_ varchar(255),
   ACT_INST_ID_ varchar(64),
   TENANT_ID_ varchar(64),
+  PRIORITY_ bigint not null default 0,
   primary key (ID_)
 );
 
@@ -270,7 +274,8 @@ create table ACT_RU_BATCH (
   ID_ varchar(64) not null,
   REV_ integer not null,
   TYPE_ varchar(255),
-  SIZE_ integer,
+  TOTAL_JOBS_ integer,
+  JOBS_CREATED_ integer,
   JOBS_PER_SEED_ integer,
   INVOCATIONS_PER_JOB_ integer,
   SEED_JOB_DEF_ID_ varchar(64),
@@ -301,6 +306,7 @@ create index ACT_IDX_JOBDEF_TENANT_ID on ACT_RU_JOBDEF(TENANT_ID_);
 create index ACT_IDX_METER_LOG on ACT_RU_METER_LOG(NAME_,TIMESTAMP_);
 create index ACT_IDX_EXT_TASK_TOPIC ON ACT_RU_EXT_TASK(TOPIC_NAME_);
 create index ACT_IDX_EXT_TASK_TENANT_ID ON ACT_RU_EXT_TASK(TENANT_ID_);
+create index ACT_IDX_EXT_TASK_PRIORITY ON ACT_RU_EXT_TASK(PRIORITY_);
 create index ACT_IDX_AUTH_GROUP_ID ON ACT_RU_AUTHORIZATION(GROUP_ID_);
 create index ACT_IDX_JOB_JOB_DEF_ID on ACT_RU_JOB(JOB_DEF_ID_);
 
@@ -408,6 +414,12 @@ alter table ACT_RU_INCIDENT
     foreign key (ROOT_CAUSE_INCIDENT_ID_)
     references ACT_RU_INCIDENT (ID_);
 
+create index ACT_IDX_INCIDENT_JOB_DEF on ACT_RU_INCIDENT(JOB_DEF_ID_);
+alter table ACT_RU_INCIDENT
+    add constraint ACT_FK_INC_JOB_DEF
+    foreign key (JOB_DEF_ID_)
+    references ACT_RU_JOBDEF (ID_);
+
 alter table ACT_RU_EXT_TASK
     add constraint ACT_FK_EXT_TASK_EXE
     foreign key (EXECUTION_ID_)
@@ -467,3 +479,4 @@ create index ACT_IDX_JOB_HANDLER_TYPE ON ACT_RU_JOB(HANDLER_TYPE_);
 create index ACT_IDX_EVENT_SUBSCR_EVT_NAME ON ACT_RU_EVENT_SUBSCR(EVENT_NAME_);
 create index ACT_IDX_PROCDEF_DEPLOYMENT_ID ON ACT_RE_PROCDEF(DEPLOYMENT_ID_);
 create index ACT_IDX_PROCDEF_TENANT_ID ON ACT_RE_PROCDEF(TENANT_ID_);
+create index ACT_IDX_PROCDEF_VER_TAG ON ACT_RE_PROCDEF(VERSION_TAG_);

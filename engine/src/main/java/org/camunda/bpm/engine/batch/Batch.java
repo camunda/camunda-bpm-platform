@@ -29,7 +29,7 @@ package org.camunda.bpm.engine.batch;
  */
 public interface Batch {
 
-  public static final String TYPE_PROCESS_INSTANCE_MIGRATION = "instance-migration";
+  String TYPE_PROCESS_INSTANCE_MIGRATION = "instance-migration";
 
   /**
    * @return the id of the batch
@@ -42,9 +42,14 @@ public interface Batch {
   String getType();
 
   /**
-   * @return the number of invocations executed by the batch
+   * @return the number of batch execution jobs required to complete the batch
    */
-  int getSize();
+  int getTotalJobs();
+
+  /**
+   * @return the number of batch execution jobs already created by the seed job
+   */
+  int getJobsCreated();
 
   /**
    * @return number of batch jobs created per batch seed job invocation

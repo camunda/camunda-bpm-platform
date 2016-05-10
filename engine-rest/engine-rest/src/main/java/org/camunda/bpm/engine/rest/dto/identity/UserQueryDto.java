@@ -56,6 +56,7 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
   protected String emailLike;
   protected String memberOfGroup;
   protected String potentialStarter;
+  protected String tenantId;
 
   public UserQueryDto() {
 
@@ -89,7 +90,7 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
   public void setLastName(String userLastName) {
     this.lastName = userLastName;
   }
-  
+
   @CamundaQueryParam("lastNameLike")
   public void setLastNameLike(String userLastNameLike) {
     this.lastNameLike = userLastNameLike;
@@ -113,6 +114,11 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
   @CamundaQueryParam("potentialStarter")
   public void setPotentialStarter(String potentialStarter) {
     this.potentialStarter = potentialStarter;
+  }
+
+  @CamundaQueryParam("memberOfTenant")
+  public void setMemberOfTenant(String tenantId) {
+    this.tenantId = tenantId;
   }
 
   @Override
@@ -156,6 +162,9 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
     }
     if (potentialStarter != null) {
       query.potentialStarter(potentialStarter);
+    }
+    if (tenantId != null) {
+      query.memberOfTenant(tenantId);
     }
   }
 

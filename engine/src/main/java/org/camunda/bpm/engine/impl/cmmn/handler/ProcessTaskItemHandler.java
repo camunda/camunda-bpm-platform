@@ -50,4 +50,10 @@ public class ProcessTaskItemHandler extends ProcessOrCaseTaskItemHandler {
     return definition.getCamundaProcessVersion();
   }
 
+  protected String getTenantId(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+    ProcessTask definition = getDefinition(element);
+
+    return definition.getCamundaProcessTenantId();
+  }
+
 }

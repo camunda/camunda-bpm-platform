@@ -82,22 +82,36 @@
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
-  <update id="updateTaskSuspensionStateByParameters" parameterType="java.util.Map">
+  <update id="updateTaskSuspensionStateByParameters" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     update ${prefix}ACT_RU_TASK set
       REV_ = REV_ + 1,
-      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
+      SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER}
     <where>
-      <if test="processInstanceId != null">
-        PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      <if test="parameter.processInstanceId != null">
+        PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR}
       </if>
-      <if test="processDefinitionId != null">
-        PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+      <if test="parameter.processDefinitionId != null">
+        PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=VARCHAR}
       </if>
-      <if test="processDefinitionKey != null">
-        PROC_DEF_ID_ IN (SELECT ID_ FROM ${prefix}ACT_RE_PROCDEF WHERE KEY_ = #{processDefinitionKey, jdbcType=VARCHAR})
+      <if test="parameter.processDefinitionKey != null">
+        PROC_DEF_ID_ IN (
+          SELECT ID_ 
+          FROM ${prefix}ACT_RE_PROCDEF PD
+          WHERE PD.KEY_ = #{parameter.processDefinitionKey, jdbcType=VARCHAR}
+          <if test="parameter.isProcessDefinitionTenantIdSet">
+            <if test="parameter.processDefinitionTenantId != null">
+              and PD.TENANT_ID_ = #{parameter.processDefinitionTenantId, jdbcType=VARCHAR}
+            </if>
+            <if test="parameter.processDefinitionTenantId == null">
+              and PD.TENANT_ID_ is null
+            </if>
+          </if>
+        )
+        <bind name="columnPrefix" value="''"/>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
       </if>
-      <if test="caseExecutionId != null">
-        CASE_EXECUTION_ID_ = #{caseExecutionId, jdbcType=VARCHAR}
+      <if test="parameter.caseExecutionId != null">
+        CASE_EXECUTION_ID_ = #{parameter.caseExecutionId, jdbcType=VARCHAR}
       </if>
     </where>
   </update>
@@ -213,7 +227,7 @@
         left join ${prefix}ACT_RU_EXECUTION E1 on RES.EXECUTION_ID_ = E1.ID_
     </if>
 
-    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       left join ${prefix}ACT_RE_PROCDEF PROCDEF on RES.PROC_DEF_ID_ = PROCDEF.ID_
     </if>
 
@@ -405,7 +419,7 @@
         <if test="tenantIds == null">
           and RES.TENANT_ID_ is null
         </if>
-      </if>  
+      </if>
       <if test="candidateUser != null || candidateGroups != null">
         <if test="!includeAssignedTasks">
           and RES.ASSIGNEE_ is null
@@ -480,7 +494,8 @@
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.contextualAuthorizationCheck" />
-
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+ 
     </where>
   </sql>
 

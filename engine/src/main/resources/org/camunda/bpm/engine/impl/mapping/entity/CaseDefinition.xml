@@ -78,13 +78,14 @@
       and KEY_ = #{caseDefinitionKey}
   </select>
 
-  <select id="selectLatestCaseDefinitionByKey" parameterType="string" resultMap="caseDefinitionResultMap">
+  <select id="selectLatestCaseDefinitionByKey" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="caseDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_CASE_DEF c1
       inner join
           (select KEY_, TENANT_ID_, max(VERSION_) as MAX_VERSION
-          from ${prefix}ACT_RE_CASE_DEF
+          from ${prefix}ACT_RE_CASE_DEF RES
           where KEY_ = #{parameter}
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
           group by TENANT_ID_, KEY_) c2
         on c1.KEY_ = c2.KEY_
     where c1.VERSION_ = c2.MAX_VERSION and 
@@ -104,7 +105,7 @@
   
   <select id="selectLatestCaseDefinitionByKeyAndTenantId" parameterType="map" resultMap="caseDefinitionResultMap">
     select *
-    from ${prefix}ACT_RE_CASE_DEF 
+    from ${prefix}ACT_RE_CASE_DEF RES
     where KEY_ = #{caseDefinitionKey}
           and TENANT_ID_ = #{tenantId}
           and VERSION_ = (
@@ -255,8 +256,10 @@
         <if test="tenantIds == null">
           and RES.TENANT_ID_ is null
         </if>
-      </if>  
-      
+      </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+
     </where>
   </sql>
 

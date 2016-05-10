@@ -287,6 +287,8 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     verify(mockedQuery).incidentType(queryParameters.get("incidentType"));
     verify(mockedQuery).incidentMessage(queryParameters.get("incidentMessage"));
     verify(mockedQuery).incidentMessageLike(queryParameters.get("incidentMessageLike"));
+    verify(mockedQuery).versionTag(queryParameters.get("versionTag"));
+    verify(mockedQuery).versionTagLike(queryParameters.get("versionTagLike"));
     verify(mockedQuery).list();
   }
 
@@ -312,6 +314,8 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     parameters.put("incidentType", "incType");
     parameters.put("incidentMessage", "incMessage");
     parameters.put("incidentMessageLike", "incMessageLike");
+    parameters.put("versionTag", "semVer");
+    parameters.put("versionTagLike", "semVerLike");
 
     return parameters;
   }
@@ -395,6 +399,24 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
   }
 
   @Test
+  public void testProcessDefinitionVersionTag() {
+    List<ProcessDefinition> processDefinitions = Arrays.asList(
+      MockProvider.mockDefinition().versionTag(MockProvider.EXAMPLE_VERSION_TAG).build(),
+      MockProvider.mockDefinition().id(MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).versionTag(MockProvider.ANOTHER_EXAMPLE_VERSION_TAG).build());
+    mockedQuery = setUpMockDefinitionQuery(processDefinitions);
+
+    Response response = given()
+      .queryParam("versionTag", MockProvider.EXAMPLE_VERSION_TAG)
+      .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .get(PROCESS_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).versionTag(MockProvider.EXAMPLE_VERSION_TAG);
+    verify(mockedQuery).list();
+  }
+
+  @Test
   public void testSortingParameters() {
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("category", "asc", Status.OK);
@@ -435,6 +457,16 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     executeAndVerifySuccessfulSorting("tenantId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySuccessfulSorting("versionTag", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByVersionTag();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySuccessfulSorting("versionTag", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByVersionTag();
+    inOrder.verify(mockedQuery).asc();
   }
 
   @Test

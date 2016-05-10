@@ -19,6 +19,7 @@ import java.util.List;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationInstructionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 
 public class MigrationExecutionDtoBuilder {
 
@@ -33,12 +34,27 @@ public class MigrationExecutionDtoBuilder {
     return this;
   }
 
+  public MigrationExecutionDtoBuilder processInstanceQuery(ProcessInstanceQueryDto processInstanceQuery) {
+    migrationExecutionDto.setProcessInstanceQuery(processInstanceQuery);
+    return this;
+  }
+
   public MigrationPlanExecutionDtoBuilder migrationPlan(String sourceProcessDefinitionId, String targetProcessDefinitionId) {
     return new MigrationPlanExecutionDtoBuilder(this, sourceProcessDefinitionId, targetProcessDefinitionId);
   }
 
   public MigrationExecutionDtoBuilder migrationPlan(MigrationPlanDto migrationPlanDto) {
     migrationExecutionDto.setMigrationPlan(migrationPlanDto);
+    return this;
+  }
+
+  public MigrationExecutionDtoBuilder skipCustomListeners(boolean skipCustomListeners) {
+    migrationExecutionDto.setSkipCustomListeners(skipCustomListeners);
+    return this;
+  }
+
+  public MigrationExecutionDtoBuilder skipIoMappings(boolean skipIoMappings) {
+    migrationExecutionDto.setSkipIoMappings(skipIoMappings);
     return this;
   }
 
@@ -58,6 +74,12 @@ public class MigrationExecutionDtoBuilder {
     @Override
     public MigrationPlanExecutionDtoBuilder instruction(String sourceActivityId, String targetActivityId) {
       super.instruction(sourceActivityId, targetActivityId);
+      return this;
+    }
+
+    @Override
+    public MigrationPlanExecutionDtoBuilder instruction(String sourceActivityId, String targetActivityId, Boolean updateEventTrigger) {
+      super.instruction(sourceActivityId, targetActivityId, updateEventTrigger);
       return this;
     }
 

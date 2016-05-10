@@ -312,6 +312,11 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
    */
   CaseExecutionQuery caseInstanceVariableValueLike(String name, String value);
 
+  /** Only select case execution with one of the given tenant ids. */
+  CaseExecutionQuery tenantIdIn(String... tenantIds);
+
+  /** Only select case executions which have no tenant id. */
+  CaseExecutionQuery withoutTenantId();
 
   // ordering //////////////////////////////////////////////////////////////
 
@@ -323,5 +328,11 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
 
   /** Order by case definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   CaseExecutionQuery orderByCaseDefinitionId();
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of case executions without tenant id is database-specific.
+   */
+  CaseExecutionQuery orderByTenantId();
 
 }

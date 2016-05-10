@@ -15,7 +15,7 @@ public class TimerEventListenerJobHandler extends TimerEventJobHandler {
     return TYPE;
   }
 
-  public void execute(String configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
+  public void execute(TimerJobConfiguration configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
 
   }
 

@@ -33,7 +33,7 @@ public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> im
   protected String type;
   protected String userId;
   protected String procDefId;
-
+  protected String tenantId;
 
   public GroupQueryImpl() {
   }
@@ -49,7 +49,7 @@ public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> im
   }
 
   public GroupQuery groupIdIn(String... ids) {
-    ensureNotNull("Provided ids", ids);
+    ensureNotNull("Provided ids", (Object[]) ids);
     this.ids = ids;
     return this;
   }
@@ -82,7 +82,12 @@ public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> im
     ensureNotNull("Provided processDefinitionId", procDefId);
     this.procDefId = procDefId;
     return this;
+  }
 
+  public GroupQuery memberOfTenant(String tenantId) {
+    ensureNotNull("Provided tenantId", tenantId);
+    this.tenantId = tenantId;
+    return this;
   }
 
   //sorting ////////////////////////////////////////////////////////
@@ -116,6 +121,8 @@ public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> im
   public String getUserId() {
     return userId;
   }
-
+  public String getTenantId() {
+    return tenantId;
+  }
 
 }

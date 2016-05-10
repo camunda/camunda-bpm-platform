@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -93,20 +94,24 @@ public class CaseExecutionManager extends AbstractManager {
   }
 
   public long findCaseExecutionCountByQueryCriteria(CaseExecutionQueryImpl caseExecutionQuery) {
+    configureTenantCheck(caseExecutionQuery);
     return (Long) getDbEntityManager().selectOne("selectCaseExecutionCountByQueryCriteria", caseExecutionQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<CaseExecution> findCaseExecutionsByQueryCriteria(CaseExecutionQueryImpl caseExecutionQuery, Page page) {
+    configureTenantCheck(caseExecutionQuery);
     return getDbEntityManager().selectList("selectCaseExecutionsByQueryCriteria", caseExecutionQuery, page);
   }
 
   public long findCaseInstanceCountByQueryCriteria(CaseInstanceQueryImpl caseInstanceQuery) {
+    configureTenantCheck(caseInstanceQuery);
     return (Long) getDbEntityManager().selectOne("selectCaseInstanceCountByQueryCriteria", caseInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<CaseInstance> findCaseInstanceByQueryCriteria(CaseInstanceQueryImpl caseInstanceQuery, Page page) {
+    configureTenantCheck(caseInstanceQuery);
     return getDbEntityManager().selectList("selectCaseInstanceByQueryCriteria", caseInstanceQuery, page);
   }
 
@@ -118,6 +123,10 @@ public class CaseExecutionManager extends AbstractManager {
   @SuppressWarnings("unchecked")
   public List<CaseExecutionEntity> findChildCaseExecutionsByCaseInstanceId(String caseInstanceId) {
     return getDbEntityManager().selectList("selectCaseExecutionsByCaseInstanceId", caseInstanceId);
+  }
+
+  protected void configureTenantCheck(AbstractQuery<?, ?> query) {
+    getTenantManager().configureQuery(query);
   }
 
 }

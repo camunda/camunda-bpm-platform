@@ -175,5 +175,4 @@ public class ServletProcessApplication extends AbstractProcessApplication implem
   public ServletContext getServletContext() {
     return servletContext;
   }
-
 }

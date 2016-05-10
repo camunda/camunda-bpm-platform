@@ -19,8 +19,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
+import org.camunda.bpm.engine.impl.ExternalTaskQueryProperty;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
@@ -29,6 +33,8 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
  *
  */
 public class ExternalTaskManager extends AbstractManager {
+
+  public static QueryOrderingProperty EXT_TASK_PRIORITY_ORDERING_PROPERTY = new QueryOrderingProperty(ExternalTaskQueryProperty.PRIORITY, Direction.DESCENDING);
 
   public ExternalTaskEntity findExternalTaskById(String id) {
     return getDbEntityManager().selectById(ExternalTaskEntity.class, id);
@@ -42,23 +48,34 @@ public class ExternalTaskManager extends AbstractManager {
     getDbEntityManager().delete(externalTask);
   }
 
+  @SuppressWarnings("unchecked")
   public List<ExternalTaskEntity> findExternalTasksByExecutionId(String id) {
     return getDbEntityManager().selectList("selectExternalTasksByExecutionId", id);
   }
 
-  public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<String> topics, int maxResults) {
-    if (topics.size() == 0) {
+  @SuppressWarnings("unchecked")
+  public List<ExternalTaskEntity> findExternalTasksByProcessInstanceId(String processInstanceId) {
+    return getDbEntityManager().selectList("selectExternalTasksByExecutionId", processInstanceId);
+  }
+
+  public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<String> topics, int maxResults, boolean usePriority) {
+    if (topics.isEmpty()) {
       return new ArrayList<ExternalTaskEntity>();
     }
 
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("topics", topics);
     parameters.put("now", ClockUtil.getCurrentTime());
+    parameters.put("applyOrdering", usePriority);
+    List<QueryOrderingProperty> orderingProperties = new ArrayList<QueryOrderingProperty>();
+    orderingProperties.add(EXT_TASK_PRIORITY_ORDERING_PROPERTY);
+    parameters.put("orderingProperties", orderingProperties);
 
     ListQueryParameterObject parameter = new ListQueryParameterObject(parameters, 0, maxResults);
     configureAuthorizationCheck(parameter);
 
-    return getDbEntityManager().selectList("selectExternalTasksForTopics", parameter);
+    DbEntityManager manager = getDbEntityManager();
+    return manager.selectList("selectExternalTasksForTopics", parameter);
   }
 
   public List<ExternalTask> findExternalTasksByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
@@ -72,13 +89,14 @@ public class ExternalTaskManager extends AbstractManager {
   }
 
   protected void updateExternalTaskSuspensionState(String processInstanceId,
-      String processDefinitionId, String processDefinitionKey, SuspensionState suspensionState) {
+    String processDefinitionId, String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("isProcessDefinitionTenantIdSet", false);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(ExternalTaskEntity.class, "updateExternalTaskSuspensionStateByParameters", parameters);
+    getDbEntityManager().update(ExternalTaskEntity.class, "updateExternalTaskSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
   public void updateExternalTaskSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
@@ -93,6 +111,15 @@ public class ExternalTaskManager extends AbstractManager {
     updateExternalTaskSuspensionState(null, null, processDefinitionKey, suspensionState);
   }
 
+  public void updateExternalTaskSuspensionStateByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("isProcessDefinitionTenantIdSet", true);
+    parameters.put("processDefinitionTenantId", processDefinitionTenantId);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbEntityManager().update(ExternalTaskEntity.class, "updateExternalTaskSuspensionStateByParameters", configureParameterizedQuery(parameters));
+  }
+
   protected void configureAuthorizationCheck(ExternalTaskQueryImpl query) {
     getAuthorizationManager().configureExternalTaskQuery(query);
   }
@@ -100,4 +127,9 @@ public class ExternalTaskManager extends AbstractManager {
   protected void configureAuthorizationCheck(ListQueryParameterObject parameter) {
     getAuthorizationManager().configureExternalTaskFetch(parameter);
   }
+
+  protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
+    return getTenantManager().configureQuery(parameter);
+  }
+
 }

@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,7 +46,7 @@ public class ProcessEngineRuleParameterizedJunit4Test {
   }
 
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
   public ProcessEngineRuleParameterizedJunit4Test(int parameter) {
 

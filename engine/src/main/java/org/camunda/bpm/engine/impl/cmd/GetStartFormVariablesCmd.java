@@ -17,8 +17,8 @@ import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.StartFormData;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -44,8 +44,7 @@ public class GetStartFormVariablesCmd extends AbstractGetFormVariablesCmd {
     });
 
     ProcessDefinition definition = startFormData.getProcessDefinition();
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadProcessDefinition((ProcessDefinitionEntity) definition);
+    checkGetStartFormVariables((ProcessDefinitionEntity) definition, commandContext);
 
     VariableMap result = new VariableMapImpl();
 
@@ -58,4 +57,9 @@ public class GetStartFormVariablesCmd extends AbstractGetFormVariablesCmd {
     return result;
   }
 
+  protected void checkGetStartFormVariables(ProcessDefinitionEntity definition, CommandContext commandContext) {
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadProcessDefinition(definition);
+    }
+  }
 }

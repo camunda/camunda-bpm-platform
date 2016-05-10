@@ -21,18 +21,17 @@ import java.util.List;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.query.Report;
 import org.camunda.bpm.engine.query.PeriodUnit;
+import org.camunda.bpm.engine.query.Report;
 
 /**
  * @author Roman Smirnov
  *
  */
-public abstract class AbstractReport extends AuthorizationCheck implements Command<Object>, Report, Serializable {
+public abstract class AbstractReport implements Command<Object>, Report, Serializable {
 
   private static final long serialVersionUID = 1L;
 

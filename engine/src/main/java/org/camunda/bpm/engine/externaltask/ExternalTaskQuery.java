@@ -18,7 +18,7 @@ import org.camunda.bpm.engine.query.Query;
 
 /**
  * @author Thorben Lindhauer
- *
+ * @author Christopher Zell
  */
 public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask> {
 
@@ -78,7 +78,25 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * Only select external tasks that belong to an instance of the given activity
    */
   ExternalTaskQuery activityId(String activityId);
+  
+  /**
+   * Only select external tasks with a priority that is higher than or equal to the given priority.
+   *
+   * @since 7.5
+   * @param priority the priority which is used for the query
+   * @return the builded external task query
+   */
+  ExternalTaskQuery priorityHigherThanOrEquals(long priority);
 
+  /**
+   * Only select external tasks with a priority that is lower than or equal to the given priority.
+   *
+   * @since 7.5
+   * @param priority the priority which is used for the query
+   * @return the builded external task query
+   */
+  ExternalTaskQuery priorityLowerThanOrEquals(long priority);
+    
   /**
    * Only select external tasks that are currently suspended
    */
@@ -98,7 +116,7 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * Only select external tasks that have retries = 0
    */
   ExternalTaskQuery noRetriesLeft();
-
+  
   /** Only select external tasks that belong to one of the given tenant ids. */
   ExternalTaskQuery tenantIdIn(String... tenantIds);
 
@@ -133,5 +151,11 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * Note that the ordering of external tasks without tenant id is database-specific.
    */
   ExternalTaskQuery orderByTenantId();
+  
+  /**
+   * Order by priority (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * @since 7.5
+   */
+  ExternalTaskQuery orderByPriority();
 
 }

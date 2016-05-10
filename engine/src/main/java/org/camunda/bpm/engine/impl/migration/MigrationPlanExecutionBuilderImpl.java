@@ -20,12 +20,16 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.migration.batch.MigrateProcessInstanceBatchCmd;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 public class MigrationPlanExecutionBuilderImpl implements MigrationPlanExecutionBuilder {
 
   protected CommandExecutor commandExecutor;
   protected MigrationPlan migrationPlan;
   protected List<String> processInstanceIds;
+  protected ProcessInstanceQuery processInstanceQuery;
+  protected boolean skipCustomListeners;
+  protected boolean skipIoMappings;
 
   public MigrationPlanExecutionBuilderImpl(CommandExecutor commandExecutor, MigrationPlan migrationPlan) {
     this.commandExecutor = commandExecutor;
@@ -45,8 +49,39 @@ public class MigrationPlanExecutionBuilderImpl implements MigrationPlanExecution
     return processInstanceIds;
   }
 
+  public MigrationPlanExecutionBuilder processInstanceQuery(ProcessInstanceQuery processInstanceQuery) {
+    this.processInstanceQuery = processInstanceQuery;
+    return this;
+  }
+
+  public ProcessInstanceQuery getProcessInstanceQuery() {
+    return processInstanceQuery;
+  }
+
+  public MigrationPlanExecutionBuilder skipCustomListeners() {
+    this.skipCustomListeners = true;
+    return this;
+  }
+
+  public boolean isSkipCustomListeners() {
+    return skipCustomListeners;
+  }
+
+  public MigrationPlanExecutionBuilder skipIoMappings() {
+    this.skipIoMappings = true;
+    return this;
+  }
+
+  public boolean isSkipIoMappings() {
+    return skipIoMappings;
+  }
+
   public void execute() {
-    commandExecutor.execute(new MigrateProcessInstanceCmd(this));
+    execute(true);
+  }
+
+  public void execute(boolean writeOperationLog) {
+    commandExecutor.execute(new MigrateProcessInstanceCmd(this, writeOperationLog));
   }
 
   public Batch executeAsync() {

@@ -14,7 +14,10 @@
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -22,6 +25,7 @@ import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 
@@ -32,12 +36,14 @@ public class ProcessInstanceSnapshot {
 
   protected String processInstanceId;
   protected String processDefinitionId;
+  protected String deploymentId;
   protected ActivityInstance activityTree;
   protected ExecutionTree executionTree;
   protected List<EventSubscription> eventSubscriptions;
   protected List<Job> jobs;
   protected List<JobDefinition> jobDefinitions;
   protected List<Task> tasks;
+  protected Map<String, VariableInstance> variables;
 
   public ProcessInstanceSnapshot(String processInstanceId, String processDefinitionId) {
     this.processInstanceId = processInstanceId;
@@ -54,6 +60,14 @@ public class ProcessInstanceSnapshot {
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
+  }
+
+  public void setDeploymentId(String deploymentId) {
+    this.deploymentId = deploymentId;
+  }
+
+  public String getDeploymentId() {
+    return deploymentId;
   }
 
   public void setProcessDefinitionId(String processDefinitionId) {
@@ -101,15 +115,19 @@ public class ProcessInstanceSnapshot {
     return eventSubscriptions;
   }
 
-  public EventSubscription getEventSubscriptionForActivityIdAndEventName(String activityId, String eventName) {
-
-    List<EventSubscription> collectedEventsubscriptions = new ArrayList<EventSubscription>();
-
-    for (EventSubscription eventSubscription : getEventSubscriptions()) {
-      if (activityId.equals(eventSubscription.getActivityId()) && eventName.equals(eventSubscription.getEventName())) {
-        collectedEventsubscriptions.add(eventSubscription);
+  public EventSubscription getEventSubscriptionById(String id) {
+    for (EventSubscription subscription : eventSubscriptions) {
+      if (subscription.getId().equals(id)) {
+        return subscription;
       }
     }
+
+    return null;
+  }
+
+  public EventSubscription getEventSubscriptionForActivityIdAndEventName(String activityId, String eventName) {
+
+    List<EventSubscription> collectedEventsubscriptions = getEventSubscriptionsForActivityIdAndEventName(activityId, eventName);
 
     if (collectedEventsubscriptions.isEmpty()) {
       return null;
@@ -120,6 +138,19 @@ public class ProcessInstanceSnapshot {
     else {
       throw new RuntimeException("There is more than one event subscription for activity " + activityId + " and event " + eventName);
     }
+  }
+
+  public List<EventSubscription> getEventSubscriptionsForActivityIdAndEventName(String activityId, String eventName) {
+
+    List<EventSubscription> collectedEventsubscriptions = new ArrayList<EventSubscription>();
+
+    for (EventSubscription eventSubscription : getEventSubscriptions()) {
+      if (activityId.equals(eventSubscription.getActivityId()) && eventName.equals(eventSubscription.getEventName())) {
+        collectedEventsubscriptions.add(eventSubscription);
+      }
+    }
+
+    return collectedEventsubscriptions;
   }
 
   public void setEventSubscriptions(List<EventSubscription> eventSubscriptions) {
@@ -149,6 +180,16 @@ public class ProcessInstanceSnapshot {
     else {
       throw new RuntimeException("There is more than one job for job definition " + jobDefinitionId);
     }
+  }
+
+  public Job getJobById(String jobId) {
+    for (Job job : getJobs()) {
+      if (jobId.equals(job.getId())) {
+        return job;
+      }
+    }
+
+    return null;
   }
 
   public void setJobs(List<Job> jobs) {
@@ -184,7 +225,79 @@ public class ProcessInstanceSnapshot {
     this.jobDefinitions = jobDefinitions;
   }
 
+  public Collection<VariableInstance> getVariables() {
+    return variables.values();
+  }
+
+  public void setVariables(List<VariableInstance> variables) {
+    this.variables = new HashMap<String, VariableInstance>();
+
+    for (VariableInstance variable : variables) {
+      this.variables.put(variable.getId(), variable);
+    }
+  }
+
+  public VariableInstance getSingleVariable(final String variableName) {
+    return getSingleVariable(new Condition<VariableInstance>() {
+
+      @Override
+      public boolean matches(VariableInstance variable) {
+        return variableName.equals(variable.getName());
+      }
+    });
+  }
+
+  public VariableInstance getSingleVariable(final String executionId, final String variableName) {
+    return getSingleVariable(new Condition<VariableInstance>() {
+
+      @Override
+      public boolean matches(VariableInstance variable) {
+        return executionId.equals(variable.getExecutionId()) && variableName.equals(variable.getName());
+      }
+    });
+  }
+
+  public VariableInstance getSingleTaskVariable(final String taskId, final String variableName) {
+    return getSingleVariable(new Condition<VariableInstance>() {
+
+      @Override
+      public boolean matches(VariableInstance variable) {
+        return variableName.equals(variable.getName())
+            && taskId.equals(variable.getTaskId());
+      }
+    });
+  }
+
+  protected VariableInstance getSingleVariable(Condition<VariableInstance> condition) {
+    List<VariableInstance> matchingVariables = new ArrayList<VariableInstance>();
+
+    for (VariableInstance variable : variables.values()) {
+      if (condition.matches(variable)) {
+        matchingVariables.add(variable);
+      }
+    }
+
+    if (matchingVariables.size() == 1) {
+      return  matchingVariables.get(0);
+    }
+    else if (matchingVariables.size() == 0) {
+      return null;
+    }
+    else {
+      throw new RuntimeException("There is more than one variable that matches the given condition");
+    }
+  }
+
+  public VariableInstance getVariable(String id) {
+    return variables.get(id);
+  }
+
   protected void ensurePropertySaved(String name, Object property) {
     EnsureUtil.ensureNotNull(BadUserRequestException.class, "The snapshot has not saved the " + name + " of the process instance", name, property);
   }
+
+  protected static interface Condition<T> {
+    boolean matches(T condition);
+  }
+
 }

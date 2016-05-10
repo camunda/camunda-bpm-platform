@@ -14,52 +14,28 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Map;
 
-import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
  * @author Thorben Lindhauer
- *
+ * @author Christopher Zell
  */
-public class CompleteExternalTaskCmd implements Command<Void> {
+public class CompleteExternalTaskCmd extends HandleExternalTaskCmd {
 
-  protected String externalTaskId;
-  protected String workerId;
   protected Map<String, Object> variables;
 
   public CompleteExternalTaskCmd(String externalTaskId, String workerId, Map<String, Object> variables) {
-    this.externalTaskId = externalTaskId;
-    this.workerId = workerId;
+    super(externalTaskId, workerId);
     this.variables = variables;
   }
 
-  public Void execute(CommandContext commandContext) {
-    validateInput();
+  @Override
+  public String getErrorMessageOnWrongWorkerAccess() {
+    return "External Task " + externalTaskId + " cannot be completed by worker '" + workerId;
+  }
 
-    ExternalTaskEntity externalTask = commandContext.getExternalTaskManager().findExternalTaskById(externalTaskId);
-    EnsureUtil.ensureNotNull(NotFoundException.class,
-        "Cannot find external task with id " + externalTaskId, "externalTask", externalTask);
-
-    if (!workerId.equals(externalTask.getWorkerId())) {
-      throw new BadUserRequestException("External Task " + externalTaskId + " cannot be completed by worker '" + workerId
-          + "'. It is locked by worker '" + externalTask.getWorkerId() + "'.");
-    }
-
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateProcessInstanceById(externalTask.getProcessInstanceId());
-
+  @Override
+  public void execute(ExternalTaskEntity externalTask) {
     externalTask.complete(variables);
-    return null;
   }
-
-  protected void validateInput() {
-    EnsureUtil.ensureNotNull("externalTaskId", externalTaskId);
-    EnsureUtil.ensureNotNull("workerId", workerId);
-  }
-
 }

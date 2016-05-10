@@ -39,6 +39,7 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
   private static final String SORT_BY_VERSION_VALUE = "version";
   private static final String SORT_BY_DEPLOYMENT_ID_VALUE = "deploymentId";
   private static final String SORT_BY_TENANT_ID = "tenantId";
+  private static final String SORT_BY_VERSION_TAG = "versionTag";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -50,6 +51,7 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     VALID_SORT_BY_VALUES.add(SORT_BY_VERSION_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEPLOYMENT_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
+    VALID_SORT_BY_VALUES.add(SORT_BY_VERSION_TAG);
   }
 
   private String processDefinitionId;
@@ -75,6 +77,8 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
   private List<String> tenantIds;
   private Boolean withoutTenantId;
   private Boolean includeDefinitionsWithoutTenantId;
+  private String versionTag;
+  private String versionTagLike;
 
   public ProcessDefinitionQueryDto() {
 
@@ -217,6 +221,16 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     this.includeDefinitionsWithoutTenantId = includeDefinitionsWithoutTenantId;
   }
 
+  @CamundaQueryParam(value = "versionTag")
+  public void setVersionTag(String versionTag) {
+    this.versionTag = versionTag;
+  }
+
+  @CamundaQueryParam(value = "versionTagLike")
+  public void setVersionTagLike(String versionTagLike) {
+    this.versionTagLike = versionTagLike;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -298,6 +312,12 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     if (TRUE.equals(includeDefinitionsWithoutTenantId)) {
       query.includeProcessDefinitionsWithoutTenantId();
     }
+    if( versionTag != null) {
+      query.versionTag(versionTag);
+    }
+    if( versionTagLike != null) {
+      query.versionTagLike(versionTagLike);
+    }
   }
 
   @Override
@@ -316,6 +336,8 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
       query.orderByDeploymentId();
     } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
       query.orderByTenantId();
+    } else if (sortBy.equals(SORT_BY_VERSION_TAG)) {
+      query.orderByVersionTag();
     }
   }
 }

@@ -85,6 +85,9 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
   /** Only select historic case activity instances which are terminated */
   HistoricCaseActivityInstanceQuery terminated();
 
+  /** Only select historic case activity instances with one of the given tenant ids. */
+  HistoricCaseActivityInstanceQuery tenantIdIn(String... tenantIds);
+
   // ordering /////////////////////////////////////////////////////////////////
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricCaseActivityInstanceQuery orderByHistoricCaseActivityInstanceId();
@@ -115,5 +118,11 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
 
   /** Order by caseDefinitionId (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricCaseActivityInstanceQuery orderByCaseDefinitionId();
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of historic case activity instances without tenant id is database-specific.
+   */
+  HistoricCaseActivityInstanceQuery orderByTenantId();
 
 }

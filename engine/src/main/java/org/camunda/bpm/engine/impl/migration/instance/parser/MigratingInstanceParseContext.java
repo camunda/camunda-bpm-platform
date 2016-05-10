@@ -22,20 +22,27 @@ import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingExternalTaskInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingJobInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessElementInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingTransitionInstance;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingProcessInstanceValidationReportImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 /**
  * @author Thorben Lindhauer
@@ -47,11 +54,14 @@ public class MigratingInstanceParseContext {
 
   protected Map<String, MigratingActivityInstance> activityInstances = new HashMap<String, MigratingActivityInstance>();
   protected Map<String, MigratingJobInstance> migratingJobs = new HashMap<String, MigratingJobInstance>();
+  protected Map<String, MigratingExternalTaskInstance> migratingExternalTasks = new HashMap<String, MigratingExternalTaskInstance>();
 
-  protected Collection<TaskEntity> tasks;
+  protected Collection<EventSubscriptionEntity> eventSubscriptions;
   protected Collection<IncidentEntity> incidents;
   protected Collection<JobEntity> jobs;
-  protected Collection<EventSubscriptionEntity> eventSubscriptions;
+  protected Collection<TaskEntity> tasks;
+  protected Collection<ExternalTaskEntity> externalTasks;
+  protected Collection<VariableInstanceEntity> variables;
 
   protected ProcessDefinitionImpl sourceProcessDefinition;
   protected ProcessDefinitionImpl targetProcessDefinition;
@@ -89,6 +99,11 @@ public class MigratingInstanceParseContext {
     return this;
   }
 
+  public MigratingInstanceParseContext externalTasks(Collection<ExternalTaskEntity> externalTasks) {
+    this.externalTasks = new HashSet<ExternalTaskEntity>(externalTasks);
+    return this;
+  }
+
   public MigratingInstanceParseContext eventSubscriptions(Collection<EventSubscriptionEntity> eventSubscriptions) {
     this.eventSubscriptions = new HashSet<EventSubscriptionEntity>(eventSubscriptions);
     return this;
@@ -103,6 +118,11 @@ public class MigratingInstanceParseContext {
     return this;
   }
 
+  public MigratingInstanceParseContext variables(Collection<VariableInstanceEntity> variables) {
+    this.variables = new HashSet<VariableInstanceEntity>(variables);
+    return this;
+  }
+
   public void submit(MigratingActivityInstance activityInstance) {
     activityInstances.put(activityInstance.getActivityInstance().getId(), activityInstance);
   }
@@ -111,8 +131,16 @@ public class MigratingInstanceParseContext {
     migratingJobs.put(job.getJobEntity().getId(), job);
   }
 
+  public void submit(MigratingExternalTaskInstance externalTask) {
+    migratingExternalTasks.put(externalTask.getId(), externalTask);
+  }
+
   public void consume(TaskEntity task) {
     tasks.remove(task);
+  }
+
+  public void consume(ExternalTaskEntity externalTask) {
+    externalTasks.remove(externalTask);
   }
 
   public void consume(IncidentEntity incident) {
@@ -127,6 +155,10 @@ public class MigratingInstanceParseContext {
     eventSubscriptions.remove(eventSubscription);
   }
 
+  public void consume(VariableInstanceEntity variableInstance) {
+    variables.remove(variableInstance);
+  }
+
   public MigratingProcessInstance getMigratingProcessInstance() {
     return migratingProcessInstance;
   }
@@ -137,6 +169,15 @@ public class MigratingInstanceParseContext {
 
   public ProcessDefinitionImpl getTargetProcessDefinition() {
     return targetProcessDefinition;
+  }
+
+  public ActivityImpl getTargetActivity(MigrationInstruction instruction) {
+    if (instruction != null) {
+      return targetProcessDefinition.findActivity(instruction.getTargetActivityId());
+    }
+    else {
+      return null;
+    }
   }
 
   public JobDefinitionEntity getTargetJobDefinition(String activityId, String jobHandlerType) {
@@ -178,6 +219,10 @@ public class MigratingInstanceParseContext {
     return migratingJobs.get(jobId);
   }
 
+  public MigratingExternalTaskInstance getMigratingExternalTaskInstanceById(String externalTaskId) {
+    return migratingExternalTasks.get(externalTaskId);
+  }
+
   public MigrationInstruction findSingleMigrationInstruction(String sourceScopeId) {
     List<MigrationInstruction> instructions = instructionsBySourceScope.get(sourceScopeId);
 
@@ -200,25 +245,35 @@ public class MigratingInstanceParseContext {
     return organizedInstructions;
   }
 
-  public void handleDependentJobs(MigratingActivityInstance migratingInstance, List<JobEntity> jobs) {
-    parser.getDependentJobHandler().handle(this, migratingInstance, jobs);
+  public void handleDependentActivityInstanceJobs(MigratingActivityInstance migratingInstance, List<JobEntity> jobs) {
+    parser.getDependentActivityInstanceJobHandler().handle(this, migratingInstance, jobs);
+  }
+
+  public void handleDependentTransitionInstanceJobs(MigratingTransitionInstance migratingInstance, List<JobEntity> jobs) {
+    parser.getDependentTransitionInstanceJobHandler().handle(this, migratingInstance, jobs);
   }
 
   public void handleDependentEventSubscriptions(MigratingActivityInstance migratingInstance, List<EventSubscriptionEntity> eventSubscriptions) {
     parser.getDependentEventSubscriptionHandler().handle(this, migratingInstance, eventSubscriptions);
   }
 
-  public void handleDependentTasks(MigratingActivityInstance migratingInstance, List<TaskEntity> tasks) {
-    parser.getDependentTaskHandler().handle(this, migratingInstance, tasks);
+  public void handleDependentVariables(MigratingProcessElementInstance migratingInstance, List<VariableInstanceEntity> variables) {
+    parser.getDependentVariablesHandler().handle(this, migratingInstance, variables);
+  }
+
+  public void handleTransitionInstance(TransitionInstance transitionInstance) {
+    parser.getTransitionInstanceHandler().handle(this, transitionInstance);
   }
 
   public void validateNoEntitiesLeft(MigratingProcessInstanceValidationReportImpl processInstanceReport) {
     processInstanceReport.setProcessInstanceId(migratingProcessInstance.getProcessInstanceId());
 
     ensureNoEntitiesAreLeft("tasks", tasks, processInstanceReport);
+    ensureNoEntitiesAreLeft("externalTask", externalTasks, processInstanceReport);
     ensureNoEntitiesAreLeft("incidents", incidents, processInstanceReport);
     ensureNoEntitiesAreLeft("jobs", jobs, processInstanceReport);
     ensureNoEntitiesAreLeft("event subscriptions", eventSubscriptions, processInstanceReport);
+    ensureNoEntitiesAreLeft("variables", variables, processInstanceReport);
   }
 
   public void ensureNoEntitiesAreLeft(String entityName, Collection<? extends DbEntity> dbEntities, MigratingProcessInstanceValidationReportImpl processInstanceReport) {

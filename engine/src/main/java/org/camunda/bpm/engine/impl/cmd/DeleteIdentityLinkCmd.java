@@ -18,9 +18,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.task.IdentityLinkType;
@@ -77,8 +77,7 @@ public abstract class DeleteIdentityLinkCmd implements Command<Void>, Serializab
     task = taskManager.findTaskById(taskId);
     ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateTask(task);
+    checkDeleteIdentityLink(task, commandContext);
 
     if (IdentityLinkType.ASSIGNEE.equals(type)) {
       task.setAssignee(null);
@@ -89,6 +88,12 @@ public abstract class DeleteIdentityLinkCmd implements Command<Void>, Serializab
     }
 
     return null;
+  }
+
+  protected void checkDeleteIdentityLink(TaskEntity task, CommandContext commandContext) {
+     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkTaskAssign(task);
+    }
   }
 
 }

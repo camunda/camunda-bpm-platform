@@ -89,6 +89,7 @@ public class DeploymentCache {
         .getProcessDefinitionManager()
         .findLatestProcessDefinitionById(processDefinitionId);
     }
+
     ensureNotNull("no deployed process definition found with id '" + processDefinitionId + "'", "processDefinition", processDefinition);
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;

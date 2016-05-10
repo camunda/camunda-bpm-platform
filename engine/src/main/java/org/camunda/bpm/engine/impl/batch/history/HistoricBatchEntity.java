@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogManager;
 
 public class HistoricBatchEntity extends HistoryEvent implements HistoricBatch, DbEntity {
@@ -29,7 +30,7 @@ public class HistoricBatchEntity extends HistoryEvent implements HistoricBatch, 
   protected String id;
   protected String type;
 
-  protected int size;
+  protected int totalJobs;
   protected int batchJobsPerSeed;
   protected int invocationsPerBatchJob;
 
@@ -50,12 +51,12 @@ public class HistoricBatchEntity extends HistoryEvent implements HistoricBatch, 
     this.type = type;
   }
 
-  public int getSize() {
-    return size;
+  public int getTotalJobs() {
+    return totalJobs;
   }
 
-  public void setSize(int size) {
-    this.size = size;
+  public void setTotalJobs(int totalJobs) {
+    this.totalJobs = totalJobs;
   }
 
   public int getBatchJobsPerSeed() {
@@ -132,6 +133,11 @@ public class HistoricBatchEntity extends HistoryEvent implements HistoricBatch, 
   }
 
   public void delete() {
+    HistoricIncidentManager historicIncidentManager = Context.getCommandContext().getHistoricIncidentManager();
+    historicIncidentManager.deleteHistoricIncidentsByJobDefinitionId(seedJobDefinitionId);
+    historicIncidentManager.deleteHistoricIncidentsByJobDefinitionId(monitorJobDefinitionId);
+    historicIncidentManager.deleteHistoricIncidentsByJobDefinitionId(batchJobDefinitionId);
+
     HistoricJobLogManager historicJobLogManager = Context.getCommandContext().getHistoricJobLogManager();
     historicJobLogManager.deleteHistoricJobLogsByJobDefinitionId(seedJobDefinitionId);
     historicJobLogManager.deleteHistoricJobLogsByJobDefinitionId(monitorJobDefinitionId);

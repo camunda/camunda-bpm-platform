@@ -15,9 +15,14 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.impl.migration.instance.parser.MigratingInstanceParseContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.MigrationObserverBehavior;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -163,6 +168,24 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
         ((PvmExecutionImpl) child).setProcessDefinition(((PvmExecutionImpl) scopeExecution).getProcessDefinition());
       }
     }
+  }
+
+  @Override
+  public void onParseMigratingInstance(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance) {
+    ExecutionEntity scopeExecution = migratingInstance.resolveRepresentativeExecution();
+
+    List<ActivityExecution> concurrentInActiveExecutions =
+        scopeExecution.findInactiveChildExecutions(getInnerActivity((ActivityImpl) migratingInstance.getSourceScope()));
+
+    // variables on ended inner instance executions need not be migrated anywhere
+    // since they are also not represented in the tree of migrating instances, we remove
+    // them from the parse context here to avoid a validation exception
+    for (ActivityExecution execution : concurrentInActiveExecutions) {
+      for (VariableInstanceEntity variable : ((ExecutionEntity) execution).getVariablesInternal()) {
+        parseContext.consume(variable);
+      }
+    }
+
   }
 
 }

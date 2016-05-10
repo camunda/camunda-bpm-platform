@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
+import org.camunda.bpm.container.impl.jboss.extension.SubsystemAttributeDefinitons;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.jboss.as.controller.AbstractRemoveStepHandler;
 import org.jboss.as.controller.OperationContext;
@@ -22,7 +23,6 @@ import org.jboss.msc.service.ServiceName;
 /**
  * @author Daniel Meyer
  * @author Christian Lipphardt
- *
  */
 public class JobExecutorRemove extends AbstractRemoveStepHandler {
 
@@ -31,6 +31,10 @@ public class JobExecutorRemove extends AbstractRemoveStepHandler {
   protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
     ServiceName name = ServiceNames.forMscExecutorService();
     context.removeService(name);
+
+    String jobExecutorThreadPoolName = SubsystemAttributeDefinitons.THREAD_POOL_NAME.resolveModelAttribute(context, model).asString();
+    ServiceName jobExecutorThreadPoolServiceName = ServiceNames.forManagedThreadPool(jobExecutorThreadPoolName);
+    context.removeService(jobExecutorThreadPoolServiceName);
   }
 
 }

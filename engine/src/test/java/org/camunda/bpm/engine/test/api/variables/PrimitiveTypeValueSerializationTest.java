@@ -13,17 +13,17 @@
 
 package org.camunda.bpm.engine.test.api.variables;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.After;
@@ -71,7 +71,7 @@ public class PrimitiveTypeValueSerializationTest {
   private String deploymentId;
 
   @Rule
-  public ProcessEngineRule rule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine());
+  public ProcessEngineRule rule = new ProvidedProcessEngineRule();
 
   @Before
   public void setup() {

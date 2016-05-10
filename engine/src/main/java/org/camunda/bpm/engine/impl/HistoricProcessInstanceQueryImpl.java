@@ -45,6 +45,9 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String businessKeyLike;
   protected boolean finished = false;
   protected boolean unfinished = false;
+  protected boolean withIncidents = false;
+  protected String incidentMessage;
+  protected String incidentMessageLike;
   protected String startedBy;
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
@@ -116,6 +119,26 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public HistoricProcessInstanceQuery unfinished() {
     this.unfinished = true;
+    return this;
+  }
+
+  public HistoricProcessInstanceQuery withIncidents() {
+    this.withIncidents = true;
+
+    return this;
+  }
+
+  public HistoricProcessInstanceQuery incidentMessage(String incidentMessage) {
+    ensureNotNull("incidentMessage", incidentMessage);
+    this.incidentMessage = incidentMessage;
+
+    return this;
+  }
+
+  public HistoricProcessInstanceQuery incidentMessageLike(String incidentMessageLike) {
+    ensureNotNull("incidentMessageLike", incidentMessageLike);
+    this.incidentMessageLike = incidentMessageLike;
+
     return this;
   }
 
@@ -312,6 +335,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public String getCaseInstanceId() {
     return caseInstanceId;
+  }
+
+  public String getIncidentMessage() {
+    return this.incidentMessage;
+  }
+
+  public String getIncidentMessageLike() {
+    return this.incidentMessageLike;
   }
 
   // below is deprecated and to be removed in 5.12

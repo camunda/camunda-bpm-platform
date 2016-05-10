@@ -12,14 +12,21 @@
  */
 package org.camunda.bpm.engine.impl.migration.instance.parser;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingEventSubscriptionInstance;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 
 /**
@@ -28,19 +35,35 @@ import org.camunda.bpm.engine.migration.MigrationInstruction;
  */
 public class EventSubscriptionInstanceHandler implements MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<EventSubscriptionEntity>> {
 
+  public static final Set<String> SUPPORTED_EVENT_TYPES = new HashSet<String>();
+  static {
+    SUPPORTED_EVENT_TYPES.add(MessageEventSubscriptionEntity.EVENT_TYPE);
+    SUPPORTED_EVENT_TYPES.add(SignalEventSubscriptionEntity.EVENT_TYPE);
+  }
+
   @Override
   public void handle(MigratingInstanceParseContext parseContext, MigratingActivityInstance owningInstance, List<EventSubscriptionEntity> elements) {
-    List<String> migratedEventSubscriptionTargetActivityIds = new ArrayList<String>();
+
+    Map<String, EventSubscriptionDeclaration> targetDeclarations = getDeclarationsByTriggeringActivity(owningInstance.getTargetScope());
 
     for (EventSubscriptionEntity eventSubscription : elements) {
-      MigrationInstruction eventSubscriptionMigrationInstruction = parseContext.findSingleMigrationInstruction(eventSubscription.getActivityId());
-      if (eventSubscriptionMigrationInstruction != null) {
-        // the event subscription is migrated
-        ActivityImpl eventSubscriptionTargetActivity = parseContext.getTargetProcessDefinition().findActivity(eventSubscriptionMigrationInstruction.getTargetActivityId());
-        migratedEventSubscriptionTargetActivityIds.add(eventSubscriptionTargetActivity.getId());
-        owningInstance.addMigratingDependentInstance(new MigratingEventSubscriptionInstance(eventSubscription, eventSubscriptionTargetActivity));
+      if (!getSupportedEventTypes().contains(eventSubscription.getEventType())) {
+        // ignore unsupported event subscriptions
+        continue;
+      }
 
-      } else {
+      MigrationInstruction migrationInstruction = parseContext.findSingleMigrationInstruction(eventSubscription.getActivityId());
+      ActivityImpl targetActivity = parseContext.getTargetActivity(migrationInstruction);
+
+      if (targetActivity != null && owningInstance.migratesTo(targetActivity.getEventScope())) {
+        // the event subscription is migrated
+        EventSubscriptionDeclaration targetDeclaration = targetDeclarations.remove(targetActivity.getId());
+
+        owningInstance.addMigratingDependentInstance(
+            new MigratingEventSubscriptionInstance(eventSubscription, targetActivity, migrationInstruction.isUpdateEventTrigger(), targetDeclaration));
+
+      }
+      else {
         // the event subscription will be removed
         owningInstance.addRemovingDependentInstance(new MigratingEventSubscriptionInstance(eventSubscription));
 
@@ -49,14 +72,25 @@ public class EventSubscriptionInstanceHandler implements MigratingDependentInsta
       parseContext.consume(eventSubscription);
     }
 
-    if (owningInstance.getTargetScope() != null) {
-      for (EventSubscriptionDeclaration eventSubscriptionDeclaration : EventSubscriptionDeclaration.getDeclarationsForScope(owningInstance.getTargetScope())) {
-        if (!migratedEventSubscriptionTargetActivityIds.contains(eventSubscriptionDeclaration.getActivityId())) {
-          // the event subscription will be created
-          owningInstance.addEmergingDependentInstance(new MigratingEventSubscriptionInstance(eventSubscriptionDeclaration));
-        }
-      }
+    if (owningInstance.migrates()) {
+      addEmergingEventSubscriptions(owningInstance, targetDeclarations.values());
     }
+  }
 
+  protected Set<String> getSupportedEventTypes() {
+    return SUPPORTED_EVENT_TYPES;
+  }
+
+  protected Map<String, EventSubscriptionDeclaration> getDeclarationsByTriggeringActivity(ScopeImpl eventScope) {
+    Map<String, EventSubscriptionDeclaration> declarations = EventSubscriptionDeclaration.getDeclarationsForScope(eventScope);
+
+    return new HashMap<String, EventSubscriptionDeclaration>(declarations);
+  }
+
+  protected void addEmergingEventSubscriptions(MigratingActivityInstance owningInstance, Collection<EventSubscriptionDeclaration> emergingDeclarations) {
+    for (EventSubscriptionDeclaration eventSubscriptionDeclaration : emergingDeclarations) {
+      // the event subscription will be created
+      owningInstance.addEmergingDependentInstance(new MigratingEventSubscriptionInstance(eventSubscriptionDeclaration));
+    }
   }
 }

@@ -13,13 +13,19 @@
 
 package org.camunda.bpm.engine.test.standalone.testing;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -36,7 +42,7 @@ import org.junit.Test;
 public class ProcessEngineRuleJunit4Test {
 
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
   @Test
   @Deployment
@@ -58,6 +64,36 @@ public class ProcessEngineRuleJunit4Test {
   @Test
   public void testWithoutDeploymentAnnotation() {
     assertEquals("aString", "aString");
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  public void requiredHistoryLevelAudit() {
+
+    assertThat(currentHistoryLevel(),
+        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
+        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  public void requiredHistoryLevelActivity() {
+
+    assertThat(currentHistoryLevel(),
+        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
+        .or(is(ProcessEngineConfiguration.HISTORY_AUDIT))
+        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void requiredHistoryLevelFull() {
+
+    assertThat(currentHistoryLevel(), is(ProcessEngineConfiguration.HISTORY_FULL));
+  }
+
+  protected String currentHistoryLevel() {
+    return engineRule.getProcessEngine().getProcessEngineConfiguration().getHistory();
   }
 
 }

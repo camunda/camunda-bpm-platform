@@ -14,9 +14,12 @@ package org.camunda.bpm.engine.impl.batch;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler.BatchSeedJobConfiguration;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 /**
  * The batch seed job handler is responsible to
@@ -26,7 +29,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
  * created to oversee the completion of the batch
  * (see {@link BatchMonitorJobHandler}).
  */
-public class BatchSeedJobHandler implements JobHandler {
+public class BatchSeedJobHandler implements JobHandler<BatchSeedJobConfiguration> {
 
   public static final String TYPE = "batch-seed-job";
 
@@ -34,7 +37,9 @@ public class BatchSeedJobHandler implements JobHandler {
     return TYPE;
   }
 
-  public void execute(String batchId, CoreExecution execution, CommandContext commandContext, String tenantId) {
+  public void execute(BatchSeedJobConfiguration configuration, CoreExecution execution, CommandContext commandContext, String tenantId) {
+
+    String batchId = configuration.getBatchId();
     BatchEntity batch = commandContext.getBatchManager().findBatchById(batchId);
     ensureNotNull("Batch with id '" + batchId + "' cannot be found", "batch", batch);
 
@@ -49,8 +54,36 @@ public class BatchSeedJobHandler implements JobHandler {
       batch.createSeedJob();
     }
     else {
-      batch.createMonitorJob();
+      // create monitor job initially without due date to
+      // enable rapid completion of simple batches
+      batch.createMonitorJob(false);
     }
+  }
+
+  @Override
+  public BatchSeedJobConfiguration newConfiguration(String canonicalString) {
+    return new BatchSeedJobConfiguration(canonicalString);
+  }
+
+  public static class BatchSeedJobConfiguration implements JobHandlerConfiguration {
+    protected String batchId;
+
+    public BatchSeedJobConfiguration(String batchId) {
+      this.batchId = batchId;
+    }
+
+    public String getBatchId() {
+      return batchId;
+    }
+
+    @Override
+    public String toCanonicalString() {
+      return batchId;
+    }
+  }
+
+  public void onDelete(BatchSeedJobConfiguration configuration, JobEntity jobEntity) {
+    // do nothing
   }
 
 }

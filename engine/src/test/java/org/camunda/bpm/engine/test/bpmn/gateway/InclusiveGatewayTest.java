@@ -647,4 +647,33 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
       .done());
   }
 
+  public void testRemoveConcurrentExecutionLocalVariablesOnJoin() {
+    deployment(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .inclusiveGateway("fork")
+      .userTask("task1")
+      .inclusiveGateway("join")
+      .userTask("afterTask")
+      .endEvent()
+      .moveToNode("fork")
+      .userTask("task2")
+      .connectTo("join")
+      .done());
+
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    for (Task task : tasks) {
+      runtimeService.setVariableLocal(task.getExecutionId(), "var", "value");
+    }
+
+    // when
+    taskService.complete(tasks.get(0).getId());
+    taskService.complete(tasks.get(1).getId());
+
+    // then
+    assertEquals(0, runtimeService.createVariableInstanceQuery().count());
+  }
+
 }

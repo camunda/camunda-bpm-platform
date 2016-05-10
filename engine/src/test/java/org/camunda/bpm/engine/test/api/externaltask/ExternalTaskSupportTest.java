@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,7 +39,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class ExternalTaskSupportTest {
 
   @Rule
-  public ProcessEngineRule rule = new ProcessEngineRule(true);
+  public ProcessEngineRule rule = new ProvidedProcessEngineRule();
 
   @Parameters
   public static Collection<Object[]> processResources() {

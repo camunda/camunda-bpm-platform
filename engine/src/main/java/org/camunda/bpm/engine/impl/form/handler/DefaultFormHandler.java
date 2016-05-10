@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.impl.form.type.FormTypes;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidator;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
@@ -300,31 +301,36 @@ public class DefaultFormHandler implements FormHandler {
     if (historyLevel.isHistoryEventProduced(HistoryEventTypes.FORM_PROPERTY_UPDATE, variableScope)) {
 
       // fire history events
-      ExecutionEntity executionEntity = null;
-      String taskId = null;
+      final ExecutionEntity executionEntity;
+      final String taskId;
       if(variableScope instanceof ExecutionEntity) {
         executionEntity = (ExecutionEntity) variableScope;
+        taskId = null;
       }
       else if (variableScope instanceof TaskEntity) {
         TaskEntity task = (TaskEntity) variableScope;
         executionEntity = task.getExecution();
         taskId = task.getId();
+      } else {
+        executionEntity = null;
+        taskId = null;
       }
 
       if (executionEntity != null) {
-        final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
-        final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
-
-        for (String variableName : properties.keySet()) {
-
-          TypedValue value = properties.getValueTyped(variableName);
+        for (final String variableName : properties.keySet()) {
+          final TypedValue value = properties.getValueTyped(variableName);
 
           // NOTE: SerializableValues are never stored as form properties
           if (!(value instanceof SerializableValue)
               && value.getValue() != null && value.getValue() instanceof String) {
-            String stringValue = (String) value.getValue();
-            HistoryEvent evt = eventProducer.createFormPropertyUpdateEvt(executionEntity, variableName, stringValue, taskId);
-            eventHandler.handleEvent(evt);
+            final String stringValue = (String) value.getValue();
+            
+            HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+              @Override
+              public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+                return producer.createFormPropertyUpdateEvt(executionEntity, variableName, stringValue, taskId);
+              }
+            });
           }
         }
       }

@@ -36,6 +36,7 @@ public abstract class UserQueryImpl extends AbstractQuery<UserQuery, User> imple
   protected String emailLike;
   protected String groupId;
   protected String procDefId;
+  protected String tenantId;
 
   public UserQueryImpl() {
   }
@@ -102,6 +103,12 @@ public abstract class UserQueryImpl extends AbstractQuery<UserQuery, User> imple
 
   }
 
+  public UserQuery memberOfTenant(String tenantId) {
+    ensureNotNull("Provided tenantId", tenantId);
+    this.tenantId = tenantId;
+    return this;
+  }
+
   //sorting //////////////////////////////////////////////////////////
 
   public UserQuery orderByUserId() {
@@ -148,5 +155,8 @@ public abstract class UserQueryImpl extends AbstractQuery<UserQuery, User> imple
   }
   public String getGroupId() {
     return groupId;
+  }
+  public String getTenantId() {
+    return tenantId;
   }
 }

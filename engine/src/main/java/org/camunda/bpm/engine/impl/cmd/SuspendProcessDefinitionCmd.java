@@ -14,8 +14,10 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
+import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
+import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
 
 /**
  * @author Daniel Meyer
@@ -39,13 +41,13 @@ public class SuspendProcessDefinitionCmd extends AbstractSetProcessDefinitionSta
   }
 
   @Override
-  protected AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd() {
-    return new SuspendJobDefinitionCmd(null, processDefinitionId, processDefinitionKey, false, null);
+  protected AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd(UpdateJobDefinitionSuspensionStateBuilderImpl jobDefinitionSuspensionStateBuilder) {
+    return new SuspendJobDefinitionCmd(jobDefinitionSuspensionStateBuilder);
   }
 
   @Override
-  protected SuspendProcessInstanceCmd getNextCommand() {
-    return new SuspendProcessInstanceCmd(null, processDefinitionId, processDefinitionKey, isTenantIdSet, tenantId);
+  protected SuspendProcessInstanceCmd getNextCommand(UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceCommandBuilder) {
+    return new SuspendProcessInstanceCmd(processInstanceCommandBuilder);
   }
 
   @Override

@@ -53,6 +53,9 @@ public interface HistoricIncidentQuery extends Query<HistoricIncidentQuery, Hist
   /** Only select incidents which contain the configuration. **/
   HistoricIncidentQuery configuration(String configuration);
 
+  /** Only select incidents that belong to one of the given job definition ids. */
+  HistoricIncidentQuery jobDefinitionIdIn(String... jobDefinitionIds);
+
   /** Only select historic incidents which are open. **/
   HistoricIncidentQuery open();
 

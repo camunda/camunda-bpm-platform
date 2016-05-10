@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.migration.instance;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 /**

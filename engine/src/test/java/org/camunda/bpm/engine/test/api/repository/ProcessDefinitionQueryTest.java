@@ -13,14 +13,14 @@
 
 package org.camunda.bpm.engine.test.api.repository;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+
+import java.util.List;
 
 
 /**
@@ -599,5 +599,34 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     repositoryService.deleteDeployment(firstDeployment, true);
     repositoryService.deleteDeployment(secondDeployment, true);
   }
+
+  @org.camunda.bpm.engine.test.Deployment(resources={"org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml"})
+  public void testQueryByVersionTag() {
+    assertEquals(1, repositoryService.createProcessDefinitionQuery()
+      .versionTag("ver-tag-2")
+      .count());
+  }
+
+  @org.camunda.bpm.engine.test.Deployment(resources={"org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml"})
+  public void testQueryByVersionTagLike() {
+    assertEquals(1, repositoryService.createProcessDefinitionQuery()
+      .versionTagLike("ver-tag-%")
+      .count());
+  }
+
+  @org.camunda.bpm.engine.test.Deployment(resources={
+    "org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/repository/VersionTagTest.testParsingVersionTag.bpmn20.xml"
+  })
+  public void testQueryOrderByVersionTag() {
+    List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery()
+      .versionTagLike("ver-tag-%")
+      .orderByVersionTag()
+      .asc()
+      .list();
+
+    assertEquals("ver-tag-2", processDefinitionList.get(1).getVersionTag());
+  }
+
 
 }

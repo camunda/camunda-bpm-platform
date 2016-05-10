@@ -17,9 +17,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 
@@ -46,8 +46,7 @@ public class CompleteTaskCmd implements Command<Void>, Serializable {
     TaskEntity task = taskManager.findTaskById(taskId);
     ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateTask(task);
+    checkCompleteTask(task, commandContext);
 
     if (variables != null) {
       task.setExecutionVariables(variables);
@@ -60,5 +59,11 @@ public class CompleteTaskCmd implements Command<Void>, Serializable {
 
   protected void completeTask(TaskEntity task) {
     task.complete();
+  }
+
+  protected void checkCompleteTask(TaskEntity task, CommandContext commandContext) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkTaskWork(task);
+    }
   }
 }

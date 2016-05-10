@@ -21,8 +21,11 @@ import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobDefinitionPriorityCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendJobCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendJobDefinitionCmd;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
+import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -321,6 +324,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+    @Override
     public void run() {
       try {
         JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
@@ -347,6 +351,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+    @Override
     public void run() {
       try {
         processEngineConfiguration.getCommandExecutorTxRequired()
@@ -372,15 +377,24 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+    @Override
     public void run() {
       try {
         processEngineConfiguration.getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new SuspendJobDefinitionCmd(null, null, processDefinitionKey, true, null)));
+          .execute(new ControlledCommand<Void>(activeThread, createSuspendJobCommand()));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
       LOG.debug(getName()+" ends");
+    }
+
+    protected Command<Void> createSuspendJobCommand() {
+      UpdateJobDefinitionSuspensionStateBuilderImpl builder = new UpdateJobDefinitionSuspensionStateBuilderImpl()
+        .byProcessDefinitionKey(processDefinitionKey)
+        .includeJobs(true);
+      
+      return new SuspendJobDefinitionCmd(builder);
     }
   }
 
@@ -397,15 +411,21 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+    @Override
     public void run() {
       try {
         processEngineConfiguration.getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new SuspendJobCmd(null, jobDefinitionId, null, null, null)));
+          .execute(new ControlledCommand<Void>(activeThread, createSuspendJobCommand()));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
       LOG.debug(getName()+" ends");
+    }
+
+    protected SuspendJobCmd createSuspendJobCommand() {
+      UpdateJobSuspensionStateBuilderImpl builder = new UpdateJobSuspensionStateBuilderImpl().byJobDefinitionId(jobDefinitionId);
+      return new SuspendJobCmd(builder);
     }
   }
 
@@ -426,6 +446,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+    @Override
     public void run() {
       try {
         processEngineConfiguration.getCommandExecutorTxRequired()

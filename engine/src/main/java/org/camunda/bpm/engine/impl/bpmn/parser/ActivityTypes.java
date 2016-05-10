@@ -20,8 +20,19 @@ public class ActivityTypes {
 
   public static final String MULTI_INSTANCE_BODY = "multiInstanceBody";
 
-
   public static final String BOUNDARY_TIMER = "boundaryTimer";
   public static final String BOUNDARY_MESSAGE = "boundaryMessage";
   public static final String BOUNDARY_SIGNAL = "boundarySignal";
+
+  public static final String START_EVENT = "startEvent";
+  public static final String START_EVENT_TIMER = "startTimerEvent";
+  public static final String START_EVENT_MESSAGE = "messageStartEvent";
+  public static final String START_EVENT_SIGNAL = "signalStartEvent";
+  public static final String START_EVENT_ESCALATION = "escalationStartEvent";
+  public static final String START_EVENT_COMPENSATION = "compensationStartEvent";
+  public static final String START_EVENT_ERROR = "errorStartEvent";
+
+  public static final String INTERMEDIATE_EVENT_MESSAGE = "intermediateMessageCatch";
+  public static final String INTERMEDIATE_EVENT_TIMER = "intermediateTimer";
+
 }

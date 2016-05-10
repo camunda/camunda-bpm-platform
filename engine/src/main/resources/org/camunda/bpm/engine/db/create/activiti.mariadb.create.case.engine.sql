@@ -27,6 +27,7 @@ create table ACT_RU_CASE_EXECUTION (
     PREV_STATE_ integer,
     CURRENT_STATE_ integer,
     REQUIRED_ boolean,
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
@@ -43,6 +44,7 @@ create table ACT_RU_CASE_SENTRY_PART (
     STANDARD_EVENT_ varchar(255),
     SOURCE_ varchar(255),
     SATISFIED_ boolean,
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
@@ -97,5 +99,6 @@ alter table ACT_RU_CASE_SENTRY_PART
     add constraint ACT_FK_CASE_SENTRY_CASE_EXEC
     foreign key (CASE_EXEC_ID_)
     references ACT_RU_CASE_EXECUTION(ID_);
-    
-create index ACT_IDX_CASE_DEF_TENANT_ID on ACT_RE_CASE_DEF(TENANT_ID_);    
+
+create index ACT_IDX_CASE_DEF_TENANT_ID on ACT_RE_CASE_DEF(TENANT_ID_);
+create index ACT_IDX_CASE_EXEC_TENANT_ID on ACT_RU_CASE_EXECUTION(TENANT_ID_);

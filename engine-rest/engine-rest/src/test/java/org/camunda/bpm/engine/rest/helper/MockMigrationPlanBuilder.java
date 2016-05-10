@@ -13,16 +13,17 @@
 
 package org.camunda.bpm.engine.rest.helper;
 
-import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
-import org.camunda.bpm.engine.migration.MigrationInstruction;
-import org.camunda.bpm.engine.migration.MigrationPlan;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.camunda.bpm.engine.migration.MigrationInstruction;
+import org.camunda.bpm.engine.migration.MigrationInstructionBuilder;
+import org.camunda.bpm.engine.migration.MigrationInstructionsBuilder;
+import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 
 public class MockMigrationPlanBuilder {
 
@@ -58,6 +59,20 @@ public class MockMigrationPlanBuilder {
     return instruction(instructionMock);
   }
 
+  public MockMigrationPlanBuilder instruction(String sourceActivityId, String targetActivityId, Boolean updateEventTrigger) {
+    MockMigrationInstructionBuilder instructionBuilder = new MockMigrationInstructionBuilder()
+      .sourceActivityId(sourceActivityId)
+      .targetActivityId(targetActivityId);
+
+    if (Boolean.TRUE.equals(updateEventTrigger)) {
+      instructionBuilder = instructionBuilder.updateEventTrigger();
+    }
+
+    MigrationInstruction instructionMock = instructionBuilder
+      .build();
+    return instruction(instructionMock);
+  }
+
   public MigrationPlan build() {
     MigrationPlan migrationPlanMock = mock(MigrationPlan.class);
     when(migrationPlanMock.getSourceProcessDefinitionId()).thenReturn(sourceProcessDefinitionId);
@@ -66,13 +81,22 @@ public class MockMigrationPlanBuilder {
     return migrationPlanMock;
   }
 
-  public MigrationPlanBuilder builder() {
+  public JoinedMigrationPlanBuilderMock builder() {
     MigrationPlan migrationPlanMock = build();
-    MigrationPlanBuilder migrationPlanBuilderMock = mock(MigrationPlanBuilder.class);
-    when(migrationPlanBuilderMock.mapEqualActivities()).thenReturn(migrationPlanBuilderMock);
-    when(migrationPlanBuilderMock.mapActivities(anyString(), anyString())).thenReturn(migrationPlanBuilderMock);
-    when(migrationPlanBuilderMock.build()).thenReturn(migrationPlanMock);
+    JoinedMigrationPlanBuilderMock migrationPlanBuilderMock =
+        mock(JoinedMigrationPlanBuilderMock.class, new FluentAnswer());
+
+    when(migrationPlanBuilderMock
+      .build())
+      .thenReturn(migrationPlanMock);
+
     return migrationPlanBuilderMock;
+  }
+
+  public static interface JoinedMigrationPlanBuilderMock extends MigrationPlanBuilder, MigrationInstructionBuilder, MigrationInstructionsBuilder {
+    // Just an empty interface joining all migration plan builder interfaces together.
+    // Allows it to mock all three with one mock instance, which in turn makes invocation verification easier.
+    // Quite a hack that may break if the interfaces become incompatible in the future.
   }
 
 }

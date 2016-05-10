@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelException;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
@@ -165,16 +166,23 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
   protected CaseDefinitionEntity transformCase(Case element) {
     // get CaseTransformer
     CmmnElementHandler<Case, CmmnActivity> caseTransformer = getDefinitionHandler(Case.class);
-    CmmnActivity definition = caseTransformer.handleElement(element, context);
+    CmmnCaseDefinition definition = (CmmnCaseDefinition) caseTransformer.handleElement(element, context);
 
-    context.setCaseDefinition((CmmnCaseDefinition) definition);
+    context.setCaseDefinition(definition);
     context.setParent(definition);
 
     CasePlanModel casePlanModel = element.getCasePlanModel();
     transformCasePlanModel(casePlanModel);
 
     for (CmmnTransformListener transformListener : transformListeners) {
-      transformListener.transformCase(element, (CmmnCaseDefinition) definition);
+      transformListener.transformCase(element, definition);
+    }
+
+    List<JobDeclaration<?,?>> declarations = context.getJobDeclarations();
+    if (!declarations.isEmpty()) {
+      ResourceDefinitionEntity resource = (ResourceDefinitionEntity) definition;
+      jobDeclarations.put(resource.getKey(), new ArrayList<JobDeclaration<?,?>>(declarations));
+      declarations.clear();
     }
 
     List<JobDeclaration<?,?>> declarations = context.getJobDeclarations();

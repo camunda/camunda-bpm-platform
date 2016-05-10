@@ -31,10 +31,14 @@ import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.junit.Assume;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
 /**
  * Convenience for ProcessEngine and services initialization in the form of a
@@ -78,6 +82,12 @@ import org.junit.runner.Description;
  * the time that was set during a test method. In other words, you don't have to
  * clean up your own time messing mess ;-)
  * </p>
+ * <p>
+ * If you need the history service for your tests then you can specify the
+ * required history level of the test method or class, using the
+ * {@link RequiredHistoryLevel} annotation. If the current history level of the
+ * process engine is lower than the specified one then the test is skipped.
+ * </p>
  *
  * @author Tom Baeyens
  */
@@ -91,6 +101,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   protected boolean ensureCleanAfterTest = false;
 
   protected ProcessEngine processEngine;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -132,14 +143,28 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
   @Override
   public void starting(Description description) {
+    deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, description.getTestClass(), description.getMethodName(),
+        description.getAnnotation(Deployment.class));
+  }
+
+  @Override
+  public Statement apply(final Statement base, final Description description) {
+
     if (processEngine == null) {
       initializeProcessEngine();
     }
 
     initializeServices();
 
-    deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, description.getTestClass(), description.getMethodName(),
-        description.getAnnotation(Deployment.class));
+    final boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, description);
+    return new Statement() {
+
+      @Override
+      public void evaluate() throws Throwable {
+        Assume.assumeTrue("ignored because the current history level is too low", hasRequiredHistoryLevel);
+        ProcessEngineRule.super.apply(base, description).evaluate();
+      }
+    };
   }
 
   protected void initializeProcessEngine() {
@@ -155,6 +180,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   }
 
   protected void initializeServices() {
+    processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
     repositoryService = processEngine.getRepositoryService();
     runtimeService = processEngine.getRuntimeService();
     taskService = processEngine.getTaskService();
@@ -170,6 +196,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   }
 
   protected void clearServiceReferences() {
+    processEngineConfiguration = null;
     repositoryService = null;
     runtimeService = null;
     taskService = null;
@@ -186,6 +213,9 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
   @Override
   public void finished(Description description) {
+    identityService.clearAuthentication();
+    processEngine.getProcessEngineConfiguration().setTenantCheckEnabled(true);
+
     TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, description.getTestClass(), description.getMethodName());
     for (String additionalDeployment : additionalDeployments) {
       TestHelper.deleteDeployment(processEngine, additionalDeployment);
@@ -196,6 +226,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
     }
 
     ClockUtil.reset();
+
 
     clearServiceReferences();
   }
@@ -218,6 +249,14 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
   public void setProcessEngine(ProcessEngine processEngine) {
     this.processEngine = processEngine;
+  }
+
+  public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
+    return processEngineConfiguration;
+  }
+
+  public void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    this.processEngineConfiguration = processEngineConfiguration;
   }
 
   @Override

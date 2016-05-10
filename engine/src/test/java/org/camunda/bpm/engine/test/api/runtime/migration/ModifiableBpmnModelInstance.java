@@ -18,12 +18,24 @@ import java.util.Collection;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.AbstractActivityBuilder;
 import org.camunda.bpm.model.bpmn.builder.AbstractBaseElementBuilder;
+import org.camunda.bpm.model.bpmn.builder.AbstractFlowNodeBuilder;
+import org.camunda.bpm.model.bpmn.builder.CallActivityBuilder;
 import org.camunda.bpm.model.bpmn.builder.EndEventBuilder;
+import org.camunda.bpm.model.bpmn.builder.IntermediateCatchEventBuilder;
+import org.camunda.bpm.model.bpmn.builder.ServiceTaskBuilder;
+import org.camunda.bpm.model.bpmn.builder.StartEventBuilder;
 import org.camunda.bpm.model.bpmn.builder.SubProcessBuilder;
 import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
+import org.camunda.bpm.model.bpmn.instance.Activity;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
+import org.camunda.bpm.model.bpmn.instance.FlowElement;
+import org.camunda.bpm.model.bpmn.instance.FlowNode;
+import org.camunda.bpm.model.bpmn.instance.Message;
+import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
+import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
+import org.camunda.bpm.model.bpmn.instance.Signal;
 import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.instance.DomDocument;
@@ -101,8 +113,28 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
     return getBuilderForElementById(activityId, AbstractActivityBuilder.class);
   }
 
+  public AbstractFlowNodeBuilder flowNodeBuilder(String flowNodeId) {
+    return getBuilderForElementById(flowNodeId, AbstractFlowNodeBuilder.class);
+  }
+
   public UserTaskBuilder userTaskBuilder(String userTaskId) {
     return getBuilderForElementById(userTaskId, UserTaskBuilder.class);
+  }
+
+  public ServiceTaskBuilder serviceTaskBuilder(String serviceTaskId) {
+    return getBuilderForElementById(serviceTaskId, ServiceTaskBuilder.class);
+  }
+
+  public CallActivityBuilder callActivityBuilder(String callActivityId) {
+    return getBuilderForElementById(callActivityId, CallActivityBuilder.class);
+  }
+
+  public IntermediateCatchEventBuilder intermediateCatchEventBuilder(String eventId) {
+    return getBuilderForElementById(eventId, IntermediateCatchEventBuilder.class);
+  }
+
+  public StartEventBuilder startEventBuilder(String eventId) {
+    return getBuilderForElementById(eventId, StartEventBuilder.class);
   }
 
   public EndEventBuilder endEventBuilder(String eventId) {
@@ -112,6 +144,47 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
   public ModifiableBpmnModelInstance changeElementId(String oldId, String newId) {
     BaseElement element = getModelElementById(oldId);
     element.setId(newId);
+    return this;
+  }
+
+  public ModifiableBpmnModelInstance changeElementName(String elementId, String newName) {
+    FlowElement flowElement = getModelElementById(elementId);
+    flowElement.setName(newName);
+    return this;
+  }
+
+  public ModifiableBpmnModelInstance removeChildren(String elementId) {
+    BaseElement element = getModelElementById(elementId);
+
+    Collection<BaseElement> children = element.getChildElementsByType(BaseElement.class);
+    for (BaseElement child : children) {
+      element.removeChildElement(child);
+    }
+
+    return this;
+  }
+
+  public ModifiableBpmnModelInstance renameMessage(String oldMessageName, String newMessageName) {
+    Collection<Message> messages = modelInstance.getModelElementsByType(Message.class);
+
+    for (Message message : messages) {
+      if (message.getName().equals(oldMessageName)) {
+        message.setName(newMessageName);
+      }
+    }
+
+    return this;
+  }
+
+  public ModifiableBpmnModelInstance renameSignal(String oldSignalName, String newSignalName) {
+    Collection<Signal> signals = modelInstance.getModelElementsByType(Signal.class);
+
+    for (Signal signal : signals) {
+      if (signal.getName().equals(oldSignalName)) {
+        signal.setName(newSignalName);
+      }
+    }
+
     return this;
   }
 
@@ -133,6 +206,39 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
     parent.addChildElement(eventSubProcess);
 
     return eventSubProcess.builder();
+  }
+
+  public ModifiableBpmnModelInstance removeFlowNode(String flowNodeId) {
+    FlowNode flowNode = getModelElementById(flowNodeId);
+    ModelElementInstance scope = flowNode.getParentElement();
+
+    scope.removeChildElement(flowNode);
+    for (SequenceFlow outgoingFlow : flowNode.getOutgoing()) {
+      scope.removeChildElement(outgoingFlow);
+    }
+    for (SequenceFlow incomingFlow : flowNode.getIncoming()) {
+      scope.removeChildElement(incomingFlow);
+    }
+
+    return this;
+  }
+
+  public ModifiableBpmnModelInstance asyncBeforeInnerMiActivity(String activityId) {
+    Activity activity = modelInstance.getModelElementById(activityId);
+
+    MultiInstanceLoopCharacteristics miCharacteristics = (MultiInstanceLoopCharacteristics) activity.getUniqueChildElementByType(MultiInstanceLoopCharacteristics.class);
+    miCharacteristics.setCamundaAsyncBefore(true);
+
+    return this;
+  }
+
+  public ModifiableBpmnModelInstance asyncAfterInnerMiActivity(String activityId) {
+    Activity activity = modelInstance.getModelElementById(activityId);
+
+    MultiInstanceLoopCharacteristics miCharacteristics = (MultiInstanceLoopCharacteristics) activity.getUniqueChildElementByType(MultiInstanceLoopCharacteristics.class);
+    miCharacteristics.setCamundaAsyncAfter(true);
+
+    return this;
   }
 
 }

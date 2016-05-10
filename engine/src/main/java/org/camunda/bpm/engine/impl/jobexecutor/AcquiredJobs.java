@@ -41,8 +41,17 @@ public class AcquiredJobs {
   }
 
   public void addJobIdBatch(List<String> jobIds) {
-    acquiredJobBatches.add(jobIds);
-    acquiredJobs.addAll(jobIds);
+    if (!jobIds.isEmpty()) {
+      acquiredJobBatches.add(jobIds);
+      acquiredJobs.addAll(jobIds);
+    }
+  }
+
+  public void addJobIdBatch(String jobId) {
+    ArrayList<String> list = new ArrayList<String>();
+    list.add(jobId);
+
+    addJobIdBatch(list);
   }
 
   public boolean contains(String jobId) {
@@ -60,7 +69,7 @@ public class AcquiredJobs {
 
     Iterator<List<String>> batchIterator = acquiredJobBatches.iterator();
     while (batchIterator.hasNext()) {
-      List<String> batch = (List<String>) batchIterator.next();
+      List<String> batch = batchIterator.next();
       batch.remove(id);
 
       // remove batch if it is now empty

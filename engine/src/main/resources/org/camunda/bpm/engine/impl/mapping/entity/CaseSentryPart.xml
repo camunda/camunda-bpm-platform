@@ -17,7 +17,8 @@
       TYPE_,
       STANDARD_EVENT_,
       SATISFIED_,
-      SOURCE_
+      SOURCE_,
+      TENANT_ID_
     )
     values
     (
@@ -29,7 +30,8 @@
       #{type, jdbcType=VARCHAR},
       #{standardEvent, jdbcType=VARCHAR},
       #{satisfied, jdbcType=BOOLEAN},
-      #{source, jdbcType=VARCHAR}
+      #{source, jdbcType=VARCHAR},
+      #{tenantId, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -62,6 +64,7 @@
     <result property="standardEvent" column="STANDARD_EVENT_" jdbcType="VARCHAR" />
     <result property="source" column="SOURCE_" jdbcType="VARCHAR" />
     <result property="satisfied" column="SATISFIED_" jdbcType="BOOLEAN" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!-- CASE SENTRY PART SELECT -->

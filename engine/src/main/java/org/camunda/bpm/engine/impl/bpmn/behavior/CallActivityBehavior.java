@@ -15,8 +15,14 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import static org.camunda.bpm.engine.impl.util.CallableElementUtil.getProcessDefinitionToCall;
 
+import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingCalledProcessInstance;
+import org.camunda.bpm.engine.impl.migration.instance.parser.MigratingInstanceParseContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.delegate.MigrationObserverBehavior;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.variable.VariableMap;
 
@@ -28,12 +34,32 @@ import org.camunda.bpm.engine.variable.VariableMap;
  * @author Joram Barrez
  * @author Roman Smirnov
  */
-public class CallActivityBehavior extends CallableElementActivityBehavior {
+public class CallActivityBehavior extends CallableElementActivityBehavior implements MigrationObserverBehavior {
 
   protected void startInstance(ActivityExecution execution, VariableMap variables, String businessKey) {
     ProcessDefinitionImpl definition = getProcessDefinitionToCall(execution, getCallableElement());
     PvmProcessInstance processInstance = execution.createSubProcessInstance(definition, businessKey);
     processInstance.start(variables);
+  }
+
+  @Override
+  public void migrateScope(ActivityExecution scopeExecution) {
+  }
+
+  @Override
+  public void onParseMigratingInstance(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance) {
+    ActivityImpl callActivity = (ActivityImpl) migratingInstance.getSourceScope();
+
+    // A call activity is typically scope and since we guarantee stability of scope executions during migration,
+    // the superExecution link does not have to be maintained during migration.
+    // There are some exceptions, though: A multi-instance call activity is not scope and therefore
+    // does not have a dedicated scope execution. In this case, the link to the super execution
+    // must be maintained throughout migration
+    if (!callActivity.isScope()) {
+      ExecutionEntity callActivityExecution = migratingInstance.resolveRepresentativeExecution();
+      ExecutionEntity calledProcessInstance = callActivityExecution.getSubProcessInstance();
+      migratingInstance.addMigratingDependentInstance(new MigratingCalledProcessInstance(calledProcessInstance));
+    }
   }
 
 }

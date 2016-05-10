@@ -17,6 +17,8 @@ import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 
 /**
@@ -24,7 +26,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
  *
  * @author Thorben Lindhauer
  */
-public class TweetNestedCommandExceptionHandler implements JobHandler {
+public class TweetNestedCommandExceptionHandler implements JobHandler<JobHandlerConfiguration> {
 
   public static final String TYPE = "tweet-exception-nested";
 
@@ -32,7 +34,7 @@ public class TweetNestedCommandExceptionHandler implements JobHandler {
     return TYPE;
   }
 
-  public void execute(String configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
+  public void execute(JobHandlerConfiguration configuration, CoreExecution execution, CommandContext commandContext, String tenantId) {
     Context.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Void>() {
 
       public Void execute(CommandContext commandContext) {
@@ -41,4 +43,19 @@ public class TweetNestedCommandExceptionHandler implements JobHandler {
 
     });
   }
+
+  @Override
+  public JobHandlerConfiguration newConfiguration(String canonicalString) {
+    return new JobHandlerConfiguration() {
+      @Override
+      public String toCanonicalString() {
+        return null;
+      }
+    };
+  }
+
+  public void onDelete(JobHandlerConfiguration configuration, JobEntity jobEntity) {
+    // do nothing
+  }
+
 }

@@ -26,16 +26,28 @@ public class ProcessModels {
 
   public static final String PROCESS_KEY = "Process";
 
+  public static ProcessBuilder newModel() {
+    return newModel(PROCESS_KEY);
+  }
 
-  protected static ProcessBuilder newModel() {
-    return Bpmn.createExecutableProcess(PROCESS_KEY);
+  public static ProcessBuilder newModel(String processKey) {
+    return Bpmn.createExecutableProcess(processKey);
   }
 
   public static final BpmnModelInstance ONE_TASK_PROCESS =
       newModel()
-      .startEvent()
+      .startEvent("startEvent")
       .userTask("userTask").name("User Task")
-      .endEvent()
+      .endEvent("endEvent")
+      .done();
+
+  public static final BpmnModelInstance TWO_TASKS_PROCESS =
+      newModel()
+      .startEvent("startEvent")
+      .userTask("userTask1")
+      .sequenceFlowId("flow1")
+      .userTask("userTask2")
+      .endEvent("endEvent")
       .done();
 
   public static final BpmnModelInstance SUBPROCESS_PROCESS =
@@ -43,7 +55,7 @@ public class ProcessModels {
       .startEvent()
       .subProcess("subProcess")
         .embeddedSubProcess()
-          .startEvent()
+          .startEvent("subProcessStart")
           .userTask("userTask").name("User Task")
           .endEvent("subProcessEnd")
         .subProcessDone()
@@ -158,7 +170,7 @@ public class ProcessModels {
   public static final BpmnModelInstance PARALLEL_DOUBLE_SUBPROCESS_PROCESS =
     newModel()
       .startEvent()
-      .parallelGateway()
+      .parallelGateway("fork")
       .subProcess("subProcess1")
         .embeddedSubProcess()
           .startEvent()
@@ -245,8 +257,6 @@ public class ProcessModels {
     .startEvent()
     .businessRuleTask("decisionTask")
       .camundaDecisionRef("testDecision")
-    .intermediateCatchEvent("catch")
-      .message("Message")
     .intermediateThrowEvent("throw")
       .message("Message")
     .endEvent()

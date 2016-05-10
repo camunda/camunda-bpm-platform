@@ -12,79 +12,176 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmd.AbstractSetJobDefinitionStateCmd;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerChangeJobDefinitionSuspensionStateJobHandler.JobDefinitionSuspensionStateConfiguration;
+import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
 
 /**
  * @author roman.smirnov
  */
-public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler implements JobHandler {
+public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler implements JobHandler<JobDefinitionSuspensionStateConfiguration> {
 
   protected static final String JOB_HANDLER_CFG_BY = "by";
   protected static final String JOB_HANDLER_CFG_JOB_DEFINITION_ID = "jobDefinitionId";
   protected static final String JOB_HANDLER_CFG_PROCESS_DEFINITION_ID = "processDefinitionId";
   protected static final String JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY = "processDefinitionKey";
+  protected static final String JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID = "processDefinitionTenantId";
 
   protected static final String JOB_HANDLER_CFG_INCLUDE_JOBS = "includeJobs";
 
-  public static String createJobHandlerConfigurationByJobDefinitionId(String jobDefinitionId, boolean includeJobs) {
-    JSONObject json = new JSONObject();
-
-    json.put(JOB_HANDLER_CFG_BY, JOB_HANDLER_CFG_JOB_DEFINITION_ID);
-    json.put(JOB_HANDLER_CFG_JOB_DEFINITION_ID, jobDefinitionId);
-    json.put(JOB_HANDLER_CFG_INCLUDE_JOBS, includeJobs);
-
-    return json.toString();
-  }
-
-  public static String createJobHandlerConfigurationByProcessDefinitionId(String processDefinitionId, boolean includeJobs) {
-    JSONObject json = new JSONObject();
-
-    json.put(JOB_HANDLER_CFG_BY, JOB_HANDLER_CFG_PROCESS_DEFINITION_ID);
-    json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID, processDefinitionId);
-    json.put(JOB_HANDLER_CFG_INCLUDE_JOBS, includeJobs);
-
-    return json.toString();
-  }
-
-  public static String createJobHandlerConfigurationByProcessDefinitionKey(String processDefinitionKey, boolean includeJobs) {
-    JSONObject json = new JSONObject();
-
-    json.put(JOB_HANDLER_CFG_BY, JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY);
-    json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY, processDefinitionKey);
-    json.put(JOB_HANDLER_CFG_INCLUDE_JOBS, includeJobs);
-
-    return json.toString();
-  }
-
-  public void execute(String configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
+  public void execute(JobDefinitionSuspensionStateConfiguration configuration, CoreExecution execution, CommandContext commandContext, String tenantId) {
     AbstractSetJobDefinitionStateCmd cmd = getCommand(configuration);
     cmd.disableLogUserOperation();
     cmd.execute(commandContext);
   }
 
-  protected String getJobDefinitionId(JSONObject configuration) {
-    return configuration.getString(JOB_HANDLER_CFG_JOB_DEFINITION_ID);
+  protected abstract AbstractSetJobDefinitionStateCmd getCommand(JobDefinitionSuspensionStateConfiguration configuration);
+
+  @Override
+  public JobDefinitionSuspensionStateConfiguration newConfiguration(String canonicalString) {
+    JSONObject jsonObject = new JSONObject(canonicalString);
+
+    return JobDefinitionSuspensionStateConfiguration.fromJson(jsonObject);
   }
 
-  protected String getProcessDefinitionId(JSONObject configuration) {
-    return configuration.getString(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID);
+  public static class JobDefinitionSuspensionStateConfiguration implements JobHandlerConfiguration {
+
+    protected String jobDefinitionId;
+    protected String processDefinitionKey;
+    protected String processDefinitionId;
+    protected boolean includeJobs;
+    protected String tenantId;
+    protected boolean isTenantIdSet;
+    protected String by;
+
+    @Override
+    public String toCanonicalString() {
+      JSONObject json = new JSONObject();
+
+      json.put(JOB_HANDLER_CFG_BY, by);
+      json.put(JOB_HANDLER_CFG_JOB_DEFINITION_ID, jobDefinitionId);
+      json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY, processDefinitionKey);
+      json.put(JOB_HANDLER_CFG_INCLUDE_JOBS, includeJobs);
+      json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID, processDefinitionId);
+
+      if (isTenantIdSet) {
+        if (tenantId != null) {
+          json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID, tenantId);
+        } else {
+          json.put(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID, JSONObject.NULL);
+        }
+      }
+
+      return json.toString();
+    }
+
+    public UpdateJobDefinitionSuspensionStateBuilderImpl createBuilder() {
+      UpdateJobDefinitionSuspensionStateBuilderImpl builder = new UpdateJobDefinitionSuspensionStateBuilderImpl();
+
+      if (JOB_HANDLER_CFG_PROCESS_DEFINITION_ID.equals(by)) {
+        builder.byProcessDefinitionId(processDefinitionId);
+
+      }
+      else if (JOB_HANDLER_CFG_JOB_DEFINITION_ID.equals(by)) {
+        builder.byJobDefinitionId(jobDefinitionId);
+      }
+      else if (JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY.equals(by)) {
+        builder.byProcessDefinitionKey(processDefinitionKey);
+
+        if (isTenantIdSet) {
+
+          if (tenantId != null) {
+            builder.processDefinitionTenantId(tenantId);
+
+          } else {
+            builder.processDefinitionWithoutTenantId();
+          }
+        }
+
+      } else {
+        throw new ProcessEngineException("Unexpected job handler configuration for property '" + JOB_HANDLER_CFG_BY + "': " + by);
+      }
+
+      builder.includeJobs(includeJobs);
+
+      return builder;
+    }
+
+    public static JobDefinitionSuspensionStateConfiguration fromJson(JSONObject jsonObject) {
+      JobDefinitionSuspensionStateConfiguration config = new JobDefinitionSuspensionStateConfiguration();
+
+      config.by = jsonObject.getString(JOB_HANDLER_CFG_BY);
+      if (jsonObject.has(JOB_HANDLER_CFG_JOB_DEFINITION_ID)) {
+        config.jobDefinitionId = jsonObject.getString(JOB_HANDLER_CFG_JOB_DEFINITION_ID);
+      }
+      if (jsonObject.has(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID)) {
+        config.processDefinitionId = jsonObject.getString(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID);
+      }
+      if (jsonObject.has(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY)) {
+        config.processDefinitionKey = jsonObject.getString(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY);
+      }
+      if (jsonObject.has(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID)) {
+        config.isTenantIdSet = true;
+        if (!jsonObject.isNull(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID)) {
+          config.tenantId = jsonObject.getString(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID);
+        }
+      }
+      if (jsonObject.has(JOB_HANDLER_CFG_INCLUDE_JOBS)) {
+        config.includeJobs = jsonObject.getBoolean(JOB_HANDLER_CFG_INCLUDE_JOBS);
+      }
+
+      return config;
+    }
+
+    public static JobDefinitionSuspensionStateConfiguration byJobDefinitionId(String jobDefinitionId, boolean includeJobs) {
+      JobDefinitionSuspensionStateConfiguration configuration = new JobDefinitionSuspensionStateConfiguration();
+      configuration.by = JOB_HANDLER_CFG_JOB_DEFINITION_ID;
+      configuration.jobDefinitionId = jobDefinitionId;
+      configuration.includeJobs = includeJobs;
+
+      return configuration;
+    }
+
+    public static JobDefinitionSuspensionStateConfiguration byProcessDefinitionId(String processDefinitionId, boolean includeJobs) {
+      JobDefinitionSuspensionStateConfiguration configuration = new JobDefinitionSuspensionStateConfiguration();
+
+      configuration.by = JOB_HANDLER_CFG_PROCESS_DEFINITION_ID;
+      configuration.processDefinitionId = processDefinitionId;
+      configuration.includeJobs = includeJobs;
+
+      return configuration;
+    }
+
+    public static JobDefinitionSuspensionStateConfiguration byProcessDefinitionKey(String processDefinitionKey, boolean includeJobs) {
+      JobDefinitionSuspensionStateConfiguration configuration = new JobDefinitionSuspensionStateConfiguration();
+
+      configuration.by = JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY;
+      configuration.processDefinitionKey = processDefinitionKey;
+      configuration.includeJobs = includeJobs;
+
+      return configuration;
+    }
+
+    public static JobDefinitionSuspensionStateConfiguration ByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String tenantId, boolean includeProcessInstances) {
+      JobDefinitionSuspensionStateConfiguration configuration = byProcessDefinitionKey(processDefinitionKey, includeProcessInstances);
+
+      configuration.isTenantIdSet = true;
+      configuration.tenantId = tenantId;
+
+      return configuration;
+
+    }
+
+
   }
 
-  protected String getProcessDefinitionKey(JSONObject configuration) {
-    return configuration.getString(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY);
+  public void onDelete(JobDefinitionSuspensionStateConfiguration configuration, JobEntity jobEntity) {
+    // do nothing
   }
-
-  protected boolean getIncludeJobs(JSONObject configuration) {
-    return configuration.getBoolean(JOB_HANDLER_CFG_INCLUDE_JOBS);
-  }
-
-  protected String getBy(JSONObject configuration) {
-    return configuration.getString(JOB_HANDLER_CFG_BY);
-  }
-
-  protected abstract AbstractSetJobDefinitionStateCmd getCommand(String configuration);
 
 }

@@ -12,17 +12,22 @@
  */
 package org.camunda.bpm.engine.impl.identity.db;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MembershipEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TenantEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TenantMembershipEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 
 /**
@@ -64,6 +69,8 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     UserEntity user = findUserById(userId);
     if(user != null) {
       deleteMembershipsByUserId(userId);
+      deleteTenantMembershipsOfUser(userId);
+
       deleteAuthorizations(Resources.USER, userId);
       getDbEntityManager().delete(user);
     }
@@ -94,8 +101,41 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     GroupEntity group = findGroupById(groupId);
     if(group != null) {
       deleteMembershipsByGroupId(groupId);
+      deleteTenantMembershipsOfGroup(groupId);
+
       deleteAuthorizations(Resources.GROUP, groupId);
       getDbEntityManager().delete(group);
+    }
+  }
+
+  // tenants //////////////////////////////////////////////////////
+
+  public Tenant createNewTenant(String tenantId) {
+    checkAuthorization(Permissions.CREATE, Resources.TENANT, null);
+    return new TenantEntity(tenantId);
+  }
+
+  public Tenant saveTenant(Tenant tenant) {
+    TenantEntity tenantEntity = (TenantEntity) tenant;
+    if (tenantEntity.getRevision() == 0) {
+      checkAuthorization(Permissions.CREATE, Resources.TENANT, null);
+      getDbEntityManager().insert(tenantEntity);
+      createDefaultAuthorizations(tenant);
+    } else {
+      checkAuthorization(Permissions.UPDATE, Resources.TENANT, tenant.getId());
+      getDbEntityManager().merge(tenantEntity);
+    }
+    return tenantEntity;
+  }
+
+  public void deleteTenant(String tenantId) {
+    checkAuthorization(Permissions.DELETE, Resources.TENANT, tenantId);
+    TenantEntity tenant = findTenantById(tenantId);
+    if (tenant != null) {
+      deleteTenantMembershipsOfTenant(tenantId);
+
+      deleteAuthorizations(Resources.TENANT, tenantId);
+      getDbEntityManager().delete(tenant);
     }
   }
 
@@ -130,6 +170,74 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     getDbEntityManager().delete(MembershipEntity.class, "deleteMembershipsByGroupId", groupId);
   }
 
+  public void createTenantUserMembership(String tenantId, String userId) {
+    checkAuthorization(Permissions.CREATE, Resources.TENANT_MEMBERSHIP, tenantId);
+
+    TenantEntity tenant = findTenantById(tenantId);
+    UserEntity user = findUserById(userId);
+
+    ensureNotNull("No tenant found with id '" + tenantId + "'.", "tenant", tenant);
+    ensureNotNull("No user found with id '" + userId + "'.", "user", user);
+
+    TenantMembershipEntity membership = new TenantMembershipEntity();
+    membership.setTenant(tenant);
+    membership.setUser(user);
+
+    getDbEntityManager().insert(membership);
+
+    createDefaultTenantMembershipAuthorizations(tenant, user);
+  }
+
+  public void createTenantGroupMembership(String tenantId, String groupId) {
+    checkAuthorization(Permissions.CREATE, Resources.TENANT_MEMBERSHIP, tenantId);
+
+    TenantEntity tenant = findTenantById(tenantId);
+    GroupEntity group = findGroupById(groupId);
+
+    ensureNotNull("No tenant found with id '" + tenantId + "'.", "tenant", tenant);
+    ensureNotNull("No group found with id '" + groupId + "'.", "group", group);
+
+    TenantMembershipEntity membership = new TenantMembershipEntity();
+    membership.setTenant(tenant);
+    membership.setGroup(group);
+
+    getDbEntityManager().insert(membership);
+
+    createDefaultTenantMembershipAuthorizations(tenant, group);
+  }
+
+  public void deleteTenantUserMembership(String tenantId, String userId) {
+    checkAuthorization(Permissions.DELETE, Resources.TENANT_MEMBERSHIP, tenantId);
+    deleteAuthorizations(Resources.TENANT_MEMBERSHIP, userId);
+
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("tenantId", tenantId);
+    parameters.put("userId", userId);
+    getDbEntityManager().delete(TenantMembershipEntity.class, "deleteTenantMembership", parameters);
+  }
+
+  public void deleteTenantGroupMembership(String tenantId, String groupId) {
+    checkAuthorization(Permissions.DELETE, Resources.TENANT_MEMBERSHIP, tenantId);
+    deleteAuthorizations(Resources.TENANT_MEMBERSHIP, groupId);
+
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("tenantId", tenantId);
+    parameters.put("groupId", groupId);
+    getDbEntityManager().delete(TenantMembershipEntity.class, "deleteTenantMembership", parameters);
+  }
+
+  protected void deleteTenantMembershipsOfUser(String userId) {
+    getDbEntityManager().delete(TenantMembershipEntity.class, "deleteTenantMembershipsOfUser", userId);
+  }
+
+  protected void deleteTenantMembershipsOfGroup(String groupId) {
+    getDbEntityManager().delete(TenantMembershipEntity.class, "deleteTenantMembershipsOfGroup", groupId);
+  }
+
+  protected void deleteTenantMembershipsOfTenant(String tenant) {
+    getDbEntityManager().delete(TenantMembershipEntity.class, "deleteTenantMembershipsOfTenant", tenant);
+  }
+
   // authorizations ////////////////////////////////////////////////////////////
 
   protected void createDefaultAuthorizations(UserEntity userEntity) {
@@ -144,9 +252,27 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     }
   }
 
+  protected void createDefaultAuthorizations(Tenant tenant) {
+    if (isAuthorizationEnabled()) {
+      saveDefaultAuthorizations(getResourceAuthorizationProvider().newTenant(tenant));
+    }
+  }
+
   protected void createDefaultMembershipAuthorizations(String userId, String groupId) {
     if(isAuthorizationEnabled()) {
       saveDefaultAuthorizations(getResourceAuthorizationProvider().groupMembershipCreated(groupId, userId));
+    }
+  }
+
+  protected void createDefaultTenantMembershipAuthorizations(Tenant tenant, User user) {
+    if(isAuthorizationEnabled()) {
+      saveDefaultAuthorizations(getResourceAuthorizationProvider().tenantMembershipCreated(tenant, user));
+    }
+  }
+
+  protected void createDefaultTenantMembershipAuthorizations(Tenant tenant, Group group) {
+    if(isAuthorizationEnabled()) {
+      saveDefaultAuthorizations(getResourceAuthorizationProvider().tenantMembershipCreated(tenant, group));
     }
   }
 

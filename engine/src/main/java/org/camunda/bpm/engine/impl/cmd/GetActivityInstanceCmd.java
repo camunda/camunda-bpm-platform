@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -73,8 +73,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       return null;
     }
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadProcessInstance(processInstanceId);
+    checkGetActivityInstance(processInstanceId, commandContext);
 
     List<ExecutionEntity> nonEventScopeExecutions = filterNonEventScopeExecutions(executionList);
     List<ExecutionEntity> leaves = filterLeaves(nonEventScopeExecutions);
@@ -172,6 +171,12 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     populateChildInstances(activityInstances, transitionInstances);
 
     return processActInst;
+  }
+
+  protected void checkGetActivityInstance(String processInstanceId, CommandContext commandContext) {
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadProcessInstance(processInstanceId);
+    }
   }
 
   protected void orderById(List<ExecutionEntity> leaves) {
@@ -363,7 +368,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
 
     // initialize parent/child sets
     if (processInstance != null) {
-      processInstance.restoreProcessInstance(executions, null, null, null, null, null);
+      processInstance.restoreProcessInstance(executions, null, null, null, null, null, null);
     }
 
     return executions;

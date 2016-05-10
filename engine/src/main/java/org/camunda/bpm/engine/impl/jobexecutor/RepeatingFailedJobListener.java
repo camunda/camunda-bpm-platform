@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 
 /**
@@ -59,8 +60,8 @@ public class RepeatingFailedJobListener implements TransactionListener {
         failedJob.createNewTimerJob(newDueDate);
 
         // update configuration of failed job
-        String config = failedJob.getJobHandlerConfiguration();
-        config = TimerEventJobHandler.createJobHandlerConfigurationWithFollowUpJobCreated(config);
+        TimerJobConfiguration config = (TimerJobConfiguration) failedJob.getJobHandlerConfiguration();
+        config.setFollowUpJobCreated(true);
         failedJob.setJobHandlerConfiguration(config);
       }
 

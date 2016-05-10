@@ -18,6 +18,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.filter.Filter;
@@ -106,6 +107,81 @@ public class MultiTenancyFilterServiceTest extends PluggableProcessEngineTestCas
     assertThat(filterService.count(filterId, extendingQuery), is(1L));
   }
 
+  public void testFilterTasksWithNoAuthenticatedTenants() {
+    TaskQuery query = taskService.createTaskQuery();
+    filterId = createFilter(query);
+
+    identityService.setAuthentication("user", null, null);
+
+    assertThat(filterService.count(filterId), is(1L));
+  }
+
+  public void testFilterTasksWithAuthenticatedTenant() {
+    TaskQuery query = taskService.createTaskQuery();
+    filterId = createFilter(query);
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    assertThat(filterService.count(filterId), is(2L));
+  }
+
+  public void testFilterTasksWithAuthenticatedTenants() {
+    TaskQuery query = taskService.createTaskQuery();
+    filterId = createFilter(query);
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
+
+    assertThat(filterService.count(filterId), is(3L));
+  }
+
+  public void testFilterTasksByTenantIdNoAuthenticatedTenants() {
+    TaskQuery query = taskService.createTaskQuery().tenantIdIn(TENANT_ONE);
+    filterId = createFilter(query);
+
+    identityService.setAuthentication("user", null, null);
+
+    assertThat(filterService.count(filterId), is(0L));
+  }
+
+  public void testFilterTasksByTenantIdWithAuthenticatedTenant() {
+    TaskQuery query = taskService.createTaskQuery().tenantIdIn(TENANT_ONE);
+    filterId = createFilter(query);
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    assertThat(filterService.count(filterId), is(1L));
+  }
+
+  public void testFilterTasksByExtendingQueryWithTenantIdNoAuthenticatedTenants() {
+    TaskQuery query = taskService.createTaskQuery().taskName("testTask");
+    filterId = createFilter(query);
+
+    identityService.setAuthentication("user", null, null);
+
+    TaskQuery extendingQuery = taskService.createTaskQuery().tenantIdIn(TENANT_ONE);
+    assertThat(filterService.count(filterId, extendingQuery), is(0L));
+  }
+
+  public void testFilterTasksByExtendingQueryWithTenantIdAuthenticatedTenant() {
+    TaskQuery query = taskService.createTaskQuery().taskName("testTask");
+    filterId = createFilter(query);
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    TaskQuery extendingQuery = taskService.createTaskQuery().tenantIdIn(TENANT_ONE);
+    assertThat(filterService.count(filterId, extendingQuery), is(1L));
+  }
+
+  public void testFilterTasksWithDisabledTenantCheck() {
+    TaskQuery query = taskService.createTaskQuery();
+    filterId = createFilter(query);
+
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    assertThat(filterService.count(filterId), is(3L));
+  }
+
   protected void createTaskWithoutTenantId() {
     createTaskForTenant(null);
   }
@@ -133,7 +209,7 @@ public class MultiTenancyFilterServiceTest extends PluggableProcessEngineTestCas
   @Override
   protected void tearDown() throws Exception {
     filterService.deleteFilter(filterId);
-
+    identityService.clearAuthentication();
     for(String taskId : taskIds) {
       taskService.deleteTask(taskId, true);
     }

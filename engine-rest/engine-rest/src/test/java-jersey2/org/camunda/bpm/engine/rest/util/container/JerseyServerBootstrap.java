@@ -30,7 +30,7 @@ public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
     try {
       server.start();
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new ServerBootstrapException(e);
     }
   }
 
@@ -47,9 +47,9 @@ public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
     try {
       server = GrizzlyHttpServerFactory.createHttpServer(serverUri, rc);
     } catch (IllegalArgumentException e) {
-      e.printStackTrace();
+      throw new ServerBootstrapException(e);
     } catch (NullPointerException e) {
-      e.printStackTrace();
+      throw new ServerBootstrapException(e);
     }
   }
 

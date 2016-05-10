@@ -12,12 +12,11 @@
  */
 package org.camunda.bpm.engine.test.api.authorization;
 
-import static org.camunda.bpm.engine.authorization.Groups.CAMUNDA_ADMIN;
-
+import java.util.Collections;
 import java.util.Map;
 
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
@@ -40,14 +39,13 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 Required authenticated group 'camunda-admin'", message);
     }
   }
 
   public void testGetTableCountAsCamundaAdmin() {
     // given
-    createGroup(CAMUNDA_ADMIN);
-    createMembership(userId, CAMUNDA_ADMIN);
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     // when
     Map<String, Long> tableCount = managementService.getTableCount();
@@ -68,14 +66,13 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 Required authenticated group 'camunda-admin'", message);
     }
   }
 
   public void testGetTableNameAsCamundaAdmin() {
     // given
-    createGroup(CAMUNDA_ADMIN);
-    createMembership(userId, CAMUNDA_ADMIN);
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     // when
     String tableName = managementService.getTableName(ProcessDefinitionEntity.class);
@@ -96,14 +93,13 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 Required authenticated group 'camunda-admin'", message);
     }
   }
 
   public void testGetTableMetaDataAsCamundaAdmin() {
     // given
-    createGroup(CAMUNDA_ADMIN);
-    createMembership(userId, CAMUNDA_ADMIN);
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     // when
     TableMetaData tableMetaData = managementService.getTableMetaData("ACT_RE_PROCDEF");
@@ -124,15 +120,14 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 Required authenticated group 'camunda-admin'", message);
     }
 
   }
 
   public void testTablePageQueryAsCamundaAdmin() {
     // given
-    createGroup(CAMUNDA_ADMIN);
-    createMembership(userId, CAMUNDA_ADMIN);
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     // when
     TablePage page = managementService.createTablePageQuery().tableName("ACT_RE_PROCDEF").listPage(0, Integer.MAX_VALUE);
@@ -153,14 +148,13 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 Required authenticated group 'camunda-admin'", message);
     }
   }
 
   public void testGetHistoryLevelAsCamundaAdmin() {
     //given
-    createGroup(CAMUNDA_ADMIN);
-    createMembership(userId, CAMUNDA_ADMIN);
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     // when
     int historyLevel = managementService.getHistoryLevel();
@@ -181,23 +175,8 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 Required authenticated group 'camunda-admin'", message);
     }
-  }
-
-  // helper ////////////////////////////////////////////
-
-  protected Group createGroup(String groupId) {
-    disableAuthorization();
-    Group group = super.createGroup(groupId);
-    enableAuthorization();
-    return group;
-  }
-
-  protected void createMembership(String userId, String groupId) {
-    disableAuthorization();
-    identityService.createMembership(userId, groupId);
-    enableAuthorization();
   }
 
 }

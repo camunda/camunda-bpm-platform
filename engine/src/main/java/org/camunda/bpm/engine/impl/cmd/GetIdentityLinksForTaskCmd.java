@@ -17,9 +17,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
@@ -48,8 +48,7 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
     TaskEntity task = taskManager.findTaskById(taskId);
     ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadTask(task);
+    checkGetIdentityLink(task, commandContext);
 
     List<IdentityLink> identityLinks = (List) task.getIdentityLinks();
 
@@ -79,4 +78,9 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
     return (List) task.getIdentityLinks();
   }
 
+  protected void checkGetIdentityLink(TaskEntity task, CommandContext commandContext) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadTask(task);
+    }
+  }
 }

@@ -783,6 +783,30 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     } catch (ProcessEngineException e) {
     }
   }
+  
+  @Deployment(resources = { DECISION_SINGLE_OUTPUT_DMN })
+  public void testQueryByUserId() {
+    evaluateDecisionWithAuthenticatedUser("demo");
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+    
+    assertThat(query.userId("demo").count(), is(1L));
+  }
+
+  @Deployment(resources = { DECISION_SINGLE_OUTPUT_DMN })
+  public void testQueryByInvalidUserId() {
+    evaluateDecisionWithAuthenticatedUser("demo");
+    
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+    
+    assertThat(query.userId("dem1").count(), is(0L));
+    
+    try {
+      query.userId(null);
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+    }
+  }
 
   public void testTableNames() {
 
@@ -1275,6 +1299,12 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
         .withCaseDefinitionByKey("case")
         .setVariables(getVariables(input))
         .create();
+  }
+
+  protected void evaluateDecisionWithAuthenticatedUser(String userId) {
+    identityService.setAuthenticatedUserId(userId);
+    VariableMap variables = Variables.putValue("input1", "test");
+    decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, variables);
   }
 
   protected VariableMap getVariables(Object input) {

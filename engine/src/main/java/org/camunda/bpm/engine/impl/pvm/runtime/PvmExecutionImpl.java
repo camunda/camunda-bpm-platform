@@ -51,7 +51,6 @@ import org.camunda.bpm.engine.impl.tree.ExecutionWalker;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
 import org.camunda.bpm.engine.impl.tree.LeafActivityInstanceExecutionCollector;
 import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
-import org.camunda.bpm.engine.impl.tree.ReferenceWalker.WalkCondition;
 import org.camunda.bpm.engine.impl.tree.ScopeCollector;
 import org.camunda.bpm.engine.impl.tree.ScopeExecutionCollector;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
@@ -325,8 +324,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   @Override
   public void endCompensation() {
-    remove();
     performOperation(PvmAtomicOperation.FIRE_ACTIVITY_END);
+    remove();
 
     PvmExecutionImpl parent = getParent();
 
@@ -468,6 +467,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       concurrentReplacingExecution.setConcurrent(true);
       concurrentReplacingExecution.setScope(false);
       concurrentReplacingExecution.setActive(false);
+      concurrentReplacingExecution.onConcurrentExpand(this);
       child.setParent(concurrentReplacingExecution);
       this.leaveActivityInstance();
       this.setActivity(null);
@@ -496,11 +496,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
             for (PvmExecutionImpl childExecution : lastConcurrent.getExecutionsAsCopy()) {
               childExecution.setParent(this);
             }
-          }
-
-          if (!lastConcurrent.isEnded()) {
-            // Copy execution-local variables of lastConcurrent
-            setVariablesLocal(lastConcurrent.getVariablesLocal());
           }
 
           // Make sure parent execution is re-activated when the last concurrent
@@ -676,6 +671,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     execution.leaveActivityInstance();
   }
 
+  /**
+   * Callback on tree expansion when this execution is used as the concurrent execution
+   * where the argument's children become a subordinate to. Note that this case is not the inverse
+   * of replace because replace has the semantics that the replacing execution can be used to continue
+   * execution of this execution's activity instance.
+   */
+  public void onConcurrentExpand(PvmExecutionImpl scopeExecution) {
+    // by default, do nothing
+  }
+
   // methods that translate to operations /////////////////////////////////////
 
   @Override
@@ -802,11 +807,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   /**
    * Instantiates the given set of activities and returns the execution for the bottom-most activity
    */
-  public Map<PvmActivity, PvmExecutionImpl> instantiateScopes(List<PvmActivity> activityStack) {
+  public Map<PvmActivity, PvmExecutionImpl> instantiateScopes(List<PvmActivity> activityStack,
+      boolean skipCustomListeners,
+      boolean skipIoMappings) {
 
     if (activityStack.isEmpty()) {
       return Collections.emptyMap();
     }
+
+    this.skipCustomListeners = skipCustomListeners;
+    this.skipIoMapping = skipIoMappings;
 
     ExecutionStartContext executionStartContext = new ExecutionStartContext(false);
 
@@ -884,15 +894,24 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   public List<ActivityExecution> findInactiveConcurrentExecutions(PvmActivity activity) {
     List<PvmExecutionImpl> inactiveConcurrentExecutionsInActivity = new ArrayList<PvmExecutionImpl>();
     if (isConcurrent()) {
-      List< ? extends PvmExecutionImpl> concurrentExecutions = getParent().getAllChildExecutions();
-      for (PvmExecutionImpl concurrentExecution: concurrentExecutions) {
-        if (concurrentExecution.getActivity() == activity && !concurrentExecution.isActive()) {
-          inactiveConcurrentExecutionsInActivity.add(concurrentExecution);
-        }
-      }
+      return getParent().findInactiveChildExecutions(activity);
     }
     else if (!isActive()) {
       inactiveConcurrentExecutionsInActivity.add(this);
+    }
+
+    return (List) inactiveConcurrentExecutionsInActivity;
+  }
+
+  @Override
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public List<ActivityExecution> findInactiveChildExecutions(PvmActivity activity) {
+    List<PvmExecutionImpl> inactiveConcurrentExecutionsInActivity = new ArrayList<PvmExecutionImpl>();
+    List< ? extends PvmExecutionImpl> concurrentExecutions = getAllChildExecutions();
+    for (PvmExecutionImpl concurrentExecution: concurrentExecutions) {
+      if (concurrentExecution.getActivity() == activity && !concurrentExecution.isActive()) {
+        inactiveConcurrentExecutionsInActivity.add(concurrentExecution);
+      }
     }
 
     return (List) inactiveConcurrentExecutionsInActivity;

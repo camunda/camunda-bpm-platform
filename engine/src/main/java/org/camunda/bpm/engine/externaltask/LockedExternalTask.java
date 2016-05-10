@@ -101,5 +101,12 @@ public interface LockedExternalTask {
    * if the task belongs to no single tenant.
    */
   String getTenantId();
+  
+  /**
+   * Returns the priority of the locked external task.
+   * The default priority is 0.
+   * @return the priority of the external task
+   */
+  long getPriority();
 
 }

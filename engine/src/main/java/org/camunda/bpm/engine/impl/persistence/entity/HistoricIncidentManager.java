@@ -48,4 +48,10 @@ public class HistoricIncidentManager extends AbstractHistoricManager {
     }
   }
 
+  public void deleteHistoricIncidentsByJobDefinitionId(String jobDefinitionId) {
+    if (isHistoryLevelFullEnabled()) {
+      getDbEntityManager().delete(HistoricIncidentEntity.class, "deleteHistoricIncidentsByJobDefinitionId", jobDefinitionId);
+    }
+  }
+
 }

@@ -24,4 +24,6 @@ public interface CoreVariableInstance {
 
   TypedValue getTypedValue(boolean deserializeValue);
 
+  void setValue(TypedValue typedValue);
+
 }

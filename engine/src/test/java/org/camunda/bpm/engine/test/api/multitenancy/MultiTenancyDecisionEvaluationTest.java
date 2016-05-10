@@ -18,6 +18,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
+
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -156,6 +158,129 @@ public class MultiTenancyDecisionEvaluationTest extends PluggableProcessEngineTe
         .variables(createVariables())
         .version(1)
         .decisionDefinitionTenantId(TENANT_TWO)
+        .evaluate();
+
+    assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
+  }
+
+  public void testEvaluateDecisionByKeyWithoutTenantIdNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    deployment(DMN_FILE);
+
+    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
+        .decisionDefinitionWithoutTenantId()
+        .variables(createVariables())
+        .evaluate();
+
+    assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
+  }
+
+  public void testFailToEvaluateDecisionByKeyNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    deploymentForTenant(TENANT_ONE, DMN_FILE);
+
+    try {
+      decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
+        .variables(createVariables())
+        .evaluate();
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("no decision definition deployed with key 'decision'"));
+    }
+  }
+
+  public void testFailToEvaluateDecisionByKeyWithTenantIdNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    deploymentForTenant(TENANT_ONE, DMN_FILE);
+
+    try {
+      decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
+        .decisionDefinitionTenantId(TENANT_ONE)
+        .variables(createVariables())
+        .evaluate();
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("Cannot evaluate the decision"));
+    }
+  }
+
+  public void testFailToEvaluateDecisionByIdNoAuthenticatedTenants() {
+    deploymentForTenant(TENANT_ONE, DMN_FILE);
+
+    DecisionDefinition decisionDefinition = repositoryService
+      .createDecisionDefinitionQuery()
+      .singleResult();
+
+    identityService.setAuthentication("user", null, null);
+
+    try {
+      decisionService.evaluateDecisionTableById(decisionDefinition.getId())
+        .variables(createVariables())
+        .evaluate();
+
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("Cannot evaluate the decision"));
+    }
+  }
+
+  public void testEvaluateDecisionByKeyWithTenantIdAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    deploymentForTenant(TENANT_ONE, DMN_FILE);
+    deploymentForTenant(TENANT_TWO, DMN_FILE);
+
+    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
+      .decisionDefinitionTenantId(TENANT_ONE)
+      .variables(createVariables())
+      .evaluate();
+
+    assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
+  }
+
+  public void testEvaluateDecisionByIdAuthenticatedTenant() {
+    deploymentForTenant(TENANT_ONE, DMN_FILE);
+
+    DecisionDefinition decisionDefinition = repositoryService
+        .createDecisionDefinitionQuery()
+        .singleResult();
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableById(decisionDefinition.getId())
+        .variables(createVariables())
+        .evaluate();
+
+    assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
+  }
+
+  public void testEvaluateDecisionByKeyWithAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    deploymentForTenant(TENANT_ONE, DMN_FILE);
+    deploymentForTenant(TENANT_TWO, DMN_FILE_SECOND_VERSION);
+
+    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
+        .variables(createVariables())
+        .evaluate();
+
+    assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
+  }
+
+  public void testEvaluateDecisionByKeyWithTenantIdDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    deploymentForTenant(TENANT_ONE, DMN_FILE);
+
+    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
+        .decisionDefinitionTenantId(TENANT_ONE)
+        .variables(createVariables())
         .evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);

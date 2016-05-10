@@ -21,10 +21,10 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 
@@ -75,8 +75,9 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
 
     // check authorization
     String processInstanceId = eventSubscriptionEntity.getProcessInstanceId();
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateProcessInstanceById(processInstanceId);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkUpdateProcessInstanceById(processInstanceId);
+    }
 
     eventSubscriptionEntity.eventReceived(processVariables, false);
 

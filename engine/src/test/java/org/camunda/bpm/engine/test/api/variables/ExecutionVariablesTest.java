@@ -57,6 +57,68 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
     assertEquals(processInstance.getId(), variable.getExecutionId());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ExecutionVariablesTest.testTreeCompactionWithLocalVariableOnConcurrentExecution.bpmn20.xml")
+  public void testStableVariableInstanceIdsOnCompaction() {
+    runtimeService.startProcessInstanceByKey("process");
+
+    Execution innerTaskExecution = runtimeService
+        .createExecutionQuery()
+        .activityId("innerTask")
+        .singleResult();
+
+    Execution subProcessConcurrentExecution = runtimeService
+        .createExecutionQuery()
+        .executionId(((ExecutionEntity) innerTaskExecution).getParentId())
+        .singleResult();
+
+    Task task = taskService
+        .createTaskQuery()
+        .taskDefinitionKey("task")
+        .singleResult();
+
+    // when
+    runtimeService.setVariableLocal(subProcessConcurrentExecution.getId(), "foo", "bar");
+    VariableInstance variableBeforeCompaction = runtimeService.createVariableInstanceQuery().singleResult();
+
+    // and completing the concurrent task, thereby pruning the sub process concurrent execution
+    taskService.complete(task.getId());
+
+    // then the variable still exists
+    VariableInstance variableAfterCompaction = runtimeService.createVariableInstanceQuery().singleResult();
+    assertEquals(variableBeforeCompaction.getId(), variableAfterCompaction.getId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ExecutionVariablesTest.testTreeCompactionForkParallelGateway.bpmn20.xml")
+  public void testStableVariableInstanceIdsOnCompactionAndExpansion() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Execution task1Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task1")
+        .singleResult();
+
+    Task task2 = taskService
+        .createTaskQuery()
+        .taskDefinitionKey("task2")
+        .singleResult();
+
+    // when
+    runtimeService.setVariableLocal(task1Execution.getId(), "foo", "bar");
+    VariableInstance variableBeforeCompaction = runtimeService.createVariableInstanceQuery().singleResult();
+
+    // compacting the tree
+    taskService.complete(task2.getId());
+
+    // expanding the tree
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("task2")
+      .execute();
+
+    // then the variable still exists
+    VariableInstance variableAfterCompaction = runtimeService.createVariableInstanceQuery().singleResult();
+    assertEquals(variableBeforeCompaction.getId(), variableAfterCompaction.getId());
+  }
+
   @Deployment
   public void testTreeCompactionForkParallelGateway() {
     // given
@@ -112,6 +174,34 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
     assertEquals(subProcessScopeExecutionId, variable.getExecutionId());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ExecutionVariablesTest.testTreeCompactionForkParallelGateway.bpmn20.xml")
+  public void testTreeCompactionWithVariablesOnScopeAndConcurrentExecution() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Task task1 = taskService
+        .createTaskQuery()
+        .taskDefinitionKey("task1")
+        .singleResult();
+
+    Execution task2Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task2")
+        .singleResult();
+
+    // when
+    runtimeService.setVariable(processInstance.getId(), "foo", "baz");
+    runtimeService.setVariableLocal(task2Execution.getId(), "foo", "bar");
+    // and completing the other task, thereby pruning the concurrent execution
+    taskService.complete(task1.getId());
+
+    // then something happens
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+    assertNotNull(variable);
+    assertEquals("foo", variable.getName());
+    assertEquals(processInstance.getId(), variable.getExecutionId());
+  }
+
   @Deployment
   public void FAILING_testForkWithThreeBranchesAndJoinOfTwoBranches() {
     // given
@@ -129,6 +219,56 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
 
     // then
     assertEquals(0, runtimeService.createVariableInstanceQuery().count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ExecutionVariablesTest.testTreeCompactionForkParallelGateway.bpmn20.xml")
+  public void testTreeCompactionAndExpansionWithConcurrentLocalVariables() {
+
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1").singleResult();
+    Task task2 = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
+
+    runtimeService.setVariableLocal(task1Execution.getId(), "var", "value");
+
+    // when compacting the tree
+    taskService.complete(task2.getId());
+
+    // and expanding again
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("task2")
+      .execute();
+
+    // then the variable is again assigned to task1's concurrent execution
+    Task task1 = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+
+    assertEquals(task1.getExecutionId(), variable.getExecutionId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ExecutionVariablesTest.testTreeCompactionForkParallelGateway.bpmn20.xml")
+  public void testTreeCompactionAndExpansionWithScopeExecutionVariables() {
+
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    Task task2 = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
+
+    runtimeService.setVariableLocal(processInstance.getId(), "var", "value");
+
+    // when compacting the tree
+    taskService.complete(task2.getId());
+
+    // and expanding again
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("task2")
+      .execute();
+
+    // then the variable is still assigned to the scope execution execution
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+
+    assertEquals(processInstance.getId(), variable.getExecutionId());
   }
 
 }

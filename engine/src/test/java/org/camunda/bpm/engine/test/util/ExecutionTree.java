@@ -30,12 +30,16 @@ import org.camunda.bpm.engine.runtime.Execution;
  */
 public class ExecutionTree implements Execution {
 
+  protected ExecutionTree parent;
   protected List<ExecutionTree> children;
   protected Execution wrappedExecution;
 
   protected ExecutionTree(Execution execution, List<ExecutionTree> children) {
     this.wrappedExecution = execution;
     this.children = children;
+    for (ExecutionTree child : children) {
+      child.parent = this;
+    }
   }
 
   public static ExecutionTree forExecution(final String executionId, ProcessEngine processEngine) {
@@ -69,6 +73,25 @@ public class ExecutionTree implements Execution {
     return children;
   }
 
+  public List<ExecutionTree> getLeafExecutions(String activityId) {
+    List<ExecutionTree> executions = new ArrayList<ExecutionTree>();
+
+    for (ExecutionTree child : children) {
+      if (!child.isEventScope()) {
+        if (child.getActivityId() != null) {
+          if (activityId.equals(child.getActivityId())) {
+            executions.add(child);
+          }
+        }
+        else {
+          executions.addAll(child.getLeafExecutions(activityId));
+        }
+      }
+    }
+
+    return executions;
+  }
+
   public String getId() {
     return wrappedExecution.getId();
   }
@@ -83,6 +106,10 @@ public class ExecutionTree implements Execution {
 
   public String getProcessInstanceId() {
     return wrappedExecution.getProcessInstanceId();
+  }
+
+  public ExecutionTree getParent() {
+    return parent;
   }
 
   public String getActivityId() {

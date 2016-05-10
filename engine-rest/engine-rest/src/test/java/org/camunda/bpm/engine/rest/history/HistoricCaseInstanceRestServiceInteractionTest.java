@@ -83,6 +83,7 @@ public class HistoricCaseInstanceRestServiceInteractionTest extends AbstractRest
     String returnedCreateUserId = from(content).getString("createUserId");
     String returnedSuperCaseInstanceId = from(content).getString("superCaseInstanceId");
     String returnedSuperProcessInstanceId = from(content).getString("superProcessInstanceId");
+    String returnedTenantId = from(content).getString("tenantId");
     boolean active = from(content).getBoolean("active");
     boolean completed = from(content).getBoolean("completed");
     boolean terminated = from(content).getBoolean("terminated");
@@ -97,6 +98,7 @@ public class HistoricCaseInstanceRestServiceInteractionTest extends AbstractRest
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_USER_ID, returnedCreateUserId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_CASE_INSTANCE_ID, returnedSuperCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_PROCESS_INSTANCE_ID, returnedSuperProcessInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_ACTIVE, active);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_COMPLETED, completed);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_IS_TERMINATED, terminated);

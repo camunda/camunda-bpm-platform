@@ -15,15 +15,27 @@ package org.camunda.bpm.engine.test.api.runtime.migration;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.migrate;
+import static org.junit.Assert.assertNotNull;
 
+import org.camunda.bpm.engine.migration.MigrationInstructionsBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.CallActivityModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.EventBasedGatewayModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ExternalTaskModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.GatewayModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.MessageReceiveModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ServiceTaskModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.TransactionModels;
 import org.camunda.bpm.engine.test.util.MigrationPlanAssert;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -40,7 +52,7 @@ public class MigrationPlanGenerationTest {
   public static final String ERROR_CODE = "Error";
   public static final String ESCALATION_CODE = "Escalation";
 
-  protected ProcessEngineRule rule = new ProcessEngineRule(true);
+  protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   @Rule
@@ -119,7 +131,8 @@ public class MigrationPlanGenerationTest {
     assertGeneratedMigrationPlan(sourceProcess, targetProcess)
       .hasInstructions(
         migrate("subProcess1").to("subProcess1"),
-        migrate("subProcess2").to("subProcess2")
+        migrate("subProcess2").to("subProcess2"),
+        migrate("fork").to("fork")
       );
   }
 
@@ -134,7 +147,8 @@ public class MigrationPlanGenerationTest {
         migrate("subProcess1").to("subProcess1"),
         migrate("nestedSubProcess1").to("nestedSubProcess1"),
         migrate("subProcess2").to("subProcess2"),
-        migrate("nestedSubProcess2").to("nestedSubProcess2")
+        migrate("nestedSubProcess2").to("nestedSubProcess2"),
+        migrate("fork").to("fork")
       );
   }
 
@@ -362,7 +376,8 @@ public class MigrationPlanGenerationTest {
     assertGeneratedMigrationPlan(sourceProcess, targetProcess)
       .hasInstructions(
         migrate("userTask1").to("userTask1"),
-        migrate("userTask2").to("userTask2")
+        migrate("userTask2").to("userTask2"),
+        migrate("fork").to("fork")
       );
   }
 
@@ -385,67 +400,102 @@ public class MigrationPlanGenerationTest {
   }
 
   @Test
-  public void testNotMigrateProcessInstanceWithEventSubProcess() {
+  public void testMigrateProcessInstanceWithEventSubProcess() {
     BpmnModelInstance testProcess = modify(ProcessModels.ONE_TASK_PROCESS)
       .addSubProcessTo(ProcessModels.PROCESS_KEY)
+      .id("eventSubProcess")
       .triggerByEvent()
       .embeddedSubProcess()
-        .startEvent().message(MESSAGE_NAME)
+        .startEvent("eventSubProcessStart").message(MESSAGE_NAME)
         .endEvent()
       .subProcessDone()
       .done();
 
     assertGeneratedMigrationPlan(testProcess, testProcess)
-      .hasEmptyInstructions();
+      .hasInstructions(
+        migrate("eventSubProcess").to("eventSubProcess"),
+        migrate("eventSubProcessStart").to("eventSubProcessStart"),
+        migrate("userTask").to("userTask")
+      );
 
     assertGeneratedMigrationPlan(testProcess, ProcessModels.ONE_TASK_PROCESS)
-      .hasEmptyInstructions();
+      .hasInstructions(
+        migrate("userTask").to("userTask")
+      );
 
     assertGeneratedMigrationPlan(ProcessModels.ONE_TASK_PROCESS, testProcess)
-      .hasEmptyInstructions();
+      .hasInstructions(
+        migrate("userTask").to("userTask")
+      );
   }
 
   @Test
-  public void testNotMigrateSubProcessWithEventSubProcess() {
+  public void testMigrateSubProcessWithEventSubProcess() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
       .addSubProcessTo("subProcess")
+      .id("eventSubProcess")
       .triggerByEvent()
       .embeddedSubProcess()
-      .startEvent().message(MESSAGE_NAME)
+      .startEvent("eventSubProcessStart").message(MESSAGE_NAME)
       .endEvent()
       .subProcessDone()
       .done();
 
     assertGeneratedMigrationPlan(testProcess, testProcess)
-      .hasEmptyInstructions();
+      .hasInstructions(
+        migrate("eventSubProcess").to("eventSubProcess"),
+        migrate("eventSubProcessStart").to("eventSubProcessStart"),
+        migrate("subProcess").to("subProcess"),
+        migrate("userTask").to("userTask")
+      );
 
     assertGeneratedMigrationPlan(testProcess, ProcessModels.SUBPROCESS_PROCESS)
-      .hasEmptyInstructions();
+      .hasInstructions(
+        migrate("subProcess").to("subProcess"),
+        migrate("userTask").to("userTask")
+      );
 
     assertGeneratedMigrationPlan(ProcessModels.SUBPROCESS_PROCESS, testProcess)
-      .hasEmptyInstructions();
+      .hasInstructions(
+        migrate("subProcess").to("subProcess"),
+        migrate("userTask").to("userTask")
+      );
+
   }
 
   @Test
-  public void testNotMigrateUserTaskInEventSubProcess() {
+  public void testMigrateUserTaskInEventSubProcess() {
     BpmnModelInstance testProcess = modify(ProcessModels.SUBPROCESS_PROCESS)
       .addSubProcessTo("subProcess")
+      .id("eventSubProcess")
       .triggerByEvent()
       .embeddedSubProcess()
-      .startEvent().message(MESSAGE_NAME)
+      .startEvent("eventSubProcessStart").message(MESSAGE_NAME)
       .userTask("innerTask")
       .endEvent()
       .subProcessDone()
       .done();
 
     assertGeneratedMigrationPlan(testProcess, testProcess)
-      .hasEmptyInstructions();
+      .hasInstructions(
+          migrate("eventSubProcess").to("eventSubProcess"),
+          migrate("eventSubProcessStart").to("eventSubProcessStart"),
+          migrate("innerTask").to("innerTask"),
+          migrate("subProcess").to("subProcess"),
+          migrate("userTask").to("userTask")
+      );
 
     assertGeneratedMigrationPlan(testProcess, ProcessModels.SUBPROCESS_PROCESS)
-      .hasEmptyInstructions();
+      .hasInstructions(
+          migrate("subProcess").to("subProcess"),
+          migrate("userTask").to("userTask")
+      );
 
     assertGeneratedMigrationPlan(ProcessModels.SUBPROCESS_PROCESS, testProcess)
-      .hasEmptyInstructions();
+    .hasInstructions(
+        migrate("subProcess").to("subProcess"),
+        migrate("userTask").to("userTask")
+    );
 
   }
 
@@ -503,16 +553,346 @@ public class MigrationPlanGenerationTest {
       .hasEmptyInstructions();
   }
 
+  @Test
+  public void testMapReceiveTasks() {
+    assertGeneratedMigrationPlan(MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS, MessageReceiveModels.ONE_RECEIVE_TASK_PROCESS)
+      .hasInstructions(
+        migrate("receiveTask").to("receiveTask"),
+        migrate("userTask").to("userTask"));
+  }
+
+  @Test
+  public void testMapMessageCatchEvents() {
+    assertGeneratedMigrationPlan(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS, MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS)
+      .hasInstructions(
+        migrate("messageCatch").to("messageCatch"),
+        migrate("userTask").to("userTask"));
+  }
+
+  @Test
+  public void testMapCallActivitiesToBpmnTest() {
+    assertGeneratedMigrationPlan(CallActivityModels.oneBpmnCallActivityProcess("foo"), CallActivityModels.oneBpmnCallActivityProcess("foo"))
+      .hasInstructions(
+        migrate("callActivity").to("callActivity"),
+        migrate("userTask").to("userTask"));
+  }
+
+  @Test
+  public void testMapCallActivitiesToCmmnTest() {
+    assertGeneratedMigrationPlan(CallActivityModels.oneCmmnCallActivityProcess("foo"), CallActivityModels.oneCmmnCallActivityProcess("foo"))
+      .hasInstructions(
+        migrate("callActivity").to("callActivity"),
+        migrate("userTask").to("userTask"));
+  }
+
+  @Test
+  public void testMapCallActivitiesFromBpmnToCmmnTest() {
+    assertGeneratedMigrationPlan(CallActivityModels.oneBpmnCallActivityProcess("foo"), CallActivityModels.oneCmmnCallActivityProcess("foo"))
+      .hasInstructions(
+        migrate("callActivity").to("callActivity"),
+        migrate("userTask").to("userTask"));
+  }
+
+  @Test
+  public void testMapCallActivitiesFromCmmnToBpmnTest() {
+    assertGeneratedMigrationPlan(CallActivityModels.oneCmmnCallActivityProcess("foo"), CallActivityModels.oneBpmnCallActivityProcess("foo"))
+      .hasInstructions(
+        migrate("callActivity").to("callActivity"),
+        migrate("userTask").to("userTask"));
+  }
+
+  @Test
+  public void testMapEventBasedGateway() {
+    assertGeneratedMigrationPlan(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS, EventBasedGatewayModels.SIGNAL_EVENT_BASED_GW_PROCESS)
+      .hasInstructions(
+        migrate("eventBasedGateway").to("eventBasedGateway"));
+  }
+
+  @Test
+  public void testMapEventBasedGatewayWithIdenticalFollowingEvents() {
+    assertGeneratedMigrationPlan(EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS, EventBasedGatewayModels.TIMER_EVENT_BASED_GW_PROCESS)
+      .hasInstructions(
+        migrate("eventBasedGateway").to("eventBasedGateway"),
+        migrate("timerCatch").to("timerCatch"),
+        migrate("afterTimerCatch").to("afterTimerCatch"));
+  }
+
+  // event sub process
+
+  @Test
+  public void testMapTimerEventSubProcessAndStartEvent() {
+    assertGeneratedMigrationPlan(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS, EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS)
+      .hasInstructions(
+        migrate("userTask").to("userTask"),
+        migrate("eventSubProcess").to("eventSubProcess"),
+        migrate("eventSubProcessStart").to("eventSubProcessStart"),
+        migrate("eventSubProcessTask").to("eventSubProcessTask"));
+  }
+
+  @Test
+  public void testMapMessageEventSubProcessAndStartEvent() {
+    assertGeneratedMigrationPlan(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS, EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS)
+      .hasInstructions(
+        migrate("userTask").to("userTask"),
+        migrate("eventSubProcess").to("eventSubProcess"),
+        migrate("eventSubProcessStart").to("eventSubProcessStart"),
+        migrate("eventSubProcessTask").to("eventSubProcessTask"));
+  }
+
+  @Test
+  public void testMapSignalEventSubProcessAndStartEvent() {
+    assertGeneratedMigrationPlan(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS, EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS)
+      .hasInstructions(
+        migrate("userTask").to("userTask"),
+        migrate("eventSubProcess").to("eventSubProcess"),
+        migrate("eventSubProcessStart").to("eventSubProcessStart"),
+        migrate("eventSubProcessTask").to("eventSubProcessTask"));
+  }
+
+  @Test
+  public void testMapEscalationEventSubProcessAndStartEvent() {
+    assertGeneratedMigrationPlan(EventSubProcessModels.ESCALATION_EVENT_SUBPROCESS_PROCESS, EventSubProcessModels.ESCALATION_EVENT_SUBPROCESS_PROCESS)
+      .hasInstructions(
+        migrate("userTask").to("userTask"),
+        migrate("eventSubProcess").to("eventSubProcess"),
+        migrate("eventSubProcessTask").to("eventSubProcessTask"));
+  }
+
+  @Test
+  public void testMapErrorEventSubProcessAndStartEvent() {
+    assertGeneratedMigrationPlan(EventSubProcessModels.ERROR_EVENT_SUBPROCESS_PROCESS, EventSubProcessModels.ERROR_EVENT_SUBPROCESS_PROCESS)
+      .hasInstructions(
+        migrate("userTask").to("userTask"),
+        migrate("eventSubProcess").to("eventSubProcess"),
+        migrate("eventSubProcessTask").to("eventSubProcessTask"));
+  }
+
+  @Test
+  public void testMapCompensationEventSubProcessAndStartEvent() {
+    assertGeneratedMigrationPlan(EventSubProcessModels.COMPENSATE_EVENT_SUBPROCESS_PROCESS, EventSubProcessModels.COMPENSATE_EVENT_SUBPROCESS_PROCESS)
+      .hasInstructions(
+        migrate("subProcess").to("subProcess"),
+        migrate("userTask").to("userTask"),
+        migrate("eventSubProcess").to("eventSubProcess"),
+        migrate("eventSubProcessTask").to("eventSubProcessTask"));
+  }
+
+  @Test
+  public void testNotMapEventSubProcessStartEventOfDifferentType() {
+    assertGeneratedMigrationPlan(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS, EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS)
+      .hasInstructions(
+        migrate("userTask").to("userTask"),
+        migrate("eventSubProcess").to("eventSubProcess"),
+        migrate("eventSubProcessTask").to("eventSubProcessTask"));
+  }
+
+  @Test
+  @Ignore("CAM-5785")
+  public void testMapEventSubProcessStartEventWhenSubProcessesAreNotEqual() {
+    BpmnModelInstance sourceModel = EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS;
+    BpmnModelInstance targetModel = modify(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS)
+        .changeElementId("eventSubProcess", "newEventSubProcess");
+
+    assertGeneratedMigrationPlan(sourceModel, targetModel)
+      .hasInstructions(
+        migrate("userTask").to("userTask"),
+        migrate("eventSubProcessStart").to("eventSubProcessStart"));
+  }
+
+  @Test
+  public void testMapEventSubProcessToEmbeddedSubProcess() {
+    BpmnModelInstance sourceModel = modify(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS)
+        .changeElementId("eventSubProcess", "subProcess");
+    BpmnModelInstance targetModel = ProcessModels.SUBPROCESS_PROCESS;
+
+    assertGeneratedMigrationPlan(sourceModel, targetModel)
+      .hasInstructions(
+        migrate("subProcess").to("subProcess"));
+  }
+
+  @Test
+  public void testMapEmbeddedSubProcessToEventSubProcess() {
+    BpmnModelInstance sourceModel = ProcessModels.SUBPROCESS_PROCESS;
+    BpmnModelInstance targetModel = modify(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS)
+        .changeElementId("eventSubProcess", "subProcess");
+
+    assertGeneratedMigrationPlan(sourceModel, targetModel)
+      .hasInstructions(
+        migrate("subProcess").to("subProcess"));
+  }
+
+  @Test
+  public void testMapExternalServiceTask() {
+    BpmnModelInstance sourceModel = ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS;
+    BpmnModelInstance targetModel = ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS;
+
+    assertGeneratedMigrationPlan(sourceModel, targetModel)
+      .hasInstructions(
+        migrate("externalTask").to("externalTask"));
+  }
+
+  @Test
+  public void testMapExternalServiceToDifferentType() {
+    BpmnModelInstance sourceModel = ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS;
+    BpmnModelInstance targetModel = ProcessModels.newModel()
+      .startEvent()
+      .sendTask("externalTask")
+        .camundaType("external")
+        .camundaTopic("foo")
+      .endEvent()
+      .done();
+
+    assertGeneratedMigrationPlan(sourceModel, targetModel)
+      .hasInstructions(
+        migrate("externalTask").to("externalTask"));
+  }
+
+  @Test
+  public void testNotMapExternalToClassDelegateServiceTask() {
+    BpmnModelInstance sourceModel = ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS;
+    BpmnModelInstance targetModel = modify(ServiceTaskModels.oneClassDelegateServiceTask("foo.Bar"))
+      .changeElementId("serviceTask", "externalTask");
+
+    assertGeneratedMigrationPlan(sourceModel, targetModel)
+      .hasEmptyInstructions();
+  }
+
+  @Test
+  public void testMapParallelGateways() {
+    BpmnModelInstance model = GatewayModels.PARALLEL_GW;
+
+    assertGeneratedMigrationPlan(model, model)
+      .hasInstructions(
+        migrate("fork").to("fork"),
+        migrate("join").to("join"),
+        migrate("parallel1").to("parallel1"),
+        migrate("parallel2").to("parallel2"),
+        migrate("afterJoin").to("afterJoin")
+      );
+  }
+
+  @Test
+  public void testMapInclusiveGateways() {
+    BpmnModelInstance model = GatewayModels.INCLUSIVE_GW;
+
+    assertGeneratedMigrationPlan(model, model)
+      .hasInstructions(
+        migrate("fork").to("fork"),
+        migrate("join").to("join"),
+        migrate("parallel1").to("parallel1"),
+        migrate("parallel2").to("parallel2"),
+        migrate("afterJoin").to("afterJoin")
+      );
+  }
+
+  @Test
+  public void testNotMapParallelToInclusiveGateway() {
+
+    assertGeneratedMigrationPlan(GatewayModels.PARALLEL_GW, GatewayModels.INCLUSIVE_GW)
+      .hasInstructions(
+        migrate("parallel1").to("parallel1"),
+        migrate("parallel2").to("parallel2"),
+        migrate("afterJoin").to("afterJoin")
+      );
+  }
+
+  @Test
+  public void testMapTransaction() {
+
+    assertGeneratedMigrationPlan(TransactionModels.ONE_TASK_TRANSACTION, TransactionModels.ONE_TASK_TRANSACTION)
+      .hasInstructions(
+        migrate("transaction").to("transaction"),
+        migrate("userTask").to("userTask")
+      );
+  }
+
+  @Test
+  public void testMapEmbeddedSubProcessToTransaction() {
+    BpmnModelInstance sourceProcess = ProcessModels.SUBPROCESS_PROCESS;
+    BpmnModelInstance targetProcess = modify(TransactionModels.ONE_TASK_TRANSACTION)
+        .changeElementId("transaction", "subProcess");
+
+    assertGeneratedMigrationPlan(sourceProcess, targetProcess)
+      .hasInstructions(
+        migrate("subProcess").to("subProcess"),
+        migrate("userTask").to("userTask")
+      );
+  }
+
+  @Test
+  public void testMapTransactionToEventSubProcess() {
+
+    BpmnModelInstance sourceProcess = TransactionModels.ONE_TASK_TRANSACTION;
+    BpmnModelInstance targetProcess = modify(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS)
+      .changeElementId("eventSubProcess", "transaction")
+      .changeElementId("userTask", "foo")
+      .changeElementId("eventSubProcessTask", "userTask");
+
+    assertGeneratedMigrationPlan(sourceProcess, targetProcess)
+      .hasInstructions(
+        migrate("transaction").to("transaction"),
+        migrate("userTask").to("userTask")
+      );
+  }
+
+  @Test
+  public void testMapNoUpdateEventTriggers() {
+    BpmnModelInstance model = MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS;
+
+    assertGeneratedMigrationPlan(model, model, false)
+      .hasInstructions(
+        migrate("userTask").to("userTask").updateEventTrigger(false),
+        migrate("messageCatch").to("messageCatch").updateEventTrigger(false)
+      );
+  }
+
+  @Test
+  public void testMapUpdateEventTriggers() {
+    BpmnModelInstance model = MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS;
+
+    assertGeneratedMigrationPlan(model, model, true)
+      .hasInstructions(
+        migrate("userTask").to("userTask").updateEventTrigger(false),
+        migrate("messageCatch").to("messageCatch").updateEventTrigger(true)
+      );
+  }
+
+  @Test
+  public void testMigrationPlanCreationWithEmptyDeploymentCache() {
+    // given
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    rule.getProcessEngineConfiguration().getDeploymentCache().discardProcessDefinitionCache();
+
+    // when
+    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    // then
+    assertNotNull(migrationPlan);
+  }
+
 
   // helper
 
   protected MigrationPlanAssert assertGeneratedMigrationPlan(BpmnModelInstance sourceProcess, BpmnModelInstance targetProcess) {
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(sourceProcess);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(targetProcess);
+    return assertGeneratedMigrationPlan(sourceProcess, targetProcess, false);
+  }
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
+  protected MigrationPlanAssert assertGeneratedMigrationPlan(BpmnModelInstance sourceProcess, BpmnModelInstance targetProcess, boolean updateEventTriggers) {
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
+
+    MigrationInstructionsBuilder migrationInstructionsBuilder = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
+      .mapEqualActivities();
+
+    if (updateEventTriggers) {
+      migrationInstructionsBuilder.updateEventTriggers();
+    }
+
+    MigrationPlan migrationPlan = migrationInstructionsBuilder
       .build();
 
     assertThat(migrationPlan)

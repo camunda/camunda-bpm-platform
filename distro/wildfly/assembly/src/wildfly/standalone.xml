@@ -25,7 +25,6 @@
         <extension module="org.wildfly.extension.batch"/>
         <extension module="org.wildfly.extension.io"/>
         <extension module="org.wildfly.extension.undertow"/>
-        <extension module="org.jboss.as.threads"/>
         <extension module="org.camunda.bpm.wildfly.camunda-wildfly-subsystem"/>
     </extensions>
     <management>
@@ -150,7 +149,7 @@
                     <security>
                         <user-name>sa</user-name>
                         <password>sa</password>
-                    </security>                   
+                    </security>
                 </datasource>
                 <drivers>
                     <driver name="h2" module="com.h2database.h2">
@@ -363,14 +362,6 @@
             <client-config name="Standard-Client-Config"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:2.0"/>
-        <subsystem xmlns="urn:jboss:domain:threads:1.1">
-            <bounded-queue-thread-pool name="job-executor-tp" allow-core-timeout="true">
-              <core-threads count="3" />
-              <queue-length count="3" />
-              <max-threads count="10" />
-              <keepalive-time time="10" unit="seconds" />
-            </bounded-queue-thread-pool>
-        </subsystem>
         <subsystem xmlns="urn:org.camunda.bpm.jboss:1.1">
             <process-engines>
                 <process-engine name="default" default="true">
@@ -388,7 +379,7 @@
                       <plugin>
                         <class>org.camunda.bpm.application.impl.event.ProcessApplicationEventListenerPlugin</class>
                       </plugin>
-                      
+
                       <!-- plugin enabling integration of camunda Spin -->
                       <plugin>
                         <class>org.camunda.spin.plugin.impl.SpinProcessEnginePlugin</class>
@@ -402,41 +393,41 @@
                     <!-- LDAP CONFIGURATION -->
                     <!-- Uncomment this section in order to enable LDAP support for this process engine -->
                     <!-- Adjust configuration, see ( http://docs.camunda.org/latest/guides/user-guide/#process-engine-identity-service-the-ldap-identity-service ) -->
-                    <!-- 
+                    <!--
                       <plugin>
                         <class>org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin</class>
                         <properties>
-                
+
                           <property name="serverUrl">ldaps://localhost:4334/</property>
                           <property name="acceptUntrustedCertificates">false</property>
                           <property name="managerDn">uid=jonny,ou=office-berlin,o=camunda,c=org</property>
                           <property name="managerPassword">s3cr3t</property>
-                
+
                           <property name="baseDn">o=camunda,c=org</property>
-                
+
                           <property name="userSearchBase">ou=employees</property>
                           <property name="userSearchFilter">(objectclass=person)</property>
-                
+
                           <property name="userIdAttribute">uid</property>
                           <property name="userFirstnameAttribute">cn</property>
                           <property name="userLastnameAttribute">sn</property>
                           <property name="userEmailAttribute">mail</property>
                           <property name="userPasswordAttribute">userpassword</property>
-                
+
                           <property name="groupSearchBase">ou=roles</property>
                           <property name="groupSearchFilter">(objectclass=groupOfNames)</property>
                           <property name="groupIdAttribute">cn</property>
                           <property name="groupNameAttribute">cn</property>
-                
+
                           <property name="groupMemberAttribute">member</property>
-                
+
                         </properties>
-                      </plugin> 
+                      </plugin>
                       -->
-                
+
                       <!-- LDAP CONFIGURATION -->
                       <!-- The following plugin allows you to grant administrator authorizations to an existing LDAP user -->
-                      <!-- 
+                      <!--
                       <plugin>
                         <class>org.camunda.bpm.engine.impl.plugin.AdministratorAuthorizationPlugin</class>
                         <properties>
@@ -448,10 +439,11 @@
                 </process-engine>
             </process-engines>
             <job-executor>
-                <thread-pool-name>job-executor-tp</thread-pool-name>
+                <core-threads>3</core-threads>
+                <max-threads>5</max-threads>
+                <queue-length>10</queue-length>
                 <job-acquisitions>
                     <job-acquisition name="default">
-                        <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
                         <properties>
                             <property name="lockTimeInMillis">300000</property>
                             <property name="waitTimeInMillis">5000</property>
@@ -473,7 +465,7 @@
         <interface name="unsecure">
             <!--
               ~  Used for IIOP sockets in the standard configuration.
-              ~                  To secure JacORB you need to setup SSL 
+              ~                  To secure JacORB you need to setup SSL
               -->
             <inet-address value="${jboss.bind.address.unsecure:127.0.0.1}"/>
         </interface>
