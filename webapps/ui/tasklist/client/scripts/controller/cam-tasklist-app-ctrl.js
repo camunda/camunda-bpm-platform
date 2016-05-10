@@ -29,6 +29,11 @@
     $scope.appVendor = configuration.getAppVendor();
     $scope.appName = configuration.getAppName();
 
+    // doing so, there's no `{{ appVendor }} {{ appName }}`
+    // visible in the title tag as the app loads
+    var htmlTitle = document.querySelector('head > title');
+    htmlTitle.textContent = $scope.appVendor + ' ' + $scope.appName;
+
     function getUserProfile(auth) {
       if (!auth || !auth.name) {
         $scope.userFullName = null;
