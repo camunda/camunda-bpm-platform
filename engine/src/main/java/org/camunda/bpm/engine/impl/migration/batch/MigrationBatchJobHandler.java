@@ -132,15 +132,11 @@ public class MigrationBatchJobHandler implements BatchJobHandler<MigrationBatchC
 
   @Override
   public void deleteJobs(BatchEntity batch) {
-    CommandContext commandContext = Context.getCommandContext();
-    List<JobEntity> jobs = commandContext
+    List<JobEntity> jobs = Context.getCommandContext()
       .getJobManager()
       .findJobsByJobDefinitionId(batch.getBatchJobDefinitionId());
 
-    ByteArrayManager byteArrayManager = commandContext.getByteArrayManager();
     for (JobEntity job : jobs) {
-      byteArrayManager.deleteByteArrayById(job.getJobHandlerConfigurationRaw());
-
       job.delete();
     }
   }
