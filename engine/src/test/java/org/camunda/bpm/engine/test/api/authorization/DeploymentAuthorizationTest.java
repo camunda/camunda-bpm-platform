@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
-import static org.camunda.bpm.engine.authorization.Groups.CAMUNDA_ADMIN;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
@@ -21,6 +20,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +30,7 @@ import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.AuthorizationQuery;
+import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -519,7 +520,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       //then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 Required authenticated group 'camunda-admin'", message);
 
     }
 
@@ -528,8 +529,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   public void testRegisterProcessApplicationAsCamundaAdmin() {
     // given
-    createGroup(CAMUNDA_ADMIN);
-    createMembership(userId, CAMUNDA_ADMIN);
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
     ProcessApplicationReference reference = processApplication.getReference();
@@ -561,7 +561,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       //then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 Required authenticated group 'camunda-admin'", message);
 
     }
 
@@ -570,8 +570,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   public void testUnregisterProcessApplicationAsCamundaAdmin() {
     // given
-    createGroup(CAMUNDA_ADMIN);
-    createMembership(userId, CAMUNDA_ADMIN);
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
@@ -603,7 +602,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       //then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 Required authenticated group 'camunda-admin'", message);
 
     }
 
@@ -612,8 +611,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   public void testGetProcessApplicationForDeploymentAsCamundaAdmin() {
     // given
-    createGroup(CAMUNDA_ADMIN);
-    createMembership(userId, CAMUNDA_ADMIN);
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
@@ -642,7 +640,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       //then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 Required authenticated group 'camunda-admin'", message);
 
     }
 
@@ -651,8 +649,8 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   public void testGetRegisteredDeploymentsAsCamundaAdmin() {
     // given
-    createGroup(CAMUNDA_ADMIN);
-    createMembership(userId, CAMUNDA_ADMIN);
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
 
     // when
@@ -677,7 +675,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       //then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 Required authenticated group 'camunda-admin'", message);
 
     }
 
@@ -686,8 +684,8 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   public void testRegisterDeploymentForJobExecutorAsCamundaAdmin() {
     // given
-    createGroup(CAMUNDA_ADMIN);
-    createMembership(userId, CAMUNDA_ADMIN);
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
 
     // when
@@ -712,7 +710,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       //then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 Required authenticated group 'camunda-admin'", message);
 
     }
 
@@ -721,8 +719,8 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   public void testUnregisterDeploymentForJobExecutorAsCamundaAdmin() {
     // given
-    createGroup(CAMUNDA_ADMIN);
-    createMembership(userId, CAMUNDA_ADMIN);
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
 
     // when
@@ -744,6 +742,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     return createDeployment(name, FIRST_RESOURCE, SECOND_RESOURCE).getId();
   }
 
+  @Override
   protected Group createGroup(String groupId) {
     disableAuthorization();
     Group group = super.createGroup(groupId);

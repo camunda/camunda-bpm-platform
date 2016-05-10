@@ -36,7 +36,7 @@ public class RegisterDeploymentCmd implements Command<Void> {
 
     ensureNotNull("Deployment " + deploymentId + " does not exist", "deployment", deployment);
 
-    commandContext.getAuthorizationManager().isCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdmin();
 
     Context.getProcessEngineConfiguration().getRegisteredDeployments().add(deploymentId);
     return null;

@@ -158,7 +158,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   public String databaseSchemaUpgrade(final Connection connection, final String catalog, final String schema) {
     return commandExecutor.execute(new Command<String>(){
       public String execute(CommandContext commandContext) {
-        commandContext.getAuthorizationManager().isCamundaAdmin();
+        commandContext.getAuthorizationManager().checkCamundaAdmin();
         DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
         DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, connection, catalog, schema);
         commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
@@ -184,7 +184,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   public Set<String> getRegisteredDeployments() {
     return commandExecutor.execute(new Command<Set<String>>() {
       public Set<String> execute(CommandContext commandContext) {
-        commandContext.getAuthorizationManager().isCamundaAdmin();
+        commandContext.getAuthorizationManager().checkCamundaAdmin();
         Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
         return new HashSet<String>(registeredDeployments);
       }

@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
@@ -398,23 +397,36 @@ public class AuthorizationManager extends AbstractManager {
 
   /* MEMBER OF CAMUNDA_ADMIN */
 
-  public void isCamundaAdmin() {
+  /**
+   * Checks if the current authentication contains the group
+   * {@link Groups#CAMUNDA_ADMIN}. The check is ignored if the authorization is
+   * disabled or no authentication exists.
+   *
+   * @throws AuthorizationException
+   */
+  public void checkCamundaAdmin() {
     final Authentication currentAuthentication = getCurrentAuthentication();
     CommandContext commandContext = Context.getCommandContext();
 
-    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
+    if (isAuthorizationEnabled() && commandContext.isAuthorizationCheckEnabled()
+        && currentAuthentication != null  && !isCamundaAdmin(currentAuthentication)) {
 
-      IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
+      throw LOG.requiredCamundaAdminException();
+    }
+  }
 
-      String userId = currentAuthentication.getUserId();
-      long count = identityService
-          .createUserQuery()
-          .userId(userId)
-          .memberOfGroup(Groups.CAMUNDA_ADMIN)
-          .count();
-      if (count == 0) {
-        throw LOG.notAMemberException(userId, Groups.CAMUNDA_ADMIN);
-      }
+  /**
+   * @param authentication
+   *          authentication to check, cannot be <code>null</code>
+   * @return <code>true</code> if the given authentication contains the group
+   *         {@link Groups#CAMUNDA_ADMIN}
+   */
+  public boolean isCamundaAdmin(Authentication authentication) {
+    List<String> groupIds = authentication.getGroupIds();
+    if (groupIds != null) {
+      return groupIds.contains(Groups.CAMUNDA_ADMIN);
+    } else {
+      return false;
     }
   }
 
