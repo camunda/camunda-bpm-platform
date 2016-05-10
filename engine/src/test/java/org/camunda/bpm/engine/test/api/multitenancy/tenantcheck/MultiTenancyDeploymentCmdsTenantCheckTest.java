@@ -326,8 +326,70 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     assertThat(inputStream, notNullValue());
   }
 
+  @Test
+  public void redeployForDifferentAuthenticatedTenants() {
+    Deployment deploymentOne = repositoryService.createDeployment()
+      .addModelInstance("emptyProcess.bpmn", emptyProcess)
+      .addModelInstance("startEndProcess.bpmn", startEndProcess)
+      .tenantId(TENANT_ONE)
+      .deploy();
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_TWO));
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot get the deployment");
+
+    repositoryService.createDeployment()
+        .addDeploymentResources(deploymentOne.getId())
+        .tenantId(TENANT_TWO)
+        .deploy();
+  }
+
+  @Test
+  public void redeployForTheSameAuthenticatedTenant() {
+    Deployment deploymentOne = repositoryService.createDeployment()
+      .addModelInstance("emptyProcess.bpmn", emptyProcess)
+      .addModelInstance("startEndProcess.bpmn", startEndProcess)
+      .tenantId(TENANT_ONE)
+      .deploy();
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    repositoryService.createDeployment()
+        .addDeploymentResources(deploymentOne.getId())
+        .tenantId(TENANT_ONE)
+        .deploy();
+
+    DeploymentQuery query = repositoryService.createDeploymentQuery();
+    assertThat(query.count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
+  }
+
+  @Test
+  public void redeployForDifferentAuthenticatedTenantsDisabledTenantCheck() {
+    Deployment deploymentOne = repositoryService.createDeployment()
+      .addModelInstance("emptyProcess.bpmn", emptyProcess)
+      .addModelInstance("startEndProcess.bpmn", startEndProcess)
+      .tenantId(TENANT_ONE)
+      .deploy();
+
+    identityService.setAuthentication("user", null, null);
+    processEngineConfiguration.setTenantCheckEnabled(false);
+
+    repositoryService.createDeployment()
+        .addDeploymentResources(deploymentOne.getId())
+        .tenantId(TENANT_TWO)
+        .deploy();
+
+    DeploymentQuery query = repositoryService.createDeploymentQuery();
+    assertThat(query.count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+  }
+
   @After
   public void tearDown() throws Exception {
+    identityService.clearAuthentication();
     for(Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
