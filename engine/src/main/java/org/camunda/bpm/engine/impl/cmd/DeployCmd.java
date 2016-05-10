@@ -107,10 +107,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
       ensureDeploymentsWithIdsExists(deploymentIds, deployments);
     }
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkCreateDeployment();
-    }
-    checkReadDeployments(commandContext, deploymentIds);
+    checkCreateAndReadDeployments(commandContext, deploymentIds);
 
     // set deployment name if it should retrieved from an existing deployment
     String nameFromDeployment = deploymentBuilder.getNameFromDeployment();
@@ -400,12 +397,13 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     return result;
   }
 
-  protected void checkReadDeployments(CommandContext commandContext, Set<String> deploymentIds) {
-    for (String deploymentId : deploymentIds) {
+  protected void checkCreateAndReadDeployments(CommandContext commandContext, Set<String> deploymentIds) {
       for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-        checker.checkReadDeployment(deploymentId);
+        checker.checkCreateDeployment();
+        for (String deploymentId : deploymentIds) {
+          checker.checkReadDeployment(deploymentId);
+        }
       }
-    }
   }
 
   protected void acquireExclusiveLock(CommandContext commandContext) {

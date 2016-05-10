@@ -42,16 +42,15 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
- * 
  * @author kristin.polenz
- *
  */
-public class MultiTenancyDeploymentCmdsTest {
+public class MultiTenancyDeploymentCmdsTenantCheckTest {
 
   protected static final String TENANT_TWO = "tenant2";
   protected static final String TENANT_ONE = "tenant1";
 
   protected static final BpmnModelInstance emptyProcess = Bpmn.createExecutableProcess().done();
+  protected static final BpmnModelInstance startEndProcess = Bpmn.createExecutableProcess().startEvent().endEvent().done();
 
   protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
 
@@ -108,7 +107,7 @@ public class MultiTenancyDeploymentCmdsTest {
     identityService.setAuthentication("user", null, null);
 
     repositoryService.createDeployment().addModelInstance("emptyProcessOne", emptyProcess).tenantId(TENANT_ONE).deploy();
-    repositoryService.createDeployment().addModelInstance("emptyProcessTwo", emptyProcess).tenantId(TENANT_TWO).deploy();
+    repositoryService.createDeployment().addModelInstance("emptyProcessTwo", startEndProcess).tenantId(TENANT_TWO).deploy();
 
     DeploymentQuery query = repositoryService.createDeploymentQuery();
     assertThat(query.count(), is(2L));
@@ -147,7 +146,7 @@ public class MultiTenancyDeploymentCmdsTest {
   @Test
   public void deleteDeploymentDisabledTenantCheck() {
     Deployment deploymentOne = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-    Deployment deploymentTwo = testRule.deployForTenant(TENANT_TWO, emptyProcess);
+    Deployment deploymentTwo = testRule.deployForTenant(TENANT_TWO, startEndProcess);
 
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
@@ -187,7 +186,7 @@ public class MultiTenancyDeploymentCmdsTest {
   @Test
   public void getDeploymentResourceNamesDisabledTenantCheck() {
     Deployment deploymentOne = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-    Deployment deploymentTwo = testRule.deployForTenant(TENANT_TWO, emptyProcess);
+    Deployment deploymentTwo = testRule.deployForTenant(TENANT_TWO, startEndProcess);
 
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
@@ -225,7 +224,7 @@ public class MultiTenancyDeploymentCmdsTest {
   @Test
   public void getDeploymentResourcesDisabledTenantCheck() {
     Deployment deploymentOne = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-    Deployment deploymentTwo = testRule.deployForTenant(TENANT_TWO, emptyProcess);
+    Deployment deploymentTwo = testRule.deployForTenant(TENANT_TWO, startEndProcess);
 
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
@@ -267,7 +266,7 @@ public class MultiTenancyDeploymentCmdsTest {
   @Test
   public void getResourceAsStreamDisabledTenantCheck() {
     Deployment deploymentOne = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-    Deployment deploymentTwo = testRule.deployForTenant(TENANT_TWO, emptyProcess);
+    Deployment deploymentTwo = testRule.deployForTenant(TENANT_TWO, startEndProcess);
 
     Resource resourceOne = repositoryService.getDeploymentResources(deploymentOne.getId()).get(0);
     Resource resourceTwo = repositoryService.getDeploymentResources(deploymentTwo.getId()).get(0);
@@ -312,7 +311,7 @@ public class MultiTenancyDeploymentCmdsTest {
   @Test
   public void getResourceAsStreamByIdDisabledTenantCheck() {
     Deployment deploymentOne = testRule.deployForTenant(TENANT_ONE, emptyProcess);
-    Deployment deploymentTwo = testRule.deployForTenant(TENANT_TWO, emptyProcess);
+    Deployment deploymentTwo = testRule.deployForTenant(TENANT_TWO, startEndProcess);
 
     Resource resourceOne = repositoryService.getDeploymentResources(deploymentOne.getId()).get(0);
     Resource resourceTwo = repositoryService.getDeploymentResources(deploymentTwo.getId()).get(0);
