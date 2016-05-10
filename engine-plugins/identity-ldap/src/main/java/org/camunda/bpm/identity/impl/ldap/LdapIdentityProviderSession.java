@@ -611,19 +611,17 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
   @Override
   public TenantQuery createTenantQuery() {
-    // TODO support multi-tenancy - CAM-5876
-    throw new UnsupportedOperationException("Multi-Tenancy is not supported for LDAP plugin.");
+    return new LdapTenantQuery(org.camunda.bpm.engine.impl.context.Context.getProcessEngineConfiguration().getCommandExecutorTxRequired());
   }
 
   @Override
   public TenantQuery createTenantQuery(CommandContext commandContext) {
-    // TODO support multi-tenancy - CAM-5876
-    throw new UnsupportedOperationException("Multi-Tenancy is not supported for LDAP plugin.");
+    return new LdapTenantQuery();
   }
 
   @Override
   public Tenant findTenantById(String id) {
-    // TODO support multi-tenancy - CAM-5876
-    throw new UnsupportedOperationException("Multi-Tenancy is not supported for LDAP plugin.");
+    // since multi-tenancy is not supported for the LDAP plugin, always return null
+    return null;
   }
 }
