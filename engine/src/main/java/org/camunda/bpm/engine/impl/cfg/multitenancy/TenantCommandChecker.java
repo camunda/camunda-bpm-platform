@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -231,6 +232,18 @@ public class TenantCommandChecker implements CommandChecker {
   public void checkTaskWork(TaskEntity task) {
     if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("work on task");
+    }
+  }
+
+  public void checkReadDecisionDefinition(DecisionDefinitionEntity decisionDefinition) {
+    if (decisionDefinition != null && !getTenantManager().isAuthenticatedTenant(decisionDefinition.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("get the decision definition");
+    }
+  }
+
+  public void checkReadCaseDefinition(CaseDefinition caseDefinition) {
+    if (caseDefinition != null && !getTenantManager().isAuthenticatedTenant(caseDefinition.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("get the case definition");
     }
   }
 

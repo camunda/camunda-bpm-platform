@@ -81,7 +81,6 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
-import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -975,14 +974,6 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureDecisionDefinitionQuery(DecisionDefinitionQueryImpl query) {
     configureQuery(query, DECISION_DEFINITION, "RES.KEY_");
-  }
-
-  public void checkReadDecisionDefinition(DecisionDefinitionEntity decisionDefinition) {
-    checkReadDecisionDefinition(decisionDefinition.getKey());
-  }
-
-  public void checkReadDecisionDefinition(String decisionDefinitionKey) {
-    checkAuthorization(READ, DECISION_DEFINITION, decisionDefinitionKey);
   }
 
   public List<String> filterAuthenticatedGroupIds(List<String> authenticatedGroupIds) {

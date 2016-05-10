@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.cfg;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -151,5 +152,15 @@ public interface CommandChecker {
    *  Check if it is allowed to delete a task
    */
   void checkDeleteTask(TaskEntity task);
+
+  /**
+   * Checks if it is allowed to read the given decision definition.
+   */
+  void checkReadDecisionDefinition(DecisionDefinitionEntity decisionDefinition);
+
+  /**
+   * Checks if it is allowed to read the given case definition.
+   */
+  void checkReadCaseDefinition(CaseDefinition caseDefinition);
 
 }

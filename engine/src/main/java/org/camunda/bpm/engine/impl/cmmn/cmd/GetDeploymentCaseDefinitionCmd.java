@@ -16,6 +16,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -37,10 +39,14 @@ public class GetDeploymentCaseDefinitionCmd implements Command<CaseDefinition>, 
   public CaseDefinition execute(CommandContext commandContext) {
     ensureNotNull("caseDefinitionId", caseDefinitionId);
 
-    return Context
-      .getProcessEngineConfiguration()
-      .getDeploymentCache()
-      .findDeployedCaseDefinitionById(caseDefinitionId);
+    CaseDefinitionEntity caseDefinition = Context.getProcessEngineConfiguration().getDeploymentCache()
+        .findDeployedCaseDefinitionById(caseDefinitionId);
+
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadCaseDefinition(caseDefinition);
+    }
+
+    return caseDefinition;
   }
 
 }

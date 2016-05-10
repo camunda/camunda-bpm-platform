@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -297,6 +298,14 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   public void checkDeleteDeployment(String deploymentId) {
     getAuthorizationManager().checkAuthorization(DELETE, DEPLOYMENT, deploymentId);
+  }
+
+  public void checkReadDecisionDefinition(DecisionDefinitionEntity decisionDefinition) {
+    getAuthorizationManager().checkAuthorization(READ, DECISION_DEFINITION, decisionDefinition.getKey());
+  }
+
+  @Override
+  public void checkReadCaseDefinition(CaseDefinition caseDefinition) {
   }
 
   protected AuthorizationManager getAuthorizationManager() {
