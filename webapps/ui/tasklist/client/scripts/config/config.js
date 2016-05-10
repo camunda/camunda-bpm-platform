@@ -1,4 +1,10 @@
 var camTasklistConf = {
+  // change the app name and vendor
+  // app: {
+  //   name: 'Todos',
+  //   vendor: 'Company'
+  // },
+  //
   // configure the date format
   // "dateFormat": {
   //   "normal": "LLL",
