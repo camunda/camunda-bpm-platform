@@ -2,9 +2,10 @@ package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import java.util.Arrays;
+
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -28,11 +29,14 @@ import org.junit.rules.RuleChain;
 public class MultiTenancyTaskServiceCmdsTenantCheckTest {
   
   protected static final String TENANT_ONE = "tenant1";
-  protected static final String TENANT_TWO = "tenant2";
   
   protected static final String PROCESS_DEFINITION_KEY = "oneTaskProcess";
   
-  protected static final BpmnModelInstance ONE_TASK_PROCESS = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().userTask().endEvent().done();
+  protected static final BpmnModelInstance ONE_TASK_PROCESS = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+    .startEvent()
+    .userTask()
+    .endEvent()
+    .done();
   
   protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
   
@@ -40,13 +44,8 @@ public class MultiTenancyTaskServiceCmdsTenantCheckTest {
   
   protected TaskService taskService;
   protected IdentityService identityService;
-  protected ProcessEngineConfiguration processEngineConfiguration;
   
-  protected static final String TEST_VARIABLE = "testVariable";
-  protected static final String TEST_VARIABLE_VALUE = "testVariableValue";
-  
-  protected static Task task;
-  protected static String processInstanceId;
+  protected Task task;
   
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -65,12 +64,11 @@ public class MultiTenancyTaskServiceCmdsTenantCheckTest {
     
     taskService = engineRule.getTaskService();
     identityService = engineRule.getIdentityService();
-    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
   }
 
   // save test cases
   @Test
-  public void saveTaskWithUserAndAuthenticatedTenant() {
+  public void saveTaskWithAuthenticatedTenant() {
     
     task = taskService.newTask("newTask");
     task.setTenantId(TENANT_ONE);
@@ -85,7 +83,7 @@ public class MultiTenancyTaskServiceCmdsTenantCheckTest {
   }
 
   @Test
-  public void saveTaskWithUserAndNoAuthenticatedTenant() {
+  public void saveTaskWithNoAuthenticatedTenant() {
     
     task = taskService.newTask("newTask");
     task.setTenantId(TENANT_ONE);
@@ -100,7 +98,7 @@ public class MultiTenancyTaskServiceCmdsTenantCheckTest {
   }
   
   @Test
-  public void saveTaskWithUserAndDisabledTenantCheck() {
+  public void saveTaskWithDisabledTenantCheck() {
     
     task = taskService.newTask("newTask");
     task.setTenantId(TENANT_ONE);
@@ -116,7 +114,7 @@ public class MultiTenancyTaskServiceCmdsTenantCheckTest {
 
   // update task test
   @Test
-  public void updateTaskWithUserAndAuthenticatedTenant() {
+  public void updateTaskWithAuthenticatedTenant() {
     
     identityService.setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
     task.setAssignee("aUser");
@@ -127,7 +125,7 @@ public class MultiTenancyTaskServiceCmdsTenantCheckTest {
   }
   
   @Test
-  public void updateTaskWithUserAndNoAuthenticatedTenant() {
+  public void updateTaskWithNoAuthenticatedTenant() {
     
     task.setAssignee("aUser");
     identityService.setAuthentication("aUserId", null);
@@ -140,7 +138,7 @@ public class MultiTenancyTaskServiceCmdsTenantCheckTest {
   }
   
   @Test
-  public void updateTaskWithUserAndDisabledTenantCheck() {
+  public void updateTaskWithDisabledTenantCheck() {
     
     task.setAssignee("aUser");
     identityService.setAuthentication("aUserId", null);
@@ -176,7 +174,7 @@ public class MultiTenancyTaskServiceCmdsTenantCheckTest {
   }
   
   @Test
-  public void claimTaskWithUserAndDisableTenantCheck() {
+  public void claimTaskWithDisableTenantCheck() {
     
     identityService.setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
