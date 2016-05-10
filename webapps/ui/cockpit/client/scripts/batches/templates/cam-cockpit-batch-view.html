@@ -20,23 +20,21 @@
               <td>{{batch.type}}</td>
               <td>
                 <progress>
+                  <div class="processed">{{(100 - ctrl.getProgressRoundedPercentage(batch, 'remaining'))}}%</div>
                   <bar value="ctrl.getProgressPercentage(batch, 'success')"
                        type="success"
                        ng-if="ctrl.getProgressAbsolute(batch, 'success') > 0"
                        class="jobs jobs-success">
-                    <div tooltip="Completed Jobs">{{ctrl.getProgressRoundedPercentage(batch, 'success')}}%</div>
                   </bar>
                   <bar value="ctrl.getProgressPercentage(batch, 'failed')"
                        type="warning"
                        ng-if="ctrl.getProgressAbsolute(batch, 'failed') > 0"
                        class="jobs jobs-failed">
-                    <div tooltip="Failed Jobs">{{ctrl.getProgressRoundedPercentage(batch, 'failed')}}%</div>
                   </bar>
                   <bar value="ctrl.getProgressPercentage(batch, 'remaining')"
                        type="info"
                        ng-if="ctrl.getProgressAbsolute(batch, 'remaining') > 0"
                        class="jobs jobs-remaining">
-                     <div tooltip="Remaining Jobs">{{ctrl.getProgressRoundedPercentage(batch, 'remaining')}}%</div>
                   </bar>
                 </progress>
               </td>
