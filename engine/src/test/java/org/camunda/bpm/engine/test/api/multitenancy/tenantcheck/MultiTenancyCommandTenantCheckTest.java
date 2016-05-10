@@ -18,6 +18,8 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Collections;
 
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -32,13 +34,14 @@ public class MultiTenancyCommandTenantCheckTest {
   public ProcessEngineRule engineRule = new ProcessEngineRule(true);
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected IdentityService identityService;
 
   @Before
   public void init() {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    identityService = engineRule.getIdentityService();
 
-    // set an authenticated user and tenant to enable the tenant check
-    engineRule.getIdentityService().setAuthentication("user", null, Collections.singletonList("tenant"));
+    identityService.setAuthentication("user", null, null);
   }
 
   @Test
@@ -101,6 +104,22 @@ public class MultiTenancyCommandTenantCheckTest {
 
         commandContext.enableTenantCheck();
         assertThat(commandContext.getTenantManager().isTenantCheckEnabled(), is(true));
+
+        return null;
+      }
+    });
+  }
+
+  @Test
+  public void disableTenantCheckForCamundaAdmin() {
+    identityService.setAuthentication("user", Collections.singletonList(Groups.CAMUNDA_ADMIN), null);
+
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+
+      @Override
+      public Void execute(CommandContext commandContext) {
+        // camunda-admin should access data from all tenants
+        assertThat(commandContext.getTenantManager().isTenantCheckEnabled(), is(false));
 
         return null;
       }
