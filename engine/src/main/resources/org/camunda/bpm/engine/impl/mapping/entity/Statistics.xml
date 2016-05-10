@@ -634,6 +634,8 @@
       on
         RES.BATCH_JOB_DEF_ID_ = JOB.JOB_DEF_ID_
 
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" /> 
+
       <where>
         <if test="batchId != null">
           RES.ID_ = #{batchId}
@@ -653,7 +655,7 @@
             and RES.TENANT_ID_ is null
           </if>
        </if>
-        
+
        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
      </where>

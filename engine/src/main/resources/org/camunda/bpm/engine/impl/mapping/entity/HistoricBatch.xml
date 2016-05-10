@@ -94,6 +94,9 @@
 
   <sql id="selectHistoricBatchesByQueryCriteriaSql">
     from ${prefix}ACT_HI_BATCH RES
+
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" />
+
     <where>
       <if test="batchId != null">
         RES.ID_ = #{batchId}
@@ -119,7 +122,7 @@
           and RES.TENANT_ID_ is null
         </if>
       </if>
-      
+
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
     </where>
