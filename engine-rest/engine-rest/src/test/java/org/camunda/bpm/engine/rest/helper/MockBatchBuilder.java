@@ -29,6 +29,7 @@ public class MockBatchBuilder {
   protected String seedJobDefinitionId;
   protected String monitorJobDefinitionId;
   protected String batchJobDefinitionId;
+  protected boolean suspended;
   protected String tenantId;
 
   public MockBatchBuilder id(String id) {
@@ -76,6 +77,11 @@ public class MockBatchBuilder {
     return this;
   }
 
+  public MockBatchBuilder suspended() {
+    this.suspended = true;
+    return this;
+  }
+
   public MockBatchBuilder tenantId(String tenantId) {
     this.tenantId = tenantId;
     return this;
@@ -92,6 +98,7 @@ public class MockBatchBuilder {
     when(batch.getSeedJobDefinitionId()).thenReturn(seedJobDefinitionId);
     when(batch.getMonitorJobDefinitionId()).thenReturn(monitorJobDefinitionId);
     when(batch.getBatchJobDefinitionId()).thenReturn(batchJobDefinitionId);
+    when(batch.isSuspended()).thenReturn(suspended);
     when(batch.getTenantId()).thenReturn(tenantId);
     return batch;
   }

@@ -16,9 +16,13 @@ package org.camunda.bpm.engine.rest.sub.batch.impl;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
+import org.camunda.bpm.engine.rest.dto.management.JobDefinitionSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.batch.BatchResource;
 
@@ -43,6 +47,33 @@ public class BatchResourceImpl implements BatchResource {
     }
 
     return BatchDto.fromBatch(batch);
+  }
+
+  public void updateSuspensionState(SuspensionStateDto suspensionState) {
+    if (suspensionState.getSuspended()) {
+      suspendBatch();
+    }
+    else {
+      activateBatch();
+    }
+  }
+
+  protected void suspendBatch() {
+    try {
+      processEngine.getManagementService().suspendBatchById(batchId);
+    }
+    catch (BadUserRequestException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Unable to suspend batch with id '" + batchId + "'");
+    }
+  }
+
+  protected void activateBatch() {
+    try {
+      processEngine.getManagementService().activateBatchById(batchId);
+    }
+    catch (BadUserRequestException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Unable to activate batch with id '" + batchId + "'");
+    }
   }
 
   public void deleteBatch(boolean cascade) {

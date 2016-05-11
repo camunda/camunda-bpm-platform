@@ -26,6 +26,7 @@ public class BatchDto {
   protected String seedJobDefinitionId;
   protected String monitorJobDefinitionId;
   protected String batchJobDefinitionId;
+  protected boolean suspended;
   protected String tenantId;
 
   public String getId() {
@@ -64,6 +65,10 @@ public class BatchDto {
     return batchJobDefinitionId;
   }
 
+  public boolean isSuspended() {
+    return suspended;
+  }
+
   public String getTenantId() {
     return tenantId;
   }
@@ -79,6 +84,7 @@ public class BatchDto {
     dto.seedJobDefinitionId = batch.getSeedJobDefinitionId();
     dto.monitorJobDefinitionId = batch.getMonitorJobDefinitionId();
     dto.batchJobDefinitionId = batch.getBatchJobDefinitionId();
+    dto.suspended = batch.isSuspended();
     dto.tenantId = batch.getTenantId();
     return dto;
   }

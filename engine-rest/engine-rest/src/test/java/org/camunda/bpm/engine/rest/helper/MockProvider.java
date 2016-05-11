@@ -2601,6 +2601,7 @@ public abstract class MockProvider {
       .seedJobDefinitionId(EXAMPLE_SEED_JOB_DEFINITION_ID)
       .monitorJobDefinitionId(EXAMPLE_MONITOR_JOB_DEFINITION_ID)
       .batchJobDefinitionId(EXAMPLE_BATCH_JOB_DEFINITION_ID)
+      .suspended()
       .tenantId(EXAMPLE_TENANT_ID);
   }
 

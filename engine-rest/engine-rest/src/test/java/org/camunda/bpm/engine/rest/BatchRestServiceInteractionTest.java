@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.rest;
 
+import static java.util.Collections.singletonMap;
+
 import static com.jayway.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.util.JsonPathUtil.from;
 import static org.hamcrest.Matchers.equalTo;
@@ -28,6 +30,7 @@ import static org.mockito.Mockito.when;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.batch.Batch;
@@ -41,6 +44,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.InOrder;
 
+import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 
 public class BatchRestServiceInteractionTest extends AbstractRestServiceTest {
@@ -50,6 +54,7 @@ public class BatchRestServiceInteractionTest extends AbstractRestServiceTest {
 
   protected static final String BATCH_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/batch";
   protected static final String SINGLE_BATCH_RESOURCE_URL = BATCH_RESOURCE_URL + "/{id}";
+  protected static final String SUSPENDED_BATCH_RESOURCE_URL = SINGLE_BATCH_RESOURCE_URL + "/suspended";
 
   protected ManagementService managementServiceMock;
   protected BatchQuery queryMock;
@@ -195,6 +200,116 @@ public class BatchRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("message", equalTo("Unable to delete batch with id '" + nonExistingId + "'"))
     .when()
       .delete(SINGLE_BATCH_RESOURCE_URL);
+  }
+
+  @Test
+  public void suspendBatch() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_BATCH_ID)
+      .contentType(ContentType.JSON)
+      .body(singletonMap("suspended", true))
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(SUSPENDED_BATCH_RESOURCE_URL);
+
+    verify(managementServiceMock).suspendBatchById(eq(MockProvider.EXAMPLE_BATCH_ID));
+    verifyNoMoreInteractions(managementServiceMock);
+  }
+
+  @Test
+  public void suspendNonExistingBatch() {
+    String nonExistingId = MockProvider.NON_EXISTING_ID;
+
+    doThrow(new BadUserRequestException("Batch for id '" + nonExistingId + "' cannot be found"))
+      .when(managementServiceMock).suspendBatchById(eq(nonExistingId));
+
+    given()
+      .pathParam("id", nonExistingId)
+      .contentType(ContentType.JSON)
+      .body(singletonMap("suspended", true))
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Unable to suspend batch with id '" + nonExistingId + "'"))
+    .when()
+      .put(SUSPENDED_BATCH_RESOURCE_URL);
+  }
+
+  @Test
+  public void suspendBatchUnauthorized() {
+    String batchId = MockProvider.EXAMPLE_BATCH_ID;
+    String expectedMessage = "The user with id 'userId' does not have 'UPDATE' permission on resource '" + batchId + "' of type 'Batch'.";
+
+    doThrow(new AuthorizationException(expectedMessage))
+      .when(managementServiceMock).suspendBatchById(eq(batchId));
+
+    given()
+      .pathParam("id", batchId)
+      .contentType(ContentType.JSON)
+      .body(singletonMap("suspended", true))
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(expectedMessage))
+    .when()
+      .put(SUSPENDED_BATCH_RESOURCE_URL);
+
+  }
+
+  @Test
+  public void activateBatch() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_BATCH_ID)
+      .contentType(ContentType.JSON)
+      .body(singletonMap("suspended", false))
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(SUSPENDED_BATCH_RESOURCE_URL);
+
+    verify(managementServiceMock).activateBatchById(eq(MockProvider.EXAMPLE_BATCH_ID));
+    verifyNoMoreInteractions(managementServiceMock);
+  }
+
+  @Test
+  public void activateNonExistingBatch() {
+    String nonExistingId = MockProvider.NON_EXISTING_ID;
+
+    doThrow(new BadUserRequestException("Batch for id '" + nonExistingId + "' cannot be found"))
+      .when(managementServiceMock).activateBatchById(eq(nonExistingId));
+
+    given()
+      .pathParam("id", nonExistingId)
+      .contentType(ContentType.JSON)
+      .body(singletonMap("suspended", false))
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Unable to activate batch with id '" + nonExistingId + "'"))
+    .when()
+      .put(SUSPENDED_BATCH_RESOURCE_URL);
+  }
+
+  @Test
+  public void activateBatchUnauthorized() {
+    String batchId = MockProvider.EXAMPLE_BATCH_ID;
+    String expectedMessage = "The user with id 'userId' does not have 'UPDATE' permission on resource '" + batchId + "' of type 'Batch'.";
+
+    doThrow(new AuthorizationException(expectedMessage))
+      .when(managementServiceMock).activateBatchById(eq(batchId));
+
+    given()
+      .pathParam("id", batchId)
+      .contentType(ContentType.JSON)
+      .body(singletonMap("suspended", false))
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(expectedMessage))
+    .when()
+      .put(SUSPENDED_BATCH_RESOURCE_URL);
+
   }
 
   protected void verifyBatchJson(String batchJson) {

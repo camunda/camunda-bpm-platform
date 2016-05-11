@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.rest.util.JsonPathUtil.from;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -228,6 +229,7 @@ public class BatchRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("type", MockProvider.EXAMPLE_BATCH_TYPE);
     parameters.put("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID + "," + MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
     parameters.put("withoutTenantId", true);
+    parameters.put("suspended", true);
 
     return parameters;
   }
@@ -237,6 +239,7 @@ public class BatchRestServiceQueryTest extends AbstractRestServiceTest {
     verify(queryMock).type(MockProvider.EXAMPLE_BATCH_TYPE);
     verify(queryMock).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
     verify(queryMock).withoutTenantId();
+    verify(queryMock).suspended();
   }
 
   protected void verifyBatchListJson(String batchListJson) {
@@ -255,6 +258,7 @@ public class BatchRestServiceQueryTest extends AbstractRestServiceTest {
     assertEquals(MockProvider.EXAMPLE_MONITOR_JOB_DEFINITION_ID, batch.getMonitorJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_BATCH_JOB_DEFINITION_ID, batch.getBatchJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_TENANT_ID, batch.getTenantId());
+    assertTrue(batch.isSuspended());
   }
 
 }
