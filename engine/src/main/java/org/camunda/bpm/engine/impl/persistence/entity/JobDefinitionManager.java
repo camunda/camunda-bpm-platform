@@ -97,8 +97,5 @@ public class JobDefinitionManager extends AbstractManager {
     getDbEntityManager().delete(JobDefinitionEntity.class, "deleteJobDefinitionsByCaseDefinitionId", definitionId);
   }
 
-  public void deleteJobDefinitionsByCaseDefinitionId(String definitionId) {
-    getDbEntityManager().delete(JobDefinitionEntity.class, "deleteJobDefinitionsByCaseDefinitionId", definitionId);
-  }
 
 }

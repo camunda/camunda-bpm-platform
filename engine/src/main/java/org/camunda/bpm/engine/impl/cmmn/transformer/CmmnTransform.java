@@ -185,12 +185,6 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
       declarations.clear();
     }
 
-    List<JobDeclaration<?,?>> declarations = context.getJobDeclarations();
-    if (!declarations.isEmpty()) {
-      jobDeclarations.put(((CaseDefinitionEntity)definition).getKey(), new ArrayList<JobDeclaration<?,?>>(declarations));
-      declarations.clear();
-    }
-
     return (CaseDefinitionEntity) definition;
   }
 
