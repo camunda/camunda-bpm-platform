@@ -229,15 +229,20 @@ public abstract class TestHelper {
 
   private static <T extends Annotation> T getAnnotation(ProcessEngine processEngine, Class<?> testClass, String methodName, Class<T> annotationClass) {
     Method method = null;
+    T annotation = null;
 
     try {
       method = getMethod(testClass, methodName);
-
+      annotation = method.getAnnotation(annotationClass);
     } catch (Exception e) {
-      return null;
+      LOG.debug("Cannot determine RequiredHistoryLevel annotation on test method '" + methodName
+          + "' of class " + testClass.getName(), e);
+      // - ignore if we cannot access the method
+      // - just try again with the class
+      // => can for example be the case for parameterized tests where methodName does not correspond to the actual method name
+      //    (note that method-level annotations still work in this
+      //     scenario due to Description#getAnnotation in annotationRequiredHistoryLevelCheck)
     }
-
-    T annotation = method.getAnnotation(annotationClass);
 
     // if not found on method, try on class level
     if (annotation == null) {
