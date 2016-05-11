@@ -981,7 +981,7 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   public void configureProcessDefinitionStatisticsQuery(ProcessDefinitionStatisticsQueryImpl query) {
-    configureQuery(query, PROCESS_DEFINITION, "PROCDEF.KEY_");
+    configureQuery(query, PROCESS_DEFINITION, "RES.KEY_");
   }
 
   public void configureActivityStatisticsQuery(ActivityStatisticsQueryImpl query) {
