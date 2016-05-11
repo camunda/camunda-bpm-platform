@@ -19,6 +19,7 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -36,11 +37,15 @@ public class MigratingProcessInstance {
   protected List<MigratingActivityInstance> migratingActivityInstances;
   protected List<MigratingTransitionInstance> migratingTransitionInstances;
   protected MigratingActivityInstance rootInstance;
+  protected ProcessDefinitionEntity sourceDefinition;
+  protected ProcessDefinitionEntity targetDefinition;
 
-  public MigratingProcessInstance(String processInstanceId) {
+  public MigratingProcessInstance(String processInstanceId, ProcessDefinitionEntity sourceDefinition, ProcessDefinitionEntity targetDefinition) {
     this.processInstanceId = processInstanceId;
     this.migratingActivityInstances = new ArrayList<MigratingActivityInstance>();
     this.migratingTransitionInstances = new ArrayList<MigratingTransitionInstance>();
+    this.sourceDefinition = sourceDefinition;
+    this.targetDefinition = targetDefinition;
   }
 
   public MigratingActivityInstance getRootInstance() {
@@ -57,6 +62,14 @@ public class MigratingProcessInstance {
 
   public Collection<MigratingTransitionInstance> getMigratingTransitionInstances() {
     return migratingTransitionInstances;
+  }
+
+  public ProcessDefinitionEntity getSourceDefinition() {
+    return sourceDefinition;
+  }
+
+  public ProcessDefinitionEntity getTargetDefinition() {
+    return targetDefinition;
   }
 
   public String getProcessInstanceId() {

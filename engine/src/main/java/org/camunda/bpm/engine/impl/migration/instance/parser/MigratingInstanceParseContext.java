@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -63,8 +64,8 @@ public class MigratingInstanceParseContext {
   protected Collection<ExternalTaskEntity> externalTasks;
   protected Collection<VariableInstanceEntity> variables;
 
-  protected ProcessDefinitionImpl sourceProcessDefinition;
-  protected ProcessDefinitionImpl targetProcessDefinition;
+  protected ProcessDefinitionEntity sourceProcessDefinition;
+  protected ProcessDefinitionEntity targetProcessDefinition;
   protected Map<String, List<JobDefinitionEntity>> targetJobDefinitions;
   protected ActivityExecutionTreeMapping mapping;
   protected Map<String, List<MigrationInstruction>> instructionsBySourceScope;
@@ -75,11 +76,11 @@ public class MigratingInstanceParseContext {
       MigratingInstanceParser parser,
       MigrationPlan migrationPlan,
       ExecutionEntity processInstance,
-      ProcessDefinitionImpl targetProcessDefinition) {
+      ProcessDefinitionEntity targetProcessDefinition) {
     this.parser = parser;
-    this.migratingProcessInstance = new MigratingProcessInstance(processInstance.getId());
     this.sourceProcessDefinition = processInstance.getProcessDefinition();
     this.targetProcessDefinition = targetProcessDefinition;
+    this.migratingProcessInstance = new MigratingProcessInstance(processInstance.getId(), sourceProcessDefinition, targetProcessDefinition);
     this.mapping = new ActivityExecutionTreeMapping(Context.getCommandContext(), processInstance.getId());
     this.instructionsBySourceScope = organizeInstructionsBySourceScope(migrationPlan);
   }

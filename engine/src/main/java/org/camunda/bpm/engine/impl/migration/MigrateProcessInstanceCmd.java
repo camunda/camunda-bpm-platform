@@ -24,10 +24,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstanceBranch;
@@ -126,7 +128,7 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
 
     // Initialize migration: match migration instructions to activity instances and collect required entities
     MigratingInstanceParser migratingInstanceParser = new MigratingInstanceParser(Context.getProcessEngineConfiguration().getProcessEngine());
-    MigratingProcessInstance migratingProcessInstance = migratingInstanceParser.parse(processInstance.getId(), migrationPlan, processInstanceReport);
+    final MigratingProcessInstance migratingProcessInstance = migratingInstanceParser.parse(processInstance.getId(), migrationPlan, processInstanceReport);
 
     validateInstructions(commandContext, migratingProcessInstance, processInstanceReport);
 
@@ -134,11 +136,42 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
       throw LOGGER.failingMigratingProcessInstanceValidation(processInstanceReport);
     }
 
-    deleteUnmappedActivityInstances(migratingProcessInstance);
+    executeInContext(
+      new Runnable() {
+        @Override
+        public void run() {
+          deleteUnmappedActivityInstances(migratingProcessInstance);
+        }
+      },
+      migratingProcessInstance.getSourceDefinition());
 
-    migrateProcessInstance(migratingProcessInstance);
+    executeInContext(
+      new Runnable() {
+        @Override
+        public void run() {
+          migrateProcessInstance(migratingProcessInstance);
+        }
+      },
+      migratingProcessInstance.getTargetDefinition());
 
     return null;
+  }
+
+  protected <T> void executeInContext(final Runnable runnable, ProcessDefinitionEntity contextDefinition) {
+    ProcessApplicationReference processApplication = ProcessApplicationContextUtil.getTargetProcessApplication(contextDefinition);
+    if (ProcessApplicationContextUtil.requiresContextSwitch(processApplication)) {
+      Context.executeWithinProcessApplication(new Callable<Void>() {
+
+        @Override
+        public Void call() throws Exception {
+          runnable.run();
+          return null;
+        }
+      }, processApplication);
+    }
+    else {
+      runnable.run();
+    }
   }
 
   /**

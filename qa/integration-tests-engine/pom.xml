@@ -930,6 +930,8 @@
                 <exclude>**/EjbPALifecycleCallbacksTest.java</exclude>
 
                 <exclude>**/PythonPaClassImportTest.java</exclude>
+                
+                <exclude>**/MigrationContextSwitchBeansTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>

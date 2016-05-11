@@ -700,9 +700,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   /** ensures initialization and returns the process definition. */
   @Override
-  public ProcessDefinitionImpl getProcessDefinition() {
+  public ProcessDefinitionEntity getProcessDefinition() {
     ensureProcessDefinitionInitialized();
-    return processDefinition;
+    return (ProcessDefinitionEntity) processDefinition;
   }
 
   public void setProcessDefinitionId(String processDefinitionId) {
