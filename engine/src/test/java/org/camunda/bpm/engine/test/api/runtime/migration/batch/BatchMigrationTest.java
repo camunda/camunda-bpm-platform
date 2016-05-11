@@ -130,7 +130,7 @@ public class BatchMigrationTest {
       .build();
 
     try {
-      runtimeService.newMigration(migrationPlan).processInstanceIds(null).executeAsync();
+      runtimeService.newMigration(migrationPlan).processInstanceIds((List<String>) null).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("process instance ids is empty"));
@@ -771,6 +771,32 @@ public class BatchMigrationTest {
     byteArrayEntity = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
       .execute(new GetByteArrayCommand(byteArrayId));
     assertNull(byteArrayEntity);
+  }
+
+  @Test
+  public void testMigrateWithVarargsArray() {
+    ProcessDefinition sourceDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceById(sourceDefinition.getId());
+
+    // when
+    Batch batch = runtimeService.newMigration(migrationPlan)
+      .processInstanceIds(processInstance1.getId(), processInstance2.getId())
+      .executeAsync();
+
+    helper.executeSeedJob(batch);
+    helper.executeMigrationJobs(batch);
+    helper.executeMonitorJob(batch);
+
+    // then
+    Assert.assertEquals(2, runtimeService.createProcessInstanceQuery()
+        .processDefinitionId(targetDefinition.getId()).count());
   }
 
   protected void assertBatchCreated(Batch batch, int processInstanceCount) {

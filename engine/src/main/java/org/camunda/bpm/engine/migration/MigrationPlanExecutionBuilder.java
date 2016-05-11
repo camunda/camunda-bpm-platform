@@ -32,6 +32,11 @@ public interface MigrationPlanExecutionBuilder {
   MigrationPlanExecutionBuilder processInstanceIds(List<String> processInstanceIds);
 
   /**
+   * @param processInstanceIds the process instance ids to migrate.
+   */
+  MigrationPlanExecutionBuilder processInstanceIds(String... processInstanceIds);
+
+  /**
    * @param processInstanceQuery a query which selects the process instances to migrate.
    *   Query results are restricted to process instances for which the user has {@link Permissions#READ} permission.
    */
