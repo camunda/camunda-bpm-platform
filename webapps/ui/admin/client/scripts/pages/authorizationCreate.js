@@ -5,6 +5,8 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
   module.exports = [ '$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI', function AuthorizationCreateController ($scope, $q, $location, Uri, Notifications, camAPI) {
 
+    var AuthorizationResource = camAPI.resource('authorization');
+
     $scope.addNewAuthorization = function() {
       $scope.authorizations = $scope.authorizations || [];
       $scope.authorizations.push({
@@ -80,7 +82,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       delete authorization.identityId;
       delete authorization.identityType;
 
-      camAPI.save(query, function(err, result) {
+      AuthorizationResource.save(query, function(err, result) {
         if(!!err) {
           Notifications.addError({
             status: 'Could not ' + (query.id ? 'update' : 'create') + ' authorization',
