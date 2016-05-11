@@ -11,30 +11,22 @@
             <tr>
               <th class="id">ID</th>
               <th class="type">Type</th>
+              <th class="failed">Failed Jobs</th>
               <th>Progress</th>
             </tr>
           </thead>
           <tbody>
             <tr ng-repeat="batch in ctrl.getBatches('runtime')" ng-class="{selected: ctrl.isSelected(batch)}">
               <td class="uuid"><a ng-href="#/batch?details={{batch.id}}&type=runtime">{{batch.id}}</a></td>
-              <td>{{batch.type}}</td>
+              <td class="type">{{batch.type}}</td>
+              <td class="failed">{{ ctrl.getProgressAbsolute(batch, 'failed') }}</td>
               <td>
                 <progress>
-                  <div class="processed">{{(100 - ctrl.getProgressRoundedPercentage(batch, 'remaining'))}}%</div>
+                  <div class="processed">{{ ctrl.getProgressRoundedPercentage(batch, 'success') }}%</div>
                   <bar value="ctrl.getProgressPercentage(batch, 'success')"
                        type="success"
                        ng-if="ctrl.getProgressAbsolute(batch, 'success') > 0"
                        class="jobs jobs-success">
-                  </bar>
-                  <bar value="ctrl.getProgressPercentage(batch, 'failed')"
-                       type="warning"
-                       ng-if="ctrl.getProgressAbsolute(batch, 'failed') > 0"
-                       class="jobs jobs-failed">
-                  </bar>
-                  <bar value="ctrl.getProgressPercentage(batch, 'remaining')"
-                       type="info"
-                       ng-if="ctrl.getProgressAbsolute(batch, 'remaining') > 0"
-                       class="jobs jobs-remaining">
                   </bar>
                 </progress>
               </td>
@@ -107,14 +99,15 @@
             <a ng-if="ctrl.getSelectionType() == 'runtime' && ctrl.getJobs().length > 0" class="btn btn-default action-button pull-right" ng-click="ctrl.retryAll()" tooltip="Increment Number of Retries for all Failed Jobs"><span class="glyphicon glyphicon-repeat"></span></a>
           </h3>
 
-          <table class="cam-table">
+          <table class="cam-table batch-details">
             <thead>
               <th>Property</th>
               <th>Value</th>
             </thead>
             <tbody ng-init="selection = ctrl.getSelection()">
               <tr ng-repeat="key in ctrl.sortingKeys"
-                  ng-if="selection[key]">
+                  ng-if="selection[key]"
+                  ng-class="key">
                 <td>{{key}}</td>
                 <td>{{selection[key]}}</td>
               </tr>
