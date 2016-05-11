@@ -33,12 +33,31 @@
     margin: 0 0 10px 0;
   }
 
-  .value {
-    font-size: 2em;
-    font-weight: 700;
-    min-width: 90px;
-    display: inline-block;
-    text-align: right;
+
+  [data-plugin-id="processes"] {
+    li {
+      height: 40px;
+      line-height: 45px;
+      clear: both;
+      > * {
+        display: inline-block;
+        float: left;
+        height: 40px;
+      }
+    }
+
+    .value,
+    .no-value {
+      text-align: right;
+      min-width: 90px;
+      padding-right: 5px;
+    }
+
+    .value {
+      font-size: 2em;
+      font-weight: 700;
+      line-height: 34px;
+    }
   }
 
   .section-title {

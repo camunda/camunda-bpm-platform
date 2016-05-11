@@ -68,6 +68,10 @@ function (
         }
       };
 
+      $scope.isUndefined = function (v) {
+        return typeof v === 'undefined';
+      };
+
       $scope.gimmeDaLabel = function (prop) {
         return prop.label[(prop.value === 1) ? 0 : 1];
       };

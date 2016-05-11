@@ -4,21 +4,23 @@
     <li ng-repeat="propName in procDefStatsKeys"
         ng-init="prop = procDefStats[propName]"
         ng-class="['prop-'+ propName, prop.value ? 'yep' : 'nope']">
-      <span class="value">{{ gimmeDaValue(prop.value) }}</span>
+      <span ng-show="isUndefined(prop.value)"
+            class="no-value">
+        <span class="glyphicon glyphicon-refresh animate-spin"></span>
+      </span>
+      <span ng-show="!isUndefined(prop.value)"
+            class="value">{{ gimmeDaValue(prop.value) }}</span>
       <a ng-href="{{ prop.link }}">{{ gimmeDaLabel(prop) }}</a>
-    </span>
-    <span ng-if="prop.value === undefined">
-      <span class="glyphicon glyphicon-refresh animate-spin"></span>
-      <a ng-href="{{ prop.link }}">{{ gimmeDaLabel(prop) }}</a>
-    </span>
   </li>
+
   <li ng-if="hasMigrationPlugin">
     <span class="value">&nbsp;</span>
     <a href="#/migration">Migration</a>
   </li>
 </ul>
+
 <div ng-if="!procDefStatsKeys.length"
-   class="well">
+     class="well">
   <span class="glyphicon glyphicon-info-sign"></span>
   No process definitions available.
 </div>
