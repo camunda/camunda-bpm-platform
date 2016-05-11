@@ -18,6 +18,9 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderCaseInstanceContext;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderHistoricDecisionInstanceContext;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInstanceContext;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -25,6 +28,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -41,15 +45,15 @@ public class MultiTenancyMigrationTenantProviderTest {
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
-  protected ProvidedProcessEngineRule tenantProviderEngineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  protected ProcessEngineTestRule tenantProviderTestRule = new ProcessEngineTestRule(tenantProviderEngineRule);
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
 
-      TenantIdProvider tenantIdProvider = new StaticTenantIdTestProvider(TENANT_ONE);
+      TenantIdProvider tenantIdProvider = new VariableBasedTenantIdProvider();
       configuration.setTenantIdProvider(tenantIdProvider);
 
       return configuration;
@@ -57,23 +61,23 @@ public class MultiTenancyMigrationTenantProviderTest {
   };
 
   @Rule
-  public RuleChain tenantRuleChain = RuleChain.outerRule(tenantProviderEngineRule).around(tenantProviderTestRule);
+  public RuleChain tenantRuleChain = RuleChain.outerRule(engineRule).around(testHelper);
 
 
   @Test
   public void cannotMigrateInstanceBetweenDifferentTenants() {
     // given
-    ProcessDefinition sharedDefinition = tenantProviderTestRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition tenantDefinition = tenantProviderTestRule.deployForTenantAndGetDefinition(TENANT_TWO, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sharedDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenantDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_TWO, ProcessModels.ONE_TASK_PROCESS);
 
-    ProcessInstance processInstance = tenantProviderEngineRule.getRuntimeService().startProcessInstanceById(sharedDefinition.getId());
-    MigrationPlan migrationPlan = tenantProviderEngineRule.getRuntimeService().createMigrationPlan(sharedDefinition.getId(), tenantDefinition.getId())
+    ProcessInstance processInstance = startInstanceForTenant(sharedDefinition, TENANT_ONE);
+    MigrationPlan migrationPlan = engineRule.getRuntimeService().createMigrationPlan(sharedDefinition.getId(), tenantDefinition.getId())
         .mapEqualActivities()
         .build();
 
     // when
     try {
-      tenantProviderEngineRule.getRuntimeService()
+      engineRule.getRuntimeService()
         .newMigration(migrationPlan)
         .processInstanceIds(Arrays.asList(processInstance.getId()))
         .execute();
@@ -91,29 +95,82 @@ public class MultiTenancyMigrationTenantProviderTest {
   @Test
   public void canMigrateInstanceBetweenSameTenantCase2() {
     // given
-    ProcessDefinition sharedDefinition = tenantProviderTestRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = tenantProviderTestRule.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sharedDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
 
-    ProcessInstance processInstance = tenantProviderEngineRule.getRuntimeService().startProcessInstanceById(sharedDefinition.getId());
-    MigrationPlan migrationPlan = tenantProviderEngineRule.getRuntimeService().createMigrationPlan(sharedDefinition.getId(), targetDefinition.getId())
+    ProcessInstance processInstance = startInstanceForTenant(sharedDefinition, TENANT_ONE);
+    MigrationPlan migrationPlan = engineRule.getRuntimeService().createMigrationPlan(sharedDefinition.getId(), targetDefinition.getId())
         .mapEqualActivities()
         .build();
 
     // when
-    tenantProviderEngineRule.getRuntimeService()
+    engineRule.getRuntimeService()
       .newMigration(migrationPlan)
       .processInstanceIds(Arrays.asList(processInstance.getId()))
       .execute();
 
     // then
-    assertMigratedTo(processInstance, targetDefinition);
+    assertInstanceOfDefinition(processInstance, targetDefinition);
   }
 
-  protected void assertMigratedTo(ProcessInstance processInstance, ProcessDefinition targetDefinition) {
-    Assert.assertEquals(1, tenantProviderEngineRule.getRuntimeService()
+  @Test
+  public void canMigrateWithProcessInstanceQueryAllInstancesOfAuthenticatedTenant() {
+    // given
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = engineRule
+        .getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities()
+        .build();
+
+    ProcessInstance processInstance1 = startInstanceForTenant(sourceDefinition, TENANT_ONE);
+    ProcessInstance processInstance2 = startInstanceForTenant(sourceDefinition, TENANT_TWO);
+
+    // when
+    engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+    engineRule.getRuntimeService()
+      .newMigration(migrationPlan)
+      .processInstanceQuery(engineRule.getRuntimeService().createProcessInstanceQuery())
+      .execute();
+    engineRule.getIdentityService().clearAuthentication();
+
+    // then
+    assertInstanceOfDefinition(processInstance1, targetDefinition);
+    assertInstanceOfDefinition(processInstance2, sourceDefinition);
+  }
+
+  protected void assertInstanceOfDefinition(ProcessInstance processInstance, ProcessDefinition targetDefinition) {
+    Assert.assertEquals(1, engineRule.getRuntimeService()
       .createProcessInstanceQuery()
       .processInstanceId(processInstance.getId())
       .processDefinitionId(targetDefinition.getId())
       .count());
+  }
+
+  protected ProcessInstance startInstanceForTenant(ProcessDefinition processDefinition, String tenantId) {
+    return engineRule.getRuntimeService()
+      .startProcessInstanceById(processDefinition.getId(),
+          Variables.createVariables().putValue(VariableBasedTenantIdProvider.TENANT_VARIABLE, tenantId));
+  }
+
+  public static class VariableBasedTenantIdProvider implements TenantIdProvider {
+    public static final String TENANT_VARIABLE = "tenantId";
+
+    @Override
+    public String provideTenantIdForProcessInstance(TenantIdProviderProcessInstanceContext ctx) {
+      return (String) ctx.getVariables().get(TENANT_VARIABLE);
+    }
+
+    @Override
+    public String provideTenantIdForCaseInstance(TenantIdProviderCaseInstanceContext ctx) {
+      return (String) ctx.getVariables().get(TENANT_VARIABLE);
+    }
+
+    @Override
+    public String provideTenantIdForHistoricDecisionInstance(TenantIdProviderHistoricDecisionInstanceContext ctx) {
+      return null;
+    }
   }
 }

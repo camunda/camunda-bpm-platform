@@ -121,8 +121,8 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
     final ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
 
     ensureProcessInstanceExist(processInstanceId, processInstance);
-    ensureSameProcessDefinition(processInstance, migrationPlan.getSourceProcessDefinitionId());
     ensureOperationAllowed(commandContext, processInstance, targetProcessDefinition);
+    ensureSameProcessDefinition(processInstance, migrationPlan.getSourceProcessDefinitionId());
 
     MigratingProcessInstanceValidationReportImpl processInstanceReport = new MigratingProcessInstanceValidationReportImpl();
 
@@ -441,7 +441,6 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkMigrateProcessInstance(processInstance, targetProcessDefinition);
     }
-
   }
 
 

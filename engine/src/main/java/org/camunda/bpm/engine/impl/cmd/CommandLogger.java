@@ -213,7 +213,7 @@ public class CommandLogger extends ProcessEngineLogger {
   public ProcessEngineException exceptionCommandWithUnauthorizedTenant(String command) {
     return new ProcessEngineException(exceptionMessage(
         "034",
-        "Cannot {} because it belongs to no authenticated tenant. {}",
+        "Cannot {} because it belongs to no authenticated tenant.",
         command
         ));
   }
