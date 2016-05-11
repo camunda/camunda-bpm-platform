@@ -12,6 +12,7 @@ var DecisionDefinitionPage = require('./decision-definition');
 var ProcessInstancePage = require('./process-instance');
 var TaskPage = require('./task');
 var UserPage = require('./user');
+var BatchPage = require('./batch');
 var AuthenticationPage = require('../../../../common/tests/pages/authentication');
 
 module.exports = new AuthorizationsPage();
@@ -26,5 +27,6 @@ module.exports.decisionDefinition = new DecisionDefinitionPage();
 module.exports.processInstance = new ProcessInstancePage();
 module.exports.task = new TaskPage();
 module.exports.user= new UserPage();
+module.exports.batch = new BatchPage();
 module.exports.authentication = new AuthenticationPage();
 

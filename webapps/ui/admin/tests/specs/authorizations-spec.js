@@ -621,6 +621,54 @@ describe('Admin Authorizations Spec', function() {
 
   });
 
+  describe('Batch Authorizations', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
+
+        authorizationsPage.navigateToWebapp('Admin');
+        authorizationsPage.authentication.userLogin('admin', 'admin');
+
+        authorizationsPage.selectNavbarItem('Authorizations');
+      });
+    });
+
+    it('should navigate to batch page', function() {
+
+      // when
+      authorizationsPage.selectAuthorizationNavbarItem('Batch');
+
+      // then
+      authorizationsPage.batch.isActive();
+      expect(authorizationsPage.batch.createNewButton().isEnabled()).to.eventually.eql(true);
+      expect(authorizationsPage.batch.boxHeader()).to.eventually.eql('Batch Authorizations');
+    });
+
+
+    it('should validate authorization attributes', function() {
+
+      authorizationsPage.createNewButton().click().then(function() {
+
+        checkCreateNewState();
+
+        checkAuthorizationTypes();
+
+        var permissionsList = [
+          'READ',
+          'CREATE',
+          'DELETE',
+          'READ_HISTORY',
+          'DELETE_HISTORY'
+        ];
+        checkPermissionTypes(permissionsList);
+
+        abortCreatingNewAuthorization();
+      });
+
+    });
+
+  });
+
   describe('New authorization on empty lists', function () {
     before(function () {
       return testHelper(setupFile.setup4, function () {

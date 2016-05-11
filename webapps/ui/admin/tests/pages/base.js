@@ -9,7 +9,8 @@ var index = [
   'Groups',
   'Tenants',
   'Authorizations',
-  'System'
+  'System',
+  'Batch'
 ];
 
 module.exports = Page.extend({
