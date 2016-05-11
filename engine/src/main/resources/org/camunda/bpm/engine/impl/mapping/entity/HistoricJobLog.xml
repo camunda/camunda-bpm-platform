@@ -184,7 +184,7 @@
         SELECT
             DISTINCT SELF.PROCESS_DEF_KEY_ AS KEY_
         FROM
-            ${prefix}ACT_HI_JOB_LOG SELF
+            (SELECT DISTINCT DKEYS.PROCESS_DEF_KEY_ from ${prefix}ACT_HI_JOB_LOG DKEYS) SELF
         WHERE
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
       ) AUTH
