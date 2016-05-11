@@ -33,9 +33,7 @@ import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.resources.ProcessInstanceRestService;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
-import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -57,14 +55,9 @@ import org.junit.experimental.categories.Category;
  */
 public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
-  protected static final String TENANT_ONE = "tenant1";
-  protected static final String TENANT_TWO = "tenant2";
-
   private ProcessEngine processEngine;
-  private ProcessEngineConfiguration processEngineConfiguration;
   private RuntimeService runtimeService;
   private RepositoryService repositoryService;
-  private IdentityService identityService;
 
   private ProcessInstanceRestService resource;
 
@@ -73,11 +66,8 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     super.before();
 
     processEngine = getProcessEngine();
-    processEngineConfiguration = getProcessEngine().getProcessEngineConfiguration();
-
     runtimeService = processEngine.getRuntimeService();
     repositoryService = processEngine.getRepositoryService();
-    identityService = processEngine.getIdentityService();
 
     resource = new ProcessInstanceRestService(processEngine.getName());
   }
@@ -97,11 +87,6 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
       runtimeService.startProcessInstanceByKey(processDefinitionKey, "businessKey_" + i);
     }
 
-    executeAvailableJobs();
-  }
-
-  private void startProcessInstanceWithTenantId(String processDefinitionKey, String tenantId) {
-    runtimeService.createProcessInstanceByKey(processDefinitionKey).processDefinitionTenantId(tenantId).execute();
     executeAvailableJobs();
   }
 
@@ -904,7 +889,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, (int) 5);
+    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, 5);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -928,7 +913,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, (int) 4);
+    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, 4);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -952,7 +937,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, (int) 5);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, 5);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -976,7 +961,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, (int) 4);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, 4);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1000,7 +985,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, (int) 5);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, 5);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1024,7 +1009,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, (int) 6);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, 6);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1337,7 +1322,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, (double) 5.0);
+    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, 5.0);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1362,7 +1347,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, (double) 4.9);
+    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, 4.9);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1387,7 +1372,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, (double) 4.9);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, 4.9);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1412,7 +1397,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, (double) 4.9);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, 4.9);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1437,7 +1422,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, (double) 5.1);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, 5.1);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1462,7 +1447,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, (double) 5.1);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, 5.1);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1480,13 +1465,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithIntegerVariable_Eq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, (int) 5);
+    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, 5);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1504,13 +1489,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithIntegerVariable_Neq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, (int) 4);
+    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, 4);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1528,13 +1513,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithIntegerVariable_Gteq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, (int) 5);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, 5);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1552,13 +1537,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithIntegerVariable_Gt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, (int) 4);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, 4);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1576,13 +1561,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithIntegerVariable_Lteq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, (int) 5);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, 5);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1600,13 +1585,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithIntegerVariable_Lt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, (int) 6);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, 6);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1624,7 +1609,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithLongVariable_Eq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -1648,7 +1633,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithLongVariable_Neq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -1672,7 +1657,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithLongVariable_Gteq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -1696,7 +1681,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithLongVariable_Gt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -1720,7 +1705,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithLongVariable_Lteq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -1744,7 +1729,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithLongVariable_Lt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -1768,7 +1753,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithShortVariable_Eq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -1792,7 +1777,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithShortVariable_Neq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -1816,7 +1801,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithShortVariable_Gteq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -1840,7 +1825,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithShortVariable_Gt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -1864,7 +1849,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithShortVariable_Lteq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -1888,7 +1873,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithShortVariable_Lt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -1913,13 +1898,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithDoubleVariable_Eq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, (double) 5.0);
+    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, 5.0);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1938,13 +1923,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithDoubleVariable_Neq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, (double) 4.9);
+    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, 4.9);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1963,13 +1948,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithDoubleVariable_Gteq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, (double) 4.9);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, 4.9);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -1988,13 +1973,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithDoubleVariable_Gt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, (double) 4.9);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, 4.9);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2013,13 +1998,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithDoubleVariable_Lteq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, (double) 5.1);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, 5.1);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2038,13 +2023,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterIntegerVariableWithDoubleVariable_Lt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (int) 5);
+    vars.put("var", 5);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, (double) 5.1);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, 5.1);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2068,7 +2053,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, (int) 5);
+    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, 5);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2092,7 +2077,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, (int) 4);
+    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, 4);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2116,7 +2101,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, (int) 5);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, 5);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2140,7 +2125,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, (int) 4);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, 4);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2164,7 +2149,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, (int) 5);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, 5);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2188,7 +2173,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, (int) 6);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, 6);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2501,7 +2486,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, (double) 5.0);
+    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, 5.0);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2526,7 +2511,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, (double) 4.9);
+    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, 4.9);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2551,7 +2536,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, (double) 4.9);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, 4.9);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2576,7 +2561,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, (double) 4.9);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, 4.9);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2601,7 +2586,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, (double) 5.1);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, 5.1);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2626,7 +2611,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, (double) 5.1);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, 5.1);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2644,13 +2629,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithIntegerVariable_Eq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.0);
+    vars.put("var", 5.0);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, (int) 5);
+    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, 5);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2668,13 +2653,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithIntegerVariable_Neq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.3);
+    vars.put("var", 5.3);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, (int) 4);
+    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, 4);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2692,13 +2677,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithIntegerVariable_Gteq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.0);
+    vars.put("var", 5.0);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, (int) 5);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, 5);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2716,13 +2701,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithIntegerVariable_Gt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.3);
+    vars.put("var", 5.3);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, (int) 4);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, 4);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2740,13 +2725,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithIntegerVariable_Lteq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.0);
+    vars.put("var", 5.0);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, (int) 5);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, 5);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2764,13 +2749,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithIntegerVariable_Lt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.3);
+    vars.put("var", 5.3);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, (int) 6);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, 6);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -2788,7 +2773,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithLongVariable_Eq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.0);
+    vars.put("var", 5.0);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -2812,7 +2797,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithLongVariable_Neq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.3);
+    vars.put("var", 5.3);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -2836,7 +2821,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithLongVariable_Gteq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.3);
+    vars.put("var", 5.3);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -2860,7 +2845,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithLongVariable_Gt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.3);
+    vars.put("var", 5.3);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -2884,7 +2869,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithLongVariable_Lteq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.0);
+    vars.put("var", 5.0);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -2908,7 +2893,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithLongVariable_Lt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.3);
+    vars.put("var", 5.3);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -2932,7 +2917,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithShortVariable_Eq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.0);
+    vars.put("var", 5.0);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -2956,7 +2941,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithShortVariable_Neq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.3);
+    vars.put("var", 5.3);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -3004,7 +2989,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithShortVariable_Gt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.3);
+    vars.put("var", 5.3);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -3028,7 +3013,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithShortVariable_Lteq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.0);
+    vars.put("var", 5.0);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -3052,7 +3037,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithShortVariable_Lt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.3);
+    vars.put("var", 5.3);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
@@ -3076,13 +3061,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithDoubleVariable_Eq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.0);
+    vars.put("var", 5.0);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, (double) 5.0);
+    VariableQueryParameterDto variable = createVariableParameter("var", EQUALS_OPERATOR_NAME, 5.0);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -3100,13 +3085,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithDoubleVariable_Neq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.3);
+    vars.put("var", 5.3);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, (double) 4.9);
+    VariableQueryParameterDto variable = createVariableParameter("var", NOT_EQUALS_OPERATOR_NAME, 4.9);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -3124,13 +3109,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithDoubleVariable_Gteq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.3);
+    vars.put("var", 5.3);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, (double) 5.3);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OR_EQUALS_OPERATOR_NAME, 5.3);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -3148,13 +3133,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithDoubleVariable_Gt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.3);
+    vars.put("var", 5.3);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, (double) 4.9);
+    VariableQueryParameterDto variable = createVariableParameter("var", GREATER_THAN_OPERATOR_NAME, 4.9);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -3172,13 +3157,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithDoubleVariable_Lteq() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.1);
+    vars.put("var", 5.1);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, (double) 5.1);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OR_EQUALS_OPERATOR_NAME, 5.1);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -3196,13 +3181,13 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     })
   public void testQueryAfterDoubleVariableWithDoubleVariable_Lt() {
     Map<String, Object> vars = new HashMap<String, Object>();
-    vars.put("var", (double) 5.3);
+    vars.put("var", 5.3);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess", vars);
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
 
-    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, (double) 5.4);
+    VariableQueryParameterDto variable = createVariableParameter("var", LESS_THAN_OPERATOR_NAME, 5.4);
     queryParameter.setVariables(Arrays.asList(variable));
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
@@ -3279,141 +3264,6 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(5);
-  }
-
-  @Test
-  public void queryCountNoAuthenticatedTenants() {
-    deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
-    deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
-
-    startProcessInstanceWithTenantId("userTaskProcess", TENANT_ONE);
-    startProcessInstanceWithTenantId("userTaskProcess", TENANT_TWO);
-
-    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
-    String[] activityIds = {"theUserTask"};
-    queryParameter.setActivityIdIn(activityIds);
-
-    identityService.setAuthentication("user", null, null);
-
-    CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
-    assertThat(result).isNotNull();
-    assertThat(result.getCount()).isEqualTo(0);
-  }
-
-  @Test
-  public void queryCountWithAuthenticatedTenant() {
-    deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
-    deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
-
-    startProcessInstanceWithTenantId("userTaskProcess", TENANT_ONE);
-    startProcessInstanceWithTenantId("userTaskProcess", TENANT_TWO);
-
-    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
-    String[] activityIds = {"theUserTask"};
-    queryParameter.setActivityIdIn(activityIds);
-
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
-
-    CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
-    assertThat(result).isNotNull();
-    assertThat(result.getCount()).isEqualTo(1);
-  }
-
-  @Test
-  public void queryCountDisabledTenantCheck() {
-    deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
-    deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
-
-    startProcessInstanceWithTenantId("userTaskProcess", TENANT_ONE);
-    startProcessInstanceWithTenantId("userTaskProcess", TENANT_TWO);
-
-    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
-    String[] activityIds = {"theUserTask"};
-    queryParameter.setActivityIdIn(activityIds);
-
-    processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthentication("user", null, null);
-
-    CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
-    assertThat(result).isNotNull();
-    assertThat(result.getCount()).isEqualTo(2);
-  }
-
-  @Test
-  public void queryWithContainingIncidentsNoAuthenticatedTenants() {
-    deployForTenant(TENANT_ONE, "processes/failing-process.bpmn");
-    deployForTenant(TENANT_TWO, "processes/failing-process.bpmn");
-
-    startProcessInstanceWithTenantId("FailingProcess", TENANT_ONE);
-    startProcessInstanceWithTenantId("FailingProcess", TENANT_TWO);
-
-    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
-    String[] activityIds = {"ServiceTask_1"};
-    queryParameter.setActivityIdIn(activityIds);
-
-    identityService.setAuthentication("user", null, null);
-
-    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
-
-    assertThat(result).isEmpty();
-  }
-
-  @Test
-  public void queryWithContainingIncidentsWithAuthenticatedTenant() {
-    deployForTenant(TENANT_ONE, "processes/failing-process.bpmn");
-    deployForTenant(TENANT_TWO, "processes/failing-process.bpmn");
-
-    startProcessInstanceWithTenantId("FailingProcess", TENANT_ONE);
-    startProcessInstanceWithTenantId("FailingProcess", TENANT_TWO);
-
-    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
-    String[] activityIds = {"ServiceTask_1"};
-    queryParameter.setActivityIdIn(activityIds);
-
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
-
-    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
-
-    assertThat(result).isNotEmpty();
-    assertThat(result).hasSize(1);
-
-    identityService.clearAuthentication();
-
-    List<IncidentStatisticsDto> incidents = result.get(0).getIncidents();
-
-    assertThat(incidents).isNotEmpty();
-    assertThat(incidents).hasSize(1);
-  }
-
-  @Test
-  public void queryWithContainingIncidentsDisabledTenantCheck() {
-    deployForTenant(TENANT_ONE, "processes/failing-process.bpmn");
-    deployForTenant(TENANT_TWO, "processes/failing-process.bpmn");
-
-    startProcessInstanceWithTenantId("FailingProcess", TENANT_ONE);
-    startProcessInstanceWithTenantId("FailingProcess", TENANT_TWO);
-
-    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
-    String[] activityIds = {"ServiceTask_1"};
-    queryParameter.setActivityIdIn(activityIds);
-
-    processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthentication("user", null, null);
-
-    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
-
-    assertThat(result).isNotEmpty();
-    assertThat(result).hasSize(2);
-
-    identityService.clearAuthentication();
-
-    List<IncidentStatisticsDto> incidents = result.get(0).getIncidents();
-    assertThat(incidents).isNotEmpty();
-    assertThat(incidents).hasSize(1);
-
-    incidents = result.get(1).getIncidents();
-    assertThat(incidents).isNotEmpty();
-    assertThat(incidents).hasSize(1);
   }
 
   private VariableQueryParameterDto createVariableParameter(String name, String operator, Object value) {

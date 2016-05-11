@@ -13,21 +13,15 @@
 package org.camunda.bpm.cockpit.plugin.base;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.hasItems;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.CalledProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.CalledProcessInstanceQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.sub.resources.ProcessInstanceResource;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
-import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -43,25 +37,18 @@ import org.junit.Test;
  */
 public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
 
-  protected static final String TENANT_ONE = "tenant1";
-  protected static final String TENANT_TWO = "tenant2";
-
   private ProcessInstanceResource resource;
   private ProcessEngine processEngine;
-  private ProcessEngineConfiguration processEngineConfiguration;
   private RuntimeService runtimeService;
   private RepositoryService repositoryService;
-  private IdentityService identityService;
 
   @Before
   public void setUp() throws Exception {
     super.before();
 
     processEngine = getProcessEngine();
-    processEngineConfiguration = getProcessEngine().getProcessEngineConfiguration();
     runtimeService = processEngine.getRuntimeService();
     repositoryService = processEngine.getRepositoryService();
-    identityService = processEngine.getIdentityService();
   }
 
   @Test
@@ -168,74 +155,4 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
     assertThat(result3).hasSize(2);
   }
 
-  @Test
-  public void getCalledProcessInstancesByParentProcessInstanceIdNoAuthenticatedTenants() {
-    deploy("processes/multi-tenancy-call-activity.bpmn");
-    deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
-    deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
-
-    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("multiTenancyCallActivity").execute();
-
-    resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
-
-    CalledProcessInstanceQueryDto queryParameter = new CalledProcessInstanceQueryDto();
-
-    identityService.setAuthentication("user", null, null);
-
-    List<CalledProcessInstanceDto> result = resource.queryCalledProcessInstances(queryParameter);
-    assertThat(result).isEmpty();
-  }
-
-  @Test
-  public void getCalledProcessInstancesByParentProcessInstanceIdWithAuthenticatedTenant() {
-    deploy("processes/multi-tenancy-call-activity.bpmn");
-    deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
-    deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
-
-    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("multiTenancyCallActivity").execute();
-
-    resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
-
-    CalledProcessInstanceQueryDto queryParameter = new CalledProcessInstanceQueryDto();
-
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
-
-    List<CalledProcessInstanceDto> result = resource.queryCalledProcessInstances(queryParameter);
-    assertThat(result).isNotEmpty();
-    assertThat(result).hasSize(1);
-
-    identityService.clearAuthentication();
-
-    CalledProcessInstanceDto dto = result.get(0);
-    assertThat(dto.getCallActivityId()).isEqualTo("CallActivity_Tenant1");
-  }
-
-  @Test
-  public void getCalledProcessInstancesByParentProcessInstanceIdDisabledTenantCheck() {
-    deploy("processes/multi-tenancy-call-activity.bpmn");
-    deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
-    deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
-
-    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("multiTenancyCallActivity").execute();
-
-    resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
-
-    CalledProcessInstanceQueryDto queryParameter = new CalledProcessInstanceQueryDto();
-
-    processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthentication("user", null, null);
-
-    List<CalledProcessInstanceDto> result = resource.queryCalledProcessInstances(queryParameter);
-    assertThat(result).isNotEmpty();
-    assertThat(result).hasSize(2);
-
-    identityService.clearAuthentication();
-
-    Set<String> callActivityIds = new HashSet<String>();
-    for (CalledProcessInstanceDto calledProcessInstanceDto : result) {
-       callActivityIds.add(calledProcessInstanceDto.getCallActivityId());
-    }
-
-    org.junit.Assert.assertThat(callActivityIds, hasItems("CallActivity_Tenant1", "CallActivity_Tenant2"));
-  }
 }
