@@ -108,14 +108,16 @@
   </select>
 
   <select id="selectRevokeAuthorization" resultType="integer">
-    SELECT EXISTS
+    SELECT
+    CASE
+    WHEN EXISTS
     ( SELECT ID_
       FROM ${prefix}ACT_RU_AUTHORIZATION 
       WHERE TYPE_ = 2 
       AND USER_ID_ IN (#{userId}, '*')
       <if test="authGroupIds != null &amp;&amp; authGroupIds.size() > 0">
       OR GROUP_ID_ IN <foreach item="item" index="index" collection="authGroupIds" open="(" separator="," close=")">#{item}</foreach>
-      </if>)
+      </if>) THEN 1 ELSE 0 END ${dbSpecificDummyTable}
   </select>
 
   <select id="selectAuthorizationByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultMap="authorizationResultMap">
