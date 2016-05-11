@@ -19,6 +19,7 @@ import org.camunda.bpm.cockpit.db.CommandExecutor;
 import org.camunda.bpm.cockpit.db.QueryParameters;
 import org.camunda.bpm.cockpit.db.QueryService;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
+import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
@@ -72,7 +73,21 @@ public class AbstractCockpitPluginResource extends AbstractAppPluginResource<Coc
    * Return <code>true</code> if tenant check is enabled.
    */
   protected boolean isTenantCheckEnabled() {
-    return getProcessEngine().getProcessEngineConfiguration().isTenantCheckEnabled();
+    return getProcessEngine().getProcessEngineConfiguration().isTenantCheckEnabled()
+        && getCurrentAuthentication() != null
+        && !isCamundaAdmin(getCurrentAuthentication());
+  }
+
+  /**
+   * Return <code>true</code> if the given authentication contains the group {@link Groups#CAMUNDA_ADMIN}.
+   */
+  protected boolean isCamundaAdmin(Authentication authentication) {
+    List<String> groupIds = authentication.getGroupIds();
+    if (groupIds != null) {
+      return groupIds.contains(Groups.CAMUNDA_ADMIN);
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -105,11 +120,10 @@ public class AbstractCockpitPluginResource extends AbstractAppPluginResource<Coc
    * Configure the tenant check for the given {@link QueryParameters}.
    */
   protected void configureTenantCheck(QueryParameters<?> query) {
-    Authentication currentAuthentication = getCurrentAuthentication();
-
     TenantCheck tenantCheck = query.getTenantCheck();
 
-    if (isTenantCheckEnabled() && currentAuthentication != null) {
+    if (isTenantCheckEnabled()) {
+      Authentication currentAuthentication = getCurrentAuthentication();
 
       tenantCheck.setTenantCheckEnabled(true);
       tenantCheck.setAuthTenantIds(currentAuthentication.getTenantIds());

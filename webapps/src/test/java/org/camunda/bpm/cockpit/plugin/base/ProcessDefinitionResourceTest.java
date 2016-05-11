@@ -14,9 +14,7 @@ import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessDefinitionDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessDefinitionQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.sub.resources.ProcessDefinitionResource;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
-import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -30,14 +28,9 @@ import org.junit.experimental.categories.Category;
 
 public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
 
-  protected static final String TENANT_ONE = "tenant1";
-  protected static final String TENANT_TWO = "tenant2";
-
   private ProcessEngine processEngine;
-  private ProcessEngineConfiguration processEngineConfiguration;
   private RuntimeService runtimeService;
   private RepositoryService repositoryService;
-  private IdentityService identityService;
   private ProcessDefinitionResource resource;
 
   @Before
@@ -45,11 +38,9 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     super.before();
 
     processEngine = getProcessEngine();
-    processEngineConfiguration = processEngine.getProcessEngineConfiguration();
 
     runtimeService = processEngine.getRuntimeService();
     repositoryService = processEngine.getRepositoryService();
-    identityService = processEngine.getIdentityService();
   }
 
   @Test
@@ -406,7 +397,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     assertThat(result3).hasSize(2);
 
   }
-  
+
   @Test
   @Deployment(resources = {
     "processes/user-task-process.bpmn",
@@ -416,20 +407,20 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
   public void testCalledProcessDefinitionQueryByBusinessKey() {
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess", "aBusinessKey");
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess", "anotherBusinessKey");
-    
+
     ProcessDefinition parallelProcess = repositoryService.createProcessDefinitionQuery()
         .processDefinitionKey("TwoParallelCallActivitiesCallingDifferentProcess")
         .singleResult();
-       
+
     resource = new ProcessDefinitionResource(getProcessEngine().getName(), parallelProcess.getId());
-    
+
     ProcessDefinitionQueryDto queryParameter1 = new ProcessDefinitionQueryDto();
     queryParameter1.setBusinessKey("aBusinessKey");
 
     List<ProcessDefinitionDto> result1 = resource.queryCalledProcessDefinitions(queryParameter1);
     assertThat(result1).isNotEmpty();
     assertThat(result1).hasSize(2);
-    
+
     ProcessDefinitionQueryDto queryParameter2 = new ProcessDefinitionQueryDto();
     queryParameter2.setBusinessKey("anotherBusinessKey");
 
@@ -437,7 +428,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     assertThat(result2).isNotEmpty();
     assertThat(result2).hasSize(2);
   }
-  
+
   @Test
   @Deployment(resources = {
     "processes/user-task-process.bpmn",
@@ -446,22 +437,22 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
   })
   public void testCalledProcessDefinitionQueryByInvalidBusinessKey() {
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess", "aBusinessKey");
-    
+
     ProcessDefinition parallelProcess = repositoryService.createProcessDefinitionQuery()
         .processDefinitionKey("TwoParallelCallActivitiesCallingDifferentProcess")
         .singleResult();
-       
+
     resource = new ProcessDefinitionResource(getProcessEngine().getName(), parallelProcess.getId());
-    
+
     ProcessDefinitionQueryDto queryParameter1 = new ProcessDefinitionQueryDto();
     queryParameter1.setBusinessKey("anInvalidBusinessKey");
 
     List<ProcessDefinitionDto> result1 = resource.queryCalledProcessDefinitions(queryParameter1);
     assertThat(result1).isEmpty();
     assertThat(result1).hasSize(0);
-    
+
   }
-  
+
   @Test
   @Deployment(resources = {
     "processes/variables-process-with-call-activity.bpmn",
@@ -471,7 +462,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableProcessWithCallActivity");
     resource = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance.getProcessDefinitionId());
-    
+
     // when
     VariableQueryParameterDto variable = createVariableParameter("varboolean", EQUALS_OPERATOR_NAME, false);
 
@@ -483,7 +474,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     // then
     assertThat(results).hasSize(0);
   }
-  
+
   @Test
   @Deployment(resources = {
     "processes/user-task-process.bpmn",
@@ -501,14 +492,14 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     vars2.put("callProcess", "anotherUserTaskProcess");
     vars1.put("aVariableName", "test456");
     runtimeService.startProcessInstanceByKey("DynamicCallActivity", vars2);
-    
+
     resource = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance.getProcessDefinitionId());
-    
+
     ProcessDefinition userTaskProcess = repositoryService
         .createProcessDefinitionQuery()
         .processDefinitionKey("userTaskProcess")
         .singleResult();
-    
+
     // when
     VariableQueryParameterDto variable = createVariableParameter("aVariableName", EQUALS_OPERATOR_NAME, "test123");
 
@@ -519,14 +510,14 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     List<ProcessDefinitionDto> results = resource.queryCalledProcessDefinitions(queryParameter);
     assertThat(results).isNotEmpty();
     assertThat(results).hasSize(1);
-    
+
     ProcessDefinitionDto dto = results.get(0);
-    
+
     assertThat(dto.getId()).isEqualTo(userTaskProcess.getId());
     assertThat(dto.getKey()).isEqualTo(userTaskProcess.getKey());
     assertThat(dto.getName()).isEqualTo(userTaskProcess.getName());
   }
-  
+
   @Test
   @Deployment(resources = {
       "processes/variables-process-with-call-activity.bpmn",
@@ -548,7 +539,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     // then
     assertThat(results).hasSize(0);
   }
-  
+
   @Test
   @Deployment(resources = {
       "processes/variables-process-with-call-activity.bpmn",
@@ -592,7 +583,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     // then
     assertThat(results).hasSize(0);
   }
-  
+
   @Test
   @Deployment(resources = {
       "processes/variables-process-with-call-activity.bpmn",
@@ -622,7 +613,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     // then
     List<ProcessDefinitionDto> results = resource.queryCalledProcessDefinitions(queryParameter);
     assertThat(results).hasSize(1);
-    
+
   }
 
   private VariableQueryParameterDto createVariableParameter(String name, String operator, Object value) {
@@ -632,81 +623,6 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     variable.setValue(value);
 
     return variable;
-  }
-
-  @Test
-  public void calledProcessDefinitionByParentProcessDefinitionIdNoAuthenticatedTenant() {
-    deploy("processes/multi-tenancy-call-activity.bpmn");
-    deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
-    deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
-
-    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("multiTenancyCallActivity").execute();
-
-    resource = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance.getProcessDefinitionId());
-
-    ProcessDefinitionQueryDto queryParameter = new ProcessDefinitionQueryDto();
-
-    identityService.setAuthentication("user", null, null);
-
-    List<ProcessDefinitionDto> result = resource.queryCalledProcessDefinitions(queryParameter);
-    assertThat(result).isEmpty();
-  }
-
-  @Test
-  public void calledProcessDefinitionByParentProcessDefinitionIdWithAuthenticatedTenant() {
-    deploy("processes/multi-tenancy-call-activity.bpmn");
-    deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
-    deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
-
-    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("multiTenancyCallActivity").execute();
-
-    resource = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance.getProcessDefinitionId());
-
-    ProcessDefinitionQueryDto queryParameter = new ProcessDefinitionQueryDto();
-
-    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
-
-    List<ProcessDefinitionDto> result = resource.queryCalledProcessDefinitions(queryParameter);
-    assertThat(result).isNotEmpty();
-    assertThat(result).hasSize(1);
-
-    identityService.clearAuthentication();
-
-    ProcessDefinitionDto dto = result.get(0);
-
-    String calledFrom = dto.getCalledFromActivityIds().get(0);
-    assertThat(calledFrom).isEqualTo("CallActivity_Tenant1");
-  }
-
-  @Test
-  public void calledProcessDefinitionByParentProcessDefinitionIdDisabledTenantCheck() {
-    deploy("processes/multi-tenancy-call-activity.bpmn");
-    deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
-    deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
-
-    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("multiTenancyCallActivity").execute();
-
-    resource = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance.getProcessDefinitionId());
-
-    ProcessDefinitionQueryDto queryParameter = new ProcessDefinitionQueryDto();
-
-    processEngineConfiguration.setTenantCheckEnabled(false);
-    identityService.setAuthentication("user", null, null);
-
-    List<ProcessDefinitionDto> result = resource.queryCalledProcessDefinitions(queryParameter);
-    assertThat(result).isNotEmpty();
-    assertThat(result).hasSize(2);
-
-    identityService.clearAuthentication();
-
-    ProcessDefinitionDto dto = result.get(0);
-
-    String calledFrom = dto.getCalledFromActivityIds().get(0);
-    assertThat(calledFrom).isEqualTo("CallActivity_Tenant1");
-
-    dto = result.get(1);
-    calledFrom = dto.getCalledFromActivityIds().get(0);
-    assertThat(calledFrom).isEqualTo("CallActivity_Tenant2");
   }
 
 }
