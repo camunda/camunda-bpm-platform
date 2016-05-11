@@ -50,6 +50,9 @@
     update
       ${prefix}ACT_HI_INCIDENT
     set
+      <!-- MySQL requires timestamps to always be part of the 
+      UPDATE statement or else it is going to update them to the current time -->
+      CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
       END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
       INCIDENT_STATE_ = #{incidentState, jdbcType=INTEGER},
       PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
