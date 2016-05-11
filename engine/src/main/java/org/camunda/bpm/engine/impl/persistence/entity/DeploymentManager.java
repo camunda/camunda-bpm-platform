@@ -98,7 +98,7 @@ public class DeploymentManager extends AbstractManager {
 
         // remove historic identity links which are not reference to a process instance
         getHistoricIdentityLinkManager().deleteHistoricIdentityLinksLogByProcessDefinitionId(processDefinitionId);
-        
+
         // remove historic job log entries not related to a process instance
         getHistoricJobLogManager().deleteHistoricJobLogsByProcessDefinitionId(processDefinitionId);
       }
@@ -232,13 +232,13 @@ public class DeploymentManager extends AbstractManager {
   }
 
   public long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery) {
-    getAuthorizationManager().configureDeploymentQuery(deploymentQuery);
+    configureQuery(deploymentQuery);
     return (Long) getDbEntityManager().selectOne("selectDeploymentCountByQueryCriteria", deploymentQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery, Page page) {
-    getAuthorizationManager().configureDeploymentQuery(deploymentQuery);
+    configureQuery(deploymentQuery);
     return getDbEntityManager().selectList("selectDeploymentsByQueryCriteria", deploymentQuery, page);
   }
 
@@ -263,6 +263,11 @@ public class DeploymentManager extends AbstractManager {
       AuthorizationEntity[] authorizations = provider.newDeployment(deployment);
       saveDefaultAuthorizations(authorizations);
     }
+  }
+
+  protected void configureQuery(DeploymentQueryImpl query) {
+    getAuthorizationManager().configureDeploymentQuery(query);
+    getTenantManager().configureQuery(query);
   }
 
 }

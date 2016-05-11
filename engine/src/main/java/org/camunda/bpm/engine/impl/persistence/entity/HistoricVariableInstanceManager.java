@@ -77,13 +77,13 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
   }
 
   public long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery) {
-    getAuthorizationManager().configureHistoricVariableInstanceQuery(historicProcessVariableQuery);
+    configureQuery(historicProcessVariableQuery);
     return (Long) getDbEntityManager().selectOne("selectHistoricVariableInstanceCountByQueryCriteria", historicProcessVariableQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery, Page page) {
-    getAuthorizationManager().configureHistoricVariableInstanceQuery(historicProcessVariableQuery);
+    configureQuery(historicProcessVariableQuery);
     return getDbEntityManager().selectList("selectHistoricVariableInstanceByQueryCriteria", historicProcessVariableQuery, page);
   }
 
@@ -100,4 +100,10 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
       }
     }
   }
+
+  protected void configureQuery(HistoricVariableInstanceQueryImpl query) {
+    getAuthorizationManager().configureHistoricVariableInstanceQuery(query);
+    getTenantManager().configureQuery(query);
+  }
+
 }

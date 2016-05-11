@@ -12,9 +12,26 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import static org.camunda.bpm.engine.authorization.Authorization.*;
-import static org.camunda.bpm.engine.authorization.Permissions.*;
-import static org.camunda.bpm.engine.authorization.Resources.*;
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_TASK;
+import static org.camunda.bpm.engine.authorization.Permissions.TASK_ASSIGN;
+import static org.camunda.bpm.engine.authorization.Permissions.TASK_WORK;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
+import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
+import static org.camunda.bpm.engine.authorization.Resources.BATCH;
+import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
@@ -69,7 +86,6 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
-import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -339,9 +355,6 @@ public class AuthorizationManager extends AbstractManager {
       authCheck.setAuthUserId(null);
       authCheck.setAuthGroupIds(null);
     }
-
-    // TODO separate tenant check from authorization - CAM-5739
-    getTenantManager().configureQuery(query);
   }
 
   @Override
@@ -438,12 +451,7 @@ public class AuthorizationManager extends AbstractManager {
   // read permission //////////////////////////////////////////////////
 
   public void checkReadProcessDefinition(ProcessDefinitionEntity definition) {
-    // TODO consolidate usages of this method with AuthorizationCommandChecker
-    checkReadProcessDefinition(definition.getKey());
-  }
-
-  public void checkReadProcessDefinition(String processDefinitionKey) {
-    checkAuthorization(READ, PROCESS_DEFINITION, processDefinitionKey);
+    checkAuthorization(READ, PROCESS_DEFINITION, definition.getKey());
   }
 
   // update permission ///////////////////////////////////////////////

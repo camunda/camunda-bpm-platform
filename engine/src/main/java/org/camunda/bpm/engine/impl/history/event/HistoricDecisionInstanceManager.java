@@ -29,7 +29,6 @@ import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSerializer;
-import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
  * Data base operations for {@link HistoricDecisionInstanceEntity}.
@@ -107,7 +106,7 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
 
  public List<HistoricDecisionInstance> findHistoricDecisionInstancesByQueryCriteria(HistoricDecisionInstanceQueryImpl query, Page page) {
     if (isHistoryEnabled()) {
-      getAuthorizationManager().configureHistoricDecisionInstanceQuery(query);
+      configureQuery(query);
 
       @SuppressWarnings("unchecked")
       List<HistoricDecisionInstance> decisionInstances = getDbEntityManager().selectList("selectHistoricDecisionInstancesByQueryCriteria", query, page);
@@ -214,7 +213,7 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
 
   public long findHistoricDecisionInstanceCountByQueryCriteria(HistoricDecisionInstanceQueryImpl query) {
     if (isHistoryEnabled()) {
-      getAuthorizationManager().configureHistoricDecisionInstanceQuery(query);
+      configureQuery(query);
       return (Long) getDbEntityManager().selectOne("selectHistoricDecisionInstanceCountByQueryCriteria", query);
     } else {
       return 0;
@@ -229,4 +228,10 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
   public long findHistoricDecisionInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
     return (Long) getDbEntityManager().selectOne("selectHistoricDecisionInstanceCountByNativeQuery", parameterMap);
   }
+
+  protected void configureQuery(HistoricDecisionInstanceQueryImpl query) {
+    getAuthorizationManager().configureHistoricDecisionInstanceQuery(query);
+    getTenantManager().configureQuery(query);
+  }
+
 }

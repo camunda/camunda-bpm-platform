@@ -86,7 +86,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
 
   public long findHistoricProcessInstanceCountByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
     if (isHistoryEnabled()) {
-      getAuthorizationManager().configureHistoricProcessInstanceQuery(historicProcessInstanceQuery);
+      configureQuery(historicProcessInstanceQuery);
       return (Long) getDbEntityManager().selectOne("selectHistoricProcessInstanceCountByQueryCriteria", historicProcessInstanceQuery);
     }
     return 0;
@@ -95,7 +95,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
   @SuppressWarnings("unchecked")
   public List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery, Page page) {
     if (isHistoryEnabled()) {
-      getAuthorizationManager().configureHistoricProcessInstanceQuery(historicProcessInstanceQuery);
+      configureQuery(historicProcessInstanceQuery);
       return getDbEntityManager().selectList("selectHistoricProcessInstancesByQueryCriteria", historicProcessInstanceQuery, page);
     }
     return Collections.EMPTY_LIST;
@@ -109,4 +109,10 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
   public long findHistoricProcessInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
     return (Long) getDbEntityManager().selectOne("selectHistoricProcessInstanceCountByNativeQuery", parameterMap);
   }
+
+  protected void configureQuery(HistoricProcessInstanceQueryImpl query) {
+    getAuthorizationManager().configureHistoricProcessInstanceQuery(query);
+    getTenantManager().configureQuery(query);
+  }
+
 }

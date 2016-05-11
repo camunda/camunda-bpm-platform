@@ -50,12 +50,12 @@ public class HistoricJobLogManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<HistoricJobLog> findHistoricJobLogsByQueryCriteria(HistoricJobLogQueryImpl query, Page page) {
-    getAuthorizationManager().configureHistoricJobLogQuery(query);
+    configureQuery(query);
     return getDbEntityManager().selectList("selectHistoricJobLogByQueryCriteria", query, page);
   }
 
   public long findHistoricJobLogsCountByQueryCriteria(HistoricJobLogQueryImpl query) {
-    getAuthorizationManager().configureHistoricJobLogQuery(query);
+    configureQuery(query);
     return (Long) getDbEntityManager().selectOne("selectHistoricJobLogCountByQueryCriteria", query);
   }
 
@@ -158,6 +158,11 @@ public class HistoricJobLogManager extends AbstractManager {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     HistoryLevel historyLevel = configuration.getHistoryLevel();
     return historyLevel.isHistoryEventProduced(eventType, job);
+  }
+
+  protected void configureQuery(HistoricJobLogQueryImpl query) {
+    getAuthorizationManager().configureHistoricJobLogQuery(query);
+    getTenantManager().configureQuery(query);
   }
 
 }

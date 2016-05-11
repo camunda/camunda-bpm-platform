@@ -41,11 +41,6 @@ public class HistoricBatchManager extends AbstractManager {
     return getDbEntityManager().selectList("selectHistoricBatchesByQueryCriteria", historicBatchQuery, page);
   }
 
-  protected void configureQuery(HistoricBatchQueryImpl query) {
-    getAuthorizationManager().configureHistoricBatchQuery(query);
-    getTenantManager().configureQuery(query);
-  }
-
   public HistoricBatchEntity findHistoricBatchById(String batchId) {
     return getDbEntityManager().selectById(HistoricBatchEntity.class, batchId);
   }
@@ -82,6 +77,11 @@ public class HistoricBatchManager extends AbstractManager {
         }
       });
     }
+  }
+
+  protected void configureQuery(HistoricBatchQueryImpl query) {
+    getAuthorizationManager().configureHistoricBatchQuery(query);
+    getTenantManager().configureQuery(query);
   }
 
 }

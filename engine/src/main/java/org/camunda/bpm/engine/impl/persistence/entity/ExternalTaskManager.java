@@ -72,19 +72,19 @@ public class ExternalTaskManager extends AbstractManager {
     parameters.put("orderingProperties", orderingProperties);
 
     ListQueryParameterObject parameter = new ListQueryParameterObject(parameters, 0, maxResults);
-    configureAuthorizationCheck(parameter);
+    configureQuery(parameter);
 
     DbEntityManager manager = getDbEntityManager();
     return manager.selectList("selectExternalTasksForTopics", parameter);
   }
 
   public List<ExternalTask> findExternalTasksByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
-    configureAuthorizationCheck(externalTaskQuery);
+    configureQuery(externalTaskQuery);
     return getDbEntityManager().selectList("selectExternalTaskByQueryCriteria", externalTaskQuery);
   }
 
   public long findExternalTaskCountByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
-    configureAuthorizationCheck(externalTaskQuery);
+    configureQuery(externalTaskQuery);
     return (Long) getDbEntityManager().selectOne("selectExternalTaskCountByQueryCriteria", externalTaskQuery);
   }
 
@@ -120,12 +120,14 @@ public class ExternalTaskManager extends AbstractManager {
     getDbEntityManager().update(ExternalTaskEntity.class, "updateExternalTaskSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
-  protected void configureAuthorizationCheck(ExternalTaskQueryImpl query) {
+  protected void configureQuery(ExternalTaskQueryImpl query) {
     getAuthorizationManager().configureExternalTaskQuery(query);
+    getTenantManager().configureQuery(query);
   }
 
-  protected void configureAuthorizationCheck(ListQueryParameterObject parameter) {
+  protected void configureQuery(ListQueryParameterObject parameter) {
     getAuthorizationManager().configureExternalTaskFetch(parameter);
+    getTenantManager().configureQuery(parameter);
   }
 
   protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {

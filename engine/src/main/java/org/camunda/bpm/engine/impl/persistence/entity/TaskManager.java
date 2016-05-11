@@ -139,14 +139,12 @@ public class TaskManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery) {
-    configureAuthorizationCheck(taskQuery);
-    configureTenantCheck(taskQuery);
+    configureQuery(taskQuery);
     return getDbEntityManager().selectList("selectTaskByQueryCriteria", taskQuery);
   }
 
   public long findTaskCountByQueryCriteria(TaskQueryImpl taskQuery) {
-    configureAuthorizationCheck(taskQuery);
-    configureTenantCheck(taskQuery);
+    configureQuery(taskQuery);
     return (Long) getDbEntityManager().selectOne("selectTaskCountByQueryCriteria", taskQuery);
   }
 
@@ -213,11 +211,8 @@ public class TaskManager extends AbstractManager {
     }
   }
 
-  protected void configureAuthorizationCheck(TaskQueryImpl query) {
+  protected void configureQuery(TaskQueryImpl query) {
     getAuthorizationManager().configureTaskQuery(query);
-  }
-
-  protected void configureTenantCheck(TaskQueryImpl query) {
     getTenantManager().configureQuery(query);
   }
 

@@ -77,13 +77,13 @@ public class HistoricDetailManager extends AbstractHistoricManager {
   }
 
   public long findHistoricDetailCountByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery) {
-    getAuthorizationManager().configureHistoricDetailQuery(historicVariableUpdateQuery);
+    configureQuery(historicVariableUpdateQuery);
     return (Long) getDbEntityManager().selectOne("selectHistoricDetailCountByQueryCriteria", historicVariableUpdateQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery, Page page) {
-    getAuthorizationManager().configureHistoricDetailQuery(historicVariableUpdateQuery);
+    configureQuery(historicVariableUpdateQuery);
     return getDbEntityManager().selectList("selectHistoricDetailsByQueryCriteria", historicVariableUpdateQuery, page);
   }
 
@@ -111,4 +111,10 @@ public class HistoricDetailManager extends AbstractHistoricManager {
   public List<HistoricDetail> findHistoricDetailsByTaskId(String taskId) {
     return getDbEntityManager().selectList("selectHistoricDetailsByTaskId", taskId);
   }
+
+  protected void configureQuery(HistoricDetailQueryImpl query) {
+    getAuthorizationManager().configureHistoricDetailQuery(query);
+    getTenantManager().configureQuery(query);
+  }
+
 }

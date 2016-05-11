@@ -45,12 +45,12 @@ public class JobDefinitionManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<JobDefinition> findJobDefnitionByQueryCriteria(JobDefinitionQueryImpl jobDefinitionQuery, Page page) {
-    getAuthorizationManager().configureJobDefinitionQuery(jobDefinitionQuery);
+    configureQuery(jobDefinitionQuery);
     return getDbEntityManager().selectList("selectJobDefinitionByQueryCriteria", jobDefinitionQuery, page);
   }
 
   public long findJobDefinitionCountByQueryCriteria(JobDefinitionQueryImpl jobDefinitionQuery) {
-    getAuthorizationManager().configureJobDefinitionQuery(jobDefinitionQuery);
+    configureQuery(jobDefinitionQuery);
     return (Long) getDbEntityManager().selectOne("selectJobDefinitionCountByQueryCriteria", jobDefinitionQuery);
   }
 
@@ -83,6 +83,11 @@ public class JobDefinitionManager extends AbstractManager {
     parameters.put("processDefinitionTenantId", processDefinitionTenantId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbEntityManager().update(JobDefinitionEntity.class, "updateJobDefinitionSuspensionStateByParameters", configureParameterizedQuery(parameters));
+  }
+
+  protected void configureQuery(JobDefinitionQueryImpl query) {
+    getAuthorizationManager().configureJobDefinitionQuery(query);
+    getTenantManager().configureQuery(query);
   }
 
   protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {

@@ -14,13 +14,13 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 public class HistoricIdentityLinkLogManager extends AbstractHistoricManager {
 
   public long findHistoricIdentityLinkLogCountByQueryCriteria(HistoricIdentityLinkLogQueryImpl query) {
-    getAuthorizationManager().configureHistoricIdentityLinkQuery(query);
+    configureQuery(query);
     return (Long) getDbEntityManager().selectOne("selectHistoricIdentityLinkCountByQueryCriteria", query);
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricIdentityLinkLog> findHistoricIdentityLinkLogByQueryCriteria(HistoricIdentityLinkLogQueryImpl query, Page page) {
-    getAuthorizationManager().configureHistoricIdentityLinkQuery(query);
+    configureQuery(query);
     return getDbEntityManager().selectList("selectHistoricIdentityLinkByQueryCriteria", query, page);
   }
 
@@ -35,4 +35,10 @@ public class HistoricIdentityLinkLogManager extends AbstractHistoricManager {
       getDbEntityManager().delete(HistoricIdentityLinkLogEntity.class, "deleteHistoricIdentityLinksByTaskId", taskId);
     }
   }
+
+  protected void configureQuery(HistoricIdentityLinkLogQueryImpl query) {
+    getAuthorizationManager().configureHistoricIdentityLinkQuery(query);
+    getTenantManager().configureQuery(query);
+  }
+
 }

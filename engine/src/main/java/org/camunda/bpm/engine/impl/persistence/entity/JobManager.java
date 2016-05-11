@@ -232,7 +232,7 @@ public class JobManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page) {
-    getAuthorizationManager().configureJobQuery(jobQuery);
+    configureQuery(jobQuery);
     return getDbEntityManager().selectList("selectJobByQueryCriteria", jobQuery, page);
   }
 
@@ -256,7 +256,7 @@ public class JobManager extends AbstractManager {
   }
 
   public long findJobCountByQueryCriteria(JobQueryImpl jobQuery) {
-    getAuthorizationManager().configureJobQuery(jobQuery);
+    configureQuery(jobQuery);
     return (Long) getDbEntityManager().selectOne("selectJobCountByQueryCriteria", jobQuery);
   }
 
@@ -344,6 +344,11 @@ public class JobManager extends AbstractManager {
     parameters.put("jobDefinitionId", jobDefinitionId);
     parameters.put("priority", priority);
     getDbEntityManager().update(JobEntity.class, "updateJobPriorityByDefinitionId", parameters);
+  }
+
+  protected void configureQuery(JobQueryImpl query) {
+    getAuthorizationManager().configureJobQuery(query);
+    getTenantManager().configureQuery(query);
   }
 
   protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {

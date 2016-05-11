@@ -26,13 +26,13 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 public class HistoricIncidentManager extends AbstractHistoricManager {
 
   public long findHistoricIncidentCountByQueryCriteria(HistoricIncidentQueryImpl query) {
-    getAuthorizationManager().configureHistoricIncidentQuery(query);
+    configureQuery(query);
     return (Long) getDbEntityManager().selectOne("selectHistoricIncidentCountByQueryCriteria", query);
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricIncident> findHistoricIncidentByQueryCriteria(HistoricIncidentQueryImpl query, Page page) {
-    getAuthorizationManager().configureHistoricIncidentQuery(query);
+    configureQuery(query);
     return getDbEntityManager().selectList("selectHistoricIncidentByQueryCriteria", query, page);
   }
 
@@ -52,6 +52,11 @@ public class HistoricIncidentManager extends AbstractHistoricManager {
     if (isHistoryLevelFullEnabled()) {
       getDbEntityManager().delete(HistoricIncidentEntity.class, "deleteHistoricIncidentsByJobDefinitionId", jobDefinitionId);
     }
+  }
+
+  protected void configureQuery(HistoricIncidentQueryImpl query) {
+    getAuthorizationManager().configureHistoricIncidentQuery(query);
+    getTenantManager().configureQuery(query);
   }
 
 }

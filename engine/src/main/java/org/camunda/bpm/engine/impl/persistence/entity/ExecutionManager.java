@@ -108,30 +108,30 @@ public class ExecutionManager extends AbstractManager {
   }
 
   public long findExecutionCountByQueryCriteria(ExecutionQueryImpl executionQuery) {
-    configureAuthorizationCheck(executionQuery);
+    configureQuery(executionQuery);
     return (Long) getDbEntityManager().selectOne("selectExecutionCountByQueryCriteria", executionQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery, Page page) {
-    configureAuthorizationCheck(executionQuery);
+    configureQuery(executionQuery);
     return getDbEntityManager().selectList("selectExecutionsByQueryCriteria", executionQuery, page);
   }
 
   public long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
-    configureAuthorizationCheck(processInstanceQuery);
+    configureQuery(processInstanceQuery);
     return (Long) getDbEntityManager().selectOne("selectProcessInstanceCountByQueryCriteria", processInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery, Page page) {
-    configureAuthorizationCheck(processInstanceQuery);
+    configureQuery(processInstanceQuery);
     return getDbEntityManager().selectList("selectProcessInstanceByQueryCriteria", processInstanceQuery, page);
   }
 
   @SuppressWarnings("unchecked")
   public List<String> findProcessInstanceIdsByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
-    configureAuthorizationCheck(processInstanceQuery);
+    configureQuery(processInstanceQuery);
     return getDbEntityManager().selectList("selectProcessInstanceIdsByQueryCriteria", processInstanceQuery);
   }
 
@@ -198,8 +198,9 @@ public class ExecutionManager extends AbstractManager {
     }
   }
 
-  protected void configureAuthorizationCheck(AbstractQuery<?, ?> query) {
+  protected void configureQuery(AbstractQuery<?, ?> query) {
     getAuthorizationManager().configureExecutionQuery(query);
+    getTenantManager().configureQuery(query);
   }
 
   protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {

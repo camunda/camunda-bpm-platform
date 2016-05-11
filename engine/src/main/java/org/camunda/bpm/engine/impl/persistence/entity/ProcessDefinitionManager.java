@@ -195,6 +195,7 @@ public class ProcessDefinitionManager extends AbstractManager {
 
   protected void configureProcessDefinitionQuery(ProcessDefinitionQueryImpl query) {
     getAuthorizationManager().configureProcessDefinitionQuery(query);
+    getTenantManager().configureQuery(query);
   }
 
   protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {

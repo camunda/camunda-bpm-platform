@@ -71,13 +71,13 @@ public class EventSubscriptionManager extends AbstractManager {
   }
 
   public long findEventSubscriptionCountByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl) {
-    configureAuthorizationCheck(eventSubscriptionQueryImpl);
+    configureQuery(eventSubscriptionQueryImpl);
     return (Long) getDbEntityManager().selectOne("selectEventSubscriptionCountByQueryCriteria", eventSubscriptionQueryImpl);
   }
 
   @SuppressWarnings("unchecked")
   public List<EventSubscription> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl, Page page) {
-    configureAuthorizationCheck(eventSubscriptionQueryImpl);
+    configureQuery(eventSubscriptionQueryImpl);
     return getDbEntityManager().selectList("selectEventSubscriptionByQueryCriteria", eventSubscriptionQueryImpl, page);
   }
 
@@ -280,8 +280,9 @@ public class EventSubscriptionManager extends AbstractManager {
     return (MessageEventSubscriptionEntity) getDbEntityManager().selectOne("selectMessageStartEventSubscriptionByNameAndTenantId", parameters);
   }
 
-  protected void configureAuthorizationCheck(EventSubscriptionQueryImpl query) {
+  protected void configureQuery(EventSubscriptionQueryImpl query) {
     getAuthorizationManager().configureEventSubscriptionQuery(query);
+    getTenantManager().configureQuery(query);
   }
 
   protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {

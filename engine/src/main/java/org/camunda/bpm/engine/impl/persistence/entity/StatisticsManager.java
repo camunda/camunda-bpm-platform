@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl;
-import org.camunda.bpm.engine.impl.batch.BatchQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
@@ -34,36 +33,36 @@ public class StatisticsManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<ProcessDefinitionStatistics> getStatisticsGroupedByProcessDefinitionVersion(ProcessDefinitionStatisticsQueryImpl query, Page page) {
-    getAuthorizationManager().configureProcessDefinitionStatisticsQuery(query);
+    configureQuery(query);
     return getDbEntityManager().selectList("selectProcessDefinitionStatistics", query, page);
   }
 
   public long getStatisticsCountGroupedByProcessDefinitionVersion(ProcessDefinitionStatisticsQueryImpl query) {
-    getAuthorizationManager().configureProcessDefinitionStatisticsQuery(query);
+    configureQuery(query);
     return (Long) getDbEntityManager().selectOne("selectProcessDefinitionStatisticsCount", query);
   }
 
   @SuppressWarnings("unchecked")
   public List<ActivityStatistics> getStatisticsGroupedByActivity(ActivityStatisticsQueryImpl query, Page page) {
     checkReadProcessDefinition(query);
-    getAuthorizationManager().configureActivityStatisticsQuery(query);
+    configureQuery(query);
     return getDbEntityManager().selectList("selectActivityStatistics", query, page);
   }
 
   public long getStatisticsCountGroupedByActivity(ActivityStatisticsQueryImpl query) {
     checkReadProcessDefinition(query);
-    getAuthorizationManager().configureActivityStatisticsQuery(query);
+    configureQuery(query);
     return (Long) getDbEntityManager().selectOne("selectActivityStatisticsCount", query);
   }
 
   @SuppressWarnings("unchecked")
   public List<DeploymentStatistics> getStatisticsGroupedByDeployment(DeploymentStatisticsQueryImpl query, Page page) {
-    getAuthorizationManager().configureDeploymentStatisticsQuery(query);
+    configureQuery(query);
     return getDbEntityManager().selectList("selectDeploymentStatistics", query, page);
   }
 
   public long getStatisticsCountGroupedByDeployment(DeploymentStatisticsQueryImpl query) {
-    getAuthorizationManager().configureDeploymentStatisticsQuery(query);
+    configureQuery(query);
     return (Long) getDbEntityManager().selectOne("selectDeploymentStatisticsCount", query);
   }
 
@@ -76,6 +75,21 @@ public class StatisticsManager extends AbstractManager {
   public long getStatisticsCountGroupedByBatch(BatchStatisticsQueryImpl query) {
     configureQuery(query);
     return (Long) getDbEntityManager().selectOne("selectBatchStatisticsCount", query);
+  }
+
+  protected void configureQuery(DeploymentStatisticsQueryImpl query) {
+    getAuthorizationManager().configureDeploymentStatisticsQuery(query);
+    getTenantManager().configureQuery(query);
+  }
+
+  protected void configureQuery(ProcessDefinitionStatisticsQueryImpl query) {
+    getAuthorizationManager().configureProcessDefinitionStatisticsQuery(query);
+    getTenantManager().configureQuery(query);
+  }
+
+  protected void configureQuery(ActivityStatisticsQueryImpl query) {
+    getAuthorizationManager().configureActivityStatisticsQuery(query);
+    getTenantManager().configureQuery(query);
   }
 
   protected void configureQuery(BatchStatisticsQueryImpl batchQuery) {

@@ -142,6 +142,7 @@ public class DecisionDefinitionManager extends AbstractManager {
 
   protected void configureDecisionDefinitionQuery(DecisionDefinitionQueryImpl query) {
     getAuthorizationManager().configureDecisionDefinitionQuery(query);
+    getTenantManager().configureQuery(query);
   }
 
   protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
