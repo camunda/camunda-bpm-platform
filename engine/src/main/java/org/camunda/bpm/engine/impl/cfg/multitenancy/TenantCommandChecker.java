@@ -116,6 +116,13 @@ public class TenantCommandChecker implements CommandChecker {
     String sourceTenant = sourceProcessDefinition.getTenantId();
     String targetTenant = targetProcessDefinition.getTenantId();
 
+    if (!getTenantManager().isAuthenticatedTenant(sourceTenant)) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("get process definition '" + sourceProcessDefinition.getId() + "'");
+    }
+    if (!getTenantManager().isAuthenticatedTenant(targetTenant)) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("get process definition '" + targetProcessDefinition.getId() + "'");
+    }
+
     if (sourceTenant != null && targetTenant != null && !sourceTenant.equals(targetTenant)) {
       throw ProcessEngineLogger.MIGRATION_LOGGER
         .cannotMigrateBetweenTenants(sourceTenant, targetTenant);
