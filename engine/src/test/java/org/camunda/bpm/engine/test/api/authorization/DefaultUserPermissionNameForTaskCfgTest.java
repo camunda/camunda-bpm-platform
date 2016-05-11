@@ -25,11 +25,11 @@ import static org.hamcrest.CoreMatchers.*;
  * @author Daniel Meyer
  *
  */
-public class DefaultTaskPermissionsCfgTest {
+public class DefaultUserPermissionNameForTaskCfgTest {
 
   @Test
   public void updateIsDefaultTaskPermission() {
-    assertEquals("UPDATE", new StandaloneInMemProcessEngineConfiguration().getDefaultTaskPermissionForUser());
+    assertEquals("UPDATE", new StandaloneInMemProcessEngineConfiguration().getDefaultUserPermissionNameForTask());
   }
 
   @Test
@@ -37,10 +37,10 @@ public class DefaultTaskPermissionsCfgTest {
     TestProcessEngineCfg testProcessEngineCfg = new TestProcessEngineCfg();
 
     // given
-    testProcessEngineCfg.setDefaultTaskPermissionForUser("UPDATE");
+    testProcessEngineCfg.setDefaultUserPermissionNameForTask("UPDATE");
 
     // if
-    testProcessEngineCfg.initDefaultTaskPermission();
+    testProcessEngineCfg.initDefaultUserPermissionForTask();
 
     // then
     assertEquals(Permissions.UPDATE, testProcessEngineCfg.getDefaultUserPermissionForTask());
@@ -51,10 +51,10 @@ public class DefaultTaskPermissionsCfgTest {
     TestProcessEngineCfg testProcessEngineCfg = new TestProcessEngineCfg();
 
     // given
-    testProcessEngineCfg.setDefaultTaskPermissionForUser("TASK_WORK");
+    testProcessEngineCfg.setDefaultUserPermissionNameForTask("TASK_WORK");
 
     // if
-    testProcessEngineCfg.initDefaultTaskPermission();
+    testProcessEngineCfg.initDefaultUserPermissionForTask();
 
     // then
     assertEquals(Permissions.TASK_WORK, testProcessEngineCfg.getDefaultUserPermissionForTask());
@@ -65,15 +65,15 @@ public class DefaultTaskPermissionsCfgTest {
     TestProcessEngineCfg testProcessEngineCfg = new TestProcessEngineCfg();
 
     // given
-    testProcessEngineCfg.setDefaultTaskPermissionForUser("UNSUPPORTED");
+    testProcessEngineCfg.setDefaultUserPermissionNameForTask("UNSUPPORTED");
 
     // if
     try {
-      testProcessEngineCfg.initDefaultTaskPermission();
+      testProcessEngineCfg.initDefaultUserPermissionForTask();
       fail("Exception expected");
 
     } catch(ProcessEngineException e) {
-      String expectedExceptionMessage = String.format("Invalid value '%s' for configuration property 'defaultTaskPermissionForUser'.", "UNSUPPORTED");
+      String expectedExceptionMessage = String.format("Invalid value '%s' for configuration property 'defaultUserPermissionNameForTask'.", "UNSUPPORTED");
       assertThat(e.getMessage(), containsString(expectedExceptionMessage));
     }
   }
@@ -83,15 +83,15 @@ public class DefaultTaskPermissionsCfgTest {
     TestProcessEngineCfg testProcessEngineCfg = new TestProcessEngineCfg();
 
     // given
-    testProcessEngineCfg.setDefaultTaskPermissionForUser(null);
+    testProcessEngineCfg.setDefaultUserPermissionNameForTask(null);
 
     // if
     try {
-      testProcessEngineCfg.initDefaultTaskPermission();
+      testProcessEngineCfg.initDefaultUserPermissionForTask();
       fail("Exception expected");
 
     } catch(ProcessEngineException e) {
-      String expectedExceptionMessage = "Invalid value 'null' for configuration property 'defaultTaskPermissionForUser'.";
+      String expectedExceptionMessage = "Invalid value 'null' for configuration property 'defaultUserPermissionNameForTask'.";
       assertThat(e.getMessage(), containsString(expectedExceptionMessage));
     }
   }
@@ -104,7 +104,7 @@ public class DefaultTaskPermissionsCfgTest {
     testProcessEngineCfg.setDefaultUserPermissionForTask(Permissions.ALL);
 
     // if
-    testProcessEngineCfg.initDefaultTaskPermission();
+    testProcessEngineCfg.initDefaultUserPermissionForTask();
 
     // then
     assertEquals(Permissions.ALL, testProcessEngineCfg.getDefaultUserPermissionForTask());
@@ -137,8 +137,8 @@ public class DefaultTaskPermissionsCfgTest {
     boolean initMethodCalled = false;
 
     @Override
-    public void initDefaultTaskPermission() {
-      super.initDefaultTaskPermission();
+    public void initDefaultUserPermissionForTask() {
+      super.initDefaultUserPermissionForTask();
       initMethodCalled = true;
     }
   }

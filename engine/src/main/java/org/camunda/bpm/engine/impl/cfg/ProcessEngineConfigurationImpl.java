@@ -665,7 +665,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initMigratingActivityInstanceValidators();
     initMigratingTransitionInstanceValidators();
     initCommandCheckers();
-    initDefaultTaskPermission();
+    initDefaultUserPermissionForTask();
     invokePostInit();
   }
 
@@ -1840,16 +1840,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
-  protected void initDefaultTaskPermission() {
+  protected void initDefaultUserPermissionForTask() {
     if(defaultUserPermissionForTask == null) {
-      if(Permissions.UPDATE.getName().equals(defaultTaskPermissionForUser)) {
+      if(Permissions.UPDATE.getName().equals(defaultUserPermissionNameForTask)) {
         defaultUserPermissionForTask = Permissions.UPDATE;
       }
-      else if(Permissions.TASK_WORK.getName().equals(defaultTaskPermissionForUser)) {
+      else if(Permissions.TASK_WORK.getName().equals(defaultUserPermissionNameForTask)) {
         defaultUserPermissionForTask = Permissions.TASK_WORK;
       }
       else {
-        throw LOG.invalidConfigDefaultTaskPermissionForUser(defaultTaskPermissionForUser, new String[] { Permissions.UPDATE.getName(), Permissions.TASK_WORK.getName()});
+        throw LOG.invalidConfigDefaultUserPermissionNameForTask(defaultUserPermissionNameForTask, new String[] { Permissions.UPDATE.getName(), Permissions.TASK_WORK.getName()});
       }
     }
   }

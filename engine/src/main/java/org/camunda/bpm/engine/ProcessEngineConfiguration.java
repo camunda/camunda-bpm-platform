@@ -207,7 +207,7 @@ public abstract class ProcessEngineConfiguration {
    * - Owner
    * The default value is UPDATE.
    */
-  protected String defaultTaskPermissionForUser = "UPDATE";
+  protected String defaultUserPermissionNameForTask = "UPDATE";
 
   /**
    * <p>The following flag <code>authorizationEnabledForCustomCode</code> will
@@ -624,12 +624,12 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
 
-  public String getDefaultTaskPermissionForUser() {
-    return defaultTaskPermissionForUser;
+  public String getDefaultUserPermissionNameForTask() {
+    return defaultUserPermissionNameForTask;
   }
 
-  public ProcessEngineConfiguration setDefaultTaskPermissionForUser(String defaultTaskPermissionForUser) {
-    this.defaultTaskPermissionForUser = defaultTaskPermissionForUser;
+  public ProcessEngineConfiguration setDefaultUserPermissionNameForTask(String defaultUserPermissionNameForTask) {
+    this.defaultUserPermissionNameForTask = defaultUserPermissionNameForTask;
     return this;
   }
 
