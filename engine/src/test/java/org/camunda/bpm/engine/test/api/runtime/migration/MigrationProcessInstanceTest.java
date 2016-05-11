@@ -101,6 +101,7 @@ public class MigrationProcessInstanceTest {
     }
   }
 
+  @Test
   public void testNullProcessInstanceIdsArray() {
     ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())

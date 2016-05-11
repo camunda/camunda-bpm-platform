@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.migration;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.batch.Batch;
@@ -48,7 +49,12 @@ public class MigrationPlanExecutionBuilderImpl implements MigrationPlanExecution
 
   @Override
   public MigrationPlanExecutionBuilder processInstanceIds(String... processInstanceIds) {
-    this.processInstanceIds = Arrays.asList(processInstanceIds);
+    if (processInstanceIds == null) {
+      this.processInstanceIds = Collections.emptyList();
+    }
+    else {
+      this.processInstanceIds = Arrays.asList(processInstanceIds);
+    }
     return this;
   }
 
