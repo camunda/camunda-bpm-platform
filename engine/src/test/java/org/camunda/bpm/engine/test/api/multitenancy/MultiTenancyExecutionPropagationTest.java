@@ -19,7 +19,6 @@ import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
@@ -325,16 +324,17 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
 
   public void testPropagateTenantIdToFailedJobIncident() {
 
-    deploymentForTenant(TENANT_ID, "org/camunda/bpm/engine/test/api/multitenancy/failingTask.bpmn");
+    deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+        .startEvent()
+        .serviceTask()
+          .camundaExpression("${failing}")
+          .camundaAsyncBefore()
+        .endEvent()
+        .done());
 
     startProcessInstance(PROCESS_DEFINITION_KEY);
-    // execute the job of the async activity
-    Job job = managementService.createJobQuery().singleResult();
-    try {
-      managementService.executeJob(job.getId());
-    } catch(ProcessEngineException e) {
-      // the job failed and created an incident
-    }
+
+    executeAvailableJobs();
 
     Incident incident = runtimeService.createIncidentQuery().singleResult();
     assertThat(incident, is(notNullValue()));
@@ -344,15 +344,15 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
 
   public void testPropagateTenantIdToFailedStartTimerIncident() {
 
-    deploymentForTenant(TENANT_ID, "org/camunda/bpm/engine/test/api/multitenancy/timerStartEventWithfailingTask.bpmn");
+    deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+        .startEvent()
+          .timerWithDuration("PT1M")
+         .serviceTask()
+           .camundaExpression("${failing}")
+         .endEvent()
+         .done());
 
-    // execute the job of the timer start event
-    Job job = managementService.createJobQuery().singleResult();
-    try {
-      managementService.executeJob(job.getId());
-    } catch(ProcessEngineException e) {
-      // the job failed and created an incident
-    }
+    executeAvailableJobs();
 
     Incident incident = runtimeService.createIncidentQuery().singleResult();
     assertThat(incident, is(notNullValue()));

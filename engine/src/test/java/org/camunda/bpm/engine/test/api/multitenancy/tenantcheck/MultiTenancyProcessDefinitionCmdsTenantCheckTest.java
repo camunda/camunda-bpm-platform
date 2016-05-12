@@ -42,8 +42,8 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
 
-  protected static final String BPMN_PROCESS_MODEL = "org/camunda/bpm/engine/test/api/multitenancy/failingTask.bpmn";
-  protected static final String BPMN_PROCESS_DIAGRAM = "org/camunda/bpm/engine/test/api/multitenancy/failingTask.png";
+  protected static final String BPMN_PROCESS_MODEL = "org/camunda/bpm/engine/test/api/multitenancy/testProcess.bpmn";
+  protected static final String BPMN_PROCESS_DIAGRAM = "org/camunda/bpm/engine/test/api/multitenancy/testProcess.png";
 
   protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
 

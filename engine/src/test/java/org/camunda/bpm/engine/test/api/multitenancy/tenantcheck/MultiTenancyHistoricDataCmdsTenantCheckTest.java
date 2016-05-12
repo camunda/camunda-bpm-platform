@@ -44,7 +44,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
-  protected static final String PROCESS_DEFINITION_KEY = "testProcess";
+  protected static final String PROCESS_DEFINITION_KEY = "failingProcess";
 
   protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
 
@@ -68,7 +68,13 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
   protected static final BpmnModelInstance BPMN_PROCESS = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
       .startEvent().endEvent().done();
 
-  protected static final String FAILING_BPMN_PROCESS = "org/camunda/bpm/engine/test/api/multitenancy/failingTask.bpmn";
+  protected static final BpmnModelInstance FAILING_BPMN_PROCESS = Bpmn.createExecutableProcess("failingProcess")
+      .startEvent()
+      .serviceTask()
+        .camundaExpression("${failing}")
+        .camundaAsyncBefore()
+      .endEvent()
+      .done();
 
   protected static final String CMMN_PROCESS = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
 

@@ -20,18 +20,25 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class MultiTenancyHistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
 
-  protected static final String BPMN = "org/camunda/bpm/engine/test/api/multitenancy/failingTask.bpmn";
+  protected static final BpmnModelInstance BPMN = Bpmn.createExecutableProcess("failingProcess")
+      .startEvent()
+      .serviceTask()
+        .camundaExpression("${failing}")
+        .camundaAsyncBefore()
+        .camundaFailedJobRetryTimeCycle("R1/PT1M")
+      .endEvent()
+      .done();
 
   protected final static String TENANT_ONE = "tenant1";
   protected final static String TENANT_TWO = "tenant2";
@@ -155,21 +162,9 @@ public class MultiTenancyHistoricJobLogQueryTest extends PluggableProcessEngineT
   }
 
   protected void startProcessInstanceAndExecuteFailingJobForTenant(String tenant) {
-    String processDefinitionId = repositoryService
-      .createProcessDefinitionQuery()
-      .tenantIdIn(tenant)
-      .singleResult()
-      .getId();
+    runtimeService.createProcessInstanceByKey("failingProcess").processDefinitionTenantId(tenant).execute();
 
-    runtimeService.startProcessInstanceById(processDefinitionId);
-
-    // execute the job of the async activity
-    Job job = managementService.createJobQuery().processDefinitionId(processDefinitionId).singleResult();
-    try {
-      managementService.executeJob(job.getId());
-    } catch (ProcessEngineException e) {
-      // the job failed and created an incident
-    }
+    executeAvailableJobs();
   }
 
 }
