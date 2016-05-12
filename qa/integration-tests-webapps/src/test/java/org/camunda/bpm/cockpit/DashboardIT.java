@@ -33,7 +33,8 @@ public class DashboardIT extends AbstractWebappUiIntegrationTest {
     WebElement submit = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("button[type=\"submit\"]")));
     submit.submit();
 
-    wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("[ng-repeat=\"propName in procDefStatsKeys\"]:first-child"), "1 process definition"));
+    wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("[ng-repeat=\"propName in procDefStatsKeys\"]:first-child > .value"), "1"));
+    wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("[ng-repeat=\"propName in procDefStatsKeys\"]:first-child > a"), "process definition"));
 
     wait.until(currentURIIs(new URI(appUrl + "/default/#/dashboard")));
   }
