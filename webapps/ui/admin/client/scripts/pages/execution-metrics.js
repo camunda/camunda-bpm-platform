@@ -8,13 +8,10 @@ var CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk');
   var Controller = [
    '$scope',
    'Uri',
-   '$filter',
-  function ($scope, Uri) {
+   'camAPI',
+  function ($scope, Uri, camAPI) {
 
-    var metricsService = new CamSDK.Client({
-      apiUri: Uri.appUri('engine://'),
-      engine: Uri.appUri(':engine')
-    }).resource('metrics');
+    var MetricsResource = camAPI.resource('metrics');
 
 
     var now = new Date();
@@ -27,7 +24,7 @@ var CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk');
       // promises??? NOPE!
       CamSDK.utils.series({
         flowNodes: function (cb) {
-          metricsService.sum({
+          MetricsResource.sum({
             name: 'activity-instance-start',
             startDate: $scope.startDate,
             endDate: $scope.endDate
@@ -36,7 +33,7 @@ var CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk');
           });
         },
         decisionElements: function (cb) {
-          metricsService.sum({
+          MetricsResource.sum({
             name: 'executed-decision-elements',
             startDate: $scope.startDate,
             endDate: $scope.endDate
@@ -48,11 +45,9 @@ var CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk');
         $scope.loadingState = 'LOADED';
         if (err) {
           $scope.loadingState = 'ERROR';
-          $scope.$apply();
           return;
         }
         $scope.metrics = res;
-        $scope.$apply();
       });
 
      };
