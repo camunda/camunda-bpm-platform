@@ -146,6 +146,23 @@ public class BatchRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
+  public void testQueryActiveBatches() {
+    Response response = given()
+      .queryParam("suspended", false)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(BATCH_RESOURCE_URL);
+
+    InOrder inOrder = inOrder(queryMock);
+    inOrder.verify(queryMock).active();
+    inOrder.verify(queryMock).list();
+    inOrder.verifyNoMoreInteractions();
+
+    verifyBatchListJson(response.asString());
+  }
+
+  @Test
   public void testFullBatchQuery() {
     Response response = given()
         .queryParams(getCompleteQueryParameters())

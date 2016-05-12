@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.rest.dto.batch;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 import java.util.ArrayList;
@@ -100,6 +101,9 @@ public class BatchQueryDto extends AbstractQueryDto<BatchQuery> {
     }
     if (TRUE.equals(suspended)) {
       query.suspended();
+    }
+    if (FALSE.equals(suspended)) {
+      query.active();
     }
   }
 
