@@ -96,6 +96,7 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
     verify(queryMock, never()).taskId(anyString());
     verify(queryMock, never()).jobId(anyString());
     verify(queryMock, never()).jobDefinitionId(anyString());
+    verify(queryMock, never()).batchId(anyString());
     verify(queryMock, never()).userId(anyString());
     verify(queryMock, never()).operationId(anyString());
     verify(queryMock, never()).operationType(anyString());
@@ -123,6 +124,7 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
         .queryParam("taskId", "4")
         .queryParam("jobId", "7")
         .queryParam("jobDefinitionId", "8")
+        .queryParam("batchId", MockProvider.EXAMPLE_BATCH_ID)
         .queryParam("userId", "icke")
         .queryParam("operationId", "5")
         .queryParam("operationType", OPERATION_TYPE_CLAIM)
@@ -142,6 +144,7 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
     verify(queryMock).taskId("4");
     verify(queryMock).jobId("7");
     verify(queryMock).jobDefinitionId("8");
+    verify(queryMock).batchId(MockProvider.EXAMPLE_BATCH_ID);
     verify(queryMock).userId("icke");
     verify(queryMock).operationId("5");
     verify(queryMock).operationType(OPERATION_TYPE_CLAIM);
@@ -163,6 +166,7 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
     assertEquals(MockProvider.EXAMPLE_TASK_ID, actual.getTaskId());
     assertEquals(MockProvider.EXAMPLE_JOB_ID, actual.getJobId());
     assertEquals(MockProvider.EXAMPLE_JOB_DEFINITION_ID, actual.getJobDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_BATCH_ID, actual.getBatchId());
     assertEquals(MockProvider.EXAMPLE_USER_ID, actual.getUserId());
     assertEquals(MockProvider.EXAMPLE_USER_OPERATION_TIMESTAMP, from(json).getString("[0].timestamp"));
     assertEquals(MockProvider.EXAMPLE_USER_OPERATION_ID, actual.getOperationId());

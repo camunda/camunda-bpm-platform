@@ -1980,6 +1980,7 @@ public abstract class MockProvider {
     when(entry.getTaskId()).thenReturn(EXAMPLE_TASK_ID);
     when(entry.getJobId()).thenReturn(EXAMPLE_JOB_ID);
     when(entry.getJobDefinitionId()).thenReturn(EXAMPLE_JOB_DEFINITION_ID);
+    when(entry.getBatchId()).thenReturn(EXAMPLE_BATCH_ID);
     when(entry.getUserId()).thenReturn(EXAMPLE_USER_ID);
     when(entry.getTimestamp()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_USER_OPERATION_TIMESTAMP));
     when(entry.getOperationId()).thenReturn(EXAMPLE_USER_OPERATION_ID);

@@ -35,6 +35,7 @@ public class UserOperationLogEntryDto {
   protected String taskId;
   protected String jobId;
   protected String jobDefinitionId;
+  protected String batchId;
   protected String userId;
   protected Date timestamp;
   protected String operationId;
@@ -59,6 +60,7 @@ public class UserOperationLogEntryDto {
     dto.taskId = entry.getTaskId();
     dto.jobId = entry.getJobId();
     dto.jobDefinitionId = entry.getJobDefinitionId();
+    dto.batchId = entry.getBatchId();
     dto.userId = entry.getUserId();
     dto.timestamp = entry.getTimestamp();
     dto.operationId = entry.getOperationId();
@@ -125,6 +127,10 @@ public class UserOperationLogEntryDto {
 
   public String getJobDefinitionId() {
     return jobDefinitionId;
+  }
+
+  public String getBatchId() {
+    return batchId;
   }
 
   public String getUserId() {
