@@ -87,6 +87,7 @@ import org.camunda.bpm.model.bpmn.instance.TimerEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.Transaction;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycle;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormData;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormField;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIn;
@@ -109,6 +110,8 @@ public class ProcessBuilderTest {
   public static final String TIMER_DATE = "2011-03-11T12:13:14Z";
   public static final String TIMER_DURATION = "P10D";
   public static final String TIMER_CYCLE = "R3/PT10H";
+
+  public static final String FAILED_JOB_RETRY_TIME_CYCLE = "R5/PT1M";
 
   private BpmnModelInstance modelInstance;
   private static ModelElementType taskType;
@@ -482,6 +485,7 @@ public class ProcessBuilderTest {
         .notCamundaExclusive()
         .camundaJobPriority("${somePriority}")
         .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
+        .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
       .endEvent()
       .done();
 
@@ -490,6 +494,8 @@ public class ProcessBuilderTest {
     assertThat(serviceTask.isCamundaExclusive()).isFalse();
     assertThat(serviceTask.getCamundaJobPriority()).isEqualTo("${somePriority}");
     assertThat(serviceTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
+
+    assertCamundaFailedJobRetryTimeCycle(serviceTask);
   }
 
   @Test
@@ -504,6 +510,7 @@ public class ProcessBuilderTest {
         .camundaTopic(TEST_STRING_API)
         .camundaType(TEST_STRING_API)
         .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
+        .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
       .done();
 
     ServiceTask serviceTask = modelInstance.getModelElementById(TASK_ID);
@@ -514,6 +521,8 @@ public class ProcessBuilderTest {
     assertThat(serviceTask.getCamundaTopic()).isEqualTo(TEST_STRING_API);
     assertThat(serviceTask.getCamundaType()).isEqualTo(TEST_STRING_API);
     assertThat(serviceTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
+
+    assertCamundaFailedJobRetryTimeCycle(serviceTask);
   }
 
   @Test
@@ -528,6 +537,7 @@ public class ProcessBuilderTest {
         .camundaTopic(TEST_STRING_API)
         .camundaType(TEST_STRING_API)
         .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
+        .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
       .endEvent()
       .done();
 
@@ -539,6 +549,8 @@ public class ProcessBuilderTest {
     assertThat(sendTask.getCamundaTopic()).isEqualTo(TEST_STRING_API);
     assertThat(sendTask.getCamundaType()).isEqualTo(TEST_STRING_API);
     assertThat(sendTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
+
+    assertCamundaFailedJobRetryTimeCycle(sendTask);
   }
 
   @Test
@@ -554,6 +566,7 @@ public class ProcessBuilderTest {
         .camundaFormHandlerClass(TEST_CLASS_API)
         .camundaFormKey(TEST_STRING_API)
         .camundaPriority(TEST_PRIORITY_API)
+        .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
       .endEvent()
       .done();
 
@@ -568,6 +581,8 @@ public class ProcessBuilderTest {
     assertThat(userTask.getCamundaFormHandlerClass()).isEqualTo(TEST_CLASS_API);
     assertThat(userTask.getCamundaFormKey()).isEqualTo(TEST_STRING_API);
     assertThat(userTask.getCamundaPriority()).isEqualTo(TEST_PRIORITY_API);
+
+    assertCamundaFailedJobRetryTimeCycle(userTask);
   }
 
   @Test
@@ -587,6 +602,7 @@ public class ProcessBuilderTest {
         .camundaDecisionRefTenantId("tenantId")
         .camundaMapDecisionResult("singleEntry")
         .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
+        .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
       .endEvent()
       .done();
 
@@ -603,6 +619,8 @@ public class ProcessBuilderTest {
     assertThat(businessRuleTask.getCamundaDecisionRefTenantId()).isEqualTo("tenantId");
     assertThat(businessRuleTask.getCamundaMapDecisionResult()).isEqualTo("singleEntry");
     assertThat(businessRuleTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
+
+    assertCamundaFailedJobRetryTimeCycle(businessRuleTask);
   }
 
   @Test
@@ -612,12 +630,15 @@ public class ProcessBuilderTest {
       .scriptTask(TASK_ID)
         .camundaResultVariable(TEST_STRING_API)
         .camundaResource(TEST_STRING_API)
+        .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
       .endEvent()
       .done();
 
     ScriptTask scriptTask = modelInstance.getModelElementById(TASK_ID);
     assertThat(scriptTask.getCamundaResultVariable()).isEqualTo(TEST_STRING_API);
     assertThat(scriptTask.getCamundaResource()).isEqualTo(TEST_STRING_API);
+
+    assertCamundaFailedJobRetryTimeCycle(scriptTask);
   }
 
   @Test
@@ -629,6 +650,7 @@ public class ProcessBuilderTest {
         .camundaFormHandlerClass(TEST_CLASS_API)
         .camundaFormKey(TEST_STRING_API)
         .camundaInitiator(TEST_STRING_API)
+        .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
       .done();
 
     StartEvent startEvent = modelInstance.getModelElementById(START_EVENT_ID);
@@ -637,6 +659,8 @@ public class ProcessBuilderTest {
     assertThat(startEvent.getCamundaFormHandlerClass()).isEqualTo(TEST_CLASS_API);
     assertThat(startEvent.getCamundaFormKey()).isEqualTo(TEST_STRING_API);
     assertThat(startEvent.getCamundaInitiator()).isEqualTo(TEST_STRING_API);
+
+    assertCamundaFailedJobRetryTimeCycle(startEvent);
   }
 
   @Test
@@ -656,6 +680,7 @@ public class ProcessBuilderTest {
         .camundaIn("in-source", "in-target")
         .camundaOut("out-source", "out-target")
         .notCamundaExclusive()
+        .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
       .endEvent()
       .done();
 
@@ -678,6 +703,8 @@ public class ProcessBuilderTest {
     CamundaOut camundaOut = (CamundaOut) callActivity.getExtensionElements().getUniqueChildElementByType(CamundaOut.class);
     assertThat(camundaOut.getCamundaSource()).isEqualTo("out-source");
     assertThat(camundaOut.getCamundaTarget()).isEqualTo("out-target");
+
+    assertCamundaFailedJobRetryTimeCycle(callActivity);
   }
 
   @Test
@@ -2371,6 +2398,14 @@ public class ProcessBuilderTest {
     assertThat(camundaFormField.getCamundaType()).isEqualTo("integer");
     assertThat(camundaFormField.getCamundaDefaultValue()).isEqualTo("myDefaultVal_2");
 
+  }
+
+  protected void assertCamundaFailedJobRetryTimeCycle(BaseElement element) {
+    assertThat(element.getExtensionElements()).isNotNull();
+
+    CamundaFailedJobRetryTimeCycle camundaFailedJobRetryTimeCycle = element.getExtensionElements().getElementsQuery().filterByType(CamundaFailedJobRetryTimeCycle.class).singleResult();
+    assertThat(camundaFailedJobRetryTimeCycle).isNotNull();
+    assertThat(camundaFailedJobRetryTimeCycle.getTextContent()).isEqualTo(FAILED_JOB_RETRY_TIME_CYCLE);
   }
 
 }

@@ -38,6 +38,7 @@ import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.Transaction;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycle;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
@@ -349,6 +350,21 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
 
   public B camundaJobPriority(String jobPriority) {
     element.setCamundaJobPriority(jobPriority);
+    return myself;
+  }
+
+  /**
+   * Sets the camunda failedJobRetryTimeCycle attribute for the build flow node.
+   *
+   * @param retryTimeCycle the retry time cycle value to set
+   * @return the builder object
+   */
+  public B camundaFailedJobRetryTimeCycle(String retryTimeCycle) {
+    CamundaFailedJobRetryTimeCycle failedJobRetryTimeCycle = createInstance(CamundaFailedJobRetryTimeCycle.class);
+    failedJobRetryTimeCycle.setTextContent(retryTimeCycle);
+
+    addExtensionElement(failedJobRetryTimeCycle);
+
     return myself;
   }
 
