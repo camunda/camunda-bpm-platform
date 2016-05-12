@@ -39,7 +39,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.AbstractSetBatchStateCmd;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.management.JobDefinition;
-import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -47,7 +46,6 @@ import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.core.IsCollectionContaining;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -447,6 +445,7 @@ public class BatchSuspensionTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testUserOperationLogQueryByBatchEntityType() {
     // given
     Batch batch1 = helper.migrateProcessInstancesAsync(1);
@@ -466,6 +465,7 @@ public class BatchSuspensionTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testUserOperationLogQueryByBatchId() {
     // given
     Batch batch1 = helper.migrateProcessInstancesAsync(1);
