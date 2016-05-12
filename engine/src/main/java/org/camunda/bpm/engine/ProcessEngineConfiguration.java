@@ -17,6 +17,7 @@ import java.io.InputStream;
 
 import javax.sql.DataSource;
 
+import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
@@ -137,6 +138,36 @@ public abstract class ProcessEngineConfiguration {
    */
   public static final String HISTORY_DEFAULT = HISTORY_AUDIT;
 
+  /**
+   * Always enables check for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations.
+   * This mode is equal to the &lt; 7.5 behavior.
+   *<p />
+   * *NOTE:* Checking revoke authorizations is very expensive for resources with a high potential
+   * cardinality like tasks or process instances and can render authorized access to the process engine
+   * effectively unusable on most databases. You are therefore strongly discouraged from using this mode.
+   *
+   */
+  public static final String AUTHORIZATION_CHECK_REVOKE_ALWAYS = "ALWAYS";
+
+  /**
+   * Never checks for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations. This mode
+   * has best performance effectively disables the use of {@link Authorization#AUTH_TYPE_REVOKE}.
+   * *Note*: It is strongly recommended to use this mode.
+   */
+  public static final String AUTHORIZATION_CHECK_REVOKE_NEVER = "NEVER";
+
+  /**
+   * This mode only checks for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations if at least
+   * one revoke authorization currently exits for the current user or one of the groups the user is a member
+   * of. To achieve this it is checked once per command whether potentially applicable revoke authorizations
+   * exist. Based on the outcome, the authorization check then uses revoke or not.
+   *<p />
+   * *NOTE:* Checking revoke authorizations is very expensive for resources with a high potential
+   * cardinality like tasks or process instances and can render authorized access to the process engine
+   * effectively unusable on most databases.
+   */
+  public static final String AUTHORIZATION_CHECK_REVOKE_AUTO = "AUTO";
+
   protected String processEngineName = ProcessEngines.NAME_DEFAULT;
   protected int idBlockSize = 100;
   protected String history = HISTORY_DEFAULT;
@@ -232,7 +263,7 @@ public abstract class ProcessEngineConfiguration {
 
   protected ValueTypeResolver valueTypeResolver;
 
-  protected boolean revokeAuthorizationCheckEnabled;
+  protected String authorizationCheckRevokes = AUTHORIZATION_CHECK_REVOKE_AUTO;
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
@@ -692,11 +723,11 @@ public abstract class ProcessEngineConfiguration {
     this.producePrioritizedExternalTasks = producePrioritizedExternalTasks;
   }
 
-  public boolean isRevokeAuthorizationCheckEnabled() {
-    return revokeAuthorizationCheckEnabled;
+  public void setAuthorizationCheckRevokes(String authorizationCheckRevokes) {
+    this.authorizationCheckRevokes = authorizationCheckRevokes;
   }
 
-  public void setRevokeAuthorizationCheckEnabled(boolean revokeAuthorizationCheckEnabled) {
-    this.revokeAuthorizationCheckEnabled = revokeAuthorizationCheckEnabled;
+  public String getAuthorizationCheckRevokes() {
+    return authorizationCheckRevokes;
   }
 }

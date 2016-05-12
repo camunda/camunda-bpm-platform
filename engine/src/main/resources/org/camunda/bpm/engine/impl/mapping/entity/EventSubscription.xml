@@ -76,12 +76,12 @@
       left join ${prefix}ACT_RU_EXECUTION PROC_EXECUTION
       on PROC_EXECUTION.ID_ = RES.PROC_INST_ID_
 
-      left join ${prefix}ACT_RE_PROCDEF PROC_PROCDEF
-      on PROC_PROCDEF.ID_ = PROC_EXECUTION.PROC_DEF_ID_
+      left join ${prefix}ACT_RE_PROCDEF PROCDEF
+      on PROCDEF.ID_ = PROC_EXECUTION.PROC_DEF_ID_
       
       <if test="!authCheck.revokeAuthorizationCheckEnabled">    
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
-        AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, EXECUTION.ID_, EXEC_PROCDEF.KEY_, PROC_EXECUTION.ID_, PROC_PROCDEF.KEY_, '*'))      
+        AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, EXECUTION.ID_, PROCDEF.KEY_, PROC_EXECUTION.ID_, PROCDEF.KEY_, '*'))      
       </if>
     </if>
     

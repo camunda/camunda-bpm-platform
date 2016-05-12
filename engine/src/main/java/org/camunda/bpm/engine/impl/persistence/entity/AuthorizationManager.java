@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
@@ -99,7 +100,6 @@ import org.camunda.bpm.engine.impl.util.CollectionUtil;
 public class AuthorizationManager extends AbstractManager {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
-  public static final String DEFAULT_AUTHORIZATION_CHECK = "defaultAuthorizationCheck";
 
   // Used instead of Collections.emptyList() as mybatis uses reflection to call methods
   // like size() which can lead to problems as Collections.EmptyList is a private implementation
@@ -113,6 +113,8 @@ public class AuthorizationManager extends AbstractManager {
    * if for a given group no authorization exists in the DB, then auth checks are not performed for this group.
    */
   protected Set<String> availableAuthorizedGroupIds = null;
+
+  protected Boolean isRevokeAuthCheckUsed = null;
 
   public PermissionCheck newPermissionCheck() {
     return new PermissionCheck();
@@ -296,23 +298,38 @@ public class AuthorizationManager extends AbstractManager {
 
     List<String> filteredGroupIds = filterAuthenticatedGroupIds(groupIds);
 
-    boolean isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled(userId, groupIds);
+    boolean isRevokeAuthorizationCheckEnabled = isRevokeAuthCheckEnabled(userId, groupIds);
     AuthorizationCheck authCheck = new AuthorizationCheck(userId, filteredGroupIds, permissionChecks, isRevokeAuthorizationCheckEnabled);
     return getDbEntityManager().selectBoolean("isUserAuthorizedForResource", authCheck);
   }
 
-  protected boolean isRevokeAuthorizationCheckEnabled(String userId, List<String> groupIds) {
-    boolean isRevokeAuthorizationCheckEnabled = Context.getProcessEngineConfiguration().isRevokeAuthorizationCheckEnabled();
-    if(!isRevokeAuthorizationCheckEnabled) {
-      isRevokeAuthorizationCheckEnabled = existsRevokeAuthorizations(userId, groupIds);
+  protected boolean isRevokeAuthCheckEnabled(String userId, List<String> groupIds) {
+    Boolean isRevokeAuthCheckEnabled = this.isRevokeAuthCheckUsed;
+
+    if(isRevokeAuthCheckEnabled == null) {
+      final String configuredMode = Context.getProcessEngineConfiguration().getAuthorizationCheckRevokes();
+      if(ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS.equals(configuredMode)) {
+        isRevokeAuthCheckEnabled = true;
+      }
+      else if(ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_NEVER.equals(configuredMode)) {
+        isRevokeAuthCheckEnabled = false;
+      }
+      else {
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("userId", userId);
+        params.put("authGroupIds", groupIds);
+        isRevokeAuthCheckEnabled = getDbEntityManager().selectBoolean("selectRevokeAuthorization", params);
+      }
+      this.isRevokeAuthCheckUsed = isRevokeAuthCheckEnabled;
     }
-    return isRevokeAuthorizationCheckEnabled;
+
+    return isRevokeAuthCheckEnabled;
   }
 
   public boolean isAuthorized(String userId, List<String> groupIds, CompositePermissionCheck compositePermissionCheck) {
     List<String> filteredGroupIds = filterAuthenticatedGroupIds(groupIds);
 
-    boolean isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled(userId, groupIds);
+    boolean isRevokeAuthorizationCheckEnabled = isRevokeAuthCheckEnabled(userId, groupIds);
     AuthorizationCheck authCheck = new AuthorizationCheck(userId, filteredGroupIds, compositePermissionCheck, isRevokeAuthorizationCheckEnabled);
     return getDbEntityManager().selectBoolean("isUserAuthorizedForResource", authCheck);
   }
@@ -347,7 +364,7 @@ public class AuthorizationManager extends AbstractManager {
 
       authCheck.setAuthUserId(currentUserId);
       authCheck.setAuthGroupIds(currentGroupIds);
-      authCheck.setRevokeAuthorizationCheckEnabled(existsRevokeAuthorizations(currentUserId, currentGroupIds));
+      authCheck.setRevokeAuthorizationCheckEnabled(isRevokeAuthCheckEnabled(currentUserId, currentGroupIds));
     }
     else {
       authCheck.setAuthorizationCheckEnabled(false);
@@ -539,7 +556,7 @@ public class AuthorizationManager extends AbstractManager {
       // - READ_TASK on PROCESS_DEFINITION
 
       ExecutionEntity execution = task.getExecution();
-      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+      ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
 
 
       PermissionCheck readPermissionCheck = newPermissionCheck();
@@ -589,7 +606,7 @@ public class AuthorizationManager extends AbstractManager {
       // - UPDATE_TASK on PROCESS_DEFINITION
 
       ExecutionEntity execution = task.getExecution();
-      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+      ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
 
       PermissionCheck updatePermissionCheck = newPermissionCheck();
       updatePermissionCheck.setPermission(UPDATE);
@@ -893,7 +910,7 @@ public class AuthorizationManager extends AbstractManager {
   /* STATISTICS QUERY */
 
   public void configureDeploymentStatisticsQuery(DeploymentStatisticsQueryImpl query) {
-    configureQuery(query, DEPLOYMENT, "DEPLOYMENT.ID_");
+    configureQuery(query, DEPLOYMENT, "RES.ID_");
 
     query.getProcessInstancePermissionChecks().clear();
     query.getJobPermissionChecks().clear();
@@ -1072,10 +1089,4 @@ public class AuthorizationManager extends AbstractManager {
     }
   }
 
-  private boolean existsRevokeAuthorizations(String userId, List<String> authGroupIds) {
-    Map<String, Object> params = new HashMap<String, Object>();
-    params.put("userId", userId);
-    params.put("authGroupIds", authGroupIds);
-    return getDbEntityManager().selectBoolean("selectRevokeAuthorization", params);
-  }
 }

@@ -37,6 +37,8 @@
 
     <property name="failedJobCommandFactory" ref="foxFailedJobCommandFactory" />
 
+    <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
+
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
     <property name="processEnginePlugins">
