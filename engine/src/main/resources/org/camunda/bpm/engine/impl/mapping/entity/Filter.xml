@@ -89,7 +89,7 @@
   <select id="selectFilterByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select distinct RES.*
     ${limitBetweenClob}
     <include refid="selectFilterByQueryCriteriaSql" />
     ${orderBy}
@@ -99,7 +99,7 @@
   <select id="selectFilterByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap_postgres">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select distinct RES.*
     ${limitBetweenClob}
     <include refid="selectFilterByQueryCriteriaSql" />
     ${orderBy}
@@ -107,7 +107,7 @@
   </select>
 
    <select id="selectFilterCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultType="long">
-    select count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectFilterByQueryCriteriaSql" />
   </select>
 

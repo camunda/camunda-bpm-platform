@@ -82,7 +82,7 @@
   <select id="selectCaseSentryPartsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl" resultMap="caseSentryPartResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select distinct RES.* 
     ${limitBetween}
     <include refid="selectCaseSentryPartsByQueryCriteriaSql"/>
     ${orderBy}
@@ -90,7 +90,7 @@
   </select>
 
   <select id="selectCaseSentryPartsCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl" resultType="long">
-    select count(*)
+    select count(distinct RES.ID_)
     <include refid="selectCaseSentryPartsByQueryCriteriaSql"/>
   </select>
 

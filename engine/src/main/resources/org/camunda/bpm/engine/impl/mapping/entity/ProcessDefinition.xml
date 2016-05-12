@@ -123,7 +123,7 @@
   </select>
 
   <select id="selectPreviousProcessDefinitionId" parameterType="map" resultType="string">
-    select RES.ID_
+    select distinct RES.*
       from ${prefix}ACT_RE_PROCDEF RES
      where RES.KEY_ = #{key}
         <if test="tenantId != null">
@@ -148,7 +148,7 @@
   <select id="selectProcessDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select distinct RES.*
     ${limitBetween}
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
@@ -156,7 +156,7 @@
   </select>
 
   <select id="selectProcessDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultType="long">
-    select count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
   </select>
   

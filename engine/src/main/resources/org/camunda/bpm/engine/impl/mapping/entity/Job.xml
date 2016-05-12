@@ -160,7 +160,8 @@
 
   <select id="selectExclusiveJobsToExecute" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
   	${limitBefore}
-    select RES.* ${limitBetween}
+    select distinct RES.*
+    ${limitBetween}
     from ${prefix}ACT_RU_JOB RES
     where (RETRIES_ &gt; 0)
       and (DUEDATE_ is null or DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
@@ -207,7 +208,7 @@
   <select id="selectJobByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobQueryImpl" resultMap="jobResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.*
+    select distinct RES.*
     ${limitBetween}
     <include refid="selectJobByQueryCriteriaSql"/>
     ${orderBy}

@@ -122,7 +122,7 @@
   <select id="selectHistoricCaseActivityInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricCaseActivityInstanceQueryImpl" resultMap="historicCaseActivityInstanceResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.*
+    select distinct RES.*
     ${limitBetween}
     <include refid="selectHistoricCaseActivityInstancesByQueryCriteriaSql"/>
     ${orderBy}

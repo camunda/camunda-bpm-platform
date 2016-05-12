@@ -51,7 +51,7 @@
   <select id="selectEventSubscriptionByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl" resultMap="eventSubscriptionResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select distinct RES.* 
     ${limitBetween}
     <include refid="selectEventSubscriptionByQueryCriteriaSql"/>
     ${orderBy}

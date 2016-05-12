@@ -128,7 +128,7 @@
   </select>
 
   <select id="selectPreviousCaseDefinitionId" parameterType="map" resultType="string">
-    select RES.ID_
+    select distinct RES.*
       from ${prefix}ACT_RE_CASE_DEF RES
      where RES.KEY_ = #{key}
        <if test="tenantId != null">
@@ -153,7 +153,7 @@
   <select id="selectCaseDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultMap="caseDefinitionResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select distinct RES.* 
     ${limitBetween}
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
@@ -161,7 +161,7 @@
   </select>
 
   <select id="selectCaseDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultType="long">
-    select count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
   </select>
 

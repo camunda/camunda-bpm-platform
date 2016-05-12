@@ -95,7 +95,7 @@
   <select id="selectBatchesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.batch.BatchQueryImpl" resultMap="batchResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.*
+    select distinct RES.*
     ${limitBetween}
     <include refid="selectBatchesByQueryCriteriaSql"/>
     ${orderBy}
@@ -103,7 +103,7 @@
   </select>
 
   <select id="selectBatchCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.batch.BatchQueryImpl" resultType="long">
-    select count(*)
+    select count(distinct RES.ID_)
     <include refid="selectBatchesByQueryCriteriaSql"/>
   </select>
 

@@ -74,7 +74,7 @@
     parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select distinct RES.*
     ${limitBetween}
     <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
     ${orderBy}
@@ -83,7 +83,7 @@
 
   <select id ="selectProcessDefinitionStatisticsCount" resultType="long" 
     parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl">
-    select count(RES.ID_) 
+    select count(distinct RES.ID_) 
     <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
   </select>
 
@@ -186,7 +186,7 @@
     parameterType="org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select distinct RES.*
     ${limitBetween}
     <include refid="selectDeploymentStatisticsByQueryCriteriaSql"/>
     ${orderBy}
@@ -195,7 +195,7 @@
 
   <select id ="selectDeploymentStatisticsCount" resultType="long"
     parameterType="org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl">
-    select count(RES.ID_) 
+    select count(distinct RES.ID_) 
     <include refid="selectDeploymentStatisticsByQueryCriteriaSql"/>
   </select>
 
@@ -344,7 +344,7 @@
     parameterType="org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select distinct RES.*
     ${limitBetween}
     <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
     ${orderBy}
@@ -353,7 +353,7 @@
 
   <select id ="selectActivityStatisticsCount" resultType="long" 
     parameterType="org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl">
-    select count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
   </select>
 
@@ -597,7 +597,7 @@
   <select id ="selectBatchStatistics" resultMap="batchStatisticsResultMap" parameterType="org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.*
+    select distinct RES.*
     ${limitBetween}
     <include refid="selectBatchStatisticsByQueryCriteriaSql"/>
     ${orderBy}
@@ -605,7 +605,7 @@
   </select>
 
   <select id ="selectBatchStatisticsCount" resultType="long" parameterType="org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl">
-    select count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectBatchStatisticsByQueryCriteriaSql"/>
   </select>
 
