@@ -13,6 +13,9 @@
 
 package org.camunda.bpm.engine.rest.dto.batch;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +40,7 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
   protected String type;
   protected List<String> tenantIds;
   protected Boolean withoutTenantId;
+  protected Boolean suspended;
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -69,6 +73,11 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
     this.withoutTenantId = withoutTenantId;
   }
 
+  @CamundaQueryParam(value="suspended", converter = BooleanConverter.class)
+  public void setSuspended(Boolean suspended) {
+    this.suspended = suspended;
+  }
+
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
   }
@@ -84,11 +93,17 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
     if (type != null) {
       query.type(type);
     }
-    if (Boolean.TRUE.equals(withoutTenantId)) {
+    if (TRUE.equals(withoutTenantId)) {
       query.withoutTenantId();
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(suspended)) {
+      query.suspended();
+    }
+    if (FALSE.equals(suspended)) {
+      query.active();
     }
   }
 

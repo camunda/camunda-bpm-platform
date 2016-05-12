@@ -16,13 +16,17 @@ package org.camunda.bpm.engine.test.api.mgmt;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.batchStatisticsById;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
+import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchStatistics;
+import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -516,6 +520,52 @@ public class BatchStatisticsQueryTest {
         assertEquals(3, batchStatistics.getFailedJobs());
       }
     }
+  }
+
+  @Test
+  public void testStatisticsQueryBySuspendedBatches() {
+    // given
+    Batch batch1 = helper.migrateProcessInstancesAsync(1);
+    Batch batch2 = helper.migrateProcessInstancesAsync(1);
+    helper.migrateProcessInstancesAsync(1);
+
+    // when
+    managementService.suspendBatchById(batch1.getId());
+    managementService.suspendBatchById(batch2.getId());
+    managementService.activateBatchById(batch1.getId());
+
+    // then
+    BatchStatisticsQuery query = managementService.createBatchStatisticsQuery().suspended();
+    Assert.assertEquals(1, query.count());
+    Assert.assertEquals(1, query.list().size());
+    Assert.assertEquals(batch2.getId(), query.singleResult().getId());
+  }
+
+  @Test
+  public void testStatisticsQueryByActiveBatches() {
+    // given
+    Batch batch1 = helper.migrateProcessInstancesAsync(1);
+    Batch batch2 = helper.migrateProcessInstancesAsync(1);
+    Batch batch3 = helper.migrateProcessInstancesAsync(1);
+
+    // when
+    managementService.suspendBatchById(batch1.getId());
+    managementService.suspendBatchById(batch2.getId());
+    managementService.activateBatchById(batch1.getId());
+
+    // then
+    BatchStatisticsQuery query = managementService.createBatchStatisticsQuery().active();
+    Assert.assertEquals(2, query.count());
+    Assert.assertEquals(2, query.list().size());
+
+    List<String> foundIds = new ArrayList<String>();
+    for (Batch batch : query.list()) {
+      foundIds.add(batch.getId());
+    }
+    assertThat(foundIds, hasItems(
+      batch1.getId(),
+      batch3.getId()
+    ));
   }
 
   protected void deleteMigrationJobs(Batch batch) {

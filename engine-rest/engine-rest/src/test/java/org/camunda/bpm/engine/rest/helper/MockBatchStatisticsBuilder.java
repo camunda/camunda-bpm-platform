@@ -33,6 +33,7 @@ public class MockBatchStatisticsBuilder {
   protected int remainingJobs;
   protected int completedJobs;
   protected int failedJobs;
+  protected boolean suspended;
 
   public MockBatchStatisticsBuilder id(String id) {
     this.id = id;
@@ -99,6 +100,11 @@ public class MockBatchStatisticsBuilder {
     return this;
   }
 
+  public MockBatchStatisticsBuilder suspended() {
+    this.suspended = true;
+    return this;
+  }
+
   public BatchStatistics build() {
     BatchStatistics batchStatistics = mock(BatchStatistics.class);
     when(batchStatistics.getId()).thenReturn(id);
@@ -114,7 +120,7 @@ public class MockBatchStatisticsBuilder {
     when(batchStatistics.getRemainingJobs()).thenReturn(remainingJobs);
     when(batchStatistics.getCompletedJobs()).thenReturn(completedJobs);
     when(batchStatistics.getFailedJobs()).thenReturn(failedJobs);
+    when(batchStatistics.isSuspended()).thenReturn(suspended);
     return batchStatistics;
   }
-
 }

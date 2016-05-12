@@ -33,6 +33,12 @@ public interface BatchStatisticsQuery extends Query<BatchStatisticsQuery, BatchS
   /** Only selects batch statistics which have no tenant id. */
   BatchStatisticsQuery withoutTenantId();
 
+  /** Only selects batches which are active **/
+  BatchStatisticsQuery active();
+
+  /** Only selects batches which are suspended **/
+  BatchStatisticsQuery suspended();
+
   /**
    * Returns batch statistics sorted by batch id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
    */

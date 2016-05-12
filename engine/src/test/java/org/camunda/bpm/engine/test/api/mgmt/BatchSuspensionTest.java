@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.test.api.mgmt;
 
 import static org.camunda.bpm.engine.EntityTypes.BATCH;
-import static org.hamcrest.core.IsCollectionContaining.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -22,9 +21,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -32,7 +28,6 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.batch.BatchQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -395,53 +390,6 @@ public class BatchSuspensionTest {
     assertEquals(AbstractSetBatchStateCmd.SUSPENSION_STATE_PROPERTY, entry.getProperty());
     assertNull(entry.getOrgValue());
     assertEquals(SuspensionState.ACTIVE.getName(), entry.getNewValue());
-  }
-
-  @Test
-  public void testBatchQueryBySuspendedBatches() {
-    // given
-    Batch batch1 = helper.migrateProcessInstancesAsync(1);
-    Batch batch2 = helper.migrateProcessInstancesAsync(1);
-    helper.migrateProcessInstancesAsync(1);
-
-    // when
-    managementService.suspendBatchById(batch1.getId());
-    managementService.suspendBatchById(batch2.getId());
-    managementService.activateBatchById(batch1.getId());
-
-    // then
-    BatchQuery query = managementService.createBatchQuery().suspended();
-    assertEquals(1, query.count());
-    assertEquals(1, query.list().size());
-    assertEquals(batch2.getId(), query.singleResult().getId());
-  }
-
-  @Test
-  public void testBatchQueryByActiveBatches() {
-    // given
-    Batch batch1 = helper.migrateProcessInstancesAsync(1);
-    Batch batch2 = helper.migrateProcessInstancesAsync(1);
-    Batch batch3 = helper.migrateProcessInstancesAsync(1);
-
-    // when
-    managementService.suspendBatchById(batch1.getId());
-    managementService.suspendBatchById(batch2.getId());
-    managementService.activateBatchById(batch1.getId());
-
-    // then
-    BatchQuery query = managementService.createBatchQuery().active();
-    assertEquals(2, query.count());
-    assertEquals(2, query.list().size());
-
-    List<String> foundIds = new ArrayList<String>();
-    for (Batch batch : query.list()) {
-      foundIds.add(batch.getId());
-    }
-    assertThat(foundIds, hasItems(
-      batch1.getId(),
-      batch3.getId()
-    ));
-
   }
 
   @Test

@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.batch.BatchQuery;
 import org.camunda.bpm.engine.batch.BatchStatistics;
 import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
@@ -25,6 +24,7 @@ import org.camunda.bpm.engine.impl.BatchQueryProperty;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 
 public class BatchStatisticsQueryImpl extends AbstractQuery<BatchStatisticsQuery, BatchStatistics> implements BatchStatisticsQuery {
 
@@ -34,6 +34,7 @@ public class BatchStatisticsQueryImpl extends AbstractQuery<BatchStatisticsQuery
   protected String type;
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
+  protected SuspensionState suspensionState;
 
   public BatchStatisticsQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -78,6 +79,20 @@ public class BatchStatisticsQueryImpl extends AbstractQuery<BatchStatisticsQuery
     this.tenantIds = null;
     isTenantIdSet = true;
     return this;
+  }
+
+  public BatchStatisticsQuery active() {
+    this.suspensionState = SuspensionState.ACTIVE;
+    return this;
+  }
+
+  public BatchStatisticsQuery suspended() {
+    this.suspensionState = SuspensionState.SUSPENDED;
+    return this;
+  }
+
+  public SuspensionState getSuspensionState() {
+    return suspensionState;
   }
 
   public BatchStatisticsQuery orderById() {

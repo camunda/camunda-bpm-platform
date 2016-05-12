@@ -45,6 +45,7 @@ public class BatchStatisticsDto extends BatchDto {
     dto.monitorJobDefinitionId = batchStatistics.getMonitorJobDefinitionId();
     dto.batchJobDefinitionId = batchStatistics.getBatchJobDefinitionId();
     dto.tenantId = batchStatistics.getTenantId();
+    dto.suspended = batchStatistics.isSuspended();
 
     dto.remainingJobs = batchStatistics.getRemainingJobs();
     dto.completedJobs = batchStatistics.getCompletedJobs();
