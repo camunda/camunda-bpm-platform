@@ -14,9 +14,9 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -43,8 +43,9 @@ public class SetJobPriorityCmd implements Command<Void> {
     JobEntity job = commandContext.getJobManager().findJobById(jobId);
     EnsureUtil.ensureNotNull(NotFoundException.class, "No job found with id '" + jobId + "'", "job", job);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkUpdateProcessInstance(job);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkUpdateJob(job);
+    }
 
     long currentPriority = job.getPriority();
     job.setPriority(priority);

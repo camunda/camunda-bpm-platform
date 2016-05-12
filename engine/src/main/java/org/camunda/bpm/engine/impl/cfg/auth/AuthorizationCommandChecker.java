@@ -46,6 +46,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -170,6 +171,11 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   @Override
+  public void checkUpdateJob(JobEntity job) {
+    getAuthorizationManager().checkUpdateProcessInstance(job);
+  }
+
+  @Override
   public void checkUpdateProcessInstance(ExecutionEntity execution) {
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
 
@@ -222,6 +228,32 @@ public class AuthorizationCommandChecker implements CommandChecker {
     secondCheck.setPermission(READ_INSTANCE);
     secondCheck.setResource(PROCESS_DEFINITION);
     secondCheck.setResourceId(processDefinition.getKey());
+    secondCheck.setAuthorizationNotFoundReturnValue(0l);
+
+    getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);
+  }
+
+  public void checkReadJob(JobEntity job) {
+    if (job.getProcessDefinitionKey() == null) {
+      // "standalone" job: nothing to do!
+      return;
+    }
+
+    // necessary permissions:
+    // - READ on PROCESS_INSTANCE
+
+    PermissionCheck firstCheck = getAuthorizationManager().newPermissionCheck();
+    firstCheck.setPermission(READ);
+    firstCheck.setResource(PROCESS_INSTANCE);
+    firstCheck.setResourceId(job.getProcessInstanceId());
+
+    // ... OR ...
+
+    // - READ_INSTANCE on PROCESS_DEFINITION
+    PermissionCheck secondCheck = getAuthorizationManager().newPermissionCheck();
+    secondCheck.setPermission(READ_INSTANCE);
+    secondCheck.setResource(PROCESS_DEFINITION);
+    secondCheck.setResourceId(job.getProcessDefinitionKey());
     secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
     getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);

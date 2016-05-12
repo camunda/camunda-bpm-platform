@@ -17,9 +17,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 
@@ -45,9 +45,10 @@ public class GetJobExceptionStacktraceCmd implements Command<String>, Serializab
 
     ensureNotNull("No job found with id " + jobId, "job", job);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadProcessInstance(job);
-
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadJob(job);
+    }
+    
     return job.getExceptionStacktrace();
   }
 

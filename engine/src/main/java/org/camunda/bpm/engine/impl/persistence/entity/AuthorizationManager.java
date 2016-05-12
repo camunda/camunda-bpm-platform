@@ -474,6 +474,7 @@ public class AuthorizationManager extends AbstractManager {
 
   /* PROCESS INSTANCE */
 
+
   // read permission ////////////////////////////////////////////////////
 
   public void checkReadProcessInstance(JobEntity job) {
@@ -500,6 +501,12 @@ public class AuthorizationManager extends AbstractManager {
     secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
     checkAuthorization(firstCheck, secondCheck);
+  }
+
+  public void checkReadHistoricJobLog(HistoricJobLogEventEntity historicJobLog) {
+    if (historicJobLog.getProcessDefinitionKey() != null) {
+      checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, historicJobLog.getProcessDefinitionKey());
+    }
   }
 
   public void checkReadHistoryAnyProcessDefinition() {

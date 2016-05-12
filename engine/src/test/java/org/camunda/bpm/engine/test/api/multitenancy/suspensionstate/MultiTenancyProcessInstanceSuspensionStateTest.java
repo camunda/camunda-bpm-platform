@@ -536,7 +536,7 @@ public class MultiTenancyProcessInstanceSuspensionStateTest {
 
     // declare expected exception
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the suspension state of an instance of the process definition");
+    thrown.expectMessage("Cannot update the process definition "+ processDefinition.getId() +" because it belongs to no authenticated tenant");
 
     engineRule.getIdentityService().setAuthentication("user", null, null);
 

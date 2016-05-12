@@ -85,7 +85,7 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot read the task "+ taskId +" because it belongs to no authenticated tenant.");
     engineRule.getTaskService().getVariable(taskId, VARIABLE_1);
   }
 
@@ -118,7 +118,7 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot read the task "+ taskId +" because it belongs to no authenticated tenant.");
     engineRule.getTaskService().getVariableTyped(taskId, VARIABLE_1).getValue();
   }
 
@@ -149,7 +149,7 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
        
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot read the task "+ taskId +" because it belongs to no authenticated tenant.");
     engineRule.getTaskService().getVariables(taskId).size();
     
   }
@@ -180,7 +180,7 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
     engineRule.getIdentityService().setAuthentication("aUserId", null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot update the task "+ taskId +" because it belongs to no authenticated tenant.");
     engineRule.getTaskService().setVariable(taskId, "newVariable", "newValue");
     
   }
@@ -213,7 +213,7 @@ public class MultiTenancyTaskVariableCmdsTenantCheckTest {
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot update the task "+ taskId +" because it belongs to no authenticated tenant.");
     engineRule.getTaskService().removeVariable(taskId, VARIABLE_1);
   }
   

@@ -194,7 +194,7 @@ public class MultiTenancyBatchTest {
     }
     catch (ProcessEngineException e) {
       // then
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Cannot delete batch because it belongs to no authenticated tenant"));
+      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Cannot delete batch "+ batch.getId() + " because it belongs to no authenticated tenant"));
     }
     finally {
       identityService.clearAuthentication();

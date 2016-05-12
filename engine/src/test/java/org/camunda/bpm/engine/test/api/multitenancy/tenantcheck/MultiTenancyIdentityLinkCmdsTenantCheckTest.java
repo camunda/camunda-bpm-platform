@@ -79,7 +79,7 @@ public class MultiTenancyIdentityLinkCmdsTenantCheckTest {
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot assign the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot assign the task "+ task.getId() +" because it belongs to no authenticated tenant.");
     taskService.setAssignee(task.getId(), "demo");
     
   }
@@ -114,7 +114,7 @@ public class MultiTenancyIdentityLinkCmdsTenantCheckTest {
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot assign the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot assign the task "+ task.getId() + " because it belongs to no authenticated tenant.");
     taskService.setOwner(task.getId(), "demo");
     
   }
@@ -148,7 +148,7 @@ public class MultiTenancyIdentityLinkCmdsTenantCheckTest {
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot read the task "+ task.getId() +" because it belongs to no authenticated tenant.");
     taskService.getIdentityLinksForTask(task.getId());
     
   }
@@ -183,7 +183,7 @@ public class MultiTenancyIdentityLinkCmdsTenantCheckTest {
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot assign the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot assign the task "+ task.getId() +" because it belongs to no authenticated tenant.");
     taskService.addCandidateUser(task.getId(), "demo");
     
   }
@@ -219,7 +219,7 @@ public class MultiTenancyIdentityLinkCmdsTenantCheckTest {
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot assign the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot assign the task "+task.getId()+ " because it belongs to no authenticated tenant.");
     taskService.addCandidateGroup(task.getId(), "demo");
     
   }
@@ -259,7 +259,7 @@ public class MultiTenancyIdentityLinkCmdsTenantCheckTest {
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot assign the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot assign the task "+ task.getId() +" because it belongs to no authenticated tenant.");
     taskService.deleteCandidateUser(task.getId(), "demo");
     
   }
@@ -300,7 +300,7 @@ public class MultiTenancyIdentityLinkCmdsTenantCheckTest {
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot assign the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot assign the task "+ task.getId() +" because it belongs to no authenticated tenant.");
     taskService.deleteCandidateGroup(task.getId(), "demo");
     
   }
@@ -337,7 +337,7 @@ public class MultiTenancyIdentityLinkCmdsTenantCheckTest {
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot assign the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot assign the task "+ task.getId() +" because it belongs to no authenticated tenant.");
     taskService.addUserIdentityLink(task.getId(), "demo", IdentityLinkType.CANDIDATE);
     
   }
@@ -373,7 +373,7 @@ public class MultiTenancyIdentityLinkCmdsTenantCheckTest {
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot assign the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot assign the task "+ task.getId() + " because it belongs to no authenticated tenant.");
     taskService.addGroupIdentityLink(task.getId(), "demo", IdentityLinkType.CANDIDATE);
     
   }
@@ -413,7 +413,7 @@ public class MultiTenancyIdentityLinkCmdsTenantCheckTest {
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot assign the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot assign the task "+ task.getId() +" because it belongs to no authenticated tenant.");
     taskService.deleteUserIdentityLink(task.getId(), "demo", IdentityLinkType.ASSIGNEE);
     
   }
@@ -456,7 +456,7 @@ public class MultiTenancyIdentityLinkCmdsTenantCheckTest {
     
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot assign the task because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot assign the task "+ task.getId() +" because it belongs to no authenticated tenant.");
     taskService.deleteGroupIdentityLink(task.getId(), "demo", IdentityLinkType.CANDIDATE);
     
   }

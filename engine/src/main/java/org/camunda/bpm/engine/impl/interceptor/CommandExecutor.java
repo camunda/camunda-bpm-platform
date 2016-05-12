@@ -22,6 +22,6 @@ package org.camunda.bpm.engine.impl.interceptor;
  */
 public interface CommandExecutor {
 
-  <T> T execute(Command<T> command);
 
+  <T> T execute(Command<T> command);
 }

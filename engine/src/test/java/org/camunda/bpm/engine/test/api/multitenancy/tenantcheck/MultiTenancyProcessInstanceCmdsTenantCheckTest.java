@@ -77,7 +77,7 @@ public class MultiTenancyProcessInstanceCmdsTenantCheckTest {
     engineRule.getIdentityService().setAuthentication("aUserId", null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot delete the process instance because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot delete the process instance "+ processInstanceId +" because it belongs to no authenticated tenant.");
   
     // when
     engineRule.getRuntimeService().deleteProcessInstance(processInstanceId, null);
@@ -122,7 +122,7 @@ public class MultiTenancyProcessInstanceCmdsTenantCheckTest {
     engineRule.getIdentityService().setAuthentication("aUserId", null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process instance because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot update the process instance "+ processInstanceId +" because it belongs to no authenticated tenant.");
   
     // when
     engineRule.getRuntimeService()

@@ -17,9 +17,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 
@@ -47,8 +47,9 @@ public class SetJobDuedateCmd implements Command<Void>, Serializable {
             .findJobById(jobId);
     if (job != null) {
 
-      AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-      authorizationManager.checkUpdateProcessInstance(job);
+      for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+        checker.checkUpdateJob(job);
+      }
 
       job.setDuedate(newDuedate);
     } else {

@@ -68,7 +68,7 @@ public class MultiTenancyActivityCmdsTenantCheckTest {
     engineRule.getIdentityService().setAuthentication("aUserId", null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the process instance because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot read the process instance "+ processInstanceId +" because it belongs to no authenticated tenant.");
     engineRule.getRuntimeService().getActivityInstance(processInstanceId);
     
   }
@@ -100,7 +100,7 @@ public class MultiTenancyActivityCmdsTenantCheckTest {
     engineRule.getIdentityService().setAuthentication("aUserId", null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the process instance because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot read the process instance "+ processInstanceId +" because it belongs to no authenticated tenant.");
     // when
     engineRule.getRuntimeService().getActiveActivityIds(processInstanceId);
 

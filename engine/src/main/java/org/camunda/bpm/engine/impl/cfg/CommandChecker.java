@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntit
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -75,6 +76,11 @@ public interface CommandChecker {
   void checkUpdateProcessInstanceByProcessDefinitionKey(String processDefinitionKey);
 
   /**
+   *  Checks if it is allowed to update a process instance of the given job.
+   */
+  void checkUpdateJob(JobEntity job);
+
+  /**
    * Checks if it is allowed to update a process instance of the given process instance id.
    */
   void checkUpdateProcessInstanceById(String processInstanceId);
@@ -89,6 +95,11 @@ public interface CommandChecker {
   void checkMigrateProcessInstance(ExecutionEntity processInstance, ProcessDefinition targetProcessDefinition);
 
   void checkReadProcessInstance(String processInstanceId);
+
+  /**
+   * Checks if it is allowed to read a job of the given job entity. 
+   */
+  void checkReadJob(JobEntity job);
 
   /**
    * Checks if it is allowed to read a process instance of the given process instance id.

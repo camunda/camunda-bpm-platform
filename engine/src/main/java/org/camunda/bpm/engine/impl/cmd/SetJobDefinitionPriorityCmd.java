@@ -55,7 +55,7 @@ public class SetJobDefinitionPriorityCmd implements Command<Void> {
         "jobDefinition",
         jobDefinition);
 
-    checkAuthorization(commandContext, jobDefinition);
+    checkUpdateProcess(commandContext, jobDefinition);
 
     Long currentPriority = jobDefinition.getOverridingJobPriority();
     jobDefinition.setJobPriority(priority);
@@ -73,15 +73,15 @@ public class SetJobDefinitionPriorityCmd implements Command<Void> {
     return null;
   }
 
-  protected void checkAuthorization(CommandContext commandContext, JobDefinitionEntity jobDefinition) {
+  protected void checkUpdateProcess(CommandContext commandContext, JobDefinitionEntity jobDefinition) {
 
-    String processDefinitionKey = jobDefinition.getProcessDefinitionKey();
+    String processDefinitionId = jobDefinition.getProcessDefinitionId();
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkUpdateProcessDefinitionByKey(processDefinitionKey);
+      checker.checkUpdateProcessDefinitionById(processDefinitionId);
 
       if (cascade) {
-        checker.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
+        checker.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
       }
     }
   }
