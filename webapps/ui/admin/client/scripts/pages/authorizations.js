@@ -34,7 +34,7 @@ var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization
           8: 'Process Instance',
           9: 'Deployment',
          10: 'Decision Definition',
-         11: 'Batch'
+         13: 'Batch'
         };
 
         pageService.breadcrumbsAdd([
@@ -56,7 +56,7 @@ var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization
           8: [ 'CREATE', 'READ', 'UPDATE', 'DELETE' ],
           9: [ 'CREATE', 'READ', 'DELETE' ],
          10: [ 'READ', 'CREATE_INSTANCE', 'READ_HISTORY', 'DELETE_HISTORY' ],
-         11: [ 'READ', 'CREATE', 'DELETE', 'READ_HISTORY', 'DELETE_HISTORY' ]
+         13: [ 'READ', 'UPDATE', 'CREATE', 'DELETE', 'READ_HISTORY', 'DELETE_HISTORY' ]
         };
 
         $scope.typeMap = {
