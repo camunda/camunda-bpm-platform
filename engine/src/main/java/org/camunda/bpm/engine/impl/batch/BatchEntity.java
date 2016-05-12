@@ -227,7 +227,6 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
   public Object getPersistentState() {
     HashMap<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("jobsCreated", jobsCreated);
-    persistentState.put("suspensionState", suspensionState);
     return persistentState;
   }
 

@@ -64,7 +64,6 @@
     update ${prefix}ACT_RU_BATCH
     set
       JOBS_CREATED_ = #{jobsCreated, jdbcType=INTEGER},
-      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
       REV_ = #{revisionNext, jdbcType=INTEGER}
     where
       ID_ = #{id, jdbcType=VARCHAR}
