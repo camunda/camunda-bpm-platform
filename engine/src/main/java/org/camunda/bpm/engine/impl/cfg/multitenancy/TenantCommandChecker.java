@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.cfg.multitenancy;
 
+import org.camunda.bpm.engine.history.HistoricCaseInstance;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
@@ -22,6 +24,8 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
@@ -272,16 +276,46 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
+  public void checkDeleteHistoricTaskInstance(HistoricTaskInstanceEntity task) {
+    if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("delete the historic task instance");
+    }
+  }
+
+  @Override
+  public void checkDeleteHistoricProcessInstance(HistoricProcessInstance instance) {
+    if (instance != null && !getTenantManager().isAuthenticatedTenant(instance.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("delete the historic process instance");
+    }
+  }
+
+  @Override
+  public void checkDeleteHistoricCaseInstance(HistoricCaseInstance instance) {
+    if (instance != null && !getTenantManager().isAuthenticatedTenant(instance.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("delete the historic case instance");
+    }
+  }
+
+  @Override
+  public void checkDeleteHistoricDecisionInstance(String decisionDefinitionKey) {
+  }
+
+  @Override
+  public void checkReadHistoricJobLog(HistoricJobLogEventEntity historicJobLog) {
+    if (historicJobLog != null && !getTenantManager().isAuthenticatedTenant(historicJobLog.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("get the historic job log");
+    }
+  }
+
+  // helper //////////////////////////////////////////////////
+
   protected TenantManager getTenantManager() {
     return Context.getCommandContext().getTenantManager();
   }
 
   protected ProcessDefinitionEntity findLatestProcessDefinitionById(String processDefinitionId) {
     return Context.getCommandContext().getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
-  }
-
-  protected ProcessDefinitionEntity findLatestProcessDefinitionByKey(String processDefinitionKey) {
-    return Context.getCommandContext().getProcessDefinitionManager().findLatestProcessDefinitionByKey(processDefinitionKey);
   }
 
   protected ExecutionEntity findExecutionById(String processInstanceId) {
@@ -291,4 +325,5 @@ public class TenantCommandChecker implements CommandChecker {
   protected DeploymentEntity findDeploymentById(String deploymentId) {
     return Context.getCommandContext().getDeploymentManager().findDeploymentById(deploymentId);
   }
+
 }

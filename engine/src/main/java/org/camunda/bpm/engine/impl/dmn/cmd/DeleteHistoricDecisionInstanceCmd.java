@@ -15,10 +15,10 @@ package org.camunda.bpm.engine.impl.dmn.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 
 /**
  * Deletes historic decision instances with the given id of the decision definition.
@@ -43,8 +43,9 @@ public class DeleteHistoricDecisionInstanceCmd implements Command<Object> {
         .findDecisionDefinitionById(decisionDefinitionId);
     ensureNotNull("No decision definition found with id: " + decisionDefinitionId, "decisionDefinition", decisionDefinition);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkDeleteHistoricDecisionInstance(decisionDefinition.getKey());
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkDeleteHistoricDecisionInstance(decisionDefinition.getKey());
+    }
 
     commandContext
       .getHistoricDecisionInstanceManager()

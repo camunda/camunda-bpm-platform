@@ -48,7 +48,6 @@ import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl;
@@ -486,12 +485,6 @@ public class AuthorizationManager extends AbstractManager {
     checkAuthorization(firstCheck, secondCheck);
   }
 
-  public void checkReadHistoricJobLog(HistoricJobLogEventEntity historicJobLog) {
-    if (historicJobLog.getProcessDefinitionKey() != null) {
-      checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, historicJobLog.getProcessDefinitionKey());
-    }
-  }
-
   public void checkReadHistoryAnyProcessDefinition() {
     checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, ANY);
   }
@@ -522,12 +515,6 @@ public class AuthorizationManager extends AbstractManager {
     secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
     checkAuthorization(firstCheck, secondCheck);
-  }
-
-  // delete permission /////////////////////////////////////////////////
-
-  public void checkDeleteHistoricProcessInstance(HistoricProcessInstance instance) {
-    checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, instance.getProcessDefinitionKey());
   }
 
   /* TASK */
@@ -728,16 +715,6 @@ public class AuthorizationManager extends AbstractManager {
     }
   }
 
-  // delete permission ////////////////////////////////////////
-
-  public void checkDeleteHistoricTaskInstance(HistoricTaskInstanceEntity task) {
-    if (task != null) {
-      if (task.getExecutionId() != null) {
-        checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, task.getProcessDefinitionKey());
-      }
-    }
-  }
-
   /* USER OPERATION LOG */
 
   // delete user operation log ///////////////////////////////
@@ -749,10 +726,6 @@ public class AuthorizationManager extends AbstractManager {
         checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, processDefinitionKey);
       }
     }
-  }
-
-  public void checkDeleteHistoricDecisionInstance(String decisionDefinitionKey) {
-    checkAuthorization(DELETE_HISTORY, DECISION_DEFINITION, decisionDefinitionKey);
   }
 
   /* QUERIES */

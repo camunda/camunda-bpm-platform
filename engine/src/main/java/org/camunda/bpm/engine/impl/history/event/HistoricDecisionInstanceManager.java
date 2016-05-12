@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSerializer;
 
@@ -58,7 +59,7 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
 
   @SuppressWarnings("unchecked")
   protected List<HistoricDecisionInstanceEntity> findHistoricDecisionInstancesByDecisionDefinitionId(String decisionDefinitionId) {
-    return getDbEntityManager().selectList("selectHistoricDecisionInstancesByDecisionDefinitionId", decisionDefinitionId);
+    return getDbEntityManager().selectList("selectHistoricDecisionInstancesByDecisionDefinitionId", configureParameterizedQuery(decisionDefinitionId));
   }
 
   protected void deleteHistoricDecisionInputInstancesByDecisionInstanceIds(Set<String> decisionInstanceIds) {
@@ -232,6 +233,10 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
   protected void configureQuery(HistoricDecisionInstanceQueryImpl query) {
     getAuthorizationManager().configureHistoricDecisionInstanceQuery(query);
     getTenantManager().configureQuery(query);
+  }
+
+  protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
+    return getTenantManager().configureQuery(parameter);
   }
 
 }

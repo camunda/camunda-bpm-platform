@@ -14,10 +14,14 @@
 package org.camunda.bpm.engine.impl.cfg;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.HistoricCaseInstance;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -176,4 +180,29 @@ public interface CommandChecker {
    */
   void checkReadCaseDefinition(CaseDefinition caseDefinition);
 
+  /**
+   * Checks if it is allowed to delete the given historic task instance.
+   */
+  void checkDeleteHistoricTaskInstance(HistoricTaskInstanceEntity task);
+
+  /**
+   * Checks if it is allowed to delete the given historic process instance.
+   */
+  void checkDeleteHistoricProcessInstance(HistoricProcessInstance instance);
+
+  /**
+   * Checks if it is allowed to delete the given historic case instance.
+   */
+  void checkDeleteHistoricCaseInstance(HistoricCaseInstance instance);
+
+  /**
+   * Checks if it is allowed to delete the historic decision instance for the given
+   * decision definition key.
+   */
+  void checkDeleteHistoricDecisionInstance(String decisionDefinitionKey);
+
+  /**
+   * Checks if it is allowed to read the given historic job log.
+   */
+  void checkReadHistoricJobLog(HistoricJobLogEventEntity historicJobLog);
 }

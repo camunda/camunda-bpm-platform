@@ -19,6 +19,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.TASK_ASSIGN;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
@@ -33,6 +34,8 @@ import static org.camunda.bpm.engine.authorization.Resources.TASK;
 
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
+import org.camunda.bpm.engine.history.HistoricCaseInstance;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
@@ -41,6 +44,8 @@ import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -320,6 +325,37 @@ public class AuthorizationCommandChecker implements CommandChecker {
   @Override
   public void checkReadCaseDefinition(CaseDefinition caseDefinition) {
   }
+
+  // delete permission ////////////////////////////////////////
+
+  public void checkDeleteHistoricTaskInstance(HistoricTaskInstanceEntity task) {
+    if (task != null) {
+      if (task.getExecutionId() != null) {
+        getAuthorizationManager().checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, task.getProcessDefinitionKey());
+      }
+    }
+  }
+
+  // delete permission /////////////////////////////////////////////////
+
+  public void checkDeleteHistoricProcessInstance(HistoricProcessInstance instance) {
+    getAuthorizationManager().checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, instance.getProcessDefinitionKey());
+  }
+
+  public void checkDeleteHistoricCaseInstance(HistoricCaseInstance instance) {
+  }
+
+  public void checkDeleteHistoricDecisionInstance(String decisionDefinitionKey) {
+    getAuthorizationManager().checkAuthorization(DELETE_HISTORY, DECISION_DEFINITION, decisionDefinitionKey);
+  }
+
+  public void checkReadHistoricJobLog(HistoricJobLogEventEntity historicJobLog) {
+    if (historicJobLog.getProcessDefinitionKey() != null) {
+      getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, historicJobLog.getProcessDefinitionKey());
+    }
+  }
+
+  // helper ////////////////////////////////////////
 
   protected AuthorizationManager getAuthorizationManager() {
     return Context.getCommandContext().getAuthorizationManager();

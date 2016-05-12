@@ -18,9 +18,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 
 /**
  * @author Frederik Heremans
@@ -43,8 +43,9 @@ public class DeleteHistoricProcessInstanceCmd implements Command<Object>, Serial
 
     ensureNotNull("No historic process instance found with id: " + processInstanceId, "instance", instance);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkDeleteHistoricProcessInstance(instance);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkDeleteHistoricProcessInstance(instance);
+    }
 
     ensureNotNull("Process instance is still running, cannot delete historic process instance: " + processInstanceId, "instance.getEndTime()", instance.getEndTime());
 
