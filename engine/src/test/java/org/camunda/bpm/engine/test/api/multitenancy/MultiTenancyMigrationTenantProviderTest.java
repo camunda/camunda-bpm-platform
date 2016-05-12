@@ -141,6 +141,34 @@ public class MultiTenancyMigrationTenantProviderTest {
     assertInstanceOfDefinition(processInstance2, sourceDefinition);
   }
 
+  @Test
+  public void canMigrateWithProcessInstanceQueryAllInstancesOfAuthenticatedTenants() {
+    // given
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = engineRule
+        .getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities()
+        .build();
+
+    ProcessInstance processInstance1 = startInstanceForTenant(sourceDefinition, TENANT_ONE);
+    ProcessInstance processInstance2 = startInstanceForTenant(sourceDefinition, TENANT_TWO);
+
+    // when
+    engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
+    engineRule.getRuntimeService()
+      .newMigration(migrationPlan)
+      .processInstanceQuery(engineRule.getRuntimeService().createProcessInstanceQuery())
+      .execute();
+    engineRule.getIdentityService().clearAuthentication();
+
+    // then
+    assertInstanceOfDefinition(processInstance1, targetDefinition);
+    assertInstanceOfDefinition(processInstance2, targetDefinition);
+  }
+
   protected void assertInstanceOfDefinition(ProcessInstance processInstance, ProcessDefinition targetDefinition) {
     Assert.assertEquals(1, engineRule.getRuntimeService()
       .createProcessInstanceQuery()
