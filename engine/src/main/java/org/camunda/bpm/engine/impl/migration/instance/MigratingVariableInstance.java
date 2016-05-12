@@ -47,7 +47,7 @@ public class MigratingVariableInstance implements MigratingInstance {
   }
 
   @Override
-  public void attachState(MigratingActivityInstance owningActivityInstance) {
+  public void attachState(MigratingScopeInstance owningActivityInstance) {
     ExecutionEntity representativeExecution = owningActivityInstance.resolveRepresentativeExecution();
     ScopeImpl currentScope = owningActivityInstance.getCurrentScope();
 

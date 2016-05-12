@@ -145,8 +145,11 @@ public class ProcessInstanceSnapshot {
     List<EventSubscription> collectedEventsubscriptions = new ArrayList<EventSubscription>();
 
     for (EventSubscription eventSubscription : getEventSubscriptions()) {
-      if (activityId.equals(eventSubscription.getActivityId()) && eventName.equals(eventSubscription.getEventName())) {
-        collectedEventsubscriptions.add(eventSubscription);
+      if (activityId.equals(eventSubscription.getActivityId())) {
+        if ((eventName == null && eventSubscription.getEventName() == null)
+          || eventName != null && eventName.equals(eventSubscription.getEventName())) {
+          collectedEventsubscriptions.add(eventSubscription);
+        }
       }
     }
 

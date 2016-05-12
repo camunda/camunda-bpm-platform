@@ -59,7 +59,7 @@ public class MigratingEventSubscriptionInstance implements MigratingInstance, Re
     eventSubscriptionEntity.setExecution(null);
   }
 
-  public void attachState(MigratingActivityInstance newOwningInstance) {
+  public void attachState(MigratingScopeInstance newOwningInstance) {
     eventSubscriptionEntity.setExecution(newOwningInstance.resolveRepresentativeExecution());
   }
 

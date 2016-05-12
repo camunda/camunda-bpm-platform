@@ -22,10 +22,12 @@ import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingEventScopeInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingExternalTaskInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingJobInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessElementInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingScopeInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingTransitionInstance;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingProcessInstanceValidationReportImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -54,6 +56,7 @@ public class MigratingInstanceParseContext {
   protected MigratingProcessInstance migratingProcessInstance;
 
   protected Map<String, MigratingActivityInstance> activityInstances = new HashMap<String, MigratingActivityInstance>();
+  protected Map<String, MigratingEventScopeInstance> compensationInstances = new HashMap<String, MigratingEventScopeInstance>();
   protected Map<String, MigratingJobInstance> migratingJobs = new HashMap<String, MigratingJobInstance>();
   protected Map<String, MigratingExternalTaskInstance> migratingExternalTasks = new HashMap<String, MigratingExternalTaskInstance>();
 
@@ -128,6 +131,13 @@ public class MigratingInstanceParseContext {
     activityInstances.put(activityInstance.getActivityInstance().getId(), activityInstance);
   }
 
+  public void submit(MigratingEventScopeInstance compensationInstance) {
+    ExecutionEntity scopeExecution = compensationInstance.resolveRepresentativeExecution();
+    if (scopeExecution != null) {
+      compensationInstances.put(scopeExecution.getId(), compensationInstance);
+    }
+  }
+
   public void submit(MigratingJobInstance job) {
     migratingJobs.put(job.getJobEntity().getId(), job);
   }
@@ -162,6 +172,10 @@ public class MigratingInstanceParseContext {
 
   public MigratingProcessInstance getMigratingProcessInstance() {
     return migratingProcessInstance;
+  }
+
+  public Collection<MigratingActivityInstance> getMigratingActivityInstances() {
+    return activityInstances.values();
   }
 
   public ProcessDefinitionImpl getSourceProcessDefinition() {
@@ -214,6 +228,10 @@ public class MigratingInstanceParseContext {
 
   public MigratingActivityInstance getMigratingActivityInstanceById(String activityInstanceId) {
     return activityInstances.get(activityInstanceId);
+  }
+
+  public MigratingScopeInstance getMigratingCompensationInstanceByExecutionId(String id) {
+    return compensationInstances.get(id);
   }
 
   public MigratingJobInstance getMigratingJobInstanceById(String jobId) {
@@ -282,5 +300,7 @@ public class MigratingInstanceParseContext {
       processInstanceReport.addFailure("Process instance contains not migrated " + entityName + ": [" + StringUtil.joinDbEntityIds(dbEntities) + "]");
     }
   }
+
+
 
 }

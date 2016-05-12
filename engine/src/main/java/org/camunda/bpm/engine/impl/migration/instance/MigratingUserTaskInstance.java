@@ -56,7 +56,7 @@ public class MigratingUserTaskInstance implements MigratingInstance {
   }
 
   @Override
-  public void attachState(MigratingActivityInstance owningInstance) {
+  public void attachState(MigratingScopeInstance owningInstance) {
     ExecutionEntity representativeExecution = owningInstance.resolveRepresentativeExecution();
     representativeExecution.addTask(userTask);
 

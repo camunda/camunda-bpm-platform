@@ -25,11 +25,13 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.CompensationModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
@@ -211,5 +213,45 @@ public class MigrationHistoricVariablesTest {
       assertEquals(targetDefinition.getId(), variable.getProcessDefinitionId());
 
     }
+  }
+
+  @Test
+  public void testMigrateEventScopeVariable() {
+    //given
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+      .mapActivities("userTask2", "userTask2")
+      .mapActivities("subProcess", "subProcess")
+      .mapActivities("compensationBoundary", "compensationBoundary")
+      .build();
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceDefinition.getId());
+
+    Execution subProcessExecution = runtimeService.createExecutionQuery().activityId("userTask1").singleResult();
+
+    runtimeService.setVariableLocal(subProcessExecution.getId(), "foo", "bar");
+
+    testHelper.completeTask("userTask1");
+
+    Execution eventScopeExecution = runtimeService.createExecutionQuery().activityId("subProcess").singleResult();
+    HistoricVariableInstance eventScopeVariable = historyService
+      .createHistoricVariableInstanceQuery()
+      .executionIdIn(eventScopeExecution.getId())
+      .singleResult();
+
+    //when
+    runtimeService.newMigration(migrationPlan)
+      .processInstanceIds(processInstance.getId())
+      .execute();
+
+    // then
+    HistoricVariableInstance historicVariableInstance = historyService
+      .createHistoricVariableInstanceQuery()
+      .variableId(eventScopeVariable.getId())
+      .singleResult();
+    Assert.assertEquals(targetDefinition.getId(), historicVariableInstance.getProcessDefinitionId());
   }
 }

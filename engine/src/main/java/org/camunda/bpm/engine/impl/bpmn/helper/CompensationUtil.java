@@ -52,15 +52,13 @@ public class CompensationUtil {
   public static void throwCompensationEvent(List<CompensateEventSubscriptionEntity> eventSubscriptions, ActivityExecution execution, boolean async) {
 
     // first spawn the compensating executions
-    for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-      ExecutionEntity compensatingExecution = null;
+    for (CompensateEventSubscriptionEntity eventSubscription : eventSubscriptions) {
       // check whether compensating execution is already created
       // (which is the case when compensating an embedded subprocess,
       // where the compensating execution is created when leaving the subprocess
       // and holds snapshot data).
-      if (eventSubscription.getConfiguration() != null) {
-        compensatingExecution = Context.getCommandContext().getExecutionManager().findExecutionById(eventSubscription.getConfiguration());
-
+      ExecutionEntity compensatingExecution = eventSubscription.getCompensatingExecution();
+      if (compensatingExecution != null) {
         if (compensatingExecution.getParent() != execution) {
           // move the compensating execution under this execution if this is not the case yet
           compensatingExecution.setParent((PvmExecutionImpl) execution);

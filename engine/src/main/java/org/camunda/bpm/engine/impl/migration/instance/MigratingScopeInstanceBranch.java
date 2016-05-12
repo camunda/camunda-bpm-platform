@@ -18,26 +18,29 @@ import java.util.Map;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 /**
- * Keeps track of activity instances created in a branch of the activity instance tree from the process instance downwards
+ * Keeps track of scope instances (activity instances; event scope instances) created in a branch
+ * of the activity/event scope tree from the process instance downwards
  *
  * @author Thorben Lindhauer
  */
-public class MigratingActivityInstanceBranch {
-  protected Map<ScopeImpl, MigratingActivityInstance> scopeInstances;
+public class MigratingScopeInstanceBranch {
+  protected Map<ScopeImpl, MigratingScopeInstance> scopeInstances;
 
-  public MigratingActivityInstanceBranch() {
-    this(new HashMap<ScopeImpl, MigratingActivityInstance>());
+  public MigratingScopeInstanceBranch() {
+    this(new HashMap<ScopeImpl, MigratingScopeInstance>());
   }
 
-  protected MigratingActivityInstanceBranch(Map<ScopeImpl, MigratingActivityInstance> scopeInstances) {
+  protected MigratingScopeInstanceBranch(
+      Map<ScopeImpl, MigratingScopeInstance> scopeInstances) {
     this.scopeInstances = scopeInstances;
   }
 
-  public MigratingActivityInstanceBranch copy() {
-    return new MigratingActivityInstanceBranch(new HashMap<ScopeImpl, MigratingActivityInstance>(scopeInstances));
+  public MigratingScopeInstanceBranch copy() {
+    return new MigratingScopeInstanceBranch(
+        new HashMap<ScopeImpl, MigratingScopeInstance>(scopeInstances));
   }
 
-  public MigratingActivityInstance getInstance(ScopeImpl scope) {
+  public MigratingScopeInstance getInstance(ScopeImpl scope) {
     return scopeInstances.get(scope);
   }
 
@@ -45,10 +48,10 @@ public class MigratingActivityInstanceBranch {
     return scopeInstances.containsKey(scope);
   }
 
-  public void visited(MigratingActivityInstance activityInstance) {
-    ScopeImpl targetScope = activityInstance.getTargetScope();
+  public void visited(MigratingScopeInstance scopeInstance) {
+    ScopeImpl targetScope = scopeInstance.getTargetScope();
     if (targetScope.isScope()) {
-      scopeInstances.put(targetScope, activityInstance);
+      scopeInstances.put(targetScope, scopeInstance);
     }
   }
 }

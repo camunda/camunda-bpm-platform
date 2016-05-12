@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -34,7 +35,7 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior imp
   @Override
   public void execute(ActivityExecution execution) throws Exception {
     PvmActivity activity = execution.getActivity();
-    PvmActivity initialActivity = (PvmActivity) activity.getProperty(BpmnParse.PROPERTYNAME_INITIAL);
+    PvmActivity initialActivity = activity.getProperties().get(BpmnProperties.INITIAL_ACTIVITY);
 
     ensureNotNull("No initial activity found for subprocess " + execution.getActivity().getId(), "initialActivity", initialActivity);
 

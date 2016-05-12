@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.core.model.PropertyKey;
 import org.camunda.bpm.engine.impl.core.model.PropertyListKey;
 import org.camunda.bpm.engine.impl.core.model.PropertyMapKey;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 /**
  * Properties of bpmn elements.
@@ -49,5 +50,11 @@ public class BpmnProperties {
    * There is code that relies on this assumption (e.g. when determining which declaration matches a job in the migration logic).
    */
   public static final PropertyMapKey<String, EventSubscriptionDeclaration> EVENT_SUBSCRIPTION_DECLARATIONS = new PropertyMapKey<String, EventSubscriptionDeclaration>("eventDefinitions", false);
+
+  public static final PropertyKey<ActivityImpl> COMPENSATION_BOUNDARY_EVENT = new PropertyKey<ActivityImpl>("compensationBoundaryEvent");
+
+  public static final PropertyKey<ActivityImpl> INITIAL_ACTIVITY = new PropertyKey<ActivityImpl>("initial");
+
+  public static final PropertyKey<Boolean> TRIGGERED_BY_EVENT = new PropertyKey<Boolean>("triggeredByEvent");
 
 }

@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.impl.migration.validation.instruction;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
+import org.camunda.bpm.engine.impl.bpmn.parser.ActivityTypes;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
@@ -22,6 +24,11 @@ public class SameEventScopeInstructionValidator implements MigrationInstructionV
 
   public void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, MigrationInstructionValidationReportImpl report) {
     ActivityImpl sourceActivity = instruction.getSourceActivity();
+    if (isCompensationBoundaryEvent(sourceActivity)) {
+      // this is not required for compensation boundary events since their
+      // event scopes need not be active at runtime
+      return;
+    }
 
     ScopeImpl sourceEventScope = instruction.getSourceActivity().getEventScope();
     ScopeImpl targetEventScope = instruction.getTargetActivity().getEventScope();
@@ -44,6 +51,11 @@ public class SameEventScopeInstructionValidator implements MigrationInstructionV
             + "must be mapped to the target activity's event scope (" + targetEventScope.getId() + ")");
       }
     }
+  }
+
+  protected boolean isCompensationBoundaryEvent(ActivityImpl sourceActivity) {
+    String activityType = sourceActivity.getProperties().get(BpmnProperties.TYPE);
+    return ActivityTypes.BOUNDARY_COMPENSATION.equals(activityType);
   }
 
   protected ScopeImpl findMappedEventScope(ScopeImpl sourceEventScope, ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions) {

@@ -93,4 +93,5 @@ public class EventSubscriptionInstanceHandler implements MigratingDependentInsta
       owningInstance.addEmergingDependentInstance(new MigratingEventSubscriptionInstance(eventSubscriptionDeclaration));
     }
   }
+
 }

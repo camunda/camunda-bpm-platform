@@ -17,6 +17,8 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessElementInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingScopeInstance;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingProcessInstanceValidationReportImpl;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationPlanValidationReportImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -127,6 +129,16 @@ public class MigrationLogger extends ProcessEngineLogger {
     }
 
     return new ProcessEngineException(detailMessage);
+  }
+
+  public ProcessEngineException cannotHandleChild(MigratingScopeInstance scopeInstance, MigratingProcessElementInstance childCandidate) {
+    return new ProcessEngineException(
+        exceptionMessage(
+            "011",
+            "Scope instance of type {} cannot have child of type {}",
+            scopeInstance.getClass().getSimpleName(),
+            childCandidate.getClass().getSimpleName())
+        );
   }
 
 }

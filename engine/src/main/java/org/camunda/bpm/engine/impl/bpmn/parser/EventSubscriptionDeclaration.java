@@ -47,7 +47,6 @@ public class EventSubscriptionDeclaration implements Serializable {
   protected String activityId = null;
   protected String eventScopeActivityId = null;
   protected boolean isStartEvent;
-  protected Boolean isParallelMultiInstance = null;
 
   protected EventSubscriptionJobDeclaration jobDeclaration = null;
 

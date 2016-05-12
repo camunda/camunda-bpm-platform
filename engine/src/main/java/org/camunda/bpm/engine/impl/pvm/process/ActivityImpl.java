@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
@@ -136,7 +137,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   public boolean isAsyncBefore() {
     return isAsyncBefore;
   }
-  
+
   public void setAsyncBefore(boolean isAsyncBefore) {
     setAsyncBefore(isAsyncBefore, true);
   }
@@ -150,7 +151,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   public boolean isAsyncAfter() {
     return isAsyncAfter;
   }
-  
+
   public void setAsyncAfter(boolean isAsyncAfter) {
     setAsyncAfter(isAsyncAfter, true);
   }
@@ -158,7 +159,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   public void setAsyncAfter(boolean isAsyncAfter, boolean exclusive) {
     if (delegateAsyncAfterUpdate != null)
       delegateAsyncAfterUpdate.updateAsyncAfter(isAsyncAfter, exclusive);
-    this.isAsyncAfter = isAsyncAfter; 
+    this.isAsyncAfter = isAsyncAfter;
   }
 
   public String getActivityId() {
@@ -270,10 +271,10 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   }
 
   public boolean isTriggeredByEvent() {
-    Boolean isTriggeredByEvent = (Boolean) getProperty(BpmnParse.PROPERTYNAME_TRIGGERED_BY_EVENT);
+    Boolean isTriggeredByEvent = getProperties().get(BpmnProperties.TRIGGERED_BY_EVENT);
     return Boolean.TRUE.equals(isTriggeredByEvent);
-  } 
-  
+  }
+
   //============================================================================
   //===============================DELEGATES====================================
   //============================================================================
@@ -301,28 +302,28 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   public void setDelegateAsyncAfterUpdate(AsyncAfterUpdate delegateAsyncAfterUpdate) {
     this.delegateAsyncAfterUpdate = delegateAsyncAfterUpdate;
   }
-  
+
   /**
    * Delegate interface for the asyncBefore property update.
    */
   public interface AsyncBeforeUpdate {
     /**
      * Method which is called if the asyncBefore property should be updated.
-     * 
+     *
      * @param asyncBefore the new value for the asyncBefore flag
      * @param exclusive the exclusive flag
      */
     public void updateAsyncBefore(boolean asyncBefore, boolean exclusive);
   }
-  
+
   /**
    * Delegate interface for the asyncAfter property update
    */
   public interface AsyncAfterUpdate {
-    
+
     /**
      * Method which is called if the asyncAfter property should be updated.
-     *  
+     *
      * @param asyncAfter the new value for the asyncBefore flag
      * @param exclusive the exclusive flag
      */

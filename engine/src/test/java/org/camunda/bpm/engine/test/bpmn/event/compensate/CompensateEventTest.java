@@ -755,12 +755,12 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(tree).hasStructure(
-          describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-            .activity("throwCompensation")
-            .beginScope("booking-subprocess")
-              .activity("cancelFlight")
-              .beginScope("compensationSubProcess")
-                .activity("compensateFlight")
+         describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+           .activity("throwCompensation")
+           .beginScope("booking-subprocess")
+             .activity("cancelFlight")
+             .beginScope("compensationSubProcess")
+               .activity("compensateFlight")
          .done());
   }
 
@@ -905,10 +905,10 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     // then the activity instance tree is correct
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(tree).hasStructure(
-        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-          .activity("throwCompensate")
-          .beginScope("compensationHandler")
-            .activity("subProcessTask")
+       describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+         .activity("throwCompensate")
+         .beginScope("compensationHandler")
+           .activity("subProcessTask")
        .done());
   }
 

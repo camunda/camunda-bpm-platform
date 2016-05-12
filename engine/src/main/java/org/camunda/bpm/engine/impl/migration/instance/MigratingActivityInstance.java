@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.migration.instance;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,7 +40,7 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
  * @author Thorben Lindhauer
  *
  */
-public class MigratingActivityInstance extends MigratingProcessElementInstance implements MigratingInstance {
+public class MigratingActivityInstance extends MigratingScopeInstance implements MigratingInstance {
 
   public static final MigrationLogger MIGRATION_LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
@@ -55,6 +56,8 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
 
   protected Set<MigratingActivityInstance> childActivityInstances = new HashSet<MigratingActivityInstance>();
   protected Set<MigratingTransitionInstance> childTransitionInstances = new HashSet<MigratingTransitionInstance>();
+  protected Set<MigratingEventScopeInstance> childCompensationInstances = new HashSet<MigratingEventScopeInstance>();
+  protected Set<MigratingCompensationEventSubscriptionInstance> childCompensationSubscriptionInstances = new HashSet<MigratingCompensationEventSubscriptionInstance>();
 
   // behaves differently if the current activity is scope or not
   protected MigratingActivityInstanceBehavior instanceBehavior;
@@ -122,6 +125,16 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
     for (MigratingTransitionInstance child : transitionChildrenCopy) {
       child.detachState();
     }
+
+    Set<MigratingEventScopeInstance> compensationChildrenCopy = new HashSet<MigratingEventScopeInstance>(childCompensationInstances);
+    for (MigratingEventScopeInstance child : compensationChildrenCopy) {
+      child.detachState();
+    }
+
+    Set<MigratingCompensationEventSubscriptionInstance> compensationSubscriptionsChildrenCopy = new HashSet<MigratingCompensationEventSubscriptionInstance>(childCompensationSubscriptionInstances);
+    for (MigratingCompensationEventSubscriptionInstance child : compensationSubscriptionsChildrenCopy) {
+      child.detachState();
+    }
   }
 
   public void detachDependentInstances() {
@@ -146,7 +159,7 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
     setParent(null);
   }
 
-  public void attachState(MigratingActivityInstance activityInstance) {
+  public void attachState(MigratingScopeInstance activityInstance) {
 
     this.setParent(activityInstance);
     instanceBehavior.attachState(activityInstance);
@@ -209,6 +222,50 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
     this.childActivityInstances.remove(activityInstance);
   }
 
+  @Override
+  public void addChild(MigratingScopeInstance migratingActivityInstance) {
+    if (migratingActivityInstance instanceof MigratingActivityInstance) {
+      addChild((MigratingActivityInstance) migratingActivityInstance);
+    }
+    else if (migratingActivityInstance instanceof MigratingEventScopeInstance) {
+      addChild((MigratingEventScopeInstance) migratingActivityInstance);
+    }
+    else {
+      throw MIGRATION_LOGGER.cannotHandleChild(this, migratingActivityInstance);
+    }
+  }
+
+  @Override
+  public void removeChild(MigratingScopeInstance child) {
+    if (child instanceof MigratingActivityInstance) {
+      removeChild((MigratingActivityInstance) child);
+    }
+    else if (child instanceof MigratingEventScopeInstance) {
+      removeChild((MigratingEventScopeInstance) child);
+    }
+    else {
+      throw MIGRATION_LOGGER.cannotHandleChild(this, child);
+    }
+  }
+
+  public void addChild(MigratingEventScopeInstance compensationInstance) {
+    this.childCompensationInstances.add(compensationInstance);
+  }
+
+  public void removeChild(MigratingEventScopeInstance compensationInstance) {
+    this.childCompensationInstances.remove(compensationInstance);
+  }
+
+  @Override
+  public void addChild(MigratingCompensationEventSubscriptionInstance migratingEventSubscription) {
+    this.childCompensationSubscriptionInstances.add(migratingEventSubscription);
+  }
+
+  @Override
+  public void removeChild(MigratingCompensationEventSubscriptionInstance migratingEventSubscription) {
+    this.childCompensationSubscriptionInstances.remove(migratingEventSubscription);
+  }
+
   public ActivityInstance getActivityInstance() {
     return activityInstance;
   }
@@ -226,14 +283,28 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
     }
   }
 
+  @Override
+  public MigratingActivityInstance getParent() {
+    return (MigratingActivityInstance) super.getParent();
+  }
+
   /**
    * Returns a copy of all children, modifying the returned set does not have any further effect.
-   * @return
    */
   public Set<MigratingProcessElementInstance> getChildren() {
     Set<MigratingProcessElementInstance> childInstances = new HashSet<MigratingProcessElementInstance>();
     childInstances.addAll(childActivityInstances);
     childInstances.addAll(childTransitionInstances);
+    childInstances.addAll(childCompensationInstances);
+    childInstances.addAll(childCompensationSubscriptionInstances);
+    return childInstances;
+  }
+
+  @Override
+  public Collection<MigratingScopeInstance> getChildScopeInstances() {
+    Set<MigratingScopeInstance> childInstances = new HashSet<MigratingScopeInstance>();
+    childInstances.addAll(childActivityInstances);
+    childInstances.addAll(childCompensationInstances);
     return childInstances;
   }
 
@@ -243,6 +314,10 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
 
   public Set<MigratingTransitionInstance> getChildTransitionInstances() {
     return childTransitionInstances;
+  }
+
+  public Set<MigratingEventScopeInstance> getChildCompensationInstances() {
+    return childCompensationInstances;
   }
 
   public boolean migrates() {
@@ -310,7 +385,7 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
   }
 
   @Override
-  public void setParent(MigratingActivityInstance parentInstance) {
+  public void setParent(MigratingScopeInstance parentInstance) {
     if (this.parentInstance != null) {
       this.parentInstance.removeChild(this);
     }
@@ -329,7 +404,7 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
 
     void detachState();
 
-    void attachState(MigratingActivityInstance parentInstance);
+    void attachState(MigratingScopeInstance parentInstance);
 
     void migrateState();
 
@@ -357,13 +432,13 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
       currentExecution.leaveActivityInstance();
       currentExecution.setActive(false);
 
-      parentInstance.destroyAttachableExecution(currentExecution);
+      getParent().destroyAttachableExecution(currentExecution);
     }
 
     @Override
-    public void attachState(MigratingActivityInstance newParentInstance) {
+    public void attachState(MigratingScopeInstance newParentInstance) {
 
-      representativeExecution = newParentInstance.createAttachableExecution();
+      representativeExecution = getParent().createAttachableExecution();
 
       representativeExecution.setActivity((PvmActivity) sourceScope);
       representativeExecution.setActivityInstanceId(activityInstance.getId());
@@ -454,12 +529,13 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
       if (sourceScope.getActivityBehavior() instanceof CompositeActivityBehavior) {
         parentExecution.leaveActivityInstance();
       }
-      parentInstance.destroyAttachableExecution(parentExecution);
+
+      getParent().destroyAttachableExecution(parentExecution);
     }
 
     @Override
-    public void attachState(MigratingActivityInstance parentInstance) {
-      ExecutionEntity newParentExecution = parentInstance.createAttachableExecution();
+    public void attachState(MigratingScopeInstance parentInstance) {
+      ExecutionEntity newParentExecution = getParent().createAttachableExecution();
 
       ExecutionEntity currentScopeExecution = resolveRepresentativeExecution();
       currentScopeExecution.setParent(newParentExecution);
@@ -539,13 +615,16 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
 
       currentExecution.deleteCascade("migration", skipCustomListeners, skipIoMappings);
 
-      parentInstance.destroyAttachableExecution(parentExecution);
+      getParent().destroyAttachableExecution(parentExecution);
 
       setParent(null);
       for (MigratingTransitionInstance child : childTransitionInstances) {
         child.setParent(null);
       }
       for (MigratingActivityInstance child : childActivityInstances) {
+        child.setParent(null);
+      }
+      for (MigratingEventScopeInstance child : childCompensationInstances) {
         child.setParent(null);
       }
     }
@@ -586,8 +665,6 @@ public class MigratingActivityInstance extends MigratingProcessElementInstance i
       }
     }
   }
-
-
 }
 
 

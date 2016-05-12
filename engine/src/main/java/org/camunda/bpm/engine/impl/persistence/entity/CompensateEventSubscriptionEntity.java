@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
@@ -59,6 +60,15 @@ public class CompensateEventSubscriptionEntity extends EventSubscriptionEntity {
     newSubscription.setCreated(created);
 
     return newSubscription;
+  }
+
+  public ExecutionEntity getCompensatingExecution() {
+    if (configuration != null) {
+      return Context.getCommandContext().getExecutionManager().findExecutionById(configuration);
+    }
+    else {
+      return null;
+    }
   }
 
 }

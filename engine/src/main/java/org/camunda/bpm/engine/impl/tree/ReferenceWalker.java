@@ -43,6 +43,10 @@ public abstract class ReferenceWalker<T> {
     currentElements.add(initialElement);
   }
 
+  public ReferenceWalker(List<T> initialElements) {
+    currentElements = new LinkedList<T>(initialElements);
+  }
+
   public ReferenceWalker<T> addPreVisitor(TreeVisitor<T> collector) {
     this.preVisitor.add(collector);
     return this;

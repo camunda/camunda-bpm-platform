@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
@@ -215,7 +216,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
         // we have to distinguish between instantiation of the start event and any other activity.
         // instantiation of the start event means interrupting behavior; instantiation
         // of any other task means no interruption.
-        PvmActivity initialActivity = (PvmActivity) topMostActivity.getProperty(BpmnParse.PROPERTYNAME_INITIAL);
+        PvmActivity initialActivity = topMostActivity.getProperties().get(BpmnProperties.INITIAL_ACTIVITY);
         PvmActivity secondTopMostActivity = null;
         if (activitiesToInstantiate.size() > 1) {
           secondTopMostActivity = (PvmActivity) activitiesToInstantiate.get(1);

@@ -60,6 +60,11 @@ public class MigratingTransitionInstance extends MigratingProcessElementInstance
   }
 
   @Override
+  public MigratingActivityInstance getParent() {
+    return (MigratingActivityInstance) super.getParent();
+  }
+
+  @Override
   public void detachState() {
 
     jobInstance.detachState();
@@ -69,16 +74,22 @@ public class MigratingTransitionInstance extends MigratingProcessElementInstance
 
     ExecutionEntity execution = resolveRepresentativeExecution();
     execution.setActive(false);
-    parentInstance.destroyAttachableExecution(execution);
+    getParent().destroyAttachableExecution(execution);
 
     setParent(null);
   }
 
   @Override
-  public void attachState(MigratingActivityInstance targetActivityInstance) {
-    setParent(targetActivityInstance);
+  public void attachState(MigratingScopeInstance scopeInstance) {
+    if (!(scopeInstance instanceof MigratingActivityInstance)) {
+      throw MIGRATION_LOGGER.cannotHandleChild(scopeInstance, this);
+    }
 
-    representativeExecution = targetActivityInstance.createAttachableExecution();
+    MigratingActivityInstance activityInstance = (MigratingActivityInstance) scopeInstance;
+
+    setParent(activityInstance);
+
+    representativeExecution = activityInstance.createAttachableExecution();
     representativeExecution.setActivityInstanceId(null);
     representativeExecution.setActive(activeState);
 
@@ -155,15 +166,21 @@ public class MigratingTransitionInstance extends MigratingProcessElementInstance
   }
 
   @Override
-  public void setParent(MigratingActivityInstance parentInstance) {
-    if (this.parentInstance != null) {
-      this.parentInstance.removeChild(this);
+  public void setParent(MigratingScopeInstance parentInstance) {
+    if (parentInstance != null && !(parentInstance instanceof MigratingActivityInstance)) {
+      throw MIGRATION_LOGGER.cannotHandleChild(parentInstance, this);
     }
 
-    this.parentInstance = parentInstance;
+    MigratingActivityInstance parentActivityInstance = (MigratingActivityInstance) parentInstance;
+
+    if (this.parentInstance != null) {
+      ((MigratingActivityInstance) this.parentInstance).removeChild(this);
+    }
+
+    this.parentInstance = parentActivityInstance;
 
     if (parentInstance != null) {
-      parentInstance.addChild(this);
+      parentActivityInstance.addChild(this);
     }
   }
 

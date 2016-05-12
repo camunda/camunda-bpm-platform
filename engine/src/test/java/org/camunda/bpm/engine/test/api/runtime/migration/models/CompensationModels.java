@@ -12,15 +12,13 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration.models;
 
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+
 import org.camunda.bpm.model.bpmn.AssociationDirection;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.instance.Activity;
 import org.camunda.bpm.model.bpmn.instance.Association;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
-import org.camunda.bpm.model.bpmn.instance.CompensateEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.Event;
-import org.camunda.bpm.model.bpmn.instance.ThrowEvent;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 
 /**
@@ -32,6 +30,10 @@ public class CompensationModels {
   public static final BpmnModelInstance ONE_COMPENSATION_TASK_MODEL = ProcessModels.newModel()
     .startEvent()
     .userTask("userTask1")
+      .boundaryEvent("compensationBoundary")
+      .compensateEventDefinition()
+      .compensateEventDefinitionDone()
+    .moveToActivity("userTask1")
     .userTask("userTask2")
     .intermediateThrowEvent("compensationEvent")
       .compensateEventDefinition()
@@ -39,14 +41,64 @@ public class CompensationModels {
       .compensateEventDefinitionDone()
     .endEvent()
     .done();
-
   static {
-    addUserTaskCompensationHandler(ONE_COMPENSATION_TASK_MODEL, "userTask1", "compensationHandler");
+    addUserTaskCompensationHandler(ONE_COMPENSATION_TASK_MODEL, "compensationBoundary", "compensationHandler");
   }
+
+public static final BpmnModelInstance COMPENSATION_ONE_TASK_SUBPROCESS_MODEL =  ProcessModels.newModel()
+      .startEvent()
+      .subProcess("subProcess")
+        .embeddedSubProcess()
+        .startEvent()
+        .userTask("userTask1")
+          .boundaryEvent("compensationBoundary")
+          .compensateEventDefinition()
+          .compensateEventDefinitionDone()
+        .moveToActivity("userTask1")
+        .endEvent()
+      .subProcessDone()
+      .userTask("userTask2")
+      .intermediateThrowEvent("compensationEvent")
+        .compensateEventDefinition()
+        .waitForCompletion(true)
+        .compensateEventDefinitionDone()
+      .endEvent()
+      .done();
+  static {
+    addUserTaskCompensationHandler(COMPENSATION_ONE_TASK_SUBPROCESS_MODEL, "compensationBoundary", "compensationHandler");
+  }
+
+  public static final BpmnModelInstance COMPENSATION_TWO_TASKS_SUBPROCESS_MODEL = ProcessModels.newModel()
+      .startEvent()
+      .subProcess("subProcess")
+        .embeddedSubProcess()
+        .startEvent()
+        .userTask("userTask1")
+          .boundaryEvent("compensationBoundary")
+          .compensateEventDefinition()
+          .compensateEventDefinitionDone()
+        .moveToActivity("userTask1")
+        .userTask("userTask2")
+        .endEvent("subProcessEnd")
+      .subProcessDone()
+      .intermediateThrowEvent("compensationEvent")
+        .compensateEventDefinition()
+        .waitForCompletion(true)
+        .compensateEventDefinitionDone()
+      .endEvent()
+      .done();
+
+    static {
+      addUserTaskCompensationHandler(COMPENSATION_TWO_TASKS_SUBPROCESS_MODEL, "compensationBoundary", "compensationHandler");
+    }
 
   public static final BpmnModelInstance COMPENSATION_END_EVENT_MODEL = ProcessModels.newModel()
       .startEvent()
       .userTask("userTask1")
+        .boundaryEvent("compensationBoundary")
+        .compensateEventDefinition()
+        .compensateEventDefinitionDone()
+      .moveToActivity("userTask1")
       .userTask("userTask2")
       .endEvent("compensationEvent")
         .compensateEventDefinition()
@@ -54,36 +106,53 @@ public class CompensationModels {
       .done();
 
   static {
-    addUserTaskCompensationHandler(COMPENSATION_END_EVENT_MODEL, "userTask1", "compensationHandler");
+    addUserTaskCompensationHandler(COMPENSATION_END_EVENT_MODEL, "compensationBoundary", "compensationHandler");
   }
 
-  public static final BpmnModelInstance TRANSACTION_COMPENSATION_MODEL = TransactionModels.CANCEL_BOUNDARY_EVENT.clone();
+  public static final BpmnModelInstance TRANSACTION_COMPENSATION_MODEL = modify(TransactionModels.CANCEL_BOUNDARY_EVENT)
+    .activityBuilder("userTask")
+      .boundaryEvent("compensationBoundary")
+      .compensateEventDefinition()
+      .compensateEventDefinitionDone()
+    .done();
   static {
-    addUserTaskCompensationHandler(TRANSACTION_COMPENSATION_MODEL, "userTask", "compensationHandler");
+    addUserTaskCompensationHandler(TRANSACTION_COMPENSATION_MODEL, "compensationBoundary", "compensationHandler");
   }
 
-  protected static void addUserTaskCompensationHandler(BpmnModelInstance modelInstance, String activityId, String compensationHandlerId) {
+  public static final BpmnModelInstance COMPENSATION_EVENT_SUBPROCESS_MODEL = modify(COMPENSATION_ONE_TASK_SUBPROCESS_MODEL)
+    .addSubProcessTo("subProcess")
+      .id("eventSubProcess")
+      .triggerByEvent()
+      .embeddedSubProcess()
+      .startEvent("eventSubProcessStart")
+        .compensateEventDefinition()
+        .compensateEventDefinitionDone()
+      .userTask("eventSubProcessTask")
+      .intermediateThrowEvent("eventSubProcessCompensationEvent")
+        .compensateEventDefinition()
+        .waitForCompletion(true)
+        .compensateEventDefinitionDone()
+      .endEvent()
+      .endEvent()
+    .done();
 
-    Activity activity = modelInstance.getModelElementById(activityId);
-    BaseElement scope = (BaseElement) activity.getParentElement();
+  public static void addUserTaskCompensationHandler(BpmnModelInstance modelInstance, String boundaryEventId, String compensationHandlerId) {
+
+    BoundaryEvent boundaryEvent = modelInstance.getModelElementById(boundaryEventId);
+    BaseElement scope = (BaseElement) boundaryEvent.getParentElement();
 
     UserTask compensationHandler = modelInstance.newInstance(UserTask.class);
     compensationHandler.setId(compensationHandlerId);
     compensationHandler.setForCompensation(true);
     scope.addChildElement(compensationHandler);
 
-    BoundaryEvent compensationBoundaryEvent = modelInstance.newInstance(BoundaryEvent.class);
-    compensationBoundaryEvent.setAttachedTo(activity);
-    compensationBoundaryEvent
-      .builder()
-      .compensateEventDefinition();
-    scope.addChildElement(compensationBoundaryEvent);
-
     Association association = modelInstance.newInstance(Association.class);
     association.setAssociationDirection(AssociationDirection.One);
-    association.setSource(compensationBoundaryEvent);
+    association.setSource(boundaryEvent);
     association.setTarget(compensationHandler);
     scope.addChildElement(association);
 
   }
+
+
 }

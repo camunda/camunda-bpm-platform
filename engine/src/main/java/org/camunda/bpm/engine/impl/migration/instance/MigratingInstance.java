@@ -31,7 +31,7 @@ public interface MigratingInstance {
    * Restoration should restore the state that was detached
    * before.
    */
-  void attachState(MigratingActivityInstance targetActivityInstance);
+  void attachState(MigratingScopeInstance targetActivityInstance);
 
   /**
    * Restore this instance's state as a subordinate to the given transition instance

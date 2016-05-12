@@ -41,7 +41,7 @@ public class MigratingCalledProcessInstance implements MigratingInstance {
   }
 
   @Override
-  public void attachState(MigratingActivityInstance targetActivityInstance) {
+  public void attachState(MigratingScopeInstance targetActivityInstance) {
     processInstance.setSuperExecution(targetActivityInstance.resolveRepresentativeExecution());
   }
 

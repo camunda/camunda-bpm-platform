@@ -85,6 +85,7 @@ import org.camunda.bpm.engine.impl.core.model.BaseCallableElement.CallableElemen
 import org.camunda.bpm.engine.impl.core.model.CallableElement;
 import org.camunda.bpm.engine.impl.core.model.CallableElementParameter;
 import org.camunda.bpm.engine.impl.core.model.DefaultCallableElementTenantIdProvider;
+import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
@@ -172,7 +173,6 @@ public class BpmnParse extends Parse {
   protected static final BpmnParseLogger LOG = ProcessEngineLogger.BPMN_PARSE_LOGGER;
 
   public static final String PROPERTYNAME_DOCUMENTATION = "documentation";
-  public static final String PROPERTYNAME_INITIAL = "initial";
   public static final String PROPERTYNAME_INITIATOR_VARIABLE_NAME = "initiatorVariableName";
   public static final String PROPERTYNAME_CONDITION = "condition";
   public static final String PROPERTYNAME_CONDITION_TEXT = "conditionText";
@@ -184,7 +184,6 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_COMPENSATION_HANDLER_ID = "compensationHandler";
   public static final String PROPERTYNAME_IS_FOR_COMPENSATION = "isForCompensation";
   public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_JOB_DECLARATION = "eventJobDeclarations";
-  public static final String PROPERTYNAME_TRIGGERED_BY_EVENT = "triggeredByEvent";
   public static final String PROPERTYNAME_THROWS_COMPENSATION = "throwsCompensation";
   public static final String PROPERTYNAME_CONSUMES_COMPENSATION = "consumesCompensation";
   public static final String PROPERTYNAME_JOB_PRIORITY = "jobPriority";
@@ -790,7 +789,7 @@ public class BpmnParse extends Parse {
         addError("Invalid reference targetRef '" + targetRef + "' of association element ", associationElement);
       } else {
 
-        if (sourceActivity != null && sourceActivity.getProperty("type").equals("compensationBoundaryCatch")) {
+        if (sourceActivity != null && ActivityTypes.BOUNDARY_COMPENSATION.equals(sourceActivity.getProperty("type"))) {
 
           if (targetActivity == null && compensationHandlers.containsKey(targetRef)) {
             targetActivity = parseCompensationHandlerForCompensationBoundaryEvent(parentScope, sourceActivity, targetRef, compensationHandlers);
@@ -812,12 +811,16 @@ public class BpmnParse extends Parse {
     Element compensationHandler = compensationHandlers.get(targetRef);
 
     ActivityImpl eventScope = (ActivityImpl) sourceActivity.getEventScope();
+    ActivityImpl compensationHandlerActivity = null;
     if (eventScope.isMultiInstance()) {
       ScopeImpl miBody = eventScope.getFlowScope();
-      return parseActivity(compensationHandler, null, miBody);
+      compensationHandlerActivity = parseActivity(compensationHandler, null, miBody);
     } else {
-      return parseActivity(compensationHandler, null, parentScope);
+      compensationHandlerActivity = parseActivity(compensationHandler, null, parentScope);
     }
+
+    compensationHandlerActivity.getProperties().set(BpmnProperties.COMPENSATION_BOUNDARY_EVENT, sourceActivity);
+    return compensationHandlerActivity;
   }
 
   protected void parseAssociationOfCompensationBoundaryEvent(Element associationElement, ActivityImpl sourceActivity, ActivityImpl targetActivity) {
@@ -960,9 +963,11 @@ public class BpmnParse extends Parse {
 
   protected void parseScopeStartEvent(ActivityImpl startEventActivity, Element startEventElement, Element parentElement, ActivityImpl scopeActivity) {
 
+    Properties scopeProperties = scopeActivity.getProperties();
+
     // set this as the scope's initial
-    if (scopeActivity.getProperty(PROPERTYNAME_INITIAL) == null) {
-      scopeActivity.setProperty(PROPERTYNAME_INITIAL, startEventActivity);
+    if (!scopeProperties.contains(BpmnProperties.INITIAL_ACTIVITY)) {
+      scopeProperties.set(BpmnProperties.INITIAL_ACTIVITY, startEventActivity);
     } else {
       addError("multiple start events not supported for subprocess", startEventElement);
     }
@@ -974,10 +979,7 @@ public class BpmnParse extends Parse {
     Element compensateEventDefinition = startEventElement.element("compensateEventDefinition");
     Element escalationEventDefinitionElement = startEventElement.element("escalationEventDefinition");
 
-    Object triggeredByEvent = scopeActivity.getProperty(PROPERTYNAME_TRIGGERED_BY_EVENT);
-    boolean isTriggeredByEvent = triggeredByEvent != null && ((Boolean) triggeredByEvent);
-
-    if (isTriggeredByEvent) { // event subprocess
+    if (scopeActivity.isTriggeredByEvent()) { // event subprocess
 
       startEventActivity.setActivityBehavior(new EventSubProcessStartEventActivityBehavior());
 
@@ -1510,7 +1512,7 @@ public class BpmnParse extends Parse {
 
     if (activityRef != null) {
       if (scopeElement.findActivityAtLevelOfSubprocess(activityRef) == null) {
-        Boolean isTriggeredByEvent = (Boolean) scopeElement.getProperty(PROPERTYNAME_TRIGGERED_BY_EVENT);
+        Boolean isTriggeredByEvent = scopeElement.getProperties().get(BpmnProperties.TRIGGERED_BY_EVENT);
         String type = (String) scopeElement.getProperty(PROPERTYNAME_TYPE);
         if (Boolean.TRUE == isTriggeredByEvent && "subProcess".equals(type)) {
           scopeElement = scopeElement.getFlowScope();
@@ -1548,7 +1550,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseBoundaryCompensateEventDefinition(Element compensateEventDefinition, ActivityImpl activity) {
-    activity.getProperties().set(BpmnProperties.TYPE, "compensationBoundaryCatch");
+    activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.BOUNDARY_COMPENSATION);
 
     ScopeImpl hostActivity = activity.getEventScope();
     for (ActivityImpl sibling : activity.getFlowScope().getActivities()) {
@@ -3362,8 +3364,8 @@ public class BpmnParse extends Parse {
 
     parseAsynchronousContinuationForActivity(subProcessElement, subProcessActivity);
 
-    Boolean isTriggeredByEvent = parseBooleanAttribute(subProcessElement.attribute(PROPERTYNAME_TRIGGERED_BY_EVENT), false);
-    subProcessActivity.setProperty(PROPERTYNAME_TRIGGERED_BY_EVENT, isTriggeredByEvent);
+    Boolean isTriggeredByEvent = parseBooleanAttribute(subProcessElement.attribute("triggeredByEvent"), false);
+    subProcessActivity.getProperties().set(BpmnProperties.TRIGGERED_BY_EVENT, isTriggeredByEvent);
     subProcessActivity.setProperty(PROPERTYNAME_CONSUMES_COMPENSATION, !isTriggeredByEvent);
 
     subProcessActivity.setScope(true);
@@ -3389,7 +3391,7 @@ public class BpmnParse extends Parse {
     activity.setScope(true);
     activity.setSubProcessScope(true);
     activity.setActivityBehavior(new SubProcessActivityBehavior());
-    activity.setProperty(PROPERTYNAME_TRIGGERED_BY_EVENT, false);
+    activity.getProperties().set(BpmnProperties.TRIGGERED_BY_EVENT, false);
     parseScope(transactionElement, activity);
 
     for (BpmnParseListener parseListener : parseListeners) {
@@ -3773,10 +3775,10 @@ public class BpmnParse extends Parse {
         addError("Invalid incoming sequenceflow for intermediateCatchEvent with id '" + destinationActivity.getId() + "' connected to an event-based gateway.",
             sequenceFlowElement);
       } else if (sourceActivity.getActivityBehavior() instanceof SubProcessActivityBehavior
-          && (Boolean) sourceActivity.getProperty(PROPERTYNAME_TRIGGERED_BY_EVENT)) {
+          && sourceActivity.isTriggeredByEvent()) {
         addError("Invalid outgoing sequence flow of event subprocess", sequenceFlowElement);
       } else if (destinationActivity.getActivityBehavior() instanceof SubProcessActivityBehavior
-          && (Boolean) destinationActivity.getProperty(PROPERTYNAME_TRIGGERED_BY_EVENT)) {
+          && destinationActivity.isTriggeredByEvent()) {
         addError("Invalid incoming sequence flow of event subprocess", sequenceFlowElement);
       }
       else {

@@ -14,10 +14,16 @@
 package org.camunda.bpm.engine.impl.migration.validation.instance;
 
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingCompensationEventSubscriptionInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingEventScopeInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessElementInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingTransitionInstance;
 
-public class NoUnmappedLeafInstanceValidator implements MigratingActivityInstanceValidator, MigratingTransitionInstanceValidator {
+public class NoUnmappedLeafInstanceValidator implements
+  MigratingActivityInstanceValidator,
+  MigratingTransitionInstanceValidator,
+  MigratingCompensationInstanceValidator {
 
   public void validate(MigratingActivityInstance migratingInstance, MigratingProcessInstance migratingProcessInstance, MigratingActivityInstanceValidationReportImpl instanceReport) {
     if (isInvalid(migratingInstance)) {
@@ -33,11 +39,43 @@ public class NoUnmappedLeafInstanceValidator implements MigratingActivityInstanc
     }
   }
 
+  @Override
+  public void validate(MigratingCompensationEventSubscriptionInstance migratingInstance, MigratingProcessInstance migratingProcessInstance,
+      MigratingActivityInstanceValidationReportImpl ancestorInstanceReport) {
+    if (isInvalid(migratingInstance)) {
+      ancestorInstanceReport.addFailure(
+            "Cannot migrate subscription for compensation handler '" + migratingInstance.getSourceScope().getId() + "'. "
+          + "There is no migration instruction for the compensation boundary event");
+    }
+  }
+
+  @Override
+  public void validate(MigratingEventScopeInstance migratingInstance, MigratingProcessInstance migratingProcessInstance,
+      MigratingActivityInstanceValidationReportImpl ancestorInstanceReport) {
+    if (isInvalid(migratingInstance)) {
+      ancestorInstanceReport.addFailure(
+          "Cannot migrate subscription for compensation handler '" + migratingInstance.getEventSubscription().getSourceScope().getId() + "'. "
+        + "There is no migration instruction for the compensation start event");
+    }
+  }
+
   protected boolean isInvalid(MigratingActivityInstance migratingInstance) {
-    return migratingInstance.getMigrationInstruction() == null && migratingInstance.getChildren().isEmpty();
+    return hasNoInstruction(migratingInstance) && migratingInstance.getChildren().isEmpty();
+  }
+
+  protected boolean isInvalid(MigratingEventScopeInstance migratingInstance) {
+    return hasNoInstruction(migratingInstance.getEventSubscription()) && migratingInstance.getChildren().isEmpty();
   }
 
   protected boolean isInvalid(MigratingTransitionInstance migratingInstance) {
+    return hasNoInstruction(migratingInstance);
+  }
+
+  protected boolean isInvalid(MigratingCompensationEventSubscriptionInstance migratingInstance) {
+    return hasNoInstruction(migratingInstance);
+  }
+
+  protected boolean hasNoInstruction(MigratingProcessElementInstance migratingInstance) {
     return migratingInstance.getMigrationInstruction() == null;
   }
 }

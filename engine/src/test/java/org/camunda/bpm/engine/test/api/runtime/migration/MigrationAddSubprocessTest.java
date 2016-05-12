@@ -54,7 +54,6 @@ public class MigrationAddSubprocessTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
 
-
   @Test
   public void testScopeUserTaskMigration() {
     // given

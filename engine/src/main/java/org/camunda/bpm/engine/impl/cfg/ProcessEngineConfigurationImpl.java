@@ -204,9 +204,10 @@ import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedPassiv
 import org.camunda.bpm.engine.impl.migration.validation.instance.AsyncAfterMigrationValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.AsyncMigrationValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.AsyncProcessStartMigrationValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instance.CompensateEventSubscriptionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingActivityInstanceValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingCompensationInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingTransitionInstanceValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instance.NoUnmappedCompensationStartEventValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.NoUnmappedLeafInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.SupportedActivityInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.VariableConflictActivityInstanceValidator;
@@ -596,6 +597,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<MigratingActivityInstanceValidator> customPostMigratingActivityInstanceValidators;
   protected List<MigratingActivityInstanceValidator> migratingActivityInstanceValidators;
   protected List<MigratingTransitionInstanceValidator> migratingTransitionInstanceValidators;
+  protected List<MigratingCompensationInstanceValidator> migratingCompensationInstanceValidators;
 
   // Default user permission for task
   protected Permission defaultUserPermissionForTask;
@@ -659,11 +661,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initDeploymentRegistration();
     initResourceAuthorizationProvider();
     initMetrics();
-    initMigrationInstructionValidators();
-    initMigrationActivityMatcher();
-    initMigrationInstructionGenerator();
-    initMigratingActivityInstanceValidators();
-    initMigratingTransitionInstanceValidators();
+    initMigration();
     initCommandCheckers();
     initDefaultUserPermissionForTask();
     invokePostInit();
@@ -1134,6 +1132,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     addSessionFactory(new DbSqlPersistenceProviderFactory());
   }
 
+  protected void initMigration() {
+    initMigrationInstructionValidators();
+    initMigrationActivityMatcher();
+    initMigrationInstructionGenerator();
+    initMigratingActivityInstanceValidators();
+    initMigratingTransitionInstanceValidators();
+    initMigratingCompensationInstanceValidators();
+  }
+
   protected void initMigrationActivityMatcher() {
     if (migrationActivityMatcher == null) {
       migrationActivityMatcher = new DefaultMigrationActivityMatcher();
@@ -1189,6 +1196,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (migratingTransitionInstanceValidators == null) {
       migratingTransitionInstanceValidators = new ArrayList<MigratingTransitionInstanceValidator>();
       migratingTransitionInstanceValidators.addAll(getDefaultMigratingTransitionInstanceValidators());
+    }
+  }
+
+  protected void initMigratingCompensationInstanceValidators() {
+    if (migratingCompensationInstanceValidators == null) {
+      migratingCompensationInstanceValidators = new ArrayList<MigratingCompensationInstanceValidator>();
+
+      migratingCompensationInstanceValidators.add(new NoUnmappedLeafInstanceValidator());
+      migratingCompensationInstanceValidators.add(new NoUnmappedCompensationStartEventValidator());
     }
   }
 
@@ -3307,13 +3323,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return migratingTransitionInstanceValidators;
   }
 
+  public List<MigratingCompensationInstanceValidator> getMigratingCompensationInstanceValidators() {
+    return migratingCompensationInstanceValidators;
+  }
+
   public List<MigratingActivityInstanceValidator> getDefaultMigratingActivityInstanceValidators() {
     List<MigratingActivityInstanceValidator> migratingActivityInstanceValidators = new ArrayList<MigratingActivityInstanceValidator>();
 
     migratingActivityInstanceValidators.add(new NoUnmappedLeafInstanceValidator());
     migratingActivityInstanceValidators.add(new VariableConflictActivityInstanceValidator());
     migratingActivityInstanceValidators.add(new SupportedActivityInstanceValidator());
-    migratingActivityInstanceValidators.add(new CompensateEventSubscriptionValidator());
 
     return migratingActivityInstanceValidators;
   }

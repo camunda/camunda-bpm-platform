@@ -14,10 +14,13 @@ package org.camunda.bpm.engine.impl.migration.instance;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.migration.MigrationLogger;
+import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -36,6 +39,8 @@ public class MigratingProcessInstance {
   protected String processInstanceId;
   protected List<MigratingActivityInstance> migratingActivityInstances;
   protected List<MigratingTransitionInstance> migratingTransitionInstances;
+  protected List<MigratingEventScopeInstance> migratingEventScopeInstances;
+  protected List<MigratingCompensationEventSubscriptionInstance> migratingCompensationSubscriptionInstances;
   protected MigratingActivityInstance rootInstance;
   protected ProcessDefinitionEntity sourceDefinition;
   protected ProcessDefinitionEntity targetDefinition;
@@ -44,6 +49,8 @@ public class MigratingProcessInstance {
     this.processInstanceId = processInstanceId;
     this.migratingActivityInstances = new ArrayList<MigratingActivityInstance>();
     this.migratingTransitionInstances = new ArrayList<MigratingTransitionInstance>();
+    this.migratingEventScopeInstances = new ArrayList<MigratingEventScopeInstance>();
+    this.migratingCompensationSubscriptionInstances = new ArrayList<MigratingCompensationEventSubscriptionInstance>();
     this.sourceDefinition = sourceDefinition;
     this.targetDefinition = targetDefinition;
   }
@@ -62,6 +69,23 @@ public class MigratingProcessInstance {
 
   public Collection<MigratingTransitionInstance> getMigratingTransitionInstances() {
     return migratingTransitionInstances;
+  }
+
+  public Collection<MigratingEventScopeInstance> getMigratingEventScopeInstances() {
+    return migratingEventScopeInstances;
+  }
+
+  public Collection<MigratingCompensationEventSubscriptionInstance> getMigratingCompensationSubscriptionInstances() {
+    return migratingCompensationSubscriptionInstances;
+  }
+
+  public Collection<MigratingScopeInstance> getMigratingScopeInstances() {
+    Set<MigratingScopeInstance> result = new HashSet<MigratingScopeInstance>();
+
+    result.addAll(migratingActivityInstances);
+    result.addAll(migratingEventScopeInstances);
+
+    return result;
   }
 
   public ProcessDefinitionEntity getSourceDefinition() {
@@ -116,6 +140,47 @@ public class MigratingProcessInstance {
     migratingTransitionInstances.add(migratingTransitionInstance);
 
     return migratingTransitionInstance;
+  }
+
+  public MigratingEventScopeInstance addEventScopeInstance(
+      MigrationInstruction migrationInstruction,
+      ExecutionEntity eventScopeExecution,
+      ScopeImpl sourceScope,
+      ScopeImpl targetScope,
+      MigrationInstruction eventSubscriptionInstruction,
+      CompensateEventSubscriptionEntity eventSubscription,
+      ScopeImpl eventSubscriptionSourceScope,
+      ScopeImpl eventSubscriptionTargetScope) {
+
+    MigratingEventScopeInstance compensationInstance = new MigratingEventScopeInstance(
+        migrationInstruction,
+        eventScopeExecution,
+        sourceScope,
+        targetScope,
+        eventSubscriptionInstruction,
+        eventSubscription,
+        eventSubscriptionSourceScope,
+        eventSubscriptionTargetScope);
+
+    migratingEventScopeInstances.add(compensationInstance);
+
+    return compensationInstance;
+  }
+
+  public MigratingCompensationEventSubscriptionInstance addCompensationSubscriptionInstance(
+      MigrationInstruction eventSubscriptionInstruction,
+      CompensateEventSubscriptionEntity eventSubscription,
+      ScopeImpl sourceScope,
+      ScopeImpl targetScope) {
+    MigratingCompensationEventSubscriptionInstance compensationInstance = new MigratingCompensationEventSubscriptionInstance(
+        eventSubscriptionInstruction,
+        sourceScope,
+        targetScope,
+        eventSubscription);
+
+    migratingCompensationSubscriptionInstances.add(compensationInstance);
+
+    return compensationInstance;
   }
 
 }

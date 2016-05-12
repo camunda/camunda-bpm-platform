@@ -27,6 +27,7 @@ import org.camunda.bpm.model.bpmn.builder.StartEventBuilder;
 import org.camunda.bpm.model.bpmn.builder.SubProcessBuilder;
 import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
 import org.camunda.bpm.model.bpmn.instance.Activity;
+import org.camunda.bpm.model.bpmn.instance.Association;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
@@ -212,13 +213,19 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
     FlowNode flowNode = getModelElementById(flowNodeId);
     ModelElementInstance scope = flowNode.getParentElement();
 
-    scope.removeChildElement(flowNode);
     for (SequenceFlow outgoingFlow : flowNode.getOutgoing()) {
       scope.removeChildElement(outgoingFlow);
     }
     for (SequenceFlow incomingFlow : flowNode.getIncoming()) {
       scope.removeChildElement(incomingFlow);
     }
+    Collection<Association> associations = scope.getChildElementsByType(Association.class);
+    for (Association association : associations) {
+      if (flowNode.equals(association.getSource()) || flowNode.equals(association.getTarget())) {
+        scope.removeChildElement(association);
+      }
+    }
+    scope.removeChildElement(flowNode);
 
     return this;
   }

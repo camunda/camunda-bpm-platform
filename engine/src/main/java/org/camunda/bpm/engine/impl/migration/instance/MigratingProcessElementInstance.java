@@ -29,7 +29,7 @@ public abstract class MigratingProcessElementInstance implements MigratingInstan
   // changes from source to target scope during migration
   protected ScopeImpl currentScope;
 
-  protected MigratingActivityInstance parentInstance;
+  protected MigratingScopeInstance parentInstance;
 
   public ScopeImpl getSourceScope() {
     return sourceScope;
@@ -47,7 +47,7 @@ public abstract class MigratingProcessElementInstance implements MigratingInstan
     return migrationInstruction;
   }
 
-  public MigratingActivityInstance getParent() {
+  public MigratingScopeInstance getParent() {
     return parentInstance;
   }
 
@@ -55,10 +55,20 @@ public abstract class MigratingProcessElementInstance implements MigratingInstan
     return other == targetScope;
   }
 
-  public abstract void setParent(MigratingActivityInstance parentInstance);
+  public abstract void setParent(MigratingScopeInstance parentInstance);
 
   public abstract void addMigratingDependentInstance(MigratingInstance migratingInstance);
 
   public abstract ExecutionEntity resolveRepresentativeExecution();
+
+  public MigratingActivityInstance getClosestAncestorAcitivityInstance() {
+    MigratingScopeInstance ancestorInstance = parentInstance;
+
+    while (!(ancestorInstance instanceof MigratingActivityInstance)) {
+      ancestorInstance = ancestorInstance.getParent();
+    }
+
+    return (MigratingActivityInstance) ancestorInstance;
+  }
 
 }

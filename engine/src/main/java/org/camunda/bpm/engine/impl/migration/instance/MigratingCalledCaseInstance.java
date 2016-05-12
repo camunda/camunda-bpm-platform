@@ -41,7 +41,7 @@ public class MigratingCalledCaseInstance implements MigratingInstance {
   }
 
   @Override
-  public void attachState(MigratingActivityInstance targetActivityInstance) {
+  public void attachState(MigratingScopeInstance targetActivityInstance) {
     caseInstance.setSuperExecution(targetActivityInstance.resolveRepresentativeExecution());
   }
 

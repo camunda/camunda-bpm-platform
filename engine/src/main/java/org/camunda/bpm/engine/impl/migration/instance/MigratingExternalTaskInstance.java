@@ -59,7 +59,7 @@ public class MigratingExternalTaskInstance implements MigratingInstance {
   }
 
   @Override
-  public void attachState(MigratingActivityInstance owningInstance) {
+  public void attachState(MigratingScopeInstance owningInstance) {
     ExecutionEntity representativeExecution = owningInstance.resolveRepresentativeExecution();
     representativeExecution.addExternalTask(externalTask);
 

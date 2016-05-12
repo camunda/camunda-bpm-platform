@@ -47,7 +47,7 @@ public class MigratingIncident implements MigratingInstance {
     incident.setExecution(null);
   }
 
-  public void attachState(MigratingActivityInstance newOwningInstance) {
+  public void attachState(MigratingScopeInstance newOwningInstance) {
     attachTo(newOwningInstance.resolveRepresentativeExecution());
   }
 
