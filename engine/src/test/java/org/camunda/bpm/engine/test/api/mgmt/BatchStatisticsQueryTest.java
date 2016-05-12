@@ -18,7 +18,9 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -520,6 +522,35 @@ public class BatchStatisticsQueryTest {
         assertEquals(3, batchStatistics.getFailedJobs());
       }
     }
+  }
+
+  @Test
+  public void testStatisticsSuspend() {
+    // given
+    Batch batch = helper.migrateProcessInstancesAsync(1);
+
+    // when
+    managementService.suspendBatchById(batch.getId());
+
+    // then
+    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery().batchId(batch.getId()).singleResult();
+
+    assertTrue(batchStatistics.isSuspended());
+  }
+
+  @Test
+  public void testStatisticsActivate() {
+    // given
+    Batch batch = helper.migrateProcessInstancesAsync(1);
+    managementService.suspendBatchById(batch.getId());
+
+    // when
+    managementService.activateBatchById(batch.getId());
+
+    // then
+    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery().batchId(batch.getId()).singleResult();
+
+    assertFalse(batchStatistics.isSuspended());
   }
 
   @Test
