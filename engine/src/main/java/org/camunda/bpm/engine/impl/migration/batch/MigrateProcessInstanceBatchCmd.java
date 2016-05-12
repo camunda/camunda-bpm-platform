@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.migration.batch;
 
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -49,7 +50,8 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
     Collection<String> processInstanceIds = collectProcessInstanceIds(commandContext);
 
     ensureNotNull(BadUserRequestException.class, "Migration plan cannot be null", "migration plan", migrationPlan);
-    ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be null or empty", "process instance ids", processInstanceIds);
+    ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot empty", "process instance ids", processInstanceIds);
+    ensureNotContainsNull(BadUserRequestException.class, "Process instance ids cannot be null", "process instance ids", processInstanceIds);
 
     ProcessDefinitionEntity sourceProcessDefinition = resolveSourceProcessDefinition(commandContext);
     ProcessDefinitionEntity targetProcessDefinition = resolveTargetProcessDefinition(commandContext);

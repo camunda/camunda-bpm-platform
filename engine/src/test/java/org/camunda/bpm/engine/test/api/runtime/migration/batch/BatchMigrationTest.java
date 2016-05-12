@@ -56,6 +56,7 @@ import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateEvent;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateExecutionListener;
 import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -123,7 +124,7 @@ public class BatchMigrationTest {
   }
 
   @Test
-  public void testNullProcessInstanceIds() {
+  public void testNullProcessInstanceIdsList() {
     ProcessDefinition testProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
@@ -138,7 +139,22 @@ public class BatchMigrationTest {
   }
 
   @Test
-  public void testEmptyProcessInstanceIds() {
+  public void testProcessInstanceIdsListWithNullValue() {
+    ProcessDefinition testProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    try {
+      runtimeService.newMigration(migrationPlan).processInstanceIds(Arrays.asList("foo", null, "bar")).executeAsync();
+      fail("Should not succeed");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("process instance ids contains null value"));
+    }
+  }
+
+  @Test
+  public void testEmptyProcessInstanceIdsList() {
     ProcessDefinition testProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
       .mapEqualActivities()
@@ -149,6 +165,38 @@ public class BatchMigrationTest {
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("process instance ids is empty"));
+    }
+  }
+
+  @Test
+  public void testNullProcessInstanceIdsArray() {
+    ProcessDefinition testProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    try {
+      runtimeService.newMigration(migrationPlan).processInstanceIds((String[]) null).executeAsync();
+      fail("Should not be able to migrate");
+    }
+    catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids is empty"));
+    }
+  }
+
+  @Test
+  public void testProcessInstanceIdsArrayWithNullValue() {
+    ProcessDefinition testProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    try {
+      runtimeService.newMigration(migrationPlan).processInstanceIds("foo", null, "bar").executeAsync();
+      fail("Should not be able to migrate");
+    }
+    catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("process instance ids contains null value"));
     }
   }
 

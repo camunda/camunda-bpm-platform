@@ -102,6 +102,22 @@ public class MigrationProcessInstanceTest {
   }
 
   @Test
+  public void testProcessInstanceIdsListWithNullValue() {
+    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    try {
+      runtimeService.newMigration(migrationPlan).processInstanceIds(Arrays.asList("foo", null, "bar")).execute();
+      fail("Should not be able to migrate");
+    }
+    catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids contains null value"));
+    }
+  }
+
+  @Test
   public void testNullProcessInstanceIdsArray() {
     ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
@@ -114,6 +130,22 @@ public class MigrationProcessInstanceTest {
     }
     catch (ProcessEngineException e) {
       assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids is empty"));
+    }
+  }
+
+  @Test
+  public void testProcessInstanceIdsArrayWithNullValue() {
+    ProcessDefinition testProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(testProcessDefinition.getId(), testProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    try {
+      runtimeService.newMigration(migrationPlan).processInstanceIds("foo", null, "bar").execute();
+      fail("Should not be able to migrate");
+    }
+    catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids contains null value"));
     }
   }
 
@@ -202,7 +234,7 @@ public class MigrationProcessInstanceTest {
       fail("Should not be able to migrate");
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("process instance id is null"));
+      assertThat(e.getMessage(), CoreMatchers.containsString("process instance ids contains null value"));
     }
   }
 
