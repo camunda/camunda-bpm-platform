@@ -40,7 +40,6 @@ import org.junit.rules.RuleChain;
 public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
-  protected static final String TENANT_TWO = "tenant2";
 
   protected static final String CMMN_MODEL = "org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn";
   protected static final String CMMN_DIAGRAM = "org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.png";
@@ -59,7 +58,7 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
   protected IdentityService identityService;
   protected ProcessEngineConfiguration processEngineConfiguration;
 
-  protected CaseDefinition caseDefinition;
+  protected String caseDefinitionId;
 
   @Before
   public void setUp() {
@@ -69,7 +68,7 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
 
     testRule.deployForTenant(TENANT_ONE, CMMN_MODEL, CMMN_DIAGRAM);
 
-    caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
+    caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
   }
 
   @Test
@@ -80,24 +79,24 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot get the case definition");
 
-    repositoryService.getCaseModel(caseDefinition.getId());
+    repositoryService.getCaseModel(caseDefinitionId);
   }
 
   @Test
   public void getCaseModelWithAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    InputStream inputStream = repositoryService.getCaseModel(caseDefinition.getId());
+    InputStream inputStream = repositoryService.getCaseModel(caseDefinitionId);
 
     assertThat(inputStream, notNullValue());
   }
 
   @Test
-  public void getDecisionModelDisabledTenantCheck() {
+  public void getCaseModelDisabledTenantCheck() {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    InputStream inputStream = repositoryService.getCaseModel(caseDefinition.getId());
+    InputStream inputStream = repositoryService.getCaseModel(caseDefinitionId);
 
     assertThat(inputStream, notNullValue());
   }
@@ -110,14 +109,14 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot get the case definition");
 
-    repositoryService.getCaseDiagram(caseDefinition.getId());
+    repositoryService.getCaseDiagram(caseDefinitionId);
   }
 
   @Test
-  public void getDecisionDiagramWithAuthenticatedTenant() {
+  public void getCaseDiagramWithAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    InputStream inputStream = repositoryService.getCaseDiagram(caseDefinition.getId());
+    InputStream inputStream = repositoryService.getCaseDiagram(caseDefinitionId);
 
     assertThat(inputStream, notNullValue());
   }
@@ -127,7 +126,7 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    InputStream inputStream = repositoryService.getCaseDiagram(caseDefinition.getId());
+    InputStream inputStream = repositoryService.getCaseDiagram(caseDefinitionId);
 
     assertThat(inputStream, notNullValue());
   }
@@ -140,14 +139,14 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot get the case definition");
 
-    repositoryService.getCaseDefinition(caseDefinition.getId());
+    repositoryService.getCaseDefinition(caseDefinitionId);
   }
 
   @Test
   public void getCaseDefinitionWithAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    CaseDefinition definition = repositoryService.getCaseDefinition(caseDefinition.getId());
+    CaseDefinition definition = repositoryService.getCaseDefinition(caseDefinitionId);
 
     assertThat(definition.getTenantId(), is(TENANT_ONE));
   }
@@ -157,7 +156,7 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    CaseDefinition definition = repositoryService.getCaseDefinition(caseDefinition.getId());
+    CaseDefinition definition = repositoryService.getCaseDefinition(caseDefinitionId);
 
     assertThat(definition.getTenantId(), is(TENANT_ONE));
   }
@@ -170,14 +169,14 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot get the case definition");
 
-    repositoryService.getCmmnModelInstance(caseDefinition.getId());
+    repositoryService.getCmmnModelInstance(caseDefinitionId);
   }
 
   @Test
   public void getCmmnModelInstanceWithAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    CmmnModelInstance modelInstance = repositoryService.getCmmnModelInstance(caseDefinition.getId());
+    CmmnModelInstance modelInstance = repositoryService.getCmmnModelInstance(caseDefinitionId);
 
     assertThat(modelInstance, notNullValue());
   }
@@ -187,7 +186,7 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    CmmnModelInstance modelInstance = repositoryService.getCmmnModelInstance(caseDefinition.getId());
+    CmmnModelInstance modelInstance = repositoryService.getCmmnModelInstance(caseDefinitionId);
 
     assertThat(modelInstance, notNullValue());
   }

@@ -41,7 +41,6 @@ import org.junit.rules.RuleChain;
 public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
-  protected static final String TENANT_TWO = "tenant2";
 
   protected static final String BPMN_PROCESS_MODEL = "org/camunda/bpm/engine/test/api/multitenancy/failingTask.bpmn";
   protected static final String BPMN_PROCESS_DIAGRAM = "org/camunda/bpm/engine/test/api/multitenancy/failingTask.png";
@@ -60,7 +59,7 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
   protected IdentityService identityService;
   protected ProcessEngineConfiguration processEngineConfiguration;
 
-  protected ProcessDefinition processDefinition;
+  protected String processDefinitionId;
 
   @Before
   public void setUp() {
@@ -70,7 +69,7 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
 
     testRule.deployForTenant(TENANT_ONE, BPMN_PROCESS_MODEL, BPMN_PROCESS_DIAGRAM);
 
-    processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
   }
 
   @Test
@@ -81,14 +80,14 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot get the process definition");
 
-    repositoryService.getProcessModel(processDefinition.getId());
+    repositoryService.getProcessModel(processDefinitionId);
   }
 
   @Test
   public void getProcessModelWithAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    InputStream inputStream = repositoryService.getProcessModel(processDefinition.getId());
+    InputStream inputStream = repositoryService.getProcessModel(processDefinitionId);
 
     assertThat(inputStream, notNullValue());
   }
@@ -98,7 +97,7 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    InputStream inputStream = repositoryService.getProcessModel(processDefinition.getId());
+    InputStream inputStream = repositoryService.getProcessModel(processDefinitionId);
 
     assertThat(inputStream, notNullValue());
   }
@@ -111,14 +110,14 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot get the process definition");
 
-    repositoryService.getProcessDiagram(processDefinition.getId());
+    repositoryService.getProcessDiagram(processDefinitionId);
   }
 
   @Test
   public void getProcessDiagramWithAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    InputStream inputStream = repositoryService.getProcessDiagram(processDefinition.getId());
+    InputStream inputStream = repositoryService.getProcessDiagram(processDefinitionId);
 
     assertThat(inputStream, notNullValue());
   }
@@ -128,7 +127,7 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    InputStream inputStream = repositoryService.getProcessDiagram(processDefinition.getId());
+    InputStream inputStream = repositoryService.getProcessDiagram(processDefinitionId);
 
     assertThat(inputStream, notNullValue());
   }
@@ -141,14 +140,14 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot get the process definition");
 
-    repositoryService.getProcessDiagramLayout(processDefinition.getId());
+    repositoryService.getProcessDiagramLayout(processDefinitionId);
   }
 
   @Test
   public void getProcessDiagramLayoutWithAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    DiagramLayout diagramLayout = repositoryService.getProcessDiagramLayout(processDefinition.getId());
+    DiagramLayout diagramLayout = repositoryService.getProcessDiagramLayout(processDefinitionId);
 
     assertThat(diagramLayout, notNullValue());
   }
@@ -158,7 +157,7 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    DiagramLayout diagramLayout = repositoryService.getProcessDiagramLayout(processDefinition.getId());
+    DiagramLayout diagramLayout = repositoryService.getProcessDiagramLayout(processDefinitionId);
 
     assertThat(diagramLayout, notNullValue());
   }
@@ -171,14 +170,14 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot get the process definition");
 
-    repositoryService.getProcessDefinition(processDefinition.getId());
+    repositoryService.getProcessDefinition(processDefinitionId);
   }
 
   @Test
   public void getProcessDefinitionWithAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    ProcessDefinition definition = repositoryService.getProcessDefinition(processDefinition.getId());
+    ProcessDefinition definition = repositoryService.getProcessDefinition(processDefinitionId);
 
     assertThat(definition.getTenantId(), is(TENANT_ONE));
   }
@@ -188,7 +187,7 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    ProcessDefinition definition = repositoryService.getProcessDefinition(processDefinition.getId());
+    ProcessDefinition definition = repositoryService.getProcessDefinition(processDefinitionId);
 
     assertThat(definition.getTenantId(), is(TENANT_ONE));
   }
@@ -201,14 +200,14 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot get the process definition");
 
-    repositoryService.getBpmnModelInstance(processDefinition.getId());
+    repositoryService.getBpmnModelInstance(processDefinitionId);
   }
 
   @Test
   public void getBpmnModelInstanceWithAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    BpmnModelInstance modelInstance = repositoryService.getBpmnModelInstance(processDefinition.getId());
+    BpmnModelInstance modelInstance = repositoryService.getBpmnModelInstance(processDefinitionId);
 
     assertThat(modelInstance, notNullValue());
   }
@@ -218,7 +217,7 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    BpmnModelInstance modelInstance = repositoryService.getBpmnModelInstance(processDefinition.getId());
+    BpmnModelInstance modelInstance = repositoryService.getBpmnModelInstance(processDefinitionId);
 
     assertThat(modelInstance, notNullValue());
   }

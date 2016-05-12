@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.cmmn.cmd;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
@@ -59,11 +58,7 @@ public class GetDeploymentCaseDiagramCmd implements Command<InputStream>, Serial
     final String resourceName = caseDefinition.getDiagramResourceName();
 
     if (resourceName != null) {
-      InputStream caseDiagramStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
-        public InputStream call() throws Exception {
-          return new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
-        }
-      });
+      InputStream caseDiagramStream = new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
       return caseDiagramStream;
     }
     else {
