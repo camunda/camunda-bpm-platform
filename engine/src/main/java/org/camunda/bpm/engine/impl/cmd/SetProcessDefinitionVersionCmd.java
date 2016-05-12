@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -47,27 +46,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
 
 
 /**
