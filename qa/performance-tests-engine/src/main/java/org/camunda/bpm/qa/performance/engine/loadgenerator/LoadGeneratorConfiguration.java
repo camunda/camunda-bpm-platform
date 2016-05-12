@@ -19,7 +19,7 @@ package org.camunda.bpm.qa.performance.engine.loadgenerator;
 public class LoadGeneratorConfiguration {
 
   /** the number of threads to use when generating load */
-  protected int numOfThreads = Runtime.getRuntime().availableProcessors() - 1;
+  protected int numOfThreads = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
 
   /** controls how often the worker runnables are executed */
   protected int numberOfIterations = 10000;
