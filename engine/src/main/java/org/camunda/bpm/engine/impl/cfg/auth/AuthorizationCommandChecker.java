@@ -329,10 +329,8 @@ public class AuthorizationCommandChecker implements CommandChecker {
   // delete permission ////////////////////////////////////////
 
   public void checkDeleteHistoricTaskInstance(HistoricTaskInstanceEntity task) {
-    if (task != null) {
-      if (task.getExecutionId() != null) {
-        getAuthorizationManager().checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, task.getProcessDefinitionKey());
-      }
+    if (task.getProcessDefinitionKey() != null) {
+      getAuthorizationManager().checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, task.getProcessDefinitionKey());
     }
   }
 
