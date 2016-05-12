@@ -45,11 +45,20 @@
 
 table.cam-table > tbody > tr.editing {
   > td {
+    &.authorization-type,
     &.identity-id,
     &.permissions,
     &.resource-id {
       padding-top: 0;
       padding-bottom: 0;
+    }
+  }
+  > td {
+    &.authorization-type,
+    &.identity-id,
+    &.resource-id {
+      padding-left: 0;
+      padding-right: 0;
     }
   }
 }
