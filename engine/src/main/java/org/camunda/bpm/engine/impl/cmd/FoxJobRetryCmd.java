@@ -111,7 +111,7 @@ public class FoxJobRetryCmd extends JobRetryCmd {
 
       DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
       String definitionKey = configuration.getTimerElementKey();
-      ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(definitionKey);
+      ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(definitionKey, job.getTenantId());
       if (processDefinition != null) {
         activity = processDefinition.getInitial();
       }

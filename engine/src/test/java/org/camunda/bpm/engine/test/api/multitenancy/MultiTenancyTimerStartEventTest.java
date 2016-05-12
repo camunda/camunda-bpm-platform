@@ -16,15 +16,27 @@ package org.camunda.bpm.engine.test.api.multitenancy;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import java.util.List;
+
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
-public class MultiTenancyTimerStartEventTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyTimerStartEventTest {
 
   protected static final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess()
       .startEvent()
@@ -36,9 +48,27 @@ public class MultiTenancyTimerStartEventTest extends PluggableProcessEngineTestC
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
-  public void testStartProcessInstanceWithTenantId() {
+  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
-    deploymentForTenant(TENANT_ONE, PROCESS);
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected ManagementService managementService;
+  protected RuntimeService runtimeService;
+  protected RepositoryService repositoryService;
+
+  @Before
+  public void initServices() {
+    managementService = engineRule.getManagementService();
+    runtimeService = engineRule.getRuntimeService();
+    repositoryService = engineRule.getRepositoryService();
+  }
+
+  @Test
+  public void startProcessInstanceWithTenantId() {
+
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     Job job = managementService.createJobQuery().singleResult();
     assertThat(job.getTenantId(), is(TENANT_ONE));
@@ -50,10 +80,11 @@ public class MultiTenancyTimerStartEventTest extends PluggableProcessEngineTestC
     assertThat(processInstance.getTenantId(), is(TENANT_ONE));
   }
 
-  public void testStartProcessInstanceTwoTenants() {
+  @Test
+  public void startProcessInstanceTwoTenants() {
 
-    deploymentForTenant(TENANT_ONE, PROCESS);
-    deploymentForTenant(TENANT_TWO, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_TWO, PROCESS);
 
     Job jobForTenantOne = managementService.createJobQuery().tenantIdIn(TENANT_ONE).singleResult();
     assertThat(jobForTenantOne, is(notNullValue()));
@@ -67,35 +98,79 @@ public class MultiTenancyTimerStartEventTest extends PluggableProcessEngineTestC
     assertThat(runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
-  public void testDeleteJobsWhileUndeployment() {
+  @Test
+  public void deleteJobsWhileUndeployment() {
 
-     String deploymentForTenantOne = deploymentForTenant(TENANT_ONE, PROCESS);
-     String deploymentForTenantTwo = deploymentForTenant(TENANT_TWO, PROCESS);
+     Deployment deploymentForTenantOne = testRule.deployForTenant(TENANT_ONE, PROCESS);
+     Deployment deploymentForTenantTwo = testRule.deployForTenant(TENANT_TWO, PROCESS);
 
      JobQuery query = managementService.createJobQuery();
      assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
      assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
 
-     repositoryService.deleteDeployment(deploymentForTenantOne, true);
+     repositoryService.deleteDeployment(deploymentForTenantOne.getId(), true);
 
      assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
      assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
 
-     repositoryService.deleteDeployment(deploymentForTenantTwo, true);
+     repositoryService.deleteDeployment(deploymentForTenantTwo.getId(), true);
 
      assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
      assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
   }
 
-  public void testDontCreateNewJobsWhileReDeployment() {
+  @Test
+  public void dontCreateNewJobsWhileReDeployment() {
 
-    deploymentForTenant(TENANT_ONE, PROCESS);
-    deploymentForTenant(TENANT_TWO, PROCESS);
-    deploymentForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_TWO, PROCESS);
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
 
     JobQuery query = managementService.createJobQuery();
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+  }
+
+  @Test
+  public void failedJobRetryTimeCycle() {
+
+    testRule.deployForTenant(TENANT_ONE, Bpmn.createExecutableProcess()
+      .startEvent()
+        .timerWithDuration("PT1M")
+        .camundaFailedJobRetryTimeCycle("R5/PT1M")
+      .serviceTask()
+        .camundaExpression("${failing}")
+      .endEvent()
+      .done());
+
+    testRule.deployForTenant(TENANT_TWO, Bpmn.createExecutableProcess()
+      .startEvent()
+        .timerWithDuration("PT1M")
+        .camundaFailedJobRetryTimeCycle("R4/PT1M")
+      .serviceTask()
+        .camundaExpression("${failing}")
+      .endEvent()
+      .done());
+
+    List<Job> jobs = managementService.createJobQuery().timers().list();
+    executeFailingJobs(jobs);
+
+    Job jobTenantOne = managementService.createJobQuery().tenantIdIn(TENANT_ONE).singleResult();
+    Job jobTenantTwo = managementService.createJobQuery().tenantIdIn(TENANT_TWO).singleResult();
+
+    assertThat(jobTenantOne.getRetries(), is(4));
+    assertThat(jobTenantTwo.getRetries(), is(3));
+  }
+
+  protected void executeFailingJobs(List<Job> jobs) {
+    for (Job job : jobs) {
+
+      try {
+        managementService.executeJob(job.getId());
+
+        fail("expected exception");
+      } catch (Exception e) {}
+    }
   }
 
 }
