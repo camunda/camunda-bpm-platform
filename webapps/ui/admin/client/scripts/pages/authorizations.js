@@ -195,7 +195,7 @@ var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization
           $location.search({'resource': 0});
           $location.replace();
           $scope.title = $scope.getResource(0);
-          $scope.selectedResourceType = 0;
+          $scope.selectedResourceType = '0';
 
         } else {
           $scope.title = $scope.getResource($routeParams.resource);
