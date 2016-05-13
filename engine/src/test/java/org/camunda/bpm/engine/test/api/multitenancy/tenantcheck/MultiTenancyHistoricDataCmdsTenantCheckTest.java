@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.runtime.CaseInstanceBuilder;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -39,6 +40,7 @@ import org.junit.rules.RuleChain;
 /**
  * @author kristin.polenz
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
