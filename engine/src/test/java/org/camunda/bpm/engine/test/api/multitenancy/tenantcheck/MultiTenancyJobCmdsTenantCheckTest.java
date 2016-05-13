@@ -147,7 +147,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     // then
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot update the process definition '"
-      + processInstance.getProcessDefinitionId() + "' because it belongs to no authenticated tenant.");
+      + jobDefinition.getProcessDefinitionId() + "' because it belongs to no authenticated tenant.");
     // when
     managementService.setJobRetriesByJobDefinitionId(jobDefinition.getId(), 1);
   }
@@ -283,7 +283,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     // then
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot update the process definition '"
-      + processInstance.getProcessDefinitionId() +"' because it belongs to no authenticated tenant.");
+      + jobDefinition.getProcessDefinitionId() +"' because it belongs to no authenticated tenant.");
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 1701);
 
   }
@@ -329,7 +329,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     // then
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot update the process definition '"
-      + processInstance.getProcessDefinitionId() +"' because it belongs to no authenticated tenant.");
+      + jobDefinition.getProcessDefinitionId() +"' because it belongs to no authenticated tenant.");
 
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 1701, true);
 
@@ -383,7 +383,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     // then
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot update the process definition '" 
-      + processInstance.getProcessDefinitionId() +"' because it belongs to no authenticated tenant.");
+      + jobDefinition.getProcessDefinitionId() +"' because it belongs to no authenticated tenant.");
 
     // when
     managementService.clearOverridingJobPriorityForJobDefinition(jobDefinition.getId());
@@ -467,9 +467,9 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   }
 
   protected ProcessInstance startProcessAndExecuteJob(final String key) {
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey(key);
+    ProcessInstance newProcessInstance = engineRule.getRuntimeService().startProcessInstanceByKey(key);
     executeAvailableJobs(key);
-    return processInstance;
+    return newProcessInstance;
   }
 
   protected void executeAvailableJobs(final String key) {
