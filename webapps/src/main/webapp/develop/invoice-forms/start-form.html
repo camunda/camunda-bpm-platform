@@ -6,25 +6,38 @@
 
   <div class="form-group">
     <label class="control-label col-md-4"
-           for="document">Upload your Invoice Document (Required)</label>
+           for="invoiceDocumentUpload">Upload your Invoice Document (Required)</label>
     <div class="col-md-8">
       <input type="file"
-        id="invoiceDocumentUpload"
-        cam-variable-name="invoiceDocument"
-        cam-variable-type="File"
-        cam-max-filesize="10000000"
-        class="form-control"/>
+             id="invoiceDocumentUpload"
+             cam-variable-name="invoiceDocument"
+             cam-variable-type="File"
+             cam-max-filesize="10000000"
+             class="form-control"/>
+      <div class="help-block">This field is required</div>
     </div>
   </div>
 
   <script cam-script type="text/form-script">
-    camForm.on('submit', function(evt) {
+    var fileUpload = $('#invoiceDocumentUpload');
+    var fileUploadHelpBlock = $('.help-block', fileUpload.parent());
 
-      var fileUpload = $('#invoiceDocumentUpload').get(0);
+    function flagFileUpload() {
+      var hasFile = fileUpload.get(0).files.length > 0;
+      fileUpload[hasFile ? 'removeClass' : 'addClass']('ng-invalid');
+      fileUploadHelpBlock[hasFile ? 'removeClass' : 'addClass']('error');
+      return hasFile;
+    }
+
+    fileUpload.on('change', function () {
+      flagFileUpload();
+    });
+
+    camForm.on('submit', function(evt) {
+      var hasFile = flagFileUpload();
 
       // prevent submit if user has not provided a file
-      evt.submitPrevented = (fileUpload.files.length == 0);
-
+      evt.submitPrevented = !hasFile;
     });
   </script>
 
