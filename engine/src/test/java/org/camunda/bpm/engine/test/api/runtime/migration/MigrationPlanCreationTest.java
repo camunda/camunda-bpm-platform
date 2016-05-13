@@ -553,12 +553,14 @@ public class MigrationPlanCreationTest {
         .mapActivities("userTask", "userTask")
         .mapActivities("boundary", "boundary")
         .build();
+
       fail("Should not succeed");
     }
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasInstructionFailures("boundary",
-          "The source activity's event scope (userTask) must be mapped to the target activity's event scope (subProcess)"
+          "The source activity's event scope (userTask) must be mapped to the target activity's event scope (subProcess)",
+          "The closest migrated ancestor 'subProcess' is migrated to scope 'subProcess' which is not an ancestor of target scope 'boundary'"
         );
     }
   }

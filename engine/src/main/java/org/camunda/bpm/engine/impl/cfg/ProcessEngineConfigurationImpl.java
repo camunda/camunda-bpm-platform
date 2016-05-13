@@ -38,8 +38,6 @@ import javax.sql.DataSource;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
-import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
@@ -203,7 +201,6 @@ import org.camunda.bpm.engine.impl.migration.batch.MigrationBatchJobHandler;
 import org.camunda.bpm.engine.impl.migration.validation.activity.MigrationActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedPassiveEventTriggerActivityValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instance.AdditionalFlowScopeActivityInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.AsyncAfterMigrationValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.AsyncMigrationValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.AsyncProcessStartMigrationValidator;
@@ -213,6 +210,7 @@ import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingTransi
 import org.camunda.bpm.engine.impl.migration.validation.instance.NoUnmappedLeafInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.SupportedActivityInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.VariableConflictActivityInstanceValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.AdditionalFlowScopeInstructionValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMultiInstanceBodyValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMultiInstanceInnerActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotRemoveMultiInstanceInnerActivityValidator;
@@ -3266,6 +3264,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     migrationInstructionValidators.add(new GatewayMappingValidator());
     migrationInstructionValidators.add(new SameEventScopeInstructionValidator());
     migrationInstructionValidators.add(new UpdateEventTriggersValidator());
+    migrationInstructionValidators.add(new AdditionalFlowScopeInstructionValidator());
     return migrationInstructionValidators;
   }
 
@@ -3300,7 +3299,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public List<MigratingActivityInstanceValidator> getDefaultMigratingActivityInstanceValidators() {
     List<MigratingActivityInstanceValidator> migratingActivityInstanceValidators = new ArrayList<MigratingActivityInstanceValidator>();
 
-    migratingActivityInstanceValidators.add(new AdditionalFlowScopeActivityInstanceValidator());
     migratingActivityInstanceValidators.add(new NoUnmappedLeafInstanceValidator());
     migratingActivityInstanceValidators.add(new VariableConflictActivityInstanceValidator());
     migratingActivityInstanceValidators.add(new SupportedActivityInstanceValidator());

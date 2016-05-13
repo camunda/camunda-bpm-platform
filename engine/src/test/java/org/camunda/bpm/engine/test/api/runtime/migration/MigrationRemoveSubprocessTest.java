@@ -15,15 +15,14 @@ package org.camunda.bpm.engine.test.api.runtime.migration;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
-import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -32,6 +31,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateEvent;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateExecutionListener;
+import org.camunda.bpm.engine.test.util.MigrationPlanValidationReportAssert;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -364,21 +364,20 @@ public class MigrationRemoveSubprocessTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_TASK_AND_SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
-
     // when
     try {
-      testHelper.createProcessInstanceAndMigrate(migrationPlan);
+      rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess")
+        .mapActivities("userTask1", "userTask1")
+        .mapActivities("userTask2", "userTask2")
+        .build();
+
       Assert.fail("should not validate");
-    } catch (MigratingProcessInstanceValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasActivityInstanceFailures("userTask2",
-          "Closest migrating ancestor activity instance is migrated to activity 'subProcess' which is not an ancestor of target activity 'userTask2'"
+    } catch (MigrationPlanValidationException e) {
+      MigrationPlanValidationReportAssert.assertThat(e.getValidationReport())
+        .hasInstructionFailures("userTask2",
+          "The closest migrated ancestor 'subProcess' is migrated to scope 'subProcess' which is not an ancestor of target scope 'userTask2'"
         );
     }
   }
@@ -549,23 +548,22 @@ public class MigrationRemoveSubprocessTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.TRIPLE_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.TRIPLE_SUBPROCESS_PROCESS);
 
-    // subProcess2 is not migrated
-    // subProcess 3 is moved out of the subProcess1 scope (by becoming a subProcess1 itself)
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess1", "subProcess1")
-      .mapActivities("subProcess3", "subProcess1")
-      .mapActivities("userTask", "userTask")
-      .build();
-
     // when
     try {
-      testHelper.createProcessInstanceAndMigrate(migrationPlan);
+      // subProcess2 is not migrated
+      // subProcess 3 is moved out of the subProcess1 scope (by becoming a subProcess1 itself)
+      rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess1", "subProcess1")
+        .mapActivities("subProcess3", "subProcess1")
+        .mapActivities("userTask", "userTask")
+        .build();
+
       Assert.fail("should not validate");
-    } catch (MigratingProcessInstanceValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasActivityInstanceFailures("subProcess3",
-          "Closest migrating ancestor activity instance is migrated to activity 'subProcess1' which is not an ancestor of target activity 'subProcess1'"
+    } catch (MigrationPlanValidationException e) {
+      MigrationPlanValidationReportAssert.assertThat(e.getValidationReport())
+        .hasInstructionFailures("subProcess3",
+          "The closest migrated ancestor 'subProcess1' is migrated to scope 'subProcess1' which is not an ancestor of target scope 'subProcess1'"
         );
     }
   }

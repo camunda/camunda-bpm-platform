@@ -12,13 +12,11 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
-
-import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
-import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.engine.test.util.MigrationPlanValidationReportAssert;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -43,22 +41,20 @@ public class MigrationFlipScopesTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.DOUBLE_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.DOUBLE_SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("outerSubProcess", "innerSubProcess")
-      .mapActivities("innerSubProcess", "outerSubProcess")
-      .mapActivities("userTask", "userTask")
-      .build();
-
     // when
     try {
-      testHelper.createProcessInstanceAndMigrate(migrationPlan);
+      rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("outerSubProcess", "innerSubProcess")
+        .mapActivities("innerSubProcess", "outerSubProcess")
+        .mapActivities("userTask", "userTask")
+        .build();
+
       Assert.fail("should not validate");
-    } catch (MigratingProcessInstanceValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-        .hasActivityInstanceFailures("innerSubProcess",
-          "Closest migrating ancestor activity instance is migrated to activity 'innerSubProcess' which is not an ancestor of target activity 'outerSubProcess'"
+    } catch (MigrationPlanValidationException e) {
+      MigrationPlanValidationReportAssert.assertThat(e.getValidationReport())
+        .hasInstructionFailures("innerSubProcess",
+          "The closest migrated ancestor 'outerSubProcess' is migrated to scope 'innerSubProcess' which is not an ancestor of target scope 'outerSubProcess'"
         );
     }
   }
