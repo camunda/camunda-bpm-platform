@@ -216,4 +216,9 @@ public interface CommandChecker {
    * Checks if it is allowed to read the given historic job log.
    */
   void checkReadHistoricJobLog(HistoricJobLogEventEntity historicJobLog);
+
+  /**
+   * Check if it is allowed to read the history for any process definition.
+   */
+  void checkReadHistoryAnyProcessDefinition();
 }

@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceReportImpl;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
 /**
@@ -26,7 +27,10 @@ public class ReportManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<DurationReportResult> createHistoricProcessInstanceDurationReport(HistoricProcessInstanceReportImpl query) {
-    return getDbEntityManager().selectList("selectHistoricProcessInstanceDurationReport", query);
+    return getDbEntityManager().selectList("selectHistoricProcessInstanceDurationReport", configureParameterizedQuery(query));
   }
 
+  protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
+    return getTenantManager().configureQuery(parameter);
+  }
 }

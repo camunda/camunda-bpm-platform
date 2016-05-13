@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.cfg.auth;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
@@ -383,6 +384,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
     if (historicJobLog.getProcessDefinitionKey() != null) {
       getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, historicJobLog.getProcessDefinitionKey());
     }
+  }
+
+  public void checkReadHistoryAnyProcessDefinition() {
+    getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, ANY);
   }
 
   // helper ////////////////////////////////////////

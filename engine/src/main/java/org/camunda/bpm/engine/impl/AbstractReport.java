@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.DurationReportResult;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -53,7 +54,9 @@ public abstract class AbstractReport implements Command<Object>, Report, Seriali
   public Object execute(CommandContext commandContext) {
     // since a report does only make sense in context of historic
     // data, the authorization check will be performed here
-    commandContext.getAuthorizationManager().checkReadHistoryAnyProcessDefinition();
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadHistoryAnyProcessDefinition();
+    }
     return executeDuration(commandContext);
   }
 
