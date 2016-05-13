@@ -181,6 +181,24 @@ Batch.prototype.getCurrentPage = function(type) {
   return this._batches[type].currentPage;
 };
 
+Batch.prototype.getSuspendedState = function () {
+  return this.getSelection().suspended;
+};
+
+Batch.prototype.toggleSuspension = function () {
+  var self = this;
+  var selection = this.getSelection();
+  selection.state = 'LOADING';
+
+  return this._sdk.resource('batch').suspended({
+    id: selection.id,
+    suspended: !selection.suspended
+  }, function (err) {
+    if (err) { throw err; } // notification?? but how?
+    self.loadDetails(selection.id, 'runtime');
+  });
+};
+
 Batch.prototype.updatePage = function(type) {
   if(type === 'job') {
     return this._loadFailedJobs(this.getSelection());
@@ -327,7 +345,6 @@ Batch.prototype.sortingKeys = [
   'totalJobs',
   'completedJobs',
   'remainingJobs',
-  'failedJobs',
   'batchJobsPerSeed',
   'invocationsPerBatchJob',
   'tenantId',
