@@ -97,6 +97,24 @@ public class MultiTenancyMigrationPlanCreateTenantCheckTest {
       .build();
   }
 
+  @Test
+  public void cannotCreateMigrationPlanForDefinitionsOfNonAuthenticatedTenantsCase3() {
+    // given
+    ProcessDefinition sourceDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    engineRule.getIdentityService().setAuthentication("user", null, null);
+
+    // then
+    exception.expect(ProcessEngineException.class);
+    exception.expectMessage("Cannot get process definition '" + sourceDefinition.getId()
+        + "' because it belongs to no authenticated tenant");
+
+    // when
+    engineRule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+      .mapEqualActivities()
+      .build();
+  }
+
 
   @Test
   public void canCreateMigrationPlanForSharedDefinitionsWithNoAuthenticatedTenants() {
@@ -113,6 +131,7 @@ public class MultiTenancyMigrationPlanCreateTenantCheckTest {
     // then
     Assert.assertNotNull(migrationPlan);
   }
+
 
   @Test
   public void canCreateMigrationPlanWithDisabledTenantCheck() {
