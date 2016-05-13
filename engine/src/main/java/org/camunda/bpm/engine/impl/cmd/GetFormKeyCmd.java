@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
@@ -23,7 +24,6 @@ import org.camunda.bpm.engine.impl.form.handler.FormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 
@@ -68,8 +68,9 @@ public class GetFormKeyCmd implements Command<String> {
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
     ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadProcessDefinition(processDefinition);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadProcessDefinition(processDefinition);
+    }
 
     Expression formKeyExpression = null;
 

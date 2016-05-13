@@ -18,13 +18,13 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.form.StartFormData;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
 
@@ -46,8 +46,9 @@ public class GetStartFormCmd implements Command<StartFormData>, Serializable {
     ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
     ensureNotNull("No process definition found for id '" + processDefinitionId + "'", "processDefinition", processDefinition);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadProcessDefinition(processDefinition);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadProcessDefinition(processDefinition);
+    }
 
     StartFormHandler startFormHandler = processDefinition.getStartFormHandler();
     ensureNotNull("No startFormHandler defined in process '" + processDefinitionId + "'", "startFormHandler", startFormHandler);

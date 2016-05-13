@@ -17,6 +17,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.form.StartFormData;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.engine.FormEngine;
@@ -24,7 +25,6 @@ import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
 
@@ -49,8 +49,9 @@ public class GetRenderedStartFormCmd implements Command<Object>, Serializable {
     ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
     ensureNotNull("Process Definition '" + processDefinitionId + "' not found", "processDefinition", processDefinition);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadProcessDefinition(processDefinition);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadProcessDefinition(processDefinition);
+    }
 
     StartFormHandler startFormHandler = processDefinition.getStartFormHandler();
     if (startFormHandler == null) {

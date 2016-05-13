@@ -18,12 +18,12 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.form.engine.FormEngine;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 
@@ -48,9 +48,9 @@ public class GetRenderedTaskFormCmd  implements Command<Object>, Serializable {
     TaskEntity task = taskManager.findTaskById(taskId);
     ensureNotNull("Task '" + taskId + "' not found", "task", task);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkReadTask(task);
-
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadTask(task);
+    }
     ensureNotNull("Task form definition for '" + taskId + "' not found", "task.getTaskDefinition()", task.getTaskDefinition());
 
     TaskFormHandler taskFormHandler = task.getTaskDefinition().getTaskFormHandler();

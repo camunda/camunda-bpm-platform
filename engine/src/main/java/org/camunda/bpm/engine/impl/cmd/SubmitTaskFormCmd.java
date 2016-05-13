@@ -19,10 +19,10 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
@@ -53,8 +53,9 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
     TaskEntity task = taskManager.findTaskById(taskId);
     ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkTaskWork(task);
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkTaskWork(task);
+    }
 
     TaskDefinition taskDefinition = task.getTaskDefinition();
     if(taskDefinition != null) {
