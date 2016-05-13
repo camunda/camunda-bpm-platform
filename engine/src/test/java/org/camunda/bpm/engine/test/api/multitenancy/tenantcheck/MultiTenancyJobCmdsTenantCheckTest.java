@@ -88,8 +88,8 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     identityService.setAuthentication("aUserId", null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the job "+ timerJob.getId() 
-      +" because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot update the job '"+ timerJob.getId() 
+      +"' because it belongs to no authenticated tenant.");
     managementService.setJobRetries(timerJob.getId(), 5);
 
   }
@@ -146,8 +146,8 @@ public class MultiTenancyJobCmdsTenantCheckTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process definition "
-      + processInstance.getProcessDefinitionId() + " because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot update the process definition '"
+      + processInstance.getProcessDefinitionId() + "' because it belongs to no authenticated tenant.");
     // when
     managementService.setJobRetriesByJobDefinitionId(jobDefinition.getId(), 1);
   }
@@ -196,7 +196,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the job " + timerJob.getId() +" because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot update the job '" + timerJob.getId() +"' because it belongs to no authenticated tenant.");
     // when
     managementService.setJobDuedate(timerJob.getId(), new Date());
 
@@ -240,7 +240,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the job "+ timerJob.getId() + " because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot update the job '"+ timerJob.getId() + "' because it belongs to no authenticated tenant.");
 
     // when
     managementService.setJobPriority(timerJob.getId(), 5);
@@ -282,8 +282,8 @@ public class MultiTenancyJobCmdsTenantCheckTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process definition "
-      + processInstance.getProcessDefinitionId() +" because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot update the process definition '"
+      + processInstance.getProcessDefinitionId() +"' because it belongs to no authenticated tenant.");
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 1701);
 
   }
@@ -328,8 +328,9 @@ public class MultiTenancyJobCmdsTenantCheckTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process definition "
-      + processInstance.getProcessDefinitionId() +" because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot update the process definition '"
+      + processInstance.getProcessDefinitionId() +"' because it belongs to no authenticated tenant.");
+
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 1701, true);
 
   }
@@ -381,8 +382,8 @@ public class MultiTenancyJobCmdsTenantCheckTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process definition " 
-      + processInstance.getProcessDefinitionId() +" because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot update the process definition '" 
+      + processInstance.getProcessDefinitionId() +"' because it belongs to no authenticated tenant.");
 
     // when
     managementService.clearOverridingJobPriorityForJobDefinition(jobDefinition.getId());
@@ -433,8 +434,8 @@ public class MultiTenancyJobCmdsTenantCheckTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the job " + timerJobId 
-      +" because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot read the job '" + timerJobId 
+      +"' because it belongs to no authenticated tenant.");
 
     // when
     managementService.getJobExceptionStacktrace(timerJobId);

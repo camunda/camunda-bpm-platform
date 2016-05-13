@@ -74,7 +74,9 @@ public class MultiTenancyFormVariablesCmdsTenantCheckTest {
     engineRule.getIdentityService().setAuthentication("aUserId", null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the process definition "+ instance.getProcessDefinitionId() +" because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot get the process definition '"
+      + instance.getProcessDefinitionId() +"' because it belongs to no authenticated tenant.");
+
     engineRule.getFormService().getStartFormVariables(instance.getProcessDefinitionId()).size();
 
   }
@@ -108,7 +110,9 @@ public class MultiTenancyFormVariablesCmdsTenantCheckTest {
     engineRule.getIdentityService().setAuthentication("aUserId", null);
     
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot read the task "+ task.getId() +" because it belongs to no authenticated tenant.");
+    thrown.expectMessage("Cannot read the task '"
+      + task.getId() +"' because it belongs to no authenticated tenant.");
+
     engineRule.getFormService().getTaskFormVariables(task.getId());
 
   }

@@ -167,8 +167,8 @@ public class MultiTenancyHistoricBatchQueryTest {
     catch (ProcessEngineException e) {
       // then
       Assert.assertThat(e.getMessage(), CoreMatchers
-        .containsString("Cannot delete historic batch "+ tenant2Batch.getId() 
-        +" because it belongs to no authenticated tenant"));
+        .containsString("Cannot delete historic batch '"+ tenant2Batch.getId() 
+        +"' because it belongs to no authenticated tenant"));
     }
 
     identityService.clearAuthentication();
