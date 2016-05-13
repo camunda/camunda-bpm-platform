@@ -458,7 +458,6 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   }
 
   protected Job selectJobByProcessInstanceId(String processInstanceId) {
-    identityService.clearAuthentication();
     Job job = managementService
         .createJobQuery()
         .processInstanceId(processInstanceId)
