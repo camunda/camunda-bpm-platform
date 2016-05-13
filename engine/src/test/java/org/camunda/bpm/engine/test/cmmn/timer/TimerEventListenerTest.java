@@ -13,17 +13,20 @@
 package org.camunda.bpm.engine.test.cmmn.timer;
 
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author smirnov
+ * @author subhro
  *
  */
 public class TimerEventListenerTest extends CmmnProcessEngineTestCase {
@@ -75,6 +78,32 @@ public class TimerEventListenerTest extends CmmnProcessEngineTestCase {
     assertNotNull(allJobs);
     assertTrue(!allJobs.isEmpty());
     assertTrue(allJobs.size()==1);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/timer/TimerEventListenerTest.testTimerOccur.cmmn"})
+  public void testTimerEventListenerOccurExecution(){
+    CaseInstance ci = createCaseInstanceByKey("case");
+    assertNotNull(ci);
+    CaseDefinition cd = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("case").singleResult();
+    List<JobDefinition> allJobs = managementService.createJobDefinitionQuery().list();
+    assertNotNull(allJobs);
+    assertTrue(!allJobs.isEmpty());
+
+    executeAvailableJobs();
+    CaseExecution exe = processEngine.getCaseService().createCaseExecutionQuery().caseInstanceId(ci.getCaseInstanceId()).singleResult();
+    assertNotNull(exe);
+    Map<String, Object> vars = processEngine.getCaseService().getVariables(exe.getId());
+    assertNotNull(vars);
+    /*System.out.println("Vars: "+vars);
+    //assertTrue(vars.containsKey("occur"));
+    try {
+      System.out.println("Sleeping for 20 secs");
+      Thread.currentThread().sleep(20 * 1000);
+
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    System.out.println("Sleeping complete....");*/
   }
 
 }
