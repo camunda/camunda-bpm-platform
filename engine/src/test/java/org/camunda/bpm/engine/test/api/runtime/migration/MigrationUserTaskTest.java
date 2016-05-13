@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidatio
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -266,7 +267,9 @@ public class MigrationUserTaskTest {
     rule.getTaskService().complete(task.getId());
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
 
-    rule.getHistoryService().deleteHistoricTaskInstance(subTaskAfterMigration.getId());
+    if (!rule.getProcessEngineConfiguration().getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+      rule.getHistoryService().deleteHistoricTaskInstance(subTaskAfterMigration.getId());
+    }
   }
 
 }

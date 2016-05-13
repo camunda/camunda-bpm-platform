@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.IdentityLink;
@@ -3630,7 +3631,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     Task task = selectSingleTask();
     assertNull(task);
 
-    historyService.deleteHistoricTaskInstance(taskId);
+    if (!processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+      historyService.deleteHistoricTaskInstance(taskId);
+    }
   }
 
   public void testStandaloneTaskCompleteWithTaskWorkPermission() {
@@ -3647,7 +3650,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     Task task = selectSingleTask();
     assertNull(task);
 
-    historyService.deleteHistoricTaskInstance(taskId);
+    if (!processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+      historyService.deleteHistoricTaskInstance(taskId);
+    }
   }
 
   // complete (process) task ////////////////////////////////////////////////////////////
