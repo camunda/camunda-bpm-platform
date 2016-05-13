@@ -28,7 +28,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
 
-  protected static final String ONE_INCIDENT_PROCESS_KEY = "process";
+  protected static final String PROCESS_DEFINITION_KEY = "exceptionInJobExecution";
 
   protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
 
@@ -54,11 +54,10 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     identityService = engineRule.getIdentityService();
 
     testRule.deployForTenant(TENANT_ONE,
-      "org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/authorization/oneIncidentProcess.bpmn20.xml");
+      "org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml");
     
     processInstance = engineRule.getRuntimeService()
-      .startProcessInstanceByKey("exceptionInJobExecution");
+      .startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
   }
 
   // set jobRetries
@@ -119,12 +118,12 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   public void testSetJobRetriesDefinitionWithAuthenticatedTenant() {
 
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().list().get(0);
-    identityService.setAuthentication("aUserId", null,  Arrays.asList(TENANT_ONE));
-  
+    
     String jobId = selectJobByProcessInstanceId(processInstance.getId()).getId();
 
     managementService.setJobRetries(jobId, 0);
 
+    identityService.setAuthentication("aUserId", null,  Arrays.asList(TENANT_ONE));
     // sets the retries for failed jobs - That's the reason why job retries are made 0 in the above step
     managementService.setJobRetriesByJobDefinitionId(jobDefinition.getId(), 1);
 
@@ -156,7 +155,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   public void testSetJobRetriesDefinitionWithDisabledTenantCheck() {
 
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().list().get(0);
-    
+
     String jobId = selectJobByProcessInstanceId(processInstance.getId()).getId();
 
     managementService.setJobRetries(jobId, 0);
@@ -411,7 +410,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   @Test
   public void testGetJobExceptionStackTraceWithAuthenticatedTenant() {
  
-    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
+    String processInstanceId = startProcessAndExecuteJob(PROCESS_DEFINITION_KEY).getId();
     String timerJobId = managementService.createJobQuery()
       .processInstanceId(processInstanceId)
       .singleResult()
@@ -424,7 +423,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   @Test
   public void testGetJobExceptionStackTraceWithNoAuthenticatedTenant() {
  
-    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
+    String processInstanceId = startProcessAndExecuteJob(PROCESS_DEFINITION_KEY).getId();
     String timerJobId = managementService.createJobQuery()
       .processInstanceId(processInstanceId)
       .singleResult()
@@ -444,7 +443,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   @Test
   public void testGetJobExceptionStackTraceWithDisabledTenantCheck() {
  
-    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
+    String processInstanceId = startProcessAndExecuteJob(PROCESS_DEFINITION_KEY).getId();
     String timerJobId = managementService.createJobQuery()
       .processInstanceId(processInstanceId)
       .singleResult()
@@ -459,6 +458,7 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   }
 
   protected Job selectJobByProcessInstanceId(String processInstanceId) {
+    identityService.clearAuthentication();
     Job job = managementService
         .createJobQuery()
         .processInstanceId(processInstanceId)
