@@ -65,7 +65,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
-  public ExpectedException thrown= ExpectedException.none();
+  public ExpectedException thrown = ExpectedException.none();
 
   protected static final BpmnModelInstance BPMN_PROCESS = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
       .startEvent().endEvent().done();
@@ -345,12 +345,11 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
   // helper //////////////////////////////////////////////////////////
 
   protected String startProcessInstance(String tenantId) {
-    VariableMap variables = Variables.createVariables().putValue("var", "throw-exception");
     if (tenantId == null) {
-      return runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, variables).getId();
+      return runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
     } else {
       return runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY)
-          .setVariables(variables).processDefinitionTenantId(tenantId).execute().getId();
+          .processDefinitionTenantId(tenantId).execute().getId();
     }
   }
 
