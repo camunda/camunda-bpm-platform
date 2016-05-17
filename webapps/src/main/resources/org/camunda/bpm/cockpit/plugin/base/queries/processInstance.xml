@@ -33,7 +33,7 @@
 
   <select id="selectRunningProcessInstancesIncludingIncidents" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
           resultMap="processInstanceMap">
-    select
+    select distinct
       INSTANCE.ID_,
       INSTANCE.BUSINESS_KEY_,
       INSTANCE.START_TIME_,
@@ -229,7 +229,7 @@
 
   <select id="selectCalledProcessInstances" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
           resultMap="calledProcessInstanceMap">
-    select RES.ID_, EXEC1.ACT_INST_ID_, EXEC1.ACT_ID_, PROC_.ID_ AS SUPER_PROC_DEF_ID_, PROC_.KEY_, PROC_.NAME_
+    select distinct RES.ID_, EXEC1.ACT_INST_ID_, EXEC1.ACT_ID_, PROC_.ID_ AS SUPER_PROC_DEF_ID_, PROC_.KEY_, PROC_.NAME_
     <include refid="selectCalledProcessInstancesByCriteria" />
     ${orderBy}
   </select>

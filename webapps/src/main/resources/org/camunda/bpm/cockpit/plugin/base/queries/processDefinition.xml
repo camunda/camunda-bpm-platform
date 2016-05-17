@@ -25,7 +25,7 @@
   </resultMap>
 
   <select id="selectProcessDefinitionWithFailedJobs" resultMap="processDefinitionMap">
-    select procdef.*,
+    select distinct procdef.*,
       (select count(*) FROM ${prefix}ACT_RU_EXECUTION exe, ${prefix}ACT_RU_JOB job
          where exe.PROC_INST_ID_ = job.PROCESS_INSTANCE_ID_ AND
                exe.PROC_DEF_ID_ = procdef.ID_ and job.RETRIES_ = 0) FAILED_JOBS_
@@ -34,7 +34,7 @@
 
   <select id="selectCalledProcessDefinitions" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessDefinitionQueryDto"
           resultMap="calledProcessDefinitionMap">
-    select RES.ID_, RES.KEY_, RES.NAME_, RES.VERSION_, EXEC2.ACT_ID_
+    select distinct RES.ID_, RES.KEY_, RES.NAME_, RES.VERSION_, EXEC2.ACT_ID_
     <include refid="selectCalledProcesses"/>
     group by RES.ID_, RES.KEY_, RES.NAME_, RES.VERSION_, EXEC2.ACT_ID_
     ${orderBy}

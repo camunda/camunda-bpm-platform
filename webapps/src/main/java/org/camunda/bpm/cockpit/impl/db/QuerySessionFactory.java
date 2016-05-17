@@ -38,6 +38,8 @@ public class QuerySessionFactory extends StandaloneProcessEngineConfiguration {
 
   private List<String> mappingFiles;
 
+  protected ProcessEngineConfigurationImpl wrappedConfiguration;
+
   @Override
   protected void init() {
     throw new IllegalArgumentException(
@@ -50,8 +52,8 @@ public class QuerySessionFactory extends StandaloneProcessEngineConfiguration {
    * stuff.
    */
   public void initFromProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration, List<String> mappings) {
+    this.wrappedConfiguration = processEngineConfiguration;
     this.mappingFiles = mappings;
-
     setDatabaseType(processEngineConfiguration.getDatabaseType());
     setDataSource(processEngineConfiguration.getDataSource());
     setDatabaseTablePrefix(processEngineConfiguration.getDatabaseTablePrefix());
@@ -69,6 +71,16 @@ public class QuerySessionFactory extends StandaloneProcessEngineConfiguration {
     initSqlSessionFactory();
     initSessionFactories();
     initValueTypeResolver();
+  }
+
+  @Override
+  public boolean isAuthorizationEnabled() {
+    return wrappedConfiguration.isAuthorizationEnabled();
+  }
+
+  @Override
+  public String getAuthorizationCheckRevokes() {
+    return wrappedConfiguration.getAuthorizationCheckRevokes();
   }
 
   @Override

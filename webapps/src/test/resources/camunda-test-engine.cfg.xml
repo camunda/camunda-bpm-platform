@@ -32,7 +32,9 @@
     <property name="failedJobCommandFactory" ref="foxFailedJobCommandFactory" />
 
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
-	
+
+    <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
+
   </bean>
   
   <bean id="foxFailedJobCommandFactory" class="org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory" />

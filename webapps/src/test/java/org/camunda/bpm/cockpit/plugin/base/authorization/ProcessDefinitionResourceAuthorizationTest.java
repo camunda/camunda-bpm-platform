@@ -44,6 +44,7 @@ public class ProcessDefinitionResourceAuthorizationTest extends AuthorizationTes
 
   protected ProcessDefinitionResource resource;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     super.setUp();
@@ -55,6 +56,7 @@ public class ProcessDefinitionResourceAuthorizationTest extends AuthorizationTes
     startProcessInstances(CALLING_USER_TASK_PROCESS_KEY, 3);
   }
 
+  @Override
   @After
   public void tearDown() {
     deleteDeployment(deploymentId);
@@ -112,6 +114,29 @@ public class ProcessDefinitionResourceAuthorizationTest extends AuthorizationTes
 
     // then
     assertThat(calledDefinitions).isNotEmpty();
+
+    ProcessDefinitionDto calledProcessDefinition = calledDefinitions.get(0);
+    assertThat(calledProcessDefinition.getKey()).isEqualTo(USER_TASK_PROCESS_KEY);
+  }
+
+  @Test
+  public void testCalledProcessDefinitionQueryWithMultipleReadPermissions() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(CALLING_USER_TASK_PROCESS_KEY).getId();
+    resource = new ProcessDefinitionResource(engineName, processDefinitionId);
+
+    String processInstanceId = selectAnyProcessInstanceByKey(CALLING_USER_TASK_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+
+    ProcessDefinitionQueryDto queryParameter = new ProcessDefinitionQueryDto();
+
+    // when
+    List<ProcessDefinitionDto> calledDefinitions = resource.queryCalledProcessDefinitions(queryParameter);
+
+    // then
+    assertThat(calledDefinitions.size()).isEqualTo(1);
 
     ProcessDefinitionDto calledProcessDefinition = calledDefinitions.get(0);
     assertThat(calledProcessDefinition.getKey()).isEqualTo(USER_TASK_PROCESS_KEY);

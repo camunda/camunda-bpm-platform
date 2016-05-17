@@ -34,6 +34,8 @@ public class QueryServiceImpl implements QueryService {
 
       @SuppressWarnings("unchecked")
       public List<T> execute(CommandContext commandContext) {
+        commandContext.getAuthorizationManager()
+          .enableQueryAuthCheck(parameter.getAuthCheck());
         return (List<T>) commandContext.getDbSqlSession().selectList(statement, parameter);
       }
 
@@ -57,6 +59,8 @@ public class QueryServiceImpl implements QueryService {
     Long queryResult = commandExecutor.executeCommand(new Command<Long>() {
 
       public Long execute(CommandContext commandContext) {
+        commandContext.getAuthorizationManager()
+          .enableQueryAuthCheck(parameter.getAuthCheck());
         return (Long) commandContext.getDbSqlSession().selectOne(statement, parameter);
       }
 

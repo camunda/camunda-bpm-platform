@@ -35,7 +35,7 @@
   <select id="selectIncidentWithCauseAndRootCauseIncidents" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto"
           resultMap="incidentResultMap">
     ${limitBefore}
-    select RES.* ${limitBetween}
+    select distinct RES.* ${limitBetween}
     <include refid="selectIncidents" />
     ${orderBy}
     ${limitAfter}
