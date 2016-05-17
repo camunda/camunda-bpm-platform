@@ -15,11 +15,8 @@ package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,6 +35,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.mockito.ArgumentCaptor;
+
+import jnr.posix.Times;
 
 public class GroupAuthorizationTest extends AuthorizationTest {
 
@@ -112,7 +111,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
         taskQuery.list();
 
         verify(authorizationManager).filterAuthenticatedGroupIds(eq(testGroupIds));
-        verify(authCheck).setAuthGroupIds((List<String>) argThat(containsInAnyOrder(testGroupIds.toArray())));
+        verify(authCheck, atLeastOnce()).setAuthGroupIds((List<String>) argThat(containsInAnyOrder(testGroupIds.toArray())));
 
         return null;
       }

@@ -351,20 +351,25 @@ public class AuthorizationManager extends AbstractManager {
 
     if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
-      authCheck.setAuthorizationCheckEnabled(true);
+      authCheck.setAuthUserId(currentAuthentication.getUserId());
+      authCheck.setAuthGroupIds(currentAuthentication.getGroupIds());
 
-      String currentUserId = currentAuthentication.getUserId();
-      List<String> currentGroupIds = filterAuthenticatedGroupIds(currentAuthentication.getGroupIds());
-
-      authCheck.setAuthUserId(currentUserId);
-      authCheck.setAuthGroupIds(currentGroupIds);
-      authCheck.setRevokeAuthorizationCheckEnabled(isRevokeAuthCheckEnabled(currentUserId, currentGroupIds));
+      enableQueryAuthCheck(authCheck);
     }
     else {
       authCheck.setAuthorizationCheckEnabled(false);
       authCheck.setAuthUserId(null);
       authCheck.setAuthGroupIds(null);
     }
+  }
+
+  public void enableQueryAuthCheck(AuthorizationCheck authCheck) {
+    List<String> authGroupIds = authCheck.getAuthGroupIds();
+    String authUserId = authCheck.getAuthUserId();
+
+    authCheck.setAuthorizationCheckEnabled(true);
+    authCheck.setAuthGroupIds(filterAuthenticatedGroupIds(authGroupIds));
+    authCheck.setRevokeAuthorizationCheckEnabled(isRevokeAuthCheckEnabled(authUserId, authGroupIds));
   }
 
   @Override
