@@ -134,7 +134,7 @@ public class MultiTenancyTimerStartEventTest {
   @Test
   public void failedJobRetryTimeCycle() {
 
-    testRule.deployForTenant(TENANT_ONE, Bpmn.createExecutableProcess()
+    testRule.deployForTenant(TENANT_ONE, Bpmn.createExecutableProcess("failingProcess")
       .startEvent()
         .timerWithDuration("PT1M")
         .camundaFailedJobRetryTimeCycle("R5/PT1M")
@@ -143,7 +143,7 @@ public class MultiTenancyTimerStartEventTest {
       .endEvent()
       .done());
 
-    testRule.deployForTenant(TENANT_TWO, Bpmn.createExecutableProcess()
+    testRule.deployForTenant(TENANT_TWO, Bpmn.createExecutableProcess("failingProcess")
       .startEvent()
         .timerWithDuration("PT1M")
         .camundaFailedJobRetryTimeCycle("R4/PT1M")
