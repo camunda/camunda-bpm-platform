@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.rest.dto.migration;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.migration.MigrationPlanValidationReport;
@@ -32,6 +33,12 @@ public class MigrationPlanReportDto {
   public static MigrationPlanReportDto form(MigrationPlanValidationReport validationReport) {
     MigrationPlanReportDto dto = new MigrationPlanReportDto();
     dto.setInstructionReports(MigrationInstructionValidationReportDto.from(validationReport.getInstructionReports()));
+    return dto;
+  }
+
+  public static MigrationPlanReportDto emptyReport() {
+    MigrationPlanReportDto dto = new MigrationPlanReportDto();
+    dto.setInstructionReports(Collections.<MigrationInstructionValidationReportDto>emptyList());
     return dto;
   }
 

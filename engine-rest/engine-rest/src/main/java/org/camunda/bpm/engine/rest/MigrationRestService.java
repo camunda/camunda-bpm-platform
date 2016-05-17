@@ -13,15 +13,17 @@
 
 package org.camunda.bpm.engine.rest;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
-import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanGenerationDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
+import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanGenerationDto;
+import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanReportDto;
 
 public interface MigrationRestService {
 
@@ -29,19 +31,24 @@ public interface MigrationRestService {
 
   @POST
   @Path("/generate")
+  @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   MigrationPlanDto generateMigrationPlan(MigrationPlanGenerationDto generationDto);
 
   @POST
   @Path("/validate")
-  void validateMigrationPlan(MigrationPlanDto migrationPlanDto);
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  MigrationPlanReportDto validateMigrationPlan(MigrationPlanDto migrationPlanDto);
 
   @POST
   @Path("/execute")
+  @Consumes(MediaType.APPLICATION_JSON)
   void executeMigrationPlan(MigrationExecutionDto migrationPlan);
 
   @POST
   @Path("/executeAsync")
+  @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   BatchDto executeMigrationPlanAsync(MigrationExecutionDto migrationPlan);
 

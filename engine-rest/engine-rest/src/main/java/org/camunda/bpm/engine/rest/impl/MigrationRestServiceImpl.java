@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanGenerationDto;
+import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanReportDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -64,8 +65,15 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
     }
   }
 
-  public void validateMigrationPlan(MigrationPlanDto migrationPlanDto) {
-    createMigrationPlan(migrationPlanDto);
+  public MigrationPlanReportDto validateMigrationPlan(MigrationPlanDto migrationPlanDto) {
+    try {
+      createMigrationPlan(migrationPlanDto);
+      // return an empty report if not errors are found
+      return MigrationPlanReportDto.emptyReport();
+    }
+    catch (MigrationPlanValidationException e) {
+     return MigrationPlanReportDto.form(e.getValidationReport());
+    }
   }
 
   public void executeMigrationPlan(MigrationExecutionDto migrationExecution) {
