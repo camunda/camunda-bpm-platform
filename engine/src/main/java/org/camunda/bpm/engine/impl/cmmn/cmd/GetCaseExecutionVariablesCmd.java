@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import org.camunda.bpm.engine.exception.cmmn.CaseExecutionNotFoundException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -52,6 +53,10 @@ public class GetCaseExecutionVariablesCmd implements Command<VariableMap>, Seria
       .findCaseExecutionById(caseExecutionId);
 
     ensureNotNull(CaseExecutionNotFoundException.class, "case execution " + caseExecutionId + " doesn't exist", "caseExecution", caseExecution);
+
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkUpdateCaseInstance(caseExecution);
+    }
 
     VariableMapImpl result = new VariableMapImpl();
     // collect variables

@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.CaseExecution;
 
 /**
  * {@link CommandChecker} to ensure that commands are only executed for
@@ -336,6 +337,13 @@ public class TenantCommandChecker implements CommandChecker {
     // Report.selectHistoricProcessInstanceDurationReport
     // It is necessary to make the check there because the query may be return only the
     // historic process instances which belong to the authenticated tenant.
+  }
+
+  @Override
+  public void checkUpdateCaseInstance(CaseExecution caseExecution) {
+    if (caseExecution != null && !getTenantManager().isAuthenticatedTenant(caseExecution.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("update the case execution '" + caseExecution.getId() + "'");
+    }
   }
 
   // helper //////////////////////////////////////////////////

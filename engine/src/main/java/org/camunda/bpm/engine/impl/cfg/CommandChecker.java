@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.CaseExecution;
 
 /**
  * Is invoked while executing a command to check if the current operation is
@@ -207,7 +208,7 @@ public interface CommandChecker {
   void checkDeleteHistoricCaseInstance(HistoricCaseInstance instance);
 
   /**
-   * Checks if it is allowed to delete the historic decision instance for the given
+   * Checks if it is allowed to delete the historic decision instance of the given
    * decision definition key.
    */
   void checkDeleteHistoricDecisionInstance(String decisionDefinitionKey);
@@ -221,4 +222,9 @@ public interface CommandChecker {
    * Check if it is allowed to read the history for any process definition.
    */
   void checkReadHistoryAnyProcessDefinition();
+
+  /**
+   * Check if it is allowed to update the case instance of the given case execution.
+   */
+  void checkUpdateCaseInstance(CaseExecution caseExecution);
 }

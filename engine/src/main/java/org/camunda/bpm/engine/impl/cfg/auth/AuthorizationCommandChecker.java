@@ -53,6 +53,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.CaseExecution;
 
 /**
  * {@link CommandChecker} that uses the {@link AuthorizationManager} to perform
@@ -390,6 +391,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
     getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, ANY);
   }
 
+  @Override
+  public void checkUpdateCaseInstance(CaseExecution caseExecution) {
+  }
+
   // helper ////////////////////////////////////////
 
   protected AuthorizationManager getAuthorizationManager() {
@@ -481,4 +486,5 @@ public class AuthorizationCommandChecker implements CommandChecker {
       getAuthorizationManager().checkAuthorization(DELETE, TASK, taskId);
     }
   }
+
 }

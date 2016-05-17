@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.camunda.bpm.engine.exception.cmmn.CaseExecutionNotFoundException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmmn.CaseExecutionCommandBuilderImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -64,6 +65,10 @@ public class CaseExecutionVariableCmd implements Command<Void>, Serializable {
       .findCaseExecutionById(caseExecutionId);
 
     ensureNotNull(CaseExecutionNotFoundException.class, "There does not exist any case execution with id: '" + caseExecutionId + "'", "caseExecution", caseExecution);
+
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkUpdateCaseInstance(caseExecution);
+    }
 
     if (variablesDeletions != null && !variablesDeletions.isEmpty()) {
       caseExecution.removeVariables(variablesDeletions);
