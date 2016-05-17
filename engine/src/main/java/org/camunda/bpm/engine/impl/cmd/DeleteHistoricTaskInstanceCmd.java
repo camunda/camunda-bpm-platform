@@ -39,8 +39,6 @@ public class DeleteHistoricTaskInstanceCmd implements Command<Object>, Serializa
 
     HistoricTaskInstanceEntity task = commandContext.getHistoricTaskInstanceManager().findHistoricTaskInstanceById(taskId);
 
-    ensureNotNull("No historic task instance found with id: " + taskId, "instance", task);
-
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkDeleteHistoricTaskInstance(task);
     }

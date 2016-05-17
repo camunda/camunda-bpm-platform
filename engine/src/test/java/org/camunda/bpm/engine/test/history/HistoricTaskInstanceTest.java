@@ -13,9 +13,6 @@
 
 package org.camunda.bpm.engine.test.history;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
@@ -114,13 +110,8 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testDeleteHistoricTaskInstance() {
-    try {
-      historyService.deleteHistoricTaskInstance("unexistingId");
-
-      fail("expected exception");
-    } catch (NullValueException e) {
-      assertThat(e.getMessage(), containsString("No historic task instance found with id: unexistingId"));
-    }
+    // deleting unexisting historic task instance should be silently ignored
+    historyService.deleteHistoricTaskInstance("unexistingId");
   }
 
   @Deployment
