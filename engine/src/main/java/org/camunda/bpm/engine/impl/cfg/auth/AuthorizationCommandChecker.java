@@ -22,7 +22,9 @@ import static org.camunda.bpm.engine.authorization.Permissions.DELETE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_TASK;
 import static org.camunda.bpm.engine.authorization.Permissions.TASK_ASSIGN;
+import static org.camunda.bpm.engine.authorization.Permissions.TASK_WORK;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
@@ -263,7 +265,51 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkReadTask(TaskEntity task) {
-    getAuthorizationManager().checkReadTask(task);
+    String taskId = task.getId();
+
+    String executionId = task.getExecutionId();
+    if (executionId != null) {
+
+      // if task exists in context of a process instance
+      // then check the following permissions:
+      // - READ on TASK
+      // - READ_TASK on PROCESS_DEFINITION
+
+      ExecutionEntity execution = task.getExecution();
+      ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
+
+
+      PermissionCheck readPermissionCheck = getAuthorizationManager().newPermissionCheck();
+      readPermissionCheck.setPermission(READ);
+      readPermissionCheck.setResource(TASK);
+      readPermissionCheck.setResourceId(taskId);
+
+      PermissionCheck readTaskPermissionCheck = getAuthorizationManager().newPermissionCheck();
+      readTaskPermissionCheck.setPermission(READ_TASK);
+      readTaskPermissionCheck.setResource(PROCESS_DEFINITION);
+      readTaskPermissionCheck.setResourceId(processDefinition.getKey());
+      readTaskPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+
+      getAuthorizationManager().checkAuthorization(readPermissionCheck, readTaskPermissionCheck);
+
+    } else {
+
+      // if task does not exist in context of process
+      // instance, then it is either a (a) standalone task
+      // or (b) it exists in context of a case instance.
+
+      // (a) standalone task: check following permission
+      // - READ on TASK
+      // (b) task in context of a case instance, in this
+      // case it is not necessary to check any permission,
+      // because such tasks can always be read
+
+      String caseExecutionId = task.getCaseExecutionId();
+      if (caseExecutionId == null) {
+        getAuthorizationManager().checkAuthorization(READ, TASK, taskId);
+      }
+
+    }
   }
 
   public void checkUpdateTask(TaskEntity task) {
@@ -466,7 +512,48 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkTaskWork(TaskEntity task) {
-    getAuthorizationManager().checkTaskWork(task);
+
+    String taskId = task.getId();
+
+    String executionId = task.getExecutionId();
+    if (executionId != null) {
+
+      // Permissions to task actions is based on the order in which PermissioncheckBuilder is built
+      CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
+          .disjunctive()
+          .atomicCheckForResourceId(TASK, taskId, TASK_WORK)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), TASK_WORK)
+          .atomicCheckForResourceId(TASK, taskId, UPDATE)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), UPDATE_TASK)
+        .build();
+
+      getAuthorizationManager().checkAuthorization(taskWorkPermission);
+
+    }
+    else {
+
+      // if task does not exist in context of process
+      // instance, then it is either a (a) standalone task
+      // or (b) it exists in context of a case instance.
+
+      // (a) standalone task: check following permission
+      // - TASK_WORK or UPDATE
+      // (b) task in context of a case instance, in this
+      // case it is not necessary to check any permission,
+      // because such tasks can always be updated
+
+      String caseExecutionId = task.getCaseExecutionId();
+      if (caseExecutionId == null) {
+        // standalone task
+        CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
+            .disjunctive()
+            .atomicCheckForResourceId(TASK, taskId, TASK_WORK)
+            .atomicCheckForResourceId(TASK, taskId, UPDATE)
+          .build();
+
+          getAuthorizationManager().checkAuthorization(taskWorkPermission);
+      }
+    }
   }
 
   public void checkDeleteTask(TaskEntity task) {
