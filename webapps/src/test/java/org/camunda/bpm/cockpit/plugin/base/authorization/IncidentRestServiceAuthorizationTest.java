@@ -40,6 +40,7 @@ public class IncidentRestServiceAuthorizationTest extends AuthorizationTest {
 
   protected IncidentRestService resource;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     super.setUp();
@@ -56,6 +57,7 @@ public class IncidentRestServiceAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
   }
 
+  @Override
   @After
   public void tearDown() {
     deleteDeployment(deploymentId);
@@ -95,6 +97,23 @@ public class IncidentRestServiceAuthorizationTest extends AuthorizationTest {
   public void testQueryWithReadPermissionOnAnyProcessInstance() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
+
+    // when
+    List<IncidentDto> incidents = resource.queryIncidents(queryParameter, null, null);
+
+    // then
+    assertThat(incidents).isNotEmpty();
+    assertThat(incidents).hasSize(3);
+  }
+
+  @Test
+  public void testQueryWithMultipleReadPermissions() {
+    // given
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+    String processInstanceId = selectAnyProcessInstanceByKey(FAILING_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     IncidentQueryDto queryParameter = new IncidentQueryDto();
 

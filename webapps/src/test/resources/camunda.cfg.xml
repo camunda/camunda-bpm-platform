@@ -29,5 +29,7 @@
     <property name="mailServerPort" value="5025" />
     <property name="history" value="full" />
 
+    <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
+
   </bean>
 </beans>

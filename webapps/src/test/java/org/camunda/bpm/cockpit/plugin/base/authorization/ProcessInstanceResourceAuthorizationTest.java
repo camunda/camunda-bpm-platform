@@ -138,6 +138,27 @@ public class ProcessInstanceResourceAuthorizationTest extends AuthorizationTest 
     assertThat(calledInstances.get(0).getId()).isNotEqualTo(processInstanceId);
   }
 
+  @Test
+  public void testCalledInstancesWithMultipleReadPermissions() {
+    // given
+    String processInstanceId = selectAnyProcessInstanceByKey(CALLING_USER_TASK_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, CALLING_USER_TASK_PROCESS_KEY, userId, READ_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+
+    resource = new ProcessInstanceResource(engineName, processInstanceId);
+
+    CalledProcessInstanceQueryDto queryParameter = new CalledProcessInstanceQueryDto();
+
+    // when
+    List<CalledProcessInstanceDto> calledInstances = resource.queryCalledProcessInstances(queryParameter);
+
+    // then
+    assertThat(calledInstances).isNotEmpty();
+    assertThat(calledInstances).hasSize(1);
+    assertThat(calledInstances.get(0).getId()).isNotEqualTo(processInstanceId);
+  }
+
+
   // query "selectCalledProcessInstances" //////////////////////////////////////////////
 
   @Test
@@ -188,6 +209,22 @@ public class ProcessInstanceResourceAuthorizationTest extends AuthorizationTest 
   public void testCalledInstancesQueryWithReadInstancePermissionOnProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, CALLING_USER_TASK_PROCESS_KEY, userId, READ_INSTANCE);
+
+    CalledProcessInstanceQueryDto queryParameter = new CalledProcessInstanceQueryDto();
+
+    // when
+    List<CalledProcessInstanceDto> calledInstances = executeCalledInstancesQueryWithAuthorization(queryParameter);
+
+    // then
+    assertThat(calledInstances).isNotEmpty();
+    assertThat(calledInstances).hasSize(3);
+  }
+
+  @Test
+  public void testCalledInstancesQueryWithMultipleReadPermissins() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, CALLING_USER_TASK_PROCESS_KEY, userId, READ_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
 
     CalledProcessInstanceQueryDto queryParameter = new CalledProcessInstanceQueryDto();
 
