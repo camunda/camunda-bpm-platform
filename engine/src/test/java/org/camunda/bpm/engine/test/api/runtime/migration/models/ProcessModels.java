@@ -254,12 +254,18 @@ public class ProcessModels {
     .done();
 
   public static final BpmnModelInstance UNSUPPORTED_ACTIVITIES = Bpmn.createExecutableProcess(PROCESS_KEY)
-    .startEvent()
+    .startEvent("startEvent")
     .businessRuleTask("decisionTask")
       .camundaDecisionRef("testDecision")
-    .intermediateThrowEvent("throw")
+    .intermediateThrowEvent("throwEvent")
       .message("Message")
-    .endEvent()
+    .serviceTask("serviceTask")
+      .camundaExpression("${true}")
+    .sendTask("sendTask")
+      .camundaExpression("${true}")
+    .scriptTask("scriptTask")
+      .scriptText("foo")
+    .endEvent("endEvent")
     .done();
 
 }

@@ -65,7 +65,15 @@ public class SupportedActivityValidator implements MigrationActivityValidator {
   }
 
   public boolean valid(ActivityImpl activity) {
-    return activity != null && SUPPORTED_ACTIVITY_BEHAVIORS.contains(activity.getActivityBehavior().getClass());
+    return activity != null && (isSupportedActivity(activity) || isAsync(activity));
+  }
+
+  protected boolean isSupportedActivity(ActivityImpl activity) {
+    return SUPPORTED_ACTIVITY_BEHAVIORS.contains(activity.getActivityBehavior().getClass());
+  }
+
+  protected boolean isAsync(ActivityImpl activity) {
+    return activity.isAsyncBefore() || activity.isAsyncAfter();
   }
 
 }

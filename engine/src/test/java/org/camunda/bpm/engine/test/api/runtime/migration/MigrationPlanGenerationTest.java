@@ -185,6 +185,54 @@ public class MigrationPlanGenerationTest {
   }
 
   @Test
+  public void testMapEqualUnsupportedAsyncBeforeActivities() {
+    BpmnModelInstance testModel = modify(ProcessModels.UNSUPPORTED_ACTIVITIES)
+      .flowNodeBuilder("startEvent").camundaAsyncBefore()
+      .moveToNode("decisionTask").camundaAsyncBefore()
+      .moveToNode("throwEvent").camundaAsyncAfter()
+      .moveToNode("serviceTask").camundaAsyncBefore()
+      .moveToNode("sendTask").camundaAsyncBefore()
+      .moveToNode("scriptTask").camundaAsyncBefore()
+      .moveToNode("endEvent").camundaAsyncBefore()
+      .done();
+
+    assertGeneratedMigrationPlan(testModel, testModel)
+      .hasInstructions(
+        migrate("startEvent").to("startEvent"),
+        migrate("decisionTask").to("decisionTask"),
+        migrate("throwEvent").to("throwEvent"),
+        migrate("serviceTask").to("serviceTask"),
+        migrate("sendTask").to("sendTask"),
+        migrate("scriptTask").to("scriptTask"),
+        migrate("endEvent").to("endEvent")
+      );
+  }
+
+  @Test
+  public void testMapEqualUnsupportedAsyncAfterActivities() {
+    BpmnModelInstance testModel = modify(ProcessModels.UNSUPPORTED_ACTIVITIES)
+      .flowNodeBuilder("startEvent").camundaAsyncAfter()
+      .moveToNode("decisionTask").camundaAsyncAfter()
+      .moveToNode("throwEvent").camundaAsyncAfter()
+      .moveToNode("serviceTask").camundaAsyncAfter()
+      .moveToNode("sendTask").camundaAsyncAfter()
+      .moveToNode("scriptTask").camundaAsyncAfter()
+      .moveToNode("endEvent").camundaAsyncAfter()
+      .done();
+
+    assertGeneratedMigrationPlan(testModel, testModel)
+      .hasInstructions(
+        migrate("startEvent").to("startEvent"),
+        migrate("decisionTask").to("decisionTask"),
+        migrate("throwEvent").to("throwEvent"),
+        migrate("serviceTask").to("serviceTask"),
+        migrate("sendTask").to("sendTask"),
+        migrate("scriptTask").to("scriptTask"),
+        migrate("endEvent").to("endEvent")
+      );
+  }
+
+  @Test
   public void testMapEqualActivitiesToParentScope() {
     BpmnModelInstance sourceProcess = modify(ProcessModels.DOUBLE_SUBPROCESS_PROCESS)
       .changeElementId("outerSubProcess", "subProcess");
