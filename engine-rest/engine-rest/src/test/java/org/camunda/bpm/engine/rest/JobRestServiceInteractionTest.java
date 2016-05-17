@@ -1294,13 +1294,13 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     doThrow(new NullValueException(expectedMessage))
       .when(mockManagementService).deleteJob(jobId);
 
-    given().log().all()
+    given()
       .pathParam("id", jobId)
-      .then().expect().log().all()
+    .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo(expectedMessage))
-      .when()
+    .when()
       .delete(SINGLE_JOB_RESOURCE_URL);
 
     verify(mockManagementService).deleteJob(jobId);
