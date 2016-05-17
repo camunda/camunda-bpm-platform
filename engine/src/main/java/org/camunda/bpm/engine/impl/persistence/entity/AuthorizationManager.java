@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
-import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
@@ -45,7 +44,6 @@ import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.AuthorizationQueryImpl;
@@ -470,9 +468,6 @@ public class AuthorizationManager extends AbstractManager {
 
   /* PROCESS INSTANCE */
 
-
-  // update permission //////////////////////////////////////////////////
-
   public void checkUpdateProcessInstance(JobEntity job) {
     if (job.getProcessDefinitionKey() == null) {
       // "standalone" job: nothing to do!
@@ -501,24 +496,7 @@ public class AuthorizationManager extends AbstractManager {
 
   /* TASK */
 
-  // create permission /////////////////////////////////////////////
-
-  public void checkCreateTask() {
-    checkAuthorization(CREATE, TASK);
-  }
-
   /* USER OPERATION LOG */
-
-  // delete user operation log ///////////////////////////////
-
-  public void checkDeleteUserOperationLog(UserOperationLogEntry entry) {
-    if (entry != null) {
-      String processDefinitionKey = entry.getProcessDefinitionKey();
-      if (processDefinitionKey != null) {
-        checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, processDefinitionKey);
-      }
-    }
-  }
 
   /* QUERIES */
 

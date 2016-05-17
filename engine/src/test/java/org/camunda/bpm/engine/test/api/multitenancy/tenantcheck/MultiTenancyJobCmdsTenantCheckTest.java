@@ -9,7 +9,7 @@ import static org.junit.Assert.assertThat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -18,6 +18,8 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,6 +45,16 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
+  protected static final BpmnModelInstance BPMN_PROCESS = Bpmn.createExecutableProcess("exceptionInJobExecution")
+    .startEvent()
+     .userTask("aUserTask")
+       .boundaryEvent("timerEvent")
+         .timerWithDuration("PT4H")
+           .serviceTask()
+           .camundaExpression("${failing}")
+    .endEvent()
+    .done();
+  
   @Rule
   public ExpectedException thrown= ExpectedException.none();
 
@@ -53,9 +65,8 @@ public class MultiTenancyJobCmdsTenantCheckTest {
 
     identityService = engineRule.getIdentityService();
 
-    testRule.deployForTenant(TENANT_ONE,
-      "org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml");
-    
+    testRule.deployForTenant(TENANT_ONE, BPMN_PROCESS);
+ 
     processInstance = engineRule.getRuntimeService()
       .startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
   }
@@ -410,7 +421,12 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   @Test
   public void testGetJobExceptionStackTraceWithAuthenticatedTenant() {
  
-    String processInstanceId = startProcessAndExecuteJob(PROCESS_DEFINITION_KEY).getId();
+    String processInstanceId = engineRule.getRuntimeService()
+      .startProcessInstanceByKey(PROCESS_DEFINITION_KEY)
+      .getId();
+
+    testRule.executeAvailableJobs();
+
     String timerJobId = managementService.createJobQuery()
       .processInstanceId(processInstanceId)
       .singleResult()
@@ -423,7 +439,12 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   @Test
   public void testGetJobExceptionStackTraceWithNoAuthenticatedTenant() {
  
-    String processInstanceId = startProcessAndExecuteJob(PROCESS_DEFINITION_KEY).getId();
+    String processInstanceId = engineRule.getRuntimeService()
+      .startProcessInstanceByKey(PROCESS_DEFINITION_KEY)
+      .getId();
+
+    testRule.executeAvailableJobs();
+
     String timerJobId = managementService.createJobQuery()
       .processInstanceId(processInstanceId)
       .singleResult()
@@ -443,7 +464,12 @@ public class MultiTenancyJobCmdsTenantCheckTest {
   @Test
   public void testGetJobExceptionStackTraceWithDisabledTenantCheck() {
  
-    String processInstanceId = startProcessAndExecuteJob(PROCESS_DEFINITION_KEY).getId();
+    String processInstanceId = engineRule.getRuntimeService()
+      .startProcessInstanceByKey(PROCESS_DEFINITION_KEY)
+      .getId();
+
+    testRule.executeAvailableJobs();
+    
     String timerJobId = managementService.createJobQuery()
       .processInstanceId(processInstanceId)
       .singleResult()
@@ -463,25 +489,5 @@ public class MultiTenancyJobCmdsTenantCheckTest {
         .processInstanceId(processInstanceId)
         .singleResult();
     return job;
-  }
-
-  protected ProcessInstance startProcessAndExecuteJob(final String key) {
-    ProcessInstance newProcessInstance = engineRule.getRuntimeService().startProcessInstanceByKey(key);
-    executeAvailableJobs(key);
-    return newProcessInstance;
-  }
-
-  protected void executeAvailableJobs(final String key) {
-    List<Job> jobs = managementService.createJobQuery().processDefinitionKey(key).withRetriesLeft().list();
-    if (jobs.isEmpty()) {
-      return;
-    }
-    for (Job job : jobs) {
-      try {
-        managementService.executeJob(job.getId());
-      } catch (Exception e) {
-      }
-    }
-    executeAvailableJobs(key);
   }
 }

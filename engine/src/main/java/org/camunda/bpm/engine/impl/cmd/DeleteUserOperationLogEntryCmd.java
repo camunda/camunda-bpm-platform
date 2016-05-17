@@ -16,9 +16,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 
 /**
  * @author Thorben Lindhauer
@@ -39,9 +39,10 @@ public class DeleteUserOperationLogEntryCmd implements Command<Void> {
       .getOperationLogManager()
       .findOperationLogById(entryId);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkDeleteUserOperationLog(entry);
-
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkDeleteUserOperationLog(entry);
+    }
+    
     commandContext.getOperationLogManager().deleteOperationLogEntryById(entryId);
     return null;
   }

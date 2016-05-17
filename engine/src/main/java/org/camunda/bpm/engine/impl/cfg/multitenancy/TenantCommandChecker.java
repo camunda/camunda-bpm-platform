@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.cfg.multitenancy;
 
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
@@ -97,10 +98,8 @@ public class TenantCommandChecker implements CommandChecker {
 
   @Override
   public void checkUpdateJob(JobEntity job) {
-    if (getTenantManager().isTenantCheckEnabled()) {
-      if (job != null && !getTenantManager().isAuthenticatedTenant(job.getTenantId())) {
-        throw LOG.exceptionCommandWithUnauthorizedTenant("update the job '"+ job.getId() + "'");
-      }
+    if (job != null && !getTenantManager().isAuthenticatedTenant(job.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("update the job '"+ job.getId() + "'");
     }
   }
 
@@ -154,10 +153,8 @@ public class TenantCommandChecker implements CommandChecker {
   }
 
   public void checkReadJob(JobEntity job) {
-    if (getTenantManager().isTenantCheckEnabled()) {
-      if (job != null && !getTenantManager().isAuthenticatedTenant(job.getTenantId())) {
-        throw LOG.exceptionCommandWithUnauthorizedTenant("read the job '"+ job.getId() + "'");
-      }
+    if (job != null && !getTenantManager().isAuthenticatedTenant(job.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("read the job '"+ job.getId() + "'");
     }
   }
 
@@ -362,5 +359,10 @@ public class TenantCommandChecker implements CommandChecker {
 
   protected DeploymentEntity findDeploymentById(String deploymentId) {
     return Context.getCommandContext().getDeploymentManager().findDeploymentById(deploymentId);
+  }
+
+  @Override
+  public void checkDeleteUserOperationLog(UserOperationLogEntry entry) {
+     // tenant check is not available for user operation log
   }
 }

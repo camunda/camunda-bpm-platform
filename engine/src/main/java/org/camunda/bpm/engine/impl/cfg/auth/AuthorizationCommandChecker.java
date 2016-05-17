@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
@@ -577,5 +578,16 @@ public class AuthorizationCommandChecker implements CommandChecker {
       getAuthorizationManager().checkAuthorization(DELETE, TASK, taskId);
     }
   }
+
+  @Override
+  public void checkDeleteUserOperationLog(UserOperationLogEntry entry) {
+    if (entry != null) {
+      String processDefinitionKey = entry.getProcessDefinitionKey();
+      if (processDefinitionKey != null) {
+        getAuthorizationManager().checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, processDefinitionKey);
+      }
+    }
+  }
+
 
 }

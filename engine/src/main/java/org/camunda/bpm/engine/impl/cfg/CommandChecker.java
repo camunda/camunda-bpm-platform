@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.cfg;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
@@ -77,7 +78,7 @@ public interface CommandChecker {
   void checkUpdateProcessInstanceByProcessDefinitionKey(String processDefinitionKey);
 
   /**
-   *  Checks if it is allowed to update a process instance of the given job.
+   *  Checks if it is allowed to update a job of the given job entity.
    */
   void checkUpdateJob(JobEntity job);
 
@@ -227,4 +228,9 @@ public interface CommandChecker {
    * Check if it is allowed to update the case instance of the given case execution.
    */
   void checkUpdateCaseInstance(CaseExecution caseExecution);
+
+  /**
+   * Check if it is allowed to delete the user operation log of the given user operation log entry.
+   */
+  void checkDeleteUserOperationLog(UserOperationLogEntry entry);
 }
