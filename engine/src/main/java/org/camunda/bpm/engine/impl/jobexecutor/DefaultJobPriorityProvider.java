@@ -31,9 +31,9 @@ public class DefaultJobPriorityProvider extends DefaultPriorityProvider<JobDecla
   private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   @Override
-  protected Long getSpecificPriority(ExecutionEntity execution, JobDeclaration<?, ?> param) {
+  protected Long getSpecificPriority(ExecutionEntity execution, JobDeclaration<?, ?> param, String jobDefinitionId) {
     Long specificPriority = null;
-    JobDefinitionEntity jobDefinition = getJobDefinitionFor(param);
+    JobDefinitionEntity jobDefinition = getJobDefinitionFor(jobDefinitionId);
     if (jobDefinition != null) 
       specificPriority = jobDefinition.getOverridingJobPriority();
     
@@ -52,11 +52,11 @@ public class DefaultJobPriorityProvider extends DefaultPriorityProvider<JobDecla
     return getProcessDefinedPriority(processDefinition, BpmnParse.PROPERTYNAME_JOB_PRIORITY, execution, describeContext(jobDeclaration, execution));
   }
 
-  protected JobDefinitionEntity getJobDefinitionFor(JobDeclaration<?, ?> jobDeclaration) {
-    if (jobDeclaration.getJobDefinitionId() != null) {
+  protected JobDefinitionEntity getJobDefinitionFor(String jobDefinitionId) {
+    if (jobDefinitionId != null) {
       return Context.getCommandContext()
         .getJobDefinitionManager()
-        .findById(jobDeclaration.getJobDefinitionId());
+        .findById(jobDefinitionId);
     } else {
       return null;
     }

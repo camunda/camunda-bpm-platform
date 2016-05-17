@@ -13,6 +13,9 @@
 package org.camunda.bpm.engine.impl.batch;
 
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler.BatchSeedJobConfiguration;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -46,6 +49,12 @@ public class BatchSeedJobDeclaration extends JobDeclaration<BatchEntity, Message
   @Override
   protected String resolveJobDefinitionId(BatchEntity batch) {
     return batch.getSeedJobDefinitionId();
+  }
+
+  public ParameterValueProvider getJobPriorityProvider() {
+    long batchJobPriority = Context.getProcessEngineConfiguration()
+      .getBatchJobPriority();
+    return new ConstantValueProvider(batchJobPriority);
   }
 
 }

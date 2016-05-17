@@ -105,7 +105,7 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
       long priority = Context
           .getProcessEngineConfiguration()
           .getJobPriorityProvider()
-          .determinePriority(contextExecution, this);
+          .determinePriority(contextExecution, this, jobDefinitionId);
 
       job.setPriority(priority);
     }

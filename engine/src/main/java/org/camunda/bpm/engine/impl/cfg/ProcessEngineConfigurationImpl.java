@@ -411,6 +411,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected int invocationsPerBatchJob = 1;
   /** seconds to wait between polling for batch completion */
   protected int batchPollTime = 30;
+  /** default priority for batch jobs */
+  protected long batchJobPriority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
 
   // OTHER ////////////////////////////////////////////////////////////////////
   protected List<FormEngine> customFormEngines;
@@ -2792,6 +2794,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setBatchPollTime(int batchPollTime) {
     this.batchPollTime = batchPollTime;
+  }
+
+  public long getBatchJobPriority() {
+    return batchJobPriority;
+  }
+
+  public void setBatchJobPriority(long batchJobPriority) {
+    this.batchJobPriority = batchJobPriority;
   }
 
   public SessionFactory getIdentityProviderSessionFactory() {

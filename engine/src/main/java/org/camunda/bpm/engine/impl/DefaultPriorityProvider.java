@@ -102,9 +102,9 @@ public abstract class DefaultPriorityProvider<T> implements PriorityProvider<T> 
   }
 
   @Override
-  public long determinePriority(ExecutionEntity execution, T param) {        
+  public long determinePriority(ExecutionEntity execution, T param, String jobDefinitionId) {
     if (param != null || execution != null) {
-      Long specificPriority = getSpecificPriority(execution, param);
+      Long specificPriority = getSpecificPriority(execution, param, jobDefinitionId);
       if (specificPriority != null) {
         return specificPriority;
       }
@@ -121,12 +121,13 @@ public abstract class DefaultPriorityProvider<T> implements PriorityProvider<T> 
    * Returns the priority defined in the specific entity. Like a job definition priority or
    * an activity priority. The result can also be null in that case the process 
    * priority will be used.
-   * 
+   *
    * @param execution the current execution
    * @param param the generic param
+   * @param jobDefinitionId the job definition id if related to a job
    * @return the specific priority
    */
-  protected abstract Long getSpecificPriority(ExecutionEntity execution, T param);
+  protected abstract Long getSpecificPriority(ExecutionEntity execution, T param, String jobDefinitionId);
   
   /**
    * Returns the priority defined in the process definition. Can also be null

@@ -38,7 +38,7 @@ public class DefaultExternalTaskPriorityProvider extends DefaultPriorityProvider
   }
 
   @Override
-  public Long getSpecificPriority(ExecutionEntity execution, ExternalTaskActivityBehavior param) {
+  public Long getSpecificPriority(ExecutionEntity execution, ExternalTaskActivityBehavior param, String jobDefinitionId) {
     ParameterValueProvider priorityProvider = param.getPriorityValueProvider();
     if (priorityProvider != null) {
       return evaluateValueProvider(priorityProvider, execution, "");

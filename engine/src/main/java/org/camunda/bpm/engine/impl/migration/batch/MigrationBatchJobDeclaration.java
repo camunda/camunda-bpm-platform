@@ -15,6 +15,9 @@ package org.camunda.bpm.engine.impl.migration.batch;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.migration.batch.MigrationBatchJobDeclaration.BatchJobContext;
@@ -63,6 +66,12 @@ public class MigrationBatchJobDeclaration extends JobDeclaration<BatchJobContext
 
     protected BatchEntity batch;
     protected ByteArrayEntity configuration;
+  }
+
+  public ParameterValueProvider getJobPriorityProvider() {
+    long batchJobPriority = Context.getProcessEngineConfiguration()
+      .getBatchJobPriority();
+    return new ConstantValueProvider(batchJobPriority);
   }
 
 }
