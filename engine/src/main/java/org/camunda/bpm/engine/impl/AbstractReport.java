@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.TenantCheck;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -43,6 +44,8 @@ public abstract class AbstractReport implements Command<Object>, Report, Seriali
   protected ReportType reportType;
 
   protected PeriodUnit reportPeriodUnit;
+
+  protected TenantCheck tenantCheck = new TenantCheck();
 
   protected AbstractReport() {
   }
@@ -113,6 +116,10 @@ public abstract class AbstractReport implements Command<Object>, Report, Seriali
 
   public String getReportTypeName() {
     return getReportType().toString();
+  }
+
+  public TenantCheck getTenantCheck() {
+    return tenantCheck;
   }
 
 }

@@ -26,9 +26,9 @@
     <result property="periodUnit" column="PERIOD_UNIT_" jdbcType="VARCHAR" />
   </resultMap>
 
-  <select id="selectHistoricProcessInstanceDurationReport" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="durationReportResultMap">
+  <select id="selectHistoricProcessInstanceDurationReport" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceReportImpl" resultMap="durationReportResultMap">
     SELECT
-      MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, '${parameter.reportPeriodUnitName}' AS PERIOD_UNIT_
+      MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, '${reportPeriodUnitName}' AS PERIOD_UNIT_
     FROM
       (
         SELECT
@@ -39,9 +39,9 @@
       PERIOD_ 
   </select>
 
-  <select id="selectHistoricProcessInstanceDurationReport_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="durationReportResultMap">
+  <select id="selectHistoricProcessInstanceDurationReport_oracle" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceReportImpl" resultMap="durationReportResultMap">
     SELECT
-      MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, '${parameter.reportPeriodUnitName}' AS PERIOD_UNIT_
+      MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, '${reportPeriodUnitName}' AS PERIOD_UNIT_
     FROM
       (
         SELECT
@@ -56,26 +56,26 @@
     FROM
       ${prefix}ACT_HI_PROCINST HPI
     <where>
-      <if test="parameter.reportTypeName.equals('DURATION')">
+      <if test="reportTypeName.equals('DURATION')">
         END_TIME_ IS NOT NULL
       </if>
-      <if test="parameter.processDefinitionIdIn != null and parameter.processDefinitionIdIn.length > 0">
+      <if test="processDefinitionIdIn != null and processDefinitionIdIn.length > 0">
         AND PROC_DEF_ID_ IN
-        <foreach item="item" index="index" collection="parameter.processDefinitionIdIn" open="(" separator="," close=")">
+        <foreach item="item" index="index" collection="processDefinitionIdIn" open="(" separator="," close=")">
           #{item}
         </foreach>
       </if>
-      <if test="parameter.processDefinitionKeyIn != null and parameter.processDefinitionKeyIn.length > 0">
+      <if test="processDefinitionKeyIn != null and processDefinitionKeyIn.length > 0">
         AND PROC_DEF_KEY_ IN
-        <foreach item="item" index="index" collection="parameter.processDefinitionKeyIn" open="(" separator="," close=")">
+        <foreach item="item" index="index" collection="processDefinitionKeyIn" open="(" separator="," close=")">
           #{item}
         </foreach>
       </if>
-      <if test="parameter.startedBefore != null">
-        AND START_TIME_ &lt;= #{parameter.startedBefore}
+      <if test="startedBefore != null">
+        AND START_TIME_ &lt;= #{startedBefore}
       </if>
-      <if test="parameter.startedAfter != null">
-        AND START_TIME_ &gt;= #{parameter.startedAfter}
+      <if test="startedAfter != null">
+        AND START_TIME_ &gt;= #{startedAfter}
       </if>
 
       <bind name="columnPrefix" value="'HPI.'"/>
@@ -86,8 +86,8 @@
 
   <sql id="periodUnitFunction">
     <choose>
-      <when test="parameter.reportPeriodUnitName.equals('MONTH')">${constant.datepart.month}</when>
-      <when test="parameter.reportPeriodUnitName.equals('QUARTER')">${constant.datepart.quarter}</when>
+      <when test="reportPeriodUnitName.equals('MONTH')">${constant.datepart.month}</when>
+      <when test="reportPeriodUnitName.equals('QUARTER')">${constant.datepart.quarter}</when>
    </choose>
   </sql>
 

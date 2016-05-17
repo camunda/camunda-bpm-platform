@@ -29,6 +29,12 @@ public class TenantManager extends AbstractManager {
   public ListQueryParameterObject configureQuery(ListQueryParameterObject query) {
     TenantCheck tenantCheck = query.getTenantCheck();
 
+    configureTenantCheck(tenantCheck);
+
+    return query;
+  }
+
+  public void configureTenantCheck(TenantCheck tenantCheck) {
     if (isTenantCheckEnabled()) {
       Authentication currentAuthentication = getCurrentAuthentication();
 
@@ -39,7 +45,6 @@ public class TenantManager extends AbstractManager {
       tenantCheck.setTenantCheckEnabled(false);
       tenantCheck.setAuthTenantIds(null);
     }
-    return query;
   }
 
   public ListQueryParameterObject configureQuery(Object parameters) {
