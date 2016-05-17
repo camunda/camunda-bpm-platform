@@ -26,11 +26,12 @@ public class ReportManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<DurationReportResult> createHistoricProcessInstanceDurationReport(HistoricProcessInstanceReportImpl query) {
-    configureParameterizedQuery(query);
+    configureQuery(query);
     return getDbEntityManager().selectList("selectHistoricProcessInstanceDurationReport", query);
   }
 
-  protected void configureParameterizedQuery(HistoricProcessInstanceReportImpl parameter) {
+  protected void configureQuery(HistoricProcessInstanceReportImpl parameter) {
     getTenantManager().configureTenantCheck(parameter.getTenantCheck());
   }
+
 }
