@@ -176,11 +176,6 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   @Override
-  public void checkUpdateJob(JobEntity job) {
-    getAuthorizationManager().checkUpdateProcessInstance(job);
-  }
-
-  @Override
   public void checkUpdateProcessInstance(ExecutionEntity execution) {
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
 
@@ -200,6 +195,32 @@ public class AuthorizationCommandChecker implements CommandChecker {
     secondCheck.setPermission(UPDATE_INSTANCE);
     secondCheck.setResource(PROCESS_DEFINITION);
     secondCheck.setResourceId(processDefinition.getKey());
+    secondCheck.setAuthorizationNotFoundReturnValue(0l);
+
+    getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);
+  }
+
+  public void checkUpdateJob(JobEntity job) {
+    if (job.getProcessDefinitionKey() == null) {
+      // "standalone" job: nothing to do!
+      return;
+    }
+
+    // necessary permissions:
+    // - READ on PROCESS_INSTANCE
+
+    PermissionCheck firstCheck = getAuthorizationManager().newPermissionCheck();
+    firstCheck.setPermission(UPDATE);
+    firstCheck.setResource(PROCESS_INSTANCE);
+    firstCheck.setResourceId(job.getProcessInstanceId());
+
+    // ... OR ...
+
+    // - UPDATE_INSTANCE on PROCESS_DEFINITION
+    PermissionCheck secondCheck = getAuthorizationManager().newPermissionCheck();
+    secondCheck.setPermission(UPDATE_INSTANCE);
+    secondCheck.setResource(PROCESS_DEFINITION);
+    secondCheck.setResourceId(job.getProcessDefinitionKey());
     secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
     getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);

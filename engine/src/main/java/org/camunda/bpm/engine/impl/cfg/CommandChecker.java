@@ -78,11 +78,6 @@ public interface CommandChecker {
   void checkUpdateProcessInstanceByProcessDefinitionKey(String processDefinitionKey);
 
   /**
-   *  Checks if it is allowed to update a job of the given job entity.
-   */
-  void checkUpdateJob(JobEntity job);
-
-  /**
    * Checks if it is allowed to update a process instance of the given process instance id.
    */
   void checkUpdateProcessInstanceById(String processInstanceId);
@@ -99,9 +94,14 @@ public interface CommandChecker {
   void checkReadProcessInstance(String processInstanceId);
 
   /**
-   * Checks if it is allowed to read a job of the given job entity. 
+   * Checks if it is allowed to read the given job. 
    */
   void checkReadJob(JobEntity job);
+
+  /**
+   * Checks if it is allowed to update the given job.
+   */
+  void checkUpdateJob(JobEntity job);
 
   /**
    * Checks if it is allowed to read a process instance of the given execution.

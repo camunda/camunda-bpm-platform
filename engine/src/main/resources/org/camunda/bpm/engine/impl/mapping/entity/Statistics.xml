@@ -409,7 +409,8 @@
                           </foreach>
                           ) = 1
                       </if>
-
+                  <bind name="columnPrefix" value="'E.'"/>
+                  <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
                   <if test="failedJobsToInclude">
                   UNION
                       select

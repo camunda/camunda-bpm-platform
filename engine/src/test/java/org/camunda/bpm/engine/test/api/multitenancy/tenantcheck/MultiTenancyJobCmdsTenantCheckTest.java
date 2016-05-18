@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -54,7 +55,15 @@ public class MultiTenancyJobCmdsTenantCheckTest {
            .camundaExpression("${failing}")
     .endEvent()
     .done();
-  
+
+  BpmnModelInstance BPMN_NO_FAIL_PROCESS = Bpmn.createExecutableProcess("noFail")
+    .startEvent()
+     .userTask("aUserTask")
+       .boundaryEvent("timerEvent")
+         .timerWithDuration("PT4H")
+    .endEvent()
+    .done();
+
   @Rule
   public ExpectedException thrown= ExpectedException.none();
 
@@ -66,7 +75,8 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     identityService = engineRule.getIdentityService();
 
     testRule.deployForTenant(TENANT_ONE, BPMN_PROCESS);
- 
+    testRule.deployForTenant(TENANT_ONE, BPMN_NO_FAIL_PROCESS);
+
     processInstance = engineRule.getRuntimeService()
       .startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
   }
@@ -481,6 +491,132 @@ public class MultiTenancyJobCmdsTenantCheckTest {
     // when
     managementService.getJobExceptionStacktrace(timerJobId);
     assertThat(managementService.getJobExceptionStacktrace(timerJobId), notNullValue());
+  }
+
+  // deleteJobs
+  @Test
+  public void testDeleteJobWithAuthenticatedTenant() {
+    String timerJobId = managementService.createJobQuery()
+      .processInstanceId(processInstance.getId())
+      .singleResult()
+      .getId();
+    
+    identityService.setAuthentication("aUserId", null,  Arrays.asList(TENANT_ONE));
+    managementService.deleteJob(timerJobId);
+
+    // then
+    assertEquals(0, managementService.createJobQuery()
+      .processInstanceId(processInstance.getId())
+      .count());
+  }
+
+  @Test
+  public void testDeleteJobWithNoAuthenticatedTenant() {
+    String timerJobId = managementService.createJobQuery()
+      .processInstanceId(processInstance.getId())
+      .singleResult()
+      .getId();
+    
+    identityService.setAuthentication("aUserId", null);
+
+    // then
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot update the job '" + timerJobId 
+      +"' because it belongs to no authenticated tenant.");
+
+    // when
+    managementService.deleteJob(timerJobId);
+  }
+
+  @Test
+  public void testDeleteJobWithDisabledTenantCheck() {
+    String timerJobId = managementService.createJobQuery()
+      .processInstanceId(processInstance.getId())
+      .singleResult()
+      .getId();
+    
+    identityService.setAuthentication("aUserId", null);
+    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
+
+    managementService.deleteJob(timerJobId);
+
+    // then
+    assertEquals(0, managementService.createJobQuery()
+      .processInstanceId(processInstance.getId())
+      .count());
+  }
+
+  //executeJobs
+  @Test
+  public void testExecuteJobWithAuthenticatedTenant() {
+
+    String noFailProcessInstanceId = engineRule.getRuntimeService()
+      .startProcessInstanceByKey("noFail")
+      .getId(); 
+
+    TaskQuery taskQuery = engineRule.getTaskService()
+      .createTaskQuery()
+      .processInstanceId(noFailProcessInstanceId);
+  
+    assertEquals(1, taskQuery.list().size());
+
+    String timerJobId = managementService.createJobQuery()
+      .processInstanceId(noFailProcessInstanceId)
+      .singleResult()
+      .getId();
+    
+    identityService.setAuthentication("aUserId", null,  Arrays.asList(TENANT_ONE));
+    managementService.executeJob(timerJobId);
+
+    // then
+    assertEquals(0, taskQuery.list().size());
+  }
+
+  @Test
+  public void testExecuteJobWithNoAuthenticatedTenant() {
+
+    String noFailProcessInstanceId = engineRule.getRuntimeService()
+      .startProcessInstanceByKey("noFail")
+      .getId(); 
+
+    String timerJobId = managementService.createJobQuery()
+      .processInstanceId(noFailProcessInstanceId)
+      .singleResult()
+      .getId();
+    
+    identityService.setAuthentication("aUserId", null);
+
+    // then
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot update the job '" + timerJobId 
+      +"' because it belongs to no authenticated tenant.");
+    managementService.executeJob(timerJobId);
+
+  }
+
+  @Test
+  public void testExecuteJobWithDisabledTenantCheck() {
+
+    String noFailProcessInstanceId = engineRule.getRuntimeService()
+      .startProcessInstanceByKey("noFail")
+      .getId(); 
+
+    String timerJobId = managementService.createJobQuery()
+      .processInstanceId(noFailProcessInstanceId)
+      .singleResult()
+      .getId();
+    
+    identityService.setAuthentication("aUserId", null);
+    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
+
+    managementService.executeJob(timerJobId);
+
+    TaskQuery taskQuery = engineRule.getTaskService()
+      .createTaskQuery()
+      .processInstanceId(noFailProcessInstanceId);
+
+    // then
+    assertEquals(0, taskQuery.list().size());
   }
 
   protected Job selectJobByProcessInstanceId(String processInstanceId) {

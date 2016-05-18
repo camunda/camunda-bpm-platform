@@ -97,16 +97,16 @@ public class TenantCommandChecker implements CommandChecker {
   }
 
   @Override
-  public void checkUpdateJob(JobEntity job) {
-    if (job != null && !getTenantManager().isAuthenticatedTenant(job.getTenantId())) {
-      throw LOG.exceptionCommandWithUnauthorizedTenant("update the job '"+ job.getId() + "'");
+  public void checkUpdateProcessInstance(ExecutionEntity execution) {
+    if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("update the process instance '"+ execution.getId() + "'");
     }
   }
 
   @Override
-  public void checkUpdateProcessInstance(ExecutionEntity execution) {
-    if (execution != null && !getTenantManager().isAuthenticatedTenant(execution.getTenantId())) {
-      throw LOG.exceptionCommandWithUnauthorizedTenant("update the process instance '"+ execution.getId() + "'");
+  public void checkUpdateJob(JobEntity job) {
+    if (job != null && !getTenantManager().isAuthenticatedTenant(job.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("update the job '"+ job.getId() + "'");
     }
   }
 

@@ -20,6 +20,7 @@ import java.util.Collections;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -30,7 +31,6 @@ import org.camunda.bpm.engine.impl.jobexecutor.FailedJobListener;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
 import org.camunda.bpm.engine.impl.jobexecutor.SuccessfulJobListener;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 /**
@@ -78,9 +78,9 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
     }
 
     if (jobExecutorContext == null) { // if null, then we are not called by the job executor
-      AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-      authorizationManager.checkUpdateProcessInstance(job);
-
+      for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+        checker.checkUpdateJob(job);
+      }
     } else {
       // if the job is called by the job executor then set the tenant id of the job
       // as authenticated tenant to enable tenant checks

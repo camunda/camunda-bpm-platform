@@ -24,10 +24,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.DeploymentStatistics;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
@@ -38,11 +40,17 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
 
   @Override
   protected void setUp() {
-    BpmnModelInstance process = Bpmn.createExecutableProcess()
-      .startEvent().done();
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess("EmptyProcess")
+    .startEvent().done();
+
+    BpmnModelInstance singleTaskProcess = Bpmn.createExecutableProcess("SingleTaskProcess")
+      .startEvent()
+        .userTask()
+      .done();
 
     deployment(process);
-    deploymentForTenant(TENANT_ONE, process);
+    deploymentForTenant(TENANT_ONE, singleTaskProcess);
     deploymentForTenant(TENANT_TWO, process);
   }
 
@@ -162,6 +170,42 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
     Set<String> tenantIds = collectDefinitionTenantIds(query.list());
     assertThat(tenantIds.size(), is(3));
     assertThat(tenantIds, hasItems(null, TENANT_ONE, TENANT_TWO));
+  }
+
+  public void testQueryAuthenticatedTenantForActivityStatistics() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SingleTaskProcess");
+
+    ActivityStatisticsQuery query = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
+
+    assertThat(query.count(), is(1L));
+
+  }
+
+  public void testQueryNoAuthenticatedTenantForActivityStatistics() {
+    
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SingleTaskProcess");
+
+    identityService.setAuthentication("user", null);
+
+    ActivityStatisticsQuery query = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
+
+    assertThat(query.count(), is(0L));
+
+  }
+
+  public void testActivityStatisticsQueryWithDisabledTenantCheck() {
+    
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SingleTaskProcess");
+    
+    identityService.setAuthentication("user", null);
+    processEngineConfiguration.setTenantCheckEnabled(false);
+
+    ActivityStatisticsQuery query = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
+    
+    assertThat(query.count(), is(1L));
+    
   }
 
   protected Set<String> collectDeploymentTenantIds(List<DeploymentStatistics> deploymentStatistics) {

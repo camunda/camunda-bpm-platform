@@ -472,36 +472,6 @@ public class AuthorizationManager extends AbstractManager {
     checkAuthorization(READ, PROCESS_DEFINITION, definition.getKey());
   }
 
-  // update permission ///////////////////////////////////////////////
-
-  /* PROCESS INSTANCE */
-
-  public void checkUpdateProcessInstance(JobEntity job) {
-    if (job.getProcessDefinitionKey() == null) {
-      // "standalone" job: nothing to do!
-      return;
-    }
-
-    // necessary permissions:
-    // - READ on PROCESS_INSTANCE
-
-    PermissionCheck firstCheck = newPermissionCheck();
-    firstCheck.setPermission(UPDATE);
-    firstCheck.setResource(PROCESS_INSTANCE);
-    firstCheck.setResourceId(job.getProcessInstanceId());
-
-    // ... OR ...
-
-    // - UPDATE_INSTANCE on PROCESS_DEFINITION
-    PermissionCheck secondCheck = newPermissionCheck();
-    secondCheck.setPermission(UPDATE_INSTANCE);
-    secondCheck.setResource(PROCESS_DEFINITION);
-    secondCheck.setResourceId(job.getProcessDefinitionKey());
-    secondCheck.setAuthorizationNotFoundReturnValue(0l);
-
-    checkAuthorization(firstCheck, secondCheck);
-  }
-
   /* TASK */
 
   /* USER OPERATION LOG */
