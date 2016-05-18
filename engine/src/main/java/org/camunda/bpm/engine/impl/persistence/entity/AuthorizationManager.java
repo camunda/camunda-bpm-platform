@@ -186,12 +186,11 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   public void checkAuthorization(CompositePermissionCheck compositePermissionCheck) {
-    Authentication currentAuthentication = getCurrentAuthentication();
-    CommandContext commandContext = getCommandContext();
+    if(isAuthCheckExecuted()) {
 
-    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
-
+      Authentication currentAuthentication = getCurrentAuthentication();
       String userId = currentAuthentication.getUserId();
+
       boolean isAuthorized = isAuthorized(compositePermissionCheck);
       if (!isAuthorized) {
 
@@ -210,11 +209,9 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   public void checkAuthorization(List<PermissionCheck> permissionChecks) {
-    Authentication currentAuthentication = getCurrentAuthentication();
-    CommandContext commandContext = getCommandContext();
+    if(isAuthCheckExecuted()) {
 
-    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
-
+      Authentication currentAuthentication = getCurrentAuthentication();
       String userId = currentAuthentication.getUserId();
       boolean isAuthorized = isAuthorized(userId, currentAuthentication.getGroupIds(), permissionChecks);
       if (!isAuthorized) {
@@ -240,12 +237,8 @@ public class AuthorizationManager extends AbstractManager {
 
   @Override
   public void checkAuthorization(Permission permission, Resource resource, String resourceId) {
-
-    final Authentication currentAuthentication = getCurrentAuthentication();
-    CommandContext commandContext = Context.getCommandContext();
-
-    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
-
+    if(isAuthCheckExecuted()) {
+      Authentication currentAuthentication = getCurrentAuthentication();
       boolean isAuthorized = isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
       if (!isAuthorized) {
         throw new AuthorizationException(
@@ -264,7 +257,7 @@ public class AuthorizationManager extends AbstractManager {
     // command context will not be done.
     final Authentication currentAuthentication = getCurrentAuthentication();
 
-    if(isAuthorizationEnabled() && currentAuthentication != null) {
+    if(isAuthorizationEnabled() && currentAuthentication != null && currentAuthentication.getUserId() != null) {
       return isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
 
     } else {
@@ -345,18 +338,14 @@ public class AuthorizationManager extends AbstractManager {
   // authorization checks on queries ////////////////////////////////
 
   public void configureQuery(ListQueryParameterObject query) {
-    final Authentication currentAuthentication = getCurrentAuthentication();
-    CommandContext commandContext = getCommandContext();
 
     AuthorizationCheck authCheck = query.getAuthCheck();
-
     authCheck.getPermissionChecks().clear();
 
-    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
-
+    if(isAuthCheckExecuted()) {
+      Authentication currentAuthentication = getCurrentAuthentication();
       authCheck.setAuthUserId(currentAuthentication.getUserId());
       authCheck.setAuthGroupIds(currentAuthentication.getGroupIds());
-
       enableQueryAuthCheck(authCheck);
     }
     else {
@@ -487,16 +476,12 @@ public class AuthorizationManager extends AbstractManager {
   // task query //////////////////////////////////////////////
 
   public void configureTaskQuery(TaskQueryImpl query) {
-    query.getAuthCheck().getPermissionChecks().clear();
+    configureQuery(query);
 
-    Authentication currentAuthentication = getCurrentAuthentication();
-    CommandContext commandContext = getCommandContext();
-    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
+    if(query.getAuthCheck().isAuthorizationCheckEnabled()) {
 
       // necessary authorization check when the task is part of
       // a running process instance
-      configureQuery(query);
-
 
       CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
               .disjunctive()
@@ -526,13 +511,10 @@ public class AuthorizationManager extends AbstractManager {
   // variable instance query /////////////////////////////
 
   protected void configureVariableInstanceQuery(VariableInstanceQueryImpl query) {
-    query.getAuthCheck().getPermissionChecks().clear();
+    configureQuery(query);
 
-    Authentication currentAuthentication = getCurrentAuthentication();
-    CommandContext commandContext = getCommandContext();
-    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
+    if(query.getAuthCheck().isAuthorizationCheckEnabled()) {
 
-      configureQuery(query);
 
       CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
               .disjunctive()
@@ -633,10 +615,7 @@ public class AuthorizationManager extends AbstractManager {
     query.getJobPermissionChecks().clear();
     query.getIncidentPermissionChecks().clear();
 
-    Authentication currentAuthentication = getCurrentAuthentication();
-    CommandContext commandContext = getCommandContext();
-
-    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
+    if(query.getAuthCheck().isAuthorizationCheckEnabled()) {
 
       PermissionCheck firstProcessInstancePermissionCheck = newPermissionCheck();
       firstProcessInstancePermissionCheck.setResource(PROCESS_INSTANCE);
@@ -698,10 +677,7 @@ public class AuthorizationManager extends AbstractManager {
     query.getJobPermissionChecks().clear();
     query.getIncidentPermissionChecks().clear();
 
-    Authentication currentAuthentication = getCurrentAuthentication();
-    CommandContext commandContext = getCommandContext();
-
-    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
+    if(query.getAuthCheck().isAuthorizationCheckEnabled()) {
 
       PermissionCheck firstProcessInstancePermissionCheck = newPermissionCheck();
       firstProcessInstancePermissionCheck.setResource(PROCESS_INSTANCE);
@@ -804,6 +780,18 @@ public class AuthorizationManager extends AbstractManager {
       copy.retainAll(authenticatedGroupIds);
       return new ArrayList<String>(copy);
     }
+  }
+
+  protected boolean isAuthCheckExecuted() {
+
+    Authentication currentAuthentication = getCurrentAuthentication();
+    CommandContext commandContext = Context.getCommandContext();
+
+    return isAuthorizationEnabled()
+        && commandContext.isAuthorizationCheckEnabled()
+        && currentAuthentication != null
+        && currentAuthentication.getUserId() != null;
+
   }
 
 }

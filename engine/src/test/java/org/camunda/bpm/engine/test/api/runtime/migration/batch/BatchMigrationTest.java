@@ -55,6 +55,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateEvent;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateExecutionListener;
 import org.camunda.bpm.engine.test.util.ClockTestUtil;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
@@ -69,9 +70,10 @@ public class BatchMigrationTest {
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
   protected BatchMigrationHelper helper = new BatchMigrationHelper(engineRule, migrationRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(migrationRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(migrationRule).around(testRule);
 
   protected ProcessEngineConfigurationImpl configuration;
   protected RuntimeService runtimeService;
@@ -348,6 +350,28 @@ public class BatchMigrationTest {
 
     // but a monitor job exists
     assertNotNull(helper.getMonitorJob(batch));
+  }
+
+  @Test
+  public void testMigrationJobsExecutionByJobExecutorWithAuthorizationEnabled() {
+    ProcessEngineConfigurationImpl processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    try {
+      Batch batch = helper.migrateProcessInstancesAsync(10);
+      helper.executeSeedJob(batch);
+
+      testRule.waitForJobExecutorToProcessAllJobs();
+
+      // then all process instances where migrated
+      assertEquals(0, helper.countSourceProcessInstances());
+      assertEquals(10, helper.countTargetProcessInstances());
+
+    } finally {
+      processEngineConfiguration.setAuthorizationEnabled(false);
+    }
+
   }
 
   @Test
