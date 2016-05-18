@@ -462,20 +462,6 @@ public class AuthorizationManager extends AbstractManager {
     }
   }
 
-  /* DEPLOYMENT */
-
-  /* PROCESS DEFINITION */
-
-  // read permission //////////////////////////////////////////////////
-
-  public void checkReadProcessDefinition(ProcessDefinitionEntity definition) {
-    checkAuthorization(READ, PROCESS_DEFINITION, definition.getKey());
-  }
-
-  /* TASK */
-
-  /* USER OPERATION LOG */
-
   /* QUERIES */
 
   // deployment query ////////////////////////////////////////

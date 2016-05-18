@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
@@ -44,13 +46,11 @@ public class StatisticsManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<ActivityStatistics> getStatisticsGroupedByActivity(ActivityStatisticsQueryImpl query, Page page) {
-    checkReadProcessDefinition(query);
     configureQuery(query);
     return getDbEntityManager().selectList("selectActivityStatistics", query, page);
   }
 
   public long getStatisticsCountGroupedByActivity(ActivityStatisticsQueryImpl query) {
-    checkReadProcessDefinition(query);
     configureQuery(query);
     return (Long) getDbEntityManager().selectOne("selectActivityStatisticsCount", query);
   }
@@ -88,6 +88,7 @@ public class StatisticsManager extends AbstractManager {
   }
 
   protected void configureQuery(ActivityStatisticsQueryImpl query) {
+    checkReadProcessDefinition(query);
     getAuthorizationManager().configureActivityStatisticsQuery(query);
     getTenantManager().configureQuery(query);
   }
@@ -103,7 +104,7 @@ public class StatisticsManager extends AbstractManager {
       String processDefinitionId = query.getProcessDefinitionId();
       ProcessDefinitionEntity definition = getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
       ensureNotNull("no deployed process definition found with id '" + processDefinitionId + "'", "processDefinition", definition);
-      getAuthorizationManager().checkReadProcessDefinition(definition);
+      getAuthorizationManager().checkAuthorization(READ, PROCESS_DEFINITION, definition.getKey());
     }
   }
 }

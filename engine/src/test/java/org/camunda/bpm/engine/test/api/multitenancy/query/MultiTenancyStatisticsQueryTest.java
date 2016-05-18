@@ -172,6 +172,15 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
     assertThat(tenantIds, hasItems(null, TENANT_ONE, TENANT_TWO));
   }
 
+  public void testActivityStatistics() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SingleTaskProcess");
+
+    ActivityStatisticsQuery query = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
+
+    assertThat(query.count(), is(1L));
+
+  }
+
   public void testQueryAuthenticatedTenantForActivityStatistics() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
@@ -195,7 +204,7 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
 
   }
 
-  public void testActivityStatisticsQueryWithDisabledTenantCheck() {
+  public void testQueryDisabledTenantCheckForActivityStatistics() {
     
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SingleTaskProcess");
     
