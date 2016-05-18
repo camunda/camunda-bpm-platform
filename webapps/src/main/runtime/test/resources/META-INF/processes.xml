@@ -9,7 +9,6 @@
     <properties>
       <property name="authorizationEnabled">true</property>
       <property name="history">full</property>
-      <property name="tenantCheckEnabled">false</property>
     </properties>
 
   </process-engine>
@@ -19,7 +18,6 @@
     <properties>
       <property name="jdbcUrl">jdbc:h2:mem:activiti2;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
       <property name="authorizationEnabled">true</property>
-      <property name="tenantCheckEnabled">false</property>
     </properties>
 
   </process-engine>
@@ -29,7 +27,6 @@
     <properties>
       <property name="jdbcUrl">jdbc:h2:mem:activiti3;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
       <property name="authorizationEnabled">true</property>
-      <property name="tenantCheckEnabled">false</property>
     </properties>
 
   </process-engine>
