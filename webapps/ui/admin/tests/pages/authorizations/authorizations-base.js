@@ -68,6 +68,10 @@ module.exports = Page.extend({
     return this.getAuthorization(idx).element(by.cssContainingText('a', 'Edit'));
   },
 
+  deleteButton: function(idx) {
+    return this.getAuthorization(idx).element(by.cssContainingText('a', 'Delete'));
+  },
+
   authorizationType: function(authType) {
     return element.all(by.css('.authorization-type')).last().element(by.cssContainingText('option', authType.toUpperCase()));
   },
@@ -165,6 +169,14 @@ module.exports = Page.extend({
     this.resourceIdField().clear();
     this.resourceIdField(resourceId);
     this.submitNewAuthorizationButton().click();
+  },
+
+  deleteAuthorization: function(idx) {
+    this.deleteButton(idx).click();
+    this.waitForElementToBeVisible(element(by.css('[ng-click="performDelete()"]')));
+    element(by.css('[ng-click="performDelete()"]')).click();
+    this.waitForElementToBeVisible(element(by.css('[ng-click="close(status)"]')));
+    element(by.css('[ng-click="close(status)"]')).click();
   }
 
 });

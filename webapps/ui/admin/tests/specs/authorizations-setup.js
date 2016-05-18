@@ -50,12 +50,5 @@ module.exports = {
 
   setup1: fragment1,
   setup2: fragment2,
-  setup3: fragment3,
-  setup4: combine(operation('user', 'create', {
-    id: 'alec',
-    password: 'reset',
-    firstName: 'Alec',
-    lastName: 'Empire',
-    email: 'alec.empire@atari-teenage-riot.org'
-  }))
+  setup3: fragment3
 };

@@ -50,7 +50,9 @@ describe('Admin Authorizations Spec', function() {
     authorizationsPage.abortNewAuthorizationButton().click();
   }
 
+
   describe('Application authorizations with normal user', function() {
+
     before(function() {
       return testHelper(setupFile.setup1, function() {
         // given
@@ -61,11 +63,12 @@ describe('Admin Authorizations Spec', function() {
     it('should not show authorization navbar item for normal user', function() {
       // when
       authorizationsPage.authentication.userLogin('ringo', 'cam123');
-      
+
       // then
       expect(authorizationsPage.checkNavbarItem('Authorizations').isPresent()).to.eventually.be.false
     });
   });
+
 
   describe('Application authorizations', function() {
 
@@ -655,6 +658,7 @@ describe('Admin Authorizations Spec', function() {
 
         var permissionsList = [
           'READ',
+          'UPDATE',
           'CREATE',
           'DELETE',
           'READ_HISTORY',
@@ -669,26 +673,65 @@ describe('Admin Authorizations Spec', function() {
 
   });
 
-  describe('New authorization on empty lists', function () {
-    before(function () {
-      return testHelper(setupFile.setup4, function () {
+
+  describe('Authorizations', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
         authorizationsPage.navigateToWebapp('Admin');
         authorizationsPage.authentication.userLogin('admin', 'admin');
 
         authorizationsPage.selectNavbarItem('Authorizations');
 
-        authorizationsPage.selectAuthorizationNavbarItem('Task');
+        authorizationsPage.selectAuthorizationNavbarItem('Decision Definition');
       });
     });
 
-    it('can be created', function () {
+    it('can be created', function() {
+
+      // when
+      authorizationsPage.decisionDefinition.createNewAuthorization('ALLOW', 'USER', 'ringo', 'CREATE_INSTANCE', '*');
+
+      // then
+      expect(authorizationsPage.decisionDefinition.authorizationList().count()).to.eventually.eql(2);
+    });
+
+
+    it('can be removed', function() {
+
+      // when
+      authorizationsPage.decisionDefinition.deleteAuthorization(0);
+
+      // then
+      expect(authorizationsPage.decisionDefinition.authorizationList().count()).to.eventually.eql(1);
+    });
+
+
+    it('can be removed until the list is empty', function() {
+
+      // when
+      authorizationsPage.decisionDefinition.deleteAuthorization(0);
+
+      // then
+      expect(authorizationsPage.decisionDefinition.authorizationList().count()).to.eventually.eql(0);
+    });
+
+
+    // skiped due to #CAM-6037
+    it.skip('can be created in an empty list', function() {
+
+      // when
       authorizationsPage.createNewButton().click().then(function() {
+
+        // then
         checkCreateNewState();
 
+        // finaly
         abortCreatingNewAuthorization();
       });
     });
   });
+
 
   describe('Update', function() {
 
@@ -779,7 +822,7 @@ describe('Admin Authorizations Spec', function() {
   });
 
 
-  describe('Pagination', function () {
+  describe('Pagination', function() {
 
     before(function() {
     // create 45 authorizations... because we can.
@@ -793,7 +836,7 @@ describe('Admin Authorizations Spec', function() {
       });
     });
 
-    it('displays a pager', function () {
+    it('displays a pager', function() {
 
       // then
       expect(element(by.css('.pagination')).isPresent()).to.eventually.eql(true);
