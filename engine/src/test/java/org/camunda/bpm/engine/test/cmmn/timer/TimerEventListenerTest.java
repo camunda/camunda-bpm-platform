@@ -84,26 +84,16 @@ public class TimerEventListenerTest extends CmmnProcessEngineTestCase {
   public void testTimerEventListenerOccurExecution(){
     CaseInstance ci = createCaseInstanceByKey("case");
     assertNotNull(ci);
-    CaseDefinition cd = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("case").singleResult();
     List<JobDefinition> allJobs = managementService.createJobDefinitionQuery().list();
     assertNotNull(allJobs);
     assertTrue(!allJobs.isEmpty());
-
+    assertTrue(allJobs.size()==1);
     executeAvailableJobs();
     CaseExecution exe = processEngine.getCaseService().createCaseExecutionQuery().caseInstanceId(ci.getCaseInstanceId()).singleResult();
     assertNotNull(exe);
     Map<String, Object> vars = processEngine.getCaseService().getVariables(exe.getId());
     assertNotNull(vars);
-    /*System.out.println("Vars: "+vars);
-    //assertTrue(vars.containsKey("occur"));
-    try {
-      System.out.println("Sleeping for 20 secs");
-      Thread.currentThread().sleep(20 * 1000);
-
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-    System.out.println("Sleeping complete....");*/
+    assertTrue(vars.containsKey("occur"));
   }
 
 }
