@@ -87,7 +87,7 @@ function (
 
       var processDefinitionService = camAPI.resource('process-definition');
       processDefinitionService.list({
-        latest: true
+        latestVersion: true
       }, function(err, data) {
         $scope.processDefinitionData = data.items;
 

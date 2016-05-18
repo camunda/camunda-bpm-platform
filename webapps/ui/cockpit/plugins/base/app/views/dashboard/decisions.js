@@ -27,7 +27,9 @@ function (
       $scope.count = 0;
       $scope.loadingState = 'LOADING';
       var service = camAPI.resource('decision-definition');
-      service.count(function (err, count) {
+      service.count({
+        latestVersion: true
+      }, function (err, count) {
         if (err) {
           $scope.loadingError = err.message;
           $scope.loadingState = 'ERROR';
