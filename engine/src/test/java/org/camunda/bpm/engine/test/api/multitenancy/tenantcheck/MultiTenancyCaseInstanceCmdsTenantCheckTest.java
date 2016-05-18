@@ -304,7 +304,7 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the case execution");
+    thrown.expectMessage("Cannot get the case execution");
 
     caseService.getVariables(caseExecutionId);
   }
@@ -335,7 +335,7 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the case execution");
+    thrown.expectMessage("Cannot get the case execution");
 
     caseService.getVariable(caseExecutionId, VARIABLE_NAME);
   }
@@ -364,7 +364,7 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the case execution");
+    thrown.expectMessage("Cannot get the case execution");
 
     caseService.getVariableTyped(caseExecutionId, VARIABLE_NAME);
   }

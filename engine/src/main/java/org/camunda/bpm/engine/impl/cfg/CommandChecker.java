@@ -104,7 +104,7 @@ public interface CommandChecker {
   void checkReadJob(JobEntity job);
 
   /**
-   * Checks if it is allowed to read a process instance of the given process instance id.
+   * Checks if it is allowed to read a process instance of the given execution.
    */
   void checkReadProcessInstance(ExecutionEntity execution);
 
@@ -225,7 +225,7 @@ public interface CommandChecker {
   void checkReadHistoryAnyProcessDefinition();
 
   /**
-   * Check if it is allowed to update the case instance of the given case execution.
+   * Check if it is allowed to update a case instance of the given case execution.
    */
   void checkUpdateCaseInstance(CaseExecution caseExecution);
 
@@ -233,4 +233,10 @@ public interface CommandChecker {
    * Check if it is allowed to delete the user operation log of the given user operation log entry.
    */
   void checkDeleteUserOperationLog(UserOperationLogEntry entry);
+
+  /**
+   * Check if it is allowed to read a case instance of the given case execution.
+   */
+  void checkReadCaseInstance(CaseExecution caseExecution);
+
 }

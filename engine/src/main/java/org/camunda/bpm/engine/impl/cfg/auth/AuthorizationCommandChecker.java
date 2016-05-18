@@ -446,6 +446,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
   public void checkUpdateCaseInstance(CaseExecution caseExecution) {
   }
 
+  @Override
+  public void checkReadCaseInstance(CaseExecution caseExecution) {
+  }
+
   // helper ////////////////////////////////////////
 
   protected AuthorizationManager getAuthorizationManager() {

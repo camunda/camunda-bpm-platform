@@ -55,7 +55,7 @@ public class GetCaseExecutionVariableTypedCmd implements Command<TypedValue>, Se
     ensureNotNull(CaseExecutionNotFoundException.class, "case execution " + caseExecutionId + " doesn't exist", "caseExecution", caseExecution);
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkUpdateCaseInstance(caseExecution);
+      checker.checkReadCaseInstance(caseExecution);
     }
 
     TypedValue value;

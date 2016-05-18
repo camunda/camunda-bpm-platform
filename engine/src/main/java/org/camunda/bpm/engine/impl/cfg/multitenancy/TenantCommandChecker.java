@@ -343,6 +343,13 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
+  public void checkReadCaseInstance(CaseExecution caseExecution) {
+    if (caseExecution != null && !getTenantManager().isAuthenticatedTenant(caseExecution.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("get the case execution '" + caseExecution.getId() + "'");
+    }
+  }
+
   // helper //////////////////////////////////////////////////
 
   protected TenantManager getTenantManager() {
