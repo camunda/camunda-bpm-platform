@@ -101,11 +101,18 @@
 
             <div class="col-xs-4 text-right">
               <div class="btn-group batch-controls">
-                <a ng-if="ctrl.getSelectionType() == 'runtime'"
+                <a ng-if="ctrl.getSelectionType() == 'runtime' && !ctrl.getSuspendedState()"
                    ng-click="ctrl.toggleSuspension()"
-                   class="btn btn-default">
-                  <span class="glyphicon"
-                        ng-class="ctrl.getSuspendedState() ? 'glyphicon-play' : 'glyphicon-pause'"></span>
+                   class="btn btn-default"
+                   tooltip="Suspend Batch">
+                  <span class="glyphicon glyphicon-pause"></span>
+                </a>
+
+                <a ng-if="ctrl.getSelectionType() == 'runtime' && ctrl.getSuspendedState()"
+                   ng-click="ctrl.toggleSuspension()"
+                   class="btn btn-default"
+                   tooltip="Activate Batch">
+                  <span class="glyphicon glyphicon-play"></span>
                 </a>
 
                 <a ng-if="ctrl.getSelectionType() == 'runtime' && ctrl.getJobs().length > 0"
@@ -161,11 +168,9 @@
                   <td class="uuid stack-trace">{{job.id}}</td>
                   <td>
                     {{job.exceptionMessage.substr(0, 120)}}…
-                    <div class="text-right">
-                      <a ng-href="{{ctrl.getStacktraceUrl(job)}}"
-                         target="_blank"
-                         tooltip="Open stacktrace in new window">Full stack trace</a>
-                    </div>
+                    <a ng-href="{{ctrl.getStacktraceUrl(job)}}"
+                       target="_blank"
+                       tooltip="Open stacktrace in new window">Full stack trace</a>
                   </td>
                   <td>
                     <div class="btn-group btn-group-sm">
