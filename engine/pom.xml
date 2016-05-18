@@ -214,7 +214,7 @@
     <test.excludes>$.</test.excludes>
     <history.level>full</history.level>
     <mail.server.port>5025</mail.server.port>
-    <authorizationCheckRevokes>AUTO</authorizationCheckRevokes>
+    <authorizationCheckRevokes>auto</authorizationCheckRevokes>
 
     <camunda.artifact>
       org.camunda.bpm
@@ -536,7 +536,7 @@
     <profile>
       <id>cfgAuthorizationCheckRevokesALWAYS</id>
       <properties>
-        <authorizationCheckRevokes>ALWAYS</authorizationCheckRevokes>
+        <authorizationCheckRevokes>always</authorizationCheckRevokes>
       </properties>
     </profile>
 

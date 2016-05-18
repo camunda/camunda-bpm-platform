@@ -73,7 +73,7 @@ public class AuthorizationCheckRevokesCfgTest {
   }
 
   @Test
-  public void shouldUseCfgValue_ALWAYS() {
+  public void shouldUseCfgValue_always() {
     final ListQueryParameterObject query = new ListQueryParameterObject();
     final AuthorizationCheck authCheck = query.getAuthCheck();
 
@@ -89,7 +89,7 @@ public class AuthorizationCheckRevokesCfgTest {
   }
 
   @Test
-  public void shouldUseCfgValue_NEVER() {
+  public void shouldUseCfgValue_never() {
     final ListQueryParameterObject query = new ListQueryParameterObject();
     final AuthorizationCheck authCheck = query.getAuthCheck();
 
@@ -105,7 +105,7 @@ public class AuthorizationCheckRevokesCfgTest {
   }
 
   @Test
-  public void shouldCheckDbForCfgValue_AUTO() {
+  public void shouldCheckDbForCfgValue_auto() {
     final ListQueryParameterObject query = new ListQueryParameterObject();
     final AuthorizationCheck authCheck = query.getAuthCheck();
 
@@ -115,6 +115,27 @@ public class AuthorizationCheckRevokesCfgTest {
 
     // given
     when(mockedConfiguration.getAuthorizationCheckRevokes()).thenReturn(ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_AUTO);
+    when(mockedEntityManager.selectBoolean(eq("selectRevokeAuthorization"), eq(expectedQueryParams))).thenReturn(true);
+
+    // if
+    authorizationManager.configureQuery(query);
+
+    // then
+    assertEquals(true, authCheck.isRevokeAuthorizationCheckEnabled());
+    verify(mockedEntityManager, times(1)).selectBoolean(eq("selectRevokeAuthorization"), eq(expectedQueryParams));
+  }
+
+  @Test
+  public void shouldCheckDbForCfgCaseInsensitive() {
+    final ListQueryParameterObject query = new ListQueryParameterObject();
+    final AuthorizationCheck authCheck = query.getAuthCheck();
+
+    final HashMap<String, Object> expectedQueryParams = new HashMap<String, Object>();
+    expectedQueryParams.put("userId", AUTHENTICATED_USER_ID);
+    expectedQueryParams.put("authGroupIds", AUTHENTICATED_GROUPS);
+
+    // given
+    when(mockedConfiguration.getAuthorizationCheckRevokes()).thenReturn("AuTo");
     when(mockedEntityManager.selectBoolean(eq("selectRevokeAuthorization"), eq(expectedQueryParams))).thenReturn(true);
 
     // if

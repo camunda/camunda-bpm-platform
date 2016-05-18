@@ -147,14 +147,14 @@ public abstract class ProcessEngineConfiguration {
    * effectively unusable on most databases. You are therefore strongly discouraged from using this mode.
    *
    */
-  public static final String AUTHORIZATION_CHECK_REVOKE_ALWAYS = "ALWAYS";
+  public static final String AUTHORIZATION_CHECK_REVOKE_ALWAYS = "always";
 
   /**
    * Never checks for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations. This mode
    * has best performance effectively disables the use of {@link Authorization#AUTH_TYPE_REVOKE}.
    * *Note*: It is strongly recommended to use this mode.
    */
-  public static final String AUTHORIZATION_CHECK_REVOKE_NEVER = "NEVER";
+  public static final String AUTHORIZATION_CHECK_REVOKE_NEVER = "never";
 
   /**
    * This mode only checks for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations if at least
@@ -166,7 +166,7 @@ public abstract class ProcessEngineConfiguration {
    * cardinality like tasks or process instances and can render authorized access to the process engine
    * effectively unusable on most databases.
    */
-  public static final String AUTHORIZATION_CHECK_REVOKE_AUTO = "AUTO";
+  public static final String AUTHORIZATION_CHECK_REVOKE_AUTO = "auto";
 
   protected String processEngineName = ProcessEngines.NAME_DEFAULT;
   protected int idBlockSize = 100;

@@ -301,7 +301,10 @@ public class AuthorizationManager extends AbstractManager {
     Boolean isRevokeAuthCheckEnabled = this.isRevokeAuthCheckUsed;
 
     if(isRevokeAuthCheckEnabled == null) {
-      final String configuredMode = Context.getProcessEngineConfiguration().getAuthorizationCheckRevokes();
+      String configuredMode = Context.getProcessEngineConfiguration().getAuthorizationCheckRevokes();
+      if(configuredMode != null) {
+        configuredMode = configuredMode.toLowerCase();
+      }
       if(ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS.equals(configuredMode)) {
         isRevokeAuthCheckEnabled = true;
       }
