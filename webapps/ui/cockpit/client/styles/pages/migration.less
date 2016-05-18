@@ -1,4 +1,5 @@
 @progress-indicator-height: 75px;
+@diagram-top-offset: 64px;
 
 .migration-page {
   position: absolute;
@@ -60,16 +61,47 @@
 
   [cam-widget-bpmn-viewer] {
     position: absolute;
-    top: 64px;
+    top: @diagram-top-offset;
     bottom: 0;
     width: 100%;
     border: none;
+
+    .selectable {
+      cursor: pointer;
+    }
+
+    .drop-target {
+      cursor: pointer;
+
+      .djs-outline {
+        stroke-width: 2px !important;
+        stroke: fade(@bpmn-highlight-border-color, 40%) !important;
+        fill: fade(@bpmn-highlight-bg, 40%) !important;
+        rx: 14px;
+        ry: 14px;
+      }
+
+      .djs-visual>:nth-child(1) {
+        fill: fade(@bpmn-highlight-bg, 40%) !important;
+      }
+
+      &.hovered {
+        .djs-visual>:nth-child(1) {
+          fill: @bpmn-highlight-bg !important;
+        }
+
+        .djs-outline {
+          stroke: @bpmn-highlight-border-color !important;
+        }
+      }
+    }
   }
 
   .badge-migration {
     border: 1px solid @btn-success-border;
     color: @btn-success-color;
     background-color: @btn-success-bg;
+    cursor: pointer;
   }
 
   .badge-migration-instances {
@@ -79,6 +111,7 @@
     background-color: #70b8db;
     border-color: #143d52;
     color: #143d52;
+    cursor: pointer;
   }
 
   .section-content {
@@ -121,6 +154,14 @@
   .process-definition-id {
     font-family: @font-family-monospace;
     font-weight: bold;
+  }
+
+  .mapping-create-overlay {
+    position: absolute;
+    top: @diagram-top-offset;
+    bottom: 0;
+    left: 0;
+    right: 0;
   }
 
   .migration-unmapped {
