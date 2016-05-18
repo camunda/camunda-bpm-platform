@@ -31,7 +31,7 @@
     <grunt.target>development</grunt.target>
     <skip.frontend.build>false</skip.frontend.build>
 
-    <authorizationCheckRevokes>AUTO</authorizationCheckRevokes>
+    <authorizationCheckRevokes>auto</authorizationCheckRevokes>
   </properties>
 
   <dependencyManagement>
@@ -986,7 +986,7 @@
     <profile>
       <id>cfgAuthorizationCheckRevokesALWAYS</id>
       <properties>
-        <authorizationCheckRevokes>ALWAYS</authorizationCheckRevokes>
+        <authorizationCheckRevokes>always</authorizationCheckRevokes>
       </properties>
     </profile>
 
