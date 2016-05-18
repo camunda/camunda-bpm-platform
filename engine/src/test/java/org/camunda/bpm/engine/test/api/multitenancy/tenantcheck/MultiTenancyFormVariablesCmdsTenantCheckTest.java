@@ -77,7 +77,7 @@ public class MultiTenancyFormVariablesCmdsTenantCheckTest {
     thrown.expectMessage("Cannot get the process definition '"
       + instance.getProcessDefinitionId() +"' because it belongs to no authenticated tenant.");
 
-    engineRule.getFormService().getStartFormVariables(instance.getProcessDefinitionId()).size();
+    engineRule.getFormService().getStartFormVariables(instance.getProcessDefinitionId());
 
   }
 
