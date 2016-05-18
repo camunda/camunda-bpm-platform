@@ -11,6 +11,16 @@ ALTER TABLE ACT_RE_PROCDEF
 
 create index ACT_IDX_PROCDEF_VER_TAG on ACT_RE_PROCDEF(VERSION_TAG_);
 
+-- AUTHORIZATION --
+
+-- add grant authorizations for group camunda-admin:
+INSERT INTO
+  ACT_RU_AUTHORIZATION (ID_, TYPE_, GROUP_ID_, RESOURCE_TYPE_, RESOURCE_ID_, PERMS_, REV_)
+VALUES
+  ('camunda-admin-grant-tenant', 1, 'camunda-admin', 11, '*', 2147483647, 1),
+  ('camunda-admin-grant-tenant-membership', 1, 'camunda-admin', 12, '*', 2147483647, 1),
+  ('camunda-admin-grant-batch', 1, 'camunda-admin', 13, '*', 2147483647, 1);
+  
 -- tenant id --
 
 ALTER TABLE ACT_RE_DEPLOYMENT
