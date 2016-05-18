@@ -36,8 +36,6 @@ import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.mockito.ArgumentCaptor;
 
-import jnr.posix.Times;
-
 public class GroupAuthorizationTest extends AuthorizationTest {
 
   public static final String testUserId = "testUser";
