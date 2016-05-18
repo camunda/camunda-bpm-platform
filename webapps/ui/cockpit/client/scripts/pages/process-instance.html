@@ -64,17 +64,17 @@
             <a ng-href="#/process-definition/{{ processDefinition.id }}/runtime">{{ processDefinition.id }}</a>
           </dd>
 
-          <dt>Definition Name:</dt>
-          <dd class="definition-name">{{ processDefinition.name }}</dd>
-
           <dt>Definition Key:</dt>
           <dd class="definition-key">{{ processDefinition.key }}</dd>
 
+          <dt>Definition Name:</dt>
+          <dd class="definition-name">{{ processDefinition.name }}</dd>
+
           <dt>Tenant ID:</dt>
           <dd class="tenant-id"
-              ng-if="processDefinition.tenantId">{{ processDefinition.tenantId }}</dd>
+              ng-if="processInstance.tenantId">{{ processInstance.tenantId }}</dd>
           <dd class="tenant-id"
-              ng-if="!processDefinition.tenantId"><span class="null-value">null</span></dd>
+              ng-if="!processInstance.tenantId"><span class="null-value">null</span></dd>
 
           <dt>Deployment ID:</dt>
           <dd class="deployment-id">
