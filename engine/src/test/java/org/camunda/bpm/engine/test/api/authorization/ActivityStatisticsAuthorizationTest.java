@@ -34,6 +34,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
 
+  @Override
   public void setUp() throws Exception {
     deploymentId = createDeployment(null, "org/camunda/bpm/engine/test/api/authorization/oneIncidentProcess.bpmn20.xml").getId();
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
@@ -42,6 +43,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
@@ -91,6 +93,29 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+
+    // when
+    ActivityStatistics statistics = managementService.createActivityStatisticsQuery(processDefinitionId).singleResult();
+
+    // then
+    assertNotNull(statistics);
+    assertEquals("scriptTask", statistics.getId());
+    assertEquals(1, statistics.getInstances());
+    assertEquals(0, statistics.getFailedJobs());
+    assertTrue(statistics.getIncidentStatistics().isEmpty());
+  }
+
+  public void testQueryIncludingInstancesWithMany() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
+
+    disableAuthorization();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().list().get(0).getId();
+    enableAuthorization();
+
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     // when

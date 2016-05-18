@@ -88,6 +88,21 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     deleteDeployment(deploymentId);
   }
 
+  public void testSimpleDeploymentQueryWithMultiple() {
+    // given
+    String deploymentId = createDeployment(null);
+    createGrantAuthorization(DEPLOYMENT, deploymentId, userId, READ);
+    createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
+
+    // when
+    DeploymentQuery query = repositoryService.createDeploymentQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+
+    deleteDeployment(deploymentId);
+  }
+
   public void testDeploymentQueryWithoutAuthorization() {
     // given
     String deploymentId1 = createDeployment("first");

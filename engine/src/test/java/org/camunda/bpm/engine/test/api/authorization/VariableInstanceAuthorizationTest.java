@@ -12,11 +12,9 @@
  */
 package org.camunda.bpm.engine.test.api.authorization;
 
-import static org.camunda.bpm.engine.authorization.Permissions.READ;
-import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
-import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
-import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
-import static org.camunda.bpm.engine.authorization.Resources.TASK;
+import static org.camunda.bpm.engine.authorization.Permissions.*;
+import static org.camunda.bpm.engine.authorization.Resources.*;
+import static org.camunda.bpm.engine.authorization.Authorization.*;
 
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -33,6 +31,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
 
+  @Override
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
@@ -40,6 +39,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
@@ -146,6 +146,21 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     setTaskVariableLocal(taskId, VARIABLE_NAME, VARIABLE_VALUE);
     createGrantAuthorization(TASK, taskId, userId, READ);
+
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+  }
+
+  public void testProcessLocalTaskVariableQueryWithMultiple() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    setTaskVariableLocal(taskId, VARIABLE_NAME, VARIABLE_VALUE);
+    createGrantAuthorization(TASK, taskId, userId, READ);
+    createGrantAuthorization(TASK, ANY, userId, READ);
 
     // when
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();

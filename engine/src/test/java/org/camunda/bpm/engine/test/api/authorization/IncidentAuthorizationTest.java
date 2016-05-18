@@ -46,6 +46,7 @@ public class IncidentAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
 
+  @Override
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/authorization/timerStartEventProcess.bpmn20.xml",
@@ -54,6 +55,7 @@ public class IncidentAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
@@ -179,6 +181,23 @@ public class IncidentAuthorizationTest extends AuthorizationTest {
   public void testSimpleQueryWithReadPermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+
+    // when
+    IncidentQuery query = runtimeService.createIncidentQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+
+    Incident incident = query.singleResult();
+    assertNotNull(incident);
+    assertEquals(processInstanceId, incident.getProcessInstanceId());
+  }
+
+  public void testSimpleQueryWithMultiple() {
+    // given
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
 
     // when

@@ -43,6 +43,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
 
+  @Override
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/authorization/timerStartEventProcess.bpmn20.xml",
@@ -51,6 +52,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   public void tearDown() {
     super.tearDown();
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
@@ -127,6 +129,19 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     // given
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+
+    // when
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
+
+    // then
+    verifyQueryResults(query, 5);
+  }
+
+  public void testSimpleQueryWithMultiple() {
+    // given
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ_HISTORY);
 
     // when
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();

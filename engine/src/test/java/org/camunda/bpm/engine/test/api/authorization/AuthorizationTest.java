@@ -56,7 +56,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
   protected String groupId = "accounting";
   protected User user;
   protected Group group;
-  
+
   protected static final String VARIABLE_NAME = "aVariableName";
   protected static final String VARIABLE_VALUE = "aVariableValue";
 
@@ -614,7 +614,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     // get the default task assignee permission
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine
       .getProcessEngineConfiguration();
-    
+
     return processEngineConfiguration.getDefaultUserPermissionForTask();
   }
 

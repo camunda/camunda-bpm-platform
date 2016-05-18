@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.test.api.authorization.history;
 
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Authorization.*;
 
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.task.Task;
@@ -13,12 +14,14 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
   protected static final String CASE_KEY = "oneTaskCase";
   protected String deploymentId;
 
+  @Override
   public void setUp() throws Exception {
     deploymentId = createDeployment(null, "org/camunda/bpm/engine/test/api/authorization/oneTaskProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn").getId();
     super.setUp();
   }
 
+  @Override
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
@@ -73,6 +76,23 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
 
     // if
     createGrantAuthorization(PROCESS_DEFINITION, ONE_PROCESS_KEY, userId, READ_HISTORY);
+
+    enableAuthorization();
+    // when
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryWithMultiple() {
+    // given
+    disableAuthorization();
+    startProcessInstanceByKey(ONE_PROCESS_KEY);
+
+    // if
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
 
     enableAuthorization();
     // when

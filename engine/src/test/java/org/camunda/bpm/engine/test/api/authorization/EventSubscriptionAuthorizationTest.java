@@ -33,6 +33,7 @@ public class EventSubscriptionAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
 
+  @Override
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneMessageBoundaryEventProcess.bpmn20.xml",
@@ -40,6 +41,7 @@ public class EventSubscriptionAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
@@ -86,6 +88,19 @@ public class EventSubscriptionAuthorizationTest extends AuthorizationTest {
     EventSubscription eventSubscription = query.singleResult();
     assertNotNull(eventSubscription);
     assertEquals(processInstanceId, eventSubscription.getProcessInstanceId());
+  }
+
+  public void testSimpleQueryWithMultiple() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+
+    // when
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
+
+    // then
+    verifyQueryResults(query, 1);
   }
 
   public void testSimpleQueryWithReadInstancesPermissionOnOneTaskProcess() {

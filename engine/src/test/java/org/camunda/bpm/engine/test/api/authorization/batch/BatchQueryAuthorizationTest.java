@@ -141,4 +141,19 @@ public class BatchQueryAuthorizationTest {
     // then
     Assert.assertEquals(2, batches.size());
   }
+
+  @Test
+  public void testQueryListMultiple() {
+    // given
+    authRule.createGrantAuthorization(Resources.BATCH, batch1.getId(), "user", Permissions.READ);
+    authRule.createGrantAuthorization(Resources.BATCH, "*", "user", Permissions.READ);
+
+    // when
+    authRule.enableAuthorization("user");
+    List<Batch> batches = engineRule.getManagementService().createBatchQuery().list();
+    authRule.disableAuthorization();
+
+    // then
+    Assert.assertEquals(2, batches.size());
+  }
 }

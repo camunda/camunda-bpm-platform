@@ -41,6 +41,7 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
   protected String secondDeploymentId;
   protected String thirdDeploymentId;
 
+  @Override
   public void setUp() throws Exception {
     firstDeploymentId = createDeployment("first", "org/camunda/bpm/engine/test/api/authorization/oneIncidentProcess.bpmn20.xml").getId();
     secondDeploymentId = createDeployment("second", "org/camunda/bpm/engine/test/api/authorization/timerStartEventProcess.bpmn20.xml").getId();
@@ -48,6 +49,7 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   public void tearDown() {
     super.tearDown();
     deleteDeployment(firstDeploymentId);
@@ -79,6 +81,18 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
 
     DeploymentStatistics statistics = query.singleResult();
     verifyStatisticsResult(statistics, 0, 0, 0);
+  }
+
+  public void testQueryWithMultiple() {
+    // given
+    createGrantAuthorization(DEPLOYMENT, firstDeploymentId, userId, READ);
+    createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
+
+    // when
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery();
+
+    // then
+    verifyQueryResults(query, 3);
   }
 
   public void testQueryWithReadPermissionOnAnyDeployment() {

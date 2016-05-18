@@ -145,4 +145,19 @@ public class HistoricBatchQueryAuthorizationTest {
     // then
     Assert.assertEquals(2, batches.size());
   }
+
+  @Test
+  public void testQueryListMultiple() {
+    // given
+    authRule.createGrantAuthorization(Resources.BATCH, "*", "user", Permissions.READ_HISTORY);
+    authRule.createGrantAuthorization(Resources.BATCH, batch1.getId(), "user", Permissions.READ_HISTORY);
+
+    // when
+    authRule.enableAuthorization("user");
+    List<HistoricBatch> batches = engineRule.getHistoryService().createHistoricBatchQuery().list();
+    authRule.disableAuthorization();
+
+    // then
+    Assert.assertEquals(2, batches.size());
+  }
 }

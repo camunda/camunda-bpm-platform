@@ -215,7 +215,7 @@
   <select id="selectVariableInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.VariableInstanceQueryImpl" resultMap="variableInstanceResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select distinct RES.*
+    select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectVariableInstanceByQueryCriteriaSql"/>
     ${orderBy}

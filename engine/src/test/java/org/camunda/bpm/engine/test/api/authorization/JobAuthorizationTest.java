@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 
 /**
@@ -46,6 +47,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
 
+  @Override
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/authorization/timerStartEventProcess.bpmn20.xml",
@@ -54,6 +56,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   public void tearDown() {
     super.tearDown();
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
@@ -95,6 +98,19 @@ public class JobAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY);
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+
+    // when
+    JobQuery query = managementService.createJobQuery();
+
+    // then
+    verifyQueryResults(query, 2);
+  }
+
+  public void testQueryWithMultiple() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     // when
     JobQuery query = managementService.createJobQuery();

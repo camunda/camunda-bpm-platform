@@ -44,6 +44,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
 
+  @Override
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
@@ -51,6 +52,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
@@ -71,6 +73,19 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     // given
     // given user gets read permission on any process definition
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
+
+    // when
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    // then
+    verifyQueryResults(query, 2);
+  }
+
+  public void testQueryWithMultiple() {
+    // given
+    // given user gets read permission on any process definition
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ);
 
     // when
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();

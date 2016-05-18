@@ -84,6 +84,17 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
     assertEquals(DECISION_DEFINITION_KEY, definition.getKey());
   }
 
+  public void testQueryWithMultiple() {
+    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, READ);
+    createGrantAuthorization(DECISION_DEFINITION, ANY, userId, READ);
+
+    // when
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
+
+    // then
+    verifyQueryResults(query, 2);
+  }
+
   public void testGetDecisionDefinitionWithoutAuthorizations() {
     // given
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();

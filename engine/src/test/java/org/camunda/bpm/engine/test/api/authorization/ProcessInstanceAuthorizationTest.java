@@ -107,6 +107,19 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(processInstanceId, instance.getId());
   }
 
+  public void testSimpleQueryWithMultiple() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+  }
+
   public void testSimpleQueryWithReadPermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();

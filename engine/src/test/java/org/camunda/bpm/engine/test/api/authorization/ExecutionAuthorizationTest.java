@@ -33,6 +33,7 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
 
+  @Override
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
@@ -40,6 +41,7 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
@@ -86,6 +88,19 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
     Execution execution = query.singleResult();
     assertNotNull(execution);
     assertEquals(processInstanceId, execution.getProcessInstanceId());
+  }
+
+  public void testSimpleQueryWithMultiple() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+
+    // when
+    ExecutionQuery query = runtimeService.createExecutionQuery();
+
+    // then
+    verifyQueryResults(query, 1);
   }
 
   public void testSimpleQueryWithReadInstancesPermissionOnOneTaskProcess() {

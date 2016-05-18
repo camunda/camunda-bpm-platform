@@ -93,7 +93,7 @@
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     SELECT RES.*, J.QUERY_, J.PROPERTIES_ FROM (
       ${limitBefore}
-      select distinct RES.ID_, RES.REV_, RES.RESOURCE_TYPE_, RES.NAME_, RES.OWNER_
+      select ${distinct} RES.ID_, RES.REV_, RES.RESOURCE_TYPE_, RES.NAME_, RES.OWNER_
       ${limitBetweenClob}
       <include refid="selectFilterByQueryCriteriaSql" />
       ${orderBy}
@@ -124,7 +124,7 @@
   <select id="selectFilterByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap_postgres">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select distinct RES.*
+    select ${distinct} RES.*
     ${limitBetweenClob}
     <include refid="selectFilterByQueryCriteriaSql" />
     ${orderBy}

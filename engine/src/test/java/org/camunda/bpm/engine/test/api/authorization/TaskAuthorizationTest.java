@@ -60,6 +60,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   protected static final String INVALID_PERMISSION = "invalidPermission";
   protected String deploymentId;
 
+  @Override
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
@@ -70,6 +71,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
@@ -129,6 +131,22 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK);
+
+    // when
+    TaskQuery query = taskService.createTaskQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+  }
+
+  public void testSimpleQueryWithMultiple() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_TASK);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK);
+    createGrantAuthorization(TASK, ANY, userId, READ);
+    createGrantAuthorization(TASK, taskId, userId, READ);
 
     // when
     TaskQuery query = taskService.createTaskQuery();
@@ -351,11 +369,11 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // when
     taskService.saveTask(task);
-    
+
     task.delegate("demoNew");
-    
+
     taskService.saveTask(task);
-    
+
     // then
     task = (TaskEntity) selectSingleTask();
     assertNotNull(task);
@@ -482,7 +500,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertNotNull(task);
     assertEquals("demo", task.getAssignee());
   }
-  
+
   public void testSaveProcessTaskUpdateWithTaskAssignPermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -696,7 +714,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     createTask(taskId);
 
     createGrantAuthorization(TASK, taskId, userId, TASK_ASSIGN);
-    
+
     // when
     taskService.setAssignee(taskId, "demo");
 
@@ -810,7 +828,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertNotNull(task);
     assertEquals("demo", task.getAssignee());
   }
-  
+
   public void testProcessTaskSetAssigneeWithTaskAssignPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -1802,8 +1820,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // when
     taskService.addUserIdentityLink(taskId, "demo", IdentityLinkType.CANDIDATE);
-    
-    
+
+
     disableAuthorization();
     List<IdentityLink> linksForTask = taskService.getIdentityLinksForTask(taskId);
 
@@ -3504,7 +3522,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
 
     createGrantAuthorization(TASK, taskId, userId, TASK_WORK);
-    
+
     // when
     taskService.claim(taskId, "demo");
 
@@ -3520,7 +3538,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
 
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
-    
+
     // when
     taskService.claim(taskId, "demo");
 
@@ -3539,12 +3557,12 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // when
     taskService.claim(taskId, "demo");
-    
+
     // then
     Task task = selectSingleTask();
     assertNotNull(task);
     assertEquals("demo", task.getAssignee());
-    
+
    }
 
   public void testProcessTaskClaimTaskWithRevokeTaskWorkPermissionOnProcessDefinition() {
@@ -3702,7 +3720,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // when
     taskService.complete(taskId);
-    
+
     // then
     Task task = selectSingleTask();
     assertNull(task);
@@ -3957,7 +3975,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertNotNull(task);
     assertEquals("demo", task.getAssignee());
   }
-  
+
   public void testProcessTaskDelegateTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
@@ -4215,7 +4233,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     deleteTask(taskId, true);
   }
-  
+
   // set priority on process task /////////////////////////////////////////////
 
   public void testProcessTaskSetPriorityWithoutAuthorization() {
@@ -10019,5 +10037,5 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   protected void verifyQueryResults(VariableInstanceQuery query, int countExpected) {
     verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
   }
- 
+
 }

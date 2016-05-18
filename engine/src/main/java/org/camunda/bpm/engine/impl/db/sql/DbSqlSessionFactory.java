@@ -66,6 +66,8 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final Map<String, String> databaseSpecificTrueConstant = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificFalseConstant = new HashMap<String, String>();
 
+  public static final Map<String, String> databaseSpecificDistinct = new HashMap<String, String>();
+
   public static final Map<String, Map<String, String>> dbSpecificConstants = new HashMap<String, Map<String, String>>();
 
   static {
@@ -80,6 +82,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenClobStatements.put(H2, databaseSpecificLimitBetweenStatements.get(H2));
     databaseSpecificOrderByStatements.put(H2, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(H2, "");
+    databaseSpecificDistinct.put(H2, "distinct");
 
     databaseSpecificBitAnd1.put(H2, "BITAND(");
     databaseSpecificBitAnd2.put(H2, ",");
@@ -111,6 +114,7 @@ public class DbSqlSessionFactory implements SessionFactory {
       databaseSpecificLimitBetweenClobStatements.put(mysqlLikeDatabase, databaseSpecificLimitBetweenStatements.get(mysqlLikeDatabase));
       databaseSpecificOrderByStatements.put(mysqlLikeDatabase, defaultOrderBy);
       databaseSpecificLimitBeforeNativeQueryStatements.put(mysqlLikeDatabase, "");
+      databaseSpecificDistinct.put(mysqlLikeDatabase, "distinct");
 
       databaseSpecificBitAnd1.put(mysqlLikeDatabase, "");
       databaseSpecificBitAnd2.put(mysqlLikeDatabase, " & ");
@@ -144,6 +148,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenClobStatements.put(POSTGRES, databaseSpecificLimitBetweenStatements.get(POSTGRES));
     databaseSpecificOrderByStatements.put(POSTGRES, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(POSTGRES, "");
+    databaseSpecificDistinct.put(POSTGRES, "distinct");
 
     databaseSpecificBitAnd1.put(POSTGRES, "");
     databaseSpecificBitAnd2.put(POSTGRES, " & ");
@@ -195,6 +200,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenClobStatements.put(ORACLE, databaseSpecificLimitBetweenStatements.get(ORACLE));
     databaseSpecificOrderByStatements.put(ORACLE, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(ORACLE, "");
+    databaseSpecificDistinct.put(ORACLE, "distinct");
 
     databaseSpecificDummyTable.put(ORACLE, "FROM DUAL");
     databaseSpecificBitAnd1.put(ORACLE, "BITAND(");
@@ -225,6 +231,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenClobStatements.put(DB2, ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select RES.* ");
     databaseSpecificOrderByStatements.put(DB2, "");
     databaseSpecificLimitBeforeNativeQueryStatements.put(DB2, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
+    databaseSpecificDistinct.put(DB2, "");
 
     databaseSpecificBitAnd1.put(DB2, "BITAND(");
     databaseSpecificBitAnd2.put(DB2, ", CAST(");
@@ -261,6 +268,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenClobStatements.put(MSSQL, databaseSpecificLimitBetweenStatements.get(MSSQL));
     databaseSpecificOrderByStatements.put(MSSQL, "");
     databaseSpecificLimitBeforeNativeQueryStatements.put(MSSQL, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
+    databaseSpecificDistinct.put(MSSQL, "");
 
     databaseSpecificBitAnd1.put(MSSQL, "");
     databaseSpecificBitAnd2.put(MSSQL, " &");

@@ -32,6 +32,7 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
   protected String instance1Id;
   protected String instance2Id;
 
+  @Override
   protected void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
@@ -42,6 +43,7 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
@@ -93,6 +95,19 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
   public void testQueryWithReadInstanceOnAnyProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
+
+    // when
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
+
+    // then
+    verifyQueryResults(query, 2);
+  }
+
+  public void testQueryWithReadInstanceWithMultiple() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, "oneExternalTaskProcess", userId, READ_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, instance1Id, userId, READ);
 
     // when
     ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();

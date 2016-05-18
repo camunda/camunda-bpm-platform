@@ -85,6 +85,19 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     verifyQueryResults(query, 1);
   }
 
+  public void testQueryWithMultiple() {
+    // given
+    startProcessInstanceAndEvaluateDecision();
+    createGrantAuthorization(DECISION_DEFINITION, ANY, userId, READ_HISTORY);
+    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, READ_HISTORY);
+
+    // when
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 1);
+  }
+
   public void testDeleteHistoricDecisionInstanceWithoutAuthorization(){
     // given
     startProcessInstanceAndEvaluateDecision();

@@ -36,6 +36,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
 
+  @Override
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/authorization/timerStartEventProcess.bpmn20.xml",
@@ -43,6 +44,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
@@ -74,6 +76,18 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
   public void testQueryWithReadPermissionOnAnyProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
+
+    // when
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+
+    // then
+    verifyQueryResults(query, 2);
+  }
+
+  public void testQueryWithMultiple() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_START_PROCESS_KEY, userId, READ);
 
     // when
     JobDefinitionQuery query = managementService.createJobDefinitionQuery();

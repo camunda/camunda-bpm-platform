@@ -39,6 +39,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
   protected String instance1Id;
   protected String instance2Id;
 
+  @Override
   protected void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
@@ -49,6 +50,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
@@ -214,4 +216,5 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     assertEquals(1, tasks.size());
     assertEquals(instance1Id, tasks.get(0).getProcessInstanceId());
   }
+
 }

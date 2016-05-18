@@ -34,12 +34,14 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
 
   protected String deploymentId;
 
+  @Override
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml").getId();
     super.setUp();
   }
 
+  @Override
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
@@ -89,6 +91,25 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
     startProcessInstanceByKey(PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+
+    // when
+    HistoricActivityStatisticsQuery query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId);
+
+    // then
+    verifyQueryResults(query, 1);
+    verifyStatisticsResult(query.singleResult(), 3, 0, 0, 0);
+  }
+
+  public void testQueryMultiple() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(PROCESS_KEY).getId();
+
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
 
     // when
     HistoricActivityStatisticsQuery query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId);
