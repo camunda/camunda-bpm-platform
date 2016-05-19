@@ -513,9 +513,10 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     createCaseInstance();
     createCaseInstance();
 
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
     String tableName = managementService.getTableName(HistoricCaseInstance.class);
 
-    assertEquals("ACT_HI_CASEINST", tableName);
+    assertEquals(tablePrefix + "ACT_HI_CASEINST", tableName);
     assertEquals(tableName, managementService.getTableName(HistoricCaseInstanceEntity.class));
 
     assertEquals(4, historyService.createNativeHistoricCaseInstanceQuery().sql("SELECT * FROM " + tableName).list().size());

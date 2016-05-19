@@ -58,12 +58,14 @@ public class JobAcquisitionSuspensionStateTest extends PluggableProcessEngineTes
         Statement statement = null;
         ResultSet rs = null;
 
+        String tablePrefix = commandContext.getProcessEngineConfiguration().getDatabaseTablePrefix();
+
         try {
           SqlSession sqlSession = commandContext.getDbSqlSession().getSqlSession();
           connection = sqlSession.getConnection();
           statement = connection
               .createStatement();
-          String insertStatementString = "INSERT INTO ACT_RU_JOB(ID_, REV_, RETRIES_, PROCESS_INSTANCE_ID_, TYPE_, EXCLUSIVE_, HANDLER_TYPE_, HANDLER_CFG_) " +
+          String insertStatementString = "INSERT INTO " + tablePrefix + "ACT_RU_JOB(ID_, REV_, RETRIES_, PROCESS_INSTANCE_ID_, TYPE_, EXCLUSIVE_, HANDLER_TYPE_, HANDLER_CFG_) " +
               "VALUES (" +
               "'" + jobId + "'," +
               "1," +

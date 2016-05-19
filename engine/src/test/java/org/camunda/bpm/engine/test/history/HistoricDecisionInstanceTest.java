@@ -809,10 +809,11 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   public void testTableNames() {
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
 
-    assertThat(managementService.getTableName(HistoricDecisionInstance.class), is("ACT_HI_DECINST"));
+    assertThat(managementService.getTableName(HistoricDecisionInstance.class), is(tablePrefix +"ACT_HI_DECINST"));
 
-    assertThat(managementService.getTableName(HistoricDecisionInstanceEntity.class), is("ACT_HI_DECINST"));
+    assertThat(managementService.getTableName(HistoricDecisionInstanceEntity.class), is(tablePrefix + "ACT_HI_DECINST"));
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -820,14 +821,16 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
 
     startProcessInstanceAndEvaluateDecision();
 
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+
     NativeHistoricDecisionInstanceQuery nativeQuery = historyService
-        .createNativeHistoricDecisionInstanceQuery().sql("SELECT * FROM ACT_HI_DECINST");
+        .createNativeHistoricDecisionInstanceQuery().sql("SELECT * FROM " + tablePrefix + "ACT_HI_DECINST");
 
     assertThat(nativeQuery.list().size(), is(1));
 
     NativeHistoricDecisionInstanceQuery nativeQueryWithParameter = historyService
         .createNativeHistoricDecisionInstanceQuery()
-        .sql("SELECT * FROM ACT_HI_DECINST H WHERE H.DEC_DEF_KEY_ = #{decisionDefinitionKey}");
+        .sql("SELECT * FROM " + tablePrefix + "ACT_HI_DECINST H WHERE H.DEC_DEF_KEY_ = #{decisionDefinitionKey}");
 
     assertThat(nativeQueryWithParameter.parameter("decisionDefinitionKey", DECISION_DEFINITION_KEY).list().size(), is(1));
     assertThat(nativeQueryWithParameter.parameter("decisionDefinitionKey", "other decision").list().size(), is(0));
@@ -838,8 +841,10 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
 
     startProcessInstanceAndEvaluateDecision();
 
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+
     NativeHistoricDecisionInstanceQuery nativeQuery = historyService
-        .createNativeHistoricDecisionInstanceQuery().sql("SELECT count(*) FROM ACT_HI_DECINST");
+        .createNativeHistoricDecisionInstanceQuery().sql("SELECT count(*) FROM " + tablePrefix + "ACT_HI_DECINST");
 
     assertThat(nativeQuery.count(), is(1L));
   }
@@ -850,8 +855,10 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     startProcessInstanceAndEvaluateDecision();
     startProcessInstanceAndEvaluateDecision();
 
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+
     NativeHistoricDecisionInstanceQuery nativeQuery = historyService.createNativeHistoricDecisionInstanceQuery()
-        .sql("SELECT * FROM ACT_HI_DECINST");
+        .sql("SELECT * FROM " + tablePrefix + "ACT_HI_DECINST");
 
     assertThat(nativeQuery.listPage(0, 2).size(), is(2));
     assertThat(nativeQuery.listPage(1, 1).size(), is(1));

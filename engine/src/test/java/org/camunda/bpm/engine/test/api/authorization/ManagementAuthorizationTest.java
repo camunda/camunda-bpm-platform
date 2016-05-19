@@ -73,12 +73,13 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   public void testGetTableNameAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
 
     // when
     String tableName = managementService.getTableName(ProcessDefinitionEntity.class);
 
     // then
-    assertEquals("ACT_RE_PROCDEF", tableName);
+    assertEquals(tablePrefix + "ACT_RE_PROCDEF", tableName);
   }
 
   // get table meta data //////////////////////////////////////////////
@@ -128,9 +129,10 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   public void testTablePageQueryAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
 
     // when
-    TablePage page = managementService.createTablePageQuery().tableName("ACT_RE_PROCDEF").listPage(0, Integer.MAX_VALUE);
+    TablePage page = managementService.createTablePageQuery().tableName(tablePrefix + "ACT_RE_PROCDEF").listPage(0, Integer.MAX_VALUE);
 
     // then
     assertNotNull(page);

@@ -1090,8 +1090,9 @@ public void testBooleanVariable() throws Exception {
   }
 
   public void testNativeQuery() {
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
     // just test that the query will be constructed and executed, details are tested in the TaskQueryTest
-    assertEquals("ACT_RU_EXECUTION", managementService.getTableName(Execution.class));
+    assertEquals(tablePrefix + "ACT_RU_EXECUTION", managementService.getTableName(Execution.class));
 
     long executionCount = runtimeService.createExecutionQuery().count();
 

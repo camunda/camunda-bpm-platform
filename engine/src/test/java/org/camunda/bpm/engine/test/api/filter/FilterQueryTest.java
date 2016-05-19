@@ -250,15 +250,16 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testNativeQuery() {
-    assertEquals("ACT_RU_FILTER", managementService.getTableName(Filter.class));
-    assertEquals("ACT_RU_FILTER", managementService.getTableName(FilterEntity.class));
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+    assertEquals(tablePrefix + "ACT_RU_FILTER", managementService.getTableName(Filter.class));
+    assertEquals(tablePrefix + "ACT_RU_FILTER", managementService.getTableName(FilterEntity.class));
     assertEquals(4, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Filter.class)).list().size());
     assertEquals(4, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Filter.class)).count());
 
-    assertEquals(16, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM ACT_RU_FILTER F1, ACT_RU_FILTER F2").count());
+    assertEquals(16, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + tablePrefix + "ACT_RU_FILTER F1, " + tablePrefix + "ACT_RU_FILTER F2").count());
 
     // select with distinct
-    assertEquals(4, taskService.createNativeTaskQuery().sql("SELECT F1.* FROM ACT_RU_FILTER F1").list().size());
+    assertEquals(4, taskService.createNativeTaskQuery().sql("SELECT F1.* FROM "+ tablePrefix + "ACT_RU_FILTER F1").list().size());
 
     assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Filter.class) + " F WHERE F.NAME_ = 'a'").count());
     assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Filter.class) + " F WHERE F.NAME_ = 'a'").list().size());
@@ -268,8 +269,9 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testNativeQueryPaging() {
-    assertEquals("ACT_RU_FILTER", managementService.getTableName(Filter.class));
-    assertEquals("ACT_RU_FILTER", managementService.getTableName(FilterEntity.class));
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+    assertEquals(tablePrefix + "ACT_RU_FILTER", managementService.getTableName(Filter.class));
+    assertEquals(tablePrefix + "ACT_RU_FILTER", managementService.getTableName(FilterEntity.class));
     assertEquals(3, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Filter.class)).listPage(0, 3).size());
     assertEquals(2, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Filter.class)).listPage(2, 2).size());
   }
