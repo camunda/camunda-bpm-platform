@@ -71,9 +71,9 @@
 
   <sql id="selectDeploymentsByQueryCriteriaSql">
     from ${prefix}ACT_RE_DEPLOYMENT RES
-    
+
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" /> 
-    
+
     <where>
       <if test="deploymentId != null">
         RES.ID_ = #{deploymentId}
@@ -138,7 +138,7 @@
 
   <!-- mysql specific -->
   <select id="selectDeploymentCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.DeploymentQueryImpl" resultType="long">
-    select distinct count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
   </select>
 

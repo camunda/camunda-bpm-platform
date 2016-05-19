@@ -178,7 +178,7 @@
 
   <!-- mysql specific sql -->
   <select id="selectCaseDefinitionCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultType="long">
-    select distinct count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
   </select>
 
