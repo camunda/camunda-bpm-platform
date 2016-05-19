@@ -180,7 +180,7 @@
   <select id="selectHistoricDetailsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricDetailQueryImpl" resultMap="historicDetailResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select ${distinct} RES.*
+    select RES.*
     ${limitBetween}
     <include refid="selectHistoricDetailsByQueryCriteriaSql"/>
     ${orderBy}
@@ -198,7 +198,7 @@
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       LEFT JOIN (
         SELECT
-            DISTINCT SELF.PROC_DEF_KEY_ AS KEY_
+            SELF.PROC_DEF_KEY_ AS KEY_
         FROM
             (SELECT DISTINCT DKEYS.PROC_DEF_KEY_ from ${prefix}ACT_HI_DETAIL DKEYS) SELF
         WHERE
