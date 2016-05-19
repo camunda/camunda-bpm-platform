@@ -9,7 +9,9 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.StartFormData;
@@ -41,6 +43,10 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
 
   protected IdentityService identityService;
 
+  protected RepositoryService repositoryService;
+
+  protected ProcessEngineConfiguration processEngineConfiguration;
+
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
@@ -57,6 +63,11 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
     identityService = engineRule.getIdentityService();
 
     runtimeService = engineRule.getRuntimeService();
+
+    repositoryService = engineRule.getRepositoryService();
+
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+
   }
 
   // GetStartForm test
@@ -106,7 +117,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
 
     identityService.setAuthentication("aUserId", null);
-    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
+    processEngineConfiguration.setTenantCheckEnabled(false);
 
     StartFormData startFormData = formService.getStartFormData(instance.getProcessDefinitionId()); 
 
@@ -124,8 +135,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
       "org/camunda/bpm/engine/test/api/form/util/VacationRequest_deprecated_forms.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/form/util/request.form");
     
-    String processDefinitionId = engineRule.getRepositoryService()
-      .createProcessDefinitionQuery()
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery()
       .singleResult().getId();
  
     identityService.setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
@@ -140,8 +150,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
       "org/camunda/bpm/engine/test/api/form/util/VacationRequest_deprecated_forms.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/form/util/request.form");
 
-    String processDefinitionId = engineRule.getRepositoryService()
-      .createProcessDefinitionQuery()
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery()
       .singleResult().getId();
 
     identityService.setAuthentication("aUserId", null);
@@ -162,12 +171,11 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
       "org/camunda/bpm/engine/test/api/form/util/VacationRequest_deprecated_forms.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/form/util/request.form");
 
-    String processDefinitionId = engineRule.getRepositoryService()
-      .createProcessDefinitionQuery()
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery()
       .singleResult().getId();
 
     identityService.setAuthentication("aUserId", null);
-    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
+    processEngineConfiguration.setTenantCheckEnabled(false);
 
     assertNotNull(formService.getRenderedStartForm(processDefinitionId, "juel"));
   }
@@ -180,8 +188,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
       "org/camunda/bpm/engine/test/api/form/util/VacationRequest_deprecated_forms.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/form/util/request.form");
 
-    String processDefinitionId = engineRule.getRepositoryService()
-      .createProcessDefinitionQuery()
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery()
       .singleResult().getId();
 
     Map<String, Object> properties = new HashMap<String, Object>();
@@ -199,8 +206,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
       "org/camunda/bpm/engine/test/api/form/util/VacationRequest_deprecated_forms.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/form/util/request.form");
 
-    String processDefinitionId = engineRule.getRepositoryService()
-      .createProcessDefinitionQuery()
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery()
       .singleResult().getId();
 
     Map<String, Object> properties = new HashMap<String, Object>();
@@ -214,7 +220,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
       +"' because it belongs to no authenticated tenant.");  
 
     // when
-    formService.submitStartForm(processDefinitionId, properties).getId();
+    formService.submitStartForm(processDefinitionId, properties);
     
   }
 
@@ -225,15 +231,14 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
       "org/camunda/bpm/engine/test/api/form/util/VacationRequest_deprecated_forms.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/form/util/request.form");
 
-    String processDefinitionId = engineRule.getRepositoryService()
-      .createProcessDefinitionQuery()
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery()
       .singleResult().getId();
 
     Map<String, Object> properties = new HashMap<String, Object>();
     properties.put("employeeName", "demo");
 
     identityService.setAuthentication("aUserId", null);
-    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
+    processEngineConfiguration.setTenantCheckEnabled(false);
 
     // when
     assertNotNull(formService.submitStartForm(processDefinitionId, properties));
@@ -276,7 +281,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
     String processDefinitionId = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getProcessDefinitionId();
     
     identityService.setAuthentication("aUserId", null);
-    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
+    processEngineConfiguration.setTenantCheckEnabled(false);
     
     // then
     assertEquals("aStartFormKey", formService.getStartFormKey(processDefinitionId));
@@ -332,7 +337,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
     String taskId = taskService.createTaskQuery().singleResult().getId();
     
     identityService.setAuthentication("aUserId", null);
-    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
+    processEngineConfiguration.setTenantCheckEnabled(false);
     
     TaskFormData taskFormData = formService.getTaskFormData(taskId);
 
@@ -349,8 +354,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
     testRule.deployForTenant(TENANT_ONE,
     "org/camunda/bpm/engine/test/api/authorization/formKeyProcess.bpmn20.xml");
     
-    String processDefinitionId = engineRule.getRepositoryService()
-      .createProcessDefinitionQuery()
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery()
       .singleResult().getId();
 
     runtimeService.startProcessInstanceById(processDefinitionId);
@@ -373,8 +377,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
     testRule.deployForTenant(TENANT_ONE,
       "org/camunda/bpm/engine/test/api/authorization/formKeyProcess.bpmn20.xml");
 
-    String processDefinitionId = engineRule.getRepositoryService()
-      .createProcessDefinitionQuery()
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery()
       .singleResult().getId();
 
     runtimeService.startProcessInstanceById(processDefinitionId);
@@ -398,8 +401,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
     testRule.deployForTenant(TENANT_ONE,
       "org/camunda/bpm/engine/test/api/authorization/formKeyProcess.bpmn20.xml");
 
-    String processDefinitionId = engineRule.getRepositoryService()
-      .createProcessDefinitionQuery()
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery()
       .singleResult().getId();
 
     runtimeService.startProcessInstanceById(processDefinitionId);
@@ -407,7 +409,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
     String taskId = taskService.createTaskQuery().processDefinitionId(processDefinitionId).singleResult().getId();
     
     identityService.setAuthentication("aUserId", null);
-    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
+    processEngineConfiguration.setTenantCheckEnabled(false);
     
     formService.submitTaskForm(taskId, null);
 
@@ -424,7 +426,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
       "org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/form/task.form").getId();
     
-    String procDefId = engineRule.getRepositoryService().createProcessDefinitionQuery().singleResult().getId();
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
     Map<String, Object> properties = new HashMap<String, Object>();
     properties.put("room", "5b");
@@ -446,7 +448,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
       "org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/form/task.form").getId();
     
-    String procDefId = engineRule.getRepositoryService().createProcessDefinitionQuery().singleResult().getId();
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
     Map<String, Object> properties = new HashMap<String, Object>();
     properties.put("room", "5b");
@@ -473,7 +475,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
       "org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/form/task.form").getId();
     
-    String procDefId = engineRule.getRepositoryService().createProcessDefinitionQuery().singleResult().getId();
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
     Map<String, Object> properties = new HashMap<String, Object>();
     properties.put("room", "5b");
@@ -482,7 +484,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
 
     String taskId = taskService.createTaskQuery().singleResult().getId();
     identityService.setAuthentication("aUserId", null);
-    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
+    processEngineConfiguration.setTenantCheckEnabled(false);
 
     // then
     assertEquals("Mike is speaking in room 5b", formService.getRenderedTaskForm(taskId, "juel"));
@@ -537,7 +539,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
     Task task = taskService.createTaskQuery().singleResult();
     
     identityService.setAuthentication("aUserId", null);
-    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
+    processEngineConfiguration.setTenantCheckEnabled(false);
 
     formService.getTaskFormKey(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
     // then
