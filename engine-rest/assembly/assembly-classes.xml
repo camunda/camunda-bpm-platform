@@ -10,13 +10,4 @@
 
   <includeBaseDirectory>false</includeBaseDirectory>
   
-  <dependencySets>
-    <dependencySet>
-      <outputDirectory>/</outputDirectory>
-      <unpack>true</unpack>
-      <includes>
-        <include>org.camunda.bpm:camunda-engine-rest-core:jar:*</include>
-      </includes>
-    </dependencySet>
-  </dependencySets>
 </assembly>

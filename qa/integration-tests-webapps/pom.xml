@@ -14,9 +14,51 @@
     <cargo.timeout>120000</cargo.timeout>
     <cargo.deploy.timeout>60000</cargo.deploy.timeout>
     <version.chromedriver>2.14</version.chromedriver>
+
+    <redirect.test.output>true</redirect.test.output>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.shrinkwrap.resolver</groupId>
+        <artifactId>shrinkwrap-resolver-bom</artifactId>
+        <version>${version.shrinkwrap.resolvers}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-bom</artifactId>
+        <version>${version.arquillian}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
+    <!-- set shrinkwrap artifacts -->
+    <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-depchain</artifactId>
+      <version>${version.shrinkwrap.resolvers}</version>
+      <scope>test</scope>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.arquillian.junit</groupId>
+      <artifactId>arquillian-junit-container</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.arquillian.protocol</groupId>
+      <artifactId>arquillian-protocol-servlet</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.jboss.spec</groupId>
       <artifactId>jboss-javaee-6.0</artifactId>
@@ -109,10 +151,10 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest</artifactId>
-      <scope>test</scope>
+      <version>${project.version}</version>
       <type>jar</type>
       <classifier>classes</classifier>
-      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -786,6 +828,37 @@
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <id>embedded-engine-rest</id>
+      <!-- Works only on Wildfly -->
+      <dependencies>
+        <dependency>
+          <groupId>org.wildfly.arquillian</groupId>
+          <artifactId>wildfly-arquillian-container-managed</artifactId>
+          <version>1.1.0.Beta1</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>false</skipTests>
+              <includes>
+                <include>**/EmbeddedEngineRest_WILDFLY.*</include>
+              </includes>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
+              <systemPropertyVariables>
+                <projectversion>${project.parent.version}</projectversion>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
   <build>
@@ -810,9 +883,6 @@
             </goals>
             <configuration>
               <forceCreation>true</forceCreation>
-            <!--  <includes>
-                <include>**/com/camunda/fox/platform/test/util/**/*.class</include>
-              </includes> -->
             </configuration>
           </execution>
         </executions>
@@ -821,7 +891,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-            <skipTests>true</skipTests>
+          <skipTests>true</skipTests>
         </configuration>
       </plugin>
     </plugins>
