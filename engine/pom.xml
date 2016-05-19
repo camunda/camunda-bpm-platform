@@ -704,7 +704,8 @@
           <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-                <excludes>
+              <excludes>
+                <exclude>**/*TestCase.java</exclude>
                 <!-- the test requires multiple process engines in parallel but
                      the DbSchemaPrefixTestHelper will first drop the schema. So
                      it cannot be used with this profile at the moment -->
