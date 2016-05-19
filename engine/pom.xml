@@ -264,6 +264,7 @@
           <include>**/*camunda.cfg.xml</include>
           <include>**/camunda.cfg.db.xml</include>
           <include>**/camunda.cfg.plugins.xml</include>
+          <include>**/camunda.cfg.prefix.xml</include>
         </includes>
       </testResource>
     </testResources>
@@ -677,6 +678,33 @@
         </plugins>
       </build>
     </profile>
+
+    <!-- profile for running testsuite with database table prefix -->
+    <profile>
+      <id>db-table-prefix</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>database-test-create-schema</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <copy file="target/test-classes/camunda.cfg.prefix.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true" />
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <!-- test profiles -->
     <profile>
      <id>testBpmn</id>
