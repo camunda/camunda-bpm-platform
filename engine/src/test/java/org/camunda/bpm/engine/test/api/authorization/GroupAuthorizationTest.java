@@ -64,7 +64,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
 
         taskQuery.list();
 
-        verify(authorizationManager).filterAuthenticatedGroupIds(eq(testGroupIds));
+        verify(authorizationManager, atLeastOnce()).filterAuthenticatedGroupIds(eq(testGroupIds));
         verify(authCheck).setAuthGroupIds(eq(Collections.<String>emptyList()));
 
         return null;
@@ -85,7 +85,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
 
         taskQuery.list();
 
-        verify(authorizationManager).filterAuthenticatedGroupIds(eq(testGroupIds));
+        verify(authorizationManager, atLeastOnce()).filterAuthenticatedGroupIds(eq(testGroupIds));
         verify(authCheck).setAuthGroupIds(eq(testGroupIds.subList(0, 1)));
 
         return null;
@@ -108,7 +108,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
 
         taskQuery.list();
 
-        verify(authorizationManager).filterAuthenticatedGroupIds(eq(testGroupIds));
+        verify(authorizationManager, atLeastOnce()).filterAuthenticatedGroupIds(eq(testGroupIds));
         verify(authCheck, atLeastOnce()).setAuthGroupIds((List<String>) argThat(containsInAnyOrder(testGroupIds.toArray())));
 
         return null;
@@ -129,7 +129,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
 
         taskQuery.list();
 
-        verify(authorizationManager).filterAuthenticatedGroupIds(eq((List<String>) null));
+        verify(authorizationManager, atLeastOnce()).filterAuthenticatedGroupIds(eq((List<String>) null));
         verify(authCheck).setAuthGroupIds(eq(Collections.<String>emptyList()));
 
         return null;
@@ -145,7 +145,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
 
         authorizationService.isUserAuthorized(testUserId, testGroupIds, Permissions.READ, Resources.TASK);
 
-        verify(authorizationManager).filterAuthenticatedGroupIds(eq(testGroupIds));
+        verify(authorizationManager, atLeastOnce()).filterAuthenticatedGroupIds(eq(testGroupIds));
 
         ArgumentCaptor<AuthorizationCheck> authorizationCheckArgument = ArgumentCaptor.forClass(AuthorizationCheck.class);
         verify(dbEntityManager).selectBoolean(eq("isUserAuthorizedForResource"), authorizationCheckArgument.capture());
@@ -168,7 +168,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
 
         authorizationService.isUserAuthorized(testUserId, testGroupIds, Permissions.READ, Resources.TASK);
 
-        verify(authorizationManager).filterAuthenticatedGroupIds(eq(testGroupIds));
+        verify(authorizationManager, atLeastOnce()).filterAuthenticatedGroupIds(eq(testGroupIds));
 
         ArgumentCaptor<AuthorizationCheck> authorizationCheckArgument = ArgumentCaptor.forClass(AuthorizationCheck.class);
         verify(dbEntityManager).selectBoolean(eq("isUserAuthorizedForResource"), authorizationCheckArgument.capture());
@@ -193,7 +193,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
 
         authorizationService.isUserAuthorized(testUserId, testGroupIds, Permissions.READ, Resources.TASK);
 
-        verify(authorizationManager).filterAuthenticatedGroupIds(eq(testGroupIds));
+        verify(authorizationManager, atLeastOnce()).filterAuthenticatedGroupIds(eq(testGroupIds));
 
         ArgumentCaptor<AuthorizationCheck> authorizationCheckArgument = ArgumentCaptor.forClass(AuthorizationCheck.class);
         verify(dbEntityManager).selectBoolean(eq("isUserAuthorizedForResource"), authorizationCheckArgument.capture());
@@ -214,7 +214,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
 
         authorizationService.isUserAuthorized(testUserId, null, Permissions.READ, Resources.TASK);
 
-        verify(authorizationManager).filterAuthenticatedGroupIds(eq((List<String>) null));
+        verify(authorizationManager, atLeastOnce()).filterAuthenticatedGroupIds(eq((List<String>) null));
 
         ArgumentCaptor<AuthorizationCheck> authorizationCheckArgument = ArgumentCaptor.forClass(AuthorizationCheck.class);
         verify(dbEntityManager).selectBoolean(eq("isUserAuthorizedForResource"), authorizationCheckArgument.capture());

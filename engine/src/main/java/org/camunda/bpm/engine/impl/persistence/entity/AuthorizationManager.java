@@ -307,7 +307,7 @@ public class AuthorizationManager extends AbstractManager {
       else {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("userId", userId);
-        params.put("authGroupIds", groupIds);
+        params.put("authGroupIds", filterAuthenticatedGroupIds(groupIds));
         isRevokeAuthCheckEnabled = getDbEntityManager().selectBoolean("selectRevokeAuthorization", params);
       }
       this.isRevokeAuthCheckUsed = isRevokeAuthCheckEnabled;
