@@ -701,6 +701,16 @@
               </execution>
             </executions>
           </plugin>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <!-- include after CAM-6041 was fixed -->
+                <exclude>**/ManagementServiceTest.java</exclude>
+                <exclude>**/ManagementAuthorizationTest.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
         </plugins>
       </build>
     </profile>
