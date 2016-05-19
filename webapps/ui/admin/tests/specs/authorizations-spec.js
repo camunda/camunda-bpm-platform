@@ -7,7 +7,7 @@ var authorizationsPage = require('../pages/authorizations');
 var cockpitPage = require('../../../cockpit/tests/pages/dashboard');
 
 
-describe('Admin Authorizations Spec', function() {
+describe.only('Admin Authorizations Spec', function() {
 
   function checkCreateNewState() {
 
@@ -730,6 +730,98 @@ describe('Admin Authorizations Spec', function() {
         abortCreatingNewAuthorization();
       });
     });
+  });
+
+  describe('Tenant Authorizations', function() {
+
+      before(function() {
+        return testHelper(setupFile.setup1, function() {
+
+          authorizationsPage.navigateToWebapp('Admin');
+          authorizationsPage.authentication.userLogin('admin', 'admin');
+
+          authorizationsPage.selectNavbarItem('Authorizations');
+        });
+      });
+
+      it('should navigate to tenant page', function() {
+
+        // when
+        authorizationsPage.selectAuthorizationNavbarItem('Tenant');
+
+        // then
+        authorizationsPage.tenant.isActive();
+        expect(authorizationsPage.tenant.createNewButton().isEnabled()).to.eventually.eql(true);
+        expect(authorizationsPage.tenant.boxHeader()).to.eventually.eql('Tenant Authorizations');
+      });
+
+
+      it('should validate authorization attributes', function() {
+
+        authorizationsPage.createNewButton().click().then(function() {
+
+          checkCreateNewState();
+
+          checkAuthorizationTypes();
+
+          var permissionsList = [
+            'READ',
+            'UPDATE',
+            'CREATE',
+            'DELETE'
+          ];
+          checkPermissionTypes(permissionsList);
+
+          abortCreatingNewAuthorization();
+        });
+
+      });
+
+  });
+
+  describe('Tenant Membership Authorizations', function() {
+
+      before(function() {
+        return testHelper(setupFile.setup1, function() {
+
+          authorizationsPage.navigateToWebapp('Admin');
+          authorizationsPage.authentication.userLogin('admin', 'admin');
+
+          authorizationsPage.selectNavbarItem('Authorizations');
+        });
+      });
+
+      it('should navigate to tenant membership page', function() {
+
+        // when
+        authorizationsPage.selectAuthorizationNavbarItem('Tenant Membership');
+
+        // then
+        authorizationsPage.tenantMembership.isActive();
+        expect(authorizationsPage.tenantMembership.createNewButton().isEnabled()).to.eventually.eql(true);
+        expect(authorizationsPage.tenantMembership.boxHeader()).to.eventually.eql('Tenant Membership Authorizations');
+      });
+
+
+      it('should validate authorization attributes', function() {
+
+        authorizationsPage.createNewButton().click().then(function() {
+
+          checkCreateNewState();
+
+          checkAuthorizationTypes();
+
+          var permissionsList = [
+            'CREATE',
+            'DELETE'
+          ];
+          checkPermissionTypes(permissionsList);
+
+          abortCreatingNewAuthorization();
+        });
+
+      });
+
   });
 
 

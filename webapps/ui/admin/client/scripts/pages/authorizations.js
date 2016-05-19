@@ -34,6 +34,8 @@ var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization
           8: 'Process Instance',
           9: 'Deployment',
          10: 'Decision Definition',
+         11: 'Tenant',
+         12: 'Tenant Membership',
          13: 'Batch'
         };
 
@@ -56,6 +58,8 @@ var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization
           8: [ 'CREATE', 'READ', 'UPDATE', 'DELETE' ],
           9: [ 'CREATE', 'READ', 'DELETE' ],
          10: [ 'READ', 'CREATE_INSTANCE', 'READ_HISTORY', 'DELETE_HISTORY' ],
+         11: [ 'READ', 'UPDATE', 'CREATE', 'DELETE' ],
+         12: [ 'CREATE', 'DELETE' ],
          13: [ 'READ', 'UPDATE', 'CREATE', 'DELETE', 'READ_HISTORY', 'DELETE_HISTORY' ]
         };
 

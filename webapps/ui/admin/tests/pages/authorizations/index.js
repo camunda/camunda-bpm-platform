@@ -13,6 +13,8 @@ var ProcessInstancePage = require('./process-instance');
 var TaskPage = require('./task');
 var UserPage = require('./user');
 var BatchPage = require('./batch');
+var TenantPage = require('./tenant');
+var TenantMembershipPage = require('./tenant-membership');
 var AuthenticationPage = require('../../../../common/tests/pages/authentication');
 
 module.exports = new AuthorizationsPage();
@@ -28,5 +30,7 @@ module.exports.processInstance = new ProcessInstancePage();
 module.exports.task = new TaskPage();
 module.exports.user= new UserPage();
 module.exports.batch = new BatchPage();
+module.exports.tenant = new TenantPage();
+module.exports.tenantMembership = new TenantMembershipPage();
 module.exports.authentication = new AuthenticationPage();
 
