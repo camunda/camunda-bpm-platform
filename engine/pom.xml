@@ -704,7 +704,11 @@
           <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <excludes>
+                <excludes>
+                <!-- the test requires multiple process engines in parallel but
+                     the DbSchemaPrefixTestHelper will first drop the schema. So
+                     it cannot be used with this profile at the moment -->
+                <exclude>**/DeploymentAwareJobExecutorTest.java</exclude>
                 <!-- include after CAM-6041 was fixed -->
                 <exclude>**/ManagementServiceTest.java</exclude>
                 <exclude>**/ManagementAuthorizationTest.java</exclude>
