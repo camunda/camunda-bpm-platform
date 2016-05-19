@@ -85,7 +85,7 @@
   </update>
   
   <update id="updateExternalTaskSuspensionStateByParameters" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    update ACT_RU_EXT_TASK
+    update ${prefix}ACT_RU_EXT_TASK
     <set>
       SUSPENSION_STATE_ = #{parameter.suspensionState, jdbcType=INTEGER}
     </set>
