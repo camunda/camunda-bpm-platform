@@ -760,34 +760,8 @@ public class MigrationCompensationTest {
   @Test
   public void testCanMigrateSiblingEventScopeExecutions() {
     // given
-    BpmnModelInstance targetModel = ProcessModels.newModel()
-      .startEvent()
-      .subProcess("outerSubProcess")
-        .embeddedSubProcess()
-        .startEvent()
-        .subProcess("innerSubProcess")
-          .embeddedSubProcess()
-          .startEvent()
-          .userTask("userTask1")
-            .boundaryEvent("compensationBoundary")
-            .compensateEventDefinition()
-            .compensateEventDefinitionDone()
-          .moveToActivity("userTask1")
-          .endEvent()
-        .subProcessDone()
-        .endEvent()
-      .subProcessDone()
-      .userTask("userTask2")
-      .intermediateThrowEvent("compensationEvent")
-        .compensateEventDefinition()
-        .waitForCompletion(true)
-        .compensateEventDefinitionDone()
-      .endEvent()
-      .done();
-    CompensationModels.addUserTaskCompensationHandler(targetModel, "compensationBoundary", "compensationHandler");
-
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetModel);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.DOUBLE_SUBPROCESS_MODEL);
 
     MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
         .mapActivities("userTask2", "userTask2")
@@ -896,34 +870,8 @@ public class MigrationCompensationTest {
   @Test
   public void testEventScopeHierarchyPreservation() {
     // given
-    BpmnModelInstance model = ProcessModels.newModel()
-        .startEvent()
-        .subProcess("outerSubProcess")
-          .embeddedSubProcess()
-          .startEvent()
-          .subProcess("innerSubProcess")
-            .embeddedSubProcess()
-            .startEvent()
-            .userTask("userTask1")
-              .boundaryEvent("compensationBoundary")
-              .compensateEventDefinition()
-              .compensateEventDefinitionDone()
-            .moveToActivity("userTask1")
-            .endEvent()
-          .subProcessDone()
-          .endEvent()
-        .subProcessDone()
-        .userTask("userTask2")
-        .intermediateThrowEvent("compensationEvent")
-          .compensateEventDefinition()
-          .waitForCompletion(true)
-          .compensateEventDefinitionDone()
-        .endEvent()
-        .done();
-      CompensationModels.addUserTaskCompensationHandler(model, "compensationBoundary", "compensationHandler");
-
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.DOUBLE_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.DOUBLE_SUBPROCESS_MODEL);
 
     try {
       // when
@@ -990,9 +938,9 @@ public class MigrationCompensationTest {
     } catch (MigrationPlanValidationException e) {
       // then
       assertThat(e.getValidationReport())
-      .hasInstructionFailures("eventSubProcessStart",
-        "The source activity's event scope (subProcess) must be mapped to the target activity's event scope (subProcess)"
-      );
+        .hasInstructionFailures("eventSubProcessStart",
+          "The source activity's event scope (subProcess) must be mapped to the target activity's event scope (subProcess)"
+        );
     }
   }
 
@@ -1020,5 +968,4 @@ public class MigrationCompensationTest {
       );
     }
   }
-
 }

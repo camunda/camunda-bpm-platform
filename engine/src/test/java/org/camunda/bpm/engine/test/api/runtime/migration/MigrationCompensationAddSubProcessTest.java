@@ -16,9 +16,11 @@ import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnMo
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.camunda.bpm.engine.test.util.MigrationPlanValidationReportAssert.assertThat;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -26,9 +28,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.CompensationModels;
-import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -278,34 +278,8 @@ public class MigrationCompensationAddSubProcessTest {
   @Test
   public void testVariablesInParentEventScopeStillAccessible() {
     // given
-    BpmnModelInstance targetModel = ProcessModels.newModel()
-      .startEvent()
-      .subProcess("outerSubProcess")
-        .embeddedSubProcess()
-        .startEvent()
-        .subProcess("innerSubProcess")
-          .embeddedSubProcess()
-          .startEvent()
-          .userTask("userTask1")
-            .boundaryEvent("compensationBoundary")
-            .compensateEventDefinition()
-            .compensateEventDefinitionDone()
-          .moveToActivity("userTask1")
-          .endEvent()
-        .subProcessDone()
-        .endEvent()
-      .subProcessDone()
-      .userTask("userTask2")
-      .intermediateThrowEvent("compensationEvent")
-        .compensateEventDefinition()
-        .waitForCompletion(true)
-        .compensateEventDefinitionDone()
-      .endEvent()
-      .done();
-    CompensationModels.addUserTaskCompensationHandler(targetModel, "compensationBoundary", "compensationHandler");
-
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetModel);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.DOUBLE_SUBPROCESS_MODEL);
 
     MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
         .mapActivities("subProcess", "outerSubProcess")
@@ -328,6 +302,40 @@ public class MigrationCompensationAddSubProcessTest {
     // then the variable snapshot is available
     Task compensationTask = rule.getTaskService().createTaskQuery().singleResult();
     Assert.assertEquals("bar", rule.getTaskService().getVariable(compensationTask.getId(), "foo"));
+  }
+
+  @Test
+  public void testCannotAddScopeOnTopOfEventSubProcess() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(CompensationModels.DOUBLE_SUBPROCESS_MODEL)
+        .addSubProcessTo("innerSubProcess")
+        .id("eventSubProcess")
+        .triggerByEvent()
+        .embeddedSubProcess()
+        .startEvent("eventSubProcessStart")
+          .compensateEventDefinition()
+          .compensateEventDefinitionDone()
+        .endEvent()
+        .done());
+
+
+    try {
+      // when
+      rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "outerSubProcess")
+        .mapActivities("eventSubProcessStart", "eventSubProcessStart")
+        .mapActivities("compensationBoundary", "compensationBoundary")
+        .mapActivities("userTask2", "userTask2")
+        .build();
+      Assert.fail("exception expected");
+    } catch (MigrationPlanValidationException e) {
+      // then
+      assertThat(e.getValidationReport())
+        .hasInstructionFailures("eventSubProcessStart",
+          "The source activity's event scope (subProcess) must be mapped to the target activity's event scope (innerSubProcess)"
+        );
+    }
   }
 
 }

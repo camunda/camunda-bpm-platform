@@ -199,6 +199,7 @@ import org.camunda.bpm.engine.impl.migration.MigrationActivityMatcher;
 import org.camunda.bpm.engine.impl.migration.MigrationInstructionGenerator;
 import org.camunda.bpm.engine.impl.migration.batch.MigrationBatchJobHandler;
 import org.camunda.bpm.engine.impl.migration.validation.activity.MigrationActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.activity.NoCompensationHandlerActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.activity.SupportedPassiveEventTriggerActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.AsyncAfterMigrationValidator;
@@ -3244,6 +3245,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     List<MigrationActivityValidator> migrationActivityValidators = new ArrayList<MigrationActivityValidator>();
     migrationActivityValidators.add(SupportedActivityValidator.INSTANCE);
     migrationActivityValidators.add(SupportedPassiveEventTriggerActivityValidator.INSTANCE);
+    migrationActivityValidators.add(NoCompensationHandlerActivityValidator.INSTANCE);
     return migrationActivityValidators;
   }
 

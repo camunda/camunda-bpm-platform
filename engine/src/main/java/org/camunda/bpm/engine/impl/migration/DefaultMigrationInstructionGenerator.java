@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.migration;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.migration.validation.activity.MigrationActivityValidator;
@@ -73,6 +74,33 @@ public class DefaultMigrationInstructionGenerator implements MigrationInstructio
     return migrationInstructions;
   }
 
+  protected List<ValidatingMigrationInstruction> generateInstructionsForActivities(
+      Collection<ActivityImpl> sourceActivities,
+      Collection<ActivityImpl> targetActivities,
+      boolean updateEventTriggers,
+      ValidatingMigrationInstructions existingInstructions) {
+
+    List<ValidatingMigrationInstruction> generatedInstructions = new ArrayList<ValidatingMigrationInstruction>();
+
+    for (ActivityImpl sourceActivity : sourceActivities) {
+      if (!existingInstructions.containsInstructionForSourceScope(sourceActivity)) {
+        for (ActivityImpl targetActivity : targetActivities) {
+          if (isValidActivity(sourceActivity)
+            && isValidActivity(targetActivity)
+            && migrationActivityMatcher.matchActivities(sourceActivity, targetActivity)) {
+
+            boolean updateEventTriggersForInstruction = updateEventTriggers && UpdateEventTriggersValidator.definesPersistentEventTrigger(sourceActivity);
+
+            ValidatingMigrationInstruction generatedInstruction = new ValidatingMigrationInstructionImpl(sourceActivity, targetActivity, updateEventTriggersForInstruction);
+            generatedInstructions.add(generatedInstruction);
+          }
+        }
+      }
+    }
+
+    return generatedInstructions;
+  }
+
   public void generate(ScopeImpl sourceScope,
       ScopeImpl targetScope,
       ProcessDefinitionImpl sourceProcessDefinition,
@@ -80,24 +108,25 @@ public class DefaultMigrationInstructionGenerator implements MigrationInstructio
       ValidatingMigrationInstructions existingInstructions,
       boolean updateEventTriggers) {
 
-    List<ValidatingMigrationInstruction> generatedInstructions = new ArrayList<ValidatingMigrationInstruction>();
+    List<ValidatingMigrationInstruction> flowScopeInstructions = generateInstructionsForActivities(
+      sourceScope.getActivities(),
+      targetScope.getActivities(),
+      updateEventTriggers,
+      existingInstructions);
 
-    for (ActivityImpl sourceActivity : sourceScope.getActivities()) {
-      for (ActivityImpl targetActivity : targetScope.getActivities()) {
-        if (isValidActivity(sourceActivity) && isValidActivity(targetActivity) && migrationActivityMatcher.matchActivities(sourceActivity, targetActivity)) {
+    existingInstructions.addAll(flowScopeInstructions);
 
-          boolean updateEventTriggersForInstruction = updateEventTriggers && UpdateEventTriggersValidator.definesPersistentEventTrigger(sourceActivity);
+    List<ValidatingMigrationInstruction> eventScopeInstructions = generateInstructionsForActivities(
+      sourceScope.getEventActivities(),
+      targetScope.getEventActivities(),
+      updateEventTriggers,
+      existingInstructions);
 
-          ValidatingMigrationInstruction generatedInstruction = new ValidatingMigrationInstructionImpl(sourceActivity, targetActivity, updateEventTriggersForInstruction);
-          generatedInstructions.add(generatedInstruction);
-          existingInstructions.addInstruction(generatedInstruction);
-        }
-      }
-    }
+    existingInstructions.addAll(eventScopeInstructions);
 
     existingInstructions.filterWith(migrationInstructionValidators);
 
-    for (ValidatingMigrationInstruction generatedInstruction : generatedInstructions) {
+    for (ValidatingMigrationInstruction generatedInstruction : flowScopeInstructions) {
       if (existingInstructions.contains(generatedInstruction)) {
         generate(
             generatedInstruction.getSourceActivity(),

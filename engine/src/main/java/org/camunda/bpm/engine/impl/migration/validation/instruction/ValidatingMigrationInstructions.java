@@ -53,8 +53,8 @@ public class ValidatingMigrationInstructions {
     indexInstruction(instruction);
   }
 
-  public void addAll(ValidatingMigrationInstructions other) {
-    for (ValidatingMigrationInstruction instruction : other.instructions) {
+  public void addAll(List<ValidatingMigrationInstruction> instructions) {
+    for (ValidatingMigrationInstruction instruction : instructions) {
       addInstruction(instruction);
     }
   }
@@ -120,6 +120,10 @@ public class ValidatingMigrationInstructions {
 
   public boolean contains(ValidatingMigrationInstruction instruction) {
     return instructions.contains(instruction);
+  }
+
+  public boolean containsInstructionForSourceScope(ScopeImpl sourceScope) {
+    return instructionsBySourceScope.containsKey(sourceScope);
   }
 
   protected boolean isValidInstruction(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, List<MigrationInstructionValidator> migrationInstructionValidators) {

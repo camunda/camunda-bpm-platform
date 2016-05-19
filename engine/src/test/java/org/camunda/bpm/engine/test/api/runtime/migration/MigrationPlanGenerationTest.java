@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.CallActivityModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.CompensationModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.EventBasedGatewayModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ExternalTaskModels;
@@ -35,7 +36,6 @@ import org.camunda.bpm.engine.test.util.MigrationPlanAssert;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -721,8 +721,7 @@ public class MigrationPlanGenerationTest {
       .hasInstructions(
         migrate("subProcess").to("subProcess"),
         migrate("userTask").to("userTask"),
-        migrate("eventSubProcess").to("eventSubProcess"),
-        migrate("eventSubProcessTask").to("eventSubProcessTask"));
+        migrate("eventSubProcessStart").to("eventSubProcessStart"));
   }
 
   @Test
@@ -735,7 +734,6 @@ public class MigrationPlanGenerationTest {
   }
 
   @Test
-  @Ignore("CAM-5785")
   public void testMapEventSubProcessStartEventWhenSubProcessesAreNotEqual() {
     BpmnModelInstance sourceModel = EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS;
     BpmnModelInstance targetModel = modify(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS)
@@ -919,6 +917,31 @@ public class MigrationPlanGenerationTest {
 
     // then
     assertNotNull(migrationPlan);
+  }
+
+  @Test
+  public void testMapCompensationBoundaryEvents() {
+
+    assertGeneratedMigrationPlan(CompensationModels.ONE_COMPENSATION_TASK_MODEL, CompensationModels.ONE_COMPENSATION_TASK_MODEL, true)
+      .hasInstructions(
+        migrate("userTask1").to("userTask1").updateEventTrigger(false),
+        migrate("userTask2").to("userTask2").updateEventTrigger(false),
+        migrate("compensationBoundary").to("compensationBoundary").updateEventTrigger(false)
+      );
+  }
+
+  @Test
+  public void testMapCompensationStartEvents() {
+    assertGeneratedMigrationPlan(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL, CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL, true)
+      .hasInstructions(
+        migrate("subProcess").to("subProcess").updateEventTrigger(false),
+        migrate("userTask1").to("userTask1").updateEventTrigger(false),
+        migrate("eventSubProcessStart").to("eventSubProcessStart").updateEventTrigger(false),
+        migrate("userTask2").to("userTask2").updateEventTrigger(false),
+        migrate("compensationBoundary").to("compensationBoundary").updateEventTrigger(false)
+      );
+
+    // should not map eventSubProcess because it active compensation is not supported
   }
 
 

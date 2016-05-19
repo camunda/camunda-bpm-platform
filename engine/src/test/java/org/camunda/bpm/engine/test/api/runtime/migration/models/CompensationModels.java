@@ -88,9 +88,37 @@ public static final BpmnModelInstance COMPENSATION_ONE_TASK_SUBPROCESS_MODEL =  
       .endEvent()
       .done();
 
-    static {
-      addUserTaskCompensationHandler(COMPENSATION_TWO_TASKS_SUBPROCESS_MODEL, "compensationBoundary", "compensationHandler");
-    }
+  static {
+    addUserTaskCompensationHandler(COMPENSATION_TWO_TASKS_SUBPROCESS_MODEL, "compensationBoundary", "compensationHandler");
+  }
+
+  public static final BpmnModelInstance DOUBLE_SUBPROCESS_MODEL = ProcessModels.newModel()
+        .startEvent()
+        .subProcess("outerSubProcess")
+          .embeddedSubProcess()
+          .startEvent()
+          .subProcess("innerSubProcess")
+            .embeddedSubProcess()
+            .startEvent()
+            .userTask("userTask1")
+              .boundaryEvent("compensationBoundary")
+              .compensateEventDefinition()
+              .compensateEventDefinitionDone()
+            .moveToActivity("userTask1")
+            .endEvent()
+          .subProcessDone()
+          .endEvent()
+        .subProcessDone()
+        .userTask("userTask2")
+        .intermediateThrowEvent("compensationEvent")
+          .compensateEventDefinition()
+          .waitForCompletion(true)
+          .compensateEventDefinitionDone()
+        .endEvent()
+        .done();
+  static {
+    CompensationModels.addUserTaskCompensationHandler(DOUBLE_SUBPROCESS_MODEL, "compensationBoundary", "compensationHandler");
+  }
 
   public static final BpmnModelInstance COMPENSATION_END_EVENT_MODEL = ProcessModels.newModel()
       .startEvent()

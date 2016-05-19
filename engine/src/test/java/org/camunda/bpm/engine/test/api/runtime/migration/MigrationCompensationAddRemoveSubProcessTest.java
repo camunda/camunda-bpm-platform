@@ -125,6 +125,4 @@ public class MigrationCompensationAddRemoveSubProcessTest {
         .done());
 
   }
-
-  // TODO: assert activity instance tree
 }

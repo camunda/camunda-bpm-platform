@@ -175,7 +175,15 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   }
 
   public void setEventScope(ScopeImpl eventScope) {
+    if (this.eventScope != null) {
+      this.eventScope.eventActivities.remove(this);
+    }
+
     this.eventScope = eventScope;
+
+    if (eventScope != null) {
+      this.eventScope.eventActivities.add(this);
+    }
   }
 
   public PvmScope getLevelOfSubprocessScope() {

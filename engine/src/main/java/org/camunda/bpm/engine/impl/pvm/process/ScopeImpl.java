@@ -15,8 +15,10 @@ package org.camunda.bpm.engine.impl.pvm.process;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
@@ -44,6 +46,9 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
   /** The activities for which the flow scope is this scope  */
   protected List<ActivityImpl> flowActivities = new ArrayList<ActivityImpl>();
   protected Map<String, ActivityImpl> namedFlowActivities = new HashMap<String, ActivityImpl>();
+
+  /** activities for which this is the event scope **/
+  protected Set<ActivityImpl> eventActivities = new HashSet<ActivityImpl>();
 
   protected ProcessDefinitionImpl processDefinition;
 
@@ -161,6 +166,10 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
 
   public List<ActivityImpl> getActivities() {
     return flowActivities;
+  }
+
+  public Set<ActivityImpl> getEventActivities() {
+    return eventActivities;
   }
 
   public boolean isSubProcessScope() {

@@ -305,28 +305,7 @@ public class MigrationCompensationRemoveSubProcessTest {
   @Test
   public void testDeletesOnlyVariablesFromRemovingScope() {
     // given
-    BpmnModelInstance sourceModel = ProcessModels.newModel()
-      .startEvent()
-      .subProcess("outerSubProcess")
-        .embeddedSubProcess()
-        .startEvent()
-        .subProcess("innerSubProcess")
-          .embeddedSubProcess()
-          .startEvent()
-          .userTask("userTask1")
-            .boundaryEvent("compensationBoundary")
-            .compensateEventDefinition()
-            .compensateEventDefinitionDone()
-          .moveToActivity("userTask1")
-          .endEvent()
-        .subProcessDone()
-        .endEvent()
-      .subProcessDone()
-      .userTask("userTask2")
-      .done();
-    CompensationModels.addUserTaskCompensationHandler(sourceModel, "compensationBoundary", "compensationHandler");
-
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceModel);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.DOUBLE_SUBPROCESS_MODEL);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
 
     MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
