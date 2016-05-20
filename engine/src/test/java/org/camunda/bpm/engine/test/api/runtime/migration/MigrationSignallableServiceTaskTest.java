@@ -73,6 +73,45 @@ public class MigrationSignallableServiceTaskTest {
     }
   }
 
+  @Test
+  public void testCannotMigrateAsyncActivityInstance() {
+    // given
+    BpmnModelInstance model = ProcessModels.newModel()
+      .startEvent()
+      .serviceTask("serviceTask")
+      .camundaAsyncBefore()
+      .camundaClass(SignallableServiceTaskDelegate.class.getName())
+      .endEvent()
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("serviceTask", "serviceTask")
+      .build();
+
+    String processInstanceId = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId()).getId();
+    testHelper.executeAvailableJobs();
+
+    // when
+    try {
+      rule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(processInstanceId)
+        .execute();
+
+      Assert.fail("should fail");
+    }
+    catch (MigratingProcessInstanceValidationException e) {
+      // then
+      assertThat(e.getValidationReport())
+        .hasActivityInstanceFailures("serviceTask",
+          "The type of the source activity is not supported for activity instance migration"
+        );
+    }
+  }
+
   public static class SignallableServiceTaskDelegate implements SignallableActivityBehavior {
 
     @Override
