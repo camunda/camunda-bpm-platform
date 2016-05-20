@@ -7,7 +7,7 @@ var authorizationsPage = require('../pages/authorizations');
 var cockpitPage = require('../../../cockpit/tests/pages/dashboard');
 
 
-describe.only('Admin Authorizations Spec', function() {
+describe('Admin Authorizations Spec', function() {
 
   function checkCreateNewState() {
 
