@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
@@ -116,7 +115,7 @@ public class DefaultPermissionForTenantMembers {
     
     identityService.deleteTenantUserMembership(tenantOne.getId(), user.getId());
 
-    assertEquals(tenantTwo.getId(),identityService.createTenantQuery()
+    assertEquals(TENANT_TWO,identityService.createTenantQuery()
      .userMember(user.getId())
      .singleResult()
      .getId());
@@ -185,7 +184,7 @@ public class DefaultPermissionForTenantMembers {
       .resourceType(Resources.TENANT)
       .hasPermission(Permissions.READ).count());
     
-    assertEquals(tenantTwo.getId(),identityService.createTenantQuery()
+    assertEquals(TENANT_TWO,identityService.createTenantQuery()
      .groupMember(group.getId())
      .singleResult()
      .getId());
