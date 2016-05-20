@@ -414,6 +414,38 @@ public class AuthorizationManager extends AbstractManager {
 
   }
 
+  public void deleteAuthorizationsByResourceIdAndUserId(Resource resource, String resourceId, String userId) {
+
+    if(resourceId == null) {
+      throw new IllegalArgumentException("Resource id cannot be null");
+    }
+
+    if(isAuthorizationEnabled()) {
+      Map<String, Object> deleteParams = new HashMap<String, Object>();
+      deleteParams.put("resourceType", resource.resourceType());
+      deleteParams.put("resourceId", resourceId);
+      deleteParams.put("userId", userId);
+      getDbEntityManager().delete(AuthorizationEntity.class, "deleteAuthorizationsForResourceId", deleteParams);
+    }
+
+  }
+
+  public void deleteAuthorizationsByResourceIdAndGroupId(Resource resource, String resourceId, String groupId) {
+
+    if(resourceId == null) {
+      throw new IllegalArgumentException("Resource id cannot be null");
+    }
+
+    if(isAuthorizationEnabled()) {
+      Map<String, Object> deleteParams = new HashMap<String, Object>();
+      deleteParams.put("resourceType", resource.resourceType());
+      deleteParams.put("resourceId", resourceId);
+      deleteParams.put("groupId", groupId);
+      getDbEntityManager().delete(AuthorizationEntity.class, "deleteAuthorizationsForResourceId", deleteParams);
+    }
+
+  }
+
   // predefined authorization checks
 
   /* MEMBER OF CAMUNDA_ADMIN */

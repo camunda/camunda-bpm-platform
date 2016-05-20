@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
 import static org.camunda.bpm.engine.authorization.Resources.FILTER;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
+import static org.camunda.bpm.engine.authorization.Resources.TENANT;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureValidIndividualResourceId;
 
@@ -93,13 +94,17 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
   }
 
   public AuthorizationEntity[] tenantMembershipCreated(Tenant tenant, User user) {
-    // no default authorizations on tenant memberships.
-    return null;
+
+    AuthorizationEntity userAuthorization = createGrantAuthorization(user.getId(), null, TENANT, tenant.getId(), READ);
+
+    return new AuthorizationEntity[]{ userAuthorization };
   }
 
   public AuthorizationEntity[] tenantMembershipCreated(Tenant tenant, Group group) {
-    // no default authorizations on tenant memberships.
-    return null;
+
+    AuthorizationEntity userAuthorization = createGrantAuthorization(null, group.getId(), TENANT, tenant.getId(), READ);
+
+    return new AuthorizationEntity[]{ userAuthorization };
   }
 
   public AuthorizationEntity[] newFilter(Filter filter) {

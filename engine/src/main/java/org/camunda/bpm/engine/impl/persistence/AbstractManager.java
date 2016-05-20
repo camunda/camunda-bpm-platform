@@ -260,6 +260,14 @@ public abstract class AbstractManager implements Session {
     getAuthorizationManager().deleteAuthorizationsByResourceId(resource, resourceId);
   }
 
+  protected void deleteAuthorizationsForUser(Resource resource, String resourceId, String userId) {
+    getAuthorizationManager().deleteAuthorizationsByResourceIdAndUserId(resource, resourceId, userId);
+  }
+
+  protected void deleteAuthorizationsForGroup(Resource resource, String resourceId, String groupId) {
+    getAuthorizationManager().deleteAuthorizationsByResourceIdAndGroupId(resource, resourceId, groupId);
+  }
+
   public void saveDefaultAuthorizations(final AuthorizationEntity[] authorizations) {
     if(authorizations != null && authorizations.length > 0) {
       Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {

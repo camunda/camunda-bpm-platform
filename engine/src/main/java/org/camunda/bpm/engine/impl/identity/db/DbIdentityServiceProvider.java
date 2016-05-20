@@ -210,6 +210,8 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     checkAuthorization(Permissions.DELETE, Resources.TENANT_MEMBERSHIP, tenantId);
     deleteAuthorizations(Resources.TENANT_MEMBERSHIP, userId);
 
+    deleteAuthorizationsForUser(Resources.TENANT, tenantId, userId);
+
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("tenantId", tenantId);
     parameters.put("userId", userId);
@@ -219,6 +221,8 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
   public void deleteTenantGroupMembership(String tenantId, String groupId) {
     checkAuthorization(Permissions.DELETE, Resources.TENANT_MEMBERSHIP, tenantId);
     deleteAuthorizations(Resources.TENANT_MEMBERSHIP, groupId);
+
+    deleteAuthorizationsForGroup(Resources.TENANT, tenantId, groupId);
 
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("tenantId", tenantId);
