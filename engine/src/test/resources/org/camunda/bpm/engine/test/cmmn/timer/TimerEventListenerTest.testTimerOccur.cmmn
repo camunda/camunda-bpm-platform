@@ -11,7 +11,7 @@
                 <extensionElements>
                     <camunda:caseExecutionListener event="occur" class="org.camunda.bpm.engine.test.cmmn.timer.TimerEventListenerCaseExecutionListener"/>
                 </extensionElements>
-                <timerExpression>R3/PT2S</timerExpression>
+                <timerExpression>2016-05-23T21:00:19Z</timerExpression>
             </timerEventListener>
         </casePlanModel>
     </case>
