@@ -248,6 +248,7 @@ public abstract class MockProvider {
 
   public static final String EXAMPLE_ACTIVITY_ID = "anActivity";
   public static final String ANOTHER_EXAMPLE_ACTIVITY_ID = "anotherActivity";
+  public static final String EXAMPLE_ACTIVITY_ID_LIST = EXAMPLE_ACTIVITY_ID + "," + ANOTHER_EXAMPLE_ACTIVITY_ID;
   public static final String NON_EXISTING_ACTIVITY_ID = "aNonExistingActivityId";
   public static final String EXAMPLE_ACTIVITY_INSTANCE_ID = "anActivityInstanceId";
   public static final String EXAMPLE_ACTIVITY_NAME = "anActivityName";

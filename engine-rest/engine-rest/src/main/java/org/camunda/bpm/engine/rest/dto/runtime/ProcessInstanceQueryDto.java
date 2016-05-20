@@ -69,6 +69,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private String incidentMessageLike;
   private List<String> tenantIds;
   private Boolean withoutTenantId;
+  private List<String> activityIds;
 
   private List<VariableQueryParameterDto> variables;
 
@@ -251,6 +252,15 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     this.withoutTenantId = withoutTenantId;
   }
 
+  public List<String> getActivityIds() {
+    return activityIds;
+  }
+
+  @CamundaQueryParam(value = "activityIdIn", converter = StringListConverter.class)
+  public void setActivityIdIn(List<String> activityIds) {
+    this.activityIds = activityIds;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -317,6 +327,9 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (TRUE.equals(withoutTenantId)) {
       query.withoutTenantId();
+    }
+    if (activityIds != null && !activityIds.isEmpty()) {
+      query.activityIdIn(activityIds.toArray(new String[activityIds.size()]));
     }
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {

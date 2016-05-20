@@ -527,6 +527,36 @@ public class ProcessInstanceRestServiceQueryTest extends
   }
 
   @Test
+  public void testActivityIdListParameter() {
+    given()
+      .queryParam("activityIdIn", MockProvider.EXAMPLE_ACTIVITY_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(PROCESS_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).activityIdIn(MockProvider.EXAMPLE_ACTIVITY_ID, MockProvider.ANOTHER_EXAMPLE_ACTIVITY_ID);
+    verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testActivityIdListPostParameter() {
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("activityIdIn", MockProvider.EXAMPLE_ACTIVITY_ID_LIST.split(","));
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(queryParameters)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(PROCESS_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).activityIdIn(MockProvider.EXAMPLE_ACTIVITY_ID, MockProvider.ANOTHER_EXAMPLE_ACTIVITY_ID);
+    verify(mockedQuery).list();
+  }
+
+  @Test
   public void testSortingParameters() {
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("instanceId", "asc", Status.OK);
