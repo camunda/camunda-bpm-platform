@@ -256,6 +256,16 @@ ALTER TABLE ACT_HI_CASEACTINST
 
 create index ACT_IDX_HI_CAS_A_I_TENANT_ID on ACT_HI_CASEACTINST(TENANT_ID_);
 
+-- AUTHORIZATION --
+
+-- add grant authorizations for group camunda-admin:
+INSERT INTO
+  ACT_RU_AUTHORIZATION (ID_, TYPE_, GROUP_ID_, RESOURCE_TYPE_, RESOURCE_ID_, PERMS_, REV_)
+VALUES
+  ('camunda-admin-grant-tenant', 1, 'camunda-admin', 11, '*', 2147483647, 1),
+  ('camunda-admin-grant-tenant-membership', 1, 'camunda-admin', 12, '*', 2147483647, 1),
+  ('camunda-admin-grant-batch', 1, 'camunda-admin', 13, '*', 2147483647, 1);
+
 -- tenant table
 
 create table ACT_ID_TENANT (
