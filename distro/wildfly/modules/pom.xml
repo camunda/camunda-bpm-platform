@@ -102,6 +102,11 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -216,6 +221,10 @@
                 </replace>
 
                 <replace dir="target/modules" token="@version.jackson.annotations@" value="${version.jackson.annotations}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.h2@" value="${version.h2}">
                   <include name="**/module.xml" />
                 </replace>
 

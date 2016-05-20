@@ -18,11 +18,6 @@
       we deploy all and only activate one with a *-ds.xml database deployment
     -->
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>org.mariadb.jdbc</groupId>
       <artifactId>mariadb-java-client</artifactId>
       <scope>runtime</scope>
@@ -274,7 +269,6 @@
                       <include name="**/module.xml" />
                       <replacefilter token="@project.version@" value="${project.version}" />
                       <replacefilter token="@version.db2@" value="${version.db2}" />
-                      <replacefilter token="@version.h2@" value="${version.h2}" />
                       <replacefilter token="@version.mariadb@" value="${version.mariadb}" />
                       <replacefilter token="@version.mysql@" value="${version.mysql}" />
                       <replacefilter token="@version.oracle@" value="${version.oracle}" />
@@ -409,7 +403,6 @@
                       <include name="**/module.xml" />
                       <replacefilter token="@project.version@" value="${project.version}" />
                       <replacefilter token="@version.db2@" value="${version.db2}" />
-                      <replacefilter token="@version.h2@" value="${version.h2}" />
                       <replacefilter token="@version.mariadb@" value="${version.mariadb}" />
                       <replacefilter token="@version.mysql@" value="${version.mysql}" />
                       <replacefilter token="@version.oracle@" value="${version.oracle}" />
