@@ -252,8 +252,6 @@
                     <!-- now patch old version of the schema -->
                     <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql</srcFile>
                     <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql</srcFile>
-                    <!-- clear authorization table when upgrading from 7.4 to 7.5 -->
-                    <srcFile>${project.basedir}/clear.authorization.table.sql</srcFile>
                   </srcFiles>
                 </configuration>
               </execution>
@@ -268,6 +266,8 @@
                     <!-- now perform the schema migrations -->
                     <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
                     <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
+                    <!-- clear authorization table when upgrading from 7.4 to 7.5 -->
+                    <srcFile>${project.basedir}/clear.authorization.table.sql</srcFile>
                   </srcFiles>
                 </configuration>
               </execution>
