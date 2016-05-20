@@ -54,7 +54,7 @@ public class MigrationAddMultiInstanceTest {
       assertThat(e.getValidationReport())
         .hasInstructionFailures("userTask",
           "Target activity 'userTask' is a descendant of multi-instance body 'userTask#multiInstanceBody' "
-          + "that is not migrated from the source process definition"
+          + "that is not mapped from the source process definition"
         );
     }
   }
@@ -76,7 +76,7 @@ public class MigrationAddMultiInstanceTest {
       assertThat(e.getValidationReport())
         .hasInstructionFailures("userTask",
           "Target activity 'userTask' is a descendant of multi-instance body 'userTask#multiInstanceBody' "
-          + "that is not migrated from the source process definition"
+          + "that is not mapped from the source process definition"
         );
     }
   }
@@ -99,7 +99,7 @@ public class MigrationAddMultiInstanceTest {
       assertThat(e.getValidationReport())
         .hasInstructionFailures("userTask",
           "Target activity 'userTask' is a descendant of multi-instance body 'subProcess#multiInstanceBody' "
-          + "that is not migrated from the source process definition"
+          + "that is not mapped from the source process definition"
         );
     }
   }

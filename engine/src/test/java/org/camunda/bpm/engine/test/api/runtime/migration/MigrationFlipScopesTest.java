@@ -54,7 +54,7 @@ public class MigrationFlipScopesTest {
     } catch (MigrationPlanValidationException e) {
       MigrationPlanValidationReportAssert.assertThat(e.getValidationReport())
         .hasInstructionFailures("innerSubProcess",
-          "The closest migrated ancestor 'outerSubProcess' is migrated to scope 'innerSubProcess' which is not an ancestor of target scope 'outerSubProcess'"
+          "The closest mapped ancestor 'outerSubProcess' is mapped to scope 'innerSubProcess' which is not an ancestor of target scope 'outerSubProcess'"
         );
     }
   }

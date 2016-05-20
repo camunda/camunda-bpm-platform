@@ -377,7 +377,7 @@ public class MigrationRemoveSubprocessTest {
     } catch (MigrationPlanValidationException e) {
       MigrationPlanValidationReportAssert.assertThat(e.getValidationReport())
         .hasInstructionFailures("userTask2",
-          "The closest migrated ancestor 'subProcess' is migrated to scope 'subProcess' which is not an ancestor of target scope 'userTask2'"
+          "The closest mapped ancestor 'subProcess' is mapped to scope 'subProcess' which is not an ancestor of target scope 'userTask2'"
         );
     }
   }
@@ -563,7 +563,7 @@ public class MigrationRemoveSubprocessTest {
     } catch (MigrationPlanValidationException e) {
       MigrationPlanValidationReportAssert.assertThat(e.getValidationReport())
         .hasInstructionFailures("subProcess3",
-          "The closest migrated ancestor 'subProcess1' is migrated to scope 'subProcess1' which is not an ancestor of target scope 'subProcess1'"
+          "The closest mapped ancestor 'subProcess1' is mapped to scope 'subProcess1' which is not an ancestor of target scope 'subProcess1'"
         );
     }
   }

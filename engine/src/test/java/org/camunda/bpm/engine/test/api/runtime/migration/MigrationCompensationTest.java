@@ -885,7 +885,7 @@ public class MigrationCompensationTest {
       // then
       assertThat(e.getValidationReport())
       .hasInstructionFailures("innerSubProcess",
-        "The closest migrated ancestor 'outerSubProcess' is migrated to scope 'innerSubProcess' "
+        "The closest mapped ancestor 'outerSubProcess' is mapped to scope 'innerSubProcess' "
         + "which is not an ancestor of target scope 'outerSubProcess'"
       );
     }
@@ -916,7 +916,7 @@ public class MigrationCompensationTest {
       // then
       assertThat(e.getValidationReport())
       .hasInstructionFailures("compensationBoundary",
-        "The closest migrated ancestor 'subProcess' is migrated to scope 'addedSubProcess' "
+        "The closest mapped ancestor 'subProcess' is mapped to scope 'addedSubProcess' "
         + "which is not an ancestor of target scope 'compensationBoundary'"
       );
     }

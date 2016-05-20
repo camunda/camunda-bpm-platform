@@ -45,7 +45,7 @@ public class CannotAddMultiInstanceBodyValidator implements MigrationInstruction
 
     if (miBodyCollector.firstMiBody != null) {
       report.addFailure("Target activity '" + targetActivity.getId() + "' is a descendant of multi-instance body '" +
-        miBodyCollector.firstMiBody.getId() + "' that is not migrated from the source process definition.");
+        miBodyCollector.firstMiBody.getId() + "' that is not mapped from the source process definition.");
     }
   }
 

@@ -33,7 +33,7 @@ public class CannotRemoveMultiInstanceInnerActivityValidator implements Migratio
       ActivityImpl innerActivity = getInnerActivity(sourceActivity);
 
       if (instructions.getInstructionsBySourceScope(innerActivity).isEmpty()) {
-        report.addFailure("Cannot remove the inner activity of a multi-instance body when the body migrates");
+        report.addFailure("Cannot remove the inner activity of a multi-instance body when the body is mapped");
       }
     }
   }

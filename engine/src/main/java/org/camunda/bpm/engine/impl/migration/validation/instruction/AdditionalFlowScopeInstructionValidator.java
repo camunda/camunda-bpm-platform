@@ -24,7 +24,7 @@ public class AdditionalFlowScopeInstructionValidator implements MigrationInstruc
     if (ancestorScopeInstruction != null && targetScope != null && targetScope != targetScope.getProcessDefinition()) {
       ScopeImpl parentInstanceTargetScope = ancestorScopeInstruction.getTargetActivity();
       if (parentInstanceTargetScope != null && !parentInstanceTargetScope.isAncestorFlowScopeOf(targetScope)) {
-        report.addFailure("The closest migrated ancestor '" + ancestorScopeInstruction.getSourceActivity().getId() + "' is migrated to scope '" +
+        report.addFailure("The closest mapped ancestor '" + ancestorScopeInstruction.getSourceActivity().getId() + "' is mapped to scope '" +
           parentInstanceTargetScope.getId() + "' which is not an ancestor of target scope '" + targetScope.getId() + "'");
       }
     }

@@ -328,7 +328,7 @@ public class MigrationPlanCreationTest {
       assertThat(e.getValidationReport())
         .hasInstructionFailures("userTask",
           "Target activity 'userTask' is a descendant of multi-instance body 'userTask#multiInstanceBody' "
-        + "that is not migrated from the source process definition."
+        + "that is not mapped from the source process definition."
         );
     }
   }
@@ -560,7 +560,7 @@ public class MigrationPlanCreationTest {
       assertThat(e.getValidationReport())
         .hasInstructionFailures("boundary",
           "The source activity's event scope (userTask) must be mapped to the target activity's event scope (subProcess)",
-          "The closest migrated ancestor 'subProcess' is migrated to scope 'subProcess' which is not an ancestor of target scope 'boundary'"
+          "The closest mapped ancestor 'subProcess' is mapped to scope 'subProcess' which is not an ancestor of target scope 'boundary'"
         );
     }
   }

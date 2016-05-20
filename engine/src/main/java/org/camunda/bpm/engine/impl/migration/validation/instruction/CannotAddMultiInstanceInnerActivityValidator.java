@@ -32,7 +32,7 @@ public class CannotAddMultiInstanceInnerActivityValidator implements MigrationIn
       ActivityImpl innerActivity = getInnerActivity(targetActivity);
 
       if (instructions.getInstructionsByTargetScope(innerActivity).isEmpty()) {
-        report.addFailure("Must migrate the inner activity of a multi-instance body when the body migrates");
+        report.addFailure("Must map the inner activity of a multi-instance body when the body is mapped");
       }
     }
   }

@@ -213,7 +213,7 @@ public class MigrationMultiInstanceTest {
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasInstructionFailures(miBodyOf("subProcess"),
-          "Cannot remove the inner activity of a multi-instance body when the body migrates"
+          "Cannot remove the inner activity of a multi-instance body when the body is mapped"
         );
     }
   }
@@ -236,7 +236,7 @@ public class MigrationMultiInstanceTest {
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasInstructionFailures(miBodyOf("userTask"),
-          "Must migrate the inner activity of a multi-instance body when the body migrates"
+          "Must map the inner activity of a multi-instance body when the body is mapped"
         );
     }
   }
@@ -361,7 +361,7 @@ public class MigrationMultiInstanceTest {
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasInstructionFailures(miBodyOf("subProcess"),
-          "Cannot remove the inner activity of a multi-instance body when the body migrates"
+          "Cannot remove the inner activity of a multi-instance body when the body is mapped"
         );
     }
   }
@@ -384,7 +384,7 @@ public class MigrationMultiInstanceTest {
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasInstructionFailures(miBodyOf("userTask"),
-          "Must migrate the inner activity of a multi-instance body when the body migrates"
+          "Must map the inner activity of a multi-instance body when the body is mapped"
         );
     }
   }
