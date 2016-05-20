@@ -719,74 +719,74 @@ public class ExecutionQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-public void testBooleanVariable() throws Exception {
+  public void testBooleanVariable() throws Exception {
 
-  // TEST EQUALS
-  HashMap<String, Object> vars = new HashMap<String, Object>();
-  vars.put("booleanVar", true);
-  ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    // TEST EQUALS
+    HashMap<String, Object> vars = new HashMap<String, Object>();
+    vars.put("booleanVar", true);
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
-  vars = new HashMap<String, Object>();
-  vars.put("booleanVar", false);
-  ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    vars = new HashMap<String, Object>();
+    vars.put("booleanVar", false);
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
-  List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery().variableValueEquals("booleanVar", true).list();
+    List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery().variableValueEquals("booleanVar", true).list();
 
-  assertNotNull(instances);
-  assertEquals(1, instances.size());
-  assertEquals(processInstance1.getId(), instances.get(0).getId());
+    assertNotNull(instances);
+    assertEquals(1, instances.size());
+    assertEquals(processInstance1.getId(), instances.get(0).getId());
 
-  instances = runtimeService.createProcessInstanceQuery().variableValueEquals("booleanVar", false).list();
+    instances = runtimeService.createProcessInstanceQuery().variableValueEquals("booleanVar", false).list();
 
-  assertNotNull(instances);
-  assertEquals(1, instances.size());
-  assertEquals(processInstance2.getId(), instances.get(0).getId());
+    assertNotNull(instances);
+    assertEquals(1, instances.size());
+    assertEquals(processInstance2.getId(), instances.get(0).getId());
 
-  // TEST NOT_EQUALS
-  instances = runtimeService.createProcessInstanceQuery().variableValueNotEquals("booleanVar", true).list();
+    // TEST NOT_EQUALS
+    instances = runtimeService.createProcessInstanceQuery().variableValueNotEquals("booleanVar", true).list();
 
-  assertNotNull(instances);
-  assertEquals(1, instances.size());
-  assertEquals(processInstance2.getId(), instances.get(0).getId());
+    assertNotNull(instances);
+    assertEquals(1, instances.size());
+    assertEquals(processInstance2.getId(), instances.get(0).getId());
 
-  instances = runtimeService.createProcessInstanceQuery().variableValueNotEquals("booleanVar", false).list();
+    instances = runtimeService.createProcessInstanceQuery().variableValueNotEquals("booleanVar", false).list();
 
-  assertNotNull(instances);
-  assertEquals(1, instances.size());
-  assertEquals(processInstance1.getId(), instances.get(0).getId());
+    assertNotNull(instances);
+    assertEquals(1, instances.size());
+    assertEquals(processInstance1.getId(), instances.get(0).getId());
 
-  // Test unsupported operations
-  try {
-    runtimeService.createProcessInstanceQuery().variableValueGreaterThan("booleanVar", true);
-    fail("Excetion expected");
-  } catch(ProcessEngineException ae) {
-    assertTextPresent("Booleans and null cannot be used in 'greater than' condition", ae.getMessage());
+    // Test unsupported operations
+    try {
+      runtimeService.createProcessInstanceQuery().variableValueGreaterThan("booleanVar", true);
+      fail("Excetion expected");
+    } catch(ProcessEngineException ae) {
+      assertTextPresent("Booleans and null cannot be used in 'greater than' condition", ae.getMessage());
+    }
+
+    try {
+      runtimeService.createProcessInstanceQuery().variableValueGreaterThanOrEqual("booleanVar", true);
+      fail("Excetion expected");
+    } catch(ProcessEngineException ae) {
+      assertTextPresent("Booleans and null cannot be used in 'greater than or equal' condition", ae.getMessage());
+    }
+
+    try {
+      runtimeService.createProcessInstanceQuery().variableValueLessThan("booleanVar", true);
+      fail("Excetion expected");
+    } catch(ProcessEngineException ae) {
+      assertTextPresent("Booleans and null cannot be used in 'less than' condition", ae.getMessage());
+    }
+
+    try {
+      runtimeService.createProcessInstanceQuery().variableValueLessThanOrEqual("booleanVar", true);
+      fail("Excetion expected");
+    } catch(ProcessEngineException ae) {
+      assertTextPresent("Booleans and null cannot be used in 'less than or equal' condition", ae.getMessage());
+    }
+
+    runtimeService.deleteProcessInstance(processInstance1.getId(), "test");
+    runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
   }
-
-  try {
-    runtimeService.createProcessInstanceQuery().variableValueGreaterThanOrEqual("booleanVar", true);
-    fail("Excetion expected");
-  } catch(ProcessEngineException ae) {
-    assertTextPresent("Booleans and null cannot be used in 'greater than or equal' condition", ae.getMessage());
-  }
-
-  try {
-    runtimeService.createProcessInstanceQuery().variableValueLessThan("booleanVar", true);
-    fail("Excetion expected");
-  } catch(ProcessEngineException ae) {
-    assertTextPresent("Booleans and null cannot be used in 'less than' condition", ae.getMessage());
-  }
-
-  try {
-    runtimeService.createProcessInstanceQuery().variableValueLessThanOrEqual("booleanVar", true);
-    fail("Excetion expected");
-  } catch(ProcessEngineException ae) {
-    assertTextPresent("Booleans and null cannot be used in 'less than or equal' condition", ae.getMessage());
-  }
-
-  runtimeService.deleteProcessInstance(processInstance1.getId(), "test");
-  runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
-}
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})

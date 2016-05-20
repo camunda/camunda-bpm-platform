@@ -35,11 +35,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   private static final long serialVersionUID = 1L;
   protected String processDefinitionId;
   protected String processDefinitionKey;
+  protected String businessKey;
   protected String activityId;
   protected String executionId;
   protected String processInstanceId;
   protected List<EventSubscriptionQueryValue> eventSubscriptions;
-  protected boolean hasMessageEventSubscriptions;
   protected SuspensionState suspensionState;
   protected String incidentType;
   protected String incidentId;
@@ -49,24 +49,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
 
-  // Not used by end-users, but needed for dynamic ibatis query
-  protected String superProcessInstanceId;
-  protected String subProcessInstanceId;
-  protected String superCaseInstanceId;
-  protected String subCaseInstanceId;
-  protected String caseInstanceId;
-  protected String deploymentId;
-  private String businessKey;
-
   public ExecutionQueryImpl() {
   }
 
   public ExecutionQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
-  }
-
-  public boolean isProcessInstancesOnly() {
-    return false; // see dynamic query
   }
 
   public ExecutionQueryImpl processDefinitionId(String processDefinitionId) {
@@ -207,11 +194,6 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     return this;
   }
 
-  public ExecutionQuery orderBySequenceCounter() {
-    orderBy(ExecutionQueryProperty.SEQUENCE_COUNTER);
-    return this;
-  }
-
   public ExecutionQuery orderByTenantId() {
     orderBy(ExecutionQueryProperty.TENANT_ID);
     return this;
@@ -240,10 +222,6 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
   //getters ////////////////////////////////////////////////////
 
-  public boolean getOnlyProcessInstances() {
-    return false;
-  }
-
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
   }
@@ -270,22 +248,6 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
   public String getExecutionId() {
     return executionId;
-  }
-
-  public String getSuperProcessInstanceId() {
-    return superProcessInstanceId;
-  }
-
-  public String getSubProcessInstanceId() {
-    return subProcessInstanceId;
-  }
-
-  public String getSuperCaseInstanceId() {
-    return superCaseInstanceId;
-  }
-
-  public String getSubCaseInstanceId() {
-    return subCaseInstanceId;
   }
 
   public SuspensionState getSuspensionState() {
@@ -318,10 +280,6 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
   public String getIncidentMessageLike() {
     return incidentMessageLike;
-  }
-
-  public String getDeploymentId() {
-    return deploymentId;
   }
 
 }
