@@ -535,7 +535,7 @@
     </profile>
 
     <profile>
-      <id>cfgAuthorizationCheckRevokesALWAYS</id>
+      <id>cfgAuthorizationCheckRevokesAlways</id>
       <properties>
         <authorizationCheckRevokes>always</authorizationCheckRevokes>
       </properties>
