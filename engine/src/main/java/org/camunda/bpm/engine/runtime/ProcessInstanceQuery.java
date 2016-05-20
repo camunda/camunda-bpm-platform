@@ -198,6 +198,12 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   /** Only selects process instances which have no tenant id. */
   ProcessInstanceQuery withoutTenantId();
 
+  /**
+   * Only selects process instances which currently wait in a leaf activity with
+   * one of the given activity ids.
+   */
+  ProcessInstanceQuery activityIdIn(String... activityIds);
+
   //ordering /////////////////////////////////////////////////////////////////
 
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
@@ -214,5 +220,4 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    * Note that the ordering of process instances without tenant id is database-specific.
    */
   ProcessInstanceQuery orderByTenantId();
-
 }
