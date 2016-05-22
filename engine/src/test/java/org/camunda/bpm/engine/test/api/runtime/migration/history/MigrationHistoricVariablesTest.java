@@ -216,6 +216,7 @@ public class MigrationHistoricVariablesTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
   public void testMigrateEventScopeVariable() {
     //given
     ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
