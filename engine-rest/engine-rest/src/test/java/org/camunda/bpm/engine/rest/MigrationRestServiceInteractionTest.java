@@ -52,7 +52,6 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
@@ -72,9 +71,7 @@ import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationReport;
-import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationInstructionDto;
-import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.helper.FluentAnswer;
 import org.camunda.bpm.engine.rest.helper.MockMigrationPlanBuilder;
@@ -91,6 +88,8 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import com.jayway.restassured.response.Response;
+import java.util.List;
+import org.camunda.bpm.engine.rest.util.migration.MigrationInstructionDtoBuilder;
 
 public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest {
 
@@ -130,8 +129,8 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
   @Test
   public void generateMigrationPlanWithInitialEmptyInstructions() {
-    MigrationPlanDto initialMigrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
-      .instructions(Collections.<MigrationInstructionDto>emptyList())
+    Map<String, Object> initialMigrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+      .instructions(Collections.<Map<String, Object>>emptyList())
       .build();
 
     Response response = given()
@@ -148,7 +147,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
   @Test
   public void generateMigrationPlanWithInitialNullInstructions() {
-    MigrationPlanDto initialMigrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+    Map<String, Object> initialMigrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
       .instructions(null)
       .build();
 
@@ -166,7 +165,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
   @Test
   public void generateMigrationPlanWithNoInitialInstructions() {
-    MigrationPlanDto initialMigrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+    Map<String, Object> initialMigrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
       .build();
 
     Response response = given()
@@ -183,7 +182,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
   @Test
   public void generateMigrationPlanIgnoringInitialInstructions() {
-    MigrationPlanDto initialMigrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+    Map<String, Object> initialMigrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
       .instruction("ignored", "ignored")
       .build();
 
@@ -209,7 +208,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     when(planBuilder.mapEqualActivities().build())
       .thenThrow(new BadUserRequestException(message));
 
-    MigrationPlanDto initialMigrationPlan = new MigrationPlanDtoBuilder(null, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).build();
+    Map<String, Object> initialMigrationPlan = new MigrationPlanDtoBuilder(null, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).build();
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -234,7 +233,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
         .build())
       .thenThrow(new BadUserRequestException(message));
 
-    MigrationPlanDto initialMigrationPlan = new MigrationPlanDtoBuilder(NON_EXISTING_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).build();
+    Map<String, Object> initialMigrationPlan = new MigrationPlanDtoBuilder(NON_EXISTING_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).build();
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -258,7 +257,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
         .build())
       .thenThrow(new BadUserRequestException(message));
 
-    MigrationPlanDto initialMigrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, null).build();
+    Map<String, Object> initialMigrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, null).build();
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -282,7 +281,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
         .build())
       .thenThrow(new BadUserRequestException(message));
 
-    MigrationPlanDto initialMigrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, NON_EXISTING_PROCESS_DEFINITION_ID).build();
+    Map<String, Object> initialMigrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, NON_EXISTING_PROCESS_DEFINITION_ID).build();
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -357,7 +356,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
   @Test
   public void executeMigrationPlan() {
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -373,7 +372,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     .when()
       .post(EXECUTE_MIGRATION_URL);
 
-    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution.getMigrationPlan());
+    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, (Map<String, Object>) migrationExecution.get(MigrationExecutionDtoBuilder.PROP_MIGRATION_PLAN));
     verifyMigrationPlanExecutionInteraction(migrationExecution);
   }
 
@@ -385,7 +384,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     ProcessInstanceQueryDto processInstanceQuery = new ProcessInstanceQueryDto();
     processInstanceQuery.setProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -401,14 +400,15 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     .when()
       .post(EXECUTE_MIGRATION_URL);
 
-    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution.getMigrationPlan());
+
+    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, (Map<String, Object>) migrationExecution.get(MigrationExecutionDtoBuilder.PROP_MIGRATION_PLAN));
     verifyMigrationPlanExecutionInteraction(migrationExecution);
   }
 
   @Test
   public void executeMigrationPlanSkipListeners() {
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
       .done()
@@ -430,7 +430,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   @Test
   public void executeMigrationPlanSkipIoMappings() {
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
       .done()
@@ -460,7 +460,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
     when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
       .done()
       .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
@@ -492,13 +492,14 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
     when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
       .done()
       .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
       .build();
 
-    migrationExecution.getMigrationPlan().setInstructions(Collections.<MigrationInstructionDto>emptyList());
+    ((Map<String, Object>) migrationExecution.get(MigrationExecutionDtoBuilder.PROP_MIGRATION_PLAN))
+            .put(MigrationPlanDtoBuilder.PROP_INSTRUCTIONS, Collections.<MigrationInstructionDto>emptyList());
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -523,7 +524,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .thenReturn(migrationPlanBuilder);
     when(migrationPlanBuilder.build()).thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(null, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -549,7 +550,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .thenReturn(migrationPlanBuilder);
     when(migrationPlanBuilder.build()).thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(NON_EXISTING_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -575,7 +576,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .thenReturn(migrationPlanBuilder);
     when(migrationPlanBuilder.build()).thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, null)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -601,7 +602,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .thenReturn(migrationPlanBuilder);
     when(migrationPlanBuilder.build()).thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, NON_EXISTING_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -625,7 +626,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     when(migrationPlanBuilderMock.mapActivities(isNull(String.class), anyString()))
       .thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(null, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -649,7 +650,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     when(migrationPlanBuilderMock.mapActivities(eq(NON_EXISTING_ACTIVITY_ID), anyString()))
       .thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(NON_EXISTING_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -673,7 +674,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     when(migrationPlanBuilderMock.mapActivities(anyString(), isNull(String.class)))
       .thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, null)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -697,7 +698,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     when(migrationPlanBuilderMock.mapActivities(anyString(), eq(NON_EXISTING_ACTIVITY_ID)))
       .thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, NON_EXISTING_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -735,7 +736,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
     when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .done()
@@ -789,7 +790,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     doThrow(new MigratingProcessInstanceValidationException("fooo", processInstanceReport))
       .when(migrationPlanExecutionBuilderMock).execute();
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .done()
@@ -836,7 +837,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     Batch batchMock = createMockBatch();
     when(migrationPlanExecutionBuilderMock.executeAsync()).thenReturn(batchMock);
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -861,7 +862,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     .when()
       .post(EXECUTE_MIGRATION_ASYNC_URL);
 
-    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution.getMigrationPlan());
+    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, (Map<String, Object>) migrationExecution.get(MigrationExecutionDtoBuilder.PROP_MIGRATION_PLAN));
     verifyMigrationPlanAsyncExecutionInteraction(migrationExecution);
   }
 
@@ -876,7 +877,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     Batch batchMock = createMockBatch();
     when(migrationPlanExecutionBuilderMock.executeAsync()).thenReturn(batchMock);
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -901,7 +902,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     .when()
       .post(EXECUTE_MIGRATION_ASYNC_URL);
 
-    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution.getMigrationPlan());
+    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, (Map<String, Object>) migrationExecution.get(MigrationExecutionDtoBuilder.PROP_MIGRATION_PLAN));
     verifyMigrationPlanAsyncExecutionInteraction(migrationExecution);
   }
 
@@ -910,7 +911,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     Batch batchMock = createMockBatch();
     when(migrationPlanExecutionBuilderMock.executeAsync()).thenReturn(batchMock);
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
       .done()
@@ -934,7 +935,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     Batch batchMock = createMockBatch();
     when(migrationPlanExecutionBuilderMock.executeAsync()).thenReturn(batchMock);
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
       .done()
@@ -964,7 +965,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
     when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
       .done()
       .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
@@ -996,13 +997,14 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
     when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
       .done()
       .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
       .build();
 
-    migrationExecution.getMigrationPlan().setInstructions(Collections.<MigrationInstructionDto>emptyList());
+    ((Map<String, Object>) migrationExecution.get(MigrationExecutionDtoBuilder.PROP_MIGRATION_PLAN))
+            .put(MigrationPlanDtoBuilder.PROP_INSTRUCTIONS, Collections.<MigrationInstructionDto>emptyList());
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -1027,7 +1029,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .thenReturn(migrationPlanBuilder);
     when(migrationPlanBuilder.build()).thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(null, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -1053,7 +1055,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .thenReturn(migrationPlanBuilder);
     when(migrationPlanBuilder.build()).thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(NON_EXISTING_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -1079,7 +1081,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .thenReturn(migrationPlanBuilder);
     when(migrationPlanBuilder.build()).thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, null)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -1105,7 +1107,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .thenReturn(migrationPlanBuilder);
     when(migrationPlanBuilder.build()).thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, NON_EXISTING_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -1129,7 +1131,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     when(migrationPlanBuilderMock.mapActivities(isNull(String.class), anyString()))
       .thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(null, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -1153,7 +1155,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     when(migrationPlanBuilderMock.mapActivities(eq(NON_EXISTING_ACTIVITY_ID), anyString()))
       .thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(NON_EXISTING_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -1177,7 +1179,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     when(migrationPlanBuilderMock.mapActivities(anyString(), isNull(String.class)))
       .thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, null)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -1201,7 +1203,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     when(migrationPlanBuilderMock.mapActivities(anyString(), eq(NON_EXISTING_ACTIVITY_ID)))
       .thenThrow(new BadUserRequestException(message));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, NON_EXISTING_ACTIVITY_ID)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID)
@@ -1239,7 +1241,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
     when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
 
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
       .done()
@@ -1267,7 +1269,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
   @Test
   public void executeMigrationPlanUpdateEventTrigger() {
-    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+    Map<String, Object> migrationExecution = new MigrationExecutionDtoBuilder()
       .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
         .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID, true)
         .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID, false)
@@ -1283,13 +1285,13 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     .when()
       .post(EXECUTE_MIGRATION_URL);
 
-    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, migrationExecution.getMigrationPlan());
+    verifyCreateMigrationPlanInteraction(migrationPlanBuilderMock, (Map<String, Object>) migrationExecution.get(MigrationExecutionDtoBuilder.PROP_MIGRATION_PLAN));
     verifyMigrationPlanExecutionInteraction(migrationExecution);
   }
 
   @Test
   public void validateMigrationPlan() {
-    MigrationPlanDto migrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+    Map<String, Object> migrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
       .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
       .instruction(ANOTHER_EXAMPLE_ACTIVITY_ID, EXAMPLE_ACTIVITY_ID, true)
       .build();
@@ -1325,7 +1327,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
 
     when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
 
-    MigrationPlanDto migrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+    Map<String, Object> migrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
       .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
       .build();
 
@@ -1370,32 +1372,38 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       );
   }
 
-  protected void verifyGenerateMigrationPlanInteraction(MigrationPlanBuilder migrationPlanBuilderMock, MigrationPlanDto initialMigrationPlan) {
-    verify(runtimeServiceMock).createMigrationPlan(eq(initialMigrationPlan.getSourceProcessDefinitionId()), eq(initialMigrationPlan.getTargetProcessDefinitionId()));
+  protected void verifyGenerateMigrationPlanInteraction(MigrationPlanBuilder migrationPlanBuilderMock, Map<String, Object> initialMigrationPlan) {
+    verify(runtimeServiceMock).createMigrationPlan(eq(initialMigrationPlan.get(MigrationPlanDtoBuilder.PROP_SOURCE_PROCESS_DEFINITION_ID).toString()),
+                                                   eq(initialMigrationPlan.get(MigrationPlanDtoBuilder.PROP_TARGET_PROCESS_DEFINITION_ID).toString()));
     // the map equal activities method should be called
     verify(migrationPlanBuilderMock).mapEqualActivities();
     // other instructions are ignored
     verify(migrationPlanBuilderMock, never()).mapActivities(anyString(), anyString());
   }
 
-  protected void verifyCreateMigrationPlanInteraction(JoinedMigrationPlanBuilderMock migrationPlanBuilderMock, MigrationPlanDto migrationPlan) {
-    verify(runtimeServiceMock).createMigrationPlan(migrationPlan.getSourceProcessDefinitionId(), migrationPlan.getTargetProcessDefinitionId());
+  protected void verifyCreateMigrationPlanInteraction(JoinedMigrationPlanBuilderMock migrationPlanBuilderMock, Map<String, Object> migrationPlan) {
+    verify(runtimeServiceMock).createMigrationPlan(migrationPlan.get(MigrationPlanDtoBuilder.PROP_SOURCE_PROCESS_DEFINITION_ID).toString(),
+                                                   migrationPlan.get(MigrationPlanDtoBuilder.PROP_TARGET_PROCESS_DEFINITION_ID).toString());
     // the map equal activities method should not be called
     verify(migrationPlanBuilderMock, never()).mapEqualActivities();
     // all instructions are added
-    if (migrationPlan.getInstructions() != null) {
-      for (MigrationInstructionDto migrationInstructionDto : migrationPlan.getInstructions()) {
+    List<Map<String, Object>> instructions = (List<Map<String, Object>>) migrationPlan.get(MigrationPlanDtoBuilder.PROP_INSTRUCTIONS);
+    if (instructions != null) {
+      for (Map<String, Object> migrationInstructionDto : instructions) {
 
         InOrder inOrder = Mockito.inOrder(migrationPlanBuilderMock);
-        inOrder.verify(migrationPlanBuilderMock).mapActivities(eq(migrationInstructionDto.getSourceActivityIds().get(0)), eq(migrationInstructionDto.getTargetActivityIds().get(0)));
-        if (Boolean.TRUE.equals(migrationInstructionDto.isUpdateEventTrigger())) {
+        String sourceActivityId = ((List<String>) migrationInstructionDto.get(MigrationInstructionDtoBuilder.PROP_SOURCE_ACTIVITY_IDS)).get(0);
+        String targetActivityId = ((List<String>) migrationInstructionDto.get(MigrationInstructionDtoBuilder.PROP_TARGET_ACTIVITY_IDS)).get(0);
+        inOrder.verify(migrationPlanBuilderMock).mapActivities(eq(sourceActivityId), eq(targetActivityId));
+        Boolean updateEventTrigger = (Boolean) migrationInstructionDto.get(MigrationInstructionDtoBuilder.PROP_UPDATE_EVENT_TRIGGER);
+        if (Boolean.TRUE.equals(updateEventTrigger)) {
           inOrder.verify(migrationPlanBuilderMock, immediatelyAfter()).updateEventTrigger();
         }
       }
     }
   }
 
-  protected void verifyMigrationPlanExecutionInteraction(MigrationExecutionDto migrationExecution) {
+  protected void verifyMigrationPlanExecutionInteraction(Map<String, Object> migrationExecution) {
     InOrder inOrder = inOrder(runtimeServiceMock, migrationPlanExecutionBuilderMock);
 
     inOrder.verify(runtimeServiceMock).newMigration(any(MigrationPlan.class));
@@ -1406,7 +1414,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     inOrder.verifyNoMoreInteractions();
   }
 
-  protected void verifyMigrationPlanAsyncExecutionInteraction(MigrationExecutionDto migrationExecution) {
+  protected void verifyMigrationPlanAsyncExecutionInteraction(Map<String, Object> migrationExecution) {
     InOrder inOrder = inOrder(runtimeServiceMock, migrationPlanExecutionBuilderMock);
 
     inOrder.verify(runtimeServiceMock).newMigration(any(MigrationPlan.class));
@@ -1417,15 +1425,20 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     Mockito.verifyNoMoreInteractions(migrationPlanExecutionBuilderMock);
   }
 
-  protected void verifyMigrationExecutionBuilderInteraction(InOrder inOrder, MigrationExecutionDto migrationExecution) {
-    inOrder.verify(migrationPlanExecutionBuilderMock).processInstanceIds(eq(migrationExecution.getProcessInstanceIds()));
-    if (migrationExecution.getProcessInstanceQuery() != null) {
+  protected void verifyMigrationExecutionBuilderInteraction(InOrder inOrder, Map<String, Object> migrationExecution) {
+    List<String> processInstanceIds = ((List<String>) migrationExecution.get(MigrationExecutionDtoBuilder.PROP_PROCESS_INSTANCE_IDS));
+
+    inOrder.verify(migrationPlanExecutionBuilderMock).processInstanceIds(eq(processInstanceIds));
+    ProcessInstanceQueryDto processInstanceQuery = (ProcessInstanceQueryDto) migrationExecution.get(MigrationExecutionDtoBuilder.PROP_PROCESS_INSTANCE_QUERY);
+    if (processInstanceQuery != null) {
       verifyMigrationPlanExecutionProcessInstanceQuery(inOrder);
     }
-    if (migrationExecution.isSkipCustomListeners()) {
+    Boolean skipCustomListeners = (Boolean) migrationExecution.getOrDefault(MigrationExecutionDtoBuilder.PROP_SKIP_CUSTOM_LISTENERS, false);
+    if (Boolean.TRUE.equals(skipCustomListeners)) {
       inOrder.verify(migrationPlanExecutionBuilderMock).skipCustomListeners();
     }
-    if (migrationExecution.isSkipIoMappings()) {
+    Boolean skipIoMappings = (Boolean) migrationExecution.get(MigrationExecutionDtoBuilder.PROP_SKIP_IO_MAPPINGS);
+    if (Boolean.TRUE.equals(skipIoMappings)) {
       inOrder.verify(migrationPlanExecutionBuilderMock).skipIoMappings();
     }
   }

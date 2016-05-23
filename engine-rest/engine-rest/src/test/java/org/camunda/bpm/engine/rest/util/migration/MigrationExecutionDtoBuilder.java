@@ -14,28 +14,33 @@
 package org.camunda.bpm.engine.rest.util.migration;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
-import org.camunda.bpm.engine.rest.dto.migration.MigrationInstructionDto;
-import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 
 public class MigrationExecutionDtoBuilder {
 
-  protected final MigrationExecutionDto migrationExecutionDto;
+  public static final String PROP_PROCESS_INSTANCE_IDS = "processInstanceIds";
+  public static final String PROP_PROCESS_INSTANCE_QUERY = "processInstanceQuery";
+  public static final String PROP_MIGRATION_PLAN = "migrationPlan";
+  public static final String PROP_SKIP_CUSTOM_LISTENERS = "skipCustomListeners";
+  public static final String PROP_SKIP_IO_MAPPINGS = "skipIoMappings";
+
+  protected final Map<String, Object> migrationExecution;
 
   public MigrationExecutionDtoBuilder() {
-    migrationExecutionDto = new MigrationExecutionDto();
+    migrationExecution = new HashMap<String, Object>();
   }
 
   public MigrationExecutionDtoBuilder processInstances(String... processInstanceIds) {
-    migrationExecutionDto.setProcessInstanceIds(Arrays.asList(processInstanceIds));
+    migrationExecution.put(PROP_PROCESS_INSTANCE_IDS, Arrays.asList(processInstanceIds));
     return this;
   }
 
   public MigrationExecutionDtoBuilder processInstanceQuery(ProcessInstanceQueryDto processInstanceQuery) {
-    migrationExecutionDto.setProcessInstanceQuery(processInstanceQuery);
+    migrationExecution.put(PROP_PROCESS_INSTANCE_QUERY, processInstanceQuery);
     return this;
   }
 
@@ -43,23 +48,23 @@ public class MigrationExecutionDtoBuilder {
     return new MigrationPlanExecutionDtoBuilder(this, sourceProcessDefinitionId, targetProcessDefinitionId);
   }
 
-  public MigrationExecutionDtoBuilder migrationPlan(MigrationPlanDto migrationPlanDto) {
-    migrationExecutionDto.setMigrationPlan(migrationPlanDto);
+  public MigrationExecutionDtoBuilder migrationPlan(Map<String, Object> migrationPlan) {
+    migrationExecution.put(PROP_MIGRATION_PLAN, migrationPlan);
     return this;
   }
 
   public MigrationExecutionDtoBuilder skipCustomListeners(boolean skipCustomListeners) {
-    migrationExecutionDto.setSkipCustomListeners(skipCustomListeners);
+    migrationExecution.put(PROP_SKIP_CUSTOM_LISTENERS, skipCustomListeners);
     return this;
   }
 
   public MigrationExecutionDtoBuilder skipIoMappings(boolean skipIoMappings) {
-    migrationExecutionDto.setSkipIoMappings(skipIoMappings);
+    migrationExecution.put(PROP_SKIP_IO_MAPPINGS, skipIoMappings);
     return this;
   }
 
-  public MigrationExecutionDto build() {
-    return migrationExecutionDto;
+  public Map<String, Object> build() {
+    return migrationExecution;
   }
 
   public class MigrationPlanExecutionDtoBuilder extends MigrationPlanDtoBuilder {
@@ -84,21 +89,20 @@ public class MigrationExecutionDtoBuilder {
     }
 
     @Override
-    public MigrationPlanExecutionDtoBuilder instructions(List<MigrationInstructionDto> instructions) {
+    public MigrationPlanExecutionDtoBuilder instructions(List<Map<String, Object>> instructions) {
       super.instructions(instructions);
       return this;
     }
 
     @Override
-    public MigrationPlanDto build() {
+    public Map<String, Object> build() {
       throw new UnsupportedOperationException("Please use the done() method to finish the migration plan building");
     }
 
     public MigrationExecutionDtoBuilder done() {
-      MigrationPlanDto migrationPlanDto = super.build();
-      return migrationExecutionDtoBuilder.migrationPlan(migrationPlanDto);
+      Map<String, Object> migrationPlan = super.build();
+      return migrationExecutionDtoBuilder.migrationPlan(migrationPlan);
     }
-
   }
 
 }
