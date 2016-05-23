@@ -130,7 +130,7 @@
   </select>
 
   <select id="selectHistoricCaseActivityInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricCaseActivityInstanceQueryImpl" resultType="long">
-    select count(*)
+    select count(distinct RES.ID_)
     <include refid="selectHistoricCaseActivityInstancesByQueryCriteriaSql"/>
   </select>
 

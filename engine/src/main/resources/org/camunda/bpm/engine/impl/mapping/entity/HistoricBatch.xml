@@ -88,7 +88,7 @@
   </select>
 
   <select id="selectHistoricBatchCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.batch.history.HistoricBatchQueryImpl" resultType="long">
-    select count(*)
+    select count(distinct RES.ID_)
     <include refid="selectHistoricBatchesByQueryCriteriaSql"/>
   </select>
 

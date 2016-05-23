@@ -139,7 +139,7 @@
   </select>
 
   <select id="selectCaseInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseInstanceQueryImpl" resultType="long">
-    select count(*)
+    select count(distinct RES.ID_)
     <include refid="selectCaseExecutionsByQueryCriteriaSql"/>
   </select>
 

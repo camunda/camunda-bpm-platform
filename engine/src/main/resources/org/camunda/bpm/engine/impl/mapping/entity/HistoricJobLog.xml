@@ -172,7 +172,7 @@
   </select>
 
   <select id="selectHistoricJobLogCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricJobLogQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    select count(RES.ID_)
     <include refid="selectHistoricJobLogByQueryCriteriaSql"/>
   </select>
 

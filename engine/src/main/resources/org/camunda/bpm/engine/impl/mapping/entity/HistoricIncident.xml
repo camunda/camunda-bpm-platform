@@ -116,7 +116,7 @@
   </select>
 
   <select id="selectHistoricIncidentCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIncidentQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    select count(RES.ID_)
     <include refid="selectHistoricIncidentByQueryCriteriaSql"/>
   </select>
 

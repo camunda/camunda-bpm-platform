@@ -89,7 +89,7 @@
   </select>
 
   <select id="selectHistoricDecisionInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    select count(RES.ID_)
     <include refid="selectHistoricDecisionInstancesByQueryCriteriaSql"/>
   </select>
   

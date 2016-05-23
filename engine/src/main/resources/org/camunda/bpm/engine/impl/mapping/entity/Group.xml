@@ -76,7 +76,7 @@
   </select>
   
    <select id="selectGroupCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.GroupQueryImpl" resultType="long">
-    select count(DISTINCT RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectGroupByQueryCriteriaSql" />
   </select>
   
