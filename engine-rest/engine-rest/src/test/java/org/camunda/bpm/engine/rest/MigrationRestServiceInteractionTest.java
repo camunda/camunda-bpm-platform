@@ -1433,7 +1433,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     if (processInstanceQuery != null) {
       verifyMigrationPlanExecutionProcessInstanceQuery(inOrder);
     }
-    Boolean skipCustomListeners = (Boolean) migrationExecution.getOrDefault(MigrationExecutionDtoBuilder.PROP_SKIP_CUSTOM_LISTENERS, false);
+    Boolean skipCustomListeners = (Boolean) migrationExecution.get(MigrationExecutionDtoBuilder.PROP_SKIP_CUSTOM_LISTENERS);
     if (Boolean.TRUE.equals(skipCustomListeners)) {
       inOrder.verify(migrationPlanExecutionBuilderMock).skipCustomListeners();
     }
