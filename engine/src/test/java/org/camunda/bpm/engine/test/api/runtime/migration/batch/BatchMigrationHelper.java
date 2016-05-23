@@ -74,6 +74,12 @@ public class BatchMigrationHelper {
     return migrateProcessInstancesAsync(numberOfProcessInstances, sourceProcessDefinition, targetProcessDefinition);
   }
 
+  public Batch migrateProcessInstancesAsyncForTenant(int numberOfProcessInstances, String tenantId) {
+    sourceProcessDefinition = migrationRule.deployForTenantAndGetDefinition(tenantId, ProcessModels.ONE_TASK_PROCESS);
+    targetProcessDefinition = migrationRule.deployForTenantAndGetDefinition(tenantId, ProcessModels.ONE_TASK_PROCESS);
+    return migrateProcessInstancesAsync(numberOfProcessInstances, sourceProcessDefinition, targetProcessDefinition);
+  }
+
   public Batch migrateProcessInstanceAsync(ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition) {
     return migrateProcessInstancesAsync(1, sourceProcessDefinition, targetProcessDefinition);
   }

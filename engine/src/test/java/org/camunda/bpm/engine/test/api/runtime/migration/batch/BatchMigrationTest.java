@@ -353,13 +353,13 @@ public class BatchMigrationTest {
   }
 
   @Test
-  public void testMigrationJobsExecutionByJobExecutorWithAuthorizationEnabled() {
+  public void testMigrationJobsExecutionByJobExecutorWithAuthorizationEnabledAndTenant() {
     ProcessEngineConfigurationImpl processEngineConfiguration = engineRule.getProcessEngineConfiguration();
 
     processEngineConfiguration.setAuthorizationEnabled(true);
 
     try {
-      Batch batch = helper.migrateProcessInstancesAsync(10);
+      Batch batch = helper.migrateProcessInstancesAsyncForTenant(10, "someTenantId");
       helper.executeSeedJob(batch);
 
       testRule.waitForJobExecutorToProcessAllJobs();
