@@ -200,26 +200,6 @@
     <if test="processFinished || processUnfinished">
       inner join ${prefix}ACT_HI_PROCINST HPI ON RES.PROC_INST_ID_ = HPI.ID_
     </if>
-    <!-- <if test="taskInvolvedUser != null || taskInvolvedGroup != null || taskHadCandidateUser != null || taskHadCandidateGroup != null">
-      <where>
-        RES.ID_ in (select TASK_ID_ from ${prefix}ACT_HI_IDENTITYLINK HIL
-        <where>
-          <if test= "taskInvolvedUser != null">
-            HIL.USER_ID_ = #{taskInvolvedUser}
-          </if>
-          <if test ="taskInvolvedGroup != null">
-           and HIL.GROUP_ID_ = #{taskInvolvedGroup}
-          </if>
-          <if test="taskHadCandidateUser != null">
-           and HIL.TYPE_ = 'candidate' and HIL.USER_ID_ = #{taskHadCandidateUser}
-          </if>
-          <if test="taskHadCandidateGroup != null">
-            and HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ = #{taskHadCandidateGroup}
-          </if>
-       </where>
-       )
-      </where>
-    </if> -->
     <if test="processDefinitionKey != null || processDefinitionName != null">
       inner join ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
     </if>
