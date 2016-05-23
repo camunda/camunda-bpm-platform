@@ -60,6 +60,8 @@ public class DefaultPermissionForTenantMemberTest {
     identityService.deleteGroup(GROUP_ID);
     identityService.deleteTenant(TENANT_ONE);
     identityService.deleteTenant(TENANT_TWO);
+
+    engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(false);
   }
 
   @Test
