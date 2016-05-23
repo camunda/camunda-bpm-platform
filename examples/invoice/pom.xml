@@ -68,11 +68,14 @@
       <build>
         <resources>
           <resource>
-            <!-- override processes.xml, providing custom process engine -->
-            <directory>src/develop/resources</directory>
+            <directory>src/main/resources</directory>
+            <excludes>
+                <exclude>META-INF/processes.xml</exclude>
+            </excludes>
           </resource>
           <resource>
-            <directory>src/main/resources</directory>
+            <!-- override processes.xml, providing custom process engine -->
+            <directory>src/develop/resources</directory>
           </resource>
         </resources>
         <plugins>
