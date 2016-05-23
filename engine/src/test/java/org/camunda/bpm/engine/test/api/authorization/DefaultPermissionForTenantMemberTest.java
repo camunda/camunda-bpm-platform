@@ -2,6 +2,8 @@ package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Collections;
+
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -17,40 +19,34 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-public class DefaultPermissionForTenantMembers {
+public class DefaultPermissionForTenantMemberTest {
 
   protected static final String TENANT_ONE = "tenant1";
-  
   protected static final String TENANT_TWO = "tenant2";
-  
+  protected static final String USER_ID = "user";
+  protected static final String GROUP_ID = "group";
+
   protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
 
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   protected AuthorizationService authorizationService;
-
   protected IdentityService identityService;
-
-  protected Tenant tenantOne;
-
-  protected User user;
-
-  protected Group group;
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-  
+
   @Before
   public void init() {
     identityService = engineRule.getIdentityService();
     authorizationService = engineRule.getAuthorizationService();
-    
-    tenantOne = createTenant(TENANT_ONE);
-    
-    user = identityService.newUser("aUserId");
+
+    createTenant(TENANT_ONE);
+
+    User user = identityService.newUser(USER_ID);
     identityService.saveUser(user);
 
-    group = identityService.newGroup("aGroupId");
+    Group group = identityService.newGroup(GROUP_ID);
     identityService.saveGroup(group);
 
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
@@ -58,139 +54,126 @@ public class DefaultPermissionForTenantMembers {
 
   @After
   public void tearDown() {
-    
-    identityService.deleteUser(user.getId());
-    identityService.deleteGroup(group.getId());
-    identityService.deleteTenant(tenantOne.getId());
+    identityService.clearAuthentication();
+
+    identityService.deleteUser(USER_ID);
+    identityService.deleteGroup(GROUP_ID);
+    identityService.deleteTenant(TENANT_ONE);
+    identityService.deleteTenant(TENANT_TWO);
   }
 
   @Test
   public void testCreateTenantUserMembership() {
 
-    identityService.createTenantUserMembership(tenantOne.getId(), user.getId());
-    
+    identityService.createTenantUserMembership(TENANT_ONE, USER_ID);
+
     assertEquals(1, authorizationService.createAuthorizationQuery()
-      .userIdIn(user.getId())
+      .userIdIn(USER_ID)
       .resourceType(Resources.TENANT)
-      .resourceId(tenantOne.getId())
+      .resourceId(TENANT_ONE)
       .hasPermission(Permissions.READ).count());
 
-   assertEquals(TENANT_ONE,identityService.createTenantQuery()
-     .userMember(user.getId())
+    identityService.setAuthenticatedUserId(USER_ID);
+
+    assertEquals(TENANT_ONE,identityService.createTenantQuery()
      .singleResult()
      .getId());
-    
   }
 
   @Test
   public void testCreateAndDeleteTenantUserMembership() {
 
-    identityService.createTenantUserMembership(tenantOne.getId(), user.getId());
-    
-    identityService.deleteTenantUserMembership(tenantOne.getId(), user.getId());
+    identityService.createTenantUserMembership(TENANT_ONE, USER_ID);
+
+    identityService.deleteTenantUserMembership(TENANT_ONE, USER_ID);
 
     assertEquals(0, authorizationService.createAuthorizationQuery()
-      .userIdIn(user.getId())
+      .userIdIn(USER_ID)
       .resourceType(Resources.TENANT)
       .hasPermission(Permissions.READ).count());
-    
-    assertEquals(0,identityService.createTenantQuery()
-     .userMember(user.getId())
-     .count());
 
+    identityService.setAuthenticatedUserId(USER_ID);
+
+    assertEquals(0,identityService.createTenantQuery()
+     .count());
   }
 
   @Test
   public void testCreateAndDeleteTenantUserMembershipForMultipleTenants() {
 
-    Tenant tenantTwo = createTenant(TENANT_TWO);
+    createTenant(TENANT_TWO);
 
-    identityService.createTenantUserMembership(tenantOne.getId(), user.getId());
-    identityService.createTenantUserMembership(tenantTwo.getId(), user.getId());
+    identityService.createTenantUserMembership(TENANT_ONE, USER_ID);
+    identityService.createTenantUserMembership(TENANT_TWO, USER_ID);
 
     assertEquals(2, authorizationService.createAuthorizationQuery()
-      .userIdIn(user.getId())
+      .userIdIn(USER_ID)
       .resourceType(Resources.TENANT)
       .hasPermission(Permissions.READ).count());
-    
-    identityService.deleteTenantUserMembership(tenantOne.getId(), user.getId());
 
-    assertEquals(TENANT_TWO,identityService.createTenantQuery()
-     .userMember(user.getId())
-     .singleResult()
-     .getId());
-    
+    identityService.deleteTenantUserMembership(TENANT_ONE, USER_ID);
+
     assertEquals(1, authorizationService.createAuthorizationQuery()
-      .userIdIn(user.getId())
+      .userIdIn(USER_ID)
       .resourceType(Resources.TENANT)
       .hasPermission(Permissions.READ).count());
-
-    identityService.deleteTenant(tenantTwo.getId());
   }
 
   @Test
   public void testCreateTenantGroupMembership() {
 
-    identityService.createTenantGroupMembership(tenantOne.getId(), group.getId());
-    
+    identityService.createTenantGroupMembership(TENANT_ONE, GROUP_ID);
+
     assertEquals(1, authorizationService.createAuthorizationQuery()
-      .groupIdIn(group.getId())
+      .groupIdIn(GROUP_ID)
       .resourceType(Resources.TENANT)
-      .resourceId(tenantOne.getId())
+      .resourceId(TENANT_ONE)
       .hasPermission(Permissions.READ).count());
 
+    identityService.setAuthentication(USER_ID, Collections.singletonList(GROUP_ID));
+
     assertEquals(TENANT_ONE,identityService.createTenantQuery()
-      .groupMember(group.getId())
       .singleResult()
       .getId());
-
   }
 
   @Test
   public void testCreateAndDeleteTenantGroupMembership() {
 
-    identityService.createTenantGroupMembership(tenantOne.getId(), group.getId());
-    
-    identityService.deleteTenantGroupMembership(tenantOne.getId(), group.getId());
+    identityService.createTenantGroupMembership(TENANT_ONE, GROUP_ID);
+
+    identityService.deleteTenantGroupMembership(TENANT_ONE, GROUP_ID);
 
     assertEquals(0, authorizationService.createAuthorizationQuery()
-      .groupIdIn(group.getId())
+      .groupIdIn(GROUP_ID)
       .resourceType(Resources.TENANT)
       .hasPermission(Permissions.READ).count());
-    
-    assertEquals(0,identityService.createTenantQuery()
-     .groupMember(group.getId())
-     .count());
 
+    identityService.setAuthentication(USER_ID, Collections.singletonList(GROUP_ID));
+
+    assertEquals(0,identityService.createTenantQuery()
+     .count());
   }
 
   @Test
   public void testCreateAndDeleteTenantGroupMembershipForMultipleTenants() {
 
-    Tenant tenantTwo = createTenant(TENANT_TWO);
+    createTenant(TENANT_TWO);
 
-    identityService.createTenantGroupMembership(tenantOne.getId(), group.getId());
-    identityService.createTenantGroupMembership(tenantTwo.getId(), group.getId());
+    identityService.createTenantGroupMembership(TENANT_ONE, GROUP_ID);
+    identityService.createTenantGroupMembership(TENANT_TWO, GROUP_ID);
 
     assertEquals(2, authorizationService.createAuthorizationQuery()
-      .groupIdIn(group.getId())
+      .groupIdIn(GROUP_ID)
       .resourceType(Resources.TENANT)
       .hasPermission(Permissions.READ).count());
 
-    identityService.deleteTenantGroupMembership(tenantOne.getId(), group.getId());
+    identityService.deleteTenantGroupMembership(TENANT_ONE, GROUP_ID);
 
     assertEquals(1, authorizationService.createAuthorizationQuery()
-      .groupIdIn(group.getId())
+      .groupIdIn(GROUP_ID)
       .resourceType(Resources.TENANT)
       .hasPermission(Permissions.READ).count());
-    
-    assertEquals(TENANT_TWO,identityService.createTenantQuery()
-     .groupMember(group.getId())
-     .singleResult()
-     .getId());
-
-    identityService.deleteTenant(tenantTwo.getId());
-
   }
 
   protected Tenant createTenant(String tenantId) {
