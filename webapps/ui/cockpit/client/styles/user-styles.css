@@ -1,16 +1,11 @@
 /*
-.navbar .navbar-brand {
-  background-image: url(../images/your-app-logo.png);
+.navbar-brand {
+  text-indent: -999em;
+  background-image: url(./path/to/the/logo.png);
+  width: 80px;
 }
 
-.navbar-collapse,
-.navbar-default,
-.navbar-right > .divider-vertical,
-.navbar-default .navbar-collapse,
-.navbar-default .navbar-nav>.open>a,
-.navbar-default .navbar-nav>.open>a:hover,
-.navbar-default .navbar-nav>.open>a:focus {
-  background-color: #4960B2;
-  border-color: #4960B2;
+[cam-widget-header] {
+  border-bottom-color: blue;
 }
 */
