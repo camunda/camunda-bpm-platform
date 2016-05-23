@@ -16,9 +16,6 @@ var template = fs.readFileSync(__dirname + '/decision-list.html', 'utf8');
 
         var decisionDefinitionService = camAPI.resource('decision-definition');
 
-        $scope.orderByPredicate = 'name';
-        $scope.orderByReverse = false;
-
         // get ALL the decisions
         decisionDefinitionService.list({
           latestVersion: true,

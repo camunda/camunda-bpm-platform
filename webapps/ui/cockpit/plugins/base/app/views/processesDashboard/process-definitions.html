@@ -22,7 +22,7 @@
         </thead>
 
         <tbody>
-          <tr ng-repeat="pd in processDefinitionData | orderBy:orderByPredicate:orderByReverse">
+          <tr ng-repeat="pd in processDefinitionData | orderBy:['name || key','tenantId']:false">
             <td class="state">
               <div ng-if="pd.incidents.length > -1" state-circle incidents="pd.incidents"></div>
               <div ng-if="pd.incidents == undefined">

@@ -21,9 +21,6 @@ var template = fs.readFileSync(__dirname + '/process-definitions.html', 'utf8');
 
         var processData = $scope.processData.newChild($scope);
 
-        $scope.orderByPredicate = 'name || key';
-        $scope.orderByReverse = false;
-
         $scope.hasReportPlugin = Views.getProviders({ component: 'cockpit.report' }).length > 0;
 
         var processDefinitionService = camAPI.resource('process-definition');
@@ -41,7 +38,7 @@ var template = fs.readFileSync(__dirname + '/process-definitions.html', 'utf8');
               var foundIds = $scope.processDefinitionData.filter(function(pd) {
                 return pd.id === processDefId;
               });
-              
+
               var foundObject = foundIds[0];
               if(!!foundObject) {
                 foundObject.incidents = statistic.incidents;

@@ -16,7 +16,7 @@
     </thead>
 
     <tbody>
-      <tr ng-repeat="decision in decisions | orderBy:orderByPredicate:orderByReverse">
+      <tr ng-repeat="decision in decisions | orderBy:['name || key','tenantId']:false">
         <td class="name">
           <a href="#/decision-definition/{{ decision.id }}">
             {{ decision.name || decision.key }}
