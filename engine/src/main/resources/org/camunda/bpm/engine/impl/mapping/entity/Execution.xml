@@ -201,7 +201,7 @@
       inner join ${prefix}ACT_RU_INCIDENT INC on RES.ID_ = INC.PROC_INST_ID_
     </if>
     <if test="activityIds != null &amp;&amp; activityIds.length > 0">
-      left join ACT_RU_EXECUTION EXE on RES.ID_ = EXE.PROC_INST_ID_
+      left join ${prefix}ACT_RU_EXECUTION EXE on RES.ID_ = EXE.PROC_INST_ID_
     </if>
     inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
 
