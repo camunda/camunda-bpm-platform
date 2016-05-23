@@ -105,6 +105,9 @@
   "NEW_TASK_ASSIGNEE" :
         "Assignee",
 
+  "NEW_TASK_TENANT_ID" :
+        "Tenant Id",
+
   "NEW_TASK_DESCRIPTION" :
         "Description",
 

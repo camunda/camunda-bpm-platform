@@ -17,6 +17,7 @@ var DeleteFilterPage = require('./filter/delete-filter');
 var InvoiceStartFormPage = require('./forms/invoice-start-form');
 var GenericStartFormPage = require('./forms/generic-start-form');
 var AuthenticationPage = require('../../../../common/tests/pages/authentication');
+var CreateTaskPage = require('./create-task-modal');
 
 module.exports = new DashboardPage();
 module.exports.taskFilters = new TaskFiltersPage();
@@ -36,3 +37,4 @@ module.exports.startProcess = new StartProcessPage();
 module.exports.startProcess.invoiceStartForm = new InvoiceStartFormPage();
 module.exports.startProcess.genericStartForm = new GenericStartFormPage();
 module.exports.authentication = new AuthenticationPage();
+module.exports.createTask = new CreateTaskPage();

@@ -98,7 +98,7 @@ Install the webapps with grunt and start the server in test mode:
 mvn jetty:run -Pdev-e2e
 ```
 
-Make sure that you terminate the server for development or use another port.
+Make sure that you terminate the server for development or use another port. You may configure the port the server runs on by passing the argument -Djetty.port=WHICH_PORT to the command line.
 
 To run the tests, call
 
