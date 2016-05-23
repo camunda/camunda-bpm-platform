@@ -12,8 +12,20 @@
  */
 package org.camunda.bpm.engine.test.api.cfg;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -28,10 +40,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * @author Daniel Meyer
@@ -101,6 +109,7 @@ public class AuthorizationCheckRevokesCfgTest {
 
     // then
     assertEquals(false, authCheck.isRevokeAuthorizationCheckEnabled());
+    verify(mockedEntityManager, never()).selectBoolean(eq("selectRevokeAuthorization"), any());
     verifyNoMoreInteractions(mockedEntityManager);
   }
 
@@ -122,6 +131,27 @@ public class AuthorizationCheckRevokesCfgTest {
 
     // then
     assertEquals(true, authCheck.isRevokeAuthorizationCheckEnabled());
+    verify(mockedEntityManager, times(1)).selectBoolean(eq("selectRevokeAuthorization"), eq(expectedQueryParams));
+  }
+
+  @Test
+  public void shouldCheckDbForCfgValueWithNoRevokes_auto() {
+    final ListQueryParameterObject query = new ListQueryParameterObject();
+    final AuthorizationCheck authCheck = query.getAuthCheck();
+
+    final HashMap<String, Object> expectedQueryParams = new HashMap<String, Object>();
+    expectedQueryParams.put("userId", AUTHENTICATED_USER_ID);
+    expectedQueryParams.put("authGroupIds", AUTHENTICATED_GROUPS);
+
+    // given
+    when(mockedConfiguration.getAuthorizationCheckRevokes()).thenReturn(ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_AUTO);
+    when(mockedEntityManager.selectBoolean(eq("selectRevokeAuthorization"), eq(expectedQueryParams))).thenReturn(false);
+
+    // if
+    authorizationManager.configureQuery(query);
+
+    // then
+    assertEquals(false, authCheck.isRevokeAuthorizationCheckEnabled());
     verify(mockedEntityManager, times(1)).selectBoolean(eq("selectRevokeAuthorization"), eq(expectedQueryParams));
   }
 
