@@ -3,7 +3,7 @@
 <ul>
   <li>
     <a href="#/batch" ng-if="countRunning == undefined"><span class="glyphicon glyphicon-refresh animate-spin"></span> running batches</a>
-    <a href="#/batch" ng-if="countRunning == 0">No running batches</a>
+    <a href="#/batch" ng-if="countRunning == 0">0 running batches</a>
     <a href="#/batch" ng-if="countRunning == 1">1 running batch</a>
     <a href="#/batch" ng-if="countRunning > 1 || isString(countRunning)">{{ countRunning }} running batches</a>
   </li>
@@ -11,7 +11,7 @@
 <ul>
   <li>
     <a href="#/batch" ng-if="countAll == undefined"><span class="glyphicon glyphicon-refresh animate-spin"></span> batches total</a>
-    <a href="#/batch" ng-if="countAll == 0">No completed batches</a>
+    <a href="#/batch" ng-if="countAll == 0">0 completed batches</a>
     <a href="#/batch" ng-if="countAll == 1">1 batch total</a>
     <a href="#/batch" ng-if="countAll > 1 || isString(countAll)">{{ countAll }} batches total</a>
   </li>
