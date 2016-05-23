@@ -61,8 +61,8 @@ function (
         },
         incidents: {
           label: [
-            'incident',
-            'incidents'
+            'process instance with incidents',
+            'process instances with incidents'
           ],
           link: '#/processes?targetPlugin=search-process-instances&searchQuery=%5B%7B%22type%22:%22PIwithIncidents%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D'
         }
@@ -101,8 +101,10 @@ function (
         });
       });
 
-      var incidentsService = camAPI.resource('incident');
-      incidentsService.count({}, function (err, data) {
+      var historyService = camAPI.resource('history');
+      historyService.processInstanceCount({
+        withIncidents: true
+      }, function (err, data) {
         if (err) { throw err; }
         procStats.incidents.value = data.count;
       });
