@@ -76,10 +76,7 @@ function (
         return prop.label[(prop.value === 1) ? 0 : 1];
       };
       $scope.gimmeDaValue = function (count) {
-        if (!count) {
-          return 'No';
-        }
-        return abbreviate(count);
+        return abbreviate(count) || 0;
       };
       $scope.loadingState = 'LOADING';
       // should I mention how much I love AngularJS?
