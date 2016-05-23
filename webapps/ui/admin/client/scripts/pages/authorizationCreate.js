@@ -7,7 +7,6 @@ var angular = require('camunda-commons-ui/vendor/angular');
     var AuthorizationResource = camAPI.resource('authorization');
 
     $scope.addNewAuthorization = function() {
-      $scope.authorizations = $scope.authorizations || [];
       $scope.authorizations.push({
         inUpdate: true,
         type: 1,
