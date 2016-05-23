@@ -274,7 +274,7 @@ public class MigrationExternalTaskTest {
       // then
       assertThat(e.getValidationReport())
       .hasInstructionFailures("externalTask",
-        "Activities have incompatible behavior for migration (ExternalTaskActivityBehavior is not compatible with"
+        "Activities have incompatible type for migration (ExternalTaskActivityBehavior is not compatible with"
         + " ClassDelegateActivityBehavior)"
       );
     }

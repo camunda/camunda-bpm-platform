@@ -406,7 +406,7 @@ public class MigrationMultiInstanceTest {
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasInstructionFailures(miBodyOf("userTask"),
-          "Activities have incompatible behavior for migration (ParallelMultiInstanceActivityBehavior is not "
+          "Activities have incompatible type for migration (ParallelMultiInstanceActivityBehavior is not "
           + "compatible with SequentialMultiInstanceActivityBehavior)"
         );
     }
