@@ -8,7 +8,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
   var isObject = angular.isObject;
 
   var RESOURCE_TYPE = 'Task';
-  var DEFAULT_COLOR = '#000000';
+  var DEFAULT_COLOR = '#555555';
 
   var likeExp = /Like$/;
   function fixLike(key, value) {
