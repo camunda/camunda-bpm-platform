@@ -230,7 +230,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     ensureVariablesInitialized();
     return commandContext
       .getExecutionManager()
-      .findProcessInstanceByQueryCriteria(this, page);
+      .findProcessInstancesByQueryCriteria(this, page);
   }
 
   public List<String> listIds() {
@@ -249,7 +249,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     ensureVariablesInitialized();
     return commandContext
       .getExecutionManager()
-      .findProcessInstanceIdsByQueryCriteria(this);
+      .findProcessInstancesIdsByQueryCriteria(this);
   }
 
   //getters /////////////////////////////////////////////////////////////////

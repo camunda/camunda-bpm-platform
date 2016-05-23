@@ -124,13 +124,13 @@ public class ExecutionManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery, Page page) {
+  public List<ProcessInstance> findProcessInstancesByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery, Page page) {
     configureQuery(processInstanceQuery);
     return getDbEntityManager().selectList("selectProcessInstanceByQueryCriteria", processInstanceQuery, page);
   }
 
   @SuppressWarnings("unchecked")
-  public List<String> findProcessInstanceIdsByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
+  public List<String> findProcessInstancesIdsByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
     configureQuery(processInstanceQuery);
     return getDbEntityManager().selectList("selectProcessInstanceIdsByQueryCriteria", processInstanceQuery);
   }

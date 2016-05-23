@@ -199,8 +199,13 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   ProcessInstanceQuery withoutTenantId();
 
   /**
-   * Only selects process instances which currently wait in a leaf activity with
-   * one of the given activity ids.
+   * <p>Only selects process instances with leaf activity instances
+   * or transition instances (async before, async after) in
+   * at least one of the given activity ids.
+   *
+   * <p><i>Leaf instance</i> means this filter works for instances
+   * of a user task is matched, but not the embedded sub process it is
+   * contained in.
    */
   ProcessInstanceQuery activityIdIn(String... activityIds);
 
