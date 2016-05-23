@@ -251,7 +251,7 @@ public class MigrationGatewayTest {
       // then
       assertThat(e.getValidationReport())
       .hasInstructionFailures("join",
-        "Activities have incompatible type for migration "
+        "Activities have incompatible types "
         + "(ParallelGatewayActivityBehavior is not compatible with InclusiveGatewayActivityBehavior)"
       );
     }
@@ -273,7 +273,7 @@ public class MigrationGatewayTest {
       // then
       assertThat(e.getValidationReport())
       .hasInstructionFailures("join",
-        "Activities have incompatible type for migration "
+        "Activities have incompatible types "
         + "(InclusiveGatewayActivityBehavior is not compatible with ParallelGatewayActivityBehavior)"
       );
     }

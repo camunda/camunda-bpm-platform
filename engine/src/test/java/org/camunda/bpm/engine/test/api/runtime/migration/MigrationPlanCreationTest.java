@@ -239,7 +239,7 @@ public class MigrationPlanCreationTest {
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasInstructionFailures("userTask",
-          "Activities have incompatible type for migration (UserTaskActivityBehavior is not compatible with ReceiveTaskActivityBehavior)"
+          "Activities have incompatible types (UserTaskActivityBehavior is not compatible with ReceiveTaskActivityBehavior)"
         );
     }
   }
@@ -259,7 +259,7 @@ public class MigrationPlanCreationTest {
       fail("Should not succeed");
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
-        .hasInstructionFailures("userTask", "Activities have incompatible type for migration (UserTaskActivityBehavior is not "
+        .hasInstructionFailures("userTask", "Activities have incompatible types (UserTaskActivityBehavior is not "
             + "compatible with SubProcessActivityBehavior)");
     }
   }
