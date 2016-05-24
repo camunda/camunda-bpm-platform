@@ -61,7 +61,7 @@ public abstract class MigratingProcessElementInstance implements MigratingInstan
 
   public abstract ExecutionEntity resolveRepresentativeExecution();
 
-  public MigratingActivityInstance getClosestAncestorAcitivityInstance() {
+  public MigratingActivityInstance getClosestAncestorActivityInstance() {
     MigratingScopeInstance ancestorInstance = parentInstance;
 
     while (!(ancestorInstance instanceof MigratingActivityInstance)) {

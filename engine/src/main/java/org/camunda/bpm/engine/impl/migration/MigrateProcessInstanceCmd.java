@@ -230,7 +230,7 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
     }
 
     for (MigratingEventScopeInstance migratingEventScopeInstance : migratingProcessInstance.getMigratingEventScopeInstances()) {
-      MigratingActivityInstance ancestorInstance = migratingEventScopeInstance.getClosestAncestorAcitivityInstance();
+      MigratingActivityInstance ancestorInstance = migratingEventScopeInstance.getClosestAncestorActivityInstance();
 
       validateEventScopeInstance(
           migratingEventScopeInstance,
@@ -241,7 +241,7 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
 
     for (MigratingCompensationEventSubscriptionInstance migratingEventSubscriptionInstance
         : migratingProcessInstance.getMigratingCompensationSubscriptionInstances()) {
-      MigratingActivityInstance ancestorInstance = migratingEventSubscriptionInstance.getClosestAncestorAcitivityInstance();
+      MigratingActivityInstance ancestorInstance = migratingEventSubscriptionInstance.getClosestAncestorActivityInstance();
 
       validateCompensateSubscriptionInstance(
           migratingEventSubscriptionInstance,
