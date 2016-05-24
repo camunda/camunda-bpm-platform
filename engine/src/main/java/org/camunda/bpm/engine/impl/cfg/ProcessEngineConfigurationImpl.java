@@ -1009,7 +1009,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       properties.put("limitAfter" , DbSqlSessionFactory.databaseSpecificLimitAfterStatements.get(databaseType));
       properties.put("innerLimitAfter" , DbSqlSessionFactory.databaseSpecificInnerLimitAfterStatements.get(databaseType));
       properties.put("limitBetween" , DbSqlSessionFactory.databaseSpecificLimitBetweenStatements.get(databaseType));
-      properties.put("limitBetweenClob" , DbSqlSessionFactory.databaseSpecificLimitBetweenClobStatements.get(databaseType));
+      properties.put("limitBetweenFilter" , DbSqlSessionFactory.databaseSpecificLimitBetweenFilterStatements.get(databaseType));
       properties.put("orderBy" , DbSqlSessionFactory.databaseSpecificOrderByStatements.get(databaseType));
       properties.put("limitBeforeNativeQuery" , DbSqlSessionFactory.databaseSpecificLimitBeforeNativeQueryStatements.get(databaseType));
       properties.put("distinct" , DbSqlSessionFactory.databaseSpecificDistinct.get(databaseType));

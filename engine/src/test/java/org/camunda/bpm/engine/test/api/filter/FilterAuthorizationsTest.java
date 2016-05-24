@@ -40,6 +40,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
   protected Authorization readAuthorization;
   protected Authorization deleteAuthorization;
 
+  @Override
   public void setUp() {
     testUser = createTestUser("test");
 
@@ -52,6 +53,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     identityService.setAuthenticatedUserId(testUser.getId());
   }
 
+  @Override
   public void tearDown() {
     processEngineConfiguration.setAuthorizationEnabled(false);
     for (Filter filter : filterService.createFilterQuery().list()) {
@@ -238,6 +240,29 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
 
     // remove Task
     taskService.deleteTask(task.getId(), true);
+  }
+
+  public void testReadFilterPermittedWithMultiple() {
+    Filter filter = createTestFilter();
+
+    grantReadFilter(filter.getId());
+    Authorization authorization = processEngine.getAuthorizationService().createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    authorization.addPermission(Permissions.READ);
+    authorization.setUserId(Authorization.ANY);
+    authorization.setResource(Resources.FILTER);
+    authorization.setResourceId(Authorization.ANY);
+    processEngine.getAuthorizationService().saveAuthorization(authorization);
+
+    long count = filterService.createFilterQuery().count();
+    assertEquals(1, count);
+
+    Filter returnedFilter = filterService.createFilterQuery().filterId(filter.getId()).singleResult();
+    assertNotNull(returnedFilter);
+
+    returnedFilter = filterService.getFilter(filter.getId());
+    assertNotNull(returnedFilter);
+
+    processEngine.getAuthorizationService().deleteAuthorization(authorization.getId());
   }
 
   public void testDefaultFilterAuthorization() {
