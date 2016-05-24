@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormFieldValidationConstraint;
 import org.camunda.bpm.engine.form.TaskFormData;
@@ -29,6 +28,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Ignore;
 
 /**
  * <p>Testcase verifying support for form matadata provided using
@@ -213,6 +213,21 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
       assertEquals(exception.getDetail(), "EXPIRED");
     }
 
+  }
+
+  @Deployment
+  public void failTestDateFormProperty()
+  {
+    Map<String, Object> variables = new HashMap<String, Object>(1);
+
+    // if i uncomment the following line, everything works fine
+    // variables.put("myDate", new Date());
+
+    // start process instance
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("date-form-property-test", variables);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    //fails
+    formService.getTaskFormData(task.getId());
   }
 
 }
