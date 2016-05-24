@@ -236,6 +236,30 @@ public class MigrationCompensationTest {
   }
 
   @Test
+  public void testCanRemoveCompensationBoundaryWithoutEventSubscriptions() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask1", "userTask1")
+      .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+    testHelper.completeTask("userTask1");
+
+    // then
+    Assert.assertEquals(0, testHelper.snapshotAfterMigration.getEventSubscriptions().size());
+
+    testHelper.completeTask("userTask2");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
   public void testCannotTriggerAddedCompensationForCompletedInstances() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
