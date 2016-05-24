@@ -10,7 +10,7 @@ var definitionPage = require('../pages/decision-definition');
 var instancePage = require('../pages/decision-instance');
 
 
-describe.only('Cockpit Decision Instance Spec', function() {
+describe('Cockpit Decision Instance Spec', function() {
 
   describe('page navigation', function() {
 
@@ -242,7 +242,7 @@ describe.only('Cockpit Decision Instance Spec', function() {
   });
 
 
-  describe.skip('multi tenancy', function() {
+  describe('multi tenancy', function() {
 
     before(function() {
       return testHelper(setupFile.multiTenancySetup, function() {
@@ -252,29 +252,27 @@ describe.only('Cockpit Decision Instance Spec', function() {
       });
     });
 
-    it.skip('should not display tenant id of instance if not exists', function() {
+    it('should not display tenant id of instance if not exists', function() {
 
       // given
       dashboardPage.goToSection('Decisions');
 
       // when
-      // HEADS UP, you cannot rely on the table sorting in cockpit! Test skipped due to CAM-6007
       decisionsPage.deployedDecisionsList.selectDecision(0);
       definitionPage.decisionInstancesTab.selectInstanceId(0);
 
       // then
-      expect(instancePage.information.tenantId()).to.eventually.contain('tenant1');
+      expect(instancePage.information.tenantId()).to.eventually.contain('null');
     });
 
 
-    it.skip('should display tenant id of instance', function() {
+    it('should display tenant id of instance', function() {
 
       // given
       dashboardPage.navigateToWebapp('Cockpit');
       dashboardPage.goToSection('Decisions');
 
       // when
-      // HEADS UP, you cannot rely on the table sorting in cockpit! Test skipped due to CAM-6007
       decisionsPage.deployedDecisionsList.selectDecision(1);
       definitionPage.decisionInstancesTab.selectInstanceId(0);
 
