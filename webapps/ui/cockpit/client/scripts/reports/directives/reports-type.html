@@ -6,8 +6,8 @@
     No reports available.
   </div>
 
-  <h3 ng-if="plugins && plugins.length > 1">Available reports</h3>
-  <ul ng-if="plugins && plugins.length > 1">
+  <h3 ng-if="plugins">Available reports</h3>
+  <ul ng-if="plugins">
     <li ng-repeat="provider in plugins">
       <a ng-class="{active: selection.type === provider.id}"
          ng-href="#/reports/{{ provider.id }}">{{ provider.label }}</a>

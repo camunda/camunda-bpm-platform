@@ -28,15 +28,13 @@ function(
   }
 
   var getDefaultReport = function(reports) {
-    if (!reports) {
+    if (!reports || !$scope.selectedReportId) {
       return;
     }
 
     if ($scope.selectedReportId) {
       return (getPluginProviders({ id: $scope.selectedReportId }) || [])[0];
     }
-
-    return reports.length === 1 ? reports[0] : null;
   };
 
   // breadcrumb //////////////////////////////////////////////////////////////
@@ -45,7 +43,7 @@ function(
 
   page.breadcrumbsClear();
 
-  if ($scope.selectedReportId && getPluginProviders().length > 1) {
+  if ($scope.selectedReportId) {
     var reportTypePlugin = getPluginProviders({ id: $scope.selectedReportId });
 
     if (reportTypePlugin.length) {
