@@ -162,7 +162,7 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
   public void attachState(MigratingScopeInstance activityInstance) {
 
     this.setParent(activityInstance);
-    instanceBehavior.attachState(activityInstance);
+    instanceBehavior.attachState();
 
     for (MigratingInstance dependentInstance : migratingDependentInstances) {
       dependentInstance.attachState(this);
@@ -404,7 +404,7 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
 
     void detachState();
 
-    void attachState(MigratingScopeInstance parentInstance);
+    void attachState();
 
     void migrateState();
 
@@ -436,7 +436,7 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
     }
 
     @Override
-    public void attachState(MigratingScopeInstance newParentInstance) {
+    public void attachState() {
 
       representativeExecution = getParent().createAttachableExecution();
 
@@ -534,7 +534,7 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
     }
 
     @Override
-    public void attachState(MigratingScopeInstance parentInstance) {
+    public void attachState() {
       ExecutionEntity newParentExecution = getParent().createAttachableExecution();
 
       ExecutionEntity currentScopeExecution = resolveRepresentativeExecution();
