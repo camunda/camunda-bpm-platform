@@ -121,8 +121,8 @@ describe('Cockpit Processes Dashboard Spec', function() {
 
       expect(processesPage.deployedProcessesList.processesList().count()).to.eventually.eql(2);
 
-      expect(processesPage.deployedProcessesList.tenantId(0)).to.eventually.eql('tenant1');
-      expect(processesPage.deployedProcessesList.tenantId(1)).to.eventually.eql('');
+      expect(processesPage.deployedProcessesList.tenantId(0)).to.eventually.eql('');
+      expect(processesPage.deployedProcessesList.tenantId(1)).to.eventually.eql('tenant1');
     });
 
     it('should aggregate process instance count by tenant id', function() {

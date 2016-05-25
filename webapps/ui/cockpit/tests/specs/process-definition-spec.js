@@ -166,8 +166,8 @@ describe('Cockpit Process Definition Spec', function() {
     describe('process definition with tenant id', function() {
 
         before(function() {
-          // first process definition is deployed for tenant with id 'tenant1'
-          processesPage.deployedProcessesList.selectProcess(0);
+          // process definitions with tenants are sorted below the ones without
+          processesPage.deployedProcessesList.selectProcess(1);
         });
 
         it('should display definition tenant id', function() {
@@ -202,9 +202,9 @@ describe('Cockpit Process Definition Spec', function() {
 
       before(function() {
         dashboardPage.navigateToWebapp('Cockpit');
-        // second process definition is deployed without tenant id
+        // first process definition displayed is deployed without tenant id
         dashboardPage.goToSection('Processes');
-        processesPage.deployedProcessesList.selectProcess(1);
+        processesPage.deployedProcessesList.selectProcess(0);
       });
 
       it('should not display definition tenant id', function() {

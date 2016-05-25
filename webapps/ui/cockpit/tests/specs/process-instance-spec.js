@@ -463,8 +463,8 @@ describe('Cockpit Process Instance Spec', function() {
     it('should display tenant id of instance', function() {
       dashboardPage.goToSection('Processes');
 
-      // first process definition is deployed for tenant with id 'tenant1'
-      processesPage.deployedProcessesList.selectProcess(0);
+      // through sorting, first process definition is without tenant, second has tenant
+      processesPage.deployedProcessesList.selectProcess(1);
       definitionPage.processInstancesTab.selectInstanceId(0);
 
       // when
@@ -478,8 +478,8 @@ describe('Cockpit Process Instance Spec', function() {
 
       dashboardPage.navigateToWebapp('Cockpit');
       dashboardPage.goToSection('Processes');
-      // second process definition is deployed without tenant id
-      processesPage.deployedProcessesList.selectProcess(1);
+      // through sorting, first process definition is without tenant, second has tenant
+      processesPage.deployedProcessesList.selectProcess(0);
       definitionPage.processInstancesTab.selectInstanceId(0);
 
       // when
