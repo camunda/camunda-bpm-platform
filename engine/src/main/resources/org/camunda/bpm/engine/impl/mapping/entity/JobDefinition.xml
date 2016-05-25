@@ -71,7 +71,7 @@
         </if>
         <if test="parameter.isProcessDefinitionTenantIdSet">
           and PROC_DEF_ID_ IN (
-            SELECT ID_ 
+            SELECT ID_
             FROM ${prefix}ACT_RE_PROCDEF PD
             WHERE PD.KEY_ = #{parameter.processDefinitionKey, jdbcType=VARCHAR}
             <if test="parameter.processDefinitionTenantId != null">

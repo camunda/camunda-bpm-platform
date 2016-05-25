@@ -1,5 +1,6 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
@@ -16,6 +17,8 @@ public class TimerEventListenerJobHandler extends TimerEventJobHandler {
   }
 
   public void execute(TimerJobConfiguration configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
+    CmmnExecution execution = (CmmnExecution) context;
+    execution.occur();
 
   }
 
