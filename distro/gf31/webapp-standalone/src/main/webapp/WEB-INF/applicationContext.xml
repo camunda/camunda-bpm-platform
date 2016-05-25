@@ -24,6 +24,7 @@
     <property name="processEngineName" value="default" />
     <property name="dataSource" ref="dataSource" />
     <property name="transactionManager" ref="transactionManager" />
+    <property name="history" value="full" />
     <property name="databaseSchemaUpdate" value="true" />
     <property name="jobExecutorActivate" value="false" />
     <property name="deploymentResources" value="classpath*:bpmn/*.bpmn" />
