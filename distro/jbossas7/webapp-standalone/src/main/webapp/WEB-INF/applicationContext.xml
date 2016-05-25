@@ -9,7 +9,7 @@
     <property name="targetDataSource">
       <bean class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="org.h2.Driver" />
-        <property name="url" value="jdbc:h2:mem:process-engine;MVCC=TRUE;TRACE_LEVEL_FILE=0" />
+        <property name="url" value="jdbc:h2:mem:process-engine;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE" />
         <property name="username" value="sa" />
         <property name="password" value="" />
       </bean>
