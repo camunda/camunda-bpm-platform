@@ -525,7 +525,7 @@ describe('Repository Spec', function() {
 
       expect(resourcePage.definitions.name(0).getText()).to.eventually.eql('User Tasks');
       expect(resourcePage.definitions.key(0).getText()).to.eventually.eql('user-tasks');
-      expect(resourcePage.definitions.instanceCount(0).getText()).to.eventually.eql('4');
+      expect(resourcePage.definitions.instanceCount(0).getText()).to.eventually.eql('2');
     });
 
 
