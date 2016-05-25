@@ -12,11 +12,13 @@
  */
 package org.camunda.bpm.engine.test.cmmn.timer;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
@@ -88,7 +90,12 @@ public class TimerEventListenerTest extends CmmnProcessEngineTestCase {
     assertNotNull(allJobs);
     assertTrue(!allJobs.isEmpty());
     assertTrue(allJobs.size()==1);
-    executeAvailableJobs();
+
+    Date startTime = new Date();
+    ClockUtil.setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
+    waitForJobExecutorToProcessAllJobs(5000L);
+    assertEquals(0L, managementService.createJobQuery().count());
+
     CaseExecution exe = processEngine.getCaseService().createCaseExecutionQuery().caseInstanceId(ci.getCaseInstanceId()).singleResult();
     assertNotNull(exe);
     Map<String, Object> vars = processEngine.getCaseService().getVariables(exe.getId());
