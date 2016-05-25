@@ -66,9 +66,23 @@
     <result property="propertiesInternal" column="PROPERTIES_" jdbcType="CLOB" />
   </resultMap>
 
+  <resultMap id="filterResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.FilterEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="resourceType" column="RESOURCE_TYPE_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="owner" column="OWNER_" jdbcType="VARCHAR" />
+    <result property="queryInternal" column="QUERY_" jdbcType="BINARY" />
+    <result property="propertiesInternal" column="PROPERTIES_" jdbcType="BINARY" />
+  </resultMap>
+
   <!-- FILTER SELECT -->
 
   <select id="selectFilter" parameterType="string" resultMap="filterResultMap">
+    select * from ${prefix}ACT_RU_FILTER where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectFilter_postgres" parameterType="string" resultMap="filterResultMap_postgres">
     select * from ${prefix}ACT_RU_FILTER where ID_ = #{id, jdbcType=VARCHAR}
   </select>
 
@@ -81,7 +95,17 @@
     ${orderBy}
     ${limitAfter}
   </select>
-  
+
+  <select id="selectFilterByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap_postgres">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectFilterByQueryCriteriaSql" />
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
   <select id="selectFilterByQueryCriteria_oracleDb2" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap">
     <!--
     SEE: https://app.camunda.com/jira/browse/CAM-6014
