@@ -451,7 +451,7 @@ public class MigrationAddSubprocessTest {
             .activity("userTask2", testHelper.getSingleActivityInstanceBeforeMigration("userTask1").getId())
         .done());
 
-    Task migratedTask = testHelper.snapshotAfterMigration.getTaskForKey("userTask1");
+    Task migratedTask = testHelper.snapshotAfterMigration.getTaskForKey("userTask2");
     Assert.assertNotNull(migratedTask);
     assertEquals(targetProcessDefinition.getId(), migratedTask.getProcessDefinitionId());
 
@@ -493,7 +493,7 @@ public class MigrationAddSubprocessTest {
             .activity("userTask2", testHelper.getSingleActivityInstanceBeforeMigration("userTask1").getId())
         .done());
 
-    Task migratedTask = testHelper.snapshotAfterMigration.getTaskForKey("userTask1");
+    Task migratedTask = testHelper.snapshotAfterMigration.getTaskForKey("userTask2");
     Assert.assertNotNull(migratedTask);
     assertEquals(targetProcessDefinition.getId(), migratedTask.getProcessDefinitionId());
 

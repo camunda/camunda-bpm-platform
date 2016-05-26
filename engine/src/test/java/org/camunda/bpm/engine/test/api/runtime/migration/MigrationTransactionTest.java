@@ -274,7 +274,7 @@ public class MigrationTransactionTest {
         testHelper.getSingleActivityInstanceBeforeMigration("eventSubProcess").getId(),
         testHelper.getSingleActivityInstanceAfterMigration("transaction").getId());
 
-    testHelper.completeTask("eventSubProcessTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(processInstance.getId());
   }
 

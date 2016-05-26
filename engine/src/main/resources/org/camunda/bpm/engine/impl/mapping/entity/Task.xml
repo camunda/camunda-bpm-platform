@@ -72,6 +72,7 @@
       CASE_EXECUTION_ID_ = #{caseExecutionId, jdbcType=VARCHAR},
       CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR},
       CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+      TASK_DEF_KEY_ = #{taskDefinitionKey, jdbcType=VARCHAR},
       DESCRIPTION_ = #{description, jdbcType=VARCHAR},
       DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
       FOLLOW_UP_DATE_ = #{followUpDate, jdbcType=TIMESTAMP},

@@ -362,7 +362,7 @@ public class MigrationEventSubProcessTest {
     Assert.assertEquals(0, testHelper.snapshotAfterMigration.getEventSubscriptions().size());
 
     // and it is possible to complete the process instance
-    testHelper.completeTask("eventSubProcessTask"); // the task definition key is not migrated, there is still eventSubProcessTask
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(processInstance.getId());
   }
 
@@ -400,7 +400,7 @@ public class MigrationEventSubProcessTest {
     testHelper.assertEventSubscriptionCreated("eventSubProcessStart", EventSubProcessModels.MESSAGE_NAME);
 
     // and it is possible to complete the process instance
-    testHelper.completeTask("userTask"); // the task definition key is not migrated, there is still userTask
+    testHelper.completeTask("eventSubProcessTask");
     testHelper.assertProcessEnded(processInstance.getId());
   }
 
@@ -569,7 +569,7 @@ public class MigrationEventSubProcessTest {
     testHelper.assertEventSubscriptionCreated("eventSubProcessStart", EventSubProcessModels.MESSAGE_NAME);
 
     // and it is possible to complete the process instance
-    testHelper.completeTask("userTask"); // the task definition key is not migrated, there is still userTask
+    testHelper.completeTask("eventSubProcessTask");
     testHelper.assertProcessEnded(processInstance.getId());
   }
 

@@ -103,6 +103,7 @@ public class MigrationHistoricTaskInstanceTest {
     HistoricTaskInstance instance = targetHistoryTaskInstanceQuery.singleResult();
     assertEquals(targetProcessDefinition.getKey(), instance.getProcessDefinitionKey());
     assertEquals(targetProcessDefinition.getId(), instance.getProcessDefinitionId());
+    assertEquals("userTask2", instance.getTaskDefinitionKey());
     assertEquals(activityInstance.getActivityInstances("userTask")[0].getId(), instance.getActivityInstanceId());
   }
 

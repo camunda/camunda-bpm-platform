@@ -75,6 +75,7 @@ public class MigratingUserTaskInstance implements MigratingInstance {
   @Override
   public void migrateState() {
     userTask.setProcessDefinitionId(migratingActivityInstance.getTargetScope().getProcessDefinition().getId());
+    userTask.setTaskDefinitionKey(migratingActivityInstance.getTargetScope().getId());
 
     migrateHistory();
   }

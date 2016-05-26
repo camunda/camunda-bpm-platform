@@ -12,12 +12,15 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -28,6 +31,8 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaTaskListener;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -228,9 +233,10 @@ public class MigrationUserTaskTest {
           .activity("userTask2", testHelper.getSingleActivityInstanceBeforeMigration("userTask1").getId())
         .done());
 
-    Task migratedTask = testHelper.snapshotAfterMigration.getTaskForKey("userTask1");
+    Task migratedTask = testHelper.snapshotAfterMigration.getTaskForKey("userTask2");
     Assert.assertNotNull(migratedTask);
     Assert.assertEquals(targetProcessDefinition.getId(), migratedTask.getProcessDefinitionId());
+    Assert.assertEquals("userTask2", migratedTask.getTaskDefinitionKey());
 
     // and it is possible to successfully complete the migrated instance
     rule.getTaskService().complete(migratedTask.getId());
@@ -261,6 +267,7 @@ public class MigrationUserTaskTest {
     Task subTaskAfterMigration = rule.getTaskService().createTaskQuery().taskId(subTask.getId()).singleResult();
     Assert.assertNull(subTaskAfterMigration.getProcessDefinitionId());
     Assert.assertNull(subTaskAfterMigration.getProcessInstanceId());
+    Assert.assertNull(subTaskAfterMigration.getTaskDefinitionKey());
 
     // the tasks can be completed and the process can be ended
     rule.getTaskService().complete(subTask.getId());
@@ -270,6 +277,55 @@ public class MigrationUserTaskTest {
     if (!rule.getProcessEngineConfiguration().getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
       rule.getHistoryService().deleteHistoricTaskInstance(subTaskAfterMigration.getId());
     }
+  }
+
+  @Test
+  public void testAccessModelInTaskListenerAfterMigration() {
+    BpmnModelInstance targetModel = modify(ProcessModels.ONE_TASK_PROCESS).changeElementId("userTask", "newUserTask");
+    addTaskListener(targetModel, "newUserTask", TaskListener.EVENTNAME_ASSIGNMENT, AccessModelInstanceTaskListener.class.getName());
+
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetModel);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask", "newUserTask")
+      .build();
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // when
+    Task task = rule.getTaskService().createTaskQuery().singleResult();
+
+    rule.getTaskService().setAssignee(task.getId(), "foo");
+
+    // then the task listener was able to access the bpmn model instance and set a variable
+    String variableValue =
+        (String) rule.getRuntimeService().getVariable(processInstance.getId(), AccessModelInstanceTaskListener.VARIABLE_NAME);
+    Assert.assertEquals("newUserTask", variableValue);
+
+  }
+
+  protected static void addTaskListener(BpmnModelInstance targetModel, String activityId, String event, String className) {
+    CamundaTaskListener taskListener = targetModel.newInstance(CamundaTaskListener.class);
+    taskListener.setCamundaClass(className);
+    taskListener.setCamundaEvent(event);
+
+    UserTask task = targetModel.getModelElementById(activityId);
+    task.builder().addExtensionElement(taskListener);
+  }
+
+  public static class AccessModelInstanceTaskListener implements TaskListener {
+
+    public static final String VARIABLE_NAME = "userTaskId";
+
+    @Override
+    public void notify(DelegateTask delegateTask) {
+      UserTask userTask = delegateTask.getBpmnModelElementInstance();
+      delegateTask.setVariable(VARIABLE_NAME, userTask.getId());
+    }
+
   }
 
 }

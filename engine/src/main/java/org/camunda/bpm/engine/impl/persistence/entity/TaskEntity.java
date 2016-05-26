@@ -1202,6 +1202,13 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   }
 
   public void setTaskDefinitionKey(String taskDefinitionKey) {
+    if ((taskDefinitionKey == null && this.taskDefinitionKey != null)
+     || (taskDefinitionKey != null && !taskDefinitionKey.equals(this.taskDefinitionKey))) {
+      this.taskDefinition = null;
+      this.formKey = null;
+      this.isFormKeyInitialized = false;
+    }
+
     this.taskDefinitionKey = taskDefinitionKey;
   }
 

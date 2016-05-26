@@ -299,7 +299,7 @@ public class MigrationCompensationTest {
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    testHelper.completeTask("userTask");
+    testHelper.completeTask("userTask1");
     Assert.assertEquals(1, rule.getRuntimeService().createEventSubscriptionQuery().count());
 
     testHelper.completeTask("userTask2");
