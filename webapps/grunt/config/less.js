@@ -4,6 +4,9 @@ module.exports = function(config, lessConfig, pathConfig) {
 
   var file = {};
   file[pathConfig.buildTarget+'/styles/styles.css'] = pathConfig.sourceDir + '/styles/styles.less';
+  if (pathConfig.appName === 'cockpit') {
+    file[pathConfig.buildTarget+'/styles/styles-components.css'] = pathConfig.sourceDir + '/styles/styles-components.less';
+  }
 
   var includePaths = [
     resolve(process.cwd(), '<%= pkg.gruntConfig.commonsUiDir %>/node_modules/bootstrap/less'),
