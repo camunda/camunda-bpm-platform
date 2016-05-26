@@ -887,11 +887,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   protected static Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
+  protected static final String MY_SQL_PRODUCT_NAME = "MySQL";
+  protected static final String MARIA_DB_PRODUCT_NAME = "MariaDB";
 
   protected static Properties getDefaultDatabaseTypeMappings() {
     Properties databaseTypeMappings = new Properties();
     databaseTypeMappings.setProperty("H2","h2");
-    databaseTypeMappings.setProperty("MySQL","mysql");
+    databaseTypeMappings.setProperty(MY_SQL_PRODUCT_NAME,"mysql");
+    databaseTypeMappings.setProperty(MARIA_DB_PRODUCT_NAME,"mariadb");
     databaseTypeMappings.setProperty("Oracle","oracle");
     databaseTypeMappings.setProperty("PostgreSQL","postgres");
     databaseTypeMappings.setProperty("Microsoft SQL Server","mssql");
@@ -914,8 +917,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     databaseTypeMappings.setProperty("DB2/SUN64","db2");
     databaseTypeMappings.setProperty("DB2/PTX","db2");
     databaseTypeMappings.setProperty("DB2/2","db2");
-    // note that the database product name of mariaDB is 'MySQL'
-    // so the databaseType have to set to 'mariadb' explicit in configuration
     return databaseTypeMappings;
   }
 
@@ -925,6 +926,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       connection = dataSource.getConnection();
       DatabaseMetaData databaseMetaData = connection.getMetaData();
       String databaseProductName = databaseMetaData.getDatabaseProductName();
+      if (MY_SQL_PRODUCT_NAME.equals(databaseProductName)) {
+        databaseProductName = checkForMariaDb(databaseMetaData, databaseProductName);
+      }
       LOG.debugDatabaseproductName(databaseProductName);
       databaseType = databaseTypeMappings.getProperty(databaseProductName);
       ensureNotNull("couldn't deduct database type from database product name '" + databaseProductName + "'", "databaseType", databaseType);
@@ -941,6 +945,34 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         e.printStackTrace();
       }
     }
+  }
+
+  /**
+   * The product name of mariadb is still 'MySQL'. This method
+   * tries if it can find some evidence for mariadb. If it is successful
+   * it will return "MariaDB", otherwise the provided database name.
+   */
+  protected String checkForMariaDb(DatabaseMetaData databaseMetaData, String databaseName) {
+    try {
+      String databaseProductVersion = databaseMetaData.getDatabaseProductVersion();
+      if (databaseProductVersion != null && databaseProductVersion.toLowerCase().contains("mariadb")) {
+        return MARIA_DB_PRODUCT_NAME;
+      }
+    } catch (SQLException ignore) { }
+
+    try {
+      String driverName = databaseMetaData.getDriverName();
+      if (driverName != null && driverName.toLowerCase().contains("mariadb")) {
+        return MARIA_DB_PRODUCT_NAME;
+      }
+    } catch (SQLException ignore) { }
+
+    String metaDataClassName = databaseMetaData.getClass().getName();
+    if (metaDataClassName != null && metaDataClassName.toLowerCase().contains("mariadb")) {
+      return MARIA_DB_PRODUCT_NAME;
+    }
+
+    return databaseName;
   }
 
   // myBatis SqlSessionFactory ////////////////////////////////////////////////

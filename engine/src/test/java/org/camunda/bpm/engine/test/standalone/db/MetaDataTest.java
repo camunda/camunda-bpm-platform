@@ -60,4 +60,15 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
         }
       });
   }
+
+  public void testMariaDbDatabaseType() {
+    if (isMariaDbConfigured()) {
+      assertEquals("mariadb",  processEngineConfiguration.getDatabaseType());
+    }
+  }
+
+  public boolean isMariaDbConfigured() {
+    return processEngineConfiguration.getJdbcUrl().toLowerCase().contains("mariadb") ||
+      processEngineConfiguration.getJdbcDriver().toLowerCase().contains("mariadb");
+  }
 }
