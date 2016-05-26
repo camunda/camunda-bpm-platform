@@ -12,20 +12,25 @@
  */
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 /**
  * @author Roman Smirnov
  *
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public abstract class AbstractUserOperationLogTest extends PluggableProcessEngineTestCase {
 
   public static final String USER_ID = "demo";
 
+  @Override
   public void setUp() throws Exception {
     identityService.setAuthenticatedUserId(USER_ID);
   }
 
+  @Override
   protected void tearDown() throws Exception {
     identityService.clearAuthentication();
   }

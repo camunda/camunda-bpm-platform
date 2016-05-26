@@ -1,16 +1,20 @@
 package org.camunda.bpm.engine.test.history;
 
 import java.util.List;
+
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.IdentityLink;
+import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricIdentityLinkLogTestByXml extends PluggableProcessEngineTestCase{
-  
+
   private static String PROCESS_DEFINITION_KEY_CANDIDATE_USER = "oneTaskProcessForHistoricIdentityLinkWithCanidateUser";
   private static String PROCESS_DEFINITION_KEY_CANDIDATE_GROUP = "oneTaskProcessForHistoricIdentityLinkWithCanidateGroup";
   private static String PROCESS_DEFINITION_KEY_ASSIGNEE = "oneTaskProcessForHistoricIdentityLinkWithAssignee";
@@ -19,7 +23,7 @@ public class HistoricIdentityLinkLogTestByXml extends PluggableProcessEngineTest
   private static final String XML_USER = "demo";
   private static final String XML_GROUP = "demoGroups";
   private static final String XML_ASSIGNEE = "assignee";
-  
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/OneTaskProcessWithCandidateUser.bpmn20.xml" })
   public void testShouldAddTaskCandidateforAddIdentityLinkUsingXml() {
 
@@ -52,10 +56,10 @@ public class HistoricIdentityLinkLogTestByXml extends PluggableProcessEngineTest
     // query Test
     HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.userId(XML_ASSIGNEE).count(), 1);
-   
-    
+
+
   }
-  
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/OneTaskProcessWithCandidateGroups.bpmn20.xml" })
   public void testShouldAddTaskCandidateGroupforAddIdentityLinkUsingXml() {
 

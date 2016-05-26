@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.concurrency;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
@@ -22,11 +23,13 @@ import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 /**
  * @author Daniel Meyer
  *
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class DbDeadlockTest extends ConcurrencyTestCase {
 
   private ThreadControl thread1;
@@ -107,6 +110,7 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
 
   }
 
+  @Override
   protected void tearDown() throws Exception {
 
     // end interaction with Thread 2

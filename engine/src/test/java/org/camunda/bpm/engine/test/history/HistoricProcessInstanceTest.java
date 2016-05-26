@@ -41,6 +41,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})

@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.ProcessInstanceQueryTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Assert;
@@ -43,6 +45,7 @@ import org.slf4j.Logger;
  * @author Frederik Heremans
  * @author Falko Menge
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoryServiceTest extends PluggableProcessEngineTestCase {
 
 private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();

@@ -35,7 +35,6 @@ import org.camunda.bpm.engine.test.history.useroperationlog.AbstractUserOperatio
 /**
  * @author Daniel Meyer
  */
-
 @SuppressWarnings("deprecation")
 public class TaskEventsTest extends AbstractUserOperationLogTest {
 

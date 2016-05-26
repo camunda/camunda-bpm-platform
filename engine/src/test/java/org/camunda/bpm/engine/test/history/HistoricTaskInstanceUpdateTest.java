@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,30 +13,33 @@
 
 package org.camunda.bpm.engine.test.history;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 
 /**
  * @author Frederik Heremans
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class HistoricTaskInstanceUpdateTest extends PluggableProcessEngineTestCase {
 
-  
+
   @Deployment
   public void testHistoricTaskInstanceUpdate() {
     runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest").getId();
-    
+
     Task task = taskService.createTaskQuery().singleResult();
-    
+
     // Update and save the task's fields before it is finished
     task.setPriority(12345);
     task.setDescription("Updated description");
     task.setName("Updated name");
     task.setAssignee("gonzo");
-    taskService.saveTask(task);   
+    taskService.saveTask(task);
 
     taskService.complete(task.getId());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().count());

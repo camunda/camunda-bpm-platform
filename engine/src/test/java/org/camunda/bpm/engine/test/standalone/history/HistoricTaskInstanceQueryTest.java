@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Thorben Lindhauer
  *
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCase {
 
 
@@ -100,7 +101,7 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
 
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", Variables.numberValue(null)).count());
   }
-  
+
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testTaskInvolvedUser() {
@@ -122,7 +123,7 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskInvolvedUser("invalidUserId").count());
     taskService.deleteTask("newTask",true);
   }
-  
+
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testTaskInvolvedGroup() {
@@ -139,7 +140,7 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskInvolvedGroup("aGroupId").count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskInvolvedGroup("bGroupId").count());
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskInvolvedGroup("invalidGroupId").count());
-    
+
     taskService.deleteTask("newTask",true);
   }
 
@@ -164,7 +165,7 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     // delete test
     taskService.deleteTask("newTask",true);
   }
-  
+
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testTaskHadCandidateGroup() {
@@ -205,7 +206,7 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     taskService.deleteCandidateGroup(taskId, "aGroupId");
     taskService.deleteCandidateGroup(taskId, "bGroupId");
     historyService.createHistoricTaskInstanceQuery();
-    
+
     // Query test
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
     assertEquals(4, query.taskInvolvedUser("aUserId").count());

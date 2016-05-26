@@ -15,12 +15,15 @@ package org.camunda.bpm.engine.test.history;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public abstract class AbstractCompositeHistoryEventHandlerTest extends PluggableProcessEngineTestCase {
 
   protected HistoryEventHandler originalHistoryEventHandler;

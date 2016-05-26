@@ -414,35 +414,6 @@
       <properties>
         <history.level>audit</history.level>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/*TestCase.java</exclude>
-                <exclude>**/RepeatingServiceTaskTest.java</exclude>
-                <exclude>**/TaskEventsTest.java</exclude>
-                <exclude>**/UserOperationLog*.java</exclude>
-                <exclude>**/HistoricIncident*Test.java</exclude>
-                <exclude>**/HistoricJobLog*Test.java</exclude>
-                <exclude>**/ProcessInstanceModificationHistoryTest.java</exclude>
-                <exclude>**/ProcessInstantiationAtActivitiesHistoryTest.java</exclude>
-                <exclude>**/UserOperationLogAuthorizationTest.java</exclude>
-                <exclude>**/HistoricDetailAuthorizationTest.java</exclude>
-                <exclude>**/HistoricVariableInstanceAuthorizationTest.java</exclude>
-                <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
-                <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
-                <exclude>**/HistoricDecisionInstanceAuthorizationTest.java</exclude>
-                <exclude>**/HistoricDecisionInstanceTest.java</exclude>
-                <exclude>**/MigrationHistoryVariablesTest.java</exclude>
-                <exclude>**/HistoricBatchQueryTest.java</exclude>
-                <exclude>**/HistoricIdentityLink*Test*.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
 
     <!--  check history activity -->
@@ -451,43 +422,6 @@
       <properties>
         <history.level>activity</history.level>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/*TestCase.java</exclude>
-                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485  -->
-                <exclude>**/Historic*InstanceTest.java</exclude>
-                <exclude>**/HistoricActivity*Test.java</exclude>
-                <exclude>**/HistoryServiceTest.java</exclude>
-                <exclude>**/RepeatingServiceTaskTest.java</exclude>
-                <exclude>**/TaskEventsTest.java</exclude>
-                <exclude>**/UserOperationLog*.java</exclude>
-                <exclude>**/HistoricIncident*Test.java</exclude>
-                <exclude>**/HistoricVariableDataFormatTest.java</exclude>
-                <exclude>**/HistoricVariableInstanceScopeTest.java</exclude>
-                <exclude>**/HistoricTaskInstanceQueryTest.java</exclude>
-                <exclude>**/HistoricJobLog*Test.java</exclude>
-                <exclude>**/ProcessInstanceModificationHistoryTest.java</exclude>
-                <exclude>**/ProcessInstantiationAtActivitiesHistoryTest.java</exclude>
-                <exclude>**/UserOperationLogAuthorizationTest.java</exclude>
-                <exclude>**/HistoricDetailAuthorizationTest.java</exclude>
-                <exclude>**/HistoricVariableInstanceAuthorizationTest.java</exclude>
-                <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
-                <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
-                <exclude>**/CompensateEventHistoryTest.java</exclude>
-                <exclude>**/HistoricDecisionInstanceAuthorizationTest.java</exclude>
-                <exclude>**/HistoricDecisionInstanceTest.java</exclude>
-                <exclude>**/MigrationHistoryVariablesTest.java</exclude>
-                <exclude>**/HistoricBatchQueryTest.java</exclude>
-                <exclude>**/HistoricIdentityLink*Test*.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
 
     <!--  check history none -->
@@ -496,42 +430,6 @@
       <properties>
         <history.level>none</history.level>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/*TestCase.java</exclude>
-                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485  -->
-                <exclude>**/Historic*InstanceTest.java</exclude>
-                <exclude>**/HistoricActivity*Test.java</exclude>
-                <exclude>**/HistoryServiceTest.java</exclude>
-                <exclude>**/RepeatingServiceTaskTest.java</exclude>
-                <exclude>**/TaskEventsTest.java</exclude>
-                <exclude>**/UserOperationLog*.java</exclude>
-                <exclude>**/HistoricVariableInstanceScopeTest.java</exclude>
-                <exclude>**/HistoricIncident*Test.java</exclude>
-                <exclude>**/HistoricVariableDataFormatTest.java</exclude>
-                <exclude>**/Historic*QueryTest.java</exclude>
-                <exclude>**/Historic*ReportTest.java</exclude>
-                <exclude>**/HistoricJobLog*Test.java</exclude>
-                <exclude>**/ProcessInstanceModificationHistoryTest.java</exclude>
-                <exclude>**/ProcessInstantiationAtActivitiesHistoryTest.java</exclude>
-                <exclude>**/UserOperationLogAuthorizationTest.java</exclude>
-                <exclude>**/Historic*AuthorizationTest.java</exclude>
-                <exclude>**/DbDeadlockTest.java</exclude>
-                <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
-                <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
-                <exclude>**/CompensateEventHistoryTest.java</exclude>
-                <exclude>**/MigrationHistoryVariablesTest.java</exclude>
-                <exclude>**/HistoricBatchQueryTest.java</exclude>
-                <exclude>**/HistoricIdentityLink*Test*.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
 
     <profile>

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -14,12 +15,14 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 /**
  *
  * @author Deivarayan Azhagappan
  *
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTestCase {
   private static final String A_USER_ID = "aUserId";
   private static final String A_GROUP_ID = "aGroupId";
@@ -40,7 +43,7 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
   private static String PROCESS_DEFINITION_KEY_MULTIPLE_CANDIDATE_USER = "oneTaskProcessForHistoricIdentityLinkWithMultipleCanidateUser";
   private static final String IDENTITY_LINK_ADD="add";
   private static final String IDENTITY_LINK_DELETE="delete";
-  
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testQueryAddTaskCandidateforAddIdentityLink() {
 
@@ -126,10 +129,10 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
 
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.operationType(IDENTITY_LINK_ADD).count(), 1);
-   
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.processDefinitionId(processInstance.getProcessDefinitionId()).count(), 2);
-    
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.processDefinitionKey(PROCESS_DEFINITION_KEY).count(), 2);
 
@@ -229,11 +232,11 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
    * Should add 3 history records of identity link addition at 01-01-2016
    * 00:00.00 Should add 3 history records of identity link deletion at
    * 01-01-2016 12:00.00
-   * 
+   *
    * Should add 3 history records of identity link addition at 01-01-2016
    * 12:30.00 Should add 3 history records of identity link deletion at
    * 01-01-2016 21:00.00
-   * 
+   *
    * Test case: Query the number of added records at different time interval.
    */
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
@@ -343,10 +346,10 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     assertEquals(2, query.listPage(1, 2).size());
     assertEquals(3, query.listPage(1, 4).size());
   }
-  
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/OneTaskProcessWithMultipleCandidateUser.bpmn20.xml" })
   public void testHistoricIdentityLinkQuerySorting() {
-    
+
     // Pre test - Historical identity link is added as part of deployment
     List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 0);
@@ -364,7 +367,7 @@ public class HistoricIdentityLinkLogQueryTest extends PluggableProcessEngineTest
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByTenantId().asc().list().size());
     assertEquals("aUser", historyService.createHistoricIdentityLinkLogQuery().orderByUserId().asc().list().get(0).getUserId());
     assertEquals("dUser", historyService.createHistoricIdentityLinkLogQuery().orderByUserId().asc().list().get(3).getUserId());
-    
+
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByAssignerId().desc().list().size());
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByTime().desc().list().size());
     assertEquals(4, historyService.createHistoricIdentityLinkLogQuery().orderByGroupId().desc().list().size());

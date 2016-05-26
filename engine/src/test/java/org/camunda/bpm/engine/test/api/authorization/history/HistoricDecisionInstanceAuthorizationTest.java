@@ -24,12 +24,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
 
 /**
  * @author Philipp Ossler
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest {
 
   protected static final String PROCESS_KEY = "testProcess";

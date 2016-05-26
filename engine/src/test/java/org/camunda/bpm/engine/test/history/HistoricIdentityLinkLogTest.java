@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.test.history;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -11,12 +12,14 @@ import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 /**
  *
  * @author Deivarayan Azhagappan
  *
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricIdentityLinkLogTest extends PluggableProcessEngineTestCase {
   private static final String A_USER_ID = "aUserId";
   private static final String B_USER_ID = "bUserId";
@@ -69,25 +72,25 @@ public class HistoricIdentityLinkLogTest extends PluggableProcessEngineTestCase 
     historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     // Addition of A_USER, Deletion of A_USER, Addition of A_USER as owner, Addition of B_USER and deletion of B_USER
     assertEquals(historicIdentityLinks.size(), 5);
-    
+
     //Query test
     HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.userId(A_USER_ID).count(), 3);
-    
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.userId(B_USER_ID).count(), 2);
- 
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.operationType(IDENTITY_LINK_ADD).count(), 3);
-    
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 2);
-    
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.type(IdentityLinkType.ASSIGNEE).count(), 4);
     assertEquals(query.type(IdentityLinkType.OWNER).count(), 1);
   }
-  
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testShouldAddClaimTaskCandidateforAddIdentityLink() {
 
@@ -100,24 +103,24 @@ public class HistoricIdentityLinkLogTest extends PluggableProcessEngineTestCase 
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
     taskService.claim(taskId, A_USER_ID);
-    
+
     historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 1);
-    
+
     //Query test
     HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.userId(A_USER_ID).count(), 1);
-    
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.operationType(IDENTITY_LINK_ADD).count(), 1);
-    
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 0);
-    
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.type(IdentityLinkType.ASSIGNEE).count(), 1);
   }
-  
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testShouldAddMultipleDelegateTaskCandidateforAddIdentityLink() {
 
@@ -138,27 +141,27 @@ public class HistoricIdentityLinkLogTest extends PluggableProcessEngineTestCase 
     // Addition of A_USER, Deletion of A_USER, Addition of A_USER as owner,
     // Addition of B_USER, Deletion of B_USER, Addition of C_USER, Deletion of C_USER
     assertEquals(historicIdentityLinks.size(), 7);
-    
+
     //Query test
     HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.userId(A_USER_ID).count(), 3);
-    
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.userId(B_USER_ID).count(), 2);
- 
+
 
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.userId(C_USER_ID).count(), 2);
-    
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.operationType(IDENTITY_LINK_ADD).count(), 4);
-    
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.operationType(IDENTITY_LINK_DELETE).count(), 3);
-    
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.type(IdentityLinkType.ASSIGNEE).count(), 6);
-    
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.type(IdentityLinkType.OWNER).count(), 1);
   }
@@ -318,27 +321,27 @@ public class HistoricIdentityLinkLogTest extends PluggableProcessEngineTestCase 
     Task taskAssignee = taskService.newTask(taskAssigneeId);
     taskAssignee.setAssignee(USER_1);
     taskService.saveTask(taskAssignee);
-    
+
     Task taskOwner = taskService.newTask(taskOwnerId);
     taskOwner.setOwner(OWNER_1);
     taskService.saveTask(taskOwner);
-    
+
     Task taskEmpty = taskService.newTask();
     taskService.saveTask(taskEmpty);
-    
+
     // then
     historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 2);
-    
+
     // Basic Query test
     HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.type(IdentityLinkType.ASSIGNEE).count(), 1);
     assertEquals(query.userId(USER_1).count(), 1);
-    
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.type(IdentityLinkType.OWNER).count(), 1);
     assertEquals(query.userId(OWNER_1).count(), 1);
-    
+
     taskService.deleteTask(taskAssigneeId,true);
     taskService.deleteTask(taskOwnerId,true);
     taskService.deleteTask(taskEmpty.getId(), true);
@@ -377,7 +380,7 @@ public class HistoricIdentityLinkLogTest extends PluggableProcessEngineTestCase 
 
     taskService.deleteTask(taskAssigneeId, true);
   }
-  
+
   public void addAndDeleteUserWithAssigner(String taskId, String identityLinkType) {
     identityService.setAuthenticatedUserId(A_ASSIGNER_ID);
     taskService.addUserIdentityLink(taskId, A_USER_ID, identityLinkType);

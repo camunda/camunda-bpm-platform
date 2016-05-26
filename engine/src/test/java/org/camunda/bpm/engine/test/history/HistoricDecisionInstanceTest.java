@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
@@ -39,6 +40,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.variables.JavaSerializable;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -48,6 +50,7 @@ import org.joda.time.DateTime;
  * @author Philipp Ossler
  * @author Ingo Richtsmeier
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase {
 
   public static final String DECISION_CASE = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.caseWithDecisionTask.cmmn";
@@ -783,24 +786,24 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     } catch (ProcessEngineException e) {
     }
   }
-  
+
   @Deployment(resources = { DECISION_SINGLE_OUTPUT_DMN })
   public void testQueryByUserId() {
     evaluateDecisionWithAuthenticatedUser("demo");
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
-    
+
     assertThat(query.userId("demo").count(), is(1L));
   }
 
   @Deployment(resources = { DECISION_SINGLE_OUTPUT_DMN })
   public void testQueryByInvalidUserId() {
     evaluateDecisionWithAuthenticatedUser("demo");
-    
+
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
-    
+
     assertThat(query.userId("dem1").count(), is(0L));
-    
+
     try {
       query.userId(null);
       fail("exception expected");
