@@ -84,7 +84,7 @@
   <build>
     <resources>
       <resource>
-        <directory>src/main/standalone</directory>
+        <directory>src/main/common/standalone</directory>
         <filtering>true</filtering>
         <includes>
           <include>configuration/standalone.xml</include>
@@ -92,11 +92,11 @@
         </includes>
       </resource>
       <resource>
-        <directory>src/main/modules</directory>
+        <directory>src/main/common/modules</directory>
         <filtering>true</filtering>
       </resource>
       <resource>
-        <directory>src/main/domain</directory>
+        <directory>src/main/common/domain</directory>
         <filtering>true</filtering>
         <includes>
           <include>configuration/domain.xml</include>
@@ -206,7 +206,7 @@
                 <configuration>
                   <target unless="maven.test.skip">
                     <copy todir="${jboss.runtime.location}/modules" overwrite="true">
-                      <fileset dir="src/main/modules" />
+                      <fileset dir="src/main/common/modules" />
                     </copy>
 
                   </target>
@@ -315,7 +315,7 @@
                 <configuration>
                   <target unless="maven.test.skip">
                     <copy todir="${jboss.runtime.location}/modules" overwrite="true">
-                      <fileset dir="src/main/modules" />
+                      <fileset dir="src/main/common/modules" />
                     </copy>
 
                   </target>
@@ -373,37 +373,6 @@
                 <configuration>
                   <overwrite>true</overwrite>
                   <outputDirectory>${jboss.runtime.location}/domain</outputDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>install-test-runtime</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>assemble</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
-                <configuration>
-                  <descriptors>
-                    <descriptor>assembly.xml</descriptor>
-                  </descriptors>
-                  <finalName>camunda-qa-jboss-runtime-${project.version}</finalName>
-                  <appendAssemblyId>false</appendAssemblyId>
-                  <outputDirectory>target/</outputDirectory>
-                  <workDirectory>target/assembly/work</workDirectory>
-                  <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
               </execution>
             </executions>

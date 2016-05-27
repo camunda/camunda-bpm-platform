@@ -317,7 +317,7 @@
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
-            <version>1.4.19-SNAPSHOT</version>
+            <version>1.4.19</version>
             <executions>
               <execution>
                 <id>start-container</id>
