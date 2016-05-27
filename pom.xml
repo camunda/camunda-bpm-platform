@@ -55,7 +55,6 @@
         <module>distro/gf31</module>
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
-        <module>distro/webjar</module>
 
         <module>database</module>
         <module>parent</module>
@@ -72,6 +71,7 @@
         <module>distro/jbossas7</module>
         <module>distro/gf31</module>
         <module>distro/tomcat</module>
+        <module>distro/webjar</module>
       </modules>
     </profile>
 
