@@ -131,26 +131,6 @@
                   <goal>run</goal>
                 </goals>
               </execution>
-              <execution>
-                <id>copy-old-mysql-scripts-for-mariadb</id>
-                <phase>generate-test-resources</phase>
-                <configuration>
-                  <target>
-
-                    <!-- copy mysql create scripts from 7.4 for mariadb as with 7.5 mariadb has own scripts -->
-                    <!-- TODO: if 7.4 patch scripts for mysql are created they probably also have to be copied for mariadb -->
-                    <!-- NOTE: this should be removed during the 7.6 development cycle -->
-
-                    <copy file="${project.build.directory}/scripts-old/sql/create/mysql_engine_${camunda.version.old}.sql" tofile="${project.build.directory}/scripts-old/sql/create/mariadb_engine_${camunda.version.old}.sql" overwrite="true" />
-                    <copy file="${project.build.directory}/scripts-old/sql/create/mysql_identity_${camunda.version.old}.sql" tofile="${project.build.directory}/scripts-old/sql/create/mariadb_identity_${camunda.version.old}.sql" overwrite="true" />
-                    <copy file="${project.build.directory}/scripts-current/sql/upgrade/mysql_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" tofile="${project.build.directory}/scripts-current/sql/upgrade/mariadb_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" overwrite="true" />
-
-                  </target>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-              </execution>
             </executions>
           </plugin>
 
