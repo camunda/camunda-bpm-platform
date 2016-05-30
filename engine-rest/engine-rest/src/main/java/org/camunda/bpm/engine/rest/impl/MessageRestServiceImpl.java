@@ -69,9 +69,14 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
     Map<String, Object> processVariables = VariableValueDto.toMap(messageDto.getProcessVariables(), processEngine, objectMapper);
 
     MessageCorrelationBuilder builder = runtimeService
-        .createMessageCorrelation(messageDto.getMessageName())
-        .setVariables(processVariables)
-        .processInstanceBusinessKey(messageDto.getBusinessKey());
+        .createMessageCorrelation(messageDto.getMessageName());
+
+    if (processVariables != null) {
+      builder.setVariables(processVariables);
+    }
+    if (messageDto.getBusinessKey() != null) {
+      builder.processInstanceBusinessKey(messageDto.getBusinessKey());
+    }
 
     if (correlationKeys != null && !correlationKeys.isEmpty()) {
       for (Entry<String, Object> correlationKey  : correlationKeys.entrySet()) {

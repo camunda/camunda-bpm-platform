@@ -10,6 +10,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Date;
@@ -23,6 +24,7 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
@@ -35,6 +37,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.mockito.Mockito;
 
 import com.jayway.restassured.http.ContentType;
 
@@ -164,12 +167,8 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       .when().post(MESSAGE_URL);
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
-    verify(messageCorrelationBuilderMock).processInstanceBusinessKey(eq((String) null));
-    verify(messageCorrelationBuilderMock).setVariables(argThat(new EqualsMap(null)));
     verify(messageCorrelationBuilderMock).correlate();
-
-//    verify(runtimeServiceMock).correlateMessage(eq(messageName), eq((String) null),
-//        argThat(new EqualsMap(null)), argThat(new EqualsMap(null)));
+    verifyNoMoreInteractions(messageCorrelationBuilderMock);
   }
 
   @Test
@@ -190,8 +189,8 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
     verify(messageCorrelationBuilderMock).processInstanceBusinessKey(eq(businessKey));
-    verify(messageCorrelationBuilderMock).setVariables(argThat(new EqualsMap(null)));
     verify(messageCorrelationBuilderMock).correlate();
+    verifyNoMoreInteractions(messageCorrelationBuilderMock);
 
   }
 
@@ -209,13 +208,10 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(MESSAGE_URL);
 
-//    verify(runtimeServiceMock).correlateMessage(eq(messageName), eq(businessKey),
-//        argThat(new EqualsMap(null)), argThat(new EqualsMap(null)));
-
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
     verify(messageCorrelationBuilderMock).processInstanceBusinessKey(eq(businessKey));
-    verify(messageCorrelationBuilderMock).setVariables(argThat(new EqualsMap(null)));
     verify(messageCorrelationBuilderMock).correlateAll();
+    verifyNoMoreInteractions(messageCorrelationBuilderMock);
 
   }
 
@@ -274,10 +270,9 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       .when().post(MESSAGE_URL);
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
-    verify(messageCorrelationBuilderMock).processInstanceBusinessKey(eq((String) null));
-    verify(messageCorrelationBuilderMock).setVariables(argThat(new EqualsMap(null)));
     verify(messageCorrelationBuilderMock).tenantId(MockProvider.EXAMPLE_TENANT_ID);
     verify(messageCorrelationBuilderMock).correlate();
+    verifyNoMoreInteractions(messageCorrelationBuilderMock);
   }
 
   @Test
@@ -293,10 +288,9 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       .when().post(MESSAGE_URL);
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
-    verify(messageCorrelationBuilderMock).processInstanceBusinessKey(eq((String) null));
-    verify(messageCorrelationBuilderMock).setVariables(argThat(new EqualsMap(null)));
     verify(messageCorrelationBuilderMock).withoutTenantId();
     verify(messageCorrelationBuilderMock).correlate();
+    verifyNoMoreInteractions(messageCorrelationBuilderMock);
   }
 
   @Test
@@ -642,6 +636,30 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     verify(messageCorrelationBuilderMock).processInstanceId(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
 
     verify(messageCorrelationBuilderMock).correlate();
+  }
+
+  @Test
+  public void testMessageCorrelationWithoutBusinessKey() {
+    when(messageCorrelationBuilderMock.processInstanceBusinessKey(null))
+      .thenThrow(new NullValueException());
+
+    String messageName = "aMessageName";
+
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+       .body(messageParameters)
+    .then()
+      .expect().statusCode(Status.NO_CONTENT.getStatusCode())
+    .when().post(MESSAGE_URL);
+
+    verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
+
+    verify(messageCorrelationBuilderMock, Mockito.never()).processInstanceBusinessKey(anyString());
+    verify(messageCorrelationBuilderMock).correlate();
+    verifyNoMoreInteractions(messageCorrelationBuilderMock);
   }
 
 }

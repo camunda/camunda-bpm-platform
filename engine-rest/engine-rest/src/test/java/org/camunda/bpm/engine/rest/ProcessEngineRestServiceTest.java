@@ -19,11 +19,11 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -77,7 +77,6 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.CaseExecution;
@@ -111,7 +110,7 @@ public class ProcessEngineRestServiceTest extends
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
-  
+
   protected static final String ENGINES_URL = TEST_RESOURCE_ROOT_PATH + "/engine";
   protected static final String SINGLE_ENGINE_URL = ENGINES_URL + "/{name}";
   protected static final String PROCESS_DEFINITION_URL = SINGLE_ENGINE_URL + "/process-definition/{id}";
@@ -515,8 +514,8 @@ public class ProcessEngineRestServiceTest extends
       .when().post(MESSAGE_URL);
 
     verify(mockRuntimeService).createMessageCorrelation(eq(messageName));
-    verify(mockMessageCorrelationBuilder).setVariables(argThat(new EqualsMap(null)));
-    verify(mockMessageCorrelationBuilder).processInstanceBusinessKey(eq((String) null));
+    verify(mockMessageCorrelationBuilder).correlate();
+    verifyNoMoreInteractions(mockMessageCorrelationBuilder);
     verifyZeroInteractions(processEngine);
   }
 
