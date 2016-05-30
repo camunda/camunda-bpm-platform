@@ -50,7 +50,6 @@
         <module>distro/jbossas7</module>
         <module>distro/wildfly</module>
         <module>distro/wildfly10</module>
-        <module>distro/gf31</module>
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
 
@@ -69,7 +68,6 @@
         <module>distro/jbossas7</module>
         <module>distro/wildfly</module>
         <module>distro/wildfly10</module>
-        <module>distro/gf31</module>
         <module>distro/tomcat</module>
         <module>distro/webjar</module>
       </modules>
@@ -107,20 +105,6 @@
       <modules>
         <module>javaee/ejb-client</module>
         <module>distro/jbossas7</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>distro-gf31</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>javaee/ejb-service</module>
-        <module>javaee/ejb-client</module>
-        <module>javaee/jobexecutor-ra</module>
-        <module>javaee/jobexecutor-rar</module>
-        <module>distro/gf31</module>
       </modules>
     </profile>
 
