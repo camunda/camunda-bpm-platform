@@ -20,9 +20,6 @@
     The parent pom for all camunda BPM projects can be found in the parent directory relative to this file.
   </description>
 
-  <properties>
-  </properties>
-
   <profiles>
     <!-- distro profile is default and builds the complete distribution.
          Does not run integration tests. -->
@@ -41,7 +38,6 @@
         <module>javaee/jobexecutor-ra</module>
         <module>javaee/jobexecutor-rar</module>
 
-
         <module>engine</module>
         <module>engine-cdi</module>
         <module>engine-spring</module>
@@ -52,6 +48,8 @@
         <module>engine-plugins</module>
 
         <module>distro/jbossas7</module>
+        <module>distro/wildfly</module>
+        <module>distro/wildfly10</module>
         <module>distro/gf31</module>
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
@@ -69,6 +67,8 @@
       </activation>
       <modules>
         <module>distro/jbossas7</module>
+        <module>distro/wildfly</module>
+        <module>distro/wildfly10</module>
         <module>distro/gf31</module>
         <module>distro/tomcat</module>
         <module>distro/webjar</module>
@@ -160,6 +160,7 @@
         <module>bom</module>
       </modules>
     </profile>
+
     <profile>
       <!-- profile for running webapp unit tests in QA -->
       <id>check-webapps</id>
@@ -168,6 +169,7 @@
         <module>bom</module>
       </modules>
     </profile>
+
     <profile>
       <id>sonatype-oss-release</id>
       <modules>
