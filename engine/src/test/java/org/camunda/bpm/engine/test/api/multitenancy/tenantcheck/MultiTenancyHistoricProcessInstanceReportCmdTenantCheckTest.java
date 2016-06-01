@@ -100,10 +100,6 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
         .duration(MONTH);
 
     assertThat(result.size(), is(1));
-
-    DurationReportResult durationReportResult = result.get(0);
-    assertThat(durationReportResult.getPeriod(), is(5));
-    assertThat(durationReportResult.getPeriodUnit().name(), is("MONTH"));
   }
 
   @Test
@@ -120,10 +116,6 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
         .duration(MONTH);
 
     assertThat(result.size(), is(1));
-
-    DurationReportResult durationReportResult = result.get(0);
-    assertThat(durationReportResult.getPeriod(), is(5));
-    assertThat(durationReportResult.getPeriodUnit().name(), is("MONTH"));
   }
 
   @Test
@@ -166,10 +158,6 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
         .duration(MONTH);
 
     assertThat(result.size(), is(1));
-
-    DurationReportResult durationReportResult = result.get(0);
-    assertThat(durationReportResult.getPeriod(), is(5));
-    assertThat(durationReportResult.getPeriodUnit().name(), is("MONTH"));
   }
 
   @Test
@@ -228,10 +216,6 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
         .duration(MONTH);
 
     assertThat(result.size(), is(1));
-
-    DurationReportResult durationReportResult = result.get(0);
-    assertThat(durationReportResult.getPeriod(), is(5));
-    assertThat(durationReportResult.getPeriodUnit().name(), is("MONTH"));
   }
 
   @Test
