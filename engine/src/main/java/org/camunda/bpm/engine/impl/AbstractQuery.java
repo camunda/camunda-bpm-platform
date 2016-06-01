@@ -214,6 +214,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   }
 
   @Deprecated
+  @Override
   public String getOrderBy() {
     if(orderBy == null) {
       return super.getOrderBy();
