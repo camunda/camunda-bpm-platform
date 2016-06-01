@@ -13,11 +13,8 @@
   </parent>
 
   <properties>
-    <ldap.server.port>5026</ldap.server.port>
+    <ldap.server.port>10389</ldap.server.port>
     <ldap.server.port.posix>5027</ldap.server.port.posix>
-    <!-- org.apache.directory.server uses an old version of slf4j -->
-    <version.slf4j>1.5.6</version.slf4j>
-    <version.logback>0.9.15</version.logback>
   </properties>
 
   <dependencies>
@@ -34,25 +31,6 @@
       </exclusions>
       <scope>test</scope>
     </dependency>
-    
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <scope>test</scope>
-   </dependency>
-   
-   <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-      <scope>test</scope>
-   </dependency>
-
   </dependencies>
 
   <build>

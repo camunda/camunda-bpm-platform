@@ -17,14 +17,13 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 
-import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
-import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testGroupPaging;
+import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testUserPaging;
 
 /**
  * @author Roman Smirnov
@@ -38,6 +37,7 @@ public class LdapDisableAuthorizationCheckTest extends ResourceProcessEngineTest
 
   protected static LdapTestEnvironment ldapTestEnvironment;
 
+  @Override
   protected void setUp() throws Exception {
     if(ldapTestEnvironment == null) {
       ldapTestEnvironment = new LdapTestEnvironment();
@@ -46,6 +46,7 @@ public class LdapDisableAuthorizationCheckTest extends ResourceProcessEngineTest
     super.setUp();
   }
 
+  @Override
   protected void tearDown() throws Exception {
     if(ldapTestEnvironment != null) {
       ldapTestEnvironment.shutdown();
@@ -55,32 +56,7 @@ public class LdapDisableAuthorizationCheckTest extends ResourceProcessEngineTest
   }
 
   public void testUserQueryPagination() {
-    List<User> users = identityService.createUserQuery().listPage(0, 2);
-    assertEquals(2, users.size());
-
-    assertEquals("roman", users.get(0).getId());
-    assertEquals("robert", users.get(1).getId());
-
-    users = identityService.createUserQuery().listPage(2, 2);
-    assertEquals(2, users.size());
-
-    assertEquals("daniel", users.get(0).getId());
-    assertEquals("oscar", users.get(1).getId());
-
-    users = identityService.createUserQuery().listPage(4, 2);
-    assertEquals(2, users.size());
-
-    assertEquals("monster", users.get(0).getId());
-    assertEquals("david(IT)", users.get(1).getId());
-
-    users = identityService.createUserQuery().listPage(6, 2);
-    assertEquals(2, users.size());
-
-    assertEquals("ruecker", users.get(0).getId());
-    assertEquals("fozzie", users.get(1).getId());
-
-    users = identityService.createUserQuery().listPage(8, 2);
-    assertEquals(0, users.size());
+    LdapTestUtilities.testUserPaging(identityService);
   }
 
   public void testUserQueryPaginationWithAuthenticatedUserWithoutAuthorizations() {
@@ -88,33 +64,7 @@ public class LdapDisableAuthorizationCheckTest extends ResourceProcessEngineTest
       processEngineConfiguration.setAuthorizationEnabled(true);
 
       identityService.setAuthenticatedUserId("oscar");
-
-      List<User> users = identityService.createUserQuery().listPage(0, 2);
-      assertEquals(2, users.size());
-
-      assertEquals("roman", users.get(0).getId());
-      assertEquals("robert", users.get(1).getId());
-
-      users = identityService.createUserQuery().listPage(2, 2);
-      assertEquals(2, users.size());
-
-      assertEquals("daniel", users.get(0).getId());
-      assertEquals("oscar", users.get(1).getId());
-
-      users = identityService.createUserQuery().listPage(4, 2);
-      assertEquals(2, users.size());
-
-      assertEquals("monster", users.get(0).getId());
-      assertEquals("david(IT)", users.get(1).getId());
-
-      users = identityService.createUserQuery().listPage(6, 2);
-      assertEquals(2, users.size());
-
-      assertEquals("ruecker", users.get(0).getId());
-      assertEquals("fozzie", users.get(1).getId());
-
-      users = identityService.createUserQuery().listPage(8, 2);
-      assertEquals(0, users.size());
+      testUserPaging(identityService);
 
     } finally {
       processEngineConfiguration.setAuthorizationEnabled(false);
@@ -132,33 +82,7 @@ public class LdapDisableAuthorizationCheckTest extends ResourceProcessEngineTest
       processEngineConfiguration.setAuthorizationEnabled(true);
 
       identityService.setAuthenticatedUserId("oscar");
-
-      List<User> users = identityService.createUserQuery().listPage(0, 2);
-      assertEquals(2, users.size());
-
-      assertEquals("roman", users.get(0).getId());
-      assertEquals("robert", users.get(1).getId());
-
-      users = identityService.createUserQuery().listPage(2, 2);
-      assertEquals(2, users.size());
-
-      assertEquals("daniel", users.get(0).getId());
-      assertEquals("oscar", users.get(1).getId());
-
-      users = identityService.createUserQuery().listPage(4, 2);
-      assertEquals(2, users.size());
-
-      assertEquals("monster", users.get(0).getId());
-      assertEquals("david(IT)", users.get(1).getId());
-
-      users = identityService.createUserQuery().listPage(6, 2);
-      assertEquals(2, users.size());
-
-      assertEquals("ruecker", users.get(0).getId());
-      assertEquals("fozzie", users.get(1).getId());
-
-      users = identityService.createUserQuery().listPage(8, 2);
-      assertEquals(0, users.size());
+      testUserPaging(identityService);
 
     } finally {
       processEngineConfiguration.setAuthorizationEnabled(false);
@@ -172,25 +96,7 @@ public class LdapDisableAuthorizationCheckTest extends ResourceProcessEngineTest
   }
 
   public void testGroupQueryPagination() {
-    List<Group> groups = identityService.createGroupQuery().listPage(0, 2);
-    assertEquals(2, groups.size());
-
-    assertEquals("management", groups.get(0).getId());
-    assertEquals("development", groups.get(1).getId());
-
-    groups = identityService.createGroupQuery().listPage(2, 2);
-    assertEquals(2, groups.size());
-
-    assertEquals("consulting", groups.get(0).getId());
-    assertEquals("sales", groups.get(1).getId());
-
-    groups = identityService.createGroupQuery().listPage(4, 2);
-    assertEquals(1, groups.size());
-
-    assertEquals("external", groups.get(0).getId());
-
-    groups = identityService.createGroupQuery().listPage(6, 2);
-    assertEquals(0, groups.size());
+    testGroupPaging(identityService);
   }
 
   public void testGroupQueryPaginationWithAuthenticatedUserWithoutAuthorizations() {
@@ -198,26 +104,7 @@ public class LdapDisableAuthorizationCheckTest extends ResourceProcessEngineTest
       processEngineConfiguration.setAuthorizationEnabled(true);
 
       identityService.setAuthenticatedUserId("oscar");
-
-      List<Group> groups = identityService.createGroupQuery().listPage(0, 2);
-      assertEquals(2, groups.size());
-
-      assertEquals("management", groups.get(0).getId());
-      assertEquals("development", groups.get(1).getId());
-
-      groups = identityService.createGroupQuery().listPage(2, 2);
-      assertEquals(2, groups.size());
-
-      assertEquals("consulting", groups.get(0).getId());
-      assertEquals("sales", groups.get(1).getId());
-
-      groups = identityService.createGroupQuery().listPage(4, 2);
-      assertEquals(1, groups.size());
-
-      assertEquals("external", groups.get(0).getId());
-
-      groups = identityService.createGroupQuery().listPage(6, 2);
-      assertEquals(0, groups.size());
+      testGroupPaging(identityService);
 
     } finally {
       processEngineConfiguration.setAuthorizationEnabled(false);
@@ -234,26 +121,7 @@ public class LdapDisableAuthorizationCheckTest extends ResourceProcessEngineTest
       processEngineConfiguration.setAuthorizationEnabled(true);
 
       identityService.setAuthenticatedUserId("oscar");
-
-      List<Group> groups = identityService.createGroupQuery().listPage(0, 2);
-      assertEquals(2, groups.size());
-
-      assertEquals("management", groups.get(0).getId());
-      assertEquals("development", groups.get(1).getId());
-
-      groups = identityService.createGroupQuery().listPage(2, 2);
-      assertEquals(2, groups.size());
-
-      assertEquals("consulting", groups.get(0).getId());
-      assertEquals("sales", groups.get(1).getId());
-
-      groups = identityService.createGroupQuery().listPage(4, 2);
-      assertEquals(1, groups.size());
-
-      assertEquals("external", groups.get(0).getId());
-
-      groups = identityService.createGroupQuery().listPage(6, 2);
-      assertEquals(0, groups.size());
+      testGroupPaging(identityService);
 
     } finally {
       processEngineConfiguration.setAuthorizationEnabled(false);

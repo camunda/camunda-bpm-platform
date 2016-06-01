@@ -12,16 +12,20 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
+import java.util.HashSet;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
 
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
+import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.checkPagingResults;
+import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testGroupPaging;
 
 
 /**
@@ -120,26 +124,9 @@ public class LdapGroupQueryTest extends LdapIdentityProviderTest {
 
   }
 
+
   public void testPagination() {
-    List<Group> groups = identityService.createGroupQuery().listPage(0, 2);
-    assertEquals(2, groups.size());
-
-    assertEquals("management", groups.get(0).getId());
-    assertEquals("development", groups.get(1).getId());
-
-    groups = identityService.createGroupQuery().listPage(2, 2);
-    assertEquals(2, groups.size());
-
-    assertEquals("consulting", groups.get(0).getId());
-    assertEquals("sales", groups.get(1).getId());
-
-    groups = identityService.createGroupQuery().listPage(4, 2);
-    assertEquals(1, groups.size());
-
-    assertEquals("external", groups.get(0).getId());
-
-    groups = identityService.createGroupQuery().listPage(6, 2);
-    assertEquals(0, groups.size());
+    testGroupPaging(identityService);
   }
 
   public void testPaginationWithAuthenticatedUser() {
@@ -152,16 +139,15 @@ public class LdapGroupQueryTest extends LdapIdentityProviderTest {
 
       identityService.setAuthenticatedUserId("oscar");
 
+      Set<String> groupNames = new HashSet<String>();
       List<Group> groups = identityService.createGroupQuery().listPage(0, 2);
       assertEquals(2, groups.size());
-
-      assertEquals("management", groups.get(0).getId());
-      assertEquals("consulting", groups.get(1).getId());
+      checkPagingResults(groupNames, groups.get(0).getId(), groups.get(1).getId());
 
       groups = identityService.createGroupQuery().listPage(2, 2);
       assertEquals(1, groups.size());
-
-      assertEquals("external", groups.get(0).getId());
+      assertFalse(groupNames.contains(groups.get(0).getId()));
+      groupNames.add(groups.get(0).getId());
 
       groups = identityService.createGroupQuery().listPage(4, 2);
       assertEquals(0, groups.size());

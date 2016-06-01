@@ -12,16 +12,20 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
+import java.util.HashSet;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.User;
+import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.checkPagingResults;
+import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testUserPaging;
 
 /**
  * @author Daniel Meyer
@@ -183,32 +187,7 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
   }
 
   public void testPagination() {
-    List<User> users = identityService.createUserQuery().listPage(0, 2);
-    assertEquals(2, users.size());
-
-    assertEquals("roman", users.get(0).getId());
-    assertEquals("robert", users.get(1).getId());
-
-    users = identityService.createUserQuery().listPage(2, 2);
-    assertEquals(2, users.size());
-
-    assertEquals("daniel", users.get(0).getId());
-    assertEquals("oscar", users.get(1).getId());
-
-    users = identityService.createUserQuery().listPage(4, 2);
-    assertEquals(2, users.size());
-
-    assertEquals("monster", users.get(0).getId());
-    assertEquals("david(IT)", users.get(1).getId());
-
-    users = identityService.createUserQuery().listPage(6, 2);
-    assertEquals(2, users.size());
-
-    assertEquals("ruecker", users.get(0).getId());
-    assertEquals("fozzie", users.get(1).getId());
-
-    users = identityService.createUserQuery().listPage(8, 2);
-    assertEquals(0, users.size());
+    testUserPaging(identityService);
   }
 
   public void testPaginationWithAuthenticatedUser() {
@@ -222,22 +201,19 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
 
       identityService.setAuthenticatedUserId("oscar");
 
+      Set<String> userNames = new HashSet<String>();
       List<User> users = identityService.createUserQuery().listPage(0, 2);
       assertEquals(2, users.size());
-
-      assertEquals("roman", users.get(0).getId());
-      assertEquals("daniel", users.get(1).getId());
+      checkPagingResults(userNames, users.get(0).getId(), users.get(1).getId());
 
       users = identityService.createUserQuery().listPage(2, 2);
       assertEquals(2, users.size());
-
-      assertEquals("oscar", users.get(0).getId());
-      assertEquals("monster", users.get(1).getId());
+      checkPagingResults(userNames, users.get(0).getId(), users.get(1).getId());
 
       users = identityService.createUserQuery().listPage(4, 2);
       assertEquals(1, users.size());
-
-      assertEquals("ruecker", users.get(0).getId());
+      assertFalse(userNames.contains(users.get(0).getId()));
+      userNames.add(users.get(0).getId());
 
       identityService.setAuthenticatedUserId("daniel");
 
