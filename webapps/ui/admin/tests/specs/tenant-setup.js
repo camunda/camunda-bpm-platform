@@ -79,6 +79,29 @@ var groupPagerSetup = combine(
   }))
 );
 
+var pagingSetup = combine(
+
+  operation('tenant', 'create', createEntities(function(idx) {
+    return {
+      id:   'tenant' + idx,
+      name: 'Tenant ' + idx
+    };
+  })),
+
+  operation('group', 'create', [{
+    id : 'group',
+    name : 'group',
+    type : 'GROUP'
+  }]),
+
+  operation('user', 'create', [{
+      id:         'user',
+      password:   'cam123',
+      firstName:  'abc',
+      lastName:   'def'
+  }])
+);
+
 module.exports = {
 
   setup1: defaultTenantSetup,
@@ -87,6 +110,8 @@ module.exports = {
 
   setup3: groupPagerSetup,
 
-  setup4: userPagerSetup
+  setup4: userPagerSetup,
+
+  setup5: pagingSetup
 
 };

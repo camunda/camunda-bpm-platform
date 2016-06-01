@@ -24,7 +24,7 @@
       <tr ng-repeat="tenant in availableTenants">
         <td class="select">
           <input type="checkbox"
-                 ng-model="tenant.checked" />
+                 ng-model="tenant.checked"/>
         </td>
 
         <td class="tenant-id">
@@ -37,6 +37,23 @@
       </tr>
     </tbody>
   </table>
+
+  <pagination ng-if="modalPages.total > modalPages.size && status !== 'SUCCESS'"
+              class="pagination-sm"
+
+              ng-model="modalPages.current"
+              ng-change="pageChange(modalPages.current)"
+
+              total-items="modalPages.total"
+              items-per-page="modalPages.size"
+              max-size="7"
+
+              boundary-links="true"
+
+              next-text="&rsaquo;"
+              last-text="&raquo;"
+              previous-text="&lsaquo;"
+              first-text="&laquo;"></pagination>
 
   <p ng-show="availableTenants.length == 0">
     There are no additional tenants available to which the user can be added.
@@ -65,9 +82,9 @@
 
   <button class="btn btn-primary"
           ng-click="createUserMemberships()"
-          ng-disabled="status !== 'beforeCreate'"
+          ng-disabled="status !== 'beforeCreate' || checkedItemsCount === 0"
           ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed' || availableTenants.length == 0">
-    Add Tenants
+    Add {{ checkedItemsCount }} Tenants
   </button>
 </div>
 <!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/create-group-membership.html -->

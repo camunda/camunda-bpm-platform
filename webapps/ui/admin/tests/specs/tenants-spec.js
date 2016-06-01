@@ -7,6 +7,7 @@ testHelper.expectStringEqual = require('../../../common/tests/string-equal');
 
 var tenantsPage = require('../pages/tenants');
 var usersPage = require('../pages/users');
+var groupsPage = require('../pages/groups');
 
 describe('Admin Tenants Spec', function() {
   describe('create new tenant', function() {
@@ -153,6 +154,55 @@ describe('Admin Tenants Spec', function() {
   });
 
   describe('Pagination', function () {
+
+    describe('list of tenants in add tenants to user modal', function() {
+      before(function() {
+        return testHelper(setupFile.setup5, function() {
+          tenantsPage.navigateToWebapp('Admin');
+          tenantsPage.authentication.userLogin('admin', 'admin');
+
+          usersPage.navigateTo();
+        });
+      });
+      
+      it('displays a pager', function () {
+        // given
+        usersPage.selectUserByEditLink(0);
+        usersPage.editUserProfile.selectUserNavbarItem('Tenants');
+
+        // when
+        usersPage.editUserTenants.openAddTenantModal();
+
+        // then
+        expect(element(by.css('.pagination')).isPresent()).to.eventually.eql(true);
+        expect(element.all(by.css('[ng-repeat="page in pages track by $index"]')).count()).to.eventually.eql(3);
+      });
+    });
+
+    describe('list of tenants in add tenants to group modal', function() {
+      before(function() {
+        return testHelper(setupFile.setup5, function() {
+          tenantsPage.navigateToWebapp('Admin');
+          tenantsPage.authentication.userLogin('admin', 'admin');
+
+          groupsPage.navigateTo();
+        });
+      });
+
+      it('displays a pager', function () {
+
+        // given
+        groupsPage.selectGroupByEditLink(0);
+        groupsPage.editGroup.selectUserNavbarItem('Tenants');
+
+        // when
+        groupsPage.editGroupTenants.openAddTenantModal();
+
+        // then
+        expect(element(by.css('.pagination')).isPresent()).to.eventually.eql(true);
+        expect(element.all(by.css('[ng-repeat="page in pages track by $index"]')).count()).to.eventually.eql(3);
+      });
+    });
 
     describe('list of tenants', function() {
 
