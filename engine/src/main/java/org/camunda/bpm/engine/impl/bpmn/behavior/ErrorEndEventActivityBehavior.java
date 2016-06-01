@@ -22,13 +22,19 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 public class ErrorEndEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
   protected String errorCode;
+  protected String errorMessage;
 
   public ErrorEndEventActivityBehavior(String errorCode) {
     this.errorCode = errorCode;
   }
 
+  public ErrorEndEventActivityBehavior(String errorCode, String errorMessage) {
+    this.errorCode = errorCode;
+    this.errorMessage = errorMessage;
+  }
+
   public void execute(ActivityExecution execution) throws Exception {
-    propagateError(errorCode, null, execution);
+    propagateError(errorCode, errorMessage, null, execution);
   }
 
   public String getErrorCode() {
@@ -38,4 +44,10 @@ public class ErrorEndEventActivityBehavior extends AbstractBpmnActivityBehavior 
     this.errorCode = errorCode;
   }
 
+  public String getErrorMessage() {
+    return errorMessage;
+  }
+  public void setErrorMessage(String errorMessage) {
+    this.errorMessage = errorMessage;
+  }
 }

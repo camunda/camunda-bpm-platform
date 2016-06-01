@@ -582,6 +582,7 @@
 			<xsd:extension base="tRootElement">
 				<xsd:attribute name="name" type="xsd:string"/>
 				<xsd:attribute name="errorCode" type="xsd:string"/>
+				<xsd:attribute name="errorMessage" type="xsd:string"/>
 				<xsd:attribute name="structureRef" type="xsd:QName"/>
 			</xsd:extension>
 		</xsd:complexContent>

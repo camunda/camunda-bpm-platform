@@ -38,6 +38,7 @@ public class ErrorEventDefinition implements Serializable {
   protected String errorCode;
   protected Integer precedence =0;
   protected String errorCodeVariable;
+  protected String errorMessageVariable;
 
   public ErrorEventDefinition(String handlerActivityId) {
     this.handlerActivityId=handlerActivityId;
@@ -101,4 +102,11 @@ public class ErrorEventDefinition implements Serializable {
     return errorCodeVariable;
   }
 
+  public void setErrorMessageVariable(String errorMessageVariable) {
+    this.errorMessageVariable = errorMessageVariable;
+  }
+
+  public String getErrorMessageVariable() {
+    return errorMessageVariable;
+  }
 }

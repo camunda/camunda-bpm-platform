@@ -165,6 +165,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
  * @author Nico Rehwaldt
  * @author Ronny Bräunlich
  * @author Christopher Zell
+ * @author Deivarayan Azhagappan
  */
 public class BpmnParse extends Parse {
 
@@ -458,7 +459,11 @@ public class BpmnParse extends Parse {
       if (errorCode != null) {
         error.setErrorCode(errorCode);
       }
-
+      String errorMessage = errorElement.attribute("errorMessage");
+      if(errorMessage != null) {
+        error.setErrorMessage(errorMessage);
+      }
+        
       errors.put(id, error);
     }
   }
@@ -1101,6 +1106,7 @@ public class BpmnParse extends Parse {
     }
     definition.setPrecedence(10);
     setErrorCodeVariableOnErrorEventDefinition(errorEventDefinition, definition);
+    setErrorMessageVariableOnErrorEventDefinition(errorEventDefinition, definition);
     addErrorEventDefinition(definition, startEventActivity.getEventScope());
   }
 
@@ -1117,6 +1123,22 @@ public class BpmnParse extends Parse {
     String errorCodeVar = errorEventDefinition.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "errorCodeVariable");
     if (errorCodeVar != null) {
       definition.setErrorCodeVariable(errorCodeVar);
+    }
+  }
+
+  /**
+   * Sets the value for "camunda:errorMessageVariable" on the passed definition if
+   * it's present.
+   *
+   * @param errorEventDefinition
+   *          the XML errorEventDefinition tag
+   * @param definition
+   *          the errorEventDefintion that can get the errorMessageVariable value
+   */
+  protected void setErrorMessageVariableOnErrorEventDefinition(Element errorEventDefinition, ErrorEventDefinition definition) {
+    String errorMessageVariable = errorEventDefinition.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "errorMessageVariable");
+    if (errorMessageVariable != null) {
+      definition.setErrorMessageVariable(errorMessageVariable);
     }
   }
 
@@ -2803,6 +2825,7 @@ public class BpmnParse extends Parse {
 
       if (errorEventDefinition != null) { // error end event
         String errorRef = errorEventDefinition.attribute("errorRef");
+        
         if (errorRef == null || "".equals(errorRef)) {
           addError("'errorRef' attribute is mandatory on error end event", errorEventDefinition);
         } else {
@@ -2813,7 +2836,11 @@ public class BpmnParse extends Parse {
                 errorEventDefinition);
           }
           activity.getProperties().set(BpmnProperties.TYPE, "errorEndEvent");
-          activity.setActivityBehavior(new ErrorEndEventActivityBehavior(error != null ? error.getErrorCode() : errorRef));
+          if(error != null) {
+            activity.setActivityBehavior(new ErrorEndEventActivityBehavior(error.getErrorCode(), error.getErrorMessage()));
+          } else {
+            activity.setActivityBehavior(new ErrorEndEventActivityBehavior(errorRef));
+          }
         }
       } else if (cancelEventDefinition != null) {
         if (scope.getProperty("type") == null || !scope.getProperty("type").equals("transaction")) {
@@ -3234,6 +3261,7 @@ public class BpmnParse extends Parse {
       definition.setErrorCode(error == null ? errorRef : error.getErrorCode());
     }
     setErrorCodeVariableOnErrorEventDefinition(errorEventDefinition, definition);
+    setErrorMessageVariableOnErrorEventDefinition(errorEventDefinition, definition);
 
     addErrorEventDefinition(definition, boundaryEventActivity.getEventScope());
 

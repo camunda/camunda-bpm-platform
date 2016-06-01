@@ -37,6 +37,7 @@ public class BpmnError extends ProcessEngineException {
   private static final long serialVersionUID = 1L;
 
   private String errorCode;
+  private String errorMessage;
 
   public BpmnError(String errorCode) {
     super("");
@@ -46,6 +47,7 @@ public class BpmnError extends ProcessEngineException {
   public BpmnError(String errorCode, String message) {
     super(message + " (errorCode='" + errorCode + "')");
     setErrorCode(errorCode);
+    setMessage(message);
   }
 
   protected void setErrorCode(String errorCode) {
@@ -61,4 +63,12 @@ public class BpmnError extends ProcessEngineException {
     return super.toString() + " (errorCode='" + errorCode + "')";
   }
 
+  protected void setMessage(String errorMessage) {
+    ensureNotEmpty("Error Message", errorMessage);
+    this.errorMessage = errorMessage;
+  }
+
+  public String getMessage() {
+    return errorMessage;
+  }
 }

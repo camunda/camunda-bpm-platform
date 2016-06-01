@@ -85,7 +85,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
       throw exception;
     }
     else {
-      propagateError(null, exception, execution);
+      propagateError(null, null,exception, execution);
     }
   }
 
@@ -165,10 +165,10 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
   }
 
   protected void propagateBpmnError(BpmnError error, ActivityExecution execution) throws Exception {
-    propagateError(error.getErrorCode(), null, execution);
+    propagateError(error.getErrorCode(), error.getMessage(), null, execution);
   }
 
-  protected void propagateError(String errorCode, Exception origException, ActivityExecution execution) throws Exception {
+  protected void propagateError(String errorCode, String errorMessage, Exception origException, ActivityExecution execution) throws Exception {
 
     ActivityExecutionHierarchyWalker walker = new ActivityExecutionHierarchyWalker(execution);
 
@@ -213,8 +213,11 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
       ErrorEventDefinition errorDefinition = errorDeclarationFinder.getErrorEventDefinition();
       PvmExecutionImpl errorHandlingExecution = activityExecutionMappingCollector.getExecutionForScope(errorHandlingActivity.getEventScope());
 
-      if(errorDefinition.getErrorCodeVariable() != null){
+      if(errorDefinition.getErrorCodeVariable() != null) {
         errorHandlingExecution.setVariable(errorDefinition.getErrorCodeVariable(), errorCode);
+      }
+      if(errorDefinition.getErrorMessageVariable() != null) {
+        errorHandlingExecution.setVariable(errorDefinition.getErrorMessageVariable(), errorMessage);
       }
       errorHandlingExecution.executeActivity(errorHandlingActivity);
     }
