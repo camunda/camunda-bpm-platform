@@ -3,8 +3,61 @@
 var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
-          '$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI', '$modalInstance', 'member', 'memberId', 'idList',
-  function($scope,   $q,   $location,   Uri,   Notifications,   camAPI,   $modalInstance,   member,   memberId,   idList) {
+          '$scope', '$q', '$location', 'search', 'Uri', 'Notifications', 'camAPI', '$modalInstance', 'member', 'memberId', 'idList',
+  function($scope,   $q,   $location,   search,   Uri,   Notifications,   camAPI,   $modalInstance,   member,   memberId,   idList) {
+
+    var modalPages = $scope.modalPages = {
+      size: 20,
+      total: 0,
+      current: 1
+    };
+
+    var checkedItems = $scope.checkedItems = [];
+        $scope.checkedItemsCount = 0;
+
+    var addItemPage = function(page) {
+      if(checkedItems[page] === undefined) {
+        checkedItems[page] = []
+      }
+    };
+
+    var addItem = function(id, page) {
+      if(checkedItems[page].indexOf(id) === -1) {
+        checkedItems[page].push(id);
+        $scope.checkedItemsCount++;
+      }
+    };
+
+    var removeItem = function(id, page) {
+      var idx = checkedItems[page].indexOf(id);
+      if(idx !== -1) {
+        checkedItems[page].splice(idx, 1);
+        $scope.checkedItemsCount--;
+      }
+    };
+
+    var executeItem = function(id, page, callback) {
+      if(checkedItems[page].indexOf(id) !== -1) {
+        callback();
+      }
+    };
+
+    $scope.$watch(function() {
+      return parseInt(($location.search() || {}).modalPage || '1');
+    }, function(newValue) {
+      modalPages.current = newValue;
+
+      // Invalidates available tenants when we change the page
+      // prevents duplication of tenants in checkedItems
+      $scope.availableTenants = undefined;
+
+      addItemPage(modalPages.current);
+      loadAllTenants();
+    });
+
+    $scope.pageChange = function(page) {
+      search.updateSilently({ modalPage: !page || page == 1 ? null : page });
+    };
 
     var TenantResource = camAPI.resource('tenant');
 
@@ -23,40 +76,54 @@ module.exports = [
     });
 
     function loadAllTenants() {
-      var deferred = $q.defer();
+      var page = modalPages.current,
+          count = modalPages.size,
+          firstResult = (page - 1) * count;
 
-      TenantResource.list(function(err, res) {
+      var pagingParams = {
+        firstResult: firstResult,
+        maxResults: count
+      };
+
+      TenantResource.list(pagingParams, function(err, res) {
         if(err === null) {
-          deferred.resolve(res);
+          $scope.availableTenants = [];
+          angular.forEach(res, function(tenant) {
+            var id = tenant.id;
+            if($scope.idList.indexOf(id) == -1) {
+
+              executeItem(id, modalPages.current, function() {
+                tenant.checked = true;
+              });
+
+              $scope.availableTenants.push(tenant);
+            }
+          });
+          $scope.status = BEFORE_CREATE;
         } else {
-          deferred.reject(err.data);
+          $scope.status = LOADING_FAILED;
+          Notifications.addError({'status': 'Failed', 'message': 'Loading of tenants failed: ' + err.data.message, 'exclusive': ['type']});
         }
       });
 
-      return deferred.promise;
+      TenantResource.count(function(err, res) {
+        if(err === null) {
+          modalPages.total = res.count;
+        }
+      });
     }
-
-    $q.all([ loadAllTenants() ]).then(function(results) {
-      var availableTenants = results[0];
-      $scope.availableTenants = [];
-      angular.forEach(availableTenants, function(tenant) {
-        if($scope.idList.indexOf(tenant.id) == -1) {
-          $scope.availableTenants.push(tenant);
-        }
-      });
-      $scope.status = BEFORE_CREATE;
-    }, function (error) {
-      $scope.status = LOADING_FAILED;
-      Notifications.addError({'status': 'Failed', 'message': 'Loading of tenants failed: ' + error.message, 'exclusive': ['type']});
-    });
-
     
     var allTenantsChecked = $scope.allTenantsChecked = function() {
       if($scope.availableTenants !== undefined) {
         var counter = 0;
+
         angular.forEach($scope.availableTenants, function(tenant) {
-          if( tenant.checked ) {
+          var id = tenant.id;
+          if( tenant.checked) {
             counter++;
+            addItem(id, modalPages.current);
+          } else {
+            removeItem(id, modalPages.current);
           }
         });
 
@@ -82,12 +149,13 @@ module.exports = [
       $scope.status = PERFORM_CREATE;
 
       var selectedTenantIds = [];
-      angular.forEach($scope.availableTenants, function(tenant){
-        if(tenant.checked) {
-          selectedTenantIds.push(tenant.id);
-        }
+      angular.forEach(checkedItems, function(item){
+        angular.forEach(item, function(id) {
+          if(selectedTenantIds.indexOf(id) === -1) {
+            selectedTenantIds.push(id);
+          }
+        });
       });
-
 
       return selectedTenantIds;
     };
@@ -118,12 +186,12 @@ module.exports = [
 
         if( err === null ) {
           if( completeCount === selectedTenantIds.length ) {
-            deferred.resolve();
+            deferred.resolve(res);
           }
 
         } else {
           if( completeCount === selectedTenantIds.length ) {
-            deferred.reject();
+            deferred.reject(err);
           }
         }
       };
@@ -156,4 +224,6 @@ module.exports = [
     $scope.close = function (status) {
       $modalInstance.close(status);
     };
+
+    loadAllTenants();
   }];
