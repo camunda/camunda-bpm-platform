@@ -321,6 +321,7 @@ public final class BpmnModelConstants {
   public static final String BPMN_ATTRIBUTE_ITEM_REF = "itemRef";
   public static final String BPMN_ATTRIBUTE_ITEM_SUBJECT_REF = "itemSubjectRef";
   public static final String BPMN_ATTRIBUTE_ERROR_CODE = "errorCode";
+  public static final String BPMN_ATTRIBUTE_ERROR_MESSAGE = "errorMessage";
   public static final String BPMN_ATTRIBUTE_LANGUAGE = "language";
   public static final String BPMN_ATTRIBUTE_EVALUATES_TO_TYPE_REF = "evaluatesToTypeRef";
   public static final String BPMN_ATTRIBUTE_PARALLEL_MULTIPLE = "parallelMultiple";
@@ -429,6 +430,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_ELEMENT_VARIABLE = "elementVariable";
   public static final String CAMUNDA_ATTRIBUTE_EVENT = "event";
   public static final String CAMUNDA_ATTRIBUTE_ERROR_CODE_VARIABLE = "errorCodeVariable";
+  public static final String CAMUNDA_ATTRIBUTE_ERROR_MESSAGE_VARIABLE = "errorMessageVariable";
   public static final String CAMUNDA_ATTRIBUTE_EXCLUSIVE = "exclusive";
   public static final String CAMUNDA_ATTRIBUTE_EXPRESSION = "expression";
   public static final String CAMUNDA_ATTRIBUTE_FORM_HANDLER_CLASS = "formHandlerClass";

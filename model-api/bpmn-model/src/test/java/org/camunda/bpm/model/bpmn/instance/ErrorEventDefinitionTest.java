@@ -14,7 +14,8 @@ public class ErrorEventDefinitionTest extends AbstractEventDefinitionTest {
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
       new AttributeAssumption("errorRef"),
-      new AttributeAssumption(CAMUNDA_NS, "errorCodeVariable")
+      new AttributeAssumption(CAMUNDA_NS, "errorCodeVariable"),
+      new AttributeAssumption(CAMUNDA_NS, "errorMessageVariable")
     );
   }
 

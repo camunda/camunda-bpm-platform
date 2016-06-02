@@ -31,7 +31,7 @@
         </camunda:potentialStarter>
         <camunda:formProperty id="test" name="test" type="test" variable="test" expression="${test}" datePattern="test" default="test"/>
       </extensionElements>
-      <errorEventDefinition camunda:errorCodeVariable="errorVariable"/>
+      <errorEventDefinition camunda:errorCodeVariable="errorVariable" camunda:errorMessageVariable="errorMessageVariable"/>
     </startEvent>
 
     <sequenceFlow id="sequenceFlow" sourceRef="startEvent" targetRef="userTask">

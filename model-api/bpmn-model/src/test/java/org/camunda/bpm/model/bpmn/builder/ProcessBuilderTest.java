@@ -664,6 +664,22 @@ public class ProcessBuilderTest {
   }
 
   @Test
+  public void testErrorDefinitionsForStartEvent() {
+    modelInstance = Bpmn.createProcess()
+    .startEvent("start")
+      .errorEventDefinition("event")
+        .errorCodeVariable("errorCodeVariable")
+        .errorMessageVariable("errorMessageVariable")
+        .error("errorCode", "Exception")
+      .errorEventDefinitionDone()
+     .endEvent().done();
+ 
+    Bpmn.writeModelToStream(System.out, modelInstance);
+    assertErrorEventDefinition("start", "errorCode", "Exception");
+    assertErrorEventDefinitionForErrorVariables("start", "errorCodeVariable", "errorMessageVariable");
+  }
+
+  @Test
   public void testCallActivityCamundaExtension() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
@@ -1769,11 +1785,11 @@ public class ProcessBuilderTest {
       .userTask("task")
       .endEvent()
       .moveToActivity("task")
-      .boundaryEvent("boundary").error("myErrorCode")
+      .boundaryEvent("boundary").error("myErrorCode", "myErrorMessage")
       .endEvent("boundaryEnd")
       .done();
-
-    assertErrorEventDefinition("boundary", "myErrorCode");
+    
+    assertErrorEventDefinition("boundary", "myErrorCode", "myErrorMessage");
 
     UserTask userTask = modelInstance.getModelElementById("task");
     BoundaryEvent boundaryEvent = modelInstance.getModelElementById("boundary");
@@ -1791,13 +1807,49 @@ public class ProcessBuilderTest {
   }
 
   @Test
+  public void testErrorDefinitionForBoundaryEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent()
+      .moveToActivity("task")
+      .boundaryEvent("boundary")
+        .errorEventDefinition("event")
+          .errorCodeVariable("errorCodeVariable")
+          .errorMessageVariable("errorMessageVariable")
+          .error("errorCode", "errorMessage")
+        .errorEventDefinitionDone()  
+      .endEvent("boundaryEnd")
+      .done();
+
+    assertErrorEventDefinition("boundary", "errorCode", "errorMessage");
+    assertErrorEventDefinitionForErrorVariables("boundary", "errorCodeVariable", "errorMessageVariable");
+  }
+
+  @Test
   public void testErrorEndEvent() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
-      .endEvent("end").error("myErrorCode")
+      .endEvent("end").error("myErrorCode", "myErrorMessage")
       .done();
 
-    assertErrorEventDefinition("end", "myErrorCode");
+    assertErrorEventDefinition("end", "myErrorCode", "myErrorMessage");
+  }
+
+  @Test
+  public void testErrorDefinitionsForEndEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .endEvent("end")
+        .errorEventDefinition("event")
+          .errorCodeVariable("errorCodeVariable")
+          .errorMessageVariable("errorMessageVariable")
+          .error("errorCode", "errorMessage")
+      .done();
+
+    Bpmn.writeModelToStream(System.out, modelInstance);
+    assertErrorEventDefinition("end", "errorCode", "errorMessage");
+    assertErrorEventDefinitionForErrorVariables("end", "errorCodeVariable", "errorMessageVariable");
   }
 
   @Test
@@ -1805,14 +1857,14 @@ public class ProcessBuilderTest {
     modelInstance = Bpmn.createProcess()
       .startEvent()
       .userTask("task")
-      .endEvent("end").error("myErrorCode")
+      .endEvent("end").error("myErrorCode", "myErrorMessage")
       .moveToActivity("task")
-      .boundaryEvent("boundary").error("myErrorCode")
+      .boundaryEvent("boundary").error("myErrorCode", "myErrorMessage")
       .endEvent("boundaryEnd")
       .done();
 
-    Error boundaryError = assertErrorEventDefinition("boundary", "myErrorCode");
-    Error endError = assertErrorEventDefinition("end", "myErrorCode");
+    Error boundaryError = assertErrorEventDefinition("boundary", "myErrorCode", "myErrorMessage");
+    Error endError = assertErrorEventDefinition("end", "myErrorCode", "myErrorMessage");
 
     assertThat(boundaryError).isEqualTo(endError);
 
@@ -1828,11 +1880,11 @@ public class ProcessBuilderTest {
         .triggerByEvent()
         .embeddedSubProcess()
         .startEvent("subProcessStart")
-        .error("myErrorCode")
+        .error("myErrorCode", "myErrorMessage")
         .endEvent()
       .done();
 
-    assertErrorEventDefinition("subProcessStart", "myErrorCode");
+    assertErrorEventDefinition("subProcessStart", "myErrorCode", "myErrorMessage");
   }
 
   @Test
@@ -2283,13 +2335,25 @@ public class ProcessBuilderTest {
     assertThat(signals).extracting("name").containsOnlyOnce(signalName);
   }
 
-  protected Error assertErrorEventDefinition(String elementId, String errorCode) {
+  protected Error assertErrorEventDefinition(String elementId, String errorCode, String errorMessage) {
     ErrorEventDefinition errorEventDefinition = assertAndGetSingleEventDefinition(elementId, ErrorEventDefinition.class);
     Error error = errorEventDefinition.getError();
     assertThat(error).isNotNull();
     assertThat(error.getErrorCode()).isEqualTo(errorCode);
+    assertThat(error.getErrorMessage()).isEqualTo(errorMessage);
 
     return error;
+  }
+
+  protected void assertErrorEventDefinitionForErrorVariables(String elementId, String errorCodeVariable, String errorMessageVariable) {
+    ErrorEventDefinition errorEventDefinition = assertAndGetSingleEventDefinition(elementId, ErrorEventDefinition.class);
+    assertThat(errorEventDefinition).isNotNull();
+    if(errorCodeVariable != null) {
+      assertThat(errorEventDefinition.getCamundaErrorCodeVariable()).isEqualTo(errorCodeVariable);
+    }
+    if(errorMessageVariable != null) {
+      assertThat(errorEventDefinition.getCamundaErrorMessageVariable()).isEqualTo(errorMessageVariable);
+    }
   }
 
   protected void assertOnlyOneErrorExists(String errorCode) {
@@ -2407,5 +2471,4 @@ public class ProcessBuilderTest {
     assertThat(camundaFailedJobRetryTimeCycle).isNotNull();
     assertThat(camundaFailedJobRetryTimeCycle.getTextContent()).isEqualTo(FAILED_JOB_RETRY_TIME_CYCLE);
   }
-
 }

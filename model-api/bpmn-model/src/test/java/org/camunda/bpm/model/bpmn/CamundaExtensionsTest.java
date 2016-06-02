@@ -41,6 +41,8 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PRIORITY_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PRIORITY_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PROCESS_JOB_PRIORITY;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_SERVICE_TASK_PRIORITY;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_STRING_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_STRING_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_TASK_EVENT_API;
@@ -54,6 +56,7 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.USER_TASK_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.ACTIVITI_NS;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_ERROR_CODE_VARIABLE;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_ERROR_MESSAGE_VARIABLE;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
 import java.util.ArrayList;
@@ -62,8 +65,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_SERVICE_TASK_PRIORITY;
 
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
@@ -417,6 +418,12 @@ public class CamundaExtensionsTest {
   public void testErrorCodeVariable(){
     ErrorEventDefinition errorEventDefinition = startEvent.getChildElementsByType(ErrorEventDefinition.class).iterator().next();
     assertThat(errorEventDefinition.getAttributeValueNs(namespace, CAMUNDA_ATTRIBUTE_ERROR_CODE_VARIABLE)).isEqualTo("errorVariable");
+  }
+
+  @Test
+  public void testErrorMessageVariable(){
+    ErrorEventDefinition errorEventDefinition = startEvent.getChildElementsByType(ErrorEventDefinition.class).iterator().next();
+    assertThat(errorEventDefinition.getAttributeValueNs(namespace, CAMUNDA_ATTRIBUTE_ERROR_MESSAGE_VARIABLE)).isEqualTo("errorMessageVariable");
   }
 
   @Test
