@@ -12,21 +12,24 @@
  */
 package org.camunda.bpm.engine.cdi.test.impl.event;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
 import org.camunda.bpm.engine.cdi.BusinessProcessEvent;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
+@RunWith(Arquillian.class)
 public class EventNotificationTest extends CdiProcessEngineTestCase {
 
   @Test
