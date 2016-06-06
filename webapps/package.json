@@ -16,6 +16,11 @@
     "libTargetDir": "target/webapp/lib",
     "commonsUiDir": "node_modules/camunda-commons-ui"
   },
+  "browserify": {
+    "transform": [
+      "brfs"
+    ]
+  },
   "dependencies": {
     "angular-data-depend": "git://github.com/camunda-third-party/angular-data-depend#8e3b66914c611069e3698fd5d4275e6cf8055d01",
     "angular-moment": "0.9.0",

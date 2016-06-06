@@ -79,6 +79,8 @@ module.exports = function(grunt) {
 
     browserify:       browserifyConf,
 
+    persistify:       browserifyConf,
+
     copy:             copyConf,
 
     less:             lessConf,
@@ -95,6 +97,7 @@ module.exports = function(grunt) {
   });
 
   require('camunda-commons-ui/grunt/tasks/localescompile')(grunt);
+  require('camunda-commons-ui/grunt/tasks/persistify')(grunt);
 
   grunt.registerTask('build', function(mode, app) {
 
@@ -118,7 +121,7 @@ module.exports = function(grunt) {
 
     var tasksToRun = [
       'clean',
-      'browserify',
+      'persistify',
       'copy',
       'less'
     ];

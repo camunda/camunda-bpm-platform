@@ -112,7 +112,7 @@ module.exports = [
         }
       });
     }
-    
+
     var allTenantsChecked = $scope.allTenantsChecked = function() {
       if($scope.availableTenants !== undefined) {
         var counter = 0;
@@ -144,7 +144,7 @@ module.exports = [
         });
       }
     };
-    
+
     var prepareMembership = function() {
       $scope.status = PERFORM_CREATE;
 
@@ -177,7 +177,7 @@ module.exports = [
     var createTenantMemberships = function(createMembershipObj) {
 
       var deferred = $q.defer();
-      
+
       var selectedTenantIds = prepareMembership();
 
       var completeCount = 0;
@@ -195,7 +195,7 @@ module.exports = [
           }
         }
       };
-      
+
       angular.forEach(selectedTenantIds, function(tenantId) {
         createMembershipObj.id = tenantId
                                     .replace(/\//g, '%2F')
