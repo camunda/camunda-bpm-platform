@@ -680,6 +680,22 @@ public class ProcessBuilderTest {
   }
 
   @Test
+  public void testErrorDefinitionsForStartEventWithoutEventDefinitionId() {
+    modelInstance = Bpmn.createProcess()
+    .startEvent("start")
+      .errorEventDefinition()
+        .errorCodeVariable("errorCodeVariable")
+        .errorMessageVariable("errorMessageVariable")
+        .error("errorCode")
+      .errorEventDefinitionDone()
+     .endEvent().done();
+ 
+    Bpmn.writeModelToStream(System.out, modelInstance);
+    assertErrorEventDefinition("start", "errorCode");
+    assertErrorEventDefinitionForErrorVariables("start", "errorCodeVariable", "errorMessageVariable");
+  }
+
+  @Test
   public void testCallActivityCamundaExtension() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
@@ -1828,26 +1844,6 @@ public class ProcessBuilderTest {
 
   @Test
   public void testErrorDefinitionForBoundaryEventWithoutEventDefinitionId() {
-    modelInstance = Bpmn.createProcess()
-      .startEvent()
-      .userTask("task")
-      .endEvent()
-      .moveToActivity("task")
-      .boundaryEvent("boundary")
-        .errorEventDefinition()
-          .errorCodeVariable("errorCodeVariable")
-          .errorMessageVariable("errorMessageVariable")
-          .error("errorCode")
-        .errorEventDefinitionDone()  
-      .endEvent("boundaryEnd")
-      .done();
-
-    assertErrorEventDefinition("boundary", "errorCode");
-    assertErrorEventDefinitionForErrorVariables("boundary", "errorCodeVariable", "errorMessageVariable");
-  }
-
-  @Test
-  public void testErrorDefinitionForBoundaryEventWithoutErrorEventId() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
       .userTask("task")
