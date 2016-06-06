@@ -48,10 +48,9 @@
         <module>engine-plugins</module>
 
         <module>distro/jbossas7</module>
-        <module>distro/wildfly</module>
-        <module>distro/wildfly10</module>
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
+
 
         <module>database</module>
         <module>parent</module>
@@ -66,10 +65,7 @@
       </activation>
       <modules>
         <module>distro/jbossas7</module>
-        <module>distro/wildfly</module>
-        <module>distro/wildfly10</module>
         <module>distro/tomcat</module>
-        <module>distro/webjar</module>
       </modules>
     </profile>
 
@@ -127,6 +123,16 @@
         <module>javaee/ejb-client</module>
         <module>distro/wildfly</module>
         <module>distro/wildfly10</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>distro-webjar</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>distro/webjar</module>
       </modules>
     </profile>
 
