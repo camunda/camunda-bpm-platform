@@ -46,6 +46,8 @@ function(
   if ($scope.selectedReportId) {
     var reportTypePlugin = getPluginProviders({ id: $scope.selectedReportId });
 
+    $scope.pluginLabel = reportTypePlugin[0].label;
+
     if (reportTypePlugin.length) {
       page.breadcrumbsAdd([
         {
