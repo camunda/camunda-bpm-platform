@@ -19,7 +19,7 @@
     </bpmn2:endEvent>
     <bpmn2:sequenceFlow id="SequenceFlow_4" name="" sourceRef="UserTask_1" targetRef="ServiceTask_1"/>
   </bpmn2:process>
-  <bpmn2:error id="Error_1" errorCode="errorCode" errorMessage="Exception" name="business error"/>
+  <bpmn2:error id="Error_1" errorCode="errorCode" name="business error"/>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_6" bpmnElement="StartEvent_1">

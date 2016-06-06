@@ -49,7 +49,7 @@ public class NestedExecutionAPIInvocationTest {
         .camundaClass(NestedProcessStartDelegate.class.getName())
       .endEvent()
       .done();
-
+  
   @Test
   @Ignore("CAM-5618")
   public void testWaitStateIsReachedOnNestedInstantiation() {

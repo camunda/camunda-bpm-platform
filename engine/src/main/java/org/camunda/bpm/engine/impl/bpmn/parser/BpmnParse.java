@@ -459,10 +459,6 @@ public class BpmnParse extends Parse {
       if (errorCode != null) {
         error.setErrorCode(errorCode);
       }
-      String errorMessage = errorElement.attribute("errorMessage");
-      if(errorMessage != null) {
-        error.setErrorMessage(errorMessage);
-      }
         
       errors.put(id, error);
     }
@@ -2837,7 +2833,7 @@ public class BpmnParse extends Parse {
           }
           activity.getProperties().set(BpmnProperties.TYPE, "errorEndEvent");
           if(error != null) {
-            activity.setActivityBehavior(new ErrorEndEventActivityBehavior(error.getErrorCode(), error.getErrorMessage()));
+            activity.setActivityBehavior(new ErrorEndEventActivityBehavior(error.getErrorCode()));
           } else {
             activity.setActivityBehavior(new ErrorEndEventActivityBehavior(errorRef));
           }

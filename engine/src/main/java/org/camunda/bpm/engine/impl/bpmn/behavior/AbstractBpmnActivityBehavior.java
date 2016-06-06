@@ -85,7 +85,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
       throw exception;
     }
     else {
-      propagateError(null, null,exception, execution);
+      propagateError(null, exception.getMessage(),exception, execution);
     }
   }
 

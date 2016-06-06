@@ -25,7 +25,6 @@ public class Error {
   
   protected String id;
   protected String errorCode;
-  protected String errorMessage;
 
   public String getId() {
     return id;
@@ -43,11 +42,4 @@ public class Error {
     this.errorCode = errorCode;
   }
 
-  public String getErrorMessage() {
-    return errorMessage;
-  }
-  
-  public void setErrorMessage(String errorMessage) {
-    this.errorMessage = errorMessage;
-  }
 }

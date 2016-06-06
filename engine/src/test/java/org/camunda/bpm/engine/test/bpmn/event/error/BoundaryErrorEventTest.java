@@ -856,7 +856,6 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     Object errorCode = "error1";
 
     checkErrorVariable(variableName, errorCode);
-    checkErrorVariable("errorMessageVariable", "Exception");
   }
 
   @Deployment(resources={
@@ -871,7 +870,6 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     Object errorCode = "error";
 
     checkErrorVariable(variableName, errorCode);
-    checkErrorVariable("errorMessageVariable", "Exception");
   }
 
   @Deployment(resources={
@@ -885,7 +883,6 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     Object errorCode = "error";
 
     checkErrorVariable(variableName, errorCode);
-    checkErrorVariable("errorMessageVariable", "Exception");
   }
 
   private void checkErrorVariable(String variableName, Object expectedValue){

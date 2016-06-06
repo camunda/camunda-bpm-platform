@@ -290,8 +290,6 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
     Object errorCode = "error";
     assertThat(errorVariable.getValue(), is(errorCode));
 
-    errorVariable = runtimeService.createVariableInstanceQuery().variableName("errorMessageVariable").singleResult();
-    assertThat(errorVariable.getValue(), is((Object)"Exception"));
   }
   
   @Deployment(resources={
@@ -308,9 +306,6 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
     //the code we gave the thrown error
     Object errorCode = "error";
     assertThat(errorVariable.getValue(), is(errorCode));
-
-    errorVariable = runtimeService.createVariableInstanceQuery().variableName("errorMessageVariable").singleResult();
-    assertThat(errorVariable.getValue(), is((Object)"Exception"));
   }
   
   @Deployment(resources={
