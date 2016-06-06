@@ -1827,6 +1827,46 @@ public class ProcessBuilderTest {
   }
 
   @Test
+  public void testErrorDefinitionForBoundaryEventWithoutEventDefinitionId() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent()
+      .moveToActivity("task")
+      .boundaryEvent("boundary")
+        .errorEventDefinition()
+          .errorCodeVariable("errorCodeVariable")
+          .errorMessageVariable("errorMessageVariable")
+          .error("errorCode")
+        .errorEventDefinitionDone()  
+      .endEvent("boundaryEnd")
+      .done();
+
+    assertErrorEventDefinition("boundary", "errorCode");
+    assertErrorEventDefinitionForErrorVariables("boundary", "errorCodeVariable", "errorMessageVariable");
+  }
+
+  @Test
+  public void testErrorDefinitionForBoundaryEventWithoutErrorEventId() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent()
+      .moveToActivity("task")
+      .boundaryEvent("boundary")
+        .errorEventDefinition()
+          .errorCodeVariable("errorCodeVariable")
+          .errorMessageVariable("errorMessageVariable")
+          .error("errorCode")
+        .errorEventDefinitionDone()  
+      .endEvent("boundaryEnd")
+      .done();
+
+    assertErrorEventDefinition("boundary", "errorCode");
+    assertErrorEventDefinitionForErrorVariables("boundary", "errorCodeVariable", "errorMessageVariable");
+  }
+
+  @Test
   public void testErrorEndEvent() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
