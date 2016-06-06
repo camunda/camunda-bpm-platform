@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -26,8 +25,9 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
-import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
+import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResultImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 public class CorrelateStartMessageCmd extends AbstractCorrelateMessageCmd implements Command<ProcessInstance> {
 
@@ -43,8 +43,8 @@ public class CorrelateStartMessageCmd extends AbstractCorrelateMessageCmd implem
     final CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
     final CorrelationSet correlationSet = new CorrelationSet(builder);
 
-    List<MessageCorrelationResult> correlationResults = commandContext.runWithoutAuthorization(new Callable<List<MessageCorrelationResult>>() {
-      public List<MessageCorrelationResult> call() throws Exception {
+    List<MessageCorrelationResultImpl> correlationResults = commandContext.runWithoutAuthorization(new Callable<List<MessageCorrelationResultImpl>>() {
+      public List<MessageCorrelationResultImpl> call() throws Exception {
         return correlationHandler.correlateStartMessages(commandContext, messageName, correlationSet);
       }
     });
@@ -56,7 +56,7 @@ public class CorrelateStartMessageCmd extends AbstractCorrelateMessageCmd implem
       throw LOG.exceptionCorrelateMessageToSingleProcessDefinition(messageName, correlationResults.size(), correlationSet);
 
     } else {
-      MessageCorrelationResult correlationResult = correlationResults.get(0);
+      MessageCorrelationResultImpl correlationResult = correlationResults.get(0);
 
       checkAuthorization(correlationResult);
 

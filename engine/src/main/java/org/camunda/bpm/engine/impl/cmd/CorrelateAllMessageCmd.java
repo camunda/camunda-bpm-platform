@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -24,14 +23,16 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
-import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
+import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResultImpl;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 
 /**
  * @author Thorben Lindhauer
  * @author Daniel Meyer
  * @author Michael Scholz
  */
-public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd implements Command<Void> {
+public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd implements Command<List<? extends MessageCorrelationResult>> {
 
   /**
    * Initialize the command with a builder
@@ -42,32 +43,32 @@ public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd implemen
     super(messageCorrelationBuilderImpl);
   }
 
-  public Void execute(final CommandContext commandContext) {
+  public List<? extends MessageCorrelationResult> execute(final CommandContext commandContext) {
     ensureAtLeastOneNotNull(
         "At least one of the following correlation criteria has to be present: " + "messageName, businessKey, correlationKeys, processInstanceId", messageName,
         builder.getBusinessKey(), builder.getCorrelationProcessInstanceVariables(), builder.getProcessInstanceId());
 
     final CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
     final CorrelationSet correlationSet = new CorrelationSet(builder);
-    List<MessageCorrelationResult> correlationResults = commandContext.runWithoutAuthorization(new Callable<List<MessageCorrelationResult>>() {
-      public List<MessageCorrelationResult> call() throws Exception {
+    List<MessageCorrelationResultImpl> correlationResults = commandContext.runWithoutAuthorization(new Callable<List<MessageCorrelationResultImpl>>() {
+      public List<MessageCorrelationResultImpl> call() throws Exception {
         return correlationHandler.correlateMessages(commandContext, messageName, correlationSet);
       }
     });
 
     // check authorization
-    for (MessageCorrelationResult correlationResult : correlationResults) {
+    for (MessageCorrelationResultImpl correlationResult : correlationResults) {
       checkAuthorization(correlationResult);
     }
 
-    for (MessageCorrelationResult correlationResult : correlationResults) {
-      if (MessageCorrelationResult.TYPE_EXECUTION.equals(correlationResult.getResultType())) {
+    for (MessageCorrelationResultImpl correlationResult : correlationResults) {
+      if (MessageCorrelationResultImpl.TYPE_EXECUTION.equals(correlationResult.getResultType())) {
         triggerExecution(commandContext, correlationResult);
       } else {
         instantiateProcess(commandContext, correlationResult);
       }
     }
 
-    return null;
+    return correlationResults;
   }
 }

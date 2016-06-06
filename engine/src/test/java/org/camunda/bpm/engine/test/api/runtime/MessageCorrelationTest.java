@@ -27,10 +27,13 @@ import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResultImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
@@ -249,6 +252,50 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
     assertEquals(2, correlatedExecutions);
 
   }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  public void testMessageCorrelateAllResultListWithResultTypeExecution() {
+    //given
+    String businessKey = "aBusinessKey";
+    ProcessInstance procInstance1 = runtimeService.startProcessInstanceByKey("process", businessKey);
+    ProcessInstance procInstance2 = runtimeService.startProcessInstanceByKey("process", businessKey);
+
+    //when correlated all with result
+    List<? extends MessageCorrelationResult> resultList = runtimeService.createMessageCorrelation("newInvoiceMessage")
+                                                              .processInstanceBusinessKey(businessKey)
+                                                              .correlateAllWithResult();
+
+
+    //then result should contains executions on which messages was correlated
+    for (MessageCorrelationResult result : resultList) {
+      assertNotNull(result);
+      assertEquals(MessageCorrelationResultImpl.TYPE_EXECUTION, result.getResultType());
+      assertTrue(procInstance1.getId().equalsIgnoreCase(result.getExecution().getProcessInstanceId())
+                || procInstance2.getId().equalsIgnoreCase(result.getExecution().getProcessInstanceId())
+      );
+      ExecutionEntity entity = (ExecutionEntity) result.getExecution();
+      assertEquals("messageCatch", entity.getActivityId());
+    }
+  }
+
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  public void testMessageCorrelateAllResultListWithResultTypeProcessDefinition() {
+    //given
+    String businessKey = "aBusinessKey";
+
+    //when correlated all with result
+    List<? extends MessageCorrelationResult> resultList = runtimeService.createMessageCorrelation("newInvoiceMessage")
+                                                              .processInstanceBusinessKey(businessKey)
+                                                              .correlateAllWithResult();
+
+
+    //then result should contains process definitions and start event activity ids on which messages was correlated
+    for (MessageCorrelationResult result : resultList) {
+      checkProcessDefinitionMessageCorrelationResult(result, "theStart", "process");
+    }
+  }
+
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
   public void testExecutionCorrelationByBusinessKeyWithVariables() {
@@ -713,6 +760,54 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstance(processInstance.getId(), null);
 
   }
+
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMatchingStartEventAndExecution.bpmn20.xml"})
+  public void testMessageCorrelationResultWithResultTypeProcessDefinition() {
+    //given
+    String msgName = "newInvoiceMessage";
+
+    //when
+    //correlate message with result
+    MessageCorrelationResult result = runtimeService.createMessageCorrelation(msgName).correlateWithResult();
+
+    //then
+    //message correlation result contains information from receiver
+    checkProcessDefinitionMessageCorrelationResult(result, "theStart", "process");
+  }
+
+  protected void checkProcessDefinitionMessageCorrelationResult(MessageCorrelationResult result, String startActivityId, String processDefinitionId) {
+    assertNotNull(result);
+    assertEquals(MessageCorrelationResultImpl.TYPE_PROCESS_DEFINITION, result.getResultType());
+    assertEquals(startActivityId, result.getStartEventActivityId());
+    assertTrue(result.getProcessDefinition().getId().contains(processDefinitionId));
+  }
+
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMatchingStartEventAndExecution.bpmn20.xml"})
+  public void testMessageCorrelationResultWithResultTypeExecution() {
+    //given
+    String msgName = "newInvoiceMessage";
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertNotNull(runtimeService.createExecutionQuery().messageEventSubscriptionName(msgName).singleResult());
+
+    //when
+    //correlate message with result
+    MessageCorrelationResult result = runtimeService.createMessageCorrelation(msgName).correlateWithResult();
+
+    //then
+    //message correlation result contains information from receiver
+    checkExecutionMessageCorrelationResult(result, processInstance, "messageCatch");
+  }
+
+  protected void checkExecutionMessageCorrelationResult(MessageCorrelationResult result, ProcessInstance processInstance, String activityId) {
+    assertNotNull(result);
+    assertEquals(MessageCorrelationResultImpl.TYPE_EXECUTION, result.getResultType());
+    assertEquals(processInstance.getId(), result.getExecution().getProcessInstanceId());
+    ExecutionEntity entity = (ExecutionEntity) result.getExecution();
+    assertEquals(activityId, entity.getActivityId());
+  }
+
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMatchingStartEventAndExecution.bpmn20.xml"})
   public void testMatchingStartEventAndExecutionUsingFluentCorrelateAll() {

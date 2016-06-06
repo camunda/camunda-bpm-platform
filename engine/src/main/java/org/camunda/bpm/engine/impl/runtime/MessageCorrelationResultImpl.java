@@ -14,6 +14,9 @@ package org.camunda.bpm.engine.impl.runtime;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 
 /**
  * <p>The result of a message correlation. A message may be correlated to either
@@ -26,7 +29,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
  * @author Daniel Meyer
  *
  */
-public class MessageCorrelationResult {
+public class MessageCorrelationResultImpl implements MessageCorrelationResult {
 
   /** signifies a message correlated to an execution */
   public final static String TYPE_EXECUTION = "execution";
@@ -35,8 +38,8 @@ public class MessageCorrelationResult {
   public final static String TYPE_PROCESS_DEFINITION = "processDefinition";
 
   /**
-   * @see MessageCorrelationResult#TYPE_EXECUTION
-   * @see MessageCorrelationResult#TYPE_PROCESS_DEFINITION
+   * @see MessageCorrelationResultImpl#TYPE_EXECUTION
+   * @see MessageCorrelationResultImpl#TYPE_PROCESS_DEFINITION
    */
   protected String resultType;
 
@@ -46,15 +49,15 @@ public class MessageCorrelationResult {
 
   protected String startEventActivityId;
 
-  public static MessageCorrelationResult matchedExecution(ExecutionEntity executionEntity) {
-    MessageCorrelationResult messageCorrelationResult = new MessageCorrelationResult();
+  public static MessageCorrelationResultImpl matchedExecution(ExecutionEntity executionEntity) {
+    MessageCorrelationResultImpl messageCorrelationResult = new MessageCorrelationResultImpl();
     messageCorrelationResult.resultType = TYPE_EXECUTION;
     messageCorrelationResult.executionEntity = executionEntity;
     return messageCorrelationResult;
   }
 
-  public static MessageCorrelationResult matchedProcessDefinition(ProcessDefinitionEntity processDefinitionEntity, String startEventActivityId) {
-    MessageCorrelationResult messageCorrelationResult = new MessageCorrelationResult();
+  public static MessageCorrelationResultImpl matchedProcessDefinition(ProcessDefinitionEntity processDefinitionEntity, String startEventActivityId) {
+    MessageCorrelationResultImpl messageCorrelationResult = new MessageCorrelationResultImpl();
     messageCorrelationResult.resultType = TYPE_PROCESS_DEFINITION;
     messageCorrelationResult.processDefinitionEntity = processDefinitionEntity;
     messageCorrelationResult.startEventActivityId = startEventActivityId;
@@ -71,12 +74,24 @@ public class MessageCorrelationResult {
     return processDefinitionEntity;
   }
 
+  @Override
   public String getStartEventActivityId() {
     return startEventActivityId;
   }
 
+  @Override
   public String getResultType() {
     return resultType;
+  }
+
+  @Override
+  public Execution getExecution() {
+    return executionEntity;
+  }
+
+  @Override
+  public PvmProcessDefinition getProcessDefinition() {
+    return processDefinitionEntity;
   }
 
 }

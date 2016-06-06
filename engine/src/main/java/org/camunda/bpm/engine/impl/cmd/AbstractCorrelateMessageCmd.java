@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
+import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResultImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
@@ -44,14 +44,14 @@ public abstract class AbstractCorrelateMessageCmd {
     this.messageName = builder.getMessageName();
   }
 
-  protected void triggerExecution(CommandContext commandContext, MessageCorrelationResult correlationResult) {
+  protected void triggerExecution(CommandContext commandContext, MessageCorrelationResultImpl correlationResult) {
     String executionId = correlationResult.getExecutionEntity().getId();
 
     MessageEventReceivedCmd command = new MessageEventReceivedCmd(messageName, executionId, builder.getPayloadProcessInstanceVariables(), builder.isExclusiveCorrelation());
     command.execute(commandContext);
   }
 
-  protected ProcessInstance instantiateProcess(CommandContext commandContext, MessageCorrelationResult correlationResult) {
+  protected ProcessInstance instantiateProcess(CommandContext commandContext, MessageCorrelationResultImpl correlationResult) {
     ProcessDefinitionEntity processDefinitionEntity = correlationResult.getProcessDefinitionEntity();
 
     ActivityImpl messageStartEvent = processDefinitionEntity.findActivity(correlationResult.getStartEventActivityId());
@@ -61,11 +61,11 @@ public abstract class AbstractCorrelateMessageCmd {
     return processInstance;
   }
 
-  protected void checkAuthorization(MessageCorrelationResult correlation) {
+  protected void checkAuthorization(MessageCorrelationResultImpl correlation) {
     CommandContext commandContext = Context.getCommandContext();
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      if (MessageCorrelationResult.TYPE_EXECUTION.equals(correlation.getResultType())) {
+      if (MessageCorrelationResultImpl.TYPE_EXECUTION.equals(correlation.getResultType())) {
         ExecutionEntity execution = correlation.getExecutionEntity();
         checker.checkUpdateProcessInstanceById(execution.getProcessInstanceId());
 

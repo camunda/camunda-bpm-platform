@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import java.util.List;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Map;
@@ -24,12 +25,14 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
 /**
  * @author Daniel Meyer
+ * @author Christopher
  *
  */
 public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder {
@@ -145,24 +148,37 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     return this;
   }
 
+  @Override
   public void correlate() {
+    correlateWithResult();
+  }
+
+  @Override
+  public MessageCorrelationResult correlateWithResult() {
     ensureProcessDefinitionIdNotSet();
     ensureProcessInstanceAndTenantIdNotSet();
 
-    execute(new CorrelateMessageCmd(this));
+    return execute(new CorrelateMessageCmd(this));
   }
 
+  @Override
   public void correlateExclusively() {
     isExclusiveCorrelation = true;
 
     correlate();
   }
 
+  @Override
   public void correlateAll() {
+    correlateAllWithResult();
+  }
+
+  @Override
+  public List<? extends MessageCorrelationResult> correlateAllWithResult() {
     ensureProcessDefinitionIdNotSet();
     ensureProcessInstanceAndTenantIdNotSet();
 
-    execute(new CorrelateAllMessageCmd(this));
+    return execute(new CorrelateAllMessageCmd(this));
   }
 
   public ProcessInstance correlateStartMessage() {

@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.runtime;
 
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.AuthorizationException;
@@ -23,6 +24,7 @@ import org.camunda.bpm.engine.authorization.Resources;
  * <p>A fluent builder for defining message correlation</p>
  *
  * @author Daniel Meyer
+ * @author Christopher Zell
  *
  */
 public interface MessageCorrelationBuilder {
@@ -144,6 +146,36 @@ public interface MessageCorrelationBuilder {
    */
   void correlate();
 
+
+  /**
+   * Executes the message correlation and returns a {@link MessageCorrelationResult} object.
+   *
+   * <p>The call of this method will result in either:
+   * <ul>
+   * <li>Exactly one waiting execution is notified to continue. The notification is performed synchronously. The result contains the execution id.</li>
+   * <li>Exactly one Process Instance is started in case the message name matches a message start event of a
+   *     process. The instantiation is performed synchronously. The result contains the start event activity id and process definition.</li>
+   * <li>MismatchingMessageCorrelationException is thrown. This means that either too many executions / process definitions match the
+   *     correlation or that no execution and process definition matches the correlation.</li>
+   * </ul>
+   * </p>
+   * The result can be identified by calling the {@link MessageCorrelationResult#getResultType}.
+   *
+   * @throws MismatchingMessageCorrelationException
+   *          if none or more than one execution or process definition is matched by the correlation
+   * @throws AuthorizationException
+   *          <li>if one execution is matched and the user has no {@link Permissions#UPDATE} permission on
+   *          {@link Resources#PROCESS_INSTANCE} or no {@link Permissions#UPDATE_INSTANCE} permission on
+   *          {@link Resources#PROCESS_DEFINITION}.</li>
+   *          <li>if one process definition is matched and the user has no {@link Permissions#CREATE} permission on
+   *          {@link Resources#PROCESS_INSTANCE} and no {@link Permissions#CREATE_INSTANCE} permission on
+   *          {@link Resources#PROCESS_DEFINITION}.</li>
+   *
+   * @return The result of the message correlation. Result contains either the execution id or the start event activity id and the process definition.
+   * @since 7.6
+   */
+  MessageCorrelationResult correlateWithResult();
+
   /**
    * <p>
    *   Behaves like {@link #correlate()}, however uses pessimistic locking for correlating a waiting execution, meaning
@@ -164,7 +196,7 @@ public interface MessageCorrelationBuilder {
    */
   void correlateExclusively();
 
-
+  
   /**
    * Executes the message correlation for multiple messages.
    *
@@ -186,6 +218,33 @@ public interface MessageCorrelationBuilder {
    *
    */
   void correlateAll();
+
+  /**
+   * Executes the message correlation for multiple messages and returns a list of message correlation results.
+   *
+   * <p>This will result in any number of the following:
+   * <ul>
+   * <li>Any number of waiting executions are notified to continue. The notification is performed synchronously. The result list contains the execution ids of the
+   * notified executions.</li>
+   * <li>Any number of process instances are started which have a message start event that matches the message name. The instantiation is performed synchronously.
+   * The result list contains the start event activity ids and process definitions from all activities on that the messages was correlated to.</li>
+   * </ul>
+   * </p>
+   * <p>Note that the message correlates to all tenants if no tenant is specified using {@link #tenantId(String)} or {@link #withoutTenantId()}.</p>
+   *
+   * @throws AuthorizationException
+   *          <li>if at least one execution is matched and the user has no {@link Permissions#UPDATE} permission on
+   *          {@link Resources#PROCESS_INSTANCE} or no {@link Permissions#UPDATE_INSTANCE} permission on
+   *          {@link Resources#PROCESS_DEFINITION}.</li>
+   *          <li>if one process definition is matched and the user has no {@link Permissions#CREATE} permission on
+   *          {@link Resources#PROCESS_INSTANCE} and no {@link Permissions#CREATE_INSTANCE} permission on
+   *          {@link Resources#PROCESS_DEFINITION}.</li>
+   *
+   * @return The result list of the message correlations. Each result contains
+   * either the execution id or the start event activity id and the process definition.
+   * @since 7.6
+   */
+  List<? extends MessageCorrelationResult> correlateAllWithResult();
 
   /**
    * Executes the message correlation.
