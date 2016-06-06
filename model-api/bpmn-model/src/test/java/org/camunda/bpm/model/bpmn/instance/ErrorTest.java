@@ -33,7 +33,6 @@ public class ErrorTest extends BpmnModelElementInstanceTest {
     return Arrays.asList(
       new AttributeAssumption("name"),
       new AttributeAssumption("errorCode"),
-      new AttributeAssumption("errorMessage"),
       new AttributeAssumption("structureRef")
     );
   }

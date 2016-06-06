@@ -33,8 +33,7 @@ public class ErrorImpl extends RootElementImpl implements Error {
 
   protected static Attribute<String> nameAttribute;
   protected static Attribute<String> errorCodeAttribute;
-  protected static Attribute<String> errorMessageAttribute;
-
+  
   protected static AttributeReference<ItemDefinition> structureRefAttribute;
   
   public static void registerType(ModelBuilder modelBuilder) {
@@ -51,9 +50,6 @@ public class ErrorImpl extends RootElementImpl implements Error {
       .build();
 
     errorCodeAttribute = typeBuilder.stringAttribute(BPMN_ATTRIBUTE_ERROR_CODE)
-      .build();
-
-    errorMessageAttribute = typeBuilder.stringAttribute(BPMN_ATTRIBUTE_ERROR_MESSAGE)
       .build();
 
     structureRefAttribute = typeBuilder.stringAttribute(BPMN_ATTRIBUTE_STRUCTURE_REF)
@@ -81,14 +77,6 @@ public class ErrorImpl extends RootElementImpl implements Error {
 
   public void setErrorCode(String errorCode) {
     errorCodeAttribute.setValue(this, errorCode);
-  }
-
-  public String getErrorMessage() {
-    return errorMessageAttribute.getValue(this);
-  }
-
-  public void setErrorMessage(String errorMessage) {
-    errorMessageAttribute.setValue(this, errorMessage);
   }
 
   public ItemDefinition getStructure() {

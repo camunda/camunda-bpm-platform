@@ -28,10 +28,6 @@ public interface Error extends RootElement {
 
   void setErrorCode(String errorCode);
 
-  String getErrorMessage();
-
-  void setErrorMessage(String errorMessage);
-
   ItemDefinition getStructure();
 
   void setStructure(ItemDefinition structure);

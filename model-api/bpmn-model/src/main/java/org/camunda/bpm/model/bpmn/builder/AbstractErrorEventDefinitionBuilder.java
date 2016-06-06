@@ -54,14 +54,10 @@ public abstract class AbstractErrorEventDefinitionBuilder<B extends AbstractErro
   }
 
   /**
-   * Sets the error attribute with errorCode and errorMessage.
+   * Sets the error attribute with errorCode.
    */
-  public B error(String errorCode, String errorMessage) {
-    Definitions definitions = modelInstance.getDefinitions();
-    Error error = createChild(definitions,Error.class);
-    error.setErrorCode(errorCode);
-    error.setErrorMessage(errorMessage);
-    element.setError(error);
+  public B error(String errorCode) {
+    element.setError(findErrorForCode(errorCode));
     return myself;
   }
 

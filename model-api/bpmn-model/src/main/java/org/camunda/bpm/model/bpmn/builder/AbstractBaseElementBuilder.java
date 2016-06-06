@@ -173,7 +173,7 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     return null;
   }
   
-  protected Error findErrorForNameAndCode(String errorCode) {
+  protected Error findErrorForCode(String errorCode) {
     Collection<Error> errors = modelInstance.getModelElementsByType(Error.class);
     for (Error error : errors) {
       if (errorCode.equals(error.getErrorCode())) {
@@ -190,37 +190,13 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     return error;
   }
 
-  protected Error findErrorForNameCodeAndMessage(String errorCode, String errorMessage) {
-    Collection<Error> errors = modelInstance.getModelElementsByType(Error.class);
-    for (Error error : errors) {
-      if (errorCode.equals(error.getErrorCode()) && errorMessage.equals(error.getErrorMessage())) {
-        // return already existing error
-        return error;
-      }
-    }
-
-    // create new error
-    Definitions definitions = modelInstance.getDefinitions();
-    Error error = createChild(definitions, Error.class);
-    error.setErrorCode(errorCode);
-    error.setErrorMessage(errorMessage);
-    return error;
-  }
-
   protected ErrorEventDefinition createEmptyErrorEventDefinition() {
     ErrorEventDefinition errorEventDefinition = createInstance(ErrorEventDefinition.class);
     return errorEventDefinition;
   }
 
   protected ErrorEventDefinition createErrorEventDefinition(String errorCode) {
-    Error error = findErrorForNameAndCode(errorCode);
-    ErrorEventDefinition errorEventDefinition = createInstance(ErrorEventDefinition.class);
-    errorEventDefinition.setError(error);
-    return errorEventDefinition;
-  }
-
-  protected ErrorEventDefinition createErrorEventDefinition(String errorCode, String errorMessage) {
-    Error error = findErrorForNameCodeAndMessage(errorCode, errorMessage);
+    Error error = findErrorForCode(errorCode);
     ErrorEventDefinition errorEventDefinition = createInstance(ErrorEventDefinition.class);
     errorEventDefinition.setError(error);
     return errorEventDefinition;

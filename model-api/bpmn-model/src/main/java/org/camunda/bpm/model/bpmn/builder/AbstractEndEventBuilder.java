@@ -39,34 +39,4 @@ public abstract class AbstractEndEventBuilder<B extends AbstractEndEventBuilder<
 
     return myself;
   }
-
-  /**
-   * Sets an error definition for the given error code and error message. If already an error
-   * with this code exists it will be used, otherwise a new error is created.
-   *
-   * @param errorCode the code of the error
-   * @return the builder object
-   */
-  public B error(String errorCode, String errorMessage) {
-    ErrorEventDefinition errorEventDefinition = createErrorEventDefinition(errorCode, errorMessage);
-    element.getEventDefinitions().add(errorEventDefinition);
-
-    return myself;
-  }
-
-  /**
-   * Creates an error event definition with an unique id
-   * and returns a builder for the error event definition.
-   *
-   * @return the error event definition builder object
-   */
-  public ErrorEventDefinitionBuilder errorEventDefinition(String id) {
-    ErrorEventDefinition errorEventDefinition = createEmptyErrorEventDefinition();
-    if (id != null) {
-      errorEventDefinition.setId(id);
-    }
-
-    element.getEventDefinitions().add(errorEventDefinition);
-    return new ErrorEventDefinitionBuilder(modelInstance, errorEventDefinition);
-  }
 }
