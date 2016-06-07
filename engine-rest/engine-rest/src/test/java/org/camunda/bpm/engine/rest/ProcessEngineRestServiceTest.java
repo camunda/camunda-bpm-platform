@@ -104,6 +104,7 @@ import org.junit.Test;
 import org.mockito.Matchers;
 
 import com.jayway.restassured.http.ContentType;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 
 public class ProcessEngineRestServiceTest extends
     AbstractRestServiceTest {
@@ -117,7 +118,10 @@ public class ProcessEngineRestServiceTest extends
   protected static final String PROCESS_INSTANCE_URL = SINGLE_ENGINE_URL + "/process-instance/{id}";
   protected static final String TASK_URL = SINGLE_ENGINE_URL + "/task/{id}";
   protected static final String IDENTITY_GROUPS_URL = SINGLE_ENGINE_URL + "/identity/groups";
-  protected static final String MESSAGE_URL = SINGLE_ENGINE_URL + "/message";
+  protected static final String MESSAGE_URL = SINGLE_ENGINE_URL + MessageRestService.PATH;
+  protected static final String MESSAGE_CORRELATION_URL = MESSAGE_URL + MessageRestService.PATH_CORRELATION;
+  protected static final String MESSAGE_CORRELATION_WITH_RESULT_URL = MESSAGE_URL + MessageRestService.PATH_CORRELATION_WITH_RESULT;
+
   protected static final String EXECUTION_URL = SINGLE_ENGINE_URL + "/execution";
   protected static final String VARIABLE_INSTANCE_URL = SINGLE_ENGINE_URL + "/variable-instance";
   protected static final String USER_URL = SINGLE_ENGINE_URL + "/user";
@@ -162,6 +166,7 @@ public class ProcessEngineRestServiceTest extends
   private CaseService mockCaseService;
   private FilterService mockFilterService;
   private MessageCorrelationBuilder mockMessageCorrelationBuilder;
+  private MessageCorrelationResult mockMessageCorrelationResult;
 
   @Before
   public void setUpRuntimeData() {
@@ -329,8 +334,10 @@ public class ProcessEngineRestServiceTest extends
 
   private void createMessageCorrelationBuilderMock() {
     mockMessageCorrelationBuilder = mock(MessageCorrelationBuilder.class);
+    mockMessageCorrelationResult = mock(MessageCorrelationResult.class);
 
     when(mockRuntimeService.createMessageCorrelation(anyString())).thenReturn(mockMessageCorrelationBuilder);
+    when(mockMessageCorrelationBuilder.correlateWithResult()).thenReturn(mockMessageCorrelationResult);
     when(mockMessageCorrelationBuilder.processInstanceId(anyString())).thenReturn(mockMessageCorrelationBuilder);
     when(mockMessageCorrelationBuilder.processInstanceBusinessKey(anyString())).thenReturn(mockMessageCorrelationBuilder);
     when(mockMessageCorrelationBuilder.processInstanceVariableEquals(anyString(), any())).thenReturn(mockMessageCorrelationBuilder);
@@ -511,13 +518,30 @@ public class ProcessEngineRestServiceTest extends
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters).pathParam("name", EXAMPLE_ENGINE_NAME)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().post(MESSAGE_URL);
+      .when().post(MESSAGE_CORRELATION_URL);
 
     verify(mockRuntimeService).createMessageCorrelation(eq(messageName));
-    verify(mockMessageCorrelationBuilder).correlate();
+    verify(mockMessageCorrelationBuilder).correlateWithResult();
     verifyNoMoreInteractions(mockMessageCorrelationBuilder);
     verifyZeroInteractions(processEngine);
   }
+
+  @Test
+  public void testMessageWithResultServiceEngineAccess() {
+    String messageName = "aMessage";
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters).pathParam("name", EXAMPLE_ENGINE_NAME)
+      .then().expect().contentType(ContentType.JSON).statusCode(Status.OK.getStatusCode())
+      .when().post(MESSAGE_CORRELATION_WITH_RESULT_URL);
+
+    verify(mockRuntimeService).createMessageCorrelation(eq(messageName));
+    verify(mockMessageCorrelationBuilder).correlateWithResult();
+    verifyNoMoreInteractions(mockMessageCorrelationBuilder);
+    verifyZeroInteractions(processEngine);
+  }
+
 
   @Test
   public void testExecutionServiceEngineAccess() {

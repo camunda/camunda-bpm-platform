@@ -27,6 +27,10 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import org.camunda.bpm.engine.rest.dto.message.MessageCorrelationResultDto;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 
 public class MessageRestServiceImpl extends AbstractRestProcessEngineAware implements MessageRestService {
 
@@ -36,6 +40,11 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
 
   @Override
   public void deliverMessage(CorrelationMessageDto messageDto) {
+    correlateMessageWithResult(messageDto);
+  }
+
+  @Override
+  public List<MessageCorrelationResultDto> correlateMessageWithResult(CorrelationMessageDto messageDto) {
     if (messageDto.getMessageName() == null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "No message name supplied");
     }
@@ -43,15 +52,18 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
       throw new InvalidRequestException(Status.BAD_REQUEST, "Parameter 'tenantId' cannot be used together with parameter 'withoutTenantId'.");
     }
 
+    List<MessageCorrelationResultDto> resultDtos = new ArrayList<MessageCorrelationResultDto>();
     try {
       MessageCorrelationBuilder correlation = createMessageCorrelationBuilder(messageDto);
-
       if (!messageDto.isAll()) {
-        correlation.correlate();
+        MessageCorrelationResult result = correlation.correlateWithResult();
+        resultDtos.add(MessageCorrelationResultDto.fromMessageCorrelationResult(result));
       } else {
-        correlation.correlateAll();
+        List<? extends MessageCorrelationResult> results = correlation.correlateAllWithResult();
+        for (MessageCorrelationResult result : results) {
+          resultDtos.add(MessageCorrelationResultDto.fromMessageCorrelationResult(result));
+        }
       }
-
     } catch (RestException e) {
       String errorMessage = String.format("Cannot deliver message: %s", e.getMessage());
       throw new InvalidRequestException(e.getStatus(), e, errorMessage);
@@ -59,6 +71,7 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
     } catch (MismatchingMessageCorrelationException e) {
       throw new RestException(Status.BAD_REQUEST, e);
     }
+    return resultDtos;
   }
 
   protected MessageCorrelationBuilder createMessageCorrelationBuilder(CorrelationMessageDto messageDto) {

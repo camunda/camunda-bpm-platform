@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.rest.sub.runtime.impl.JobResourceImpl;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;

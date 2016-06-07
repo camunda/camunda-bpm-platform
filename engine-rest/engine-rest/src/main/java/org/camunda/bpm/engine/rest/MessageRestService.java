@@ -12,19 +12,32 @@
  */
 package org.camunda.bpm.engine.rest;
 
+import java.util.List;
 import org.camunda.bpm.engine.rest.dto.message.CorrelationMessageDto;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import org.camunda.bpm.engine.rest.dto.message.MessageCorrelationResultDto;
 
 @Produces(MediaType.APPLICATION_JSON)
 public interface MessageRestService {
 
   public static final String PATH = "/message";
+  public static final String PATH_CORRELATION = "/correlation";
+  public static final String PATH_CORRELATION_WITH_RESULT = "/correlationWithResult";
 
   @POST
+  @Path(PATH_CORRELATION)
   @Consumes(MediaType.APPLICATION_JSON)
   void deliverMessage(CorrelationMessageDto messageDto);
+
+  @POST
+  @Path(PATH_CORRELATION_WITH_RESULT)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  List<MessageCorrelationResultDto> correlateMessageWithResult(CorrelationMessageDto messageDto);
+
 }

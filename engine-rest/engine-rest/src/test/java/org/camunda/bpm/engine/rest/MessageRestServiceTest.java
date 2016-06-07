@@ -3,13 +3,8 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -40,16 +35,31 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
+import java.util.LinkedHashMap;
+import java.util.List;
+import static org.camunda.bpm.engine.rest.AbstractRestServiceTest.POST_JSON_CONTENT_TYPE;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class MessageRestServiceTest extends AbstractRestServiceTest {
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
-  protected static final String MESSAGE_URL = TEST_RESOURCE_ROOT_PATH + "/message";
+  protected static final String MESSAGE_URL = TEST_RESOURCE_ROOT_PATH +  MessageRestService.PATH;
+  protected static final String MESSAGE_CORRELATION_URL = MESSAGE_URL + MessageRestService.PATH_CORRELATION;
+  protected static final String MESSAGE_CORRELATION_WITH_RESULT_URL = MESSAGE_URL + MessageRestService.PATH_CORRELATION_WITH_RESULT;
 
   private RuntimeService runtimeServiceMock;
   private MessageCorrelationBuilder messageCorrelationBuilderMock;
+  private MessageCorrelationResult mockMessageCorrelationResult;
 
   @Before
   public void setupMocks() {
@@ -64,6 +74,9 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     when(messageCorrelationBuilderMock.processInstanceVariableEquals(anyString(), any())).thenReturn(messageCorrelationBuilderMock);
     when(messageCorrelationBuilderMock.setVariables(Matchers.<Map<String,Object>>any())).thenReturn(messageCorrelationBuilderMock);
     when(messageCorrelationBuilderMock.setVariable(anyString(), any())).thenReturn(messageCorrelationBuilderMock);
+
+    mockMessageCorrelationResult = mock(MessageCorrelationResult.class);
+    when(messageCorrelationBuilderMock.correlateWithResult()).thenReturn(mockMessageCorrelationResult);
   }
 
   @Test
@@ -85,7 +98,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().post(MESSAGE_URL);
+      .when().post(MESSAGE_CORRELATION_URL);
 
     Map<String, Object> expectedCorrelationKeys = new HashMap<String, Object>();
     expectedCorrelationKeys.put("aKey", "aValue");
@@ -105,10 +118,37 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       verify(messageCorrelationBuilderMock).processInstanceVariableEquals(name, value);
     }
 
-    verify(messageCorrelationBuilderMock).correlate();
+    verify(messageCorrelationBuilderMock).correlateWithResult();
 
 //    verify(runtimeServiceMock).correlateMessage(eq(messageName), eq(businessKey),
 //        argThat(new EqualsMap(expectedCorrelationKeys)), argThat(new EqualsMap(expectedVariables)));
+  }
+
+  @Test
+  public void testFullMessageCorrelationWithResult() {
+    String messageName = "aMessageName";
+    String businessKey = "aBusinessKey";
+
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("businessKey", businessKey);
+
+    Response response = given().contentType(POST_JSON_CONTENT_TYPE)
+           .body(messageParameters)
+    .then().expect()
+           .contentType(ContentType.JSON)
+           .statusCode(Status.OK.getStatusCode())
+    .when().post(MESSAGE_CORRELATION_WITH_RESULT_URL);
+    List<LinkedHashMap> results = response.body().as(List.class);
+
+    assertNotNull(results);
+    assertTrue(!results.isEmpty());
+    LinkedHashMap<String, String> result = results.get(0);
+    assertNotNull(result);
+
+    verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
+    verify(messageCorrelationBuilderMock).processInstanceBusinessKey(eq(businessKey));
+    verify(messageCorrelationBuilderMock).correlateWithResult();
   }
 
   @Test
@@ -131,7 +171,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().post(MESSAGE_URL);
+      .when().post(MESSAGE_CORRELATION_URL);
 
     Map<String, Object> expectedCorrelationKeys = new HashMap<String, Object>();
     expectedCorrelationKeys.put("aKey", "aValue");
@@ -151,8 +191,32 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       verify(messageCorrelationBuilderMock).processInstanceVariableEquals(name, value);
     }
 
-    verify(messageCorrelationBuilderMock).correlateAll();
+    verify(messageCorrelationBuilderMock).correlateAllWithResult();
 
+  }
+
+  @Test
+  public void testFullMessageCorrelationAllWithResult() {
+    String messageName = "aMessageName";
+    String businessKey = "aBusinessKey";
+
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("businessKey", businessKey);
+    messageParameters.put("all", true);
+
+    Response response = given().contentType(POST_JSON_CONTENT_TYPE)
+           .body(messageParameters)
+    .then().expect()
+           .contentType(ContentType.JSON)
+           .statusCode(Status.OK.getStatusCode())
+    .when().post(MESSAGE_CORRELATION_WITH_RESULT_URL);
+
+    List results = response.body().as(List.class);
+    assertTrue(results.isEmpty());
+    verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
+    verify(messageCorrelationBuilderMock).processInstanceBusinessKey(eq(businessKey));
+    verify(messageCorrelationBuilderMock).correlateAllWithResult();
   }
 
   @Test
@@ -164,10 +228,10 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().post(MESSAGE_URL);
+      .when().post(MESSAGE_CORRELATION_URL);
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
-    verify(messageCorrelationBuilderMock).correlate();
+    verify(messageCorrelationBuilderMock).correlateWithResult();
     verifyNoMoreInteractions(messageCorrelationBuilderMock);
   }
 
@@ -182,14 +246,14 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().post(MESSAGE_URL);
+      .when().post(MESSAGE_CORRELATION_URL);
 
 //    verify(runtimeServiceMock).correlateMessage(eq(messageName), eq(businessKey),
 //        argThat(new EqualsMap(null)), argThat(new EqualsMap(null)));
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
     verify(messageCorrelationBuilderMock).processInstanceBusinessKey(eq(businessKey));
-    verify(messageCorrelationBuilderMock).correlate();
+    verify(messageCorrelationBuilderMock).correlateWithResult();
     verifyNoMoreInteractions(messageCorrelationBuilderMock);
 
   }
@@ -206,11 +270,11 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().post(MESSAGE_URL);
+      .when().post(MESSAGE_CORRELATION_URL);
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
     verify(messageCorrelationBuilderMock).processInstanceBusinessKey(eq(businessKey));
-    verify(messageCorrelationBuilderMock).correlateAll();
+    verify(messageCorrelationBuilderMock).correlateAllWithResult();
     verifyNoMoreInteractions(messageCorrelationBuilderMock);
 
   }
@@ -220,7 +284,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     String messageName = "aMessage";
 
     doThrow(new MismatchingMessageCorrelationException(messageName, "Expected exception: cannot correlate"))
-      .when(messageCorrelationBuilderMock).correlate();
+      .when(messageCorrelationBuilderMock).correlateWithResult();
 
     Map<String, Object> messageParameters = new HashMap<String, Object>();
     messageParameters.put("messageName", messageName);
@@ -228,7 +292,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", containsString("Expected exception: cannot correlate"))
-      .when().post(MESSAGE_URL);
+      .when().post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -237,7 +301,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     // thrown, if instantiation of the process or signalling the instance fails
     doThrow(new ProcessEngineException("Expected exception"))
-      .when(messageCorrelationBuilderMock).correlate();
+      .when(messageCorrelationBuilderMock).correlateWithResult();
 
     Map<String, Object> messageParameters = new HashMap<String, Object>();
     messageParameters.put("messageName", messageName);
@@ -245,7 +309,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
       .body("message", equalTo("Expected exception"))
-      .when().post(MESSAGE_URL);
+      .when().post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -254,7 +318,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("No message name supplied"))
-      .when().post(MESSAGE_URL);
+      .when().post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -267,11 +331,11 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().post(MESSAGE_URL);
+      .when().post(MESSAGE_CORRELATION_URL);
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
     verify(messageCorrelationBuilderMock).tenantId(MockProvider.EXAMPLE_TENANT_ID);
-    verify(messageCorrelationBuilderMock).correlate();
+    verify(messageCorrelationBuilderMock).correlateWithResult();
     verifyNoMoreInteractions(messageCorrelationBuilderMock);
   }
 
@@ -285,11 +349,11 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().post(MESSAGE_URL);
+      .when().post(MESSAGE_CORRELATION_URL);
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
     verify(messageCorrelationBuilderMock).withoutTenantId();
-    verify(messageCorrelationBuilderMock).correlate();
+    verify(messageCorrelationBuilderMock).correlateWithResult();
     verifyNoMoreInteractions(messageCorrelationBuilderMock);
   }
 
@@ -311,7 +375,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Parameter 'tenantId' cannot be used together with parameter 'withoutTenantId'."))
     .when()
-      .post(MESSAGE_URL);
+      .post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -333,7 +397,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("Cannot deliver message: "
         + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Integer.class)))
-    .when().post(MESSAGE_URL);
+    .when().post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -355,7 +419,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("Cannot deliver message: "
         + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Short.class)))
-    .when().post(MESSAGE_URL);
+    .when().post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -377,7 +441,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("Cannot deliver message: "
         + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Long.class)))
-    .when().post(MESSAGE_URL);
+    .when().post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -399,7 +463,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("Cannot deliver message: "
         + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Double.class)))
-    .when().post(MESSAGE_URL);
+    .when().post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -421,7 +485,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("Cannot deliver message: "
         + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Date.class)))
-    .when().post(MESSAGE_URL);
+    .when().post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -442,7 +506,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("Cannot deliver message: Unsupported value type 'X'"))
-    .when().post(MESSAGE_URL);
+    .when().post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -464,7 +528,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("Cannot deliver message: "
         + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Integer.class)))
-    .when().post(MESSAGE_URL);
+    .when().post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -486,7 +550,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("Cannot deliver message: "
         + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Short.class)))
-    .when().post(MESSAGE_URL);
+    .when().post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -508,7 +572,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("Cannot deliver message: "
         + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Long.class)))
-    .when().post(MESSAGE_URL);
+    .when().post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -530,7 +594,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("Cannot deliver message: "
         + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Double.class)))
-    .when().post(MESSAGE_URL);
+    .when().post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -552,7 +616,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("Cannot deliver message: "
         + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Date.class)))
-    .when().post(MESSAGE_URL);
+    .when().post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -573,7 +637,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("Cannot deliver message: Unsupported value type 'X'"))
-    .when().post(MESSAGE_URL);
+    .when().post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -583,7 +647,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     messageParameters.put("messageName", messageName);
 
     String message = "expected exception";
-    doThrow(new AuthorizationException(message)).when(messageCorrelationBuilderMock).correlate();
+    doThrow(new AuthorizationException(message)).when(messageCorrelationBuilderMock).correlateWithResult();
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -593,18 +657,18 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       .body("type", equalTo(AuthorizationException.class.getSimpleName()))
       .body("message", equalTo(message))
     .when()
-      .post(MESSAGE_URL);
+      .post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
-  public void testCorrelateAllThrowsAuthorizationException() {
+  public void testcorrelateAllThrowsAuthorizationException() {
     String messageName = "aMessageName";
     Map<String, Object> messageParameters = new HashMap<String, Object>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("all", true);
 
     String message = "expected exception";
-    doThrow(new AuthorizationException(message)).when(messageCorrelationBuilderMock).correlateAll();
+    doThrow(new AuthorizationException(message)).when(messageCorrelationBuilderMock).correlateAllWithResult();
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -614,7 +678,7 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       .body("type", equalTo(AuthorizationException.class.getSimpleName()))
       .body("message", equalTo(message))
     .when()
-      .post(MESSAGE_URL);
+      .post(MESSAGE_CORRELATION_URL);
   }
 
   @Test
@@ -630,12 +694,12 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
        .body(messageParameters)
     .then()
       .expect().statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().post(MESSAGE_URL);
+    .when().post(MESSAGE_CORRELATION_URL);
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
     verify(messageCorrelationBuilderMock).processInstanceId(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
 
-    verify(messageCorrelationBuilderMock).correlate();
+    verify(messageCorrelationBuilderMock).correlateWithResult();
   }
 
   @Test
@@ -653,12 +717,12 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
        .body(messageParameters)
     .then()
       .expect().statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().post(MESSAGE_URL);
+    .when().post(MESSAGE_CORRELATION_URL);
 
     verify(runtimeServiceMock).createMessageCorrelation(eq(messageName));
 
     verify(messageCorrelationBuilderMock, Mockito.never()).processInstanceBusinessKey(anyString());
-    verify(messageCorrelationBuilderMock).correlate();
+    verify(messageCorrelationBuilderMock).correlateWithResult();
     verifyNoMoreInteractions(messageCorrelationBuilderMock);
   }
 
