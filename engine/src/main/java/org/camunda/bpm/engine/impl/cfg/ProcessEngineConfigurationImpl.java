@@ -261,6 +261,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskReportManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
@@ -1113,6 +1114,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(ByteArrayManager.class));
       addSessionFactory(new GenericManagerFactory(TableDataManager.class));
       addSessionFactory(new GenericManagerFactory(TaskManager.class));
+      addSessionFactory(new GenericManagerFactory(TaskReportManager.class));
       addSessionFactory(new GenericManagerFactory(VariableInstanceManager.class));
       addSessionFactory(new GenericManagerFactory(EventSubscriptionManager.class));
       addSessionFactory(new GenericManagerFactory(StatisticsManager.class));

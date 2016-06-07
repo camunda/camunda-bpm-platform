@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.NativeTaskQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.task.TaskReport;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -937,4 +938,9 @@ public interface TaskService {
 
   /** The list of subtasks for this parent task */
   List<Task> getSubTasks(String parentTaskId);
+
+  /**
+   * Instantiate a task report.
+   */
+  TaskReport createTaskReport();
 }

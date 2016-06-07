@@ -83,6 +83,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskReportManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
@@ -298,6 +299,10 @@ public class CommandContext {
 
   public TaskManager getTaskManager() {
     return getSession(TaskManager.class);
+  }
+
+  public TaskReportManager getTaskReportManager() {
+    return getSession(TaskReportManager.class);
   }
 
   public MeterLogManager getMeterLogManager() {

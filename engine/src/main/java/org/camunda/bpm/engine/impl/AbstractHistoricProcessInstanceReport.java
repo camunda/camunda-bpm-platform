@@ -12,12 +12,6 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
@@ -29,11 +23,17 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.query.Report;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 /**
  * @author Roman Smirnov
  *
  */
-public abstract class AbstractReport implements Command<Object>, Report, Serializable {
+public abstract class AbstractHistoricProcessInstanceReport implements Command<Object>, Report, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -47,10 +47,10 @@ public abstract class AbstractReport implements Command<Object>, Report, Seriali
 
   protected TenantCheck tenantCheck = new TenantCheck();
 
-  protected AbstractReport() {
+  protected AbstractHistoricProcessInstanceReport() {
   }
 
-  protected AbstractReport(CommandExecutor commandExecutor) {
+  protected AbstractHistoricProcessInstanceReport(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
   }
 
@@ -97,7 +97,7 @@ public abstract class AbstractReport implements Command<Object>, Report, Seriali
     return commandExecutor;
   }
 
-  public AbstractReport setCommandExecutor(CommandExecutor commandExecutor) {
+  public AbstractHistoricProcessInstanceReport setCommandExecutor(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
     return this;
   }

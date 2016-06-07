@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
  * @author Roman Smirnov
  *
  */
-public class HistoricProcessInstanceReportImpl extends AbstractReport implements HistoricProcessInstanceReport {
+public class HistoricProcessInstanceHistoricProcessInstanceReportImpl extends AbstractHistoricProcessInstanceReport implements HistoricProcessInstanceReport {
 
   private static final long serialVersionUID = 1L;
 
@@ -37,7 +37,7 @@ public class HistoricProcessInstanceReportImpl extends AbstractReport implements
   protected String[] processDefinitionIdIn;
   protected String[] processDefinitionKeyIn;
 
-  public HistoricProcessInstanceReportImpl(CommandExecutor commandExecutor) {
+  public HistoricProcessInstanceHistoricProcessInstanceReportImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
 

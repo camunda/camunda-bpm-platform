@@ -12,25 +12,34 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.impl.TaskReportImpl;
+import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.task.TaskCountByCandidateGroupResult;
+
 import java.util.List;
 
-import org.camunda.bpm.engine.history.DurationReportResult;
-import org.camunda.bpm.engine.impl.HistoricProcessInstanceHistoricProcessInstanceReportImpl;
-import org.camunda.bpm.engine.impl.persistence.AbstractManager;
-
 /**
- * @author Roman Smirnov
+ * @author Stefan Hentschel
  *
  */
-public class ReportManager extends AbstractManager {
+public class TaskReportManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
-  public List<DurationReportResult> createHistoricProcessInstanceDurationReport(HistoricProcessInstanceHistoricProcessInstanceReportImpl query) {
+  public List<TaskCountByCandidateGroupResult> createTaskCountByCandidateGroupReport(TaskReportImpl query) {
     configureQuery(query);
-    return getDbEntityManager().selectList("selectHistoricProcessInstanceDurationReport", query);
+    return getDbEntityManager().selectListWithRawParameter(
+      "selectTaskCountByCandidateGroupReportQuery",
+      query,
+      0,
+      Integer.MAX_VALUE
+    );
   }
 
-  protected void configureQuery(HistoricProcessInstanceHistoricProcessInstanceReportImpl parameter) {
+  protected void configureQuery(TaskReportImpl parameter) {
+    getAuthorizationManager().checkAuthorization(Permissions.READ, Resources.TASK, Authorization.ANY);
     getTenantManager().configureTenantCheck(parameter.getTenantCheck());
   }
 

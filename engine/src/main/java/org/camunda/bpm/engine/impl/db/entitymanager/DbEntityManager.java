@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.AbstractReport;
+import org.camunda.bpm.engine.impl.AbstractHistoricProcessInstanceReport;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.GroupQueryImpl;
@@ -147,7 +147,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
     }
   }
 
-  public List selectList(String statement, AbstractReport reportQuery) {
+  public List selectList(String statement, AbstractHistoricProcessInstanceReport reportQuery) {
     return selectListWithRawParameter(statement, reportQuery, 0, Integer.MAX_VALUE);
   }
 

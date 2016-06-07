@@ -529,4 +529,34 @@
      ${sql}
   </select>
 
+  <!-- TASK GROUP ASSIGNMENT REPORT RESULT MAP -->
+
+  <resultMap id="taskCountByCandidateGroupReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.TaskCountByCandidateGroupResultEntity">
+    <result property="taskCount" column="TASK_COUNT_" jdbcType="INTEGER" />
+    <result property="groupName" column="GROUP_NAME_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <select id="selectTaskCountByCandidateGroupReportQuery" parameterType="org.camunda.bpm.engine.impl.TaskReportImpl" resultMap="taskCountByCandidateGroupReportResultMap">
+    SELECT
+        COUNT(T.ID_) AS TASK_COUNT_,
+        I.GROUP_ID_ AS GROUP_NAME_
+    FROM
+        ${prefix}ACT_RU_TASK T
+    LEFT JOIN
+        ${prefix}ACT_RU_IDENTITYLINK I
+    ON
+        I.TASK_ID_ = T.ID_
+
+    <where>
+      <bind name="columnPrefix" value="'T.'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+    </where>
+
+    GROUP BY
+        GROUP_NAME_
+    ORDER BY
+        GROUP_NAME_
+    ASC
+  </select>
+
 </mapper>

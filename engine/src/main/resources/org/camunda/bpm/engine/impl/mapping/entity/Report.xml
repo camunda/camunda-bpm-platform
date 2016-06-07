@@ -26,7 +26,7 @@
     <result property="periodUnit" column="PERIOD_UNIT_" jdbcType="VARCHAR" />
   </resultMap>
 
-  <select id="selectHistoricProcessInstanceDurationReport" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceReportImpl" resultMap="durationReportResultMap">
+  <select id="selectHistoricProcessInstanceDurationReport" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceHistoricProcessInstanceReportImpl" resultMap="durationReportResultMap">
     SELECT
       MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, '${reportPeriodUnitName}' AS PERIOD_UNIT_
     FROM
@@ -39,7 +39,7 @@
       PERIOD_ 
   </select>
 
-  <select id="selectHistoricProcessInstanceDurationReport_oracle" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceReportImpl" resultMap="durationReportResultMap">
+  <select id="selectHistoricProcessInstanceDurationReport_oracle" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceHistoricProcessInstanceReportImpl" resultMap="durationReportResultMap">
     SELECT
       MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, '${reportPeriodUnitName}' AS PERIOD_UNIT_
     FROM

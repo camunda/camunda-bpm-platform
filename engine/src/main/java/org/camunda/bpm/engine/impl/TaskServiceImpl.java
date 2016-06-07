@@ -67,6 +67,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.NativeTaskQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.task.TaskReport;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -382,6 +383,10 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
   public List<Task> getSubTasks(String parentTaskId) {
     return commandExecutor.execute(new GetSubTasksCmd(parentTaskId));
+  }
+
+  public TaskReport createTaskReport() {
+    return new TaskReportImpl(commandExecutor);
   }
 
 }
