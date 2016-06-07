@@ -121,6 +121,45 @@ module.exports = function(grunt) {
 
     var tasksToRun = [
       'clean',
+      'browserify',
+      'copy',
+      'less'
+    ];
+
+    if(typeof app === 'undefined' || app === 'tasklist') {
+      tasksToRun.push('localescompile');
+    }
+
+    if(grunt.config.data.buildMode === 'prod') {
+      tasksToRun.push('uglify');
+    }
+
+    grunt.task.run(tasksToRun);
+
+  });
+
+grunt.registerTask('new-build', function(mode, app) {
+
+
+    if(typeof app !== 'undefined') {
+      console.log(' ------------  will build ' + app + ' -------------');
+      var objs = [browserifyConf, copyConf, lessConf, localesConf, watchConf, uglifyConf];
+      for(var i = 0; i < objs.length; i++) {
+        var obj = objs[i];
+        for (var key in obj) {
+          if (obj.hasOwnProperty(key) && key.toLowerCase().indexOf(app) === -1 && key !== 'options' &&
+                                         key.toLowerCase().indexOf('webapp') === -1 &&
+                                         key.toLowerCase().indexOf('sdk') === -1) {
+              delete obj[key];
+          }
+        }
+      }
+    }
+
+    grunt.config.data.buildMode = mode || 'prod';
+
+    var tasksToRun = [
+      'clean',
       'persistify',
       'copy',
       'less'
@@ -147,6 +186,19 @@ module.exports = function(grunt) {
     } else {
       grunt.task.run([
         'build:dev',
+        'watch'
+      ]);
+    }
+  });
+  grunt.registerTask('auto-new-build', function(app) {
+    if(app) {
+      grunt.task.run([
+        'new-build:dev:' + app,
+        'watch'
+      ]);
+    } else {
+      grunt.task.run([
+        'new-build:dev',
         'watch'
       ]);
     }
