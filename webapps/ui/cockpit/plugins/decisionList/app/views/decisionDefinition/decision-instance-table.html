@@ -2,10 +2,10 @@
 <div cam-widget-loader
      loading-state="{{ loadingState }}"
      text-empty="No decision instances matched by current filter.">
-  <table class="decision-instances cam-table">
+  <table class="decision-instances cam-table cam-fixed-layout">
     <thead>
       <tr>
-        <th class="instance-id uuid">ID</th>
+        <th class="instance-id">ID</th>
         <th class="start-time">Evaluation Time</th>
         <th class="process-definition-key">Process Definition Key</th>
         <th class="process-instance-id">Process Instance Id</th>
@@ -14,30 +14,35 @@
     </thead>
     <tbody>
       <tr ng-repeat="decisionInstance in decisionInstances">
-        <td class="instance-id uuid">
+        <td class="instance-id"
+            cam-widget-clipboard="decisionInstance.id">
           <a ng-href="#/decision-instance/{{ decisionInstance.id }}" title="{{ decisionInstance.id }}">
             {{ decisionInstance.id }}
           </a>
         </td>
 
-        <td class="start-time">
+        <td class="start-time"
+            cam-widget-clipboard="decisionInstance.evaluationTime">
           {{ decisionInstance.evaluationTime | camDate }}
         </td>
 
-        <td class="process-definition-key">
+        <td class="process-definition-key"
+            cam-widget-clipboard="decisionInstance.processDefinitionKey">
           <a ng-href="{{ getProcessDefinitionLink(decisionInstance) }}">
             {{ decisionInstance.processDefinitionKey }}
           </a>
         </td>
 
-        <td class="process-instance-id uuid">
+        <td class="process-instance-id"
+            cam-widget-clipboard="decisionInstance.processInstanceId">
           <a ng-href="{{ getProcessInstanceLink(decisionInstance) }}">
             {{ decisionInstance.processInstanceId }}
           </a>
         </td>
 
-        <td class="activity-id">
-            {{ decisionInstance.activityId }}
+        <td class="activity-id"
+            cam-widget-clipboard="decisionInstance.activityId">
+          {{ decisionInstance.activityId }}
         </td>
       </tr>
     </tbody>

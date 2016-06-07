@@ -402,7 +402,7 @@ describe('Cockpit Process Instance Spec', function() {
       dashboardPage.navigateToWebapp('Cockpit');
       dashboardPage.goToSection('Processes');
       processesPage.deployedProcessesList.selectProcessByName(name);
-      element(by.css('.ctn-content-bottom .instance-id a')).click();
+      element(by.css('.ctn-content-bottom .instance-id [ng-transclude] a')).click();
       element(by.css('.ctn-toolbar [tooltip~="Retries"]')).click();
     }
 

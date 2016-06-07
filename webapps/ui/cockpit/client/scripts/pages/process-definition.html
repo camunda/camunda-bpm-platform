@@ -63,11 +63,17 @@
           <dd class="version-tag"
               ng-if="!processDefinition.versionTag"><span class="null-value">null</span></dd>
 
-          <dt>Definition ID:</dt>
-          <dd class="definition-id">{{ processDefinition.id }}</dd>
+          <dt cam-widget-clipboard="processDefinition.id"
+              ng-class="{hovered: hovered === 'definition-id'}">Definition ID:</dt>
+          <dd class="definition-id"
+              ng-mouseenter="hoverTitle('definition-id')"
+              ng-mouseleave="hoverTitle()">{{ processDefinition.id }}</dd>
 
-          <dt>Definition Key:</dt>
-          <dd class="definition-key">{{ processDefinition.key }}</dd>
+          <dt cam-widget-clipboard="processDefinition.key"
+              ng-class="{hovered: hovered === 'definition-key'}">Definition Key:</dt>
+          <dd class="definition-key"
+              ng-mouseenter="hoverTitle('definition-key')"
+              ng-mouseleave="hoverTitle()">{{ processDefinition.key }}</dd>
 
           <dt>Definition Name:</dt>
           <dd class="definition-name"
@@ -75,14 +81,22 @@
           <dd class="definition-name"
               ng-if="!processDefinition.name || processDefinition.name === processDefinition.key"><span class="null-value">null</span></dd>
 
-          <dt>Tenant ID:</dt>
+          <dt ng-if="processDefinition.tenantId"
+              cam-widget-clipboard="processDefinition.tenantId"
+              ng-class="{hovered: hovered === 'tenant-id'}">Tenant ID:</dt>
           <dd class="tenant-id"
-              ng-if="processDefinition.tenantId">{{ processDefinition.tenantId }}</dd>
+              ng-if="processDefinition.tenantId"
+              ng-mouseenter="hoverTitle('tenant-id')"
+              ng-mouseleave="hoverTitle()">{{ processDefinition.tenantId }}</dd>
+          <dt ng-if="!processDefinition.tenantId">Tenant ID:</dt>
           <dd class="tenant-id"
               ng-if="!processDefinition.tenantId"><span class="null-value">null</span></dd>
 
-          <dt>Deployment ID:</dt>
-          <dd class="deployment-id">
+          <dt cam-widget-clipboard="processDefinition.deploymentId"
+              ng-class="{hovered: hovered === 'deployment-id'}">Deployment ID:</dt>
+          <dd class="deployment-id"
+              ng-mouseenter="hoverTitle('deployment-id')"
+              ng-mouseleave="hoverTitle()">
             <a ng-href="{{ getDeploymentUrl() }}">{{ processDefinition.deploymentId }}</a>
           </dd>
 

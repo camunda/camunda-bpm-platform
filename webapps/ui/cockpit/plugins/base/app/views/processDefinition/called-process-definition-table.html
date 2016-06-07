@@ -12,21 +12,25 @@
 
     <tbody>
       <tr ng-repeat="calledProcessDefinition in calledProcessDefinitions">
-        <td class="process-definition">
+        <td class="process-definition"
+            cam-widget-clipboard="calledProcessDefinition.id">
           <a ng-href="#/process-definition/{{ calledProcessDefinition.id }}?parentProcessDefinitionId={{ processDefinition.id }}">
             {{ calledProcessDefinition.name }}
           </a>
         </td>
 
         <td class="activity">
-          <a ng-show="calledProcessDefinition.calledFromActivities.length === 1"
-             cam-select-activity="calledProcessDefinition.calledFromActivities[0].id"
-             ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ calledProcessDefinition.calledFromActivities[0].id }}&amp;detailsTab=call-process-definitions-table">
-            {{ calledProcessDefinition.calledFromActivities[0].name }}
-          </a>
+          <span ng-show="calledProcessDefinition.calledFromActivities.length === 1"
+                cam-widget-clipboard="calledProcessDefinition.calledFromActivities[0].id">
+            <a cam-select-activity="calledProcessDefinition.calledFromActivities[0].id"
+               ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ calledProcessDefinition.calledFromActivities[0].id }}&amp;detailsTab=call-process-definitions-table">
+              {{ calledProcessDefinition.calledFromActivities[0].name }}
+            </a>
+          </span>
 
           <ul ng-show="calledProcessDefinition.calledFromActivities.length > 1">
-            <li ng-repeat="activity in calledProcessDefinition.calledFromActivities">
+            <li ng-repeat="activity in calledProcessDefinition.calledFromActivities"
+                cam-widget-clipboard="activity.id">
               <a cam-select-activity="activity.id"
                  ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ activity.id }}&amp;detailsTab=call-process-definitions-table">
                 {{ activity.name }}

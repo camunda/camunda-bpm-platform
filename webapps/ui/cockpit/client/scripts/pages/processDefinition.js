@@ -6,7 +6,6 @@ var template = fs.readFileSync(__dirname + '/process-definition.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular'),
     routeUtil = require('../../../../common/scripts/util/routeUtil'),
-    dataDepend = require('angular-data-depend'),
     camCommons = require('camunda-commons-ui/lib');
 
   var ngModule = angular.module('cam.cockpit.pages.processDefinition', ['dataDepend', camCommons.name]);
@@ -20,6 +19,11 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
 
     // utilities ///////////////////////
+
+    $scope.hovered = null;
+    $scope.hoverTitle = function (id) {
+      $scope.hovered = id || null;
+    };
 
     $scope.$on('$routeChanged', function() {
       processData.set('filter', parseFilterFromUri());
@@ -193,13 +197,13 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
     processData.provide('instances.all', [ 'processDefinition', function(definition) {
 
-	  var queryParams = { processDefinitionKey : definition.key }
+    var queryParams = { processDefinitionKey : definition.key };
 
-	  if(definition.tenantId) {
-    	queryParams.tenantIdIn = [ definition.tenantId ];
-      } else {
-    	queryParams.withoutTenantId = true;
-      }
+    if(definition.tenantId) {
+      queryParams.tenantIdIn = [ definition.tenantId ];
+    } else {
+      queryParams.withoutTenantId = true;
+    }
 
       return ProcessInstanceResource.count(queryParams).$promise;
     }]);
@@ -231,10 +235,10 @@ var angular = require('camunda-commons-ui/vendor/angular'),
         'sortBy': 'version',
         'sortOrder': 'desc' };
 
-   	  if(definition.tenantId) {
-       	queryParams.tenantIdIn = [ definition.tenantId ];
-      }	else {
-    	  queryParams.withoutTenantId = true;
+      if(definition.tenantId) {
+        queryParams.tenantIdIn = [ definition.tenantId ];
+      } else {
+        queryParams.withoutTenantId = true;
       }
 
       return ProcessDefinitionResource.query(queryParams).$promise;

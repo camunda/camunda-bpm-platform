@@ -6,7 +6,6 @@ var template = fs.readFileSync(__dirname + '/decision-definition.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular'),
     routeUtil = require('../../../../common/scripts/util/routeUtil'),
-    dataDepend = require('angular-data-depend'),
     camCommons = require('camunda-commons-ui/lib');
 
   var ngModule = angular.module('cam.cockpit.pages.decisionDefinition', ['dataDepend', camCommons.name]);
@@ -23,6 +22,11 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     // utilities ///////////////////////
 
     var decisionDefinitionService = camAPI.resource('decision-definition');
+
+    $scope.hovered = null;
+    $scope.hoverTitle = function (id) {
+      $scope.hovered = id || null;
+    };
 
     // end utilities ///////////////////////
 
@@ -54,7 +58,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
         key: decisionDefinition.key,
         sortBy: 'version',
         sortOrder: 'desc'
-      }
+      };
 
       if(decisionDefinition.tenantId) {
     	queryParams.tenantIdIn = decisionDefinition.tenantId;

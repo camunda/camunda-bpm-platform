@@ -19,6 +19,10 @@
       <tr ng-repeat="incident in incidents">
         <td class="message"
             ng-show="incident.incidentType === 'failedJob'">
+          <!--
+            it would be great to be able to copy the stacktrace from here
+            using the clipboard widget but it comes from an API endpoint...
+          -->
           <a ng-if="incident.rootCauseIncidentMessage"
              href="{{ getJobStacktraceUrl(incident) }}"
              target="_blank"
@@ -37,7 +41,10 @@
         </td>
         <td class="message"
             ng-if="incident.incidentType !== 'failedJob' && incident.rootCauseIncidentMessage">
-          <div class="auto-cutoff">{{ incident.rootCauseIncidentMessage }}</div>
+          <div class="auto-cutoff"
+               cam-widget-clipboard="incident.rootCauseIncidentMessage">
+            {{ incident.rootCauseIncidentMessage }}
+          </div>
         </td>
         <td class="message"
             ng-if="incident.incidentType !== 'failedJob' && !incident.rootCauseIncidentMessage">
@@ -49,7 +56,8 @@
         </td>
 
         <td class="activity">
-          <span ng-show="incident.linkable">
+          <span ng-show="incident.linkable"
+                cam-widget-clipboard="incident.activityId">
             <a cam-select-activity="incident.activityId"
                ng-href="#/process-instance/{{ processInstance.id }}?activityIds={{ incident.activityId }}&amp;detailsTab=incidents-tab">
               {{ incident.activityName }}
@@ -60,16 +68,18 @@
           </span>
         </td>
 
-        <td class="cause instance-id uuid">
-          <span ng-show="incident.causeIncidentProcessInstanceId !== incident.processInstanceId" >
+        <td class="cause instance-id">
+          <span ng-show="incident.causeIncidentProcessInstanceId !== incident.processInstanceId"
+                cam-widget-clipboard="incident.causeIncidentProcessInstanceId">
             <a href="#/process-instance/{{incident.causeIncidentProcessInstanceId}}?activityIds={{ incident.causeIncidentActivityId }}&amp;detailsTab=incidents-tab">
               {{ incident.causeIncidentProcessInstanceId }}
             </a>
           </span>
         </td>
 
-        <td class="cause-root instance-id uuid">
-          <span ng-show="incident.rootCauseIncidentProcessInstanceId !== incident.processInstanceId" >
+        <td class="cause-root instance-id">
+          <span ng-show="incident.rootCauseIncidentProcessInstanceId !== incident.processInstanceId"
+                cam-widget-clipboard="incident.rootCauseIncidentProcessInstanceId">
             <a href="#/process-instance/{{incident.rootCauseIncidentProcessInstanceId}}?activityIds={{ incident.rootCauseIncidentActivityId }}&amp;detailsTab=incidents-tab">
               {{ incident.rootCauseIncidentProcessInstanceId }}
             </a>

@@ -6,7 +6,6 @@ var template = fs.readFileSync(__dirname + '/process-instance.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular'),
     routeUtil = require('../../../../common/scripts/util/routeUtil'),
-    dataDepend = require('angular-data-depend'),
     camCommons = require('camunda-commons-ui/lib');
 
   var ngModule = angular.module('cam.cockpit.pages.processInstance', [camCommons.name, 'dataDepend']);
@@ -29,6 +28,11 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     var pageData = $scope.pageData = dataDepend.create($scope);
 
     // utilities ///////////////////////
+
+    $scope.hovered = null;
+    $scope.hoverTitle = function (id) {
+      $scope.hovered = id || null;
+    };
 
     $scope.$on('$routeChanged', function() {
       processData.set('filter', parseFilterFromUri());

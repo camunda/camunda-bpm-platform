@@ -6,7 +6,7 @@
     <thead>
       <tr>
         <th class="state">State</th>
-        <th class="instance-id uuid">ID</th>
+        <th class="instance-id">ID</th>
         <th class="start-time">Start Time</th>
         <th class="business-key">Business Key</th>
       </tr>
@@ -25,19 +25,26 @@
           </span>
         </td>
 
-        <td class="instance-id uuid">
-          <a ng-href="{{ getProcessInstanceUrl(processInstance) }}" title="{{ processInstance.id }}">
+        <td class="instance-id"
+            cam-widget-clipboard="processInstance.id">
+          <a ng-href="{{ getProcessInstanceUrl(processInstance) }}"
+             title="{{ processInstance.id }}">
             {{ processInstance.id }}
           </a>
         </td>
 
-        <td class="start-time">
+        <td class="start-time"
+            cam-widget-clipboard="processInstance.startTime">
           {{ processInstance.startTime | camDate }}
         </td>
 
-        <td class="business-key">
+        <td class="business-key"
+            ng-if="processInstance.businessKey"
+            cam-widget-clipboard="processInstance.businessKey">
           {{ processInstance.businessKey }}
         </td>
+        <td class="business-key"
+            ng-if="!processInstance.businessKey"></td>
       </tr>
     </tbody>
   </table>

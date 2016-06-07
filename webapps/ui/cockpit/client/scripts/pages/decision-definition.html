@@ -45,11 +45,16 @@
           </span>
         </dd>
 
-        <dt>Definition ID:</dt>
-        <dd>{{ decisionDefinition.id }}</dd>
+        <dt cam-widget-clipboard="decisionDefinition.id"
+            ng-class="{hovered: hovered === 'definition-id'}">Definition ID:</dt>
+        <dd ng-mouseenter="hoverTitle('definition-id')"
+            ng-mouseleave="hoverTitle()">{{ decisionDefinition.id }}</dd>
 
-        <dt>Definition Key:</dt>
-        <dd class="definition-key">{{ decisionDefinition.key }}</dd>
+        <dt cam-widget-clipboard="decisionDefinition.key"
+            ng-class="{hovered: hovered === 'definition-key'}">Definition Key:</dt>
+        <dd class="definition-key"
+            ng-mouseenter="hoverTitle('definition-key')"
+            ng-mouseleave="hoverTitle()">{{ decisionDefinition.key }}</dd>
 
         <dt>Definition Name:</dt>
         <dd class="definition-name"
@@ -57,14 +62,22 @@
         <dd class="definition-name"
             ng-if="!decisionDefinition.name || decisionDefinition.name === decisionDefinition.key"><span class="null-value">null</span></dd>
 
-        <dt>Tenant ID:</dt>
+        <dt ng-if="decisionDefinition.tenantId"
+            cam-widget-clipboard="decisionDefinition.tenantId"
+            ng-class="{hovered: hovered === 'tenant-id'}">Tenant ID:</dt>
         <dd class="tenant-id"
-            ng-if="decisionDefinition.tenantId">{{ decisionDefinition.tenantId }}</dd>
+            ng-if="decisionDefinition.tenantId"
+            ng-mouseenter="hoverTitle('tenant-id')"
+            ng-mouseleave="hoverTitle()">{{ decisionDefinition.tenantId }}</dd>
+        <dt ng-if="!decisionDefinition.tenantId">Tenant ID:</dt>
         <dd class="tenant-id"
             ng-if="!decisionDefinition.tenantId"><span class="null-value">null</span></dd>
 
-        <dt>Deployment ID:</dt>
-        <dd class="deployment-id">
+        <dt cam-widget-clipboard="decisionDefinition.deploymentId"
+            ng-class="{hovered: hovered === 'deployment-id'}">Deployment ID:</dt>
+        <dd class="deployment-id"
+            ng-mouseenter="hoverTitle('deployment-id')"
+            ng-mouseleave="hoverTitle()">
           <a ng-href="{{ getDeploymentUrl() }}">{{ decisionDefinition.deploymentId }}</a>
         </dd>
       </dl>
