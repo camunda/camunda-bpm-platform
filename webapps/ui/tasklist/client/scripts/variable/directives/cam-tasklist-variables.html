@@ -41,14 +41,33 @@
           </span>
 
           <a class="variable-value variable-type"
+             ng-if="!expanded"
              ng-switch-when="Object"
              ng-click="showValue(variablesByName[info.name], $event)">
             {{ variablesByName[info.name].valueInfo.objectTypeName }}
           </a>
 
+          <a class="variable-value variable-type"
+             ng-if="expanded"
+             ng-switch-when="Object"
+             ng-click="showValue(variablesByName[info.name], $event)"
+             href>
+            {{ variablesByName[info.name].valueInfo.objectTypeName }}
+          </a>
+
           <a class="variable-value"
+             ng-if="!expanded"
              ng-switch-when="Bytes"
              ng-click="download(variablesByName[info.name], $event)">
+            {{ 'DOWNLOAD' | translate }}
+            <span class="glyphicon glyphicon-download"></span>
+          </a>
+
+          <a class="variable-value"
+             ng-if="expanded"
+             ng-switch-when="Bytes"
+             ng-click="download(variablesByName[info.name], $event)"
+             href>
             {{ 'DOWNLOAD' | translate }}
             <span class="glyphicon glyphicon-download"></span>
           </a>
@@ -78,7 +97,8 @@
        tooltip-placement="bottom"
        tooltip="{{ (expanded ? 'LESS_VARIABLES' : 'MORE_VARIABLES') | translate }}">
     <a class="glyphicon"
-       ng-class="{'glyphicon-menu-up': expanded, 'glyphicon-menu-down': !expanded}">
+       ng-class="{'glyphicon-menu-up': expanded, 'glyphicon-menu-down': !expanded}"
+       href>
     </a>
   </div>
 </div>
