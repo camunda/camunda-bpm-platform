@@ -55,7 +55,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskManager;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterManager;
@@ -87,7 +86,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
-import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 
 /**
  * @author Tom Baeyens
@@ -109,11 +107,6 @@ public class CommandContext {
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected FailedJobCommandFactory failedJobCommandFactory;
 
-  protected List<AtomicOperationInvocation> queuedInvocations = new ArrayList<AtomicOperationInvocation>();
-  protected BpmnStackTrace bpmnStackTrace = new BpmnStackTrace();
-
-  protected boolean isExecuting = false;
-
   protected List<CommandContextListener> commandContextListeners = new LinkedList<CommandContextListener>();
 
   public CommandContext(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -125,73 +118,6 @@ public class CommandContext {
     this.failedJobCommandFactory = processEngineConfiguration.getFailedJobCommandFactory();
     sessionFactories = processEngineConfiguration.getSessionFactories();
     this.transactionContext = transactionContextFactory.openTransactionContext(this);
-  }
-
-  public void performOperation(AtomicOperation executionOperation, ExecutionEntity execution) {
-    performOperation(executionOperation, execution, false);
-  }
-
-  public void performOperationAsync(AtomicOperation executionOperation, ExecutionEntity execution) {
-    performOperation(executionOperation, execution, true);
-  }
-
-  public void performOperation(final AtomicOperation executionOperation, final ExecutionEntity execution, final boolean performAsync) {
-    AtomicOperationInvocation invocation = new AtomicOperationInvocation(executionOperation, execution, performAsync);
-    queuedInvocations.add(0, invocation);
-    performNext();
-  }
-
-  protected void performNext() {
-    AtomicOperationInvocation nextInvocation = queuedInvocations.get(0);
-
-    if(nextInvocation.operation.isAsyncCapable() && isExecuting) {
-      // will be picked up by while loop below
-      return;
-    }
-
-    ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(nextInvocation.execution);
-    if(requiresContextSwitch(targetProcessApplication)) {
-
-      Context.executeWithinProcessApplication(new Callable<Void>() {
-        public Void call() throws Exception {
-          performNext();
-          return null;
-        }
-
-      }, targetProcessApplication, new InvocationContext(nextInvocation.execution));
-    }
-    else {
-      if(!nextInvocation.operation.isAsyncCapable()) {
-        // if operation is not async capable, perform right away.
-        invokeNext();
-      }
-      else {
-        try  {
-          isExecuting = true;
-          while (!queuedInvocations.isEmpty()) {
-            // assumption: all operations are executed within the same process application...
-            nextInvocation = queuedInvocations.get(0);
-            invokeNext();
-          }
-        }
-        finally {
-          isExecuting = false;
-        }
-      }
-    }
-  }
-
-  protected void invokeNext() {
-    AtomicOperationInvocation invocation = queuedInvocations.remove(0);
-    try {
-      invocation.execute(bpmnStackTrace);
-    }
-    catch(RuntimeException e) {
-      // log bpmn stacktrace
-      bpmnStackTrace.printStackTrace(Context.getProcessEngineConfiguration().isBpmnStacktraceVerbose());
-      // rethrow
-      throw e;
-    }
   }
 
   public void performOperation(final CmmnAtomicOperation executionOperation, final CaseExecutionEntity execution) {
@@ -220,10 +146,6 @@ public class CommandContext {
 
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
     return processEngineConfiguration;
-  }
-
-  protected ProcessApplicationReference getTargetProcessApplication(ExecutionEntity execution) {
-    return ProcessApplicationContextUtil.getTargetProcessApplication(execution);
   }
 
   protected ProcessApplicationReference getTargetProcessApplication(CaseExecutionEntity execution) {

@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler.AsyncContinuationConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -72,7 +73,7 @@ public class AsyncContinuationJobHandler implements JobHandler<AsyncContinuation
       execution.setTransition(transition);
     }
 
-    commandContext
+    Context.getCommandInvocationContext()
       .performOperation(atomicOperation, execution);
   }
 

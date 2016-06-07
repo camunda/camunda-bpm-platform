@@ -12,10 +12,20 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+
 import org.apache.ibatis.exceptions.PersistenceException;
+import org.camunda.bpm.application.InvocationContext;
+import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 
 /**
  * In contrast to {@link CommandContext}, this context holds resources that are only valid
@@ -30,6 +40,9 @@ public class CommandInvocationContext {
 
   protected Throwable throwable;
   protected Command< ? > command;
+  protected boolean isExecuting = false;
+  protected List<AtomicOperationInvocation> queuedInvocations = new ArrayList<AtomicOperationInvocation>();
+  protected BpmnStackTrace bpmnStackTrace = new BpmnStackTrace();
 
   public CommandInvocationContext(Command<?> command) {
     this.command = command;
@@ -50,6 +63,81 @@ public class CommandInvocationContext {
     else {
       LOG.maskedExceptionInCommandContext(throwable);
     }
+  }
+
+  public void performOperation(AtomicOperation executionOperation, ExecutionEntity execution) {
+    performOperation(executionOperation, execution, false);
+  }
+
+  public void performOperationAsync(AtomicOperation executionOperation, ExecutionEntity execution) {
+    performOperation(executionOperation, execution, true);
+  }
+
+  public void performOperation(final AtomicOperation executionOperation, final ExecutionEntity execution, final boolean performAsync) {
+    AtomicOperationInvocation invocation = new AtomicOperationInvocation(executionOperation, execution, performAsync);
+    queuedInvocations.add(0, invocation);
+    performNext();
+  }
+
+  protected void performNext() {
+    AtomicOperationInvocation nextInvocation = queuedInvocations.get(0);
+
+    if(nextInvocation.operation.isAsyncCapable() && isExecuting) {
+      // will be picked up by while loop below
+      return;
+    }
+
+    ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(nextInvocation.execution);
+    if(requiresContextSwitch(targetProcessApplication)) {
+
+      Context.executeWithinProcessApplication(new Callable<Void>() {
+        public Void call() throws Exception {
+          performNext();
+          return null;
+        }
+
+      }, targetProcessApplication, new InvocationContext(nextInvocation.execution));
+    }
+    else {
+      if(!nextInvocation.operation.isAsyncCapable()) {
+        // if operation is not async capable, perform right away.
+        invokeNext();
+      }
+      else {
+        try  {
+          isExecuting = true;
+          while (! queuedInvocations.isEmpty()) {
+            // assumption: all operations are executed within the same process application...
+            nextInvocation = queuedInvocations.get(0);
+            invokeNext();
+          }
+        }
+        finally {
+          isExecuting = false;
+        }
+      }
+    }
+  }
+
+  protected void invokeNext() {
+    AtomicOperationInvocation invocation = queuedInvocations.remove(0);
+    try {
+      invocation.execute(bpmnStackTrace);
+    }
+    catch(RuntimeException e) {
+      // log bpmn stacktrace
+      bpmnStackTrace.printStackTrace(Context.getProcessEngineConfiguration().isBpmnStacktraceVerbose());
+      // rethrow
+      throw e;
+    }
+  }
+
+  protected boolean requiresContextSwitch(ProcessApplicationReference processApplicationReference) {
+    return ProcessApplicationContextUtil.requiresContextSwitch(processApplicationReference);
+  }
+
+  protected ProcessApplicationReference getTargetProcessApplication(ExecutionEntity execution) {
+    return ProcessApplicationContextUtil.getTargetProcessApplication(execution);
   }
 
   public void rethrow() {
