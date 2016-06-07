@@ -1,22 +1,28 @@
-define('camunda-cockpit-bootstrap', [
+__define('camunda-cockpit-bootstrap', [
   './scripts/camunda-cockpit-ui'
-], function (camundaCockpitUi) {
+], function () {
   'use strict';
 
-  require.config({
+  var camundaCockpitUi = window.CamundaCockpitUi;
+
+  requirejs.config({
     baseUrl: '../../../lib'
   });
 
-  require(['globalize'], function(globalize) {
-    var requirePackages = window;
+  var requirePackages = window;
+  camundaCockpitUi.exposePackages(requirePackages);
 
-    camundaCockpitUi.exposePackages(requirePackages);
-    globalize(require, ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js', 'jquery', 'angular-data-depend', 'moment', 'events'], requirePackages);
+  window.define = window.__define;
+  window.require = window.__require;
+
+  requirejs(['globalize'], function(globalize) {
+
+    globalize(requirejs, ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js', 'jquery', 'angular-data-depend', 'moment', 'events'], requirePackages);
 
     var pluginPackages = window.PLUGIN_PACKAGES || [];
     var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
 
-    require.config({
+    requirejs.config({
       packages: pluginPackages,
       baseUrl: '../',
       paths: {
@@ -28,8 +34,10 @@ define('camunda-cockpit-bootstrap', [
       return plugin.requirePackageName;
     }));
 
-    require(dependencies, function() {
-      require([],function() {
+    requirejs(dependencies, function() {
+      requirejs([],function() {
+        window.define = undefined;
+        window.require = undefined;
         camundaCockpitUi(pluginDependencies);
       });
     });
@@ -38,4 +46,4 @@ define('camunda-cockpit-bootstrap', [
 
 });
 
-require(['camunda-cockpit-bootstrap'], function(){});
+requirejs(['camunda-cockpit-bootstrap'], function(){});

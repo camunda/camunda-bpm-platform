@@ -93,13 +93,18 @@ module.exports = function(grunt) {
 
     watch:            watchConf,
 
+    ensureLibs: {
+      thirdParty: {}
+    },
+
     protractor:       require('./grunt/config/protractor')(config)
   });
 
   require('camunda-commons-ui/grunt/tasks/localescompile')(grunt);
   require('camunda-commons-ui/grunt/tasks/persistify')(grunt);
+  require('camunda-commons-ui/grunt/tasks/ensureLibs')(grunt);
 
-  grunt.registerTask('build', function(mode, app) {
+  grunt.registerTask('old-build', function(mode, app) {
 
 
     if(typeof app !== 'undefined') {
@@ -121,6 +126,7 @@ module.exports = function(grunt) {
 
     var tasksToRun = [
       'clean',
+      'ensureLibs',
       'browserify',
       'copy',
       'less'
@@ -138,7 +144,7 @@ module.exports = function(grunt) {
 
   });
 
-grunt.registerTask('new-build', function(mode, app) {
+grunt.registerTask('build', function(mode, app) {
 
 
     if(typeof app !== 'undefined') {
@@ -160,6 +166,7 @@ grunt.registerTask('new-build', function(mode, app) {
 
     var tasksToRun = [
       'clean',
+      'ensureLibs',
       'persistify',
       'copy',
       'less'
@@ -177,6 +184,19 @@ grunt.registerTask('new-build', function(mode, app) {
 
   });
 
+  grunt.registerTask('old-auto-build', function(app) {
+    if(app) {
+      grunt.task.run([
+        'old-build:dev:' + app,
+        'watch'
+      ]);
+    } else {
+      grunt.task.run([
+        'old-build:dev',
+        'watch'
+      ]);
+    }
+  });
   grunt.registerTask('auto-build', function(app) {
     if(app) {
       grunt.task.run([
@@ -186,19 +206,6 @@ grunt.registerTask('new-build', function(mode, app) {
     } else {
       grunt.task.run([
         'build:dev',
-        'watch'
-      ]);
-    }
-  });
-  grunt.registerTask('auto-new-build', function(app) {
-    if(app) {
-      grunt.task.run([
-        'new-build:dev:' + app,
-        'watch'
-      ]);
-    } else {
-      grunt.task.run([
-        'new-build:dev',
         'watch'
       ]);
     }
