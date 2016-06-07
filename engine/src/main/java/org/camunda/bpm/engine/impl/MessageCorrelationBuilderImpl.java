@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
 /**
  * @author Daniel Meyer
- * @author Christopher
+ * @author Christopher Zell
  *
  */
 public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder {

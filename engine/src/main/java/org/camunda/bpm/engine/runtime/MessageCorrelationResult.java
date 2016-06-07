@@ -15,7 +15,7 @@
  */
 package org.camunda.bpm.engine.runtime;
 
-import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 /**
  * <p>The result of a message correlation. A message may be correlated to either
@@ -40,7 +40,7 @@ public interface MessageCorrelationResult {
    *
    * @return the process definition
    */
-  PvmProcessDefinition getProcessDefinition();
+  ProcessDefinition getProcessDefinition();
 
   /**
    * Returns the activity id of the start event on which the message was correlated to.

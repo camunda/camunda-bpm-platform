@@ -14,7 +14,7 @@ package org.camunda.bpm.engine.impl.runtime;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 
@@ -90,7 +90,7 @@ public class MessageCorrelationResultImpl implements MessageCorrelationResult {
   }
 
   @Override
-  public PvmProcessDefinition getProcessDefinition() {
+  public ProcessDefinition getProcessDefinition() {
     return processDefinitionEntity;
   }
 
