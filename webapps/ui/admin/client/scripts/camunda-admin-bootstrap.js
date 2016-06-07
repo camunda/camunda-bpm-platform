@@ -1,22 +1,27 @@
-define('camunda-admin-bootstrap', [
+__define('camunda-admin-bootstrap', [
   './scripts/camunda-admin-ui'
-], function (camundaAdminUi) {
+], function () {
   'use strict';
 
-  require.config({
+  var camundaAdminUi = window.CamundaAdminUi;
+
+  requirejs.config({
     baseUrl: '../../../lib'
   });
 
-  require(['globalize'], function(globalize) {
-    var requirePackages = window;
+  var requirePackages = window;
+  camundaAdminUi.exposePackages(requirePackages);
 
-    camundaAdminUi.exposePackages(requirePackages);
-    globalize(require, ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js', 'jquery'], requirePackages);
+  window.define = window.__define;
+  window.require = window.__require;
+
+  requirejs(['globalize'], function(globalize) {
+    globalize(requirejs, ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js', 'jquery'], requirePackages);
 
     var pluginPackages = window.PLUGIN_PACKAGES || [];
     var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
 
-    require.config({
+    requirejs.config({
       packages: pluginPackages,
       baseUrl: '../',
       paths: {
@@ -28,8 +33,10 @@ define('camunda-admin-bootstrap', [
       return plugin.requirePackageName;
     }));
 
-    require(dependencies, function() {
-      require([],function() {
+    requirejs(dependencies, function() {
+      requirejs([],function() {
+        window.define = undefined;
+        window.require = undefined;
         camundaAdminUi(pluginDependencies);
       });
     });
@@ -38,4 +45,4 @@ define('camunda-admin-bootstrap', [
 
 });
 
-require(['camunda-admin-bootstrap'], function(){});
+requirejs(['camunda-admin-bootstrap'], function(){});

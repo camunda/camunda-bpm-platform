@@ -103,11 +103,19 @@
     <script type="application/javascript"
             src="$APP_ROOT/lib/require.js"></script>
     <script type="text/javascript">
-require.config({
+
+window.__define = window.define;
+window.__require = window.require;
+window.define = undefined;
+window.require = undefined;
+
+requirejs.config({
   baseUrl: '$APP_ROOT/app/cockpit',
   urlArgs: 'bust=$GRUNT_CACHE_BUST'
 });
-require(['$APP_ROOT/app/cockpit/camunda-cockpit-bootstrap.js'], function () {});
+requirejs(['$APP_ROOT/lib/deps.js'], function () {
+  requirejs(['$APP_ROOT/app/cockpit/camunda-cockpit-bootstrap.js'], function(){});
+});
     </script>
 
     <!--[if lte IE 9]>

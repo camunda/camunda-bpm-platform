@@ -1,25 +1,27 @@
-define('camunda-tasklist-bootstrap', [
+__define('camunda-tasklist-bootstrap', [
   './scripts/camunda-tasklist-ui'
-  //'globalize',
-  // 'ngDefine',
-  // 'angular'
-], function (camundaTasklistUi) {
+], function () {
   'use strict';
 
-  require.config({
+  var camundaTasklistUi = window.CamundaTasklistUi;
+
+  requirejs.config({
     baseUrl: '../../../lib'
   });
+  var requirePackages = window;
 
-  require(['globalize'], function(globalize) {
-    var requirePackages = window;
+  camundaTasklistUi.exposePackages(requirePackages);
 
-    camundaTasklistUi.exposePackages(requirePackages);
-    globalize(require, ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js', 'jquery', 'angular-data-depend'], requirePackages);
+  window.define = window.__define;
+  window.require = window.__require;
+
+  requirejs(['globalize'], function(globalize) {
+    globalize(requirejs, ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js', 'jquery', 'angular-data-depend'], requirePackages);
 
     var pluginPackages = window.PLUGIN_PACKAGES || [];
     var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
 
-    require.config({
+    requirejs.config({
       packages: pluginPackages,
       baseUrl: '../',
       paths: {
@@ -31,7 +33,7 @@ define('camunda-tasklist-bootstrap', [
       return plugin.requirePackageName;
     }));
 
-    require(dependencies, function(angular) {
+    requirejs(dependencies, function(angular) {
       // we now loaded the tasklist and the plugins, great
       // before we start initializing the tasklist though (and leave the requirejs context),
       // lets see if we should load some custom scripts first
@@ -67,15 +69,18 @@ define('camunda-tasklist-bootstrap', [
         });
 
         // configure RequireJS
-        require.config(conf);
+        requirejs.config(conf);
 
         // load the dependencies and bootstrap the AngularJS application
-        require(custom.deps || [], function() {
+        requirejs(custom.deps || [], function() {
 
           // create a AngularJS module (with possible AngularJS module dependencies)
           // on which the custom scripts can register their
           // directives, controllers, services and all when loaded
           angular.module('cam.tasklist.custom', custom.ngDeps);
+
+          window.define = undefined;
+          window.require = undefined;
 
           // now that we loaded the plugins and the additional modules, we can finally
           // initialize the tasklist
@@ -94,6 +99,8 @@ define('camunda-tasklist-bootstrap', [
         // not have been defined yet. Placing a new require call here will put
         // the bootstrapping of the angular app at the end of the queue
         require([], function() {
+          window.define = undefined;
+          window.require = undefined;
           camundaTasklistUi(pluginDependencies);
         });
       }
@@ -104,4 +111,4 @@ define('camunda-tasklist-bootstrap', [
 
 });
 
-require(['camunda-tasklist-bootstrap'], function(){});
+requirejs(['camunda-tasklist-bootstrap'], function(){});
