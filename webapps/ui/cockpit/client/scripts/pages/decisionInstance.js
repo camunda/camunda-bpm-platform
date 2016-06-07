@@ -26,6 +26,11 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
     var decisionDefinitionService = camAPI.resource('decision-definition');
 
+    $scope.hovered = null;
+    $scope.hoverTitle = function (id) {
+      $scope.hovered = id || null;
+    };
+
     // end utilities ///////////////////////
 
 
