@@ -10,7 +10,7 @@
       <planItem id="PI_ProcessTask_1" definitionRef="ProcessTask_1" />
       <processTask id="ProcessTask_1" name="A Process Task" processRef="subProcessQueryTest">
         <extensionElements>
-          <camunda:businessKey businessKey="#{caseExecution.caseBusinessKey}" />
+          <camunda:in businessKey="#{caseExecution.caseBusinessKey}" />
         </extensionElements>
       </processTask>
     </casePlanModel>
