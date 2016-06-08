@@ -512,6 +512,7 @@
                           <property name="groupNameAttribute">cn</property>
 
                           <property name="groupMemberAttribute">member</property>
+                          <property name="sortControlSupported">false</property>
 
                         </properties>
                       </plugin>

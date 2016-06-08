@@ -65,6 +65,7 @@
     <property name="groupIdAttribute" value="ou" />
     <property name="groupNameAttribute" value="cn" />
     <property name="groupMemberAttribute" value="member" />
+    <property name="sortControlSupported" value="false" />
   </bean>
 
   <bean id="administratorAuthorizationPlugin" class="org.camunda.bpm.engine.impl.plugin.AdministratorAuthorizationPlugin">
