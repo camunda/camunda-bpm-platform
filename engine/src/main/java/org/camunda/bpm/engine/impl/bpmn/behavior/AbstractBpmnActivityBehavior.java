@@ -269,7 +269,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
       List<ErrorEventDefinition> errorEventDefinitions = scope.getProperties().get(BpmnProperties.ERROR_EVENT_DEFINITIONS);
       for (ErrorEventDefinition errorEventDefinition : errorEventDefinitions) {
         PvmActivity activityHandler = scope.getProcessDefinition().findActivity(errorEventDefinition.getHandlerActivityId());
-        if ((!isReThrowingErrorEventSubprocess(errorEventDefinition, activityHandler)) && ((exception != null && errorEventDefinition.catchesException(exception)) 
+        if ((!isReThrowingErrorEventSubprocess(activityHandler)) && ((exception != null && errorEventDefinition.catchesException(exception)) 
           || (exception == null && errorEventDefinition.catchesError(errorCode)))) {
 
           errorHandlerActivity = activityHandler;
@@ -279,7 +279,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
       }
     }
 
-    protected boolean isReThrowingErrorEventSubprocess(ErrorEventDefinition errorEventDefinition, PvmActivity activityHandler) {
+    protected boolean isReThrowingErrorEventSubprocess(PvmActivity activityHandler) {
       return activityHandler.isSubProcessScope() && activityHandler.equals(currentActivity.getFlowScope());
     }
     
