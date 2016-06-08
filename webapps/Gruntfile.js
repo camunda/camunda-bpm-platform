@@ -20,6 +20,12 @@ module.exports = function(grunt) {
   require('./ui/tasklist/grunt/config/browserify')(config, browserifyConf);
   require('./ui/cockpit/grunt/config/browserify')(config, browserifyConf);
 
+  var babelConf = { };
+  require('./ui/admin/grunt/config/babel')(config, babelConf);
+  require('./ui/tasklist/grunt/config/babel')(config, babelConf);
+  require('./ui/cockpit/grunt/config/babel')(config, babelConf);
+
+
   var copyConf = require('./grunt/config/copy');
   require('./ui/admin/grunt/config/copy')(config, copyConf);
   require('./ui/cockpit/grunt/config/copy')(config, copyConf);
@@ -88,6 +94,8 @@ module.exports = function(grunt) {
     localescompile:   localesConf,
 
     uglify:           uglifyConf,
+
+    babel:            babelConf,
 
     clean:            require('./grunt/config/clean')(config),
 
@@ -174,6 +182,10 @@ grunt.registerTask('build', function(mode, app) {
 
     if(typeof app === 'undefined' || app === 'tasklist') {
       tasksToRun.push('localescompile');
+    }
+
+    if(grunt.config.data.buildMode === 'prod' || process.env.IE) {
+      tasksToRun.push('babel');
     }
 
     if(grunt.config.data.buildMode === 'prod') {
