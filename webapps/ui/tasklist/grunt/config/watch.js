@@ -57,4 +57,11 @@ module.exports = function(config, watchConf) {
     files: '**/*.{css,html,js}'
   };
 
+  watchConf.tasklist_plugins = {
+    options: {
+      cwd: '<%= pkg.gruntConfig.pluginBuildTarget %>/',
+      livereload: config.livereloadPort || false
+    },
+    files: '**/*.{css,html,js}'
+  };
 };
