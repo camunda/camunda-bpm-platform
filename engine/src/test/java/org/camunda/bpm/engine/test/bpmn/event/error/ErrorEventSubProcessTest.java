@@ -327,4 +327,30 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
     assertThat(errorVariable.getValue(), is((Object)"ouch!"));
   }
 
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testThrowErrorInLoop.bpmn20.xml"
+    })
+  public void testThrowErrorInLoop(){
+    runtimeService.startProcessInstanceByKey("looping-error"); 
+    
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("WaitState", task.getName());
+    taskService.complete(task.getId());
+
+    assertEquals("ErrorHandlingUserTask", taskService.createTaskQuery().singleResult().getName());
+  }
+
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testThrowErrorInLoopWithCallActivity.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/error/ThrowErrorToCallActivity.bpmn20.xml"
+    })
+  public void testThrowErrorInLoopWithCallActivity(){
+    runtimeService.startProcessInstanceByKey("CallActivityErrorInLoop"); 
+    
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("ErrorLog", task.getName());
+    taskService.complete(task.getId());
+
+    assertEquals("ErrorHandlingUserTask", taskService.createTaskQuery().singleResult().getName());
+  }
 }

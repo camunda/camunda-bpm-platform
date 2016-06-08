@@ -172,7 +172,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
 
     ActivityExecutionHierarchyWalker walker = new ActivityExecutionHierarchyWalker(execution);
 
-    final ErrorDeclarationForProcessInstanceFinder errorDeclarationFinder = new ErrorDeclarationForProcessInstanceFinder(origException, errorCode);
+    final ErrorDeclarationForProcessInstanceFinder errorDeclarationFinder = new ErrorDeclarationForProcessInstanceFinder(origException, errorCode, execution.getActivity());
     ActivityExecutionMappingCollector activityExecutionMappingCollector = new ActivityExecutionMappingCollector(execution);
 
     walker.addScopePreVisitor(errorDeclarationFinder);
@@ -256,26 +256,33 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     protected String errorCode;
     protected PvmActivity errorHandlerActivity;
     protected ErrorEventDefinition errorEventDefinition;
-
-    public ErrorDeclarationForProcessInstanceFinder(Exception exception, String errorCode) {
+    protected PvmActivity currentActivity;
+    
+    public ErrorDeclarationForProcessInstanceFinder(Exception exception, String errorCode, PvmActivity currentActivity) {
       this.exception = exception;
       this.errorCode = errorCode;
+      this.currentActivity = currentActivity;
     }
 
     @Override
     public void visit(PvmScope scope) {
       List<ErrorEventDefinition> errorEventDefinitions = scope.getProperties().get(BpmnProperties.ERROR_EVENT_DEFINITIONS);
       for (ErrorEventDefinition errorEventDefinition : errorEventDefinitions) {
-        if ((exception != null && errorEventDefinition.catchesException(exception)) || (exception == null && errorEventDefinition.catchesError(errorCode))) {
+        PvmActivity activityHandler = scope.getProcessDefinition().findActivity(errorEventDefinition.getHandlerActivityId());
+        if ((!isReThrowingErrorEventSubprocess(errorEventDefinition, activityHandler)) && ((exception != null && errorEventDefinition.catchesException(exception)) 
+          || (exception == null && errorEventDefinition.catchesError(errorCode)))) {
 
-          errorHandlerActivity = scope.getProcessDefinition().findActivity(errorEventDefinition.getHandlerActivityId());
+          errorHandlerActivity = activityHandler;
           this.errorEventDefinition = errorEventDefinition;
-
           break;
         }
       }
     }
 
+    protected boolean isReThrowingErrorEventSubprocess(ErrorEventDefinition errorEventDefinition, PvmActivity activityHandler) {
+      return activityHandler.isSubProcessScope() && activityHandler.equals(currentActivity.getFlowScope());
+    }
+    
     public PvmActivity getErrorHandlerActivity() {
       return errorHandlerActivity;
     }
