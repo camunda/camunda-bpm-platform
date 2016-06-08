@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -87,9 +87,6 @@ public class NestedExecutionAPIInvocationTest {
   @Before
   public void init() {
 
-    NestedProcessStartDelegate.engine = engineRule1.getProcessEngine();
-    StartProcessOnAnotherEngineDelegate.engine = engineRule2.getProcessEngine();
-
     // given
     Deployment deployment1 = engineRule1.getRepositoryService()
       .createDeployment()
@@ -140,12 +137,10 @@ public class NestedExecutionAPIInvocationTest {
 
   public static class StartProcessOnAnotherEngineDelegate implements JavaDelegate {
 
-    public static ProcessEngine engine;
-
     @Override
     public void execute(DelegateExecution execution) throws Exception {
 
-      RuntimeService runtimeService = engine.getRuntimeService();
+      RuntimeService runtimeService = ProcessEngines.getProcessEngine("engine2").getRuntimeService();
 
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
@@ -159,12 +154,10 @@ public class NestedExecutionAPIInvocationTest {
 
   public static class NestedProcessStartDelegate implements JavaDelegate {
 
-    public static ProcessEngine engine;
-
     @Override
     public void execute(DelegateExecution execution) throws Exception {
 
-      RuntimeService runtimeService = engine.getRuntimeService();
+      RuntimeService runtimeService = ProcessEngines.getDefaultProcessEngine().getRuntimeService();
 
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
