@@ -23,9 +23,9 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
-import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResultImpl;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
+import org.camunda.bpm.engine.impl.runtime.CorrelationHandlerResult;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
 
 /**
  * @author Thorben Lindhauer
@@ -51,8 +51,8 @@ public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd implements 
 
     final CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
     final CorrelationSet correlationSet = new CorrelationSet(builder);
-    MessageCorrelationResultImpl correlationResult = commandContext.runWithoutAuthorization(new Callable<MessageCorrelationResultImpl>() {
-      public MessageCorrelationResultImpl call() throws Exception {
+    CorrelationHandlerResult correlationResult = commandContext.runWithoutAuthorization(new Callable<CorrelationHandlerResult>() {
+      public CorrelationHandlerResult call() throws Exception {
         return correlationHandler.correlateMessage(commandContext, messageName, correlationSet);
       }
     });
@@ -64,12 +64,6 @@ public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd implements 
     // check authorization
     checkAuthorization(correlationResult);
 
-    if (MessageCorrelationResultImpl.TYPE_EXECUTION.equals(correlationResult.getResultType())) {
-      triggerExecution(commandContext, correlationResult);
-
-    } else {
-      instantiateProcess(commandContext, correlationResult);
-    }
-    return correlationResult;
+    return createMessageCorrelationResult(commandContext, correlationResult);
   }
 }

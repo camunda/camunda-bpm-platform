@@ -174,7 +174,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   }
 
   @Override
-  public List<? extends MessageCorrelationResult> correlateAllWithResult() {
+  public List<MessageCorrelationResult> correlateAllWithResult() {
     ensureProcessDefinitionIdNotSet();
     ensureProcessInstanceAndTenantIdNotSet();
 

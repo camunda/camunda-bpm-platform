@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
-import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResultImpl;
+import org.camunda.bpm.engine.impl.runtime.CorrelationHandlerResult;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -43,8 +43,8 @@ public class CorrelateStartMessageCmd extends AbstractCorrelateMessageCmd implem
     final CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
     final CorrelationSet correlationSet = new CorrelationSet(builder);
 
-    List<MessageCorrelationResultImpl> correlationResults = commandContext.runWithoutAuthorization(new Callable<List<MessageCorrelationResultImpl>>() {
-      public List<MessageCorrelationResultImpl> call() throws Exception {
+    List<CorrelationHandlerResult> correlationResults = commandContext.runWithoutAuthorization(new Callable<List<CorrelationHandlerResult>>() {
+      public List<CorrelationHandlerResult> call() throws Exception {
         return correlationHandler.correlateStartMessages(commandContext, messageName, correlationSet);
       }
     });
@@ -56,7 +56,7 @@ public class CorrelateStartMessageCmd extends AbstractCorrelateMessageCmd implem
       throw LOG.exceptionCorrelateMessageToSingleProcessDefinition(messageName, correlationResults.size(), correlationSet);
 
     } else {
-      MessageCorrelationResultImpl correlationResult = correlationResults.get(0);
+      CorrelationHandlerResult correlationResult = correlationResults.get(0);
 
       checkAuthorization(correlationResult);
 

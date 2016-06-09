@@ -15,8 +15,6 @@
  */
 package org.camunda.bpm.engine.runtime;
 
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-
 /**
  * <p>The result of a message correlation. A message may be correlated to either
  * a waiting execution (BPMN receive message event) or a process definition
@@ -36,18 +34,11 @@ public interface MessageCorrelationResult {
   Execution getExecution();
 
   /**
-   * Returns the process definition on which the message was correlated to.
+   * Returns the process instance id on which the message was correlated to.
    *
-   * @return the process definition
+   * @return the process instance id
    */
-  ProcessDefinition getProcessDefinition();
-
-  /**
-   * Returns the activity id of the start event on which the message was correlated to.
-   *
-   * @return the activity id of the start event
-   */
-  String getStartEventActivityId();
+  ProcessInstance getProcessInstance();
 
   /**
    * Returns the result type of the message correlation result.
@@ -55,6 +46,7 @@ public interface MessageCorrelationResult {
    * or to a process definition like a start event.
    *
    * @return the result type of the message correlation result
+   * @see {@link MessageCorrelationResultType}
    */
-  String getResultType();
+  MessageCorrelationResultType getResultType();
 }
