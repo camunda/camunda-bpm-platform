@@ -27,6 +27,7 @@ public class CorrelationMessageDto {
   private String processInstanceId;
 
   private boolean all = false;
+  private boolean resultEnabled = false;
 
   public String getMessageName() {
     return messageName;
@@ -75,7 +76,7 @@ public class CorrelationMessageDto {
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
   }
-  
+
   public boolean isWithoutTenantId() {
     return withoutTenantId;
   }
@@ -90,5 +91,13 @@ public class CorrelationMessageDto {
 
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+  }
+
+  public boolean isResultEnabled() {
+    return resultEnabled;
+  }
+
+  public void setResultEnabled(boolean resultEnabled) {
+    this.resultEnabled = resultEnabled;
   }
 }

@@ -15,9 +15,10 @@
  */
 package org.camunda.bpm.engine.rest.dto.message;
 
-import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
 
 /**
  *
@@ -25,30 +26,28 @@ import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
  */
 public class MessageCorrelationResultDto {
 
-  private String resultType;
+  private MessageCorrelationResultType resultType;
 
   //restul type execution
   private ExecutionDto execution;
 
   //result type process definition
-  private String startEventActivityId;
-  private ProcessDefinitionDto processDefinition;
+  private ProcessInstanceDto processInstance;
 
   public static MessageCorrelationResultDto fromMessageCorrelationResult(MessageCorrelationResult result) {
     MessageCorrelationResultDto dto = new MessageCorrelationResultDto();
     if (result != null) {
       dto.resultType = result.getResultType();
-      dto.startEventActivityId = result.getStartEventActivityId();
-      if (result.getProcessDefinition() != null) {
-        dto.processDefinition = ProcessDefinitionDto.fromProcessDefinition(result.getProcessDefinition());
-      } else if (result.getProcessDefinition() != null) {
+      if (result.getProcessInstance() != null) {
+        dto.processInstance = ProcessInstanceDto.fromProcessInstance(result.getProcessInstance());
+      } else if (result.getExecution() != null) {
         dto.execution = ExecutionDto.fromExecution(result.getExecution());
       }
     }
     return dto;
   }
 
-  public String getResultType() {
+  public MessageCorrelationResultType getResultType() {
     return resultType;
   }
 
@@ -56,12 +55,7 @@ public class MessageCorrelationResultDto {
     return execution;
   }
 
-  public String getStartEventActivityId() {
-    return startEventActivityId;
+  public ProcessInstanceDto getProcessInstance() {
+    return processInstance;
   }
-
-  public ProcessDefinitionDto getProcessDefinition() {
-    return processDefinition;
-  }
-
 }

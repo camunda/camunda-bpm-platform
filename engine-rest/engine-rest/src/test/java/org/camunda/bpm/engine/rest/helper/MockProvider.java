@@ -93,6 +93,8 @@ import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
+import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Attachment;
@@ -2670,4 +2672,25 @@ public abstract class MockProvider {
     return mockList;
   }
 
+
+  public static MessageCorrelationResult createMessageCorrelationResult(MessageCorrelationResultType type) {
+    MessageCorrelationResult result = mock(MessageCorrelationResult.class);
+    when(result.getResultType()).thenReturn(type);
+    if (result.getResultType().equals(MessageCorrelationResultType.Execution)) {
+      Execution ex = createMockExecution();
+      when(result.getExecution()).thenReturn(ex);
+    } else {
+      ProcessInstance instance = createMockInstance();
+      when(result.getProcessInstance()).thenReturn(instance);
+    }
+    return result;
+  }
+
+
+  public static List<MessageCorrelationResult> createMessageCorrelationResultList(MessageCorrelationResultType type) {
+    List<MessageCorrelationResult> list = new ArrayList<MessageCorrelationResult>();
+    list.add(createMessageCorrelationResult(type));
+    list.add(createMessageCorrelationResult(type));
+    return list;
+  }
 }

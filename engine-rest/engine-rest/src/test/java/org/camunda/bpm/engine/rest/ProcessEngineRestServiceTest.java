@@ -119,8 +119,6 @@ public class ProcessEngineRestServiceTest extends
   protected static final String TASK_URL = SINGLE_ENGINE_URL + "/task/{id}";
   protected static final String IDENTITY_GROUPS_URL = SINGLE_ENGINE_URL + "/identity/groups";
   protected static final String MESSAGE_URL = SINGLE_ENGINE_URL + MessageRestService.PATH;
-  protected static final String MESSAGE_CORRELATION_URL = MESSAGE_URL + MessageRestService.PATH_CORRELATION;
-  protected static final String MESSAGE_CORRELATION_WITH_RESULT_URL = MESSAGE_URL + MessageRestService.PATH_CORRELATION_WITH_RESULT;
 
   protected static final String EXECUTION_URL = SINGLE_ENGINE_URL + "/execution";
   protected static final String VARIABLE_INSTANCE_URL = SINGLE_ENGINE_URL + "/variable-instance";
@@ -518,7 +516,7 @@ public class ProcessEngineRestServiceTest extends
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters).pathParam("name", EXAMPLE_ENGINE_NAME)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().post(MESSAGE_CORRELATION_URL);
+      .when().post(MESSAGE_URL);
 
     verify(mockRuntimeService).createMessageCorrelation(eq(messageName));
     verify(mockMessageCorrelationBuilder).correlateWithResult();
@@ -531,10 +529,11 @@ public class ProcessEngineRestServiceTest extends
     String messageName = "aMessage";
     Map<String, Object> messageParameters = new HashMap<String, Object>();
     messageParameters.put("messageName", messageName);
+    messageParameters.put("resultEnabled", true);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters).pathParam("name", EXAMPLE_ENGINE_NAME)
       .then().expect().contentType(ContentType.JSON).statusCode(Status.OK.getStatusCode())
-      .when().post(MESSAGE_CORRELATION_WITH_RESULT_URL);
+      .when().post(MESSAGE_URL);
 
     verify(mockRuntimeService).createMessageCorrelation(eq(messageName));
     verify(mockMessageCorrelationBuilder).correlateWithResult();

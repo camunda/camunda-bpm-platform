@@ -29,6 +29,8 @@ import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.camunda.bpm.engine.rest.dto.message.MessageCorrelationResultDto;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 
@@ -39,12 +41,7 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
   }
 
   @Override
-  public void deliverMessage(CorrelationMessageDto messageDto) {
-    correlateMessageWithResult(messageDto);
-  }
-
-  @Override
-  public List<MessageCorrelationResultDto> correlateMessageWithResult(CorrelationMessageDto messageDto) {
+  public Response deliverMessage(CorrelationMessageDto messageDto) {
     if (messageDto.getMessageName() == null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "No message name supplied");
     }
@@ -59,7 +56,7 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
         MessageCorrelationResult result = correlation.correlateWithResult();
         resultDtos.add(MessageCorrelationResultDto.fromMessageCorrelationResult(result));
       } else {
-        List<? extends MessageCorrelationResult> results = correlation.correlateAllWithResult();
+        List<MessageCorrelationResult> results = correlation.correlateAllWithResult();
         for (MessageCorrelationResult result : results) {
           resultDtos.add(MessageCorrelationResultDto.fromMessageCorrelationResult(result));
         }
@@ -71,7 +68,16 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
     } catch (MismatchingMessageCorrelationException e) {
       throw new RestException(Status.BAD_REQUEST, e);
     }
-    return resultDtos;
+    return createResponse(resultDtos, messageDto);
+  }
+
+
+  protected Response createResponse(List<MessageCorrelationResultDto> resultDtos, CorrelationMessageDto messageDto) {
+    Response.ResponseBuilder response = Response.noContent();
+    if (messageDto.isResultEnabled()) {
+      response = Response.ok(resultDtos, MediaType.APPLICATION_JSON);
+    }
+    return response.build();
   }
 
   protected MessageCorrelationBuilder createMessageCorrelationBuilder(CorrelationMessageDto messageDto) {
