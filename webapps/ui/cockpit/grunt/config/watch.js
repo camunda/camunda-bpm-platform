@@ -30,20 +30,23 @@ module.exports = function(config, watchConf) {
       ]
   };
 
+  watchConf.cockpit_plugin_styles = {
+      options: options,
+      files: [
+        '<%= pkg.gruntConfig.pluginSourceDir %>/cockpit/plugins/**/*.{css,less}'
+      ],
+      tasks: [
+        'less:cockpit_plugin_styles'
+      ]
+  };
+
   watchConf.cockpit_dist = {
     options: {
-      cwd: '<%= pkg.gruntConfig.cockpitBuildTarget %>/',
       livereload: config.livereloadPort || false
     },
-    files: '**/*.{css,html,js}'
+    files: [
+      '<%= pkg.gruntConfig.cockpitBuildTarget %>/**/*.{css,html,js}',
+      '<%= pkg.gruntConfig.pluginBuildTarget %>/cockpit/**/*.{css,html,js}'
+    ]
   };
-
-  watchConf.cockpit_plugins = {
-    options: {
-      cwd: '<%= pkg.gruntConfig.pluginBuildTarget %>/',
-      livereload: config.livereloadPort || false
-    },
-    files: '**/*.{css,html,js}'
-  };
-
 };

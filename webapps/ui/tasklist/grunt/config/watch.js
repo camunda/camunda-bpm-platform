@@ -29,6 +29,16 @@ module.exports = function(config, watchConf) {
       ]
   };
 
+  watchConf.tasklist_plugin_styles = {
+      options: options,
+      files: [
+        '<%= pkg.gruntConfig.pluginSourceDir %>/tasklist/plugins/**/*.{css,less}'
+      ],
+      tasks: [
+        'less:tasklist_plugin_styles'
+      ]
+  };
+
   watchConf.tasklist_config = {
       options: options,
       files: [
@@ -51,17 +61,11 @@ module.exports = function(config, watchConf) {
 
   watchConf.tasklist_dist = {
     options: {
-      cwd: '<%= pkg.gruntConfig.tasklistBuildTarget %>/',
       livereload: config.livereloadPort || false
     },
-    files: '**/*.{css,html,js}'
-  };
-
-  watchConf.tasklist_plugins = {
-    options: {
-      cwd: '<%= pkg.gruntConfig.pluginBuildTarget %>/',
-      livereload: config.livereloadPort || false
-    },
-    files: '**/*.{css,html,js}'
+    files: [
+      '<%= pkg.gruntConfig.tasklistBuildTarget %>/**/*.{css,html,js}',
+      '<%= pkg.gruntConfig.pluginBuildTarget %>/tasklist/**/*.{css,html,js}'
+    ]
   };
 };

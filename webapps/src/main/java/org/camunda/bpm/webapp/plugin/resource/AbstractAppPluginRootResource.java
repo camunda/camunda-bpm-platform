@@ -66,6 +66,7 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
 
   public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
   public static final String MIME_TYPE_TEXT_HTML = "text/html";
+  public static final String MIME_TYPE_TEXT_CSS = "text/css";
   public static final String MIME_TYPE_TEXT_JAVASCRIPT = "text/javascript";
 
   @Context
@@ -160,6 +161,9 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
     } else
     if (file.endsWith(".html")) {
       return MIME_TYPE_TEXT_HTML;
+    } else
+    if (file.endsWith(".css")) {
+      return MIME_TYPE_TEXT_CSS;
     } else {
       return MIME_TYPE_TEXT_PLAIN;
     }
