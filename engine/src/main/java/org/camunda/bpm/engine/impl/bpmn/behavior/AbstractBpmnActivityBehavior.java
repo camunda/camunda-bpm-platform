@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionHierarchyWalker;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionMappingCollector;
@@ -280,7 +281,8 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     }
 
     protected boolean isReThrowingErrorEventSubprocess(PvmActivity activityHandler) {
-      return activityHandler.isSubProcessScope() && activityHandler.equals(currentActivity.getFlowScope());
+      ScopeImpl activityHandlerScope = (ScopeImpl)activityHandler;
+      return activityHandlerScope.isAncestorFlowScopeOf((ScopeImpl)currentActivity);
     }
     
     public PvmActivity getErrorHandlerActivity() {
