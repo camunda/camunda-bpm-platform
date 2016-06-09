@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -48,7 +49,8 @@ public class NestedExecutionAPIInvocationTest {
       String name = "engine2";
       configuration.setProcessEngineName(name);
       configuration.setJdbcUrl(String.format("jdbc:h2:mem%s",name));
-
+      configuration.setDatabaseSchema(null);
+      configuration.setDatabaseTablePrefix("");
       return configuration;
     }
   };
@@ -87,6 +89,9 @@ public class NestedExecutionAPIInvocationTest {
   @Before
   public void init() {
 
+    StartProcessOnAnotherEngineDelegate.engine = engine2BootstrapRule.getProcessEngine();
+    NestedProcessStartDelegate.engine = engineRule1.getProcessEngine();
+
     // given
     Deployment deployment1 = engineRule1.getRepositoryService()
       .createDeployment()
@@ -107,6 +112,12 @@ public class NestedExecutionAPIInvocationTest {
       .deploy();
 
     engineRule2.manageDeployment(deployment3);
+  }
+
+  @After
+  public void clearEngineReference() {
+    StartProcessOnAnotherEngineDelegate.engine = null;
+    NestedProcessStartDelegate.engine = null;
   }
 
   @Test
@@ -137,10 +148,12 @@ public class NestedExecutionAPIInvocationTest {
 
   public static class StartProcessOnAnotherEngineDelegate implements JavaDelegate {
 
+    public static ProcessEngine engine;
+    
     @Override
     public void execute(DelegateExecution execution) throws Exception {
 
-      RuntimeService runtimeService = ProcessEngines.getProcessEngine("engine2").getRuntimeService();
+      RuntimeService runtimeService = engine.getRuntimeService();
 
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
@@ -154,10 +167,11 @@ public class NestedExecutionAPIInvocationTest {
 
   public static class NestedProcessStartDelegate implements JavaDelegate {
 
+    public static ProcessEngine engine;
     @Override
     public void execute(DelegateExecution execution) throws Exception {
 
-      RuntimeService runtimeService = ProcessEngines.getDefaultProcessEngine().getRuntimeService();
+      RuntimeService runtimeService = engine.getRuntimeService();
 
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
