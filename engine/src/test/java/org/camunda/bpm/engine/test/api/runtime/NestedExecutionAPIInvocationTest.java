@@ -43,17 +43,7 @@ public class NestedExecutionAPIInvocationTest {
   public ProcessEngineRule engineRule1 = new ProvidedProcessEngineRule();
 
   @ClassRule
-  public static ProcessEngineBootstrapRule engine2BootstrapRule = new ProcessEngineBootstrapRule("camunda.cfg.xml") {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-
-      String name = "engine2";
-      configuration.setProcessEngineName(name);
-      configuration.setJdbcUrl(String.format("jdbc:h2:mem%s",name));
-      configuration.setDatabaseSchema(null);
-      configuration.setDatabaseTablePrefix("");
-      return configuration;
-    }
-  };
+  public static ProcessEngineBootstrapRule engine2BootstrapRule = new ProcessEngineBootstrapRule("camunda.cfg.prefix_extended.xml");
 
   @Rule
   public ProcessEngineRule engineRule2 = new ProvidedProcessEngineRule(engine2BootstrapRule);
