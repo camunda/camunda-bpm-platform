@@ -3,8 +3,12 @@ module.exports = function(config, lessConfig, pathConfig) {
   var resolve = require('path').resolve;
 
   var file = {};
-  file[pathConfig.buildTarget+'/styles/styles.css'] = pathConfig.sourceDir + '/styles/styles.less';
-  if (pathConfig.appName === 'cockpit') {
+  if(pathConfig.plugin) {
+    file[pathConfig.buildTarget+'/plugin.css'] = pathConfig.sourceDir + '/styles.less';
+  } else {
+    file[pathConfig.buildTarget+'/styles/styles.css'] = pathConfig.sourceDir + '/styles/styles.less';
+  }
+  if (pathConfig.appName === 'cockpit' && !pathConfig.plugin) {
     file[pathConfig.buildTarget+'/styles/styles-components.css'] = pathConfig.sourceDir + '/styles/styles-components.less';
   }
 
@@ -20,22 +24,18 @@ module.exports = function(config, lessConfig, pathConfig) {
     resolve(process.cwd(), 'node_modules/camunda-bpm-webapp/ui/common/styles'),
     resolve(process.cwd(), 'node_modules/camunda-bpm-webapp/ui/' + pathConfig.appName, 'styles'),
     resolve(process.cwd(), 'node_modules/camunda-bpm-webapp/ui/' + pathConfig.appName, 'client/scripts'),
-
-    // resolve(__dirname, '../../..', 'camunda-bpm-webapp/webapp/src/main/resources-plugin'),
-    // resolve(__dirname, '../../..', 'camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/src/main/resources-plugin')
   ];
 
-  lessConfig[pathConfig.appName + '_styles'] = {
+  lessConfig[pathConfig.appName + (pathConfig.plugin ? '_plugin' : '') + '_styles'] = {
     options: {
       paths: includePaths,
-
 
       dumpLineNumbers: '<%= buildMode === "prod" ? "" : "comments" %>',
       compress: '<%= buildMode === "prod" ? "true" : "" %>',
       sourceMap: '<%= buildMode === "prod" ? "true" : "" %>',
 
       sourceMapURL: './styles.css.map',
-      sourceMapFilename: pathConfig.buildTarget + '/styles/styles.css.map'
+      sourceMapFilename: pathConfig.plugin ? pathConfig.buildTarget+'/plugin.css.map' : pathConfig.buildTarget + '/styles/styles.css.map'
     },
     files: file
   };

@@ -29,19 +29,23 @@ module.exports = function(config, watchConf) {
       ]
   };
 
-  watchConf.admin_dist = {
-    options: {
-      cwd: '<%= pkg.gruntConfig.adminBuildTarget %>/',
-      livereload: config.livereloadPort || false
-    },
-    files: '**/*.{css,html,js}'
+  watchConf.admin_plugin_styles = {
+      options: options,
+      files: [
+        '<%= pkg.gruntConfig.pluginSourceDir %>/admin/plugins/**/*.{css,less}'
+      ],
+      tasks: [
+        'less:admin_plugin_styles'
+      ]
   };
 
-  watchConf.admin_plugins = {
+  watchConf.admin_dist = {
     options: {
-      cwd: '<%= pkg.gruntConfig.pluginBuildTarget %>/',
       livereload: config.livereloadPort || false
     },
-    files: '**/*.{css,html,js}'
+    files: [
+      '<%= pkg.gruntConfig.adminBuildTarget %>/**/*.{css,html,js}',
+      '<%= pkg.gruntConfig.pluginBuildTarget %>/admin/**/*.{css,html,js}'
+    ]
   };
 };

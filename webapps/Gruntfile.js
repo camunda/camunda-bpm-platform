@@ -35,24 +35,44 @@ module.exports = function(grunt) {
   require('./grunt/config/less')(config, lessConf, {
     appName: 'admin',
     sourceDir: pkg.gruntConfig.adminSourceDir,
-    buildTarget: pkg.gruntConfig.adminBuildTarget,
+    buildTarget: pkg.gruntConfig.adminBuildTarget
   });
+  require('./grunt/config/less')(config, lessConf, {
+    appName: 'admin',
+    sourceDir: pkg.gruntConfig.pluginSourceDir + '/admin/plugins',
+    buildTarget: pkg.gruntConfig.pluginBuildTarget + '/admin/app',
+    plugin: true
+  });
+
   require('./grunt/config/less')(config, lessConf, {
     appName: 'cockpit',
     sourceDir: pkg.gruntConfig.cockpitSourceDir,
-    buildTarget: pkg.gruntConfig.cockpitBuildTarget,
+    buildTarget: pkg.gruntConfig.cockpitBuildTarget
   });
+  require('./grunt/config/less')(config, lessConf, {
+    appName: 'cockpit',
+    sourceDir: pkg.gruntConfig.pluginSourceDir + '/cockpit/plugins',
+    buildTarget: pkg.gruntConfig.pluginBuildTarget + '/cockpit/app',
+    plugin: true
+  });
+
   require('./grunt/config/less')(config, lessConf, {
     appName: 'tasklist',
     sourceDir: pkg.gruntConfig.tasklistSourceDir,
-    buildTarget: pkg.gruntConfig.tasklistBuildTarget,
+    buildTarget: pkg.gruntConfig.tasklistBuildTarget
+  });
+  require('./grunt/config/less')(config, lessConf, {
+    appName: 'tasklist',
+    sourceDir: pkg.gruntConfig.pluginSourceDir + '/tasklist/plugins',
+    buildTarget: pkg.gruntConfig.pluginBuildTarget + '/tasklist/app',
+    plugin: true
   });
 
   var localesConf = { };
   require('./grunt/config/localescompile')(config, localesConf, {
     appName: 'tasklist',
     sourceDir: pkg.gruntConfig.tasklistSourceDir,
-    buildTarget: pkg.gruntConfig.tasklistBuildTarget,
+    buildTarget: pkg.gruntConfig.tasklistBuildTarget
   });
 
   var watchConf = {
@@ -112,46 +132,6 @@ module.exports = function(grunt) {
   require('camunda-commons-ui/grunt/tasks/persistify')(grunt);
   require('camunda-commons-ui/grunt/tasks/ensureLibs')(grunt);
 
-  grunt.registerTask('old-build', function(mode, app) {
-
-
-    if(typeof app !== 'undefined') {
-      console.log(' ------------  will build ' + app + ' -------------');
-      var objs = [browserifyConf, copyConf, lessConf, localesConf, watchConf, uglifyConf];
-      for(var i = 0; i < objs.length; i++) {
-        var obj = objs[i];
-        for (var key in obj) {
-          if (obj.hasOwnProperty(key) && key.toLowerCase().indexOf(app) === -1 && key !== 'options' &&
-                                         key.toLowerCase().indexOf('webapp') === -1 &&
-                                         key.toLowerCase().indexOf('sdk') === -1) {
-              delete obj[key];
-          }
-        }
-      }
-    }
-
-    grunt.config.data.buildMode = mode || 'prod';
-
-    var tasksToRun = [
-      'clean',
-      'ensureLibs',
-      'browserify',
-      'copy',
-      'less'
-    ];
-
-    if(typeof app === 'undefined' || app === 'tasklist') {
-      tasksToRun.push('localescompile');
-    }
-
-    if(grunt.config.data.buildMode === 'prod') {
-      tasksToRun.push('uglify');
-    }
-
-    grunt.task.run(tasksToRun);
-
-  });
-
 grunt.registerTask('build', function(mode, app) {
 
 
@@ -196,19 +176,6 @@ grunt.registerTask('build', function(mode, app) {
 
   });
 
-  grunt.registerTask('old-auto-build', function(app) {
-    if(app) {
-      grunt.task.run([
-        'old-build:dev:' + app,
-        'watch'
-      ]);
-    } else {
-      grunt.task.run([
-        'old-build:dev',
-        'watch'
-      ]);
-    }
-  });
   grunt.registerTask('auto-build', function(app) {
     if(app) {
       grunt.task.run([
