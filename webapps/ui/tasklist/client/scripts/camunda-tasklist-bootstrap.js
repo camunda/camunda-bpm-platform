@@ -21,6 +21,13 @@ __define('camunda-tasklist-bootstrap', [
     var pluginPackages = window.PLUGIN_PACKAGES || [];
     var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
 
+    pluginPackages.forEach(function(plugin) {
+      var node = document.createElement('link');
+      node.setAttribute('rel', 'stylesheet');
+      node.setAttribute('href', plugin.location + '/plugin.css');
+      document.head.appendChild(node);
+    });
+
     requirejs.config({
       packages: pluginPackages,
       baseUrl: '../',
