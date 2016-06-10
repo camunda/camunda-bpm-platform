@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,11 +24,15 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 public class DbIdGenerator implements IdGenerator {
 
   protected int idBlockSize;
-  protected long nextId = 0;
-  protected long lastId = -1;
-  
+  protected long nextId;
+  protected long lastId;
+
   protected CommandExecutor commandExecutor;
-  
+
+  public DbIdGenerator() {
+    reset();
+  }
+
   public synchronized String getNextId() {
     if (lastId<nextId) {
       getNewBlock();
@@ -51,12 +55,21 @@ public class DbIdGenerator implements IdGenerator {
   public void setIdBlockSize(int idBlockSize) {
     this.idBlockSize = idBlockSize;
   }
-  
+
   public CommandExecutor getCommandExecutor() {
     return commandExecutor;
   }
 
   public void setCommandExecutor(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
+  }
+
+  /**
+   * Reset inner state so that the generator fetches a new block of IDs from the database
+   * when the next ID generation request is received.
+   */
+  public void reset() {
+    nextId = 0;
+    lastId = -1;
   }
 }

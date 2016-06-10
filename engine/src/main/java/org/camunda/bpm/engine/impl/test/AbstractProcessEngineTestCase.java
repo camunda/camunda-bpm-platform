@@ -130,6 +130,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
       // only fail if no test failure was recorded
       TestHelper.assertAndEnsureCleanDbAndCache(processEngine, exception == null);
+      TestHelper.resetIdGenerator(processEngineConfiguration);
       ClockUtil.reset();
 
       // Can't do this in the teardown, as the teardown will be called as part

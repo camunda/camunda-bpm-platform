@@ -225,6 +225,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
       TestHelper.assertAndEnsureCleanDbAndCache(processEngine);
     }
 
+    TestHelper.resetIdGenerator(processEngineConfiguration);
     ClockUtil.reset();
 
 

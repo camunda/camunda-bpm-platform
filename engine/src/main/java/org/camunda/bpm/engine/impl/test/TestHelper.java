@@ -34,9 +34,11 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
+import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
+import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.dmn.deployer.DmnDeployer;
@@ -489,6 +491,14 @@ public abstract class TestHelper {
       .executable()
       .list()
       .isEmpty();
+  }
+
+  public static void resetIdGenerator(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    IdGenerator idGenerator = processEngineConfiguration.getIdGenerator();
+
+    if (idGenerator instanceof DbIdGenerator) {
+      ((DbIdGenerator) idGenerator).reset();
+    }
   }
 
   private static class InteruptTask extends TimerTask {
