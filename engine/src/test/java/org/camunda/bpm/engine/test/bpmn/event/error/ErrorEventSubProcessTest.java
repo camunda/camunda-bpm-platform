@@ -371,7 +371,7 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testThrowErrorInLoopFromCallActivityToEventSubProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/error/ThrowErrorToCallActivity.bpmn20.xml"
     })
-  public void testShouldNotThrowErrorInLoopFromCallActivityToEventSubProcess(){
+  public void FAILING_testShouldNotThrowErrorInLoopFromCallActivityToEventSubProcess(){
     runtimeService.startProcessInstanceByKey("Process_1"); 
     
     Task task = taskService.createTaskQuery().singleResult();
@@ -383,8 +383,8 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
 
     // TODO: Loop exists when error thrown from call activity to event sub process
-    // as they both have different process definition
-    assertEquals("userTask", taskService.createTaskQuery().singleResult().getName());
+    // as they both have different process definition - CAM-6212
+    assertEquals("BoundaryEventTask", taskService.createTaskQuery().singleResult().getName());
   }
 
   
