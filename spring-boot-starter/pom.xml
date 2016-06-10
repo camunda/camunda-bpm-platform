@@ -11,7 +11,7 @@
 
   <groupId>org.camunda.bpm.extension</groupId>
   <artifactId>camunda-bpm-spring-boot-starter-root</artifactId>
-  <version>1.2.0</version>
+  <version>1.3.0-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
@@ -101,7 +101,7 @@
     <connection>scm:git:git@github.com:camunda/camunda-bpm-spring-boot-starter.git</connection>
     <url>scm:git:git@github.com:camunda/camunda-bpm-spring-boot-starter.git</url>
     <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-spring-boot-starter.git</developerConnection>
-    <tag>1.2.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <!-- repositories used for distribution of releases and snapshots, DO NOT CHANGE -->
