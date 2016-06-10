@@ -459,7 +459,7 @@ public class BpmnParse extends Parse {
       if (errorCode != null) {
         error.setErrorCode(errorCode);
       }
-        
+
       errors.put(id, error);
     }
   }
@@ -2821,7 +2821,7 @@ public class BpmnParse extends Parse {
 
       if (errorEventDefinition != null) { // error end event
         String errorRef = errorEventDefinition.attribute("errorRef");
-        
+
         if (errorRef == null || "".equals(errorRef)) {
           addError("'errorRef' attribute is mandatory on error end event", errorEventDefinition);
         } else {
@@ -3441,10 +3441,10 @@ public class BpmnParse extends Parse {
     // parse definition key (and behavior)
     String calledElement = callActivityElement.attribute("calledElement");
     String caseRef = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "caseRef");
+    String varMapping = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "varMapping");
 
     if (calledElement == null && caseRef == null) {
       addError("Missing attribute 'calledElement' or 'caseRef'", callActivityElement);
-
     } else if (calledElement != null && caseRef != null) {
       addError("The attributes 'calledElement' or 'caseRef' cannot be used together: Use either 'calledElement' or 'caseRef'", callActivityElement);
     }
@@ -3461,7 +3461,16 @@ public class BpmnParse extends Parse {
     CallableElementActivityBehavior behavior = null;
 
     if (calledElement != null) {
-      behavior = new CallActivityBehavior();
+      if (varMapping != null) {
+        if (varMapping.startsWith("$")) {
+         Expression exp = expressionManager.createExpression(varMapping);
+         behavior = new CallActivityBehavior(exp);
+        } else {
+          behavior = new CallActivityBehavior(varMapping);
+        }
+      } else {
+        behavior = new CallActivityBehavior();
+      }
       ParameterValueProvider definitionKeyProvider = createParameterValueProvider(calledElement, expressionManager);
       callableElement.setDefinitionKeyValueProvider(definitionKeyProvider);
 

@@ -253,4 +253,9 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
         "040", "End concurrent execution in event subprocess");
   }
 
+  public ProcessEngineException missingDelegateVariableMappingParentClassException(String className, String delegateVarMapping) {
+    return new ProcessEngineException(
+      exceptionMessage("041", "Class '{}' doesn't implement '{}'.", className, delegateVarMapping));
+  }
+
 }

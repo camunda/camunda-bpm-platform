@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import org.camunda.bpm.engine.delegate.Expression;
 import static org.camunda.bpm.engine.impl.util.CallableElementUtil.getProcessDefinitionToCall;
 
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
@@ -36,6 +37,18 @@ import org.camunda.bpm.engine.variable.VariableMap;
  */
 public class CallActivityBehavior extends CallableElementActivityBehavior implements MigrationObserverBehavior {
 
+  public CallActivityBehavior() {
+  }
+
+  public CallActivityBehavior(String className) {
+    super(className);
+  }
+
+  public CallActivityBehavior(Expression expression) {
+    super(expression);
+  }
+
+  @Override
   protected void startInstance(ActivityExecution execution, VariableMap variables, String businessKey) {
     ProcessDefinitionImpl definition = getProcessDefinitionToCall(execution, getCallableElement());
     PvmProcessInstance processInstance = execution.createSubProcessInstance(definition, businessKey);
