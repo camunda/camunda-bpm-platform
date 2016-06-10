@@ -16,7 +16,9 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto;
@@ -101,14 +103,15 @@ public class IncidentRestServiceTenantCheckTest extends AbstractCockpitPluginTes
     identityService.setAuthentication("user", null, null);
 
     List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
-    assertThat(result).isNotEmpty();
     assertThat(result).hasSize(2);
 
-    IncidentDto incident1 = result.get(0);
-    assertThat(incident1.getProcessInstanceId()).isEqualTo(processInstanceTenantOne);
+    Set<String> processInstnaceIds = new HashSet<String>();
+    for (IncidentDto incidentDto : result) {
+      processInstnaceIds.add(incidentDto.getProcessInstanceId());
+    }
 
-    IncidentDto incident2 = result.get(1);
-    assertThat(incident2.getProcessInstanceId()).isEqualTo(processInstanceTenantTwo);
+    assertThat(processInstnaceIds).contains(processInstanceTenantOne);
+    assertThat(processInstnaceIds).contains(processInstanceTenantTwo);
   }
 
   @Test
@@ -116,15 +119,17 @@ public class IncidentRestServiceTenantCheckTest extends AbstractCockpitPluginTes
 
     identityService.setAuthentication("user", Collections.singletonList(Groups.CAMUNDA_ADMIN), null);
 
+
     List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
-    assertThat(result).isNotEmpty();
     assertThat(result).hasSize(2);
 
-    IncidentDto incident1 = result.get(0);
-    assertThat(incident1.getProcessInstanceId()).isEqualTo(processInstanceTenantOne);
+    Set<String> processInstnaceIds = new HashSet<String>();
+    for (IncidentDto incidentDto : result) {
+      processInstnaceIds.add(incidentDto.getProcessInstanceId());
+    }
 
-    IncidentDto incident2 = result.get(1);
-    assertThat(incident2.getProcessInstanceId()).isEqualTo(processInstanceTenantTwo);
+    assertThat(processInstnaceIds).contains(processInstanceTenantOne);
+    assertThat(processInstnaceIds).contains(processInstanceTenantTwo);
   }
 
 }
