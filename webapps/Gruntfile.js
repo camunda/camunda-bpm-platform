@@ -137,7 +137,7 @@ grunt.registerTask('build', function(mode, app) {
 
     if(typeof app !== 'undefined') {
       console.log(' ------------  will build ' + app + ' -------------');
-      var objs = [browserifyConf, copyConf, lessConf, localesConf, watchConf, uglifyConf];
+      var objs = [browserifyConf, copyConf, lessConf, localesConf, watchConf, uglifyConf, babelConf];
       for(var i = 0; i < objs.length; i++) {
         var obj = objs[i];
         for (var key in obj) {
@@ -177,6 +177,9 @@ grunt.registerTask('build', function(mode, app) {
   });
 
   grunt.registerTask('auto-build', function(app) {
+    if(process.env.IE) {
+      grunt.warn('IE compatible incremental build is not supported.');
+    }
     if(app) {
       grunt.task.run([
         'build:dev:' + app,
