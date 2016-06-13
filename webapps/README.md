@@ -77,6 +77,7 @@ The webapps are then available pointing a browser at [http://localhost:8080](htt
 
 You can now start developing using the `grunt auto-build` command in the webapp directory. To shorten compile times, you can specify the project you are going to make changes to by calling `grunt auto-build:cockpit`
 
+If you are only changing Javascript files, you can set the environment variable `FAST_BUILD` to 1 to further improve compile times.
 
 If you want to make changes in the camunda-commons-ui project or the camunda-bpm-sdk-js, you have to link the projects via npm:
 
