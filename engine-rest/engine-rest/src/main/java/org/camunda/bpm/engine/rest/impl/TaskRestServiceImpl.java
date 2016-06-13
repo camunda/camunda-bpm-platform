@@ -32,7 +32,9 @@ import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.hal.Hal;
 import org.camunda.bpm.engine.rest.hal.task.HalTaskList;
+import org.camunda.bpm.engine.rest.sub.task.TaskReportResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
+import org.camunda.bpm.engine.rest.sub.task.impl.TaskReportResourceImpl;
 import org.camunda.bpm.engine.rest.sub.task.impl.TaskResourceImpl;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -160,5 +162,10 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Could not save task: " + e.getMessage());
     }
 
+  }
+
+  @Override
+  public TaskReportResource getTaskReportResource() {
+    return new TaskReportResourceImpl(getProcessEngine());
   }
 }

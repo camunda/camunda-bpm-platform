@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.hal.Hal;
+import org.camunda.bpm.engine.rest.sub.task.TaskReportResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
 
 import javax.ws.rs.*;
@@ -67,5 +68,9 @@ public interface TaskRestService {
   @Path("/create")
   @Consumes(MediaType.APPLICATION_JSON)
   void createTask(TaskDto taskDto);
+
+  @Path("/report")
+  TaskReportResource getTaskReportResource();
+
 
 }

@@ -103,6 +103,7 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskCountByCandidateGroupResult;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.BytesValue;
@@ -166,6 +167,10 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TASK_ATTACHMENT_DESCRIPTION = "aTaskAttachmentDescription";
   public static final String EXAMPLE_TASK_ATTACHMENT_TYPE = "aTaskAttachmentType";
   public static final String EXAMPLE_TASK_ATTACHMENT_URL = "aTaskAttachmentUrl";
+
+  // task count by candidate group
+
+  public static final int EXAMPLE_TASK_COUNT_BY_CANDIDATE_GROUP = 2;
 
   // form data
   public static final String EXAMPLE_FORM_KEY = "aFormKey";
@@ -888,6 +893,16 @@ public abstract class MockProvider {
     List<Attachment> mocks = new ArrayList<Attachment>();
     mocks.add(createMockTaskAttachment());
     return mocks;
+  }
+
+  public static List<TaskCountByCandidateGroupResult> createMockTaskCountByCandidateGroupReport() {
+    TaskCountByCandidateGroupResult mock = mock(TaskCountByCandidateGroupResult.class);
+    when(mock.getGroupName()).thenReturn(EXAMPLE_GROUP_ID);
+    when(mock.getTaskCount()).thenReturn(EXAMPLE_TASK_COUNT_BY_CANDIDATE_GROUP);
+
+    List<TaskCountByCandidateGroupResult> mockList = new ArrayList<TaskCountByCandidateGroupResult>();
+    mockList.add(mock);
+    return mockList;
   }
 
   // form data
