@@ -141,4 +141,15 @@ module.exports = function(config, copyConf) {
         }
       ]
     };
+
+  copyConf.admin_config = {
+      files: [
+        {
+          expand: true,
+          cwd: '<%= pkg.gruntConfig.adminSourceDir %>/scripts',
+          src: ['config.js'],
+          dest: '<%= pkg.gruntConfig.adminBuildTarget %>/scripts/'
+        }
+      ]
+  };
 };

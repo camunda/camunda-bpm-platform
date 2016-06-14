@@ -124,4 +124,15 @@ module.exports = function(config, copyConf) {
         }
       ]
     };
+
+  copyConf.cockpit_config = {
+      files: [
+        {
+          expand: true,
+          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/scripts',
+          src: ['config.js'],
+          dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/scripts/'
+        }
+      ]
+  };
 };
