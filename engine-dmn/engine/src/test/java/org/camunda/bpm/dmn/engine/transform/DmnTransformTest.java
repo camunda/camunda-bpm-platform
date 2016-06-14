@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableInputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableOutputImpl;
@@ -55,24 +56,23 @@ public class DmnTransformTest extends DmnEngineTest {
   public void shouldTransformDecisionTables() {
     List<DmnDecision> decisions = parseDecisionsFromFile(TRANSFORM_DMN);
     DmnDecision decision = decisions.get(0);
-    assertThat(decision.isDecisionTable()).isTrue();
-    assertThat(decision).isInstanceOf(DmnDecisionTableImpl.class);
+    assertThat(decision).isInstanceOf(DmnDecisionImpl.class);
 
-    DmnDecisionTableImpl decisionTable = (DmnDecisionTableImpl) decision;
+    DmnDecisionImpl decisionEntity = (DmnDecisionImpl) decision;
+    DmnDecisionTableImpl decisionTable = decisionEntity.getDecisionTable();
     assertThat(decisionTable.getHitPolicyHandler()).isInstanceOf(UniqueHitPolicyHandler.class);
 
     decision = decisions.get(1);
-    assertThat(decision.isDecisionTable()).isTrue();
-    assertThat(decision).isInstanceOf(DmnDecisionTableImpl.class);
+    assertThat(decision).isInstanceOf(DmnDecisionImpl.class);
 
-    decisionTable = (DmnDecisionTableImpl) decision;
+    decisionTable = ((DmnDecisionImpl) decision).getDecisionTable();
     assertThat(decisionTable.getHitPolicyHandler()).isInstanceOf(FirstHitPolicyHandler.class);
   }
 
   @Test
   public void shouldTransformInputs() {
-    DmnDecisionTableImpl decision = (DmnDecisionTableImpl) parseDecisionFromFile("decision1", TRANSFORM_DMN);
-    List<DmnDecisionTableInputImpl> inputs = decision.getInputs();
+    DmnDecisionImpl decisionEntity = (DmnDecisionImpl) parseDecisionFromFile("decision1", TRANSFORM_DMN);
+    List<DmnDecisionTableInputImpl> inputs = decisionEntity.getDecisionTable().getInputs();
     assertThat(inputs).hasSize(2);
 
     DmnDecisionTableInputImpl input = inputs.get(0);
@@ -108,8 +108,8 @@ public class DmnTransformTest extends DmnEngineTest {
 
   @Test
   public void shouldTransformOutputs() {
-    DmnDecisionTableImpl decision = (DmnDecisionTableImpl) parseDecisionFromFile("decision1", TRANSFORM_DMN);
-    List<DmnDecisionTableOutputImpl> outputs = decision.getOutputs();
+    DmnDecisionImpl decisionEntity = (DmnDecisionImpl) parseDecisionFromFile("decision1", TRANSFORM_DMN);
+    List<DmnDecisionTableOutputImpl> outputs = decisionEntity.getDecisionTable().getOutputs();
     assertThat(outputs).hasSize(2);
 
     DmnDecisionTableOutputImpl output = outputs.get(0);
@@ -129,8 +129,8 @@ public class DmnTransformTest extends DmnEngineTest {
 
   @Test
   public void shouldTransformRules() {
-    DmnDecisionTableImpl decision = (DmnDecisionTableImpl) parseDecisionFromFile("decision1", TRANSFORM_DMN);
-    List<DmnDecisionTableRuleImpl> rules = decision.getRules();
+    DmnDecisionImpl decisionEntity = (DmnDecisionImpl) parseDecisionFromFile("decision1", TRANSFORM_DMN);
+    List<DmnDecisionTableRuleImpl> rules = decisionEntity.getDecisionTable().getRules();
     assertThat(rules).hasSize(1);
 
     DmnDecisionTableRuleImpl rule = rules.get(0);

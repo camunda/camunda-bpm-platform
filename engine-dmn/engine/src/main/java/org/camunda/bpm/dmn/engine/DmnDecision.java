@@ -13,6 +13,10 @@
 
 package org.camunda.bpm.dmn.engine;
 
+import java.util.List;
+
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
+
 /**
  * A decision of the DMN Engine.
  *
@@ -39,9 +43,23 @@ public interface DmnDecision {
 
   /**
    * Check if the decision is implemented as Decision Table.
-   *
-   * @return true if the decision is implement as Decision Table, false otherwise
+   * 
+   *  @return true if the decision is implement as Decision Table, false otherwise
    */
   boolean isDecisionTable();
+  
+  /**
+   * Gets the decision table associated with the decision.
+   * 
+   * @return an instance of DmnDecisionTableImpl or null if not set
+   */
+  DmnDecisionTableImpl getDecisionTable();
+
+  /**
+   * Gets the list of required decisions. 
+   * 
+   * @return the list of required decisions.
+   */
+  List<DmnDecision> getRequiredDecisions(); 
 
 }

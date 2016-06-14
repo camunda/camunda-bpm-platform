@@ -13,10 +13,8 @@
 
 package org.camunda.bpm.dmn.engine.util;
 
-import static org.camunda.bpm.dmn.engine.test.asserts.DmnEngineTestAssertions.assertThat;
-
 import java.io.InputStream;
-
+import static org.camunda.bpm.dmn.engine.test.asserts.DmnEngineTestAssertions.assertThat;
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
@@ -42,7 +40,7 @@ public final class DmnExampleVerifier {
     DmnDecisionTableResult results = engine.evaluateDecisionTable(decision, variables);
     assertThat(results)
       .hasSingleResult()
-      .containsOnlyKeys("result", "reason")
+      .containsKeys("result", "reason")
       .containsEntry("result", "notok")
       .containsEntry("reason", "work on your status first, as bronze you're not going to get anything");
 
@@ -51,7 +49,7 @@ public final class DmnExampleVerifier {
     results = engine.evaluateDecisionTable(decision, variables);
     assertThat(results)
       .hasSingleResult()
-      .containsOnlyKeys("result", "reason")
+      .containsKeys("result", "reason")
       .containsEntry("result", "ok")
       .containsEntry("reason", "you little fish will get what you want");
 
@@ -60,7 +58,7 @@ public final class DmnExampleVerifier {
     results = engine.evaluateDecisionTable(decision, variables);
     assertThat(results)
       .hasSingleResult()
-      .containsOnlyKeys("result", "reason")
+      .containsKeys("result", "reason")
       .containsEntry("result", "notok")
       .containsEntry("reason", "you took too much man, you took too much!");
 
@@ -70,7 +68,7 @@ public final class DmnExampleVerifier {
     results = engine.evaluateDecisionTable(decision, variables);
     assertThat(results)
       .hasSingleResult()
-      .containsOnlyKeys("result", "reason")
+      .containsKeys("result", "reason")
       .containsEntry("result", "ok")
       .containsEntry("reason", "you get anything you want");
   }

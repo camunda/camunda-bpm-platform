@@ -20,22 +20,23 @@ import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedDecisionRule;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedInput;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class DmnDecisionTableEvaluationEventImpl implements DmnDecisionTableEvaluationEvent {
 
-  protected DmnDecision decisionTable;
+  protected DmnDecisionTableImpl decisionTable;
   protected List<DmnEvaluatedInput> inputs = new ArrayList<DmnEvaluatedInput>();
   protected List<DmnEvaluatedDecisionRule> matchingRules = new ArrayList<DmnEvaluatedDecisionRule>();
   protected String collectResultName;
   protected TypedValue collectResultValue;
   protected long executedDecisionElements;
 
-  public DmnDecision getDecisionTable() {
+  public DmnDecisionTableImpl getDecisionTable() {
     return decisionTable;
   }
 
-  public void setDecisionTable(DmnDecision decisionTable) {
+  public void setDecisionTable(DmnDecisionTableImpl decisionTable) {
     this.decisionTable = decisionTable;
   }
 

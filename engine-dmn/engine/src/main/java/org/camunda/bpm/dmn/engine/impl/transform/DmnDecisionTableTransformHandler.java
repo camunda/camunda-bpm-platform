@@ -20,7 +20,6 @@ import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformContext;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformHandler;
 import org.camunda.bpm.model.dmn.BuiltinAggregator;
 import org.camunda.bpm.model.dmn.HitPolicy;
-import org.camunda.bpm.model.dmn.instance.Decision;
 import org.camunda.bpm.model.dmn.instance.DecisionTable;
 
 public class DmnDecisionTableTransformHandler implements DmnElementTransformHandler<DecisionTable, DmnDecisionTableImpl> {
@@ -34,10 +33,6 @@ public class DmnDecisionTableTransformHandler implements DmnElementTransformHand
   protected DmnDecisionTableImpl createFromDecisionTable(DmnElementTransformContext context, DecisionTable decisionTable) {
     DmnDecisionTableImpl dmnDecisionTable = createDmnElement(context, decisionTable);
 
-    // use the parent decision id and name
-    Decision decision = (Decision) decisionTable.getParentElement();
-    dmnDecisionTable.setKey(decision.getId());
-    dmnDecisionTable.setName(decision.getName());
     dmnDecisionTable.setHitPolicyHandler(getHitPolicyHandler(context, decisionTable, dmnDecisionTable));
 
     return dmnDecisionTable;

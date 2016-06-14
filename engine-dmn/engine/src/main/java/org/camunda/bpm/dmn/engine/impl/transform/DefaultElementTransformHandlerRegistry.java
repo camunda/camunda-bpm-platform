@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformHandler;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformHandlerRegistry;
+import org.camunda.bpm.model.dmn.instance.Decision;
 import org.camunda.bpm.model.dmn.instance.DecisionTable;
 import org.camunda.bpm.model.dmn.instance.DmnModelElementInstance;
 import org.camunda.bpm.model.dmn.instance.Input;
@@ -34,6 +35,7 @@ public class DefaultElementTransformHandlerRegistry implements DmnElementTransfo
   protected static Map<Class<? extends DmnModelElementInstance>, DmnElementTransformHandler> getDefaultElementTransformHandlers() {
     Map<Class<? extends DmnModelElementInstance>, DmnElementTransformHandler> handlers = new HashMap<Class<? extends DmnModelElementInstance>, DmnElementTransformHandler>();
 
+    handlers.put(Decision.class, new DmnDecisionTransformHandler());
     handlers.put(DecisionTable.class, new DmnDecisionTableTransformHandler());
     handlers.put(Input.class, new DmnDecisionTableInputTransformHandler());
     handlers.put(InputExpression.class, new DmnDecisionTableInputExpressionTransformHandler());

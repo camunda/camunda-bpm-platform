@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.hitpolicy.DefaultHitPolicyHandlerRegistry;
@@ -155,7 +156,7 @@ public class DmnDecisionTableEvaluationListenerTest extends DmnEngineTest {
     List<DmnEvaluatedDecisionRule> matchingRules = listener.evaluationEvent.getMatchingRules();
     Map<String, DmnEvaluatedOutput> outputs = matchingRules.get(0).getOutputEntries();
     assertThat(outputs).hasSize(2)
-      .containsOnlyKeys("out1", "out2");
+      .containsKeys("out1", "out2");
 
     DmnEvaluatedOutput output1 = outputs.get("out1");
     assertThat(output1.getId()).isEqualTo("output1");
@@ -173,7 +174,7 @@ public class DmnDecisionTableEvaluationListenerTest extends DmnEngineTest {
     matchingRules = listener.evaluationEvent.getMatchingRules();
     outputs = matchingRules.get(0).getOutputEntries();
     assertThat(outputs).hasSize(1)
-      .containsOnlyKeys("out2");
+      .containsKeys("out2");
 
     output2 = outputs.get("out2");
     assertThat(output2.getId()).isEqualTo("output2");
@@ -262,8 +263,8 @@ public class DmnDecisionTableEvaluationListenerTest extends DmnEngineTest {
   public void setDecisionTableHitPolicy(HitPolicy hitPolicy, BuiltinAggregator aggregator) {
     DmnHitPolicyHandler handler = hitPolicyHandlerRegistry.getHandler(hitPolicy, aggregator);
     assertThat(handler).isNotNull();
-    DmnDecisionTableImpl decisionTable = (DmnDecisionTableImpl) this.decision;
-    decisionTable.setHitPolicyHandler(handler);
+    DmnDecisionImpl DecisionEntity = (DmnDecisionImpl) this.decision;
+    DecisionEntity.getDecisionTable().setHitPolicyHandler(handler);
   }
 
   public DmnDecisionTableResult evaluateDecisionTable(Object input1, Object input2, Object input3, Object output1) {

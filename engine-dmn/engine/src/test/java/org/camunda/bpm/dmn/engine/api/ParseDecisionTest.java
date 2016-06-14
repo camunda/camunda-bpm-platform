@@ -38,7 +38,8 @@ public class ParseDecisionTest extends DmnEngineTest {
   public static final String MISSING_RULE_ID_DMN = "org/camunda/bpm/dmn/engine/api/MissingIds.missingRuleId.dmn";
   public static final String MISSING_COMPOUND_OUTPUT_NAME_DMN = "org/camunda/bpm/dmn/engine/api/CompoundOutputs.noName.dmn";
   public static final String DUPLICATE_COMPOUND_OUTPUT_NAME_DMN = "org/camunda/bpm/dmn/engine/api/CompoundOutputs.duplicateName.dmn";
-
+  public static final String REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/RequiredDecision.dmn";
+  
   @Test
   public void shouldParseDecisionFromInputStream() {
     InputStream inputStream = IoUtil.fileAsStream(NO_INPUT_DMN);
@@ -53,6 +54,16 @@ public class ParseDecisionTest extends DmnEngineTest {
 
     decision = dmnEngine.parseDecision("decision", modelInstance);
     assertDecision(decision);
+  }
+
+  @Test
+  public void shouldParseDecisionWithRequiredDecision() {
+    InputStream inputStream = IoUtil.fileAsStream(REQUIRED_DECISIONS_DMN);
+    DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
+
+    decision = dmnEngine.parseDecision("decision", modelInstance);
+    assertDecision(decision);
+    assertThat(decision.getRequiredDecisions().size()).isEqualTo(2);
   }
 
   @Test

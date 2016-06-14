@@ -16,6 +16,7 @@ package org.camunda.bpm.dmn.engine.impl.transform;
 import java.io.File;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableInputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableOutputImpl;

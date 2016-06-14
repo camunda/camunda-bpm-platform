@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableInputImpl;
@@ -70,8 +71,8 @@ public class ExpressionLanguageTest extends DmnEngineTest {
   @Test
   @DecisionResource(resource = GROOVY_DMN)
   public void testGlobalExpressionLanguage() {
-    DmnDecisionTableImpl decisionTable  = (DmnDecisionTableImpl) decision;
-
+    DmnDecisionImpl decisionEntity  = (DmnDecisionImpl) decision;
+    DmnDecisionTableImpl decisionTable = decisionEntity.getDecisionTable();
     for (DmnDecisionTableInputImpl dmnInput : decisionTable.getInputs()) {
       assertThat(dmnInput.getExpression().getExpressionLanguage()).isEqualTo("groovy");
     }

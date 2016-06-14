@@ -16,39 +16,15 @@ package org.camunda.bpm.dmn.engine.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.impl.spi.hitpolicy.DmnHitPolicyHandler;
 
-public class DmnDecisionTableImpl implements DmnDecision {
-
-  protected String key;
-  protected String name;
+public class DmnDecisionTableImpl {
 
   protected DmnHitPolicyHandler hitPolicyHandler;
 
   protected List<DmnDecisionTableInputImpl> inputs = new ArrayList<DmnDecisionTableInputImpl>();
   protected List<DmnDecisionTableOutputImpl> outputs = new ArrayList<DmnDecisionTableOutputImpl>();
   protected List<DmnDecisionTableRuleImpl> rules = new ArrayList<DmnDecisionTableRuleImpl>();
-
-  public String getKey() {
-    return key;
-  }
-
-  public void setKey(String key) {
-    this.key = key;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public boolean isDecisionTable() {
-    return true;
-  }
 
   public DmnHitPolicyHandler getHitPolicyHandler() {
     return hitPolicyHandler;
@@ -85,9 +61,7 @@ public class DmnDecisionTableImpl implements DmnDecision {
   @Override
   public String toString() {
     return "DmnDecisionTableImpl{" +
-      "key='" + key + '\'' +
-      ", name='" + name + '\'' +
-      ", hitPolicyHandler=" + hitPolicyHandler +
+      " hitPolicyHandler=" + hitPolicyHandler +
       ", inputs=" + inputs +
       ", outputs=" + outputs +
       ", rules=" + rules +
