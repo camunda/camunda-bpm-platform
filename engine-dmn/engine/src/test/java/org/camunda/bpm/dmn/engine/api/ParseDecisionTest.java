@@ -17,13 +17,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 
 import java.io.InputStream;
+import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformException;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
 import org.camunda.bpm.model.dmn.Dmn;
+import org.camunda.bpm.model.dmn.DmnModelException;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
+import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.commons.utils.IoUtil;
 import org.junit.Test;
 
@@ -38,13 +41,15 @@ public class ParseDecisionTest extends DmnEngineTest {
   public static final String MISSING_RULE_ID_DMN = "org/camunda/bpm/dmn/engine/api/MissingIds.missingRuleId.dmn";
   public static final String MISSING_COMPOUND_OUTPUT_NAME_DMN = "org/camunda/bpm/dmn/engine/api/CompoundOutputs.noName.dmn";
   public static final String DUPLICATE_COMPOUND_OUTPUT_NAME_DMN = "org/camunda/bpm/dmn/engine/api/CompoundOutputs.duplicateName.dmn";
-  public static final String REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/RequiredDecision.dmn";
-  
+  public static final String MISSING_REQUIRED_DECISION_REFERENCE_DMN = "org/camunda/bpm/dmn/engine/api/MissingRequiredDecisionReference.dmn";
+  public static final String WRONG_REQUIRED_DECISION_REFERENCE_DMN = "org/camunda/bpm/dmn/engine/api/WrongRequiredDecisionReference.dmn";
+  public static final String MISSING_REQUIRED_DECISION_ATTRIBUTE_DMN = "org/camunda/bpm/dmn/engine/api/MissingRequiredDecisionAttribute.dmn";
+  public static final String NO_INFORMATION_REQUIREMENT_ATTRIBUTE_DMN = "org/camunda/bpm/dmn/engine/api/NoInformationRequirementAttribute.dmn";
   @Test
   public void shouldParseDecisionFromInputStream() {
     InputStream inputStream = IoUtil.fileAsStream(NO_INPUT_DMN);
     decision = dmnEngine.parseDecision("decision", inputStream);
-    assertDecision(decision);
+    assertDecision(decision, "decision");
   }
 
   @Test
@@ -53,17 +58,7 @@ public class ParseDecisionTest extends DmnEngineTest {
     DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
 
     decision = dmnEngine.parseDecision("decision", modelInstance);
-    assertDecision(decision);
-  }
-
-  @Test
-  public void shouldParseDecisionWithRequiredDecision() {
-    InputStream inputStream = IoUtil.fileAsStream(REQUIRED_DECISIONS_DMN);
-    DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
-
-    decision = dmnEngine.parseDecision("decision", modelInstance);
-    assertDecision(decision);
-    assertThat(decision.getRequiredDecisions().size()).isEqualTo(2);
+    assertDecision(decision, "decision");
   }
 
   @Test
@@ -171,9 +166,58 @@ public class ParseDecisionTest extends DmnEngineTest {
     }
   }
 
-  protected void assertDecision(DmnDecision decision) {
+  @Test
+  public void shouldFailIfRequiredDecisionReferenceMissing() {
+    try {
+      parseDecisionsFromFile(MISSING_REQUIRED_DECISION_REFERENCE_DMN);
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    }
+    catch (DmnTransformException e) {
+      assertThat(e)
+        .hasCauseExactlyInstanceOf(ModelException.class)
+        .hasMessageStartingWith("DMN-02004")
+        .hasMessageContaining("Unable to find a model element instance for id null");
+    }
+  }
+
+  @Test
+  public void shouldFailIfWrongRequiredDecisionReference() {
+    try {
+      parseDecisionsFromFile(WRONG_REQUIRED_DECISION_REFERENCE_DMN);
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    }
+    catch (DmnTransformException e) {
+      assertThat(e)
+        .hasCauseExactlyInstanceOf(ModelException.class)
+        .hasMessageStartingWith("DMN-02004")
+        .hasMessageContaining("Unable to find a model element instance for id");
+    }
+  }
+
+  @Test
+  public void shouldNotFailIfMissingRequiredDecisionAttribute() {
+    List<DmnDecision> decisions = parseDecisionsFromFile(MISSING_REQUIRED_DECISION_ATTRIBUTE_DMN);
+    assertThat(decisions.size()).isEqualTo(1);
+    assertThat(decisions.get(0).getRequiredDecisions().size()).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldFailIfNoInformationRequirementAttribute() {
+    try {
+      parseDecisionsFromFile(NO_INFORMATION_REQUIREMENT_ATTRIBUTE_DMN);
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    }
+    catch (DmnTransformException e) {
+      assertThat(e)
+        .hasCauseExactlyInstanceOf(DmnModelException.class)
+        .hasMessageStartingWith("DMN-02003")
+        .hasMessageContaining("Unable to transform decisions from input stream");
+    }
+  }
+  
+  protected void assertDecision(DmnDecision decision, String key) {
     assertThat(decision).isNotNull();
-    assertThat(decision.getKey()).isEqualTo("decision");
+    assertThat(decision.getKey()).isEqualTo(key);
   }
 
 }

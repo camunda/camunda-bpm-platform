@@ -14,9 +14,12 @@
 package org.camunda.bpm.dmn.engine.transform;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 
+import java.io.InputStream;
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
@@ -26,13 +29,20 @@ import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableRuleImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnExpressionImpl;
 import org.camunda.bpm.dmn.engine.impl.hitpolicy.FirstHitPolicyHandler;
 import org.camunda.bpm.dmn.engine.impl.hitpolicy.UniqueHitPolicyHandler;
+import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformException;
 import org.camunda.bpm.dmn.engine.impl.type.DefaultTypeDefinition;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
+import org.camunda.bpm.model.dmn.Dmn;
+import org.camunda.bpm.model.dmn.DmnModelInstance;
+import org.camunda.commons.utils.IoUtil;
 import org.junit.Test;
 
 public class DmnTransformTest extends DmnEngineTest {
 
   public static final String TRANSFORM_DMN = "org/camunda/bpm/dmn/engine/transform/DmnTransformTest.dmn";
+  public static final String REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/RequiredDecision.dmn";
+  public static final String MULTIPLE_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/MultipleRequiredDecisions.dmn";
+  public static final String LOOP_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/LoopInRequiredDecision.dmn";
 
   @Test
   public void shouldTransformDecisions() {
@@ -56,6 +66,7 @@ public class DmnTransformTest extends DmnEngineTest {
   public void shouldTransformDecisionTables() {
     List<DmnDecision> decisions = parseDecisionsFromFile(TRANSFORM_DMN);
     DmnDecision decision = decisions.get(0);
+    assertThat(decision.isDecisionTable()).isTrue();
     assertThat(decision).isInstanceOf(DmnDecisionImpl.class);
 
     DmnDecisionImpl decisionEntity = (DmnDecisionImpl) decision;
@@ -63,6 +74,7 @@ public class DmnTransformTest extends DmnEngineTest {
     assertThat(decisionTable.getHitPolicyHandler()).isInstanceOf(UniqueHitPolicyHandler.class);
 
     decision = decisions.get(1);
+    assertThat(decision.isDecisionTable()).isTrue();
     assertThat(decision).isInstanceOf(DmnDecisionImpl.class);
 
     decisionTable = ((DmnDecisionImpl) decision).getDecisionTable();
@@ -164,6 +176,86 @@ public class DmnTransformTest extends DmnEngineTest {
     assertThat(dmnOutputEntry.getName()).isNull();
     assertThat(dmnOutputEntry.getExpressionLanguage()).isNull();
     assertThat(dmnOutputEntry.getExpression()).isNull();
+  }
+
+  @Test
+  public void shouldParseDecisionWithRequiredDecisions() {
+    InputStream inputStream = IoUtil.fileAsStream(REQUIRED_DECISIONS_DMN);
+    DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
+
+    DmnDecision buyProductDecision = dmnEngine.parseDecision("buyProduct", modelInstance);
+    assertDecision(buyProductDecision, "buyProduct");
+    
+    List<DmnDecision> buyProductrequiredDecisions = buyProductDecision.getRequiredDecisions();
+    assertThat(buyProductrequiredDecisions.size()).isEqualTo(1);
+
+    DmnDecision buyComputerDecision = buyProductrequiredDecisions.get(0);
+    assertThat(buyComputerDecision.getKey()).isEqualTo("buyComputer");
+    
+    List<DmnDecision> buyComputerRequiredDecision = buyComputerDecision.getRequiredDecisions();
+    assertThat(buyComputerRequiredDecision.size()).isEqualTo(1);
+    
+    DmnDecision buyElectronicDecision = buyComputerRequiredDecision.get(0);
+    assertThat(buyElectronicDecision.getKey()).isEqualTo("buyElectronic");
+    
+    assertThat(buyElectronicDecision.getRequiredDecisions().size()).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldParseDecisionsWithRequiredDecisions() {
+    InputStream inputStream = IoUtil.fileAsStream(REQUIRED_DECISIONS_DMN);
+    DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
+
+    List<DmnDecision> decisions = dmnEngine.parseDecisions(modelInstance);
+    
+    DmnDecision buyProductDecision = decisions.get(0);
+    assertDecision(buyProductDecision, "buyProduct");
+    List<DmnDecision> requiredProductDecisions = buyProductDecision.getRequiredDecisions();
+    assertThat(requiredProductDecisions.size()).isEqualTo(1);
+    assertThat(requiredProductDecisions.get(0).getKey()).isEqualTo("buyComputer");
+    
+    DmnDecision buyComputerDecision = decisions.get(1);
+    assertDecision(buyComputerDecision, "buyComputer");
+    List<DmnDecision> buyComputerRequiredDecisions = buyComputerDecision.getRequiredDecisions();
+    assertThat(buyComputerRequiredDecisions.size()).isEqualTo(1);
+    assertThat(buyComputerRequiredDecisions.get(0).getKey()).isEqualTo("buyElectronic");
+    
+    DmnDecision buyElectronicDecision = decisions.get(2);
+    assertDecision(buyElectronicDecision, "buyElectronic");
+    List<DmnDecision> buyElectronicRequiredDecisions = buyElectronicDecision.getRequiredDecisions();
+    assertThat(buyElectronicRequiredDecisions.size()).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldParseDecisionWithMultipleRequiredDecisions() {
+    InputStream inputStream = IoUtil.fileAsStream(MULTIPLE_REQUIRED_DECISIONS_DMN);
+    DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
+    DmnDecision decision = dmnEngine.parseDecision("car",modelInstance);
+    List<DmnDecision> requiredDecisions = decision.getRequiredDecisions();
+    assertThat(requiredDecisions.size()).isEqualTo(2);
+    assertThat(requiredDecisions.get(0).getKey()).isEqualTo("carPrice");
+    assertThat(requiredDecisions.get(1).getKey()).isEqualTo("carSpeed");
+  }
+
+  @Test
+  public void shouldDetectLoopInParseDecisionWithRequiredDecision() {
+    InputStream inputStream = IoUtil.fileAsStream(LOOP_REQUIRED_DECISIONS_DMN);
+    DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
+
+    try {
+      decision = dmnEngine.parseDecision("buyProduct", modelInstance);
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    } catch(DmnTransformException e) {
+      Assertions.assertThat(e)
+      .hasMessageStartingWith("DMN-02004")
+      .hasMessageContaining("DMN-02015")
+      .hasMessageContaining("decision 'buyProduct' has a loop");
+    }
+  }
+
+  protected void assertDecision(DmnDecision decision, String key) {
+    assertThat(decision).isNotNull();
+    assertThat(decision.getKey()).isEqualTo(key);
   }
 
 }

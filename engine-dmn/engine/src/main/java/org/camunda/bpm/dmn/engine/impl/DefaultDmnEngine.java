@@ -90,7 +90,7 @@ public class DefaultDmnEngine implements DmnEngine {
     ensureNotNull("decision", decision);
     ensureNotNull("variableContext", variableContext);
 
-    if (decision instanceof DmnDecisionImpl) {
+    if (decision.isDecisionTable() && decision instanceof DmnDecisionImpl) {
       DefaultDmnDecisionContext decisionContext = new DefaultDmnDecisionContext(dmnEngineConfiguration);
       return decisionContext.evaluateDecisionTable((DmnDecisionImpl)decision, variableContext);
     }

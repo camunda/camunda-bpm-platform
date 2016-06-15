@@ -23,7 +23,7 @@
 
   <decision id="buyComputer" name="buyComputer">
     <informationRequirement>
-      <requiredDecision href="#buyElectronic" />
+      <requiredDecision href="#buyProduct" />
     </informationRequirement>
     <decisionTable id="buyComputerDecisionTable">
       <input id="input1">
@@ -38,21 +38,4 @@
       </rule>
     </decisionTable>
   </decision>
-
-  <decision id="buyElectronic" name="buyElectronic">
-    <decisionTable id="buyElectronicDecisionTable">
-      <input id="input">
-        <inputExpression><text>requirement</text></inputExpression>
-      </input>
-      <output id="type" name="" typeRef="string" />
-      <rule id="rule1">
-        <inputEntry id="inputEntry1"><text>Electronic</text>
-        </inputEntry>
-        <outputEntry id="outputEntry1"><text>Computer</text>
-        </outputEntry>
-      </rule>
-    </decisionTable>
-  </decision>
-  
-  
 </definitions>

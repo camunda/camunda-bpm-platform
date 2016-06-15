@@ -63,6 +63,8 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
   protected List<DmnTransformListener> transformListeners;
   protected DmnElementTransformHandlerRegistry handlerRegistry;
 
+  protected List<String> requiredDecisionIds = new ArrayList<String>();
+
   // context
   protected DmnModelInstance modelInstance;
   protected Object parent;
@@ -133,6 +135,7 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
           dmnDecisions.add(dmnDecision);
           notifyTransformListeners(decision, dmnDecision);
         }
+        requiredDecisionIds.clear();
       }
       return (List<T>) dmnDecisions;
     }
@@ -142,17 +145,20 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
   }
 
   protected DmnDecision transformDecision(Decision decision) {
-    DmnElementTransformHandler<Decision, DmnDecisionImpl> handler = handlerRegistry.getHandler(Decision.class);
-    DmnDecisionImpl decisionImpl = handler.handleElement(this, decision);
-    this.decision = decisionImpl;
-    // validate decision id
-    if (decisionImpl.getKey() == null) {
-      throw LOG.decisionIdIsMissing(decisionImpl);
+
+    if(requiredDecisionIds.contains(decision.getId())) {
+      requiredDecisionIds.clear();
+      throw LOG.requiredDecisionLoopDetected(decision);
+    } else {
+      requiredDecisionIds.add(decision.getId());
     }
 
-    for (InformationRequirement informationRequirement: decision.getInformationRequirements()) {
-      DmnDecision requiredDecision = transformDecision(informationRequirement.getRequiredDecision());
-      decisionImpl.getRequiredDecisions().add(requiredDecision);
+    DmnElementTransformHandler<Decision, DmnDecisionImpl> handler = handlerRegistry.getHandler(Decision.class);
+    DmnDecisionImpl dmnDecision = handler.handleElement(this, decision);
+    this.decision = dmnDecision;
+    // validate decision id
+    if (dmnDecision.getKey() == null) {
+      throw LOG.decisionIdIsMissing(dmnDecision);
     }
 
     Expression expression = decision.getExpression();
@@ -162,26 +168,33 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
     }
 
     if (expression instanceof DecisionTable) {
-      DmnDecisionTableImpl decisionTableImpl = transformDecisionTable((DecisionTable) expression);
-      decisionImpl.setDecisionTable(decisionTableImpl);
-      return decisionImpl;
-    }
-    else {
+      DmnDecisionTableImpl dmnDecisionTable = transformDecisionTable((DecisionTable) expression);
+      dmnDecision.setDecisionTable(dmnDecisionTable);
+    } else {
       LOG.decisionTypeNotSupported(expression, decision);
       return null;
     }
+
+    for (InformationRequirement informationRequirement: decision.getInformationRequirements()) {
+      Decision requiredDecision = informationRequirement.getRequiredDecision();
+      if(requiredDecision != null) {
+        DmnDecision dmnRequiredDecision = transformDecision(requiredDecision);
+        dmnDecision.getRequiredDecisions().add(dmnRequiredDecision);
+      }
+    }
+    return dmnDecision;
   }
 
   protected DmnDecisionTableImpl transformDecisionTable(DecisionTable decisionTable) {
     DmnElementTransformHandler<DecisionTable, DmnDecisionTableImpl> handler = handlerRegistry.getHandler(DecisionTable.class);
-    DmnDecisionTableImpl decisionTableImpl = handler.handleElement(this, decisionTable);
+    DmnDecisionTableImpl dmnDecisionTable = handler.handleElement(this, decisionTable);
 
     for (Input input : decisionTable.getInputs()) {
-      parent = decisionTableImpl;
-      this.decisionTable = decisionTableImpl;
+      parent = dmnDecisionTable;
+      this.decisionTable = dmnDecisionTable;
       DmnDecisionTableInputImpl dmnInput = transformDecisionTableInput(input);
       if (dmnInput != null) {
-        decisionTableImpl.getInputs().add(dmnInput);
+        dmnDecisionTable.getInputs().add(dmnInput);
         notifyTransformListeners(input, dmnInput);
       }
     }
@@ -189,36 +202,36 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
     boolean needsName = decisionTable.getOutputs().size() > 1;
     Set<String> usedNames = new HashSet<String>();
     for (Output output : decisionTable.getOutputs()) {
-      parent = decisionTableImpl;
-      this.decisionTable = decisionTableImpl;
+      parent = dmnDecisionTable;
+      this.decisionTable = dmnDecisionTable;
       DmnDecisionTableOutputImpl dmnOutput = transformDecisionTableOutput(output);
       if (dmnOutput != null) {
         // validate output name
         String outputName = dmnOutput.getOutputName();
         if (needsName && outputName == null) {
-          throw LOG.compoundOutputsShouldHaveAnOutputName(decisionTableImpl, dmnOutput);
+          throw LOG.compoundOutputsShouldHaveAnOutputName(dmnDecisionTable, dmnOutput);
         }
         if (usedNames.contains(outputName)) {
-          throw LOG.compoundOutputWithDuplicateName(decisionTableImpl, dmnOutput);
+          throw LOG.compoundOutputWithDuplicateName(dmnDecisionTable, dmnOutput);
         }
         usedNames.add(outputName);
 
-        decisionTableImpl.getOutputs().add(dmnOutput);
+        dmnDecisionTable.getOutputs().add(dmnOutput);
         notifyTransformListeners(output, dmnOutput);
       }
     }
 
     for (Rule rule : decisionTable.getRules()) {
-      parent = decisionTableImpl;
-      this.decisionTable = decisionTableImpl;
+      parent = dmnDecisionTable;
+      this.decisionTable = dmnDecisionTable;
       DmnDecisionTableRuleImpl dmnRule = transformDecisionTableRule(rule);
       if (dmnRule != null) {
-        decisionTableImpl.getRules().add(dmnRule);
+        dmnDecisionTable.getRules().add(dmnRule);
         notifyTransformListeners(rule, dmnRule);
       }
     }
 
-    return decisionTableImpl;
+    return dmnDecisionTable;
   }
 
   protected DmnDecisionTableInputImpl transformDecisionTableInput(Input input) {
@@ -353,5 +366,4 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
   public DmnHitPolicyHandlerRegistry getHitPolicyHandlerRegistry() {
     return hitPolicyHandlerRegistry;
   }
-
 }

@@ -47,7 +47,7 @@ public class DmnDecisionImpl implements DmnDecision {
 
   @Override
   public boolean isDecisionTable() {
-    return false;
+    return true;
   }
 
   @Override

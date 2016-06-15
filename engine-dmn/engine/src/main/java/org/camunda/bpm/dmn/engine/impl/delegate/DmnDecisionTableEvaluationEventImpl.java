@@ -82,8 +82,11 @@ public class DmnDecisionTableEvaluationEventImpl implements DmnDecisionTableEval
 
   @Override
   public String toString() {
+    DmnDecisionImpl dmnDecision = ((DmnDecisionImpl)decision);
     return "DmnDecisionTableEvaluationEventImpl{" +
-      "decisionTable=" + ((DmnDecisionImpl)decision).getDecisionTable() +
+      " key="+ dmnDecision.getKey() +
+      ", name="+ dmnDecision.getName() + 
+      ", decisionTable=" + dmnDecision.getDecisionTable() +
       ", inputs=" + inputs +
       ", matchingRules=" + matchingRules +
       ", collectResultName='" + collectResultName + '\'' +
