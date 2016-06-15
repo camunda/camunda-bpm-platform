@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.dmn.entity.repository;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -38,7 +39,10 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
   protected String resourceName;
   protected String diagramResourceName;
   protected String tenantId;
-
+  
+  // FIX ME:
+  protected DmnDecision decision;
+  
   // firstVersion is true, when version == 1 or when
   // this definition does not have any previous definitions
   protected boolean firstVersion = false;
@@ -66,6 +70,15 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
 
   public int getRevisionNext() {
     return revision + 1;
+  }
+
+
+  public DmnDecision getDecision() {
+    return decision;
+  }
+
+  public void setDecision(DmnDecision decision) {
+    this.decision = decision;
   }
 
   @Override

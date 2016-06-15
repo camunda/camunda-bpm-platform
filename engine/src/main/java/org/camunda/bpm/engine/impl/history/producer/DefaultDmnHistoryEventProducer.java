@@ -21,6 +21,8 @@ import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedDecisionRule;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedInput;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedOutput;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
@@ -67,7 +69,8 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     // set current time as evaluation time
     event.setEvaluationTime(ClockUtil.getCurrentTime());
 
-    DecisionDefinition decisionDefinition = (DecisionDefinition) evaluationEvent.getDecisionTable();
+    // FIX ME:
+    DecisionDefinition decisionDefinition =  (DecisionDefinition)((DmnDecisionImpl)evaluationEvent.getDecisionTable()).getDecisionTable();
     String tenantId = execution.getTenantId();
     if (tenantId == null) {
       tenantId = provideTenantId(decisionDefinition, event);
@@ -88,7 +91,8 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     // set current time as evaluation time
     event.setEvaluationTime(ClockUtil.getCurrentTime());
 
-    DecisionDefinition decisionDefinition = (DecisionDefinition) evaluationEvent.getDecisionTable();
+    // FIX ME:
+    DecisionDefinition decisionDefinition = (DecisionDefinition)((DmnDecisionImpl) evaluationEvent.getDecisionTable()).getDecisionTable();
     String tenantId = execution.getTenantId();
     if (tenantId == null) {
       tenantId = provideTenantId(decisionDefinition, event);
@@ -109,8 +113,9 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     // set the user id if there is an authenticated user and no process instance
     setUserId(event);
 
-    DmnDecision decisionTable = evaluationEvent.getDecisionTable();
-
+    // FIX ME:
+    DmnDecisionTableImpl decisionTable = ((DmnDecisionImpl)evaluationEvent.getDecisionTable()).getDecisionTable();
+ 
     String tenantId = ((DecisionDefinition) decisionTable).getTenantId();
     if (tenantId == null) {
       tenantId = provideTenantId((DecisionDefinition) decisionTable, event);
@@ -135,10 +140,11 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
   protected void initDecisionInstanceEvent(HistoricDecisionInstanceEntity event, DmnDecisionTableEvaluationEvent evaluationEvent, HistoryEventTypes eventType) {
     event.setEventType(eventType.getEventName());
 
-    DmnDecision decisionTable = evaluationEvent.getDecisionTable();
-    event.setDecisionDefinitionId(((DecisionDefinition) decisionTable).getId());
-    event.setDecisionDefinitionKey(decisionTable.getKey());
-    event.setDecisionDefinitionName(decisionTable.getName());
+    // FIX ME:
+    DmnDecisionImpl decision = (DmnDecisionImpl) evaluationEvent.getDecisionTable();
+    event.setDecisionDefinitionId(((DecisionDefinition) decision.getDecisionTable()).getId());
+    event.setDecisionDefinitionKey(decision.getKey());
+    event.setDecisionDefinitionName(decision.getName());
 
     if(evaluationEvent.getCollectResultValue() != null) {
       Double collectResultValue = getCollectResultValue(evaluationEvent.getCollectResultValue());

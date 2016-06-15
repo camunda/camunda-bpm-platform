@@ -49,7 +49,8 @@ public class DecisionTableInvocation extends DelegateInvocation {
     final DmnEngine dmnEngine = Context.getProcessEngineConfiguration()
       .getDmnEngine();
 
-    invocationResult = dmnEngine.evaluateDecisionTable((DmnDecision) decisionDefinition, variableContext);
+    // FIX ME:
+    invocationResult = dmnEngine.evaluateDecisionTable(((DecisionDefinitionEntity) decisionDefinition).getDecision(), variableContext);
   }
 
   @Override

@@ -13,8 +13,12 @@
 package org.camunda.bpm.engine.impl.dmn.deployer;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnTransformer;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
@@ -25,6 +29,7 @@ import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.model.dmn.instance.Decision;
 
 /**
  * {@link Deployer} responsible to parse DMN 1.0 XML files and create the
@@ -45,9 +50,21 @@ public class DmnDeployer extends AbstractDefinitionDeployer<DecisionDefinitionEn
   protected List<DecisionDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource, Properties properties) {
     byte[] bytes = resource.getBytes();
     ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
-
+    List<DecisionDefinitionEntity> decisionTables = new ArrayList<DecisionDefinitionEntity>();
     try {
-      return transformer.createTransform().modelInstance(inputStream).transformDecisions();
+      // FIX ME:
+      List<DmnDecision> decisions = transformer.createTransform().modelInstance(inputStream).transformDecisions();
+      for(DmnDecision decision: decisions) {
+        DmnDecisionImpl decisionImpl = (DmnDecisionImpl)decision;
+        
+        DecisionDefinitionEntity decisionTable = (DecisionDefinitionEntity)decisionImpl.getDecisionTable();
+        decisionTable.setKey(decision.getKey());
+        decisionTable.setName(decision.getName());
+        decisionTable.setDecision(decision);
+        decisionTables.add(decisionTable);
+      }
+      
+      return decisionTables;
     }
     catch (Exception e) {
       throw new ProcessEngineException("Unable to transform DMN resource '" + resource.getName() + "'", e);
