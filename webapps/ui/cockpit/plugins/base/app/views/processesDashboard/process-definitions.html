@@ -69,7 +69,7 @@
          select="selectTab('previews')">
       <div class="tile-grid">
         <div ng-repeat="pd in processDefinitionData | orderBy:orderByPredicate:orderByReverse"
-             class="tile">
+             class="tile col-xs-12 col-sm-6 col-md-4 col-lg-3">
           <a href="#/process-definition/{{ pd.id }}">
             <h4 class="tile-header">
               {{ pd.name || pd.key }}
