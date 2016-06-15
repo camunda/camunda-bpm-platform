@@ -19,6 +19,7 @@ var pagesModule = require('./pages/main'),
     var ngDependencies = [
       'ng',
       'ngResource',
+      'cam.cockpit.custom',
       camCommonsUi.name,
       directivesModule.name,
       filtersModule.name,
