@@ -15,6 +15,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
     var ngDependencies = [
       'ng',
       'ngResource',
+      'cam.cockpit.custom',
       commons.name,
       require('./repository/main').name,
       require('./batches/main').name,
