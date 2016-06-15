@@ -32,7 +32,6 @@ public class DmnDecisionImpl implements DmnDecision {
     this.decisionTable = decisionTable;   
   }
 
-  @Override
   public DmnDecisionTableImpl getDecisionTable() {
     return decisionTable;
   }

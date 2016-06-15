@@ -16,7 +16,6 @@ package org.camunda.bpm.dmn.engine.delegate;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.dmn.HitPolicy;
 
@@ -28,7 +27,7 @@ public interface DmnDecisionTableEvaluationEvent {
   /**
    * @return the evaluated decision table
    */
-  DmnDecisionTableImpl getDecisionTable();
+  DmnDecision getDecisionTable();
 
   /**
    * @return the inputs on which the decision table was evaluated

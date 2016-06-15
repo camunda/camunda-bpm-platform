@@ -23,6 +23,7 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
+import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
@@ -80,9 +81,10 @@ public class DefaultDmnDecisionContext {
    * @param variableContext the available variable context
    * @return the result of the decision evaluation
    */
-  public DmnDecisionTableResult evaluateDecisionTable(DmnDecisionTableImpl decisionTable, VariableContext variableContext) {
+  public DmnDecisionTableResult evaluateDecisionTable(DmnDecision decision, VariableContext variableContext) {
     DmnDecisionTableEvaluationEventImpl evaluationResult = new DmnDecisionTableEvaluationEventImpl();
-    evaluationResult.setDecisionTable(decisionTable);
+    evaluationResult.setDecisionTable(decision);
+    DmnDecisionTableImpl decisionTable = ((DmnDecisionImpl)decision).getDecisionTable();
     evaluationResult.setExecutedDecisionElements(calculateExecutedDecisionElements(decisionTable));
 
     int inputSize = decisionTable.getInputs().size();

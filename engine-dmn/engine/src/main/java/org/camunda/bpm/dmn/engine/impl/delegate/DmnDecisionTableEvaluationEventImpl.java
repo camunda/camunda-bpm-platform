@@ -20,24 +20,24 @@ import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedDecisionRule;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedInput;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class DmnDecisionTableEvaluationEventImpl implements DmnDecisionTableEvaluationEvent {
 
-  protected DmnDecisionTableImpl decisionTable;
+  protected DmnDecision decision;
   protected List<DmnEvaluatedInput> inputs = new ArrayList<DmnEvaluatedInput>();
   protected List<DmnEvaluatedDecisionRule> matchingRules = new ArrayList<DmnEvaluatedDecisionRule>();
   protected String collectResultName;
   protected TypedValue collectResultValue;
   protected long executedDecisionElements;
 
-  public DmnDecisionTableImpl getDecisionTable() {
-    return decisionTable;
+  public DmnDecision getDecisionTable() {
+    return decision;
   }
 
-  public void setDecisionTable(DmnDecisionTableImpl decisionTable) {
-    this.decisionTable = decisionTable;
+  public void setDecisionTable(DmnDecision decision) {
+   this.decision = decision;
   }
 
   public List<DmnEvaluatedInput> getInputs() {
@@ -83,7 +83,7 @@ public class DmnDecisionTableEvaluationEventImpl implements DmnDecisionTableEval
   @Override
   public String toString() {
     return "DmnDecisionTableEvaluationEventImpl{" +
-      "decisionTable=" + decisionTable +
+      "decisionTable=" + ((DmnDecisionImpl)decision).getDecisionTable() +
       ", inputs=" + inputs +
       ", matchingRules=" + matchingRules +
       ", collectResultName='" + collectResultName + '\'' +
