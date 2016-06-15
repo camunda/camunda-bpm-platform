@@ -56,6 +56,7 @@ public class ByteArrayField {
   }
 
   protected ByteArrayEntity getByteArrayEntity() {
+
     if (byteArrayValue == null) {
       if (byteArrayId != null) {
         // no lazy fetching outside of command context
@@ -103,10 +104,15 @@ public class ByteArrayField {
       // but should be checked and docked here (or removed if it turns out to be unnecessary)
       getByteArrayEntity();
 
-      Context
-        .getCommandContext()
-        .getByteArrayManager()
-        .deleteByteArrayById(this.byteArrayId);
+      if (byteArrayValue != null) {
+        Context.getCommandContext()
+               .getDbEntityManager()
+               .delete(byteArrayValue);
+      } else {
+        Context.getCommandContext()
+               .getByteArrayManager()
+               .deleteByteArrayById(byteArrayId);
+      }
 
       byteArrayId = null;
     }

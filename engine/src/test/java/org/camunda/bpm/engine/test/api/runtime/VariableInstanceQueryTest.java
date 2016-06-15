@@ -49,7 +49,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQuery() {
     // given
     Map<String, Object> variables1 = new HashMap<String, Object>();
-    variables1.put("intVar", (int)123);
+    variables1.put("intVar", 123);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
 
     Map<String, Object> variables2 = new HashMap<String, Object>();
@@ -463,11 +463,11 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByNameAndVariableValueEquals_Integer() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("intValue", (int) 1234);
+    variables.put("intValue", 1234);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
 
     // when
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals("intValue", (int) 1234);
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals("intValue", 1234);
 
     // then
     List<VariableInstance> result = query.list();
@@ -487,15 +487,15 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByNameAndVariableValueNotEquals_Integer() {
     // given
     Map<String, Object> variables1 = new HashMap<String, Object>();
-    variables1.put("intValue", (int) 1234);
+    variables1.put("intValue", 1234);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
 
     Map<String, Object> variables2 = new HashMap<String, Object>();
-    variables2.put("intValue", (int) 5555);
+    variables2.put("intValue", 5555);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
 
     // when
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueNotEquals("intValue", (int) 5555);
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueNotEquals("intValue", 5555);
 
     // then
     List<VariableInstance> result = query.list();
@@ -515,19 +515,19 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByNameAndVariableGreaterThan_Integer() {
     // given
     Map<String, Object> variables1 = new HashMap<String, Object>();
-    variables1.put("intValue", (int) 1234);
+    variables1.put("intValue", 1234);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
 
     Map<String, Object> variables2 = new HashMap<String, Object>();
-    variables2.put("intValue", (int) 5555);
+    variables2.put("intValue", 5555);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
 
     Map<String, Object> variables3 = new HashMap<String, Object>();
-    variables3.put("intValue", (int) 9876);
+    variables3.put("intValue", 9876);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
 
     // when
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueGreaterThan("intValue", (int) 1234);
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueGreaterThan("intValue", 1234);
 
     // then
     List<VariableInstance> result = query.list();
@@ -554,19 +554,19 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByNameAndVariableGreaterThanAndEqual_Integer() {
     // given
     Map<String, Object> variables1 = new HashMap<String, Object>();
-    variables1.put("intValue", (int) 1234);
+    variables1.put("intValue", 1234);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
 
     Map<String, Object> variables2 = new HashMap<String, Object>();
-    variables2.put("intValue", (int) 5555);
+    variables2.put("intValue", 5555);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
 
     Map<String, Object> variables3 = new HashMap<String, Object>();
-    variables3.put("intValue", (int) 9876);
+    variables3.put("intValue", 9876);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
 
     // when
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueGreaterThanOrEqual("intValue", (int) 1234);
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueGreaterThanOrEqual("intValue", 1234);
 
     // then
     List<VariableInstance> result = query.list();
@@ -595,19 +595,19 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByNameAndVariableLessThan_Integer() {
     // given
     Map<String, Object> variables1 = new HashMap<String, Object>();
-    variables1.put("intValue", (int) 1234);
+    variables1.put("intValue", 1234);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
 
     Map<String, Object> variables2 = new HashMap<String, Object>();
-    variables2.put("intValue", (int) 5555);
+    variables2.put("intValue", 5555);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
 
     Map<String, Object> variables3 = new HashMap<String, Object>();
-    variables3.put("intValue", (int) 9876);
+    variables3.put("intValue", 9876);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
 
     // when
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLessThan("intValue", (int) 9876);
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLessThan("intValue", 9876);
 
     // then
     List<VariableInstance> result = query.list();
@@ -634,19 +634,19 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByNameAndVariableLessThanAndEqual_Integer() {
     // given
     Map<String, Object> variables1 = new HashMap<String, Object>();
-    variables1.put("intValue", (int) 1234);
+    variables1.put("intValue", 1234);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
 
     Map<String, Object> variables2 = new HashMap<String, Object>();
-    variables2.put("intValue", (int) 5555);
+    variables2.put("intValue", 5555);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
 
     Map<String, Object> variables3 = new HashMap<String, Object>();
-    variables3.put("intValue", (int) 9876);
+    variables3.put("intValue", 9876);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
 
     // when
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLessThanOrEqual("intValue", (int) 9876);
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLessThanOrEqual("intValue", 9876);
 
     // then
     List<VariableInstance> result = query.list();
@@ -1922,7 +1922,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryOrderByType_Asc() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("intVar", (int)123);
+    variables.put("intVar", 123);
     variables.put("myVar", "test123");
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
 
@@ -1948,7 +1948,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryOrderByType_Desc() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("intVar", (int)123);
+    variables.put("intVar", 123);
     variables.put("myVar", "test123");
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
 
@@ -1974,7 +1974,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryOrderByActivityInstanceId_Asc() {
     // given
     Map<String, Object> variables1 = new HashMap<String, Object>();
-    variables1.put("intVar", (int)123);
+    variables1.put("intVar", 123);
     ExecutionEntity execution1 = (ExecutionEntity) runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
 
     Map<String, Object> variables2 = new HashMap<String, Object>();
@@ -2014,7 +2014,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryOrderByActivityInstanceId_Desc() {
     // given
     Map<String, Object> variables1 = new HashMap<String, Object>();
-    variables1.put("intVar", (int)123);
+    variables1.put("intVar", 123);
     ExecutionEntity execution1 = (ExecutionEntity) runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
 
     Map<String, Object> variables2 = new HashMap<String, Object>();
