@@ -19,7 +19,6 @@ var pagesModule = require('./pages/main'),
     var ngDependencies = [
       'ng',
       'ngResource',
-      'cam.cockpit.custom',
       camCommonsUi.name,
       directivesModule.name,
       filtersModule.name,
@@ -126,7 +125,7 @@ var pagesModule = require('./pages/main'),
     }
 
     $(document).ready(function () {
-      angular.bootstrap(document, [ appNgModule.name ]);
+      angular.bootstrap(document, [ appNgModule.name, 'cam.admin.custom' ]);
 
       if (top !== window) {
         window.parent.postMessage({ type: 'loadamd' }, '*');

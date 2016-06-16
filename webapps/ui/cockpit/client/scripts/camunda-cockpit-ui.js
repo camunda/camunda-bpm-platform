@@ -15,7 +15,6 @@ var angular = require('camunda-commons-ui/vendor/angular');
     var ngDependencies = [
       'ng',
       'ngResource',
-      'cam.cockpit.custom',
       commons.name,
       require('./repository/main').name,
       require('./batches/main').name,
@@ -91,7 +90,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       }
     }]);
 
-      angular.bootstrap(document, [ appNgModule.name ]);
+      angular.bootstrap(document, [ appNgModule.name, 'cam.cockpit.custom' ]);
 
       if (top !== window) {
         window.parent.postMessage({ type: 'loadamd' }, '*');
