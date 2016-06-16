@@ -38,6 +38,7 @@ import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -113,9 +114,11 @@ public class TaskCountByCandidateGroupsTest {
     List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
 
     // then
-    assertEquals(1, results.get(0).getTaskCount());
-    assertEquals(2, results.get(1).getTaskCount());
-    assertEquals(1, results.get(2).getTaskCount());
+    for( TaskCountByCandidateGroupResult result : results ) {
+      checkResultCount(result, null, 1);
+      checkResultCount(result, groups.get(0), 2);
+      checkResultCount(result, groups.get(1), 1);
+    }
   }
 
   @Test
@@ -127,9 +130,9 @@ public class TaskCountByCandidateGroupsTest {
     List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
 
     // then
-    assertEquals(null, results.get(0).getGroupName());
-    assertEquals(groups.get(0), results.get(1).getGroupName());
-    assertEquals(groups.get(1), results.get(2).getGroupName());
+    for( TaskCountByCandidateGroupResult result : results ) {
+      assertTrue(checkResultName(result));
+    }
   }
 
   @Test
@@ -142,9 +145,11 @@ public class TaskCountByCandidateGroupsTest {
     List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
 
     // then
-    assertEquals(1, results.get(0).getTaskCount());
-    assertEquals(1, results.get(1).getTaskCount());
-    assertEquals(1, results.get(2).getTaskCount());
+    for( TaskCountByCandidateGroupResult result : results ) {
+      checkResultCount(result, null, 1);
+      checkResultCount(result, groups.get(0), 1);
+      checkResultCount(result, groups.get(1), 1);
+    }
   }
 
   @Test
@@ -170,9 +175,11 @@ public class TaskCountByCandidateGroupsTest {
     List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
 
     // then
-    assertEquals(1, results.get(0).getTaskCount());
-    assertEquals(1, results.get(1).getTaskCount());
-    assertEquals(1, results.get(2).getTaskCount());
+    for( TaskCountByCandidateGroupResult result : results ) {
+      checkResultCount(result, null, 1);
+      checkResultCount(result, groups.get(0), 1);
+      checkResultCount(result, groups.get(1), 1);
+    }
   }
 
   @Test
@@ -262,6 +269,19 @@ public class TaskCountByCandidateGroupsTest {
     }
 
     tasks.add(task.getId());
+  }
+
+  protected void checkResultCount(TaskCountByCandidateGroupResult result, String expectedResultName, int expectedResultCount) {
+    if( (expectedResultName == null     && result.getGroupName() == null) ||
+        (result.getGroupName() != null  && result.getGroupName().equals(expectedResultName))) {
+      assertEquals(expectedResultCount, result.getTaskCount());
+    }
+  }
+
+  protected boolean checkResultName(TaskCountByCandidateGroupResult result) {
+    return result.getGroupName() == null ||
+           result.getGroupName().equals(groups.get(0)) ||
+           result.getGroupName().equals(groups.get(1));
   }
 
   protected void authenticateWithSingleTenant() {
