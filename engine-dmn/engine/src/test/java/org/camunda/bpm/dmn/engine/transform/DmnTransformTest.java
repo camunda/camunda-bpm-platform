@@ -41,6 +41,7 @@ public class DmnTransformTest extends DmnEngineTest {
 
   public static final String TRANSFORM_DMN = "org/camunda/bpm/dmn/engine/transform/DmnTransformTest.dmn";
   public static final String REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/RequiredDecision.dmn";
+  public static final String MULTI_LEVEL_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/MultilevelRequiredDecisions.dmn";
   public static final String MULTIPLE_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/MultipleRequiredDecisions.dmn";
   public static final String MULTI_LEVEL_MULTIPLE_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/MultilevelMultipleRequiredDecisions.dmn";
   public static final String LOOP_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/LoopInRequiredDecision.dmn";

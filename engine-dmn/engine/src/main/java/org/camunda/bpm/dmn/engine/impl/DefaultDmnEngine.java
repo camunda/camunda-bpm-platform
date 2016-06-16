@@ -92,7 +92,7 @@ public class DefaultDmnEngine implements DmnEngine {
 
     if (decision.isDecisionTable() && decision instanceof DmnDecisionImpl) {
       DefaultDmnDecisionContext decisionContext = new DefaultDmnDecisionContext(dmnEngineConfiguration);
-      return decisionContext.evaluateDecisionTable((DmnDecisionImpl)decision, variableContext);
+       return decisionContext.evaluateDecision((DmnDecisionImpl)decision, variableContext);
     }
     else {
       throw LOG.decisionTypeNotSupported(decision);

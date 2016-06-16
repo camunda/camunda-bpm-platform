@@ -16,9 +16,12 @@ package org.camunda.bpm.dmn.engine.impl;
 import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -40,6 +43,7 @@ import org.camunda.bpm.dmn.engine.impl.spi.el.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElExpression;
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 import org.camunda.bpm.dmn.feel.impl.FeelEngine;
+import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.impl.context.CompositeVariableContext;
@@ -61,7 +65,7 @@ public class DefaultDmnDecisionContext {
   protected final String inputExpressionExpressionLanguage;
   protected final String inputEntryExpressionLanguage;
   protected final String outputEntryExpressionLanguage;
-
+  
   public DefaultDmnDecisionContext(DefaultDmnEngineConfiguration configuration) {
     evaluationListeners = configuration.getDecisionTableEvaluationListeners();
 
@@ -72,6 +76,38 @@ public class DefaultDmnDecisionContext {
     inputExpressionExpressionLanguage = configuration.getDefaultInputExpressionExpressionLanguage();
     inputEntryExpressionLanguage = configuration.getDefaultInputEntryExpressionLanguage();
     outputEntryExpressionLanguage = configuration.getDefaultOutputEntryExpressionLanguage();
+  }
+
+  /**
+   * Evaluate a decision with the given {@link VariableContext}
+   *
+   * @param decision the decision to evaluate
+   * @param variableContext the available variable context
+   * @return the result of the decision evaluation
+   */
+
+  public DmnDecisionTableResult evaluateDecision(DmnDecision decision, VariableContext variableContext) {
+
+    if(decision.getKey() == null 
+      || ((DmnDecisionImpl)decision).getRelatedDecisionTable() == null) {
+      throw LOG.unableToFindAnyDecisionTable();
+    }
+
+    VariableMap variableMap = buildVariableMapFromVariableContext(variableContext);
+    
+    Map<String, DmnDecision> requiredDecisions = new LinkedHashMap<String, DmnDecision>();
+    buildDecisionTree(decision, requiredDecisions);
+    DmnDecisionTableResult evaluatedResult = null;
+
+    for (Map.Entry<String, DmnDecision> entry:requiredDecisions.entrySet()) {
+      DmnDecision evaluateDecision = entry.getValue();
+      evaluatedResult =  evaluateDecisionTable(evaluateDecision, variableMap.asVariableContext());
+      if(decision != evaluateDecision) {
+        addResultToVariableContext(evaluatedResult, variableMap);
+      }
+    }
+    return evaluatedResult;  
+   
   }
 
   /**
@@ -104,6 +140,47 @@ public class DefaultDmnDecisionContext {
 
     setEvaluationOutput(decisionTable, matchingRules, variableContext, evaluationResult);
     return generateDecisionTableResult(decisionTable, evaluationResult);
+  }
+
+  protected void addResultToVariableContext(DmnDecisionTableResult evaluatedResult, VariableMap variableMap)
+  {
+    List<Map<String, Object>> resultList = evaluatedResult.getResultList();
+
+    if(resultList.isEmpty()) {
+      return;
+    } else if(resultList.size() == 1) {
+      variableMap.putAll(evaluatedResult.getSingleResult());
+    } else {
+      Set<String> outputs = new HashSet<String>();
+    
+      for (Map<String, Object> resultMap : resultList) {
+        outputs.addAll(resultMap.keySet());
+      }
+      
+      for (String output : outputs) {
+        List<Object> values = evaluatedResult.collectEntries(output);
+        variableMap.put(output, values);
+      }
+    }
+  }
+
+  protected VariableMap buildVariableMapFromVariableContext(VariableContext variableContext) {
+    
+    VariableMap variableMap = Variables.createVariables();
+
+    Set<String> variables = variableContext.keySet();
+    for(String variable: variables) {
+      variableMap.put(variable, variableContext.resolve(variable));
+    }
+    
+    return variableMap;
+  }
+
+  protected void buildDecisionTree(DmnDecision decision, Map<String, DmnDecision> requiredDecisions) {
+    for(DmnDecision dmnDecision : decision.getRequiredDecisions()){
+      buildDecisionTree(dmnDecision, requiredDecisions);
+    }
+    requiredDecisions.put(decision.getKey(),decision);
   }
 
   protected DmnEvaluatedInput evaluateInput(DmnDecisionTableInputImpl input, VariableContext variableContext) {
