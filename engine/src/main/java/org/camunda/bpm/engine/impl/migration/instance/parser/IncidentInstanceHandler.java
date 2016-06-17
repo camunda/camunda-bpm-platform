@@ -27,14 +27,12 @@ public class IncidentInstanceHandler implements MigratingInstanceParseHandler<In
 
   @Override
   public void handle(MigratingInstanceParseContext parseContext, IncidentEntity incident) {
-    if (incident.getConfiguration() == null &&
-            (isFailedJobIncident(incident) || isExternalTaskIncident(incident))) {
+    if (incident.getConfiguration() == null
+            && (isFailedJobIncident(incident) || isExternalTaskIncident(incident))) {
       handleCallActivityIncident(parseContext, incident);
-    }
-    else if (isFailedJobIncident(incident)) {
+    } else if (isFailedJobIncident(incident)) {
       handleFailedJobIncident(parseContext, incident);
-    }
-    else if (isExternalTaskIncident(incident)) {
+    } else if (isExternalTaskIncident(incident)) {
       handleExternalTaskIncident(parseContext, incident);
     }
   }
@@ -54,14 +52,16 @@ public class IncidentInstanceHandler implements MigratingInstanceParseHandler<In
 
   protected void handleFailedJobIncident(MigratingInstanceParseContext parseContext, IncidentEntity incident) {
     MigratingJobInstance owningInstance = parseContext.getMigratingJobInstanceById(incident.getConfiguration());
-    if (owningInstance != null && owningInstance.migrates()) {
+    if (owningInstance != null) {
       parseContext.consume(incident);
-      MigratingIncident migratingIncident = new MigratingIncident(incident, owningInstance.getTargetScope());
-      JobDefinitionEntity targetJobDefinitionEntity = owningInstance.getTargetJobDefinitionEntity();
-      if (targetJobDefinitionEntity != null) {
-        migratingIncident.setTargetJobDefinitionId(targetJobDefinitionEntity.getId());
+      if (owningInstance.migrates()) {
+        MigratingIncident migratingIncident = new MigratingIncident(incident, owningInstance.getTargetScope());
+        JobDefinitionEntity targetJobDefinitionEntity = owningInstance.getTargetJobDefinitionEntity();
+        if (targetJobDefinitionEntity != null) {
+          migratingIncident.setTargetJobDefinitionId(targetJobDefinitionEntity.getId());
+        }
+        owningInstance.addMigratingDependentInstance(migratingIncident);
       }
-      owningInstance.addMigratingDependentInstance(migratingIncident);
     }
   }
 
