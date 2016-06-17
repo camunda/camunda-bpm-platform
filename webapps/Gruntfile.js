@@ -20,12 +20,6 @@ module.exports = function(grunt) {
   require('./ui/tasklist/grunt/config/browserify')(config, browserifyConf);
   require('./ui/cockpit/grunt/config/browserify')(config, browserifyConf);
 
-  var babelConf = { };
-  require('./ui/admin/grunt/config/babel')(config, babelConf);
-  require('./ui/tasklist/grunt/config/babel')(config, babelConf);
-  require('./ui/cockpit/grunt/config/babel')(config, babelConf);
-
-
   var copyConf = require('./grunt/config/copy');
   require('./ui/admin/grunt/config/copy')(config, copyConf);
   require('./ui/cockpit/grunt/config/copy')(config, copyConf);
@@ -115,8 +109,6 @@ module.exports = function(grunt) {
 
     uglify:           uglifyConf,
 
-    babel:            babelConf,
-
     clean:            require('./grunt/config/clean')(config),
 
     watch:            watchConf,
@@ -137,7 +129,7 @@ grunt.registerTask('build', function(mode, app) {
 
     if(typeof app !== 'undefined') {
       console.log(' ------------  will build ' + app + ' -------------');
-      var objs = [browserifyConf, copyConf, lessConf, localesConf, watchConf, uglifyConf, babelConf];
+      var objs = [browserifyConf, copyConf, lessConf, localesConf, watchConf, uglifyConf];
       for(var i = 0; i < objs.length; i++) {
         var obj = objs[i];
         for (var key in obj) {
@@ -164,10 +156,6 @@ grunt.registerTask('build', function(mode, app) {
       tasksToRun.push('localescompile');
     }
 
-    if(grunt.config.data.buildMode === 'prod' || process.env.IE) {
-      tasksToRun.push('babel');
-    }
-
     if(grunt.config.data.buildMode === 'prod') {
       tasksToRun.push('uglify');
     }
@@ -177,9 +165,6 @@ grunt.registerTask('build', function(mode, app) {
   });
 
   grunt.registerTask('auto-build', function(app) {
-    if(process.env.IE) {
-      grunt.warn('IE compatible incremental build is not supported.');
-    }
     if(app) {
       grunt.task.run([
         'build:dev:' + app,
