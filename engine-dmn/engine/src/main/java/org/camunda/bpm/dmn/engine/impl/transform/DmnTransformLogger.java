@@ -16,7 +16,6 @@ package org.camunda.bpm.dmn.engine.impl.transform;
 import java.io.File;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableInputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableOutputImpl;
@@ -141,7 +140,7 @@ public class DmnTransformLogger extends DmnLogger {
   public DmnTransformException requiredDecisionLoopDetected(Decision decision) {
     return new DmnTransformException(exceptionMessage(
       "015",
-      "The decision '{}' created a loop in required decisions.", decision.getId())
+      "The decision '{}' has a loop.", decision.getId())
     );
   }
 }

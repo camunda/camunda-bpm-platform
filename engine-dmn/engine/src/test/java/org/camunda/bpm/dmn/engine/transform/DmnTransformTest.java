@@ -251,7 +251,7 @@ public class DmnTransformTest extends DmnEngineTest {
       Assertions.assertThat(e)
       .hasMessageStartingWith("DMN-02004")
       .hasMessageContaining("DMN-02015")
-      .hasMessageContaining("decision 'buyElectronic' created a loop");
+      .hasMessageContaining("decision 'buyProduct' has a loop");
     }
   }
 
@@ -267,7 +267,7 @@ public class DmnTransformTest extends DmnEngineTest {
       Assertions.assertThat(e)
       .hasMessageStartingWith("DMN-02004")
       .hasMessageContaining("DMN-02015")
-      .hasMessageContaining("decision 'buyProduct' created a loop");
+      .hasMessageContaining("decision 'buyProduct' has a loop");
     }
   }
 

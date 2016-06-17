@@ -19,10 +19,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
@@ -130,7 +128,7 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
       Collection<Decision> decisions = definitions.getChildElementsByType(Decision.class);
       List<DmnDecision> dmnDecisions = new ArrayList<DmnDecision>();
       for (Decision decision : decisions) {
-        DmnDecision dmnDecision = transformDecision(decision, null, new HashMap<Decision,Decision>());
+        DmnDecision dmnDecision = transformDecision(decision,new ArrayList<String>());
         if (dmnDecision != null) {
           dmnDecisions.add(dmnDecision);
           notifyTransformListeners(decision, dmnDecision);
@@ -143,9 +141,14 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
     }
   }
 
-  protected DmnDecision transformDecision(Decision decision, Decision parent, Map<Decision, Decision> decisionsRelationshipMap) {
+  protected DmnDecision transformDecision(Decision decision, List<String> decisionsList) {
 
-    decisionsRelationshipMap.put(decision, parent);
+    if(decisionsList.contains(decision.getId())) {
+      throw LOG.requiredDecisionLoopDetected(decision);
+    } else {
+      decisionsList.add(decision.getId());
+    }
+
     DmnElementTransformHandler<Decision, DmnDecisionImpl> handler = handlerRegistry.getHandler(Decision.class);
     DmnDecisionImpl dmnDecision = handler.handleElement(this, decision);
     this.decision = dmnDecision;
@@ -171,30 +174,11 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
     for (InformationRequirement informationRequirement: decision.getInformationRequirements()) {
       Decision requiredDecision = informationRequirement.getRequiredDecision();
       if(requiredDecision != null) {
-        if(ancestorCheck(decision, requiredDecision, decisionsRelationshipMap)) {
-          throw LOG.requiredDecisionLoopDetected(decision);
-        }
-        DmnDecision dmnRequiredDecision = transformDecision(requiredDecision, decision, decisionsRelationshipMap);
+        DmnDecision dmnRequiredDecision = transformDecision(requiredDecision, new ArrayList<String>(decisionsList));
         dmnDecision.getRequiredDecisions().add(dmnRequiredDecision);
       }
     }
     return dmnDecision;
-  }
-
-  protected boolean ancestorCheck(Decision childDecision, Decision parentDecision, Map<Decision, Decision> decisionsRelationshipMap) {
-    if(childDecision == parentDecision) {
-      return true;
-    }
-
-    Decision localParentDecision;
-    while((localParentDecision = decisionsRelationshipMap.get(childDecision)) != null) {
-      if (localParentDecision == parentDecision) {
-        return true;
-      } else {
-        childDecision = decisionsRelationshipMap.get(childDecision);  
-      }
-    }
-    return false;
   }
 
   protected DmnDecisionTableImpl transformDecisionTable(DecisionTable decisionTable) {
