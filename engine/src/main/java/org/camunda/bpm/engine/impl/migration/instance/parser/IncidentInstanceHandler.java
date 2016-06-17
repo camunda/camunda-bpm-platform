@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.migration.instance.parser;
 
+import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingExternalTaskInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingIncident;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingJobInstance;
@@ -26,11 +27,24 @@ public class IncidentInstanceHandler implements MigratingInstanceParseHandler<In
 
   @Override
   public void handle(MigratingInstanceParseContext parseContext, IncidentEntity incident) {
-    if (isFailedJobIncident(incident)) {
+    if (incident.getConfiguration() == null &&
+            (isFailedJobIncident(incident) || isExternalTaskIncident(incident))) {
+      handleCallActivityIncident(parseContext, incident);
+    }
+    else if (isFailedJobIncident(incident)) {
       handleFailedJobIncident(parseContext, incident);
     }
     else if (isExternalTaskIncident(incident)) {
       handleExternalTaskIncident(parseContext, incident);
+    }
+  }
+
+  protected void handleCallActivityIncident(MigratingInstanceParseContext parseContext, IncidentEntity incident) {
+    MigratingActivityInstance owningInstance = parseContext.getMigratingActivityInstanceById(incident.getExecution().getActivityInstanceId());
+    if (owningInstance != null) {
+      parseContext.consume(incident);
+      MigratingIncident migratingIncident = new MigratingIncident(incident, owningInstance.getTargetScope());
+      owningInstance.addMigratingDependentInstance(migratingIncident);
     }
   }
 
@@ -40,8 +54,8 @@ public class IncidentInstanceHandler implements MigratingInstanceParseHandler<In
 
   protected void handleFailedJobIncident(MigratingInstanceParseContext parseContext, IncidentEntity incident) {
     MigratingJobInstance owningInstance = parseContext.getMigratingJobInstanceById(incident.getConfiguration());
-    parseContext.consume(incident);
     if (owningInstance != null && owningInstance.migrates()) {
+      parseContext.consume(incident);
       MigratingIncident migratingIncident = new MigratingIncident(incident, owningInstance.getTargetScope());
       JobDefinitionEntity targetJobDefinitionEntity = owningInstance.getTargetJobDefinitionEntity();
       if (targetJobDefinitionEntity != null) {
@@ -57,8 +71,8 @@ public class IncidentInstanceHandler implements MigratingInstanceParseHandler<In
 
   protected void handleExternalTaskIncident(MigratingInstanceParseContext parseContext, IncidentEntity incident) {
     MigratingExternalTaskInstance owningInstance = parseContext.getMigratingExternalTaskInstanceById(incident.getConfiguration());
-    parseContext.consume(incident);
     if (owningInstance != null) {
+      parseContext.consume(incident);
       MigratingIncident migratingIncident = new MigratingIncident(incident, owningInstance.getTargetScope());
       owningInstance.addMigratingDependentInstance(migratingIncident);
     }
