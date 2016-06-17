@@ -553,7 +553,7 @@
     </where>
 
     GROUP BY
-        GROUP_NAME_
+        I.GROUP_ID_
     ORDER BY
         GROUP_NAME_
     ASC
