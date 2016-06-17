@@ -4,30 +4,26 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/decisionTable.html', 'utf8');
 
-  var DirectiveController = ['$scope',
+var DirectiveController = ['$scope',
                     function( $scope) {
 
-    $scope.control = {};
+                      $scope.control = {};
 
-  }];
+                    }];
 
-  var Directive = function ($compile) {
-    return {
-      restrict: 'EAC',
-      scope: {
-        decisionTable: '=',
-        control: '=?',
-        onLoad: '&'
-      },
-      controller: DirectiveController,
-      template: template,
+var Directive = function() {
+  return {
+    restrict: 'EAC',
+    scope: {
+      decisionTable: '=',
+      control: '=?',
+      onLoad: '&'
+    },
+    controller: DirectiveController,
+    template: template,
 
-      link: function($scope) {
-
-      }
-    };
+    link: function() {}
   };
+};
 
-  Directive.$inject = [ '$compile'];
-
-  module.exports = Directive;
+module.exports = Directive;

@@ -7,29 +7,29 @@ var Controller = [
   '$scope',
   'Views',
   'page',
-function (
+  function(
   $scope,
   Views,
   page
 ) {
-  var $rootScope = $scope.$root;
+    var $rootScope = $scope.$root;
 
-  $scope.dashboardPlugins = Views.getProviders({
-    component: 'cockpit.dashboard.section'
-  });
+    $scope.dashboardPlugins = Views.getProviders({
+      component: 'cockpit.dashboard.section'
+    });
 
   // old plugins are still shown on the dashboard
-  $scope.dashboardVars = { read: [ 'processData' ] };
-  $scope.deprecateDashboardProviders = Views.getProviders({ component: 'cockpit.dashboard'});
+    $scope.dashboardVars = { read: [ 'processData' ] };
+    $scope.deprecateDashboardProviders = Views.getProviders({ component: 'cockpit.dashboard'});
 
 
-  $rootScope.showBreadcrumbs = true;
+    $rootScope.showBreadcrumbs = true;
 
   // reset breadcrumbs
-  page.breadcrumbsClear();
+    page.breadcrumbsClear();
 
-  page.titleSet('Dashboard');
-}];
+    page.titleSet('Dashboard');
+  }];
 
 var RouteConfig = [ '$routeProvider', function($routeProvider) {
   $routeProvider.when('/dashboard', {

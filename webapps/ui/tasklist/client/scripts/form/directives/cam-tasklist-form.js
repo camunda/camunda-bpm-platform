@@ -3,33 +3,31 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-tasklist-form.html', 'utf8');
 
-var angular = require('camunda-commons-ui/vendor/angular');
+var EMBEDDED_KEY = 'embedded:',
+    APP_KEY = 'app:',
+    ENGINE_KEY = 'engine:',
+    DEPLOYMENT_KEY = 'deployment:';
 
-  var EMBEDDED_KEY = 'embedded:',
-      APP_KEY = 'app:',
-      ENGINE_KEY = 'engine:',
-      DEPLOYMENT_KEY = 'deployment:';
-
-  function compact(arr) {
-    var a = [];
-    for (var ay in arr) {
-      if (arr[ay]) {
-        a.push(arr[ay]);
-      }
+function compact(arr) {
+  var a = [];
+  for (var ay in arr) {
+    if (arr[ay]) {
+      a.push(arr[ay]);
     }
-    return a;
   }
+  return a;
+}
 
-  var noop = function () {};
+var noop = function() {};
 
-  module.exports = [function(){
+module.exports = [function() {
 
-    return {
+  return {
 
-      restrict: 'A',
+    restrict: 'A',
 
-      scope: {
-        tasklistForm : '=',
+    scope: {
+      tasklistForm : '=',
 
         /*
          * current options are:
@@ -40,35 +38,35 @@ var angular = require('camunda-commons-ui/vendor/angular');
          * - disableAddVariableButton: to disable or enable the 'Add Variable' button
          *   inside a generic form
          */
-        options: '=',
+      options: '=',
 
         /*
          * contains parameter like taskId, processDefinitionId, processDefinitionKey etc.
          */
-        params: '=',
+      params: '=',
 
         /* will be used to make a callback when the form will be completed */
-        onFormCompletionCallback: '&',
+      onFormCompletionCallback: '&',
 
         /*
          * will be used to register a completion handler, when the completion
          * will be trigger from the outside of a form
          */
-        onFormCompletion: '&',
+      onFormCompletion: '&',
 
         /*
          * is a callback which will called when the validation state of the
          * form changes (pass the flag '$invalid').
          */
-        onFormValidation: '&'
-      },
+      onFormValidation: '&'
+    },
 
-      template: template,
+    template: template,
 
-      controller: [
-        '$scope',
-        'Uri',
-        'camAPI',
+    controller: [
+      '$scope',
+      'Uri',
+      'camAPI',
       function(
         $scope,
         Uri,
@@ -104,13 +102,13 @@ var angular = require('camunda-commons-ui/vendor/angular');
         };
 
         function setAsynchronousFormKeyFailure(err) {
-           $scope.asynchronousFormKey.failure = true;
-           $scope.asynchronousFormKey.error = err;
+          $scope.asynchronousFormKey.failure = true;
+          $scope.asynchronousFormKey.error = err;
         }
 
         function setAsynchronousFormKey(formKey) {
-            $scope.asynchronousFormKey.key = formKey;
-            $scope.asynchronousFormKey.loaded = true;
+          $scope.asynchronousFormKey.key = formKey;
+          $scope.asynchronousFormKey.loaded = true;
         }
 
         function parseForm(form) {
@@ -164,11 +162,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
                     }
                   }
                   if (!resourceFound) {
-                    setAsynchronousFormKeyFailure(new Error("Resource " + resourceName + " not found in deployment"));
+                    setAsynchronousFormKeyFailure(new Error('Resource ' + resourceName + ' not found in deployment'));
                   }
                 }
               });
-            }
+            };
 
             if ($scope.params.processDefinitionId) {
               processDefinitionResource.get($scope.params.processDefinitionId, function(err, deploymentData) {
@@ -204,39 +202,39 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         // completion /////////////////////////////////////////////
 
-        var completionCallback = function (err, result)  {
+        var completionCallback = function(err, result)  {
           $scope.onFormCompletionCallback(err, result);
         };
 
-        var complete = $scope.complete = function () {
+        var complete = $scope.complete = function() {
           $scope.completionHandler(completionCallback);
         };
 
         $scope.onFormCompletion(complete);
 
-        $scope.showCompleteButton = function () {
+        $scope.showCompleteButton = function() {
           return $scope.options &&
                  !$scope.options.hideCompleteButton &&
                  $scope.$loaded;
         };
 
-        $scope.disableCompleteButton = function () {
+        $scope.disableCompleteButton = function() {
           return $scope.$invalid || ($scope.options && $scope.options.disableCompleteButton);
         };
 
         // save ///////////////////////////////////////////////////
 
-        var save = $scope.save = function (evt) {
+        $scope.save = function(evt) {
           $scope.saveHandler(evt);
         };
 
         // API ////////////////////////////////////////////////////
 
-        this.notifyFormInitialized = function () {
+        this.notifyFormInitialized = function() {
           $scope.$loaded = true;
         };
 
-        this.notifyFormInitializationFailed = function (error) {
+        this.notifyFormInitializationFailed = function(error) {
           $scope.tasklistForm.$error = error;
           // mark the form as initialized
           this.notifyFormInitialized();
@@ -246,29 +244,29 @@ var angular = require('camunda-commons-ui/vendor/angular');
           this.notifyFormValidated(true);
         };
 
-        this.notifyFormCompleted = function (err) {
+        this.notifyFormCompleted = function(err) {
           $scope.onFormCompletion(err);
         };
 
-        this.notifyFormValidated = function (invalid) {
+        this.notifyFormValidated = function(invalid) {
           $scope.$invalid = invalid;
           $scope.onFormValidation(invalid);
         };
 
-        this.notifyFormDirty = function (dirty) {
+        this.notifyFormDirty = function(dirty) {
           $scope.$dirty = dirty;
         };
 
 
-        this.getOptions = function () {
+        this.getOptions = function() {
           return $scope.options || {};
         };
 
-        this.getTasklistForm = function () {
+        this.getTasklistForm = function() {
           return $scope.tasklistForm;
         };
 
-        this.getParams = function () {
+        this.getParams = function() {
           return $scope.params || {};
         };
 
@@ -282,5 +280,5 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
 
       }]
-    };
-  }];
+  };
+}];

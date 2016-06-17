@@ -6,17 +6,15 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-form-generic.html', 'u
 var angular = require('camunda-commons-ui/vendor/angular');
 var $ = require('jquery');
 
-  function noop () {}
-
-  module.exports = [
-    'CamForm',
-    'camAPI',
-    '$timeout',
+module.exports = [
+  'CamForm',
+  'camAPI',
+  '$timeout',
   function(
     CamForm,
     camAPI,
     $timeout
-  ){
+  ) {
 
     return {
 
@@ -40,18 +38,18 @@ var $ = require('jquery');
 
         var $update = false;
 
-        $scope.$watch(function () {
+        $scope.$watch(function() {
           return $update;
-        }, function (value) {
+        }, function(value) {
           if (value) {
             showForm(value, formController.getParams());
             $update = false;
           }
         });
 
-        $scope.$watch(function () {
+        $scope.$watch(function() {
           return formController.getTasklistForm();
-        }, function (value) {
+        }, function(value) {
           if (value) {
             $update = true;
             $scope.variables = [];
@@ -78,7 +76,7 @@ var $ = require('jquery');
           camForm = new CamForm(params);
         }
 
-        var done = function (err, _camForm) {
+        var done = function(err, _camForm) {
           if (err) {
             return formController.notifyFormInitializationFailed(err);
           }
@@ -113,7 +111,7 @@ var $ = require('jquery');
           camForm.fields = [];
         }
 
-        var complete = function (callback) {
+        var complete = function(callback) {
 
           function localCallback(error, result) {
             clearVariableManager();

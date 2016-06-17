@@ -1,15 +1,18 @@
 'use strict';
+
+var angular = require('camunda-commons-ui/vendor/angular');
+
 var fs = require('fs');
 
 var startProcessActionTemplate = fs.readFileSync(__dirname + '/cam-tasklist-navbar-action-start-process-plugin.html', 'utf8');
 var template = fs.readFileSync(__dirname + '/modals/cam-tasklist-process-start-modal.html', 'utf8');
 
-  var Controller = [
-    '$scope',
-    '$modal',
-    '$q',
-    'camAPI',
-    'dataDepend',
+var Controller = [
+  '$scope',
+  '$modal',
+  '$q',
+  'camAPI',
+  'dataDepend',
   function(
     $scope,
     $modal,
@@ -34,7 +37,7 @@ var template = fs.readFileSync(__dirname + '/modals/cam-tasklist-process-start-m
     processData.provide('processDefinitions', ['processDefinitionQuery', function(processDefinitionQuery) {
       var deferred = $q.defer();
 
-      ProcessDefinition.list(processDefinitionQuery, function (err, res) {
+      ProcessDefinition.list(processDefinitionQuery, function(err, res) {
         if(err) {
           deferred.reject(err);
         }
@@ -49,14 +52,14 @@ var template = fs.readFileSync(__dirname + '/modals/cam-tasklist-process-start-m
 
     processData.provide('currentProcessDefinitionId', { id: null });
 
-    processData.provide('startForm', ['currentProcessDefinitionId', function (currentProcessDefinitionId) {
+    processData.provide('startForm', ['currentProcessDefinitionId', function(currentProcessDefinitionId) {
       var deferred = $q.defer();
 
       if (!currentProcessDefinitionId.id) {
         deferred.resolve(null);
       }
       else {
-        ProcessDefinition.startForm(currentProcessDefinitionId, function (err, res) {
+        ProcessDefinition.startForm(currentProcessDefinitionId, function(err, res) {
           if(err) {
             deferred.reject(err);
           }
@@ -76,11 +79,11 @@ var template = fs.readFileSync(__dirname + '/modals/cam-tasklist-process-start-m
         controller: 'camProcessStartModalCtrl',
         template: template,
         resolve: {
-          processData: function () { return processData; }
+          processData: function() { return processData; }
         }
       });
 
-      modalInstance.result.then(function(result) {
+      modalInstance.result.then(function() {
         if ($scope.tasklistApp && $scope.tasklistApp.refreshProvider) {
           $scope.tasklistApp.refreshProvider.refreshTaskList();
           document.querySelector('.start-process-action a').focus();
@@ -94,16 +97,16 @@ var template = fs.readFileSync(__dirname + '/modals/cam-tasklist-process-start-m
 
   }];
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('tasklist.navbar.action', {
-      id: 'start-process-action',
-      template: startProcessActionTemplate,
-      controller: Controller,
-      priority: 100
-    });
-  };
+  ViewsProvider.registerDefaultView('tasklist.navbar.action', {
+    id: 'start-process-action',
+    template: startProcessActionTemplate,
+    controller: Controller,
+    priority: 100
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

@@ -6,24 +6,24 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-tasks.html', 'utf8');
 var angular = require('camunda-commons-ui/vendor/angular');
 
 
-  var $ = angular.element;
+var $ = angular.element;
 
-  module.exports = [function(){
+module.exports = [function() {
 
-    return {
+  return {
 
-      restrict: 'A',
-      scope: {
-        tasklistData: '='
-      },
+    restrict: 'A',
+    scope: {
+      tasklistData: '='
+    },
 
-      template: template,
+    template: template,
 
-      controller: [
-        '$scope',
-        '$location',
-        'search',
-        '$timeout',
+    controller: [
+      '$scope',
+      '$location',
+      'search',
+      '$timeout',
       function(
         $scope,
         $location,
@@ -56,7 +56,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
         /**
          * observe the list of tasks
          */
-        $scope.state = tasksData.observe('taskList', function (taskList) {
+        $scope.state = tasksData.observe('taskList', function(taskList) {
           $scope.totalItems = taskList.count;
           $scope.tasks = taskList._embedded.task;
           if(taskList._embedded.assignee) {
@@ -71,7 +71,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
           }
         });
 
-        $scope.assigneeDisplayedName = function (task) {
+        $scope.assigneeDisplayedName = function(task) {
           var _assignee = assignees[task.assignee] || {};
           var hasFirstLastName = _assignee.firstName || _assignee.lastName;
           if (hasFirstLastName) {
@@ -110,7 +110,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
           }
         }]);
 
-        $scope.focus = function ($event, task) {
+        $scope.focus = function($event, task) {
           if ($event) {
             $event.preventDefault();
           }
@@ -158,7 +158,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
             selectPreviousTask();
           }
           // wait for angular to update the classes and scroll to the newly selected task
-          $timeout(function(){
+          $timeout(function() {
             var $el = $($event.target).find('li.active')[0];
             if ($el) {
               $el.scrollIntoView(false);
@@ -166,7 +166,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
           });
         };
 
-        $scope.getHrefUrl = function (task) {
+        $scope.getHrefUrl = function(task) {
           var href = '#/?task=' + task.id;
           var detailsTab = $location.search().detailsTab;
           if (detailsTab) {
@@ -187,13 +187,13 @@ var angular = require('camunda-commons-ui/vendor/angular');
           tasksData.changed('taskListQuery');
         };
 
-         $scope.resetPage = function() {
-           updateSilently({
-             page: 1
-           });
-           tasksData.changed('taskListQuery');
-         };
+        $scope.resetPage = function() {
+          updateSilently({
+            page: 1
+          });
+          tasksData.changed('taskListQuery');
+        };
 
       }]
-    };
-  }];
+  };
+}];

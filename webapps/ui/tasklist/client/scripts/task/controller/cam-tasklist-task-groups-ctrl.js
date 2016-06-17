@@ -2,14 +2,14 @@
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  var GROUP_TYPE = 'candidate';
+var GROUP_TYPE = 'candidate';
 
-  module.exports = [
-    '$scope',
-    '$translate',
-    '$q',
-    'Notifications',
-    'camAPI',
+module.exports = [
+  '$scope',
+  '$translate',
+  '$q',
+  'Notifications',
+  'camAPI',
   function(
     $scope,
     $translate,
@@ -56,13 +56,13 @@ var angular = require('camunda-commons-ui/vendor/angular');
       $scope.validateNewGroup();
     });
 
-    taskGroupsData.observe('task', function (_task) {
+    taskGroupsData.observe('task', function(_task) {
       task = _task;
     });
 
     // actions ///////////////////////////////////////////////////////
 
-    $scope.$watch('modalGroupsState.$error', function (error){
+    $scope.$watch('modalGroupsState.$error', function(error) {
       if (error) {
         Notifications.addError({
           status: messages.failure,
@@ -73,7 +73,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       }
     });
 
-    $scope.addGroup = function () {
+    $scope.addGroup = function() {
       var taskId = task.id;
 
       groupsChanged();
@@ -112,7 +112,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       });
     };
 
-    $scope.validateNewGroup = function () {
+    $scope.validateNewGroup = function() {
       delete newGroup.error;
 
       if ($scope.taskGroupForm && $scope.taskGroupForm.newGroup) {
@@ -122,7 +122,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
         var newGroupId = newGroup.groupId;
 
         if (newGroupId) {
-          for(var i = 0, currentGroup; !!(currentGroup = $scope._groups[i]); i++) {
+          for(var i = 0, currentGroup; (currentGroup = $scope._groups[i]); i++) {
             if (newGroupId === currentGroup.id) {
               newGroup.error = { message: 'DUPLICATE_GROUP' };
 
@@ -134,7 +134,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
     };
 
-    $scope.isValid = function () {
+    $scope.isValid = function() {
       if (!newGroup.groupId || newGroup.error) {
         return false;
       }

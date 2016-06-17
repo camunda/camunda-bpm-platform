@@ -4,23 +4,23 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-cockpit-deployments.html', 'utf8');
 
-  module.exports = [function() {
+module.exports = [function() {
 
-    return {
+  return {
 
-      restrict: 'A',
-      scope: {
-        deploymentsData: '='
-      },
+    restrict: 'A',
+    scope: {
+      deploymentsData: '='
+    },
 
-      template: template,
+    template: template,
 
-      controller: [
-        '$scope',
-        '$location',
-        'search',
-        'Notifications',
-      function (
+    controller: [
+      '$scope',
+      '$location',
+      'search',
+      'Notifications',
+      function(
         $scope,
         $location,
         search,
@@ -40,7 +40,7 @@ var template = fs.readFileSync(__dirname + '/cam-cockpit-deployments.html', 'utf
         // control ///////////////////////////////////////////////////////////////////
 
         var control = $scope.control = {};
-        control.addMessage = function (status, msg) {
+        control.addMessage = function(status, msg) {
           Notifications.addMessage({
             status: status,
             message: msg,
@@ -55,7 +55,7 @@ var template = fs.readFileSync(__dirname + '/cam-cockpit-deployments.html', 'utf
         $scope.pageSize = null;
         $scope.totalItems = 0;
 
-        var pageChange = $scope.pageChange = function (page) {
+        var pageChange = $scope.pageChange = function(page) {
           // update query
           updateSilently({
             deploymentsPage: page,
@@ -81,7 +81,7 @@ var template = fs.readFileSync(__dirname + '/cam-cockpit-deployments.html', 'utf
           $scope.totalItems = count;
         }]);
 
-        deploymentsListData.observe('currentDeployment', function (currentDeployment) {
+        deploymentsListData.observe('currentDeployment', function(currentDeployment) {
           $scope.currentDeployment = currentDeployment;
         });
 
@@ -99,7 +99,7 @@ var template = fs.readFileSync(__dirname + '/cam-cockpit-deployments.html', 'utf
           }
 
           search.updateSilently({
-            deployment: deployment.id,
+            deployment: deployment.id
           });
           deploymentsListData.changed('currentDeployment');
         };
@@ -109,5 +109,5 @@ var template = fs.readFileSync(__dirname + '/cam-cockpit-deployments.html', 'utf
         };
 
       }]
-    };
-  }];
+  };
+}];

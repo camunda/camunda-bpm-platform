@@ -36,7 +36,7 @@
    * @param {Object} currentSearch  - The parsed object of the route "search" part
    * @return {string}               - A URL string to be redirected to
    */
-  utils.replaceLastPathFragment = function (replacement, currentPath, currentSearch, keepSearchParams) {
+  utils.replaceLastPathFragment = function(replacement, currentPath, currentSearch, keepSearchParams) {
     var redirectUrl = currentPath.replace(/[^\/]*$/, replacement);
 
     return utils.redirectTo(redirectUrl, currentSearch, keepSearchParams);
@@ -66,6 +66,6 @@
     }
 
     return redirectUrl + (search.length ? '?' + search.join('&') : '');
-  }
+  };
 
   module.exports = utils;

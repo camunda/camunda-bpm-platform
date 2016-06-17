@@ -6,14 +6,14 @@ var angular = require('angular');
 var incidentsTemplate = fs.readFileSync(__dirname + '/incidents-tab.html', 'utf8');
 var retryTemplate = fs.readFileSync(__dirname + '/job-retry-dialog.html', 'utf8');
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
-    ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
-      id: 'incidents-tab',
-      label: 'Incidents',
-      template: incidentsTemplate,
-      controller: [
-               '$scope', '$http', '$modal', 'search', 'Uri',
-      function ($scope,   $http,   $modal,   search,   Uri) {
+var Configuration = function PluginConfiguration(ViewsProvider) {
+  ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
+    id: 'incidents-tab',
+    label: 'Incidents',
+    template: incidentsTemplate,
+    controller: [
+      '$scope', '$http', '$modal', 'search', 'Uri',
+      function($scope,   $http,   $modal,   search,   Uri) {
 
         // input: processInstance, processData
 
@@ -40,7 +40,7 @@ var retryTemplate = fs.readFileSync(__dirname + '/job-retry-dialog.html', 'utf8'
           updateView(newFilter, bpmnElements, activityIdToInstancesMap);
         });
 
-        function updateView (newFilter, bpmnElements, activityIdToInstancesMap) {
+        function updateView(newFilter, bpmnElements, activityIdToInstancesMap) {
           filter = angular.copy(newFilter);
 
           delete filter.page;
@@ -76,7 +76,7 @@ var retryTemplate = fs.readFileSync(__dirname + '/job-retry-dialog.html', 'utf8'
           // get the incidents
           $scope.loadingState = 'LOADING';
           $http.post(Uri.appUri('plugin://base/:engine/incident'), params, {params: pagingParams }).success(function(data) {
-            angular.forEach(data, function (incident) {
+            angular.forEach(data, function(incident) {
               var activityId = incident.activityId;
               var bpmnElement = bpmnElements[activityId];
               incident.activityName = (bpmnElement && (bpmnElement.name || bpmnElement.id)) || activityId;
@@ -88,7 +88,7 @@ var retryTemplate = fs.readFileSync(__dirname + '/job-retry-dialog.html', 'utf8'
           });
         }
 
-        $scope.getIncidentType = function (incident) {
+        $scope.getIncidentType = function(incident) {
           if (incident.incidentType === 'failedJob') {
             return 'Failed Job';
           }
@@ -96,7 +96,7 @@ var retryTemplate = fs.readFileSync(__dirname + '/job-retry-dialog.html', 'utf8'
           return incident.incidentType;
         };
 
-        $scope.getJobStacktraceUrl = function (incident) {
+        $scope.getJobStacktraceUrl = function(incident) {
           return Uri.appUri('engine://engine/:engine/job/' + incident.rootCauseIncidentConfiguration + '/stacktrace');
         };
 
@@ -118,10 +118,10 @@ var retryTemplate = fs.readFileSync(__dirname + '/job-retry-dialog.html', 'utf8'
 
         };
       }],
-      priority: 15
-    });
-  };
+    priority: 15
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

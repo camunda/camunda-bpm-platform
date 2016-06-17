@@ -2,20 +2,19 @@
 
 var fs = require('fs');
 
-var angular = require('angular');
 var template = fs.readFileSync(__dirname + '/variable-table.html', 'utf8');
 
-  module.exports = [ 'ViewsProvider', function(ViewsProvider) {
+module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.decisionInstance.tab', {
-      id: 'decision-input-table',
-      label: 'Outputs',
-      template: template,
-      controller: [
-               '$scope',
-      function ($scope) {
+  ViewsProvider.registerDefaultView('cockpit.decisionInstance.tab', {
+    id: 'decision-input-table',
+    label: 'Outputs',
+    template: template,
+    controller: [
+      '$scope',
+      function($scope) {
 
-        $scope.variables = $scope.decisionInstance.outputs.map(function (variable) {
+        $scope.variables = $scope.decisionInstance.outputs.map(function(variable) {
           return {
             variable: {
               type: variable.type,
@@ -26,6 +25,6 @@ var template = fs.readFileSync(__dirname + '/variable-table.html', 'utf8');
           };
         });
       }],
-      priority: 10
-    });
-  }];
+    priority: 10
+  });
+}];

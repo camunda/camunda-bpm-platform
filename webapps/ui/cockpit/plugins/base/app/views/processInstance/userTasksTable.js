@@ -6,7 +6,7 @@ var identityLinksTemplate = fs.readFileSync(__dirname + '/identity-links-modal.h
 var userTasksTemplate = fs.readFileSync(__dirname + '/user-tasks-table.html', 'utf8');
 var angular = require('angular');
 
-  module.exports = function(ngModule) {
+module.exports = function(ngModule) {
 
     /**
      * @name userTaskTable
@@ -23,13 +23,13 @@ var angular = require('angular');
      * @param {function} cb   - the function returning the new value for each array value
      * @returns {array}       - a new array with the values produced
      */
-    function map(array, cb) {
-      var newArray = [];
-      angular.forEach(array, function(val, key) {
-        newArray[key] = cb(val, key);
-      });
-      return newArray;
-    }
+  function map(array, cb) {
+    var newArray = [];
+    angular.forEach(array, function(val, key) {
+      newArray[key] = cb(val, key);
+    });
+    return newArray;
+  }
 
     /**
      * Removes "empty" values of an array - {@link http://underscorejs.org/#compact|_.compact()}
@@ -37,15 +37,15 @@ var angular = require('angular');
      * @param {array} array   - the original array
      * @returns {array}       - a new array with the values produced
      */
-    function compact(array) {
-      var newArray = [];
-      angular.forEach(array, function(val) {
-        if (!!val) {
-          newArray.push(val);
-        }
-      });
-      return newArray;
-    }
+  function compact(array) {
+    var newArray = [];
+    angular.forEach(array, function(val) {
+      if (val) {
+        newArray.push(val);
+      }
+    });
+    return newArray;
+  }
 
     /**
      * Ensure a function
@@ -53,16 +53,16 @@ var angular = require('angular');
      * @param {?function} func - the original function
      * @returns {function}     - a function
      */
-    function ensureCallback(func) {
-      return angular.isFunction(func) ? func : angular.noop;
-    }
+  function ensureCallback(func) {
+    return angular.isFunction(func) ? func : angular.noop;
+  }
 
 
 
 
 
-    ngModule.controller('UserTaskController', [
-            '$scope', 'search', 'camAPI', 'TaskResource', 'Notifications', '$modal',
+  ngModule.controller('UserTaskController', [
+    '$scope', 'search', 'camAPI', 'TaskResource', 'Notifications', '$modal',
     function($scope,   search,   camAPI,   TaskResource,   Notifications,   $modal) {
 
       // input: processInstance, processData
@@ -88,13 +88,13 @@ var angular = require('angular');
         search('page', !newValue || newValue == 1 ? null : newValue);
       });
 
-      userTaskData.observe([ 'filter', 'executionIdToInstanceMap' ], function (newFilter, executionIdToInstanceMap) {
+      userTaskData.observe([ 'filter', 'executionIdToInstanceMap' ], function(newFilter, executionIdToInstanceMap) {
         pages.current = newFilter.page || 1;
 
         updateView(newFilter, executionIdToInstanceMap);
       });
 
-      function updateView (newFilter, executionIdToInstanceMap) {
+      function updateView(newFilter, executionIdToInstanceMap) {
         filter = angular.copy(newFilter);
 
         delete filter.page;
@@ -127,13 +127,12 @@ var angular = require('angular');
         taskIdIdToExceptionMessageMap = {};
         taskCopies = {};
 
-        TaskResource.count(params).$promise.then(function (response) {
+        TaskResource.count(params).$promise.then(function(response) {
           pages.total = response.count;
         });
 
-        TaskResource.query(pagingParams, params).$promise.then(function (response) {
-          // for (var i = 0, task; !!(task = response.resource[i]); i++) {
-          for (var i = 0, task; !!(task = response[i]); i++) {
+        TaskResource.query(pagingParams, params).$promise.then(function(response) {
+          for (var i = 0, task; (task = response[i]); i++) {
             task.instance = executionIdToInstanceMap[task.executionId];
             taskCopies[task.id] = angular.copy(task);
           }
@@ -144,8 +143,8 @@ var angular = require('angular');
 
       }
 
-      $scope.getHref = function (userTask) {
-        if(!!userTask.instance) {
+      $scope.getHref = function(userTask) {
+        if(userTask.instance) {
           return '#/process-instance/' + processInstance.id + '?detailsTab=user-tasks-tab&activityInstanceIds=' + userTask.instance.id;
         }
 
@@ -162,7 +161,7 @@ var angular = require('angular');
 
         TaskResource.setAssignee(defaultParams, params).$promise.then(
           // success
-          function (response) {
+          function(response) {
             var assignee = copy.assignee = userTask.assignee = response.userId;
 
             var message;
@@ -188,7 +187,7 @@ var angular = require('angular');
           },
 
           // error
-          function (error) {
+          function(error) {
             var message;
             if (userTask.assignee) {
               message = 'The assignee of the user task \'' +
@@ -220,7 +219,7 @@ var angular = require('angular');
       $scope.openDialog = function(userTask, decorator) {
 
         // 1. load the identityLinks
-        Task.identityLinks(userTask.id, function (err, response) {
+        Task.identityLinks(userTask.id, function(err, response) {
 
           // 2. filter the response.data to exclude links
           var identityLinks = compact(map(response, function(item) {
@@ -233,7 +232,7 @@ var angular = require('angular');
             resolve: {
               userTask: function() { return userTask; },
               identityLinks: function() { return identityLinks; },
-              decorator: function() { return decorator }
+              decorator: function() { return decorator; }
             },
             controller: 'IdentityLinksController',
             template: identityLinksTemplate,
@@ -283,14 +282,14 @@ var angular = require('angular');
         });
       };
 
-      $scope.getExceptionForUserTask = function (userTask) {
+      $scope.getExceptionForUserTask = function(userTask) {
         return taskIdIdToExceptionMessageMap[userTask.id];
       };
 
     }]);
 
-    ngModule.controller('IdentityLinksController', [
-            '$modalInstance', 'camAPI', '$scope', 'Notifications', 'userTask', 'identityLinks', 'decorator',
+  ngModule.controller('IdentityLinksController', [
+    '$modalInstance', 'camAPI', '$scope', 'Notifications', 'userTask', 'identityLinks', 'decorator',
     function($modalInstance,   camAPI,   $scope,   Notifications,   userTask,   identityLinks,   decorator) {
 
       var Task = camAPI.resource('task');
@@ -301,14 +300,14 @@ var angular = require('angular');
       $scope.title = decorator.title;
       var key = $scope.key = decorator.key;
 
-      $scope.$on('$routeChangeStart', function () {
+      $scope.$on('$routeChangeStart', function() {
         $modalInstance.close();
       });
 
       $scope.removeItem = function() {
         var delta = this.delta;
 
-        Task.identityLinksDelete(userTask.id, this.identityLink, function (err) {
+        Task.identityLinksDelete(userTask.id, this.identityLink, function(err) {
 
           if (err) {
             return Notifications.addError({
@@ -349,7 +348,7 @@ var angular = require('angular');
           type: 'candidate'
         };
 
-        newIdentityLink[key] = editForm.newItem
+        newIdentityLink[key] = editForm.newItem;
 
         Task.identityLinksAdd(userTask.id, newIdentityLink, function(err) {
 
@@ -369,18 +368,18 @@ var angular = require('angular');
 
     }]);
 
-    var Configuration = function(ViewsProvider) {
-      ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
-        id: 'user-tasks-tab',
-        label: 'User Tasks',
-        template: userTasksTemplate,
-        controller: 'UserTaskController',
-        priority: 5
-      });
-    };
-
-    Configuration.$inject = ['ViewsProvider'];
-
-    ngModule.config(Configuration);
-
+  var Configuration = function(ViewsProvider) {
+    ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
+      id: 'user-tasks-tab',
+      label: 'User Tasks',
+      template: userTasksTemplate,
+      controller: 'UserTaskController',
+      priority: 5
+    });
   };
+
+  Configuration.$inject = ['ViewsProvider'];
+
+  ngModule.config(Configuration);
+
+};

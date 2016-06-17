@@ -6,7 +6,7 @@ var template = fs.readFileSync(__dirname + '/tasks.html', 'utf8');
 
 module.exports = [
   'ViewsProvider',
-  function (
+  function(
     ViewsProvider
   ) {
     ViewsProvider.registerDefaultView('cockpit.dashboard.section', {
@@ -14,7 +14,7 @@ module.exports = [
       label: 'Tasks',
       template: template,
       pagePath: '#/tasks',
-      checkActive: function (path) {
+      checkActive: function(path) {
         return path.indexOf('#/tasks') > -1;
       },
       controller: [
@@ -28,7 +28,7 @@ module.exports = [
           $scope.loadingState = 'LOADING';
 
           var TaskResource = camAPI.resource('task');
-          TaskResource.count({}, function (err, count) {
+          TaskResource.count({}, function(err, count) {
             if (err) {
               $scope.loadingError = err.message;
               $scope.loadingState = 'ERROR';

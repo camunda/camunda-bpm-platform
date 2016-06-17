@@ -7,8 +7,8 @@ var template = fs.readFileSync(__dirname + '/cam-cockpit-source.html', 'utf8');
 var angular = require('camunda-commons-ui/vendor/angular');
 require('camunda-commons-ui/vendor/prism');
 
-  module.exports = [
-    '$window',
+module.exports = [
+  '$window',
   function(
     $window
   ) {
@@ -24,7 +24,7 @@ require('camunda-commons-ui/vendor/prism');
 
       template: template,
 
-      link: function ($scope, $element) {
+      link: function($scope, $element) {
 
         var Prism = $window.Prism;
 
@@ -43,7 +43,7 @@ require('camunda-commons-ui/vendor/prism');
 
         $scope.extension = function() {
           if (name) {
-            var extension = (name.match(/\.(\w+)$/) || [,''])[1];
+            var extension = (name.match(/\.(\w+)$/) || ['', ''])[1];
             extension = extension && extension.toLowerCase();
             return Extensions[extension] || extension;
           }

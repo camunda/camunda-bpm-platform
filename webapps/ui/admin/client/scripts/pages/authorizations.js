@@ -1,5 +1,3 @@
-/* global define: false */
-
 'use strict';
 
 var fs = require('fs');
@@ -7,12 +5,12 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/authorizations.html', 'utf8');
 var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization.html', 'utf8');
 
-  module.exports = [ '$routeProvider', function($routeProvider) {
-    $routeProvider.when('/authorization', {
-      template: template,
-      controller: [
-               '$scope', 'page',      '$routeParams', '$modal', 'AuthorizationResource', 'Notifications', '$location',
-      function ($scope,   pageService, $routeParams,   $modal,   AuthorizationResource,   Notifications,   $location) {
+module.exports = [ '$routeProvider', function($routeProvider) {
+  $routeProvider.when('/authorization', {
+    template: template,
+    controller: [
+      '$scope', 'page',      '$routeParams', '$modal', 'AuthorizationResource', 'Notifications', '$location',
+      function($scope,   pageService, $routeParams,   $modal,   AuthorizationResource,   Notifications,   $location) {
 
         $scope.$root.showBreadcrumbs = true;
 
@@ -33,10 +31,10 @@ var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization
           7: 'Task',
           8: 'Process Instance',
           9: 'Deployment',
-         10: 'Decision Definition',
-         11: 'Tenant',
-         12: 'Tenant Membership',
-         13: 'Batch'
+          10: 'Decision Definition',
+          11: 'Tenant',
+          12: 'Tenant Membership',
+          13: 'Batch'
         };
 
         pageService.breadcrumbsAdd([
@@ -57,10 +55,10 @@ var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization
           7: [ 'CREATE', 'READ', 'UPDATE', 'DELETE', 'TASK_ASSIGN', 'TASK_WORK' ],
           8: [ 'CREATE', 'READ', 'UPDATE', 'DELETE' ],
           9: [ 'CREATE', 'READ', 'DELETE' ],
-         10: [ 'READ', 'CREATE_INSTANCE', 'READ_HISTORY', 'DELETE_HISTORY' ],
-         11: [ 'READ', 'UPDATE', 'CREATE', 'DELETE' ],
-         12: [ 'CREATE', 'DELETE' ],
-         13: [ 'READ', 'UPDATE', 'CREATE', 'DELETE', 'READ_HISTORY', 'DELETE_HISTORY' ]
+          10: [ 'READ', 'CREATE_INSTANCE', 'READ_HISTORY', 'DELETE_HISTORY' ],
+          11: [ 'READ', 'UPDATE', 'CREATE', 'DELETE' ],
+          12: [ 'CREATE', 'DELETE' ],
+          13: [ 'READ', 'UPDATE', 'CREATE', 'DELETE', 'READ_HISTORY', 'DELETE_HISTORY' ]
         };
 
         $scope.typeMap = {
@@ -70,7 +68,7 @@ var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization
         };
 
         $scope.getIdentityId = function(auth) {
-          if(!!auth.userId) {
+          if(auth.userId) {
             return auth.userId;
           } else {
             return auth.groupId;
@@ -154,7 +152,7 @@ var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization
 
           AuthorizationResource.count({
             resourceType :  $scope.selectedResourceType
-          }).$promise.then(function (response) {
+          }).$promise.then(function(response) {
             $scope.pages.total = response.count;
           }, reqError);
 
@@ -173,9 +171,9 @@ var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization
         $scope.$watch('pages.current', loadAuthorizations);
 
         $scope.getPermissionsForResource = function() {
-          if(!!$scope.selectedResourceType) {
+          if($scope.selectedResourceType) {
             return $scope.permissionMap[$scope.selectedResourceType];
-          }else {
+          } else {
             return [];
           }
         };
@@ -206,7 +204,7 @@ var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization
           $scope.selectedResourceType = $routeParams.resource;
         }
       }],
-      authentication: 'required',
-      reloadOnSearch: false
-    });
-  }];
+    authentication: 'required',
+    reloadOnSearch: false
+  });
+}];

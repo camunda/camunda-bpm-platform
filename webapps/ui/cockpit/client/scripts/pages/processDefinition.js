@@ -8,10 +8,10 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     routeUtil = require('../../../../common/scripts/util/routeUtil'),
     camCommons = require('camunda-commons-ui/lib');
 
-  var ngModule = angular.module('cam.cockpit.pages.processDefinition', ['dataDepend', camCommons.name]);
+var ngModule = angular.module('cam.cockpit.pages.processDefinition', ['dataDepend', camCommons.name]);
 
-  var Controller = [
-          '$scope', '$rootScope', '$q', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition', 'page',
+var Controller = [
+  '$scope', '$rootScope', '$q', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition', 'page',
   function($scope,   $rootScope,   $q,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   Views,   Data,   Transform,   Variables,   dataDepend,   processDefinition,   page
   ) {
 
@@ -21,7 +21,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     // utilities ///////////////////////
 
     $scope.hovered = null;
-    $scope.hoverTitle = function (id) {
+    $scope.hoverTitle = function(id) {
       $scope.hovered = id || null;
     };
 
@@ -154,7 +154,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
         return array && array.length;
       }
 
-      function getDateValueForType (dateFilters, type) {
+      function getDateValueForType(dateFilters, type) {
         for (var i = 0; i < dateFilters.length; i++) {
           var filter = dateFilters[i];
           if (filter.type === type) {
@@ -197,13 +197,13 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
     processData.provide('instances.all', [ 'processDefinition', function(definition) {
 
-    var queryParams = { processDefinitionKey : definition.key };
+      var queryParams = { processDefinitionKey : definition.key };
 
-    if(definition.tenantId) {
-      queryParams.tenantIdIn = [ definition.tenantId ];
-    } else {
-      queryParams.withoutTenantId = true;
-    }
+      if(definition.tenantId) {
+        queryParams.tenantIdIn = [ definition.tenantId ];
+      } else {
+        queryParams.withoutTenantId = true;
+      }
 
       return ProcessInstanceResource.count(queryParams).$promise;
     }]);
@@ -246,7 +246,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
     // processDiagram /////////////////////
 
-    processData.provide('processDiagram', [ 'bpmnDefinition', 'bpmnElements', function (bpmnDefinition, bpmnElements) {
+    processData.provide('processDiagram', [ 'bpmnDefinition', 'bpmnElements', function(bpmnDefinition, bpmnElements) {
       var diagram = $scope.processDiagram = $scope.processDiagram || {};
 
       angular.extend(diagram, {
@@ -289,9 +289,9 @@ var angular = require('camunda-commons-ui/vendor/angular'),
         href: '#/process-definition/'+ definition.id +'/runtime',
         processDefinition: definition,
 
-        choices: plugins.sort(function (a, b) {
+        choices: plugins.sort(function(a, b) {
           return a.priority < b.priority ? -1 : (a.priority > b.priority ? 1 : 0);
-        }).map(function (plugin) {
+        }).map(function(plugin) {
           return {
             active: plugin.id === 'runtime',
             label: plugin.label,
@@ -362,7 +362,9 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     try {
       $scope.hasMigrationPlugin = !!angular.module('cockpit.plugin.migration');
     }
-    catch (e) {}
+    catch (e) {
+      // do nothing
+    }
 
     // INITIALIZE PLUGINS
     var processPlugins = (
@@ -379,7 +381,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
     for(var i = 0; i < processPlugins.length; i++) {
       if(typeof processPlugins[i].initialize === 'function') {
-         processPlugins[i].initialize(initData);
+        processPlugins[i].initialize(initData);
       }
     }
 
@@ -434,7 +436,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
   }];
 
-  var ProcessDefinitionFilterController = [
+var ProcessDefinitionFilterController = [
   '$scope',
   '$filter',
   'debounce',
@@ -473,7 +475,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
       return result;
     }
 
-    function createDateFilter (dateFilter) {
+    function createDateFilter(dateFilter) {
       return angular.copy(dateFilter) || [];
     }
 
@@ -534,7 +536,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
       }
 
       // start
-      angular.forEach(start, function (filter) {
+      angular.forEach(start, function(filter) {
         if (filter.value) {
           if (filter.type === 'after') {
             newStart.push({ type: 'after', value: filter.value });
@@ -658,7 +660,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
       $scope.filterChanged();
     };
 
-    $scope.removeStartDateFilter = function (filter) {
+    $scope.removeStartDateFilter = function(filter) {
       var start = filterData.start,
           idx = start.indexOf(filter);
 
@@ -669,7 +671,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
       $scope.filterChanged();
     };
 
-    $scope.dateFilterTypeChanged = function (firstSelectBox, secondSelectBox) {
+    $scope.dateFilterTypeChanged = function(firstSelectBox, secondSelectBox) {
       if (firstSelectBox && secondSelectBox) {
 
         if (firstSelectBox.$modelValue === secondSelectBox.$modelValue) {
@@ -687,8 +689,8 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     $scope.sidebarTab = 'info';
   }];
 
-  var RouteConfig = [
-    '$routeProvider',
+var RouteConfig = [
+  '$routeProvider',
   function(
     $routeProvider
   ) {
@@ -717,26 +719,26 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     });
   }];
 
-  var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.view', {
-      id: 'runtime',
-      priority: 20,
-      label: 'Runtime',
-      keepSearchParams: [
-        'parentProcessDefinitionId',
-        'businessKey',
-        'variables',
-        'startedAfter',
-        'startedBefore',
-        'viewbox'
-      ]
-    });
-  }];
+var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
+  ViewsProvider.registerDefaultView('cockpit.processDefinition.view', {
+    id: 'runtime',
+    priority: 20,
+    label: 'Runtime',
+    keepSearchParams: [
+      'parentProcessDefinitionId',
+      'businessKey',
+      'variables',
+      'startedAfter',
+      'startedBefore',
+      'viewbox'
+    ]
+  });
+}];
 
-  ngModule
+ngModule
     .controller('ProcessDefinitionFilterController', ProcessDefinitionFilterController)
     .config(RouteConfig)
     .config(ViewConfig)
   ;
 
-  module.exports = ngModule;
+module.exports = ngModule;

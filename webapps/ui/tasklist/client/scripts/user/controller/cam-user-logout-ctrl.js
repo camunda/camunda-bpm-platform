@@ -4,13 +4,13 @@
     '$translate',
     'AuthenticationService',
     'Notifications',
-  function(
+    function(
     $translate,
     AuthenticationService,
     Notifications
   ) {
 
-    AuthenticationService
+      AuthenticationService
       .logout()
       .then(function() {
         $translate('LOGGED_OUT').then(function(translated) {
@@ -21,4 +21,4 @@
         });
       });
 
-  }];
+    }];

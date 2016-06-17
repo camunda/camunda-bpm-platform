@@ -6,15 +6,15 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-form-embedded.html', '
 var angular = require('camunda-commons-ui/vendor/angular');
 var $ = require('jquery');
 
-  module.exports = [
-    'CamForm',
-    'camAPI',
-    '$timeout',
+module.exports = [
+  'CamForm',
+  'camAPI',
+  '$timeout',
   function(
     CamForm,
     camAPI,
     $timeout
-  ){
+  ) {
 
     return {
 
@@ -35,7 +35,7 @@ var $ = require('jquery');
           '$invalid': true
         };
 
-        $scope.$watch('asynchronousFormKey', function (formInfo) {
+        $scope.$watch('asynchronousFormKey', function(formInfo) {
           if (formInfo && formInfo.loaded) {            
             showForm(container, formInfo, formController.getParams());
           }
@@ -75,7 +75,7 @@ var $ = require('jquery');
 
         }
 
-        var done = function (err, _camForm) {
+        var done = function(err, _camForm) {
           if (err) {
             return formController.notifyFormInitializationFailed(err);
           }
@@ -104,7 +104,7 @@ var $ = require('jquery');
           }
         });
 
-        var complete = function (callback) {
+        var complete = function(callback) {
           camForm.submit(callback);
         };
 
@@ -113,7 +113,7 @@ var $ = require('jquery');
           camForm.store();
 
           // manually trigger a mouseleave event to make the tooltip disappear
-          $timeout(function(){
+          $timeout(function() {
             angular.element(evt.target).triggerHandler($.Event('mouseleave'));
           });
         };

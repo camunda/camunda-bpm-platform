@@ -2,18 +2,18 @@
 
 var angular = require('angular');
 
-  var Controller = [ '$scope', 'processData', 'JobDefinitionResource',
-      function ($scope, processData, JobDefinitionResource) {
+var Controller = [ '$scope', 'processData', 'JobDefinitionResource',
+      function($scope, processData, JobDefinitionResource) {
 
-        $scope.$on('$processDefinition.suspensionState.changed', function (processDefinition) {
+        $scope.$on('$processDefinition.suspensionState.changed', function() {
           processData.changed('jobDefinitions');
         });
 
-        processData.provide('jobDefinitions', ['processDefinition', function (processDefinition) {
+        processData.provide('jobDefinitions', ['processDefinition', function(processDefinition) {
           return JobDefinitionResource.query({ processDefinitionId : processDefinition.id }).$promise;
         }]);
 
-        processData.observe(['jobDefinitions', 'bpmnElements'], function (jobDefinitions, bpmnElements) {
+        processData.observe(['jobDefinitions', 'bpmnElements'], function(jobDefinitions, bpmnElements) {
 
           angular.forEach(jobDefinitions, function(jobDefinition) {
             var activityId = jobDefinition.activityId,
@@ -25,16 +25,16 @@ var angular = require('angular');
 
         });
 
-  }];
+      }];
 
-  var Configuration = function PluginConfiguration(DataProvider) {
+var Configuration = function PluginConfiguration(DataProvider) {
 
-    DataProvider.registerData('cockpit.processDefinition.data', {
-      id: 'job-definitions-data',
-      controller: Controller
-    });
-  };
+  DataProvider.registerData('cockpit.processDefinition.data', {
+    id: 'job-definitions-data',
+    controller: Controller
+  });
+};
 
-  Configuration.$inject = ['DataProvider'];
+Configuration.$inject = ['DataProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

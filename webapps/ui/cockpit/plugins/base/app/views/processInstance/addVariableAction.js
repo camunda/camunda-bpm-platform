@@ -6,15 +6,15 @@ var actionTemplate = fs.readFileSync(__dirname + '/add-variable-action.html', 'u
 var dialogTemplate = fs.readFileSync(__dirname + '/add-variable-dialog.html', 'utf8');
 var angular = require('angular');
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
-    ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.action', {
-      id: 'add-variable-action',
-      label: 'Add Variable Action',
-      template: actionTemplate,
-      controller: [
-              '$scope', '$modal',
+var Configuration = function PluginConfiguration(ViewsProvider) {
+  ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.action', {
+    id: 'add-variable-action',
+    label: 'Add Variable Action',
+    template: actionTemplate,
+    controller: [
+      '$scope', '$modal',
       function($scope,   $modal) {
-        $scope.openDialog = function () {
+        $scope.openDialog = function() {
           var dialog = $modal.open({
             scope: $scope,
             resolve: {
@@ -35,10 +35,10 @@ var angular = require('angular');
           });
         };
       }],
-      priority: 10
-    });
-  };
+    priority: 10
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

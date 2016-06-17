@@ -5,15 +5,15 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/process-instance-table.html', 'utf8');
 var angular = require('angular');
 
-  module.exports = [ 'ViewsProvider', function(ViewsProvider) {
+module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.tab', {
-      id: 'process-instances-table',
-      label: 'Process Instances',
-      template: template,
-      controller: [
-               '$scope', '$location', 'search', 'routeUtil', 'PluginProcessInstanceResource',
-      function ($scope,   $location,   search,   routeUtil,   PluginProcessInstanceResource) {
+  ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.tab', {
+    id: 'process-instances-table',
+    label: 'Process Instances',
+    template: template,
+    controller: [
+      '$scope', '$location', 'search', 'routeUtil', 'PluginProcessInstanceResource',
+      function($scope,   $location,   search,   routeUtil,   PluginProcessInstanceResource) {
 
         var processData = $scope.processData.newChild($scope);
 
@@ -68,7 +68,7 @@ var angular = require('angular');
           delete countParams.activityIds;
 
           // fix missmatch -> start -> startedAfter/startedBefore
-          angular.forEach(countParams.start, function (dateFilter) {
+          angular.forEach(countParams.start, function(dateFilter) {
             if (dateFilter.value) {
               if (dateFilter.type === 'after') {
                 countParams.startedAfter = dateFilter.value;
@@ -107,6 +107,6 @@ var angular = require('angular');
         };
 
       }],
-      priority: 10
-    });
-  }];
+    priority: 10
+  });
+}];

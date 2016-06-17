@@ -2,8 +2,8 @@
 
 var angular = require('angular');
 
-  module.exports = [
-          '$scope', '$location', '$http', 'Notifications', '$modalInstance', 'Uri', 'variableInstance',
+module.exports = [
+  '$scope', '$location', '$http', 'Notifications', '$modalInstance', 'Uri', 'variableInstance',
   function($scope,   $location,   $http,   Notifications,   $modalInstance,   Uri,   variableInstance) {
 
     var BEFORE_CHANGE = 'beforeChange',
@@ -27,9 +27,9 @@ var angular = require('angular');
 
     $scope.confirmed = false;
 
-    function uploadComplete(parsedValue) {
+    function uploadComplete() {
       var self = $scope.xhr;
-      $scope.$apply(function(){
+      $scope.$apply(function() {
         if(self.status == 204) {
           $scope.status = CHANGE_SUCCESS;
 
@@ -78,7 +78,7 @@ var angular = require('angular');
       }
     };
 
-    $scope.change = function () {
+    $scope.change = function() {
       if($scope.status == BEFORE_CHANGE) {
         $scope.status = CONFIRM_CHANGE;
       }
@@ -94,7 +94,7 @@ var angular = require('angular');
           updateDeserialized = true;
         }
 
-        if($scope.dataFormat === "application/json" || updateDeserialized) {
+        if($scope.dataFormat === 'application/json' || updateDeserialized) {
           try {
             // check whether the user provided valid JSON.
             JSON.parse(newValue);
@@ -119,7 +119,7 @@ var angular = require('angular');
           };
 
           $http({method: 'PUT', url: $scope.getObjectVariablePutUrl(), data: variableUpdate})
-            .success(function(data, status, headers, config) {
+            .success(function() {
               $scope.status = CHANGE_SUCCESS;
 
               Notifications.addMessage({
@@ -128,7 +128,7 @@ var angular = require('angular');
               });
 
             })
-            .error(function(data, status, headers, config) {
+            .error(function(data) {
               $scope.status = BEFORE_CHANGE;
 
               Notifications.addError({
@@ -162,7 +162,7 @@ var angular = require('angular');
     $http({
       method: 'GET',
       url: Uri.appUri('engine://engine/:engine/variable-instance/'+variableInstance.id)
-    }).success(function(data, status) {
+    }).success(function(data) {
       if(!data.errorMessage) {
         $scope.initialValueDeserialized = JSON.stringify(data.value);
         $scope.currentValueDeserialized = angular.copy($scope.initialValueDeserialized);
@@ -170,8 +170,8 @@ var angular = require('angular');
       else {
         $scope.deserializationError = data.errorMessage;
       }
-    }).error(function(data, status) {
-      $scpe.deserializedValue = data;
+    }).error(function(data) {
+      $scope.deserializedValue = data;
     });
 
     $scope.selectTab = function(tab) {
@@ -182,15 +182,15 @@ var angular = require('angular');
       $scope.status = BEFORE_CHANGE;
     };
 
-    $scope.getSerializableVariableUploadUrl = function () {
+    $scope.getSerializableVariableUploadUrl = function() {
       return Uri.appUri('engine://engine/:engine/execution/'+variableInstance.executionId+'/localVariables/'+variableInstance.name+'/data');
     };
 
-    $scope.getObjectVariablePutUrl = function () {
+    $scope.getObjectVariablePutUrl = function() {
       return Uri.appUri('engine://engine/:engine/execution/'+variableInstance.executionId+'/localVariables/'+variableInstance.name);
     };
 
-    $scope.$on('$routeChangeStart', function () {
+    $scope.$on('$routeChangeStart', function() {
       $modalInstance.dismiss();
     });
 

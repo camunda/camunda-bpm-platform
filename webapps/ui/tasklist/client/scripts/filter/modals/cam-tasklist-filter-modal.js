@@ -2,75 +2,75 @@
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  var copy = angular.copy;
-  var each = angular.forEach;
-  var isArray = angular.isArray;
-  var isObject = angular.isObject;
+var copy = angular.copy;
+var each = angular.forEach;
+var isArray = angular.isArray;
+var isObject = angular.isObject;
 
-  var RESOURCE_TYPE = 'Task';
-  var DEFAULT_COLOR = '#555555';
+var RESOURCE_TYPE = 'Task';
+var DEFAULT_COLOR = '#555555';
 
-  var likeExp = /Like$/;
-  function fixLike(key, value) {
-    if (likeExp.test(key)) {
+var likeExp = /Like$/;
+function fixLike(key, value) {
+  if (likeExp.test(key)) {
 
-      if (value[0] !== '%') {
-        value = '%' + value;
-      }
-
-      var length = value.length - 1;
-      if (value[length] !== '%') {
-        value = value + '%';
-      }
-
+    if (value[0] !== '%') {
+      value = '%' + value;
     }
-    return value;
-  }
 
-  function unfixLike(key, value) {
-    if (likeExp.test(key)) {
-      if (value[0] === '%') {
-        value = value.slice(1, value.length);
-      }
-
-      if (value.slice(-1) === '%') {
-        value = value.slice(0, -1);
-      }
+    var length = value.length - 1;
+    if (value[length] !== '%') {
+      value = value + '%';
     }
-    return value;
-  }
 
-  var varExp = /Variables$/;
-  function isQueryVariable(key) {
-    return varExp.test(key);
   }
+  return value;
+}
 
-  var expressionsExp = /^[\s]*(\#|\$)\{/;
-  function isExpression(value) {
-    return expressionsExp.test(value);
+function unfixLike(key, value) {
+  if (likeExp.test(key)) {
+    if (value[0] === '%') {
+      value = value.slice(1, value.length);
+    }
+
+    if (value.slice(-1) === '%') {
+      value = value.slice(0, -1);
+    }
   }
+  return value;
+}
 
-  function cleanJson(obj) {
-    each(Object.keys(obj), function(key) {
+var varExp = /Variables$/;
+function isQueryVariable(key) {
+  return varExp.test(key);
+}
+
+var expressionsExp = /^[\s]*(\#|\$)\{/;
+function isExpression(value) {
+  return expressionsExp.test(value);
+}
+
+function cleanJson(obj) {
+  each(Object.keys(obj), function(key) {
       // property with name starting with "$" or empty arrays are removed
-      if (key[0] === '$' || (isArray(obj[key]) && !obj[key].length)) {
-        delete obj[key];
-      }
-      else if (isObject(obj[key]) || isArray(obj[key])) {
-        obj[key] = cleanJson(obj[key]);
-      }
-    });
-    return obj;
-  }
+    if (key[0] === '$' || (isArray(obj[key]) && !obj[key].length)) {
+      delete obj[key];
+    }
+    else if (isObject(obj[key]) || isArray(obj[key])) {
+      obj[key] = cleanJson(obj[key]);
+    }
+  });
+  return obj;
+}
 
-  module.exports = [
-    '$scope',
-    '$translate',
-    '$q',
-    'Notifications',
-    'camAPI',
-    'filter',
-    'filtersData',
+module.exports = [
+  '$scope',
+  '$translate',
+  '$q',
+  'Notifications',
+  'camAPI',
+  'filter',
+  'filtersData',
   function(
     $scope,
     $translate,
@@ -143,7 +143,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
     filterModalData.provide('filter', $scope.filter);
 
-    filterModalData.provide('userFilterAccess', ['filter', function (filter) {
+    filterModalData.provide('userFilterAccess', ['filter', function(filter) {
       var deferred = $q.defer();
 
       if(!filter || !filter.id) {
@@ -156,7 +156,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       else {
         Filter.authorizations(filter.id, function(err, resp) {
 
-          if(!!err) {
+          if(err) {
             deferred.reject(err);
           }
           else {
@@ -170,7 +170,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
     }]);
 
-    filterModalData.provide('accesses', ['userFilterAccess', function (access) {
+    filterModalData.provide('accesses', ['userFilterAccess', function(access) {
       var accesses = {};
       each(access.links, function(link) {
         accesses[link.rel] = true;
@@ -186,21 +186,21 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
     // provider ////////////////////////////////////
 
-    var defaultValidationProvider = function () {
+    var defaultValidationProvider = function() {
       return false;
     };
 
     $scope.isValid = defaultValidationProvider;
 
-    $scope.registerValidationProvider = function (fn) {
+    $scope.registerValidationProvider = function(fn) {
       $scope.isValid = fn || defaultValidationProvider;
     };
 
-    var postFilterSavedProvider = function (filter, callback) {
+    var postFilterSavedProvider = function(filter, callback) {
       return callback();
     };
 
-    $scope.registerPostFilterSavedProvider = function (fn) {
+    $scope.registerPostFilterSavedProvider = function(fn) {
       postFilterSavedProvider = fn || postFilterSavedProvider;
     };
 
@@ -224,7 +224,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       var _queryArray = ($scope.filter.query || []).concat(queryVariables);
       var _queryObj = {};
 
-      for (var i = 0, elem; !!(elem = _queryArray[i]); i++) {
+      for (var i = 0, elem; (elem = _queryArray[i]); i++) {
 
         var key = elem.key;
         var value = elem.value;
@@ -292,11 +292,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         toSave.id = filterId = filterId || filterResponse.id;
 
-        postFilterSavedProvider(toSave, function (err) {
+        postFilterSavedProvider(toSave, function(err) {
 
           if (err) {
             if (isArray(err) && err.length) {
-              for (var i = 0, error; !!(error = err[i]); i++) {
+              for (var i = 0, error; (error = err[i]); i++) {
                 errorNotification(error.status, error.error, i === 0);
               }
             }

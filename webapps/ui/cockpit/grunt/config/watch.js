@@ -41,6 +41,27 @@ module.exports = function(config, watchConf) {
       ]
   };
 
+  watchConf.cockpit_scripts_lint = {
+    options: options,
+    files: [
+      '<%= pkg.gruntConfig.cockpitSourceDir %>/scripts/**/*.js'
+    ],
+    tasks: [
+      'newer:eslint:cockpit_scripts'
+    ]
+  };
+
+  watchConf.cockpit_plugins_lint = {
+    options: options,
+    files: [
+      '<%= pkg.gruntConfig.pluginSourceDir %>/cockpit/plugins/**/*.js'
+    ],
+    tasks: [
+      'newer:eslint:cockpit_plugins'
+    ]
+  };
+
+
   watchConf.cockpit_dist = {
     options: {
       livereload: config.livereloadPort || false

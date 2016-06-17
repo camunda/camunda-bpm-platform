@@ -16,8 +16,8 @@
       }
       Task.list(params, function(err, data) {
         if(data._embedded.task.length > 0) {
-          var msg = "";
-          for(var task, i = 0; !!(task = data._embedded.task[i]); i++) {
+          var msg = '';
+          for(var task, i = 0; (task = data._embedded.task[i]); i++) {
             msg += '<a ng-href="#/?task='+ task.id +'" ng-click="removeNotification(notification)">'+task.name+'</a>, ';
           }
           $translate(params.processInstanceId ? 'ASSIGN_NOTE_PROCESS' : 'ASSIGN_NOTE_CASE').then(function(translated) {

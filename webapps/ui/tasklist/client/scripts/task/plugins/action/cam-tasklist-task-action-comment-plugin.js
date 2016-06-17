@@ -4,10 +4,10 @@ var fs = require('fs');
 var addCommentTemplate = fs.readFileSync(__dirname + '/cam-tasklist-task-action-comment-plugin.html', 'utf8');
 var addCommentFormTemplate = fs.readFileSync(__dirname + '/modals/cam-tasklist-comment-form.html', 'utf8');
 
-  var Controller = [
-   '$scope',
-   '$modal',
-  function (
+var Controller = [
+  '$scope',
+  '$modal',
+  function(
     $scope,
     $modal
   ) {
@@ -41,16 +41,16 @@ var addCommentFormTemplate = fs.readFileSync(__dirname + '/modals/cam-tasklist-c
 
   }];
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('tasklist.task.action', {
-      id: 'task-action-comment',
-      template: addCommentTemplate,
-      controller: Controller,
-      priority: 100
-    });
-  };
+  ViewsProvider.registerDefaultView('tasklist.task.action', {
+    id: 'task-action-comment',
+    template: addCommentTemplate,
+    controller: Controller,
+    priority: 100
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

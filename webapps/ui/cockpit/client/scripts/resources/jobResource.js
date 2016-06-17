@@ -1,6 +1,6 @@
   'use strict';
 
-  var Resource = [ '$resource', 'Uri', function ($resource, Uri) {
+  var Resource = [ '$resource', 'Uri', function($resource, Uri) {
 
     return $resource(Uri.appUri('engine://engine/:engine/job/:id/:action'), { id: '@id' }, {
       query: { method: 'POST', isArray: true},

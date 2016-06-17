@@ -1,6 +1,6 @@
-__define('camunda-tasklist-bootstrap', [
+window.__define('camunda-tasklist-bootstrap', [
   './scripts/camunda-tasklist-ui'
-], function () {
+], function() {
   'use strict';
 
   var camundaTasklistUi = window.CamundaTasklistUi;
@@ -69,7 +69,7 @@ __define('camunda-tasklist-bootstrap', [
           'urlArgs',
           'scriptType'
           // 'skipDataMain' // not relevant either
-        ].forEach(function (prop) {
+        ].forEach(function(prop) {
           if (custom[prop]) {
             conf[prop] = custom[prop];
           }
@@ -118,4 +118,4 @@ __define('camunda-tasklist-bootstrap', [
 
 });
 
-requirejs(['camunda-tasklist-bootstrap'], function(){});
+requirejs(['camunda-tasklist-bootstrap'], function() {});

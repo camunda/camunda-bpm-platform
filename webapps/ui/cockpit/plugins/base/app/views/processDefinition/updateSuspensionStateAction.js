@@ -6,16 +6,16 @@ var actionTemplate = fs.readFileSync(__dirname + '/update-suspension-state-actio
 var dialogTemplate = fs.readFileSync(__dirname + '/update-suspension-state-dialog.html', 'utf8');
 var angular = require('angular');
 
-  module.exports = ['ViewsProvider', function(ViewsProvider) {
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.action', {
-      id: 'update-suspension-state-action',
-      label: 'Update Suspension State',
-      template: actionTemplate,
-      controller: [
-              '$scope', '$rootScope', '$modal',
+module.exports = ['ViewsProvider', function(ViewsProvider) {
+  ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.action', {
+    id: 'update-suspension-state-action',
+    label: 'Update Suspension State',
+    template: actionTemplate,
+    controller: [
+      '$scope', '$rootScope', '$modal',
       function($scope,   $rootScope,   $modal) {
 
-        $scope.openDialog = function () {
+        $scope.openDialog = function() {
           var dialog = $modal.open({
             resolve: {
               processData: function() { return $scope.processData; },
@@ -40,6 +40,6 @@ var angular = require('angular');
         };
 
       }],
-      priority: 50
-    });
-  }];
+    priority: 50
+  });
+}];

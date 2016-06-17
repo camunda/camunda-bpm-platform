@@ -6,68 +6,68 @@ var searchConfigJSON = fs.readFileSync(__dirname + '/cam-tasklist-search-plugin-
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  var expressionsRegex = /^[\s]*(\#|\$)\{/;
+var expressionsRegex = /^[\s]*(\#|\$)\{/;
 
-  var searchConfig = JSON.parse(searchConfigJSON);
+var searchConfig = JSON.parse(searchConfigJSON);
 
-  var parseValue = function(value, enforceString) {
-    if(enforceString) {
-      return '' + value;
-    }
-    if(!isNaN(value) && value.trim() !== '') {
+var parseValue = function(value, enforceString) {
+  if(enforceString) {
+    return '' + value;
+  }
+  if(!isNaN(value) && value.trim() !== '') {
       // value must be transformed to number
-      return +value;
-    }
-    if(value === 'true') {
-      return true;
-    }
-    if(value === 'false') {
-      return false;
-    }
-    if(value === 'NULL') {
-      return null;
-    }
-    if(value.indexOf('\'') === 0 && value.lastIndexOf('\'') === value.length - 1) {
-      return value.substr(1, value.length - 2);
-    }
-    return value;
-  };
+    return +value;
+  }
+  if(value === 'true') {
+    return true;
+  }
+  if(value === 'false') {
+    return false;
+  }
+  if(value === 'NULL') {
+    return null;
+  }
+  if(value.indexOf('\'') === 0 && value.lastIndexOf('\'') === value.length - 1) {
+    return value.substr(1, value.length - 2);
+  }
+  return value;
+};
 
-  var sanitizeValue = function(value, operator) {
-    if(operator === 'Like' || operator === 'like') {
-      return '%'+value+'%';
-    } else if(operator == 'in') {
-    	return value.split(',');
-    }
-    return value;
-  };
+var sanitizeValue = function(value, operator) {
+  if(operator === 'Like' || operator === 'like') {
+    return '%'+value+'%';
+  } else if(operator == 'in') {
+    return value.split(',');
+  }
+  return value;
+};
 
-  var getQueryValueBySearch = function(search) {
-    if (search.basic) {
-      return true;
-    }
-    return sanitizeValue(parseValue(search.value.value, search.enforceString), search.operator.value.key);
-  };
+var getQueryValueBySearch = function(search) {
+  if (search.basic) {
+    return true;
+  }
+  return sanitizeValue(parseValue(search.value.value, search.enforceString), search.operator.value.key);
+};
 
-  var sanitizeProperty = function(search, type, operator, value) {
-    var out = type;
-    if(['Like', 'Before', 'After'].indexOf(operator) !== -1) {
-      out += operator;
-    }
-    if(expressionsRegex.test(value) &&
+var sanitizeProperty = function(search, type, operator, value) {
+  var out = type;
+  if(['Like', 'Before', 'After'].indexOf(operator) !== -1) {
+    out += operator;
+  }
+  if(expressionsRegex.test(value) &&
        ['assignee', 'owner', 'candidateGroup', 'candidateUser', 'involvedUser'].indexOf(type) !== -1) {
-      out += 'Expression';
-    }
-    if(type === 'priority' && operator !== 'eq') {
-      out = operator + 'Priority';
-    }
-    return out;
-  };
+    out += 'Expression';
+  }
+  if(type === 'priority' && operator !== 'eq') {
+    out = operator + 'Priority';
+  }
+  return out;
+};
 
-  var Controller = [
-   '$scope',
-   '$translate',
-  function (
+var Controller = [
+  '$scope',
+  '$translate',
+  function(
     $scope,
     $translate
   ) {
@@ -139,16 +139,16 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
   }];
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('tasklist.list', {
-      id: 'task-search',
-      template: template,
-      controller: Controller,
-      priority: 100
-    });
-  };
+  ViewsProvider.registerDefaultView('tasklist.list', {
+    id: 'task-search',
+    template: template,
+    controller: Controller,
+    priority: 100
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

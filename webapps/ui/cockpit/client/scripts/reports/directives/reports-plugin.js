@@ -16,19 +16,19 @@ module.exports = [function() {
 
     controller: [
       '$scope',
-    function (
+      function(
       $scope
     ) {
 
-      var reportPluginData = $scope.reportPluginData = $scope.reportData.newChild($scope);
+        var reportPluginData = $scope.reportPluginData = $scope.reportData.newChild($scope);
 
-      reportPluginData.observe('plugin', function(plugin) {
-        $scope.plugin = plugin;
-      });
+        reportPluginData.observe('plugin', function(plugin) {
+          $scope.plugin = plugin;
+        });
 
-      $scope.reportPluginVars = { read: [ 'reportPluginData' ] };
+        $scope.reportPluginVars = { read: [ 'reportPluginData' ] };
 
-    }]
+      }]
 
   };
 

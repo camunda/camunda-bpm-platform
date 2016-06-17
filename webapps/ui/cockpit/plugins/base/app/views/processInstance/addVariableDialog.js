@@ -2,8 +2,8 @@
 
 var angular = require('angular');
 
-  module.exports = [
-          '$scope', '$http', 'Uri', 'Notifications', '$modalInstance', 'processInstance',
+module.exports = [
+  '$scope', '$http', 'Uri', 'Notifications', '$modalInstance', 'processInstance',
   function($scope,   $http,   Uri,   Notifications,   $modalInstance,   processInstance) {
 
     $scope.variableTypes = [
@@ -28,11 +28,11 @@ var angular = require('angular');
         SUCCESS = 'SUCCESS',
         FAIL = 'FAIL';
 
-    $scope.$on('$routeChangeStart', function () {
+    $scope.$on('$routeChangeStart', function() {
       $modalInstance.close($scope.status);
     });
 
-    $scope.close = function () {
+    $scope.close = function() {
       $modalInstance.close($scope.status);
     };
 
@@ -45,7 +45,7 @@ var angular = require('angular');
       return (formScope && formScope.addVariableForm) ? formScope.addVariableForm.$valid : false;
     };
 
-    $scope.save = function () {
+    $scope.save = function() {
       if (!isValid()) {
         return;
       }
@@ -59,7 +59,7 @@ var angular = require('angular');
 
       $http
       .put(Uri.appUri('engine://engine/:engine/process-instance/' + processInstance.id + '/variables/' + name), data)
-      .success(function () {
+      .success(function() {
         $scope.status = SUCCESS;
 
         Notifications.addMessage({
@@ -67,7 +67,7 @@ var angular = require('angular');
           message: 'Added the variable',
           exclusive: true
         });
-      }).error(function (data) {
+      }).error(function(data) {
         $scope.status = FAIL;
 
         Notifications.addError({

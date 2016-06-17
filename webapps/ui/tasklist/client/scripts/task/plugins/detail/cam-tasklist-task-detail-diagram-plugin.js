@@ -3,11 +3,11 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-tasklist-task-detail-diagram-plugin.html', 'utf8');
 
-  var Controller = [
-   '$scope',
-   '$q',
-   'camAPI',
-  function (
+var Controller = [
+  '$scope',
+  '$q',
+  'camAPI',
+  function(
     $scope,
     $q,
     camAPI
@@ -20,7 +20,7 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-task-detail-diagram-pl
 
     // provider ////////////////////////////////////////////////////////
 
-    diagramData.provide('bpmn20xml', ['processDefinition', function (processDefinition) {
+    diagramData.provide('bpmn20xml', ['processDefinition', function(processDefinition) {
       var deferred = $q.defer();
 
       if (!processDefinition) {
@@ -39,7 +39,7 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-task-detail-diagram-pl
       return deferred.promise;
     }]);
 
-    diagramData.provide('processDiagram', ['bpmn20xml', 'processDefinition', 'task', function (bpmn20xml, processDefinition, task) {
+    diagramData.provide('processDiagram', ['bpmn20xml', 'processDefinition', 'task', function(bpmn20xml, processDefinition, task) {
       var processDiagram = {};
 
       processDiagram.processDefinition = processDefinition;
@@ -51,11 +51,11 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-task-detail-diagram-pl
 
     // observer /////////////////////////////////////////////////////////
 
-    diagramData.observe('processDefinition', function (processDefinition) {
+    diagramData.observe('processDefinition', function(processDefinition) {
       $scope.processDefinition = processDefinition;
     });
 
-    $scope.processDiagramState = diagramData.observe('processDiagram', function (processDiagram) {
+    $scope.processDiagramState = diagramData.observe('processDiagram', function(processDiagram) {
       $scope.processDiagram = processDiagram;
     });
 
@@ -67,17 +67,17 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-task-detail-diagram-pl
 
   }];
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('tasklist.task.detail', {
-      id: 'task-detail-diagram',
-      label: 'DIAGRAM',
-      template: template,
-      controller: Controller,
-      priority: 600
-    });
-  };
+  ViewsProvider.registerDefaultView('tasklist.task.detail', {
+    id: 'task-detail-diagram',
+    label: 'DIAGRAM',
+    template: template,
+    controller: Controller,
+    priority: 600
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

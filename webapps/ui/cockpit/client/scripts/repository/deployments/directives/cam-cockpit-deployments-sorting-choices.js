@@ -6,21 +6,21 @@ var template = fs.readFileSync(__dirname + '/cam-cockpit-deployments-sorting-cho
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  module.exports = [function() {
+module.exports = [function() {
 
-    return {
+  return {
 
-      restrict: 'A',
-      scope: {
-        deploymentsData: '='
-      },
+    restrict: 'A',
+    scope: {
+      deploymentsData: '='
+    },
 
-      template: template,
+    template: template,
 
-      controller: [
-        '$scope',
-        'search',
-      function (
+    controller: [
+      '$scope',
+      'search',
+      function(
         $scope,
         search
       ) {
@@ -49,7 +49,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         // observe data /////////////////////////////////////////////////////////////
 
-        deploymentsSortingData.observe('deploymentsSorting', function (pagination) {
+        deploymentsSortingData.observe('deploymentsSorting', function(pagination) {
           $scope.sorting = angular.copy(pagination);
         });
 
@@ -76,5 +76,5 @@ var angular = require('camunda-commons-ui/vendor/angular');
         };
 
       }]
-    };
-  }];
+  };
+}];

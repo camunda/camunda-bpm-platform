@@ -12,12 +12,12 @@ var angular = require('angular'),
     dashboardAuthorizations = require('./dashboard/authorizations'),
     dashboardSystem = require('./dashboard/system');
 
-  var ngModule = angular.module('cockpit.plugin.base.views', []);
+var ngModule = angular.module('cockpit.plugin.base.views', []);
 
-  ngModule.config(dashboardUsers);
-  ngModule.config(dashboardGroups);
-  ngModule.config(dashboardTenants);
-  ngModule.config(dashboardAuthorizations);
-  ngModule.config(dashboardSystem);
+ngModule.config(dashboardUsers);
+ngModule.config(dashboardGroups);
+ngModule.config(dashboardTenants);
+ngModule.config(dashboardAuthorizations);
+ngModule.config(dashboardSystem);
 
-  module.exports = ngModule;
+module.exports = ngModule;

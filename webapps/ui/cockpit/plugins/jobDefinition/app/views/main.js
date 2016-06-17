@@ -6,11 +6,11 @@ var angular = require('angular'),
     jobDefinitionSuspensionOverlay = require('./processDefinition/jobDefinitionSuspensionOverlay'),
     suspensionStateAction = require('./processDefinition/suspensionStateAction');
 
-  var ngModule = angular.module('cockpit.plugin.jobDefinition.views', []);
+var ngModule = angular.module('cockpit.plugin.jobDefinition.views', []);
 
-  ngModule.config(jobDefinitionTable);
-  ngModule.controller('JobDefinitionSuspensionStateController', jobDefinitionSuspensionState);
-  ngModule.config(jobDefinitionSuspensionOverlay);
-  ngModule.config(suspensionStateAction);
+ngModule.config(jobDefinitionTable);
+ngModule.controller('JobDefinitionSuspensionStateController', jobDefinitionSuspensionState);
+ngModule.config(jobDefinitionSuspensionOverlay);
+ngModule.config(suspensionStateAction);
 
-  module.exports = ngModule;
+module.exports = ngModule;

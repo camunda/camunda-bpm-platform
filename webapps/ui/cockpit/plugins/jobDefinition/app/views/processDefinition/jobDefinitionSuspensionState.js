@@ -2,8 +2,8 @@
 
 var angular = require('angular');
 
-  module.exports = [
-          '$scope', '$http', '$filter', 'Uri', 'Notifications', '$modalInstance', 'jobDefinition',
+module.exports = [
+  '$scope', '$http', '$filter', 'Uri', 'Notifications', '$modalInstance', 'jobDefinition',
   function($scope,   $http,   $filter,   Uri,   Notifications,   $modalInstance,   jobDefinition) {
 
     var BEFORE_UPDATE = 'BEFORE_UPDATE',
@@ -25,11 +25,11 @@ var angular = require('angular');
       executionDate : dateFilter(Date.now(), dateFormat)
     };
 
-    $scope.$on('$routeChangeStart', function () {
+    $scope.$on('$routeChangeStart', function() {
       $modalInstance.close($scope.status);
     });
 
-    $scope.updateSuspensionState = function () {
+    $scope.updateSuspensionState = function() {
       $scope.status = PERFORM_UPDATE;
 
       var data = {};
@@ -38,7 +38,7 @@ var angular = require('angular');
       data.includeJobs = $scope.data.includeJobs;
       data.executionDate = !$scope.data.executeImmediately ? $scope.data.executionDate : null;
 
-      $http.put(Uri.appUri('engine://engine/:engine/job-definition/' + jobDefinition.id + '/suspended/'), data).success(function () {
+      $http.put(Uri.appUri('engine://engine/:engine/job-definition/' + jobDefinition.id + '/suspended/'), data).success(function() {
         $scope.status = UPDATE_SUCCESS;
 
         if ($scope.data.executeImmediately) {
@@ -47,7 +47,7 @@ var angular = require('angular');
           Notifications.addMessage({'status': 'Finished', 'message': 'The update of the suspension state of the job definition has been scheduled.', 'exclusive': true });
         }
 
-      }).error(function (data) {
+      }).error(function(data) {
         $scope.status = UPDATE_FAILED;
 
         if ($scope.data.executeImmediately) {
@@ -58,12 +58,12 @@ var angular = require('angular');
       });
     };
 
-    $scope.isValid = function () {
+    $scope.isValid = function() {
       var formScope = angular.element('[name="updateSuspensionStateForm"]').scope();
       return (formScope && formScope.updateSuspensionStateForm) ? formScope.updateSuspensionStateForm.$valid : false;
     };
 
-    $scope.close = function (status) {
+    $scope.close = function(status) {
       var response = {};
 
       response.status = status;

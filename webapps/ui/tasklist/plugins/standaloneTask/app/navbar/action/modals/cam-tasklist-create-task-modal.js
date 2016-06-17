@@ -2,11 +2,11 @@
 
 var angular = require('angular');
 
-  module.exports = [
-    '$scope',
-    '$translate',
-    'Notifications',
-    'camAPI',
+module.exports = [
+  '$scope',
+  '$translate',
+  'Notifications',
+  'camAPI',
   function(
     $scope,
     $translate,
@@ -29,9 +29,9 @@ var angular = require('angular');
 
     function getTenants() {
       var queryParams = {
-          userMember : $scope.authentication.name,
-          includingGroupsOfUser : true
-      }
+        userMember : $scope.authentication.name,
+        includingGroupsOfUser : true
+      };
 
       Tenant.list(queryParams, function(err, res) {
         if (res && res.length > 0) {
@@ -47,24 +47,24 @@ var angular = require('angular');
 
     getTenants();
 
-    $scope.setNewTaskForm = function (innerForm) {
+    $scope.setNewTaskForm = function(innerForm) {
       _form = innerForm;
-    }
+    };
 
     $scope.$on('$locationChangeSuccess', function() {
       $scope.$dismiss();
     });
 
-    var isValid = $scope.isValid = function () {
+    var isValid = $scope.isValid = function() {
       return _form && _form.$valid;
     };
 
-    $scope.save = function () {
+    $scope.save = function() {
       if (!isValid()) {
         return;
       }
 
-      Task.create(task, function (err) {
+      Task.create(task, function(err) {
         if (err) {
           $translate('TASK_SAVE_ERROR').then(function(translated) {
             Notifications.addError({

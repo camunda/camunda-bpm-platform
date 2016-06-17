@@ -6,8 +6,8 @@ var userLoginTemplate = fs.readFileSync(__dirname + '/../user/controller/cam-aut
 
 require('./../user/index');
 
-  module.exports = [
-    '$routeProvider',
+module.exports = [
+  '$routeProvider',
   function(
     $routeProvider
   ) {

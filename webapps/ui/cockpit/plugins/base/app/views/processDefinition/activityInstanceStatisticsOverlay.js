@@ -5,19 +5,19 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/activity-instance-statistics-overlay.html', 'utf8');
 var angular = require('angular');
 
-  module.exports = [ 'ViewsProvider', function(ViewsProvider) {
+module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.diagram.overlay', {
-      id: 'activity-instance-statistics-overlay',
-      template: template,
-      controller: [
-               '$scope',
-      function ($scope) {
+  ViewsProvider.registerDefaultView('cockpit.processDefinition.diagram.overlay', {
+    id: 'activity-instance-statistics-overlay',
+    template: template,
+    controller: [
+      '$scope',
+      function($scope) {
 
         var bpmnElement = $scope.bpmnElement,
             processData = $scope.processData.newChild($scope);
 
-        processData.provide('activityInstance', ['activityInstanceStatistics', function (activityInstanceStatistics) {
+        processData.provide('activityInstance', ['activityInstanceStatistics', function(activityInstanceStatistics) {
           for (var i = 0; i < activityInstanceStatistics.length; i++) {
             var current = activityInstanceStatistics[i];
             if (current.id === bpmnElement.id) {
@@ -27,7 +27,7 @@ var angular = require('angular');
           return null;
         }]);
 
-        processData.provide('activityInstanceMI', ['activityInstanceStatistics', function (activityInstanceStatistics) {
+        processData.provide('activityInstanceMI', ['activityInstanceStatistics', function(activityInstanceStatistics) {
           for (var i = 0; i < activityInstanceStatistics.length; i++) {
             var current = activityInstanceStatistics[i];
             if (current.id === bpmnElement.id + '#multiInstanceBody') {
@@ -87,6 +87,6 @@ var angular = require('angular');
         };
 
       }],
-      priority: 20
-    });
-  }];
+    priority: 20
+  });
+}];

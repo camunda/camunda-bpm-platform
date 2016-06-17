@@ -6,15 +6,15 @@ var angular = require('angular');
 var actionTemplate = fs.readFileSync(__dirname + '/override-job-priority-action.html', 'utf8');
 var dialogTemplate = fs.readFileSync(__dirname + '/override-job-priority-dialog.html', 'utf8');
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
-    ViewsProvider.registerDefaultView('cockpit.jobDefinition.action', {
-      id: 'job-definition-override-job-priority-action',
-      template: actionTemplate,
-      controller: [
-              '$scope', '$rootScope', '$modal',
+var Configuration = function PluginConfiguration(ViewsProvider) {
+  ViewsProvider.registerDefaultView('cockpit.jobDefinition.action', {
+    id: 'job-definition-override-job-priority-action',
+    template: actionTemplate,
+    controller: [
+      '$scope', '$rootScope', '$modal',
       function($scope,   $rootScope,   $modal) {
 
-        $scope.openDialog = function (jobDefinition) {
+        $scope.openDialog = function(jobDefinition) {
           var dialog = $modal.open({
             resolve: {
               jobDefinition: function() { return jobDefinition; }
@@ -32,10 +32,10 @@ var dialogTemplate = fs.readFileSync(__dirname + '/override-job-priority-dialog.
           });
         };
       }],
-      priority: 10
-    });
-  };
+    priority: 10
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

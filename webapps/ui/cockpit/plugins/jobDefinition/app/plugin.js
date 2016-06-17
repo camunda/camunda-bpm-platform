@@ -5,4 +5,4 @@ var angular = require('angular'),
     dataModule = require('./data/main'),
     actionsModule = require('./actions/main');
 
-  module.exports = angular.module('cockpit.plugin.jobDefinition', [viewsModule.name, dataModule.name, actionsModule.name]);
+module.exports = angular.module('cockpit.plugin.jobDefinition', [viewsModule.name, dataModule.name, actionsModule.name]);

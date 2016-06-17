@@ -6,13 +6,13 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
 require('camunda-commons-ui/lib/util/index');
 
-  var navigationModule = angular.module('cam.tasklist.navigation', [
-    require('camunda-commons-ui/lib/util/index').name,
-    'ui.bootstrap',
-    'cam.tasklist.user'
-  ]);
+var navigationModule = angular.module('cam.tasklist.navigation', [
+  require('camunda-commons-ui/lib/util/index').name,
+  'ui.bootstrap',
+  'cam.tasklist.user'
+]);
 
-  navigationModule.controller('camHeaderViewsCtrl', camHeaderViewsCtrl);
-  navigationModule.controller('camLayoutCtrl', camLayoutCtrl);
+navigationModule.controller('camHeaderViewsCtrl', camHeaderViewsCtrl);
+navigationModule.controller('camLayoutCtrl', camLayoutCtrl);
 
-  module.exports = navigationModule;
+module.exports = navigationModule;

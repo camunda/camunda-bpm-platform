@@ -59,6 +59,26 @@ module.exports = function(config, watchConf) {
       ]
   };
 
+  watchConf.tasklist_scripts_lint = {
+    options: options,
+    files: [
+      '<%= pkg.gruntConfig.tasklistSourceDir %>/scripts/**/*.js'
+    ],
+    tasks: [
+      'newer:eslint:tasklist_scripts'
+    ]
+  };
+
+  watchConf.tasklist_plugins_lint = {
+    options: options,
+    files: [
+      '<%= pkg.gruntConfig.pluginSourceDir %>/tasklist/plugins/**/*.js'
+    ],
+    tasks: [
+      'newer:eslint:tasklist_plugins'
+    ]
+  };
+
   watchConf.tasklist_dist = {
     options: {
       livereload: config.livereloadPort || false

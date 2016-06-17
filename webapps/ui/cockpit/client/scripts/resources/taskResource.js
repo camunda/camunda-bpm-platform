@@ -1,5 +1,5 @@
   'use strict';
-  var TaskResource = [ '$resource', 'Uri', function ($resource, Uri) {
+  var TaskResource = [ '$resource', 'Uri', function($resource, Uri) {
     var endpoint = Uri.appUri('engine://engine/:engine/task/:id/:action/:subAction');
     var endpointParams = { id: '@id' };
 

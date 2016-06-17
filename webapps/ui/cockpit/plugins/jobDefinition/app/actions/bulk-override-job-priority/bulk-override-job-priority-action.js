@@ -6,12 +6,12 @@ var angular = require('angular');
 var actionTemplate = fs.readFileSync(__dirname + '/bulk-override-job-priority-action.html', 'utf8');
 var dialogTemplate = fs.readFileSync(__dirname + '/bulk-override-job-priority-dialog.html', 'utf8');
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.action', {
-      id: 'bulk-job-definition-override-job-priority-action',
-      template: actionTemplate,
-      controller: [
-              '$scope', '$rootScope', '$modal',
+var Configuration = function PluginConfiguration(ViewsProvider) {
+  ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.action', {
+    id: 'bulk-job-definition-override-job-priority-action',
+    template: actionTemplate,
+    controller: [
+      '$scope', '$rootScope', '$modal',
       function($scope,   $rootScope,   $modal) {
 
         var processData = $scope.processData.newChild($scope);
@@ -21,7 +21,7 @@ var dialogTemplate = fs.readFileSync(__dirname + '/bulk-override-job-priority-di
           jobDefinitions = _jobDefinitions;
         });
 
-        $scope.openDialog = function () {
+        $scope.openDialog = function() {
           var dialog = $modal.open({
             resolve: {
               jobDefinitions: function() { return jobDefinitions; }
@@ -39,10 +39,10 @@ var dialogTemplate = fs.readFileSync(__dirname + '/bulk-override-job-priority-di
           });
         };
       }],
-      priority: 10
-    });
-  };
+    priority: 10
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

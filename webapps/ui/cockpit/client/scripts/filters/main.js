@@ -2,15 +2,15 @@
 
 var angular = require('camunda-commons-ui/vendor/angular'),
 
-   shorten = require('./shorten'),
-   abbreviateNumber = require('./abbreviateNumber'),
-   duration = require('./duration');
+    shorten = require('./shorten'),
+    abbreviateNumber = require('./abbreviateNumber'),
+    duration = require('./duration');
 
 
-  var filtersModule = angular.module('cam.cockpit.filters', []);
+var filtersModule = angular.module('cam.cockpit.filters', []);
 
-  filtersModule.filter('shorten', shorten);
-  filtersModule.filter('abbreviateNumber', abbreviateNumber);
-  filtersModule.filter('duration', duration);
+filtersModule.filter('shorten', shorten);
+filtersModule.filter('abbreviateNumber', abbreviateNumber);
+filtersModule.filter('duration', duration);
 
-  module.exports = filtersModule;
+module.exports = filtersModule;

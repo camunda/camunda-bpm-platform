@@ -11,21 +11,21 @@ var routeUtil = require('./../util/routeUtil');
  *
  * @module cam.cockpit.services.routeUtil
  */
-  module.exports = [function() {
+module.exports = [function() {
 
-    return {
+  return {
 
-      redirectToRuntime: function(params, currentPath, currentSearch) {
-        return routeUtil.redirectToRuntime(params, currentPath, currentSearch);
-      },
+    redirectToRuntime: function(params, currentPath, currentSearch) {
+      return routeUtil.redirectToRuntime(params, currentPath, currentSearch);
+    },
 
-      replaceLastPathFragment: function (replacement, currentPath, currentSearch, keepSearchParams) {
-        return routeUtil.replaceLastPathFragment(replacement, currentPath, currentSearch, keepSearchParams);
-      },
+    replaceLastPathFragment: function(replacement, currentPath, currentSearch, keepSearchParams) {
+      return routeUtil.replaceLastPathFragment(replacement, currentPath, currentSearch, keepSearchParams);
+    },
 
-      redirectTo: function (redirectUrl, currentSearch, keepSearchParams) {
-        return routeUtil.redirectTo(redirectUrl, currentSearch, keepSearchParams);
-      }
+    redirectTo: function(redirectUrl, currentSearch, keepSearchParams) {
+      return routeUtil.redirectTo(redirectUrl, currentSearch, keepSearchParams);
     }
+  };
 
-  }];
+}];

@@ -9,98 +9,96 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/variable.html', 'utf8');
 
-var angular = require('camunda-commons-ui/vendor/angular');
+var Directive = function() {
+  return {
+    restrict: 'EAC',
+    scope: {
+      variable: '='
+    },
+    replace: true,
+    template: template,
+    link: function(scope, element) {
 
-  var Directive = ['$compile', function ($compile) {
-    return {
-      restrict: 'EAC',
-      scope: {
-        variable: '='
-      },
-      replace: true,
-      template: template,
-      link: function(scope, element, attrs) {
+      var inPlaceEdit = (element.attr('inline-edit') !== undefined),
+          oldVariableValue,
+          oldVariableValueBoolean = true;
 
-        var inPlaceEdit = (element.attr('inline-edit') !== undefined),
-            oldVariableValue,
-            oldVariableValueBoolean = true;
+      scope.autofocus = !!(element.attr('autofocus') !== undefined);
 
-        scope.autofocus = !!(element.attr('autofocus') !== undefined);
+      scope.isBoolean = function(variable) {
+        return variable.type.toLowerCase() === 'boolean';
+      };
 
-        var isBoolean = scope.isBoolean = function (variable) {
-          return variable.type.toLowerCase() === 'boolean';
-        };
+      scope.isInteger = function(variable) {
+        return variable.type.toLowerCase() === 'integer';
+      };
 
-        var isInteger = scope.isInteger = function (variable) {
-          return variable.type.toLowerCase() === 'integer';
-        };
+      scope.isShort = function(variable) {
+        return variable.type.toLowerCase() === 'short';
+      };
 
-        var isShort = scope.isShort = function (variable) {
-          return variable.type.toLowerCase() === 'short';
-        };
+      scope.isLong = function(variable) {
+        return variable.type.toLowerCase() === 'long';
+      };
 
-        var isLong = scope.isLong = function (variable) {
-          return variable.type.toLowerCase() === 'long';
-        };
+      scope.isDouble = function(variable) {
+        return variable.type.toLowerCase() === 'double';
+      };
 
-        var isDouble = scope.isDouble = function (variable) {
-          return variable.type.toLowerCase() === 'double';
-        };
+      scope.isFloat = function(variable) {
+        return variable.type.toLowerCase() === 'float';
+      };
 
-        var isFloat = scope.isFloat = function (variable) {
-          return variable.type.toLowerCase() === 'float';
-        };
+      scope.isString = function(variable) {
+        return variable.type.toLowerCase() === 'string';
+      };
 
-        var isString = scope.isString = function (variable) {
-          return variable.type.toLowerCase() === 'string';
-        };
+      scope.isDate = function(variable) {
+        return variable.type.toLowerCase() === 'date';
+      };
 
-        var isDate = scope.isDate = function (variable) {
-          return variable.type.toLowerCase() === 'date';
-        };
+      scope.isNull = function(variable) {
+        return variable.type.toLowerCase() === 'null';
+      };
 
-        var isNull = scope.isNull = function (variable) {
-          return variable.type.toLowerCase() === 'null';
-        };
+      scope.isObject = function(variable) {
+        return variable.type.toLowerCase() === 'object';
+      };
 
-        var isObject = scope.isObject = function (variable) {
-          return variable.type.toLowerCase() === 'object';
-        };
+      scope.isInPlaceEdit = function() {
+        return inPlaceEdit;
+      };
 
-        scope.isInPlaceEdit = function () {
-          return inPlaceEdit;
-        };
+      scope.$watch('variable.type', function(newValue, oldValue) {
+        if (oldValue === newValue) {
+          return;
+        }
 
-        scope.$watch('variable.type', function (newValue, oldValue) {
-          if (oldValue === newValue) {
-            return;
-          }
+        if (newValue.toLowerCase() === 'boolean') {
+          oldVariableValue = scope.variable.value;
 
-          if (newValue.toLowerCase() === 'boolean') {
-            oldVariableValue = scope.variable.value;
+          scope.variable.value = oldVariableValueBoolean;
+          return;
+        }
 
-            scope.variable.value = oldVariableValueBoolean;
-            return;
-          }
+        if (oldValue.toLowerCase() === 'boolean') {
+          oldVariableValueBoolean = scope.variable.value;
 
-          if (oldValue.toLowerCase() === 'boolean') {
-            oldVariableValueBoolean = scope.variable.value;
+          scope.variable.value = oldVariableValue;
+          return;
+        }
 
-            scope.variable.value = oldVariableValue;
-            return;
-          }
+        if(newValue.toLowerCase() === 'null') {
+          scope.variable.value = null;
+        }
 
-          if(newValue.toLowerCase() === 'null') {
-            scope.variable.value = null;
-          }
+        if(newValue.toLowerCase() === 'object') {
+          scope.variable.valueInfo = scope.variable.valueInfo || {};
+        }
+      });
 
-          if(newValue.toLowerCase() === 'object') {
-            scope.variable.valueInfo = scope.variable.valueInfo || {};
-          }
-        });
+    }
+  };
+};
 
-      }
-    };
-  }];
-
-  module.exports = Directive;
+module.exports = Directive;

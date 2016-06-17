@@ -17,7 +17,7 @@
     'configuration',
     '$window',
     '$scope',
-  function(
+    function(
     camAPI,
     configuration,
     $window,
@@ -25,38 +25,38 @@
   ) {
 
     // create a new tasklistApp
-    $scope.tasklistApp = new TasklistApp();
-    $scope.appVendor = configuration.getAppVendor();
-    $scope.appName = configuration.getAppName();
+      $scope.tasklistApp = new TasklistApp();
+      $scope.appVendor = configuration.getAppVendor();
+      $scope.appName = configuration.getAppName();
 
     // doing so, there's no `{{ appVendor }} {{ appName }}`
     // visible in the title tag as the app loads
-    var htmlTitle = document.querySelector('head > title');
-    htmlTitle.textContent = $scope.appVendor + ' ' + $scope.appName;
+      var htmlTitle = document.querySelector('head > title');
+      htmlTitle.textContent = $scope.appVendor + ' ' + $scope.appName;
 
-    function getUserProfile(auth) {
-      if (!auth || !auth.name) {
-        $scope.userFullName = null;
-        return;
+      function getUserProfile(auth) {
+        if (!auth || !auth.name) {
+          $scope.userFullName = null;
+          return;
+        }
+
+        var userService = camAPI.resource('user');
+        userService.profile(auth.name, function(err, info) {
+          if (err) {
+            $scope.userFullName = null;
+            throw err;
+          }
+          $scope.userFullName = info.firstName + ' ' + info.lastName;
+        });
       }
 
-      var userService = camAPI.resource('user');
-      userService.profile(auth.name, function (err, info) {
-        if (err) {
-          $scope.userFullName = null;
-          throw err;
-        }
-        $scope.userFullName = info.firstName + ' ' + info.lastName;
+      $scope.$on('authentication.changed', function(ev, auth) {
+        getUserProfile(auth);
       });
-    }
 
-    $scope.$on('authentication.changed', function (ev, auth) {
-      getUserProfile(auth);
-    });
+      getUserProfile($scope.authentication);
 
-    getUserProfile($scope.authentication);
-
-    $scope.$on('authentication.logout.success', function () {
-      $window.location.reload();
-    });
-  }];
+      $scope.$on('authentication.logout.success', function() {
+        $window.location.reload();
+      });
+    }];

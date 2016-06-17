@@ -4,53 +4,36 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/cam-tasklist-task.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular');
-var jquery = require('jquery');
 
-  var TaskErrorManager = (function() {
+module.exports = [ function() {
 
-    function TaskErrorManager() {
+  return {
+    restrict: 'A',
+    scope: {
+      tasklistData: '='
+    },
 
-      this.errorProvider = null;
+    template: template,
 
-    }
-
-    return TaskErrorManager;
-
-  })();
-
-  module.exports = [ function() {
-
-    return {
-      restrict: 'A',
-      scope: {
-        tasklistData: '='
-      },
-
-      template: template,
-
-      controller : [
-        '$scope',
-        '$q',
-        '$location',
-        '$translate',
-        'Notifications',
-        'camAPI',
-        'Views',
-        'search',
+    controller : [
+      '$scope',
+      '$q',
+      '$location',
+      '$translate',
+      'Notifications',
+      'Views',
+      'search',
       function(
         $scope,
         $q,
         $location,
         $translate,
         Notifications,
-        camAPI,
         Views,
         search
       ) {
 
         // setup /////////////////////////////////////////////////////////////////////
-
-        var Task = camAPI.resource('task');
 
         var taskData = $scope.taskData = $scope.tasklistData.newChild($scope);
 
@@ -67,7 +50,7 @@ var jquery = require('jquery');
           });
         }
 
-        $scope.errorHandler = function (status, err) {
+        $scope.errorHandler = function(status, err) {
           var _status = enhanceErrorMessage(err.message);
 
           if(_status === 'TASK_NOT_EXIST' || _status === 'INSTANCE_SUSPENDED') {
@@ -125,7 +108,7 @@ var jquery = require('jquery');
           taskData.changed('taskList');
         }
 
-        $scope.$watch('taskState.$error', function (err) {
+        $scope.$watch('taskState.$error', function(err) {
           if (err) {
             var src = enhanceErrorMessage(err.message);
             errorNotification(src, err);
@@ -177,14 +160,14 @@ var jquery = require('jquery');
           return !!assignee && assignee.id === $scope.$root.authentication.name;
         }]);
 
-        taskData.provide('processDefinition', ['task', function (task) {
+        taskData.provide('processDefinition', ['task', function(task) {
           if (!task || !task._embedded || !task._embedded.processDefinition) {
             return null;
           }
           return task._embedded.processDefinition[0];
         }]);
 
-        taskData.provide('caseDefinition', ['task', function (task) {
+        taskData.provide('caseDefinition', ['task', function(task) {
           if (!task || !task._embedded || !task._embedded.caseDefinition) {
             return null;
           }
@@ -200,7 +183,7 @@ var jquery = require('jquery');
           $scope.task = task;
         });
 
-        taskData.observe('isAssignee', function (isAssignee) {
+        taskData.observe('isAssignee', function(isAssignee) {
           $scope.isAssignee = isAssignee;
         });
 
@@ -248,5 +231,5 @@ var jquery = require('jquery');
         });
 
       }]
-    };
-  }];
+  };
+}];

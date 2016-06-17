@@ -1,6 +1,6 @@
   'use strict';
 
-  module.exports = function () {
+  module.exports = function() {
     return {
       restrict: 'EAC',
       link: function(scope, element, attrs) {

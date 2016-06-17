@@ -5,17 +5,17 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/cam-cockpit-delete-deployment-plugin.html', 'utf8');
 var modalTemplate = fs.readFileSync(__dirname + '/modals/cam-cockpit-delete-deployment-modal.html', 'utf8');
 
-  var Controller = [
-   '$scope',
-   '$modal',
-  function (
+var Controller = [
+  '$scope',
+  '$modal',
+  function(
     $scope,
     $modal
   ) {
 
     var deploymentData = $scope.deploymentData;
 
-    $scope.deleteDeployment = function ($event, deployment) {
+    $scope.deleteDeployment = function($event, deployment) {
       $event.stopPropagation();
 
       $modal.open({
@@ -33,16 +33,16 @@ var modalTemplate = fs.readFileSync(__dirname + '/modals/cam-cockpit-delete-depl
 
   }];
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.repository.deployment.action', {
-      id: 'delete-deployment',
-      template: template,
-      controller: Controller,
-      priority: 1000
-    });
-  };
+  ViewsProvider.registerDefaultView('cockpit.repository.deployment.action', {
+    id: 'delete-deployment',
+    template: template,
+    controller: Controller,
+    priority: 1000
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

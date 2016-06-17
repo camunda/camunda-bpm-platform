@@ -8,17 +8,19 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     routeUtil = require('../../../../common/scripts/util/routeUtil'),
     camCommons = require('camunda-commons-ui/lib');
 
-  var ngModule = angular.module('cam.cockpit.pages.processInstance', [camCommons.name, 'dataDepend']);
+var ngModule = angular.module('cam.cockpit.pages.processInstance', [camCommons.name, 'dataDepend']);
 
-  var Controller = [
-          '$scope', '$filter', '$rootScope', '$location', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Data', 'Transform', 'processInstance', 'dataDepend', 'page', 'breadcrumbTrails',
+var Controller = [
+  '$scope', '$filter', '$rootScope', '$location', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Data', 'Transform', 'processInstance', 'dataDepend', 'page', 'breadcrumbTrails',
   function($scope,   $filter,   $rootScope,   $location,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   IncidentResource,   Views,   Data,   Transform,   processInstance,   dataDepend,   page,   breadcrumbTrails) {
 
     $scope.hasMigrationPlugin = false;
     try {
       $scope.hasMigrationPlugin = !!angular.module('cockpit.plugin.migration');
     }
-    catch (e) {}
+    catch (e) {
+      // do nothing
+    }
 
     $scope.processInstance = processInstance;
 
@@ -30,7 +32,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     // utilities ///////////////////////
 
     $scope.hovered = null;
-    $scope.hoverTitle = function (id) {
+    $scope.hoverTitle = function(id) {
       $scope.hovered = id || null;
     };
 
@@ -103,7 +105,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
           changed,
           completedFilter;
 
-      angular.forEach(activityInstanceIds, function (instanceId) {
+      angular.forEach(activityInstanceIds, function(instanceId) {
         var instance = instanceIdToInstanceMap[instanceId] || {},
             activityId = instance.activityId || instance.targetActivityId,
             idx = activityIds.indexOf(activityId);
@@ -114,14 +116,14 @@ var angular = require('camunda-commons-ui/vendor/angular'),
         }
       });
 
-      angular.forEach(activityIds, function (activityId) {
+      angular.forEach(activityIds, function(activityId) {
         var instanceList = activityIdToInstancesMap[activityId],
             foundOne = false,
             instanceIds = [];
 
         if (instanceList) {
 
-          for (var i = 0, instance; !!(instance = instanceList[i]); i++) {
+          for (var i = 0, instance; (instance = instanceList[i]); i++) {
             var idx = activityInstanceIds.indexOf(instance.id);
 
             if (idx !== -1) {
@@ -203,7 +205,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     processData.provide('filter', parseFilterFromUri());
 
     // processDefinition
-    processData.provide('processDefinition', ['processInstance', function (processInstance) {
+    processData.provide('processDefinition', ['processInstance', function(processInstance) {
       return ProcessDefinitionResource.get({ id: processInstance.definitionId }).$promise;
     }]);
 
@@ -225,88 +227,88 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     }]);
 
     // activityInstances
-    processData.provide('activityInstances', ['processInstance', function (processInstance) {
+    processData.provide('activityInstances', ['processInstance', function(processInstance) {
       return ProcessInstanceResource.activityInstances({ id: processInstance.id }).$promise;
     }]);
 
     // activityInstanceTree, activityIdToInstancesMap, instanceIdToInstanceMap
     processData.provide([ 'activityInstanceTree', 'activityIdToInstancesMap', 'instanceIdToInstanceMap' ], [
-             'activityInstances', 'processDefinition', 'bpmnElements',
-    function (activityInstances,   processDefinition,   bpmnElements) {
-      var activityIdToInstancesMap = {},
-          instanceIdToInstanceMap = {},
-          model = bpmnElements[processDefinition.key];
+      'activityInstances', 'processDefinition', 'bpmnElements',
+      function(activityInstances,   processDefinition,   bpmnElements) {
+        var activityIdToInstancesMap = {},
+            instanceIdToInstanceMap = {},
+            model = bpmnElements[processDefinition.key];
 
-      function getActivityName(bpmnElement) {
-        var name = bpmnElement.name;
-        if (!name) {
-          var shortenFilter = $filter('shorten');
-          name = bpmnElement.$type.substr(5) + ' (' + shortenFilter(bpmnElement.id, 8) + ')';
+        function getActivityName(bpmnElement) {
+          var name = bpmnElement.name;
+          if (!name) {
+            var shortenFilter = $filter('shorten');
+            name = bpmnElement.$type.substr(5) + ' (' + shortenFilter(bpmnElement.id, 8) + ')';
+          }
+
+          return name;
         }
 
-        return name;
-      }
-
-      function decorateActivityInstanceTree(instance) {
-        var children = instance.childActivityInstances;
+        function decorateActivityInstanceTree(instance) {
+          var children = instance.childActivityInstances;
 
 
-        if (children && children.length > 0) {
+          if (children && children.length > 0) {
 
-          for (var i = 0, child; !!(child = children[i]); i++) {
-            var activityId = child.activityId,
-                bpmnElement = bpmnElements[activityId],
-                instances = activityIdToInstancesMap[activityId] || [];
+            for (var i = 0, child; (child = children[i]); i++) {
+              var activityId = child.activityId,
+                  bpmnElement = bpmnElements[activityId],
+                  instances = activityIdToInstancesMap[activityId] || [];
 
-            if(bpmnElement) {
-              child.name = getActivityName(bpmnElement);
-            } else {
-              child.name = activityId;
+              if(bpmnElement) {
+                child.name = getActivityName(bpmnElement);
+              } else {
+                child.name = activityId;
+              }
+              child.isTransitionInstance = false;
+              activityIdToInstancesMap[activityId] = instances;
+              if(!instanceIdToInstanceMap[child.id]) {
+                instanceIdToInstanceMap[child.id] = child;
+              }
+              instances.push(child);
+
+              decorateActivityInstanceTree(child);
             }
-            child.isTransitionInstance = false;
-            activityIdToInstancesMap[activityId] = instances;
-            if(!instanceIdToInstanceMap[child.id]) {
-              instanceIdToInstanceMap[child.id] = child;
-            }
-            instances.push(child);
+          }
 
-            decorateActivityInstanceTree(child);
+          var transitions = instance.childTransitionInstances;
+          if (transitions && transitions.length > 0) {
+
+            for (var t = 0, transition; (transition = transitions[t]); t++) {
+              var targetActivityId = transition.targetActivityId,
+                  transitionBpmnElement = bpmnElements[targetActivityId],
+                  transitionInstances = activityIdToInstancesMap[targetActivityId] || [];
+
+              if(transitionBpmnElement) {
+                transition.name = getActivityName(transitionBpmnElement);
+              } else {
+                transition.name = targetActivityId;
+              }
+              transition.isTransitionInstance = true;
+              activityIdToInstancesMap[targetActivityId] = transitionInstances;
+              if(!instanceIdToInstanceMap[transition.id]) {
+                instanceIdToInstanceMap[transition.id] = transition;
+              }
+              transitionInstances.push(transition);
+            }
           }
         }
 
-        var transitions = instance.childTransitionInstances;
-        if (transitions && transitions.length > 0) {
-
-          for (var t = 0, transition; !!(transition = transitions[t]); t++) {
-            var targetActivityId = transition.targetActivityId,
-                transitionBpmnElement = bpmnElements[targetActivityId],
-                transitionInstances = activityIdToInstancesMap[targetActivityId] || [];
-
-            if(transitionBpmnElement) {
-              transition.name = getActivityName(transitionBpmnElement);
-            } else {
-              transition.name = targetActivityId;
-            }
-            transition.isTransitionInstance = true;
-            activityIdToInstancesMap[targetActivityId] = transitionInstances;
-            if(!instanceIdToInstanceMap[transition.id]) {
-              instanceIdToInstanceMap[transition.id] = transition;
-            }
-            transitionInstances.push(transition);
-          }
-        }
-      }
-
-      activityInstances.name = getActivityName(model);
+        activityInstances.name = getActivityName(model);
       // add initially the root to the map
-      instanceIdToInstanceMap[activityInstances.id] = activityInstances;
+        instanceIdToInstanceMap[activityInstances.id] = activityInstances;
 
-      decorateActivityInstanceTree(activityInstances);
+        decorateActivityInstanceTree(activityInstances);
 
-      return [ activityInstances, activityIdToInstancesMap, instanceIdToInstanceMap ];
-    }]);
+        return [ activityInstances, activityIdToInstancesMap, instanceIdToInstanceMap ];
+      }]);
 
-    processData.provide('executionIdToInstanceMap', ['instanceIdToInstanceMap', function (instanceIdToInstanceMap) {
+    processData.provide('executionIdToInstanceMap', ['instanceIdToInstanceMap', function(instanceIdToInstanceMap) {
       var executionIdToInstanceMap = {};
 
       for (var key in instanceIdToInstanceMap) {
@@ -315,7 +317,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
             executionId = instance.executionId;
 
         if (executionIds) {
-          for (var i = 0, execId; !!(execId = executionIds[i]); i++) {
+          for (var i = 0, execId; (execId = executionIds[i]); i++) {
             executionIdToInstanceMap[execId] = instance;
           }
         }
@@ -329,15 +331,15 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     }]);
 
     // incidents
-    processData.provide('incidents', ['processInstance', function (processInstance) {
+    processData.provide('incidents', ['processInstance', function(processInstance) {
       return IncidentResource.query({ processInstanceId : processInstance.id }).$promise;
     }]);
 
     // incidentStatistics
-    processData.provide('activityIdToIncidentsMap', ['incidents', function (incidents) {
+    processData.provide('activityIdToIncidentsMap', ['incidents', function(incidents) {
       var activityIdToIncidentsMap = {};
 
-      for (var i = 0, incident; !!(incident = incidents[i]); i++) {
+      for (var i = 0, incident; (incident = incidents[i]); i++) {
         var activity = activityIdToIncidentsMap[incident.activityId];
         if (!activity) {
           activity = [];
@@ -351,15 +353,15 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
     // processDiagram
     processData.provide('processDiagram', [
-             'bpmnDefinition', 'bpmnElements',
-    function (bpmnDefinition,   bpmnElements) {
-      var processDiagram = {};
+      'bpmnDefinition', 'bpmnElements',
+      function(bpmnDefinition,   bpmnElements) {
+        var processDiagram = {};
 
-      processDiagram.bpmnDefinition = bpmnDefinition;
-      processDiagram.bpmnElements = bpmnElements;
+        processDiagram.bpmnDefinition = bpmnDefinition;
+        processDiagram.bpmnElements = bpmnElements;
 
-      return processDiagram;
-    }]);
+        return processDiagram;
+      }]);
 
     processData.provide('latestDefinition', ['processDefinition', function(definition) {
       var queryParams = {
@@ -384,11 +386,11 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
     processData.observe([ 'filter', 'instanceIdToInstanceMap', 'activityIdToInstancesMap'], autoCompleteFilter);
 
-    $scope.processDefinition = processData.observe('processDefinition', function (processDefinition) {
+    $scope.processDefinition = processData.observe('processDefinition', function(processDefinition) {
       $scope.processDefinition = processDefinition;
     });
 
-    $scope.latestProcessDefinition = processData.observe('latestDefinition', function (processDefinition) {
+    $scope.latestProcessDefinition = processData.observe('latestDefinition', function(processDefinition) {
       $scope.latestProcessDefinition = processDefinition[0];
     });
 
@@ -437,7 +439,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
       return routeUtil.redirectTo(path, searches, [ 'deployment', 'resourceName', 'deploymentsQuery' ]);
     };
 
-    processData.provide('superProcessInstanceCount', ['processInstance', function (processInstance) {
+    processData.provide('superProcessInstanceCount', ['processInstance', function(processInstance) {
       return ProcessInstanceResource.count({ subProcessInstance : processInstance.id }).$promise;
     }]);
 
@@ -458,8 +460,8 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     $rootScope.showBreadcrumbs = true;
 
     processData.observe([
-             'processDefinition', 'processInstance', 'superProcessInstanceCount'],
-    function (processDefinition,   processInstance,   superProcessInstanceCount) {
+      'processDefinition', 'processInstance', 'superProcessInstanceCount'],
+    function(processDefinition,   processInstance,   superProcessInstanceCount) {
       var crumbs = [
         {
           label: 'Processes',
@@ -489,9 +491,9 @@ var angular = require('camunda-commons-ui/vendor/angular'),
         href: '#/process-instance/'+ (processInstance.id) +'/runtime',
         processInstance: processInstance,
 
-        choices: plugins.sort(function (a, b) {
+        choices: plugins.sort(function(a, b) {
           return a.priority < b.priority ? -1 : (a.priority > b.priority ? 1 : 0);
-        }).map(function (plugin) {
+        }).map(function(plugin) {
           return {
             active: plugin.id === 'runtime',
             label: plugin.label,
@@ -510,22 +512,22 @@ var angular = require('camunda-commons-ui/vendor/angular'),
       ].join(' | '));
     });
 
-    $scope.activityInstanceTree = processData.observe('activityInstanceTree', function (activityInstanceTree) {
+    $scope.activityInstanceTree = processData.observe('activityInstanceTree', function(activityInstanceTree) {
       $scope.activityInstanceTree = activityInstanceTree;
     });
 
-    $scope.processDiagram = processData.observe('processDiagram', function (processDiagram) {
+    $scope.processDiagram = processData.observe('processDiagram', function(processDiagram) {
       $scope.processDiagram = processDiagram;
     });
 
-    processData.observe([ 'instanceIdToInstanceMap', 'activityIdToInstancesMap' ], function (instanceIdToInstanceMap, activityIdToInstancesMap) {
+    processData.observe([ 'instanceIdToInstanceMap', 'activityIdToInstancesMap' ], function(instanceIdToInstanceMap, activityIdToInstancesMap) {
       $scope.instanceIdToInstanceMap = instanceIdToInstanceMap;
       $scope.activityIdToInstancesMap = activityIdToInstancesMap;
     });
 
     // /////// End of usage of definied process data
 
-    $scope.handleBpmnElementSelection = function (id, $event) {
+    $scope.handleBpmnElementSelection = function(id, $event) {
 
       if (!id) {
         processData.set('filter', {});
@@ -554,7 +556,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
         }
 
         activityInstanceIds = [];
-        angular.forEach(instanceList, function (instance) {
+        angular.forEach(instanceList, function(instance) {
           activityInstanceIds.push(instance.id);
         });
       } else
@@ -566,7 +568,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
           if(multiInstance) {
             activityIds.push( id+'#multiInstanceBody' );
           }
-          angular.forEach(instanceList, function (instance) {
+          angular.forEach(instanceList, function(instance) {
             activityInstanceIds.push(instance.id);
           });
         } else
@@ -577,7 +579,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
             activityIds.splice( activityIds.indexOf(id+'#multiInstanceBody' ), 1);
           }
 
-          angular.forEach(instanceList, function (instance) {
+          angular.forEach(instanceList, function(instance) {
             var instanceId = instance.id,
                 index = activityInstanceIds.indexOf(instanceId);
 
@@ -597,7 +599,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
       processData.set('filter', newFilter);
     };
 
-    $scope.handleActivityInstanceSelection = function (id, activityId, $event) {
+    $scope.handleActivityInstanceSelection = function(id, activityId, $event) {
 
       if (!id) {
         processData.set('filter', {});
@@ -632,7 +634,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
           var foundAnotherActivityInstance = false;
           if (instanceList) {
-            for (var i = 0, instance; !!(instance = instanceList[i]); i++) {
+            for (var i = 0, instance; (instance = instanceList[i]); i++) {
               var instanceId = instance.id,
                   instanceIndex = activityInstanceIds.indexOf(instanceId);
 
@@ -658,9 +660,9 @@ var angular = require('camunda-commons-ui/vendor/angular'),
       processData.set('filter', newFilter);
     };
 
-    $scope.orderChildrenBy = function () {
+    $scope.orderChildrenBy = function() {
 
-      return function (elem) {
+      return function(elem) {
         var id = elem.id,
             idx = id.indexOf(':');
 
@@ -669,7 +671,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
     };
 
-    $scope.$on('$routeChangeStart', function () {
+    $scope.$on('$routeChangeStart', function() {
       page.breadcrumbsClear();
     });
 
@@ -696,7 +698,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
     for(var i = 0; i < instancePlugins.length; i++) {
       if(typeof instancePlugins[i].initialize === 'function') {
-         instancePlugins[i].initialize(initData);
+        instancePlugins[i].initialize(initData);
       }
     }
 
@@ -752,49 +754,49 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
 
 
-  ngModule
+ngModule
     .controller('ProcessInstanceFilterController', [
       '$scope',
-    function ($scope) {
-      var processData = $scope.processData.newChild($scope),
-          filterData;
+      function($scope) {
+        var processData = $scope.processData.newChild($scope),
+            filterData;
 
-      processData.provide('filterData', [ 'filter', function(filter) {
+        processData.provide('filterData', [ 'filter', function(filter) {
 
-        if (!filterData || filterData.filter != filter) {
-          var activityIds = filter.activityIds || [],
-              activityInstanceIds = filter.activityInstanceIds || [];
+          if (!filterData || filterData.filter != filter) {
+            var activityIds = filter.activityIds || [],
+                activityInstanceIds = filter.activityInstanceIds || [];
 
-          return {
-            filter: filter,
-            activityCount: activityIds.length || 0,
-            activityInstanceCount: activityInstanceIds.length || 0
-          };
-        } else {
-          return filterData;
-        }
-      }]);
+            return {
+              filter: filter,
+              activityCount: activityIds.length || 0,
+              activityInstanceCount: activityInstanceIds.length || 0
+            };
+          } else {
+            return filterData;
+          }
+        }]);
 
-      processData.observe([ 'filterData' ], function(_filterData) {
-        $scope.filterData = filterData = _filterData;
-      });
+        processData.observe([ 'filterData' ], function(_filterData) {
+          $scope.filterData = filterData = _filterData;
+        });
 
-      $scope.clearSelection = function () {
+        $scope.clearSelection = function() {
         // update cached filter
-        filterData = {
-          activityCount: 0,
-          activityInstanceCount: 0,
-          filter: {}
+          filterData = {
+            activityCount: 0,
+            activityInstanceCount: 0,
+            filter: {}
+          };
+
+          processData.set('filter', filterData.filter);
         };
 
-        processData.set('filter', filterData.filter);
-      };
+        $scope.sidebarTab = 'info';
+      }]);
 
-      $scope.sidebarTab = 'info';
-  }]);
-
-  var RouteConfig = [
-          '$routeProvider',
+var RouteConfig = [
+  '$routeProvider',
   function($routeProvider) {
 
     $routeProvider.when('/process-instance/:id', {
@@ -807,20 +809,20 @@ var angular = require('camunda-commons-ui/vendor/angular'),
       authentication: 'required',
       resolve: {
         processInstance: [
-                'ResourceResolver', 'ProcessInstanceResource', 'Uri', 'Views', 'Notifications', '$route', '$http', '$location',
-        function(ResourceResolver,   ProcessInstanceResource,   Uri,   Views,   Notifications,   $route,   $http,   $location) {
+          'ResourceResolver', 'ProcessInstanceResource', 'Uri', 'Views', 'Notifications', '$route', '$http', '$location',
+          function(ResourceResolver,   ProcessInstanceResource,   Uri,   Views,   Notifications,   $route,   $http,   $location) {
 
-          return ResourceResolver.getByRouteParam('id', {
-            name: 'running process instance',
+            return ResourceResolver.getByRouteParam('id', {
+              name: 'running process instance',
 
-            resolve: function(id) {
-              return ProcessInstanceResource.get({ id : id });
-            },
+              resolve: function(id) {
+                return ProcessInstanceResource.get({ id : id });
+              },
 
-            redirectTo: function (error) {
-              var id = $route.current.params['id'];
+              redirectTo: function() {
+                var id = $route.current.params['id'];
 
-              $http.get(Uri.appUri('engine://engine/:engine/history/process-instance/') + id)
+                $http.get(Uri.appUri('engine://engine/:engine/history/process-instance/') + id)
                 .success (function(result) {
 
                   var path;
@@ -835,7 +837,6 @@ var angular = require('camunda-commons-ui/vendor/angular'),
                   });
 
                   if (historyProvider) {
-                    var currentPath = $location.path();
                     // keep search params
                     search = $location.search();
                     path = '/process-instance/' + id + '/history';
@@ -861,7 +862,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
                   });
 
                 })
-                .error (function(error) {
+                .error (function() {
 
                   $location.path('/dashboard');
                   $location.search({});
@@ -874,26 +875,26 @@ var angular = require('camunda-commons-ui/vendor/angular'),
                     exclusive: [ 'http' ]
                   });
                 });
-            }
-          });
-        }]
+              }
+            });
+          }]
       },
       reloadOnSearch: false
     });
   }];
 
-  var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
-    ViewsProvider.registerDefaultView('cockpit.processInstance.view', {
-      id: 'runtime',
-      priority: 20,
-      label: 'Runtime',
-      keepSearchParams: [ 'viewbox' ]
-    });
-  }];
+var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
+  ViewsProvider.registerDefaultView('cockpit.processInstance.view', {
+    id: 'runtime',
+    priority: 20,
+    label: 'Runtime',
+    keepSearchParams: [ 'viewbox' ]
+  });
+}];
 
-  ngModule
+ngModule
     .config(RouteConfig)
     .config(ViewConfig)
   ;
 
-  module.exports = ngModule;
+module.exports = ngModule;

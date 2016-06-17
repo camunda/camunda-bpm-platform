@@ -1,6 +1,6 @@
-__define('camunda-admin-bootstrap', [
+window.__define('camunda-admin-bootstrap', [
   './scripts/camunda-admin-ui'
-], function () {
+], function() {
   'use strict';
 
   var camundaAdminUi = window.CamundaAdminUi;
@@ -69,7 +69,7 @@ __define('camunda-admin-bootstrap', [
           'urlArgs',
           'scriptType'
           // 'skipDataMain' // not relevant either
-        ].forEach(function (prop) {
+        ].forEach(function(prop) {
           if (custom[prop]) {
             conf[prop] = custom[prop];
           }
@@ -117,4 +117,4 @@ __define('camunda-admin-bootstrap', [
 
 });
 
-requirejs(['camunda-admin-bootstrap'], function(){});
+requirejs(['camunda-admin-bootstrap'], function() {});

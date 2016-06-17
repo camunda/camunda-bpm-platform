@@ -3,8 +3,8 @@
 var angular = require('angular'),
     jobDefinitionData = require('./processDefinition/jobDefinitionData');
 
-  var ngModule = angular.module('cockpit.plugin.jobDefinition.data', []);
+var ngModule = angular.module('cockpit.plugin.jobDefinition.data', []);
 
-  ngModule.config(jobDefinitionData);
+ngModule.config(jobDefinitionData);
 
-  module.exports = ngModule;
+module.exports = ngModule;

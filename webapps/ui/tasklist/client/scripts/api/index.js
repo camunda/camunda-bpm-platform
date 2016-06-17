@@ -1,32 +1,32 @@
 'use strict';
 var angular = require('camunda-commons-ui/vendor/angular'),
-  CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular');
+    CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular');
 
-  var apiModule = angular.module('cam.tasklist.client', []);
+var apiModule = angular.module('cam.tasklist.client', []);
 
-  apiModule.value('HttpClient', CamSDK.Client);
+apiModule.value('HttpClient', CamSDK.Client);
 
-  apiModule.value('CamForm', CamSDK.Form);
+apiModule.value('CamForm', CamSDK.Form);
 
-  apiModule.run([ '$rootScope', 'Notifications', '$translate', function($rootScope, Notifications, $translate) {
-    $rootScope.$on('authentication.login.required', function() {
-      $translate([
-        'SESSION_EXPIRED',
-        'SESSION_EXPIRED_MESSAGE'
-      ]).then(function(translations) {
-        Notifications.addError({
-          status: translations.SESSION_EXPIRED,
-          message: translations.SESSION_EXPIRED_MESSAGE,
-          exclusive: true
-        });
+apiModule.run([ '$rootScope', 'Notifications', '$translate', function($rootScope, Notifications, $translate) {
+  $rootScope.$on('authentication.login.required', function() {
+    $translate([
+      'SESSION_EXPIRED',
+      'SESSION_EXPIRED_MESSAGE'
+    ]).then(function(translations) {
+      Notifications.addError({
+        status: translations.SESSION_EXPIRED,
+        message: translations.SESSION_EXPIRED_MESSAGE,
+        exclusive: true
       });
     });
-  }]);
+  });
+}]);
 
-  apiModule.factory('camAPI', [
-          'camAPIHttpClient',
-          '$window',
-          'Uri',
+apiModule.factory('camAPI', [
+  'camAPIHttpClient',
+  '$window',
+  'Uri',
   function(camAPIHttpClient, $window, Uri) {
 
     var conf = {
@@ -43,4 +43,4 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     return new CamSDK.Client(conf);
   }]);
 
-  module.exports = apiModule;
+module.exports = apiModule;

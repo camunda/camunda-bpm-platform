@@ -1,6 +1,5 @@
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular');
 var Ctrl = require('../components/batch');
 var events = require('../components/events');
 
@@ -15,7 +14,7 @@ module.exports = [
   'camAPI',
   '$location',
   '$modal',
-function(
+  function(
   $scope,
   page,
   camAPI,
@@ -23,32 +22,32 @@ function(
   $modal
 ) {
 
-  $scope.$on('$destroy', function() {
-    events.removeAllListeners();
-    $scope.ctrl.stopLoadingPeriodically();
-  });
-
-  $scope.$watch(function() {
-    return ($location.search() || {});
-  }, function(newValue) {
-    if(newValue.details && newValue.type) {
-      $scope.ctrl.loadDetails(newValue.details, newValue.type);
-    }
-  });
-
-  events.on('details:switchToHistory', function() {
-    $location.search('type', 'history');
-  });
-
-  events.on('deleteModal:open', function(deleteModal) {
-    deleteModal.instance = $modal.open({
-      template: deleteModalTemplate,
-      controller: deleteModalCtrl,
+    $scope.$on('$destroy', function() {
+      events.removeAllListeners();
+      $scope.ctrl.stopLoadingPeriodically();
     });
-  });
 
-  require('../components/breadcrumbs')(page, $scope.$root);
+    $scope.$watch(function() {
+      return ($location.search() || {});
+    }, function(newValue) {
+      if(newValue.details && newValue.type) {
+        $scope.ctrl.loadDetails(newValue.details, newValue.type);
+      }
+    });
 
-  $scope.ctrl = new Ctrl(camAPI);
-  $scope.ctrl.loadPeriodically(5000);
-}];
+    events.on('details:switchToHistory', function() {
+      $location.search('type', 'history');
+    });
+
+    events.on('deleteModal:open', function(deleteModal) {
+      deleteModal.instance = $modal.open({
+        template: deleteModalTemplate,
+        controller: deleteModalCtrl
+      });
+    });
+
+    require('../components/breadcrumbs')(page, $scope.$root);
+
+    $scope.ctrl = new Ctrl(camAPI);
+    $scope.ctrl.loadPeriodically(5000);
+  }];

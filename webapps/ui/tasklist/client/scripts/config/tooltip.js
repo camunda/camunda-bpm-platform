@@ -2,11 +2,11 @@
 
   module.exports = [
     '$tooltipProvider',
-  function(
+    function(
     $tooltipProvider
   ) {
-    $tooltipProvider.options({
-      appendToBody: true,
-      popupDelay: 500
-    });
-  }];
+      $tooltipProvider.options({
+        appendToBody: true,
+        popupDelay: 500
+      });
+    }];

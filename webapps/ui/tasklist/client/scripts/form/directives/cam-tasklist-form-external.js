@@ -3,10 +3,8 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-tasklist-form-external.html', 'utf8');
 
-var angular = require('camunda-commons-ui/vendor/angular');
-
-  module.exports = [
-    '$location',
+module.exports = [
+  '$location',
   function($location) {
 
     return {
@@ -26,9 +24,9 @@ var angular = require('camunda-commons-ui/vendor/angular');
         $scope.externalFormUrl  = null;
         $scope.EXTERNAL_FORM_NOTE = null;
 
-        $scope.$watch(function () {
+        $scope.$watch(function() {
           return formController.getTasklistForm() && formController.getParams();
-        }, function (value) {
+        }, function(value) {
 
           if (value) {
 
@@ -70,9 +68,9 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         });
 
-        $scope.$watch(function () {
+        $scope.$watch(function() {
           return formController.getOptions();
-        }, function (options) {
+        }, function(options) {
 
           if (options) {
             options.hideCompleteButton = true;

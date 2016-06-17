@@ -6,29 +6,29 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-sorting-choices.html',
 var angular = require('camunda-commons-ui/vendor/angular');
 var $ = require('jquery');
 
-  function stringifySortings(sortingQuery) {
-    return JSON.stringify(sortingQuery.map(function (sorting) {
-      var obj = {
-        sortBy: sorting.by,
-        sortOrder: sorting.order
-      };
+function stringifySortings(sortingQuery) {
+  return JSON.stringify(sortingQuery.map(function(sorting) {
+    var obj = {
+      sortBy: sorting.by,
+      sortOrder: sorting.order
+    };
 
-      if (sorting.by.indexOf('Variable') > -1) {
-        if (!sorting.parameters) {
-          throw new Error('Variable sorting needs parameters');
-        }
-        obj.parameters = sorting.parameters;
+    if (sorting.by.indexOf('Variable') > -1) {
+      if (!sorting.parameters) {
+        throw new Error('Variable sorting needs parameters');
       }
+      obj.parameters = sorting.parameters;
+    }
 
-      return obj;
-    }));
-  }
+    return obj;
+  }));
+}
 
-  module.exports = [
-    'search',
-    '$translate',
-    '$location',
-    '$timeout',
+module.exports = [
+  'search',
+  '$translate',
+  '$location',
+  '$timeout',
   function(
     search,
     $translate,
@@ -45,7 +45,7 @@ var $ = require('jquery');
 
       template: template,
 
-      controller: [function () {}],
+      controller: [function() {}],
 
       link: function(scope, element) {
         var $bdy = $('body');
@@ -67,7 +67,7 @@ var $ = require('jquery');
             $timeout.cancel(plannedRefresh);
           }
 
-          plannedRefresh = $timeout(function () {
+          plannedRefresh = $timeout(function() {
             var columns = $(element).parents('.columns');
             var headers = columns.find('.cell.top');
             var bodies = columns.find('.cell.content');
@@ -104,7 +104,7 @@ var $ = require('jquery');
           assignee:               $translate.instant('ASSIGNEE')
         };
 
-        scope.byLabel = function (index) {
+        scope.byLabel = function(index) {
           if (!scope.sortings[index]) {
             return '';
           }
@@ -136,7 +136,7 @@ var $ = require('jquery');
 
             scope.availableOptions = angular.copy(scope.uniqueProps);
 
-            scope.sortings = urlSortings.map(function (sorting) {
+            scope.sortings = urlSortings.map(function(sorting) {
               scope.sortedOn.push(sorting.sortBy);
               scope.openDropdowns.push(false);
 
@@ -164,7 +164,7 @@ var $ = require('jquery');
         });
 
 
-        scope.$watch('sortings.length', function (now, before) {
+        scope.$watch('sortings.length', function(now, before) {
           if (now !== before) { scope.updateSortings(); }
         });
 
@@ -178,7 +178,7 @@ var $ = require('jquery');
           }
         }
 
-        scope.$watch('openDropdowns', function (now) {
+        scope.$watch('openDropdowns', function(now) {
           var index = now.indexOf(true);
           var els = element
                       .find('li.sorting-choice .dropdown-menu')
@@ -188,7 +188,7 @@ var $ = require('jquery');
           }
         }, true);
 
-        scope.$watch('openDropdownNew', function (now) {
+        scope.$watch('openDropdownNew', function(now) {
           if (now) {
             positionDropdown($newSort);
           }
@@ -232,9 +232,9 @@ var $ = require('jquery');
         };
 
         // should NOT manipulate the `scope.sortings`!
-        scope.updateSortings = function () {
+        scope.updateSortings = function() {
           scope.openDropdowns = [];
-          scope.sortedOn = scope.sortings.map(function (sorting) {
+          scope.sortedOn = scope.sortings.map(function(sorting) {
             scope.openDropdowns.push(false);
             return sorting.by;
           });
@@ -251,7 +251,7 @@ var $ = require('jquery');
         /**
          * Invoked when adding a sorting object
          */
-        scope.addSorting = function (id, type, value) {
+        scope.addSorting = function(id, type, value) {
 
           var newSorting = {
             order: 'desc',
@@ -278,7 +278,7 @@ var $ = require('jquery');
         /**
          * Invoked when removing a sorting object
          */
-        scope.removeSorting = function (index) {
+        scope.removeSorting = function(index) {
           scope.sortings.splice(index, 1);
           scope.updateSortings();
 

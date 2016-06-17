@@ -1,12 +1,12 @@
 'use strict';
 
-  module.exports = [
-    '$scope',
-    '$q',
-    'camAPI',
-    'Notifications',
-    'deploymentData',
-    'deployment',
+module.exports = [
+  '$scope',
+  '$q',
+  'camAPI',
+  'Notifications',
+  'deploymentData',
+  'deployment',
   function(
     $scope,
     $q,
@@ -30,7 +30,7 @@
     $scope.deployment = deployment;
     $scope.status;
 
-    $scope.$on('$routeChangeStart', function () {
+    $scope.$on('$routeChangeStart', function() {
       $scope.$dismiss();
     });
 
@@ -123,11 +123,11 @@
         $scope.caseInstanceCount > 1 ? info.push('instances') : info.push('instance');
       }
 
-      info.push('which belong to this deployment.')
+      info.push('which belong to this deployment.');
       info = info.join(' ');
 
       return info;
-    }
+    };
 
     $scope.deleteDeployment = function() {
       $scope.status = 'PERFORM_DELETE';

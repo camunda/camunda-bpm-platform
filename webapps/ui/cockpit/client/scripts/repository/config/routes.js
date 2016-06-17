@@ -4,8 +4,8 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/../controllers/cam-cockpit-repository-view.html', 'utf8');
 
-  module.exports = [
-    '$routeProvider',
+module.exports = [
+  '$routeProvider',
   function(
     $routeProvider
   ) {

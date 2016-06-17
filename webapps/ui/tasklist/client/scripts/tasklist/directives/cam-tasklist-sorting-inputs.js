@@ -3,13 +3,11 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-tasklist-sorting-inputs.html', 'utf8');
 
-var angular = require('camunda-commons-ui/vendor/angular');
-
-  module.exports = [
-    '$translate',
-  function (
+module.exports = [
+  '$translate',
+  function(
     $translate
-  ){
+  ) {
     return {
       restrict: 'AC',
 
@@ -21,27 +19,27 @@ var angular = require('camunda-commons-ui/vendor/angular');
         change: '=',
         applyHandler: '&',
         resetFunction: '=',
-        variable: '=',
+        variable: '='
       },
 
       controller: [
         '$scope',
-      function (
+        function(
         $scope
       ) {
-        $scope.variableTypes = {
-          'Boolean':  $translate.instant('BOOLEAN'),
-          'Double':   $translate.instant('DOUBLE'),
-          'Date':     $translate.instant('DATE'),
-          'Integer':  $translate.instant('INTEGER'),
-          'Long':     $translate.instant('LONG'),
-          'Short':    $translate.instant('SHORT'),
-          'String':   $translate.instant('STRING')
-        };
+          $scope.variableTypes = {
+            'Boolean':  $translate.instant('BOOLEAN'),
+            'Double':   $translate.instant('DOUBLE'),
+            'Date':     $translate.instant('DATE'),
+            'Integer':  $translate.instant('INTEGER'),
+            'Long':     $translate.instant('LONG'),
+            'Short':    $translate.instant('SHORT'),
+            'String':   $translate.instant('STRING')
+          };
 
-        $scope.applySorting = function (evt) {
-          $scope.applyHandler({$event: evt});
-        };
-      }]
+          $scope.applySorting = function(evt) {
+            $scope.applyHandler({$event: evt});
+          };
+        }]
     };
   }];
