@@ -21,3 +21,4 @@ dependency-reduced-pom.xml
 node_modules
 test.*.log
 webapp/*.log
+debug.log
