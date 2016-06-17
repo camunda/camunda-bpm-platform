@@ -12,18 +12,16 @@ module.exports = function(config, lessConfig, pathConfig) {
     file[pathConfig.buildTarget+'/styles/styles-components.css'] = pathConfig.sourceDir + '/styles/styles-components.less';
   }
 
+  var eePrefix = config.pkg.name === 'camunda-bpm-webapp-ee' ? 'node_modules/camunda-bpm-webapp/' : '';
   var includePaths = [
-    resolve(process.cwd(), '<%= pkg.gruntConfig.commonsUiDir %>/node_modules/bootstrap/less'),
     resolve(process.cwd(), '<%= pkg.gruntConfig.commonsUiDir %>/lib/widgets'),
     resolve(process.cwd(), '<%= pkg.gruntConfig.commonsUiDir %>/resources/less'),
     resolve(process.cwd(), '<%= pkg.gruntConfig.commonsUiDir %>/resources/css'),
     resolve(process.cwd(), '<%= pkg.gruntConfig.commonsUiDir %>/node_modules'),
-    resolve(process.cwd(), 'ui/common/styles'),
-    resolve(process.cwd(), 'ui/' + pathConfig.appName, 'styles'),
-    resolve(process.cwd(), 'ui/' + pathConfig.appName, 'client/scripts'),
-    resolve(process.cwd(), 'node_modules/camunda-bpm-webapp/ui/common/styles'),
-    resolve(process.cwd(), 'node_modules/camunda-bpm-webapp/ui/' + pathConfig.appName, 'styles'),
-    resolve(process.cwd(), 'node_modules/camunda-bpm-webapp/ui/' + pathConfig.appName, 'client/scripts'),
+
+    resolve(process.cwd(), eePrefix + 'ui/common/styles'),
+    resolve(process.cwd(), eePrefix + 'ui/' + pathConfig.appName, 'client/styles'),
+    resolve(process.cwd(), eePrefix + 'ui/' + pathConfig.appName, 'client/scripts')
   ];
 
   lessConfig[pathConfig.appName + (pathConfig.plugin ? '_plugin' : '') + '_styles'] = {
