@@ -1,10 +1,10 @@
-@import "_cam-bootstrap";
+// use `reference` to avoid duplicate bootstrap styles
+// as they are already available in other compiled CSS
+@import (reference) "shared/bootstrap";
 
-@import "cam-variables.less";
-@import "app-variables.less";
+@import "./_app-variables.less";
 
-@import "_bpmn-font";
-@import "_mixins";
+@import "shared/_mixins";
 
 
 

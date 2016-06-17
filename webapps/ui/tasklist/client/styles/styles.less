@@ -1,8 +1,8 @@
-@import "cam-variables";
-@import "app-variables";
-@import "cam-webapps-common";
+@import "_app-variables";
+@import "./../../../common/styles/cam-webapps-common.less";
 
 /* ---------------------------------------------------------------- */
+// camunda-commons-ui widgets
 
 @import "variable/cam-widget-variable";
 @import "variables-table/cam-widget-variables-table";
@@ -13,13 +13,15 @@
 @import "search-pill/cam-widget-search-pill";
 @import "search/cam-widget-search";
 
-@import "_layout";
+/* ---------------------------------------------------------------- */
 
-@import "_forms";
-@import "_loader";
-@import "_modal";
+@import "./layout";
 
-@import "_notifications-panel";
+@import "./forms";
+@import "./loader";
+@import "./modal";
+
+@import "./notifications-panel";
 
 
 // @import "filter/directives/cam-tasklist-filters";
