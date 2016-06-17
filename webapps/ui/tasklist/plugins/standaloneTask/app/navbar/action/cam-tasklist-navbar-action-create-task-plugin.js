@@ -5,11 +5,11 @@ var fs = require('fs');
 var createTaskActionTemplate = fs.readFileSync(__dirname + '/cam-tasklist-navbar-action-create-task-plugin.html', 'utf8');
 var createTaskModalTemplate = fs.readFileSync(__dirname + '/modals/cam-tasklist-create-task-modal.html', 'utf8');
 
-  var Controller = [
-   '$scope',
-   '$modal',
-   '$timeout',
-  function (
+var Controller = [
+  '$scope',
+  '$modal',
+  '$timeout',
+  function(
     $scope,
     $modal,
     $timeout
@@ -22,7 +22,7 @@ var createTaskModalTemplate = fs.readFileSync(__dirname + '/modals/cam-tasklist-
         template: createTaskModalTemplate
       });
 
-      modalInstance.result.then(function(result) {
+      modalInstance.result.then(function() {
         if ($scope.tasklistApp && $scope.tasklistApp.refreshProvider) {
           $scope.tasklistApp.refreshProvider.refreshTaskList();
           document.querySelector('.create-task-action a').focus();
@@ -44,16 +44,16 @@ var createTaskModalTemplate = fs.readFileSync(__dirname + '/modals/cam-tasklist-
 
   }];
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('tasklist.navbar.action', {
-      id: 'create-task-action',
-      template: createTaskActionTemplate,
-      controller: Controller,
-      priority: 200
-    });
-  };
+  ViewsProvider.registerDefaultView('tasklist.navbar.action', {
+    id: 'create-task-action',
+    template: createTaskActionTemplate,
+    controller: Controller,
+    priority: 200
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

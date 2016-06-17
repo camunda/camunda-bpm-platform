@@ -4,9 +4,9 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/goto-process-instance-action.html', 'utf8');
 
-  module.exports = function(ngModule) {
-    ngModule.controller('GotoProcessInstanceActionController', [
-            '$scope', 'Views',
+module.exports = function(ngModule) {
+  ngModule.controller('GotoProcessInstanceActionController', [
+    '$scope', 'Views',
     function($scope,   Views) {
 
       var processInstancePlugins = Views.getProviders({ component: 'cockpit.processInstance.view' });
@@ -28,17 +28,17 @@ var template = fs.readFileSync(__dirname + '/goto-process-instance-action.html',
 
     }]);
 
-    var Configuration = function PluginConfiguration(ViewsProvider) {
-      ViewsProvider.registerDefaultView('cockpit.decisionInstance.action', {
-        id: 'goto-process-instance-action',
-        label: 'Goto Process Instance Action',
-        template: template,
-        controller: 'GotoProcessInstanceActionController',
-        priority: 20
-      });
-    };
-
-    Configuration.$inject = ['ViewsProvider'];
-
-    ngModule.config(Configuration);
+  var Configuration = function PluginConfiguration(ViewsProvider) {
+    ViewsProvider.registerDefaultView('cockpit.decisionInstance.action', {
+      id: 'goto-process-instance-action',
+      label: 'Goto Process Instance Action',
+      template: template,
+      controller: 'GotoProcessInstanceActionController',
+      priority: 20
+    });
   };
+
+  Configuration.$inject = ['ViewsProvider'];
+
+  ngModule.config(Configuration);
+};

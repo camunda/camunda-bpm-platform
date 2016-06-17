@@ -8,26 +8,26 @@ var Controller = [
   '$scope',
   'Views',
   'page',
-function (
+  function(
   $scope,
   Views,
   page
 ) {
-  var $rootScope = $scope.$root;
+    var $rootScope = $scope.$root;
 
-  $rootScope.showBreadcrumbs = true;
+    $rootScope.showBreadcrumbs = true;
 
-  page.breadcrumbsClear();
+    page.breadcrumbsClear();
 
-  page.breadcrumbsAdd({
-    label: 'Decisions'
-  });
+    page.breadcrumbsAdd({
+      label: 'Decisions'
+    });
 
-  page.titleSet('Decisions');
+    page.titleSet('Decisions');
 
   // INITIALIZE PLUGINS
-  $scope.plugins = Views.getProviders({ component: 'cockpit.decisions.dashboard' });
-}];
+    $scope.plugins = Views.getProviders({ component: 'cockpit.decisions.dashboard' });
+  }];
 
 var RouteConfig = [ '$routeProvider', function($routeProvider) {
   $routeProvider.when('/decisions', {

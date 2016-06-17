@@ -84,12 +84,19 @@ module.exports = function(grunt) {
   require('./ui/tasklist/grunt/config/watch')(config, watchConf);
   require('./ui/cockpit/grunt/config/watch')(config, watchConf);
   require('./ui/admin/grunt/config/watch')(config, watchConf);
+  require('./ui/common/grunt/config/watch')(config, watchConf);
 
   var uglifyConf = {};
   require('./grunt/config/uglify')(config, uglifyConf);
   require('./ui/admin/grunt/config/uglify')(config, uglifyConf);
   require('./ui/tasklist/grunt/config/uglify')(config, uglifyConf);
   require('./ui/cockpit/grunt/config/uglify')(config, uglifyConf);
+
+  var eslintConf = {};
+  require('./ui/admin/grunt/config/eslint')(config, eslintConf);
+  require('./ui/tasklist/grunt/config/eslint')(config, eslintConf);
+  require('./ui/cockpit/grunt/config/eslint')(config, eslintConf);
+  require('./ui/common/grunt/config/eslint')(config, eslintConf);
 
 
   grunt.initConfig({
@@ -113,6 +120,8 @@ module.exports = function(grunt) {
 
     watch:            watchConf,
 
+    eslint:           eslintConf,
+
     ensureLibs: {
       thirdParty: {}
     },
@@ -129,7 +138,7 @@ grunt.registerTask('build', function(mode, app) {
 
     if(typeof app !== 'undefined') {
       console.log(' ------------  will build ' + app + ' -------------');
-      var objs = [browserifyConf, copyConf, lessConf, localesConf, watchConf, uglifyConf];
+      var objs = [browserifyConf, copyConf, lessConf, localesConf, watchConf, uglifyConf, eslintConf];
       for(var i = 0; i < objs.length; i++) {
         var obj = objs[i];
         for (var key in obj) {
@@ -144,13 +153,22 @@ grunt.registerTask('build', function(mode, app) {
 
     grunt.config.data.buildMode = mode || 'prod';
 
-    var tasksToRun = [
+    var tasksToRun = [];
+
+    if(grunt.config.data.buildMode === 'prod') {
+      tasksToRun.push('eslint');
+    } else {
+      tasksToRun.push('newer:eslint');
+    }
+
+
+    tasksToRun.push(
       'clean',
       'ensureLibs',
       'persistify',
       'copy',
       'less'
-    ];
+    );
 
     if(typeof app === 'undefined' || app === 'tasklist') {
       tasksToRun.push('localescompile');

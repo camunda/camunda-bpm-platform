@@ -4,11 +4,11 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-cockpit-definitions-plugin.html', 'utf8');
 
-  var Controller = [
-   '$scope',
-   '$q',
-   'camAPI',
-  function (
+var Controller = [
+  '$scope',
+  '$q',
+  'camAPI',
+  function(
     $scope,
     $q,
     camAPI
@@ -70,7 +70,7 @@ var template = fs.readFileSync(__dirname + '/cam-cockpit-definitions-plugin.html
         });
       }
 
-      for (var i = 0, definition; !!(definition = definitions[i]); i++) {
+      for (var i = 0, definition; (definition = definitions[i]); i++) {
 
         var Service = null;
         var query = null;
@@ -115,17 +115,17 @@ var template = fs.readFileSync(__dirname + '/cam-cockpit-definitions-plugin.html
 
   }];
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.repository.resource.detail', {
-      id: 'resource-details',
-      label: 'Definitions',
-      template: template,
-      controller: Controller,
-      priority: 1000
-    });
-  };
+  ViewsProvider.registerDefaultView('cockpit.repository.resource.detail', {
+    id: 'resource-details',
+    label: 'Definitions',
+    template: template,
+    controller: Controller,
+    priority: 1000
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

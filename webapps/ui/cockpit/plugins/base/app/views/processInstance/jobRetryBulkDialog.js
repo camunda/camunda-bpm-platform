@@ -2,9 +2,9 @@
 
 var angular = require('angular');
 
-  module.exports = [
-           '$scope', '$q', 'Notifications', 'JobResource', '$modalInstance', 'processData', 'processInstance',
-  function ($scope,   $q,   Notifications,   JobResource,   $modalInstance,   processData,   processInstance) {
+module.exports = [
+  '$scope', '$q', 'Notifications', 'JobResource', '$modalInstance', 'processData', 'processInstance',
+  function($scope,   $q,   Notifications,   JobResource,   $modalInstance,   processData,   processInstance) {
 
     var jobRetriesData = processData.newChild($scope);
 
@@ -16,7 +16,6 @@ var angular = require('angular');
 
     var finishedWithFailures = false;
 
-    var retryFailed = false;
     $scope.allJobsSelected = false;
 
     var FINISHED = 'finished',
@@ -24,11 +23,11 @@ var angular = require('angular');
         SUCCESS = 'successful',
         FAILED = 'failed';
 
-    var executionIdToInstanceMap = jobRetriesData.observe('executionIdToInstanceMap', function (executionMap) {
+    var executionIdToInstanceMap = jobRetriesData.observe('executionIdToInstanceMap', function(executionMap) {
       executionIdToInstanceMap = executionMap;
     });
 
-    $scope.$on('$routeChangeStart', function () {
+    $scope.$on('$routeChangeStart', function() {
       $modalInstance.close($scope.status);
     });
 
@@ -72,8 +71,8 @@ var angular = require('angular');
           processInstanceId: processInstance.id,
           withException: true,
           noRetriesLeft: true
-        }).$promise.then(function (response) {
-          for (var i = 0, job; !!(job = response[i]); i++) {
+        }).$promise.then(function(response) {
+          for (var i = 0, job; (job = response[i]); i++) {
             jobIdToFailedJobMap[job.id] = job;
             var instance = executionIdToInstanceMap[job.executionId];
             job.instance = instance;
@@ -100,7 +99,7 @@ var angular = require('angular');
 
     });
 
-    function updateSummarizeTable (page) {
+    function updateSummarizeTable(page) {
       var count = summarizePages.size;
       var firstResult = (page - 1) * count;
 
@@ -115,14 +114,14 @@ var angular = require('angular');
       }
     }
 
-    $scope.selectAllJobs = function (allJobsSelected) {
-      angular.forEach($scope.failedJobs, function (job) {
+    $scope.selectAllJobs = function(allJobsSelected) {
+      angular.forEach($scope.failedJobs, function(job) {
         job.selected = allJobsSelected;
         selectFailedJob(job);
       });
     };
 
-    var selectFailedJob = $scope.selectFailedJob = function (failedJob) {
+    var selectFailedJob = $scope.selectFailedJob = function(failedJob) {
       var index = selectedFailedJobIds.indexOf(failedJob.id);
 
       if (failedJob.selected === true) {
@@ -141,13 +140,13 @@ var angular = require('angular');
       }
     };
 
-    $scope.retryFailedJobs = function (selectedFailedJobIds) {
+    $scope.retryFailedJobs = function(selectedFailedJobIds) {
       $scope.status = PERFORM;
 
       summarizePages.total = selectedFailedJobIds.length;
       summarizePages.current = 1;
 
-      doRetry(selectedFailedJobIds).then(function () {
+      doRetry(selectedFailedJobIds).then(function() {
         if (!finishedWithFailures) {
           Notifications.addMessage({
             status: 'Finished',
@@ -163,10 +162,10 @@ var angular = require('angular');
         }
 
         $scope.status = FINISHED;
-       });
+      });
     };
 
-    function doRetry (selectedFailedJobIds) {
+    function doRetry(selectedFailedJobIds) {
       var deferred = $q.defer();
 
       var count = selectedFailedJobIds.length;
@@ -177,7 +176,7 @@ var angular = require('angular');
           id: job.id
         }, {
           retries: 1
-        }, function () {
+        }, function() {
           job.status = SUCCESS;
 
           // we want to show a summarize, when all requests
@@ -187,12 +186,11 @@ var angular = require('angular');
             deferred.resolve();
           }
 
-        }, function (error) {
+        }, function(error) {
           finishedWithFailures = true;
 
           job.status = FAILED;
           job.retryError = error;
-          retryFailed = true;
 
           // we want to show a summarize, when all requests
           // responded, that's why we uses a counter
@@ -200,10 +198,10 @@ var angular = require('angular');
           if (count === 0) {
             deferred.resolve();
           }
-         });
+        });
       }
 
-      for (var i = 0, jobId; !!(jobId = selectedFailedJobIds[i]); i++) {
+      for (var i = 0, jobId; (jobId = selectedFailedJobIds[i]); i++) {
         var job = jobIdToFailedJobMap[jobId];
         retryJob(job);
       }
@@ -212,7 +210,7 @@ var angular = require('angular');
     }
 
 
-    $scope.close = function (status) {
+    $scope.close = function(status) {
       $modalInstance.close(status);
     };
   }];

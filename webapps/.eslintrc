@@ -1,0 +1,28 @@
+{
+  "rules": {
+    "space-before-blocks": [ 2, "always"],
+    "indent": [ 2, 2, { "VariableDeclarator": { "var": 2, "let": 2, "const": 3 } } ],
+    "space-before-function-paren": [ 2, "never" ],
+    "quotes": [ 2, "single" ],
+    "semi": [ 2, "always" ],
+    "no-console": 1
+  },
+  "env": {
+    "node": true,
+    "browser": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "globals": {
+    "requirejs": false,
+    "expect": false,
+    "it": false,
+    "describe": false,
+    "beforeEach": true,
+    "afterEach": true,
+    "before": true,
+    "after": true
+  }
+}

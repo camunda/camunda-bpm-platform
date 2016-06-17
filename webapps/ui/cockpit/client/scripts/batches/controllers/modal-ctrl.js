@@ -4,12 +4,10 @@ var Ctrl = require('../components/delete');
 
 module.exports = [
   '$scope',
-  '$modalInstance',
-function(
-  $scope,
-  $modalInstance
+  function(
+  $scope
 ) {
 
-  $scope.ctrl = new Ctrl();
+    $scope.ctrl = new Ctrl();
 
-}];
+  }];

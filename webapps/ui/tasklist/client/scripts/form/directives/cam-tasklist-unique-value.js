@@ -40,7 +40,7 @@
         ctrl.$parsers.unshift(validate);
         ctrl.$formatters.push(validate);
 
-        $attrs.$observe('camUniqueValue', function(comparisonModel){
+        $attrs.$observe('camUniqueValue', function() {
           return validate(ctrl.$viewValue);
         });
       }

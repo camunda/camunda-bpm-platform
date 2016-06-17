@@ -2,8 +2,8 @@
 
 var angular = require('angular');
 
-  module.exports = [
-          '$scope', '$http', '$filter', 'Uri', 'Notifications', '$modalInstance', 'processDefinition',
+module.exports = [
+  '$scope', '$http', '$filter', 'Uri', 'Notifications', '$modalInstance', 'processDefinition',
   function($scope,   $http,   $filter,   Uri,   Notifications,   $modalInstance,   processDefinition) {
 
     var BEFORE_UPDATE = 'BEFORE_UPDATE',
@@ -25,11 +25,11 @@ var angular = require('angular');
       executionDate : dateFilter(Date.now(), dateFormat)
     };
 
-    $scope.$on('$routeChangeStart', function () {
+    $scope.$on('$routeChangeStart', function() {
       $modalInstance.close($scope.status);
     });
 
-    $scope.updateSuspensionState = function () {
+    $scope.updateSuspensionState = function() {
       $scope.status = PERFORM_UPDATE;
 
       var data = {};
@@ -40,7 +40,7 @@ var angular = require('angular');
 
       $http
       .put(Uri.appUri('engine://engine/:engine/process-definition/' + processDefinition.id + '/suspended/'), data)
-      .success(function () {
+      .success(function() {
         $scope.status = UPDATE_SUCCESS;
 
         if ($scope.data.executeImmediately) {
@@ -57,7 +57,7 @@ var angular = require('angular');
           });
         }
 
-      }).error(function (response) {
+      }).error(function(response) {
         $scope.status = UPDATE_FAILED;
 
         if ($scope.data.executeImmediately) {
@@ -76,12 +76,12 @@ var angular = require('angular');
       });
     };
 
-    $scope.isValid = function () {
+    $scope.isValid = function() {
       var formScope = angular.element('[name="updateSuspensionStateForm"]').scope();
       return (formScope && formScope.updateSuspensionStateForm) ? formScope.updateSuspensionStateForm.$valid : false;
     };
 
-    $scope.close = function (status) {
+    $scope.close = function(status) {
       var response = {};
 
       response.status = status;

@@ -3,7 +3,7 @@
 var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
-          '$scope', '$q', '$location', 'search', 'Uri', 'Notifications', 'camAPI', '$modalInstance', 'member', 'memberId', 'idList',
+  '$scope', '$q', '$location', 'search', 'Uri', 'Notifications', 'camAPI', '$modalInstance', 'member', 'memberId', 'idList',
   function($scope,   $q,   $location,   search,   Uri,   Notifications,   camAPI,   $modalInstance,   member,   memberId,   idList) {
 
     var modalPages = $scope.modalPages = {
@@ -13,11 +13,11 @@ module.exports = [
     };
 
     var checkedItems = $scope.checkedItems = [];
-        $scope.checkedItemsCount = 0;
+    $scope.checkedItemsCount = 0;
 
     var addItemPage = function(page) {
       if(checkedItems[page] === undefined) {
-        checkedItems[page] = []
+        checkedItems[page] = [];
       }
     };
 
@@ -71,7 +71,7 @@ module.exports = [
     $scope.idList = idList;
     $scope.memberId = memberId;
 
-    $scope.$on('$routeChangeStart', function () {
+    $scope.$on('$routeChangeStart', function() {
       $modalInstance.close($scope.status);
     });
 
@@ -149,7 +149,7 @@ module.exports = [
       $scope.status = PERFORM_CREATE;
 
       var selectedTenantIds = [];
-      angular.forEach(checkedItems, function(item){
+      angular.forEach(checkedItems, function(item) {
         angular.forEach(item, function(id) {
           if(selectedTenantIds.indexOf(id) === -1) {
             selectedTenantIds.push(id);
@@ -202,9 +202,9 @@ module.exports = [
                                     .replace(/\\/g, '%5C');
 
         if( typeof createMembershipObj.userId === 'string' ) {
-          TenantResource.createUserMember(createMembershipObj, cb)
+          TenantResource.createUserMember(createMembershipObj, cb);
         } else {
-          TenantResource.createGroupMember(createMembershipObj, cb)
+          TenantResource.createGroupMember(createMembershipObj, cb);
         }
 
         createMembershipNotification(deferred);
@@ -213,15 +213,15 @@ module.exports = [
 
     $scope.createUserMemberships = function() {
       var memberObj = { userId: $scope.memberId };
-      createTenantMemberships(memberObj)
+      createTenantMemberships(memberObj);
     };
 
     $scope.createGroupMemberships = function() {
       var memberObj = { groupId: $scope.memberId };
-      createTenantMemberships(memberObj)
+      createTenantMemberships(memberObj);
     };
 
-    $scope.close = function (status) {
+    $scope.close = function(status) {
       $modalInstance.close(status);
     };
 

@@ -6,7 +6,7 @@
     'Notifications',
     'camAPI',
     'task',
-  function(
+    function(
     $scope,
     $translate,
     Notifications,
@@ -14,32 +14,32 @@
     task
   ) {
 
-    var Task = camAPI.resource('task');
+      var Task = camAPI.resource('task');
 
-    $scope.comment = { message: '' };
+      $scope.comment = { message: '' };
 
-    $scope.$on('$locationChangeSuccess', function() {
-      $scope.$dismiss();
-    });
+      $scope.$on('$locationChangeSuccess', function() {
+        $scope.$dismiss();
+      });
 
-    function errorNotification(src, err) {
-      $translate(src).then(function(translated) {
-        Notifications.addError({
-          status: translated,
-          message: (err ? err.message : ''),
-          exclusive: true,
-          scope: $scope
+      function errorNotification(src, err) {
+        $translate(src).then(function(translated) {
+          Notifications.addError({
+            status: translated,
+            message: (err ? err.message : ''),
+            exclusive: true,
+            scope: $scope
+          });
         });
-      });
-    }
+      }
 
-    $scope.submit = function() {
-      Task.createComment(task.id, $scope.comment.message, function(err) {
-        if (err) {
-          return errorNotification('COMMENT_SAVE_ERROR', err);
-        }
+      $scope.submit = function() {
+        Task.createComment(task.id, $scope.comment.message, function(err) {
+          if (err) {
+            return errorNotification('COMMENT_SAVE_ERROR', err);
+          }
 
-        $scope.$close();
-      });
-    };
-  }];
+          $scope.$close();
+        });
+      };
+    }];

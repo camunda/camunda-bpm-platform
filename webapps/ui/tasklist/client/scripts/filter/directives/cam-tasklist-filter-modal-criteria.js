@@ -12,7 +12,7 @@
 
   function isValid(regex, error, exprSupport) {
 
-    return function (value) {
+    return function(value) {
 
       if (exprSupport) {
         if (expressionsRegex.test(value)) {
@@ -300,7 +300,7 @@
       ]
     }
   ];
-  module.exports = criteria.map(function (item) {
+  module.exports = criteria.map(function(item) {
     item.name = item.group.toLowerCase().replace(/[^a-z0-9-]+/g, '-');
     return item;
   });

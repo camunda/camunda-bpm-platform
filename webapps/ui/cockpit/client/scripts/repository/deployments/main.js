@@ -17,23 +17,23 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     /* modals */
     camCockpitDeleteDeploymentModalCtrl = require('./plugins/actions/delete/modals/cam-cockpit-delete-deployment-modal-ctrl');
 
-  var deploymentsModule = angular.module('cam.cockpit.repository.deployments', [
-    'ui.bootstrap'
-  ]);
+var deploymentsModule = angular.module('cam.cockpit.repository.deployments', [
+  'ui.bootstrap'
+]);
 
   /* controllers */
-  deploymentsModule.controller('camDeploymentsCtrl', camCockpitDeploymentsCtrl);
+deploymentsModule.controller('camDeploymentsCtrl', camCockpitDeploymentsCtrl);
 
   /* directives */
-  deploymentsModule.directive('camDeployments', camCockpitDeployments);
-  deploymentsModule.directive('camDeployment', camCockpitDeployment);
-  deploymentsModule.directive('camDeploymentsSortingChoices', camCockpitDeploymentsSortingChoices);
+deploymentsModule.directive('camDeployments', camCockpitDeployments);
+deploymentsModule.directive('camDeployment', camCockpitDeployment);
+deploymentsModule.directive('camDeploymentsSortingChoices', camCockpitDeploymentsSortingChoices);
 
   /* plugins */
-  deploymentsModule.config(camCockpitDeploymentsSearchPlugin);
-  deploymentsModule.config(camCockpitDeleteDeploymentPlugin);
+deploymentsModule.config(camCockpitDeploymentsSearchPlugin);
+deploymentsModule.config(camCockpitDeleteDeploymentPlugin);
 
   /* modals */
-  deploymentsModule.controller('camDeleteDeploymentModalCtrl', camCockpitDeleteDeploymentModalCtrl);
+deploymentsModule.controller('camDeleteDeploymentModalCtrl', camCockpitDeleteDeploymentModalCtrl);
 
-  module.exports = deploymentsModule;
+module.exports = deploymentsModule;

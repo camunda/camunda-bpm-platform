@@ -8,29 +8,29 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
   // QUESTION: Shouldn't we use the templateUrl property instead?
 
-  function dashed(str) {
-    return (str || '').replace(/([A-Z])/g, function ($1) {
-      return '-' + $1.toLowerCase();
-    });
-  }
+function dashed(str) {
+  return (str || '').replace(/([A-Z])/g, function($1) {
+    return '-' + $1.toLowerCase();
+  });
+}
 
-  var iconNames = {
-    'start-event':                            'start-event-none',
-    'error-start-event':                      'start-event-error',
-    'cancel-end-event':                       'end-event-cancel',
-    'error-end-event':                        'end-event-error',
-    'none-end-event':                         'end-event-none',
-    'parallel-gateway':                       'gateway-parallel',
-    'exclusive-gateway':                      'gateway-xor',
-    'intermediate-compensation-throw-event':  'intermediate-event-throw-compensation'
-  };
+var iconNames = {
+  'start-event':                            'start-event-none',
+  'error-start-event':                      'start-event-error',
+  'cancel-end-event':                       'end-event-cancel',
+  'error-end-event':                        'end-event-error',
+  'none-end-event':                         'end-event-none',
+  'parallel-gateway':                       'gateway-parallel',
+  'exclusive-gateway':                      'gateway-xor',
+  'intermediate-compensation-throw-event':  'intermediate-event-throw-compensation'
+};
 
 
-  var Directive = [
-    '$compile',
-    '$http',
-    '$filter',
-  function ($compile, $http, $filter) {
+var Directive = [
+  '$compile',
+  '$http',
+  '$filter',
+  function($compile, $http, $filter) {
     return {
       restrict: 'EAC',
 
@@ -43,7 +43,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       },
 
       link: function(scope, element) {
-        scope.symbolIconName = function (str) {
+        scope.symbolIconName = function(str) {
           var name = dashed(str);
           name = iconNames[name] ? iconNames[name] : name;
           return 'icon-'+ name;
@@ -59,7 +59,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
           fn(template);
         }
 
-        scope.$watch('node', function (newValue) {
+        scope.$watch('node', function(newValue) {
           if (!newValue || newValue.$loaded === false) {
             return;
           }
@@ -75,11 +75,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
           createTreeNode(newValue);
         });
 
-        scope.$on(nodeOpenedEventName, function ($event, value) {
+        scope.$on(nodeOpenedEventName, function($event, value) {
           handleNodeEvents($event, value);
         });
 
-        scope.$on(nodeSelectedEventName, function ($event, value) {
+        scope.$on(nodeSelectedEventName, function($event, value) {
           handleNodeEvents($event, value);
         });
 
@@ -164,7 +164,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
           });
         }
 
-        scope.propogateSelection = function (id, activityId, $event) {
+        scope.propogateSelection = function(id, activityId, $event) {
           scope.onElementClick({
             id: id,
             activityId: activityId,
@@ -181,4 +181,4 @@ var angular = require('camunda-commons-ui/vendor/angular');
     };
   }];
 
-  module.exports = Directive;
+module.exports = Directive;

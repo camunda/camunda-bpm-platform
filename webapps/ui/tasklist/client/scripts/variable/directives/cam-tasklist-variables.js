@@ -7,10 +7,10 @@ var modalTemplate = fs.readFileSync(__dirname + '/../modals/cam-tasklist-variabl
 var angular = require('camunda-commons-ui/vendor/angular');
 
   // AngularJS DI
-  module.exports = [
-    '$modal',
-    '$window',
-    'Uri',
+module.exports = [
+  '$modal',
+  '$window',
+  'Uri',
   function(
     $modal,
     $window,

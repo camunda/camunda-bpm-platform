@@ -10,30 +10,30 @@ var pagesModule = require('./pages/main'),
     angular = require('camunda-commons-ui/vendor/angular');
 
 
-  var APP_NAME = 'cam.admin';
-  var $ = window.jQuery = window.$ = require('jquery');
+var APP_NAME = 'cam.admin';
+var $ = window.jQuery = window.$ = require('jquery');
 
 
-  module.exports = function(pluginDependencies) {
+module.exports = function(pluginDependencies) {
 
-    var ngDependencies = [
-      'ng',
-      'ngResource',
-      camCommonsUi.name,
-      directivesModule.name,
-      filtersModule.name,
-      pagesModule.name,
-      resourcesModule.name,
-      servicesModule.name
-    ].concat(pluginDependencies.map(function(el){
-      return el.ngModuleName;
-    }));
+  var ngDependencies = [
+    'ng',
+    'ngResource',
+    camCommonsUi.name,
+    directivesModule.name,
+    filtersModule.name,
+    pagesModule.name,
+    resourcesModule.name,
+    servicesModule.name
+  ].concat(pluginDependencies.map(function(el) {
+    return el.ngModuleName;
+  }));
 
-    var appNgModule = angular.module(APP_NAME, ngDependencies);
+  var appNgModule = angular.module(APP_NAME, ngDependencies);
 
-    var ModuleConfig = [
-      '$routeProvider',
-      'UriProvider',
+  var ModuleConfig = [
+    '$routeProvider',
+    'UriProvider',
     function(
       $routeProvider,
       UriProvider
@@ -68,14 +68,14 @@ var pagesModule = require('./pages/main'),
       }]);
     }];
 
-    appNgModule.config(ModuleConfig);
+  appNgModule.config(ModuleConfig);
 
 
-    appNgModule.controller('camAdminAppCtrl', [
-      '$scope',
-      '$route',
-      'UserResource',
-    function (
+  appNgModule.controller('camAdminAppCtrl', [
+    '$scope',
+    '$route',
+    'UserResource',
+    function(
       $scope,
       $route,
       UserResource
@@ -93,7 +93,7 @@ var pagesModule = require('./pages/main'),
         });
       }
 
-      $scope.$on('authentication.changed', function (ev, auth) {
+      $scope.$on('authentication.changed', function(ev, auth) {
         if (auth) {
           getUserProfile(auth);
         }
@@ -106,41 +106,41 @@ var pagesModule = require('./pages/main'),
     }]);
 
 
-    if (typeof window.adminConf !== 'undefined' && window.adminConf.polyfills) {
-      var polyfills = window.adminConf.polyfills;
+  if (typeof window.adminConf !== 'undefined' && window.adminConf.polyfills) {
+    var polyfills = window.adminConf.polyfills;
 
-      if (polyfills.indexOf('placeholder') > -1) {
-        var load = window.requirejs;
-        var appRoot = $('head base').attr('app-root');
+    if (polyfills.indexOf('placeholder') > -1) {
+      var load = window.requirejs;
+      var appRoot = $('head base').attr('app-root');
 
+      load([
+        appRoot + '/app/tasklist/scripts/placeholders.utils.js',
+        appRoot + '/app/tasklist/scripts/placeholders.main.js'
+      ], function() {
         load([
-          appRoot + '/app/tasklist/scripts/placeholders.utils.js',
-          appRoot + '/app/tasklist/scripts/placeholders.main.js'
-        ], function () {
-          load([
-            appRoot + '/app/tasklist/scripts/placeholders.jquery.js'
-          ], function () {});
-        });
-      }
+          appRoot + '/app/tasklist/scripts/placeholders.jquery.js'
+        ], function() {});
+      });
     }
+  }
 
-    $(document).ready(function () {
-      angular.bootstrap(document, [ appNgModule.name, 'cam.admin.custom' ]);
+  $(document).ready(function() {
+    angular.bootstrap(document, [ appNgModule.name, 'cam.admin.custom' ]);
 
-      if (top !== window) {
-        window.parent.postMessage({ type: 'loadamd' }, '*');
-      }
-    });
+    if (top !== window) {
+      window.parent.postMessage({ type: 'loadamd' }, '*');
+    }
+  });
 
       /* live-reload
       // loads livereload client library (without breaking other scripts execution)
       $('body').append('<script src="//' + location.hostname + ':LIVERELOAD_PORT/livereload.js?snipver=1"></script>');
       /* */
-  };
+};
 
-  module.exports.exposePackages = function(requirePackages) {
-    requirePackages.angular = angular;
-    requirePackages.jquery = $;
-    requirePackages['camunda-commons-ui'] = camCommonsUi;
-    requirePackages['camunda-bpm-sdk-js'] = sdk;
-  };
+module.exports.exposePackages = function(requirePackages) {
+  requirePackages.angular = angular;
+  requirePackages.jquery = $;
+  requirePackages['camunda-commons-ui'] = camCommonsUi;
+  requirePackages['camunda-bpm-sdk-js'] = sdk;
+};

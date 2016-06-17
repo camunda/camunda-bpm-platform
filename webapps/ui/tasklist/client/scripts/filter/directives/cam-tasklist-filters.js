@@ -3,24 +3,24 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-tasklist-filters.html', 'utf8');
 
-  var noop = function () {};
+var noop = function() {};
 
-  module.exports = [function() {
+module.exports = [function() {
 
-    return {
+  return {
 
-      restrict: 'A',
-      scope: {
-        filtersData: '=',
-        openModal: '&'
-      },
+    restrict: 'A',
+    scope: {
+      filtersData: '=',
+      openModal: '&'
+    },
 
-      template: template,
+    template: template,
 
-      controller: [
-        '$scope',
-        'search',
-      function (
+    controller: [
+      '$scope',
+      'search',
+      function(
         $scope,
         search
       ) {
@@ -45,7 +45,7 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-filters.html', 'utf8')
 
           $scope.totalItems = filters.length;
 
-          for (var i = 0, filter; !!(filter = filters[i]); i++) {
+          for (var i = 0, filter; (filter = filters[i]); i++) {
             filter.style = {
               'z-index': filters.length + 10 - i
             };
@@ -55,7 +55,7 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-filters.html', 'utf8')
 
         });
 
-        filtersData.observe('currentFilter', function (currentFilter) {
+        filtersData.observe('currentFilter', function(currentFilter) {
           $scope.currentFilter = currentFilter;
         });
 
@@ -82,5 +82,5 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-filters.html', 'utf8')
         };
 
       }]
-    };
-  }];
+  };
+}];

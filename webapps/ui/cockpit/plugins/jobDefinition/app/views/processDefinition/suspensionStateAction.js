@@ -6,15 +6,15 @@ var angular = require('angular');
 var actionTemplate = fs.readFileSync(__dirname + '/suspension-state-action.html', 'utf8');
 var dialogTemplate = fs.readFileSync(__dirname + '/job-definition-suspension-state-dialog.html', 'utf8');
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
-    ViewsProvider.registerDefaultView('cockpit.jobDefinition.action', {
-      id: 'update-suspension-state',
-      template: actionTemplate,
-      controller: [
-              '$scope', '$rootScope', 'search', '$modal',
+var Configuration = function PluginConfiguration(ViewsProvider) {
+  ViewsProvider.registerDefaultView('cockpit.jobDefinition.action', {
+    id: 'update-suspension-state',
+    template: actionTemplate,
+    controller: [
+      '$scope', '$rootScope', 'search', '$modal',
       function($scope, $rootScope, search, $modal) {
 
-        $scope.openSuspensionStateDialog = function (jobDefinition) {
+        $scope.openSuspensionStateDialog = function(jobDefinition) {
           var dialog = $modal.open({
             resolve: {
               jobDefinition: function() { return jobDefinition; }
@@ -38,10 +38,10 @@ var dialogTemplate = fs.readFileSync(__dirname + '/job-definition-suspension-sta
         };
 
       }],
-      priority: 50
-    });
-  };
+    priority: 50
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

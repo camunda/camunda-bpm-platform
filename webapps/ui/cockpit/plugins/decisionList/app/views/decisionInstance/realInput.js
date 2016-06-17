@@ -17,7 +17,7 @@
         viewer.get('eventBus').on('cell.render', function(event) {
 
           var inputIdx = data.decisionInstance.inputs.map(function(inputObject) {
-           return inputObject.clauseId;
+            return inputObject.clauseId;
           }).indexOf(event.data.column.id);
 
           if(event.data.row === clauseRow &&

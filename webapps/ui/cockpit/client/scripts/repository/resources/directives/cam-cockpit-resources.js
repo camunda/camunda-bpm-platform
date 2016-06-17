@@ -6,24 +6,24 @@ var template = fs.readFileSync(__dirname + '/cam-cockpit-resources.html', 'utf8'
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  var $ = angular.element;
+var $ = angular.element;
 
-  module.exports = [function(){
+module.exports = [function() {
 
-    return {
+  return {
 
-      restrict: 'A',
-      scope: {
-        repositoryData: '='
-      },
+    restrict: 'A',
+    scope: {
+      repositoryData: '='
+    },
 
-      template: template,
+    template: template,
 
-      controller: [
-        '$scope',
-        '$location',
-        '$timeout',
-        'search',
+    controller: [
+      '$scope',
+      '$location',
+      '$timeout',
+      'search',
       function(
         $scope,
         $location,
@@ -35,35 +35,29 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         // utilities /////////////////////////////////////////////////////////////////
 
-        var updateSilently = function (params) {
+        var updateSilently = function(params) {
           search.updateSilently(params);
-        }
-
-        var getPropertyFromLocation = function (property) {
-          var search = $location.search() || {};
-          return search[property] || null;
-        }
-
+        };
 
         // observe data //////////////////////////////////////////////////////////////
 
-        $scope.state = resourcesData.observe('resourceId', function (resourceId) {
+        $scope.state = resourcesData.observe('resourceId', function(resourceId) {
           $scope.currentResourceId = resourceId.resourceId;
         });
 
         // taken from
         // http://stackoverflow.com/questions/1916218/find-the-longest-common-starting-substring-in-a-set-of-strings#answer-1917041
-        function sharedStart(array){
+        function sharedStart(array) {
           var A = array.concat().sort(),
-          a1= A[0], a2= A[A.length-1], L= a1.length, i= 0;
+              a1= A[0], a2= A[A.length-1], L= a1.length, i= 0;
           while(i<L && a1.charAt(i)=== a2.charAt(i)) i++;
           return a1.substring(0, i);
         }
 
         $scope.sharedStart = '';
-        $scope.state = resourcesData.observe('resources', function (resources) {
+        $scope.state = resourcesData.observe('resources', function(resources) {
           var paths = [];
-          $scope.resources = (resources || []).map(function (resource) {
+          $scope.resources = (resources || []).map(function(resource) {
             var parts = (resource.name || resource.id).split('/');
             resource._filename = parts.pop();
             resource._filepath = parts.join('/');
@@ -73,14 +67,14 @@ var angular = require('camunda-commons-ui/vendor/angular');
           $scope.sharedStart = sharedStart(paths);
         });
 
-        $scope.truncateFilepath = function (filepath) {
+        $scope.truncateFilepath = function(filepath) {
           return filepath.slice($scope.sharedStart.length);
         };
 
 
         // selection //////////////////////////////////////////////////////////////////
 
-        $scope.focus = function ($event, resource) {
+        $scope.focus = function($event, resource) {
           if ($event) {
             $event.preventDefault();
           }
@@ -132,7 +126,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
             selectPreviousResource();
           }
           // wait for angular to update the classes and scroll to the newly selected task
-          $timeout(function(){
+          $timeout(function() {
             var $el = $($event.target).find('li.active')[0];
             if ($el) {
               $el.scrollIntoView(false);
@@ -141,5 +135,5 @@ var angular = require('camunda-commons-ui/vendor/angular');
         };
 
       }]
-    };
-  }];
+  };
+}];

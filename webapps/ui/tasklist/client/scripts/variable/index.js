@@ -13,12 +13,12 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
 require('angular-moment');
 
-  var variableModule = angular.module('cam.tasklist.variables', [
-    'ui.bootstrap',
-    'angularMoment'
-  ]);
+var variableModule = angular.module('cam.tasklist.variables', [
+  'ui.bootstrap',
+  'angularMoment'
+]);
 
-  variableModule.directive('camTasklistVariables', camTasklistVariables);
-  variableModule.controller('camTasklistVariablesDetailsModalCtrl', camTasklistVariablesDetailsModalCtrl);
+variableModule.directive('camTasklistVariables', camTasklistVariables);
+variableModule.controller('camTasklistVariablesDetailsModalCtrl', camTasklistVariablesDetailsModalCtrl);
 
-  module.exports = variableModule;
+module.exports = variableModule;

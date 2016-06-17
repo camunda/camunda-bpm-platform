@@ -2,8 +2,6 @@
 
 var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/reports-type.html', 'utf8');
-var angular = require('camunda-commons-ui/vendor/angular');
-var extend = angular.extend;
 
 module.exports = [function() {
 
@@ -20,30 +18,30 @@ module.exports = [function() {
     controller: [
       '$scope',
       '$route',
-    function (
+      function(
       $scope,
       $route
     ) {
-      var getPluginProviders = $scope.getPluginProviders();
+        var getPluginProviders = $scope.getPluginProviders();
 
-      var reportsTypeData = $scope.reportsTypeData = $scope.reportData.newChild($scope);
+        var reportsTypeData = $scope.reportsTypeData = $scope.reportData.newChild($scope);
 
-      reportsTypeData.observe('plugin', function(plugin) {
-        $scope.plugin = plugin;
-        $scope.selection = {
-          type: (plugin || {}).id
-        };
-      });
+        reportsTypeData.observe('plugin', function(plugin) {
+          $scope.plugin = plugin;
+          $scope.selection = {
+            type: (plugin || {}).id
+          };
+        });
 
-      reportsTypeData.observe('plugins', function(plugins) {
-        $scope.plugins = plugins;
-      });
+        reportsTypeData.observe('plugins', function(plugins) {
+          $scope.plugins = plugins;
+        });
 
-      if ($route.current.params.reportType) {
-        var plugin = (getPluginProviders({ id: $route.current.params.reportType }) || [])[0];
-        reportsTypeData.set('plugin', plugin);
-      }
-    }]
+        if ($route.current.params.reportType) {
+          var plugin = (getPluginProviders({ id: $route.current.params.reportType }) || [])[0];
+          reportsTypeData.set('plugin', plugin);
+        }
+      }]
   };
 
 }];

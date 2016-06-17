@@ -5,14 +5,14 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-filter-modal-form-perm
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  var copy = angular.copy;
+var copy = angular.copy;
 
-  var RESOURCE_TYPE = 5;
+var RESOURCE_TYPE = 5;
 
-  module.exports = [
-    'camAPI',
-    '$q',
-    '$timeout',
+module.exports = [
+  'camAPI',
+  '$q',
+  '$timeout',
   function(
     camAPI,
     $q,
@@ -32,7 +32,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
       template: template,
 
-      link: function ($scope, $element, attrs, parentCtrl) {
+      link: function($scope, $element, attrs, parentCtrl) {
         // by default, the fields for new permission are not shown
         $scope.showNewPermissionFields = false;
 
@@ -40,7 +40,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
         // the "permission" accordion part is being closed
         // this will add the permission
         // (like if the "add" button had been clicked)
-        $scope.$watch('isOpen', function (actual, previous) {
+        $scope.$watch('isOpen', function(actual, previous) {
           if (!$scope.disableAddButton() && !actual && previous) {
             $scope.addReadPermission();
           }
@@ -48,7 +48,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
           $scope.showNewPermissionFields = false;
         });
 
-        $scope.$on('pre-submit', function () {
+        $scope.$on('pre-submit', function() {
           if (!$scope.disableAddButton()) {
             $scope.addReadPermission();
           }
@@ -83,7 +83,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         // register handler to show or hide the accordion hint /////////////////
 
-        var showHintProvider = function () {
+        var showHintProvider = function() {
           var control = getNewPermissionField();
 
           return control && control.$error && control.$error.duplicate;
@@ -93,7 +93,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         // provide ////////////////////////////////////////////////////////////////////////
 
-        filterAuthorizationData.provide('authorizations', ['filter', function (filter) {
+        filterAuthorizationData.provide('authorizations', ['filter', function(filter) {
           var deferred = $q.defer();
 
           if(!filter || !filter.id) {
@@ -106,9 +106,9 @@ var angular = require('camunda-commons-ui/vendor/angular');
             Authorization.list({
               resourceType: RESOURCE_TYPE,
               resourceId: filter.id
-            }, function (err, resp) {
+            }, function(err, resp) {
 
-              if(!!err) {
+              if(err) {
                 deferred.reject(err);
               }
               else {
@@ -137,7 +137,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         // handle global read permission ////////////////////////////////////////////////////
 
-        $scope.globalReadAuthorizationChanged = function () {
+        $scope.globalReadAuthorizationChanged = function() {
           if ($scope.isGlobalReadAuthorization) {
 
             if (!globalAuthorization) {
@@ -160,18 +160,18 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         // handle new permission ////////////////////////////////////////////////////////////
 
-        $scope.switchType = function () {
+        $scope.switchType = function() {
           newPermission.type = newPermission.type === 'user' ? 'group' : 'user';
           validateNewPermission();
         };
 
-        $scope.getReadAuthorizations = function (authorizations) {
+        $scope.getReadAuthorizations = function(authorizations) {
           if (authorizations) {
             return getAuthorizationsWithReadPermissions(authorizations);
           }
         };
 
-        var validateNewPermission = $scope.validateNewPermission = function () {
+        var validateNewPermission = $scope.validateNewPermission = function() {
           var control = getNewPermissionField();
           // new permission fields might not be present when this function is called
           if (!control) { return; }
@@ -192,7 +192,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
           }
         };
 
-        $scope.disableAddButton = function () {
+        $scope.disableAddButton = function() {
           // when the new permission fields are not yet present,
           // the "Add permis." is aimed to make them visible
           // (see addReadPermission below)
@@ -204,7 +204,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
         };
 
 
-        var addReadPermission = $scope.addReadPermission = function () {
+        var addReadPermission = $scope.addReadPermission = function() {
           // the first click only adds the fields
           if (!$scope.showNewPermissionFields) {
             $scope.showNewPermissionFields = true;
@@ -232,7 +232,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
             var _authorizations = authorizations;
             authorizations = $scope.authorizations = [];
 
-            for (var i = 0, _auth; !!(_auth = _authorizations[i]); i++) {
+            for (var i = 0, _auth; (_auth = _authorizations[i]); i++) {
               if (_auth !== auth) {
                 authorizations.push(_auth);
               }
@@ -263,7 +263,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
           });
         };
 
-        $scope.keyPressed = function ($event) {
+        $scope.keyPressed = function($event) {
           var keyCode = $event.keyCode;
 
           if (keyCode === 13) {
@@ -281,7 +281,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         // remove read permission ///////////////////////////////////////////////////////////
 
-        $scope.removeReadPermission = function (auth) {
+        $scope.removeReadPermission = function(auth) {
           removeReadPermissionFromAuthorization(auth);
           validateNewPermission();
 
@@ -292,13 +292,13 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         var errors = [];
 
-        var submitAuthorizations = function (filter, callback) {
+        var submitAuthorizations = function(filter, callback) {
           var actions = [];
           errors = [];
 
           if ($scope.isGlobalReadAuthorization) {
 
-            for (var k = 0, auth; !!(auth = authorizations[k]); k++) {
+            for (var k = 0, auth; (auth = authorizations[k]); k++) {
 
               if (isGrantAuthorization(auth) && hasReadPermission(auth)) {
                 // remove read permission so that the corresponding
@@ -308,7 +308,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
             }
           }
 
-          for (var i = 0, authorization; !!(authorization = authorizations[i]); i++) {
+          for (var i = 0, authorization; (authorization = authorizations[i]); i++) {
             var permissions = authorization.permissions;
             var $permissions = authorization.$permissions;
 
@@ -351,7 +351,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
             }
           }
 
-          performSubmit(actions, filter).then(function () {
+          performSubmit(actions, filter).then(function() {
             if (!errors || !errors.length) {
               errors = null;
             }
@@ -379,7 +379,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
             authorization.resourceId = authorization.resourceId || filter.id;
 
-            var callback = function (err, resp) {
+            var callback = function(err, resp) {
               count = count - 1;
 
               if (!err) {
@@ -429,7 +429,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
             deferred.resolve();
           }
 
-          for (var i = 0, action; !!(action = actions[i]); i++) {
+          for (var i = 0, action; (action = actions[i]); i++) {
             var type = action.type;
             // do not create a copy of authorization, if there is a
             // failure during submitting the authorizations, the dialog
@@ -447,39 +447,39 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         // helper /////////////////////////////////////////////////////////////////////////
 
-        function initializeAuthorizations (authorizations) {
-          for (var i = 0, authorization; !!(authorization = authorizations[i]); i++) {
+        function initializeAuthorizations(authorizations) {
+          for (var i = 0, authorization; (authorization = authorizations[i]); i++) {
             // save the original permissions
             authorization.$permissions = copy(authorization.permissions || []);
           }
         }
 
-        function getNewPermissionField () {
+        function getNewPermissionField() {
           return _form.newPermission;
         }
 
-        function isGlobalAuthorization (authorization) {
+        function isGlobalAuthorization(authorization) {
           return authorization && authorization.type === 0;
         }
 
-        function isGrantAuthorization (authorization) {
+        function isGrantAuthorization(authorization) {
           return authorization && authorization.type === 1;
         }
 
-        function isGlobalUserOrGroupId (authorization) {
+        function isGlobalUserOrGroupId(authorization) {
           authorization = authorization || {};
           var id = authorization.userId || authorization.groupId;
           return id === '*';
         }
 
-        function hasProperty (authorization, prop) {
+        function hasProperty(authorization, prop) {
           return !!authorization[prop];
         }
 
         function hasReadPermission(authorization) {
           if (authorization && authorization.permissions) {
             var permissions = authorization.permissions;
-            for (var i = 0, perm; !!(perm = permissions[i]); i++) {
+            for (var i = 0, perm; (perm = permissions[i]); i++) {
               if (perm === 'READ' || perm === 'ALL') {
                 return true;
               }
@@ -489,7 +489,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
         }
 
         function getGlobalAuthorization(authorizations) {
-          for (var i = 0, authorization; !!(authorization = authorizations[i]); i++) {
+          for (var i = 0, authorization; (authorization = authorizations[i]); i++) {
             if (isGlobalAuthorization(authorization)) {
               return authorization;
             }
@@ -499,7 +499,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
         function getAuthorizationsWithReadPermissions(authorizations) {
           var result = [];
 
-          for (var i = 0, authorization; !!(authorization = authorizations[i]); i++) {
+          for (var i = 0, authorization; (authorization = authorizations[i]); i++) {
 
             if (isGrantAuthorization(authorization)) {
 
@@ -517,7 +517,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
           var _authorizations = getAuthorziations(authorizations, criteria);
           var obj = {};
 
-          for (var i = 0, authorization; !!(authorization = _authorizations[i]); i++) {
+          for (var i = 0, authorization; (authorization = _authorizations[i]); i++) {
             var _criteria = authorization[criteria];
             obj[_criteria] = authorization;
           }
@@ -528,7 +528,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
         function getAuthorziations(authorizations, criteria) {
           var result = [];
 
-          for (var i = 0, authorization; !!(authorization = authorizations[i]); i++) {
+          for (var i = 0, authorization; (authorization = authorizations[i]); i++) {
 
             if (isGrantAuthorization(authorization)) {
 
@@ -579,7 +579,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
               authorization.permissions = [];
 
-              for (var i = 0, perm; !!(perm = permissions[i]); i++) {
+              for (var i = 0, perm; (perm = permissions[i]); i++) {
                 if (perm !== 'READ') {
                   authorization.permissions.push(perm);
                 }

@@ -2,9 +2,9 @@
 
 var angular = require('angular');
 
-  module.exports = [
-           '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$modalInstance', 'jobDefinitions',
-  function ($scope,   $q,   Notifications,   JobDefinitionResource,   $modalInstance,   jobDefinitions) {
+module.exports = [
+  '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$modalInstance', 'jobDefinitions',
+  function($scope,   $q,   Notifications,   JobDefinitionResource,   $modalInstance,   jobDefinitions) {
 
     $scope.status;
     var FINISHED = 'FINISHED',
@@ -18,12 +18,12 @@ var angular = require('angular');
 
     var data = $scope.data = {
       priority: null,
-      includeJobs: false,
+      includeJobs: false
     };
 
     $scope.setJobPriority = true;
 
-    $scope.$on('$routeChangeStart', function () {
+    $scope.$on('$routeChangeStart', function() {
       var response = {};
       response.status = $scope.status;
       $modalInstance.close(response);
@@ -37,7 +37,7 @@ var angular = require('angular');
       updateSummarizeTable(newValue);
     });
 
-    function updateSummarizeTable (page) {
+    function updateSummarizeTable(page) {
       var count = summarizePages.size;
       var firstResult = (page - 1) * count;
 
@@ -51,7 +51,7 @@ var angular = require('angular');
       }
     }
 
-    $scope.submit = function () {
+    $scope.submit = function() {
       var setJobPriority = $scope.setJobPriority;
       if (!setJobPriority) {
         data = {};
@@ -63,7 +63,7 @@ var angular = require('angular');
     function overrideJobPriority(jobDefinitions) {
       $scope.status = PERFORM;
 
-      doOverride(jobDefinitions).then(function () {
+      doOverride(jobDefinitions).then(function() {
         if (!finishedWithFailures) {
 
           if ($scope.setJobPriority) {
@@ -99,8 +99,8 @@ var angular = require('angular');
         }
 
         $scope.status = FINISHED;
-       });
-    };
+      });
+    }
 
     function doOverride(jobDefinitions) {
       var deferred = $q.defer();
@@ -111,7 +111,7 @@ var angular = require('angular');
         jobDefinition.status = PERFORM;
         JobDefinitionResource.setJobPriority({
           id: jobDefinition.id
-        }, data, function () {
+        }, data, function() {
           jobDefinition.status = SUCCESS;
 
           // we want to show a summarize, when all requests
@@ -121,7 +121,7 @@ var angular = require('angular');
             deferred.resolve();
           }
 
-        }, function (error) {
+        }, function(error) {
           finishedWithFailures = true;
 
           jobDefinition.status = FAILED;
@@ -133,22 +133,22 @@ var angular = require('angular');
           if (count === 0) {
             deferred.resolve();
           }
-         });
+        });
       }
 
-      for (var i = 0, jobDefinition; !!(jobDefinition = jobDefinitions[i]); i++) {
+      for (var i = 0, jobDefinition; (jobDefinition = jobDefinitions[i]); i++) {
         setJobPriority(jobDefinition);
       }
 
       return deferred.promise;
     }
 
-    $scope.isValid = function () {
+    $scope.isValid = function() {
       var formScope = angular.element('[name="overrideJobPriorityForm"]').scope();
       return !$scope.setJobPriority || ((formScope && formScope.overrideJobPriorityForm) ? formScope.overrideJobPriorityForm.$valid : false);
     };
 
-    $scope.close = function (status) {
+    $scope.close = function(status) {
       var response = {};
       response.status = status;
       $modalInstance.close(response);

@@ -6,30 +6,28 @@ var template = fs.readFileSync(__dirname + '/cam-cockpit-resource-wrapper.html',
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  module.exports = [ function() {
+module.exports = [ function() {
 
-    return {
-      restrict: 'A',
-      scope: {
-        resourceDetailsData: '=',
-        control: '=?'
-      },
+  return {
+    restrict: 'A',
+    scope: {
+      resourceDetailsData: '=',
+      control: '=?'
+    },
 
-      template: template,
+    template: template,
 
-      controller : [
-        '$scope',
-        '$q',
-        '$location',
-        'camAPI',
-        'Views',
-        'Notifications',
-        'search',
+    controller : [
+      '$scope',
+      '$q',
+      '$location',
+      'Views',
+      'Notifications',
+      'search',
       function(
         $scope,
         $q,
         $location,
-        camAPI,
         Views,
         Notifications,
         search
@@ -73,8 +71,6 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         // fields /////////////////////////////////////////////////////////////////////
 
-        var Deployment = camAPI.resource('deployment');
-
         var resourceData = $scope.resourceData = $scope.resourceDetailsData.newChild($scope);
 
         var PLUGIN_DETAILS_COMPONENT = 'cockpit.repository.resource.detail';
@@ -86,11 +82,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
           $scope.deployment = deployment;
         });
 
-        $scope.resourceState = resourceData.observe([ 'resource', 'binary', function(resource, binary) {
+        $scope.resourceState = resourceData.observe([ 'resource', 'binary', function(resource) {
           $scope.resource = resource;
         }]);
 
-        $scope.$watch('resourceState.$error', function (err) {
+        $scope.$watch('resourceState.$error', function(err) {
           if (err) {
             var src = enhanceErrorMessage(err.message);
             errorNotification(src, err);
@@ -142,5 +138,5 @@ var angular = require('camunda-commons-ui/vendor/angular');
         });
 
       }]
-    };
-  }];
+  };
+}];

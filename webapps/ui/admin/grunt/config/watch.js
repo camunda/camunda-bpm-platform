@@ -39,6 +39,26 @@ module.exports = function(config, watchConf) {
       ]
   };
 
+  watchConf.admin_scripts_lint = {
+    options: options,
+    files: [
+      '<%= pkg.gruntConfig.adminSourceDir %>/scripts/**/*.js'
+    ],
+    tasks: [
+      'newer:eslint:admin_scripts'
+    ]
+  };
+
+  watchConf.admin_plugins_lint = {
+    options: options,
+    files: [
+      '<%= pkg.gruntConfig.pluginSourceDir %>/admin/plugins/**/*.js'
+    ],
+    tasks: [
+      'newer:eslint:admin_plugins'
+    ]
+  };
+
   watchConf.admin_dist = {
     options: {
       livereload: config.livereloadPort || false

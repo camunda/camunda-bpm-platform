@@ -5,7 +5,7 @@
     return {
 
       require: 'ngModel',
-      link: function (scope, element, attrs, ngModel) {
+      link: function(scope, element, attrs, ngModel) {
 
         function parseText(text) {
           var variable;

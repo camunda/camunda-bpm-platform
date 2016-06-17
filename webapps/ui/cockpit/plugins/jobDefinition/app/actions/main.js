@@ -10,14 +10,14 @@ var angular = require('angular'),
     bulkOverrideJobPriorityAction = require('./bulk-override-job-priority/bulk-override-job-priority-action'),
     bulkOverrideJobPriorityDialog = require('./bulk-override-job-priority/bulk-override-job-priority-dialog');
 
-  var ngModule = angular.module('cockpit.plugin.jobDefinition.actions', []);
+var ngModule = angular.module('cockpit.plugin.jobDefinition.actions', []);
 
   // override job priority action
-  ngModule.config(overrideJobPriorityAction);
-  ngModule.controller('JobDefinitionOverrideJobPriorityController', overrideJobPriorityDialog);
+ngModule.config(overrideJobPriorityAction);
+ngModule.controller('JobDefinitionOverrideJobPriorityController', overrideJobPriorityDialog);
 
   // bulk override job priority action
-  ngModule.config(bulkOverrideJobPriorityAction);
-  ngModule.controller('BulkJobDefinitionOverrideJobPriorityController', bulkOverrideJobPriorityDialog);
+ngModule.config(bulkOverrideJobPriorityAction);
+ngModule.controller('BulkJobDefinitionOverrideJobPriorityController', bulkOverrideJobPriorityDialog);
 
-  module.exports = ngModule;
+module.exports = ngModule;

@@ -7,11 +7,11 @@ var searchConfigJSON = fs.readFileSync(__dirname + '/cam-cockpit-deployments-sea
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  var searchConfig = JSON.parse(searchConfigJSON);
+var searchConfig = JSON.parse(searchConfigJSON);
 
-  var Controller = [
-   '$scope',
-  function (
+var Controller = [
+  '$scope',
+  function(
     $scope
   ) {
 
@@ -42,7 +42,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       return value;
     };
 
-    var getQueryParamBySearch = function (search) {
+    var getQueryParamBySearch = function(search) {
       var param = search.type.value.key;
       var op = search.operator.value.key;
 
@@ -85,16 +85,16 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
   }];
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.repository.deployments.list', {
-      id: 'deployments-search',
-      template: template,
-      controller: Controller,
-      priority: 100
-    });
-  };
+  ViewsProvider.registerDefaultView('cockpit.repository.deployments.list', {
+    id: 'deployments-search',
+    template: template,
+    controller: Controller,
+    priority: 100
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

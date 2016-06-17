@@ -5,32 +5,32 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-filter-modal-form.html
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  var isArray = angular.isArray;
+var isArray = angular.isArray;
 
-  var noop = function () {};
+var noop = function() {};
 
-  var GENERAL_ACCORDION =       'general',
-      PERMISSION_ACCORDION =    'permission',
-      CRITERIA_ACCORDION =      'criteria',
-      VARIABLE_ACCORDION =      'variable';
+var GENERAL_ACCORDION =       'general',
+    PERMISSION_ACCORDION =    'permission',
+    CRITERIA_ACCORDION =      'criteria',
+    VARIABLE_ACCORDION =      'variable';
 
-  module.exports = [function() {
+module.exports = [function() {
 
-    return {
+  return {
 
-      restrict: 'A',
-      scope: {
-        filter: '=',
-        filterModalData: '=',
-        registerIsValidProvider: '&',
-        registerPostFilterSavedProvider: '&'
-      },
+    restrict: 'A',
+    scope: {
+      filter: '=',
+      filterModalData: '=',
+      registerIsValidProvider: '&',
+      registerPostFilterSavedProvider: '&'
+    },
 
-      template: template,
+    template: template,
 
-      controller: [
-        '$scope',
-      function (
+    controller: [
+      '$scope',
+      function(
         $scope
       ) {
 
@@ -57,7 +57,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
         // init isValidProvider ////////////////////////////////////////////////////////
 
-        var isValidProvider = function () {
+        var isValidProvider = function() {
           return $scope.filterForm.$valid;
         };
 
@@ -66,12 +66,12 @@ var angular = require('camunda-commons-ui/vendor/angular');
         // handle hints ////////////////////////////////////////////////////////////////
 
         var hintProvider = {};
-        this.registerHintProvider = function (formName, fn) {
+        this.registerHintProvider = function(formName, fn) {
           fn = fn || noop;
           hintProvider[formName] = fn;
         };
 
-        $scope.showHint = function (formName) {
+        $scope.showHint = function(formName) {
           var provider = hintProvider[formName];
           return provider && provider();
         };
@@ -79,11 +79,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
         // handle submit after filter has been saved succesfully //////////////////////
 
         var postFilterSavedProviders = [];
-        this.registerPostFilterSavedProvider = function (provider) {
-          postFilterSavedProviders.push(provider || function (filter, callback) { return callback(); } );
+        this.registerPostFilterSavedProvider = function(provider) {
+          postFilterSavedProviders.push(provider || function(filter, callback) { return callback(); } );
         };
 
-        var postFilterSavedProvider = function (filter, callback) {
+        var postFilterSavedProvider = function(filter, callback) {
 
           var count = postFilterSavedProviders.length;
 
@@ -92,7 +92,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
           }
 
           var errors = [];
-          var localCallback = function (err) {
+          var localCallback = function(err) {
             count = count - 1;
 
             if (err) {
@@ -120,7 +120,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
           };
 
-          for (var i = 0, provider; !!(provider = postFilterSavedProviders[i]); i++) {
+          for (var i = 0, provider; (provider = postFilterSavedProviders[i]); i++) {
             provider(filter, localCallback);
           }
 
@@ -142,6 +142,6 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
       }]
 
-    };
+  };
 
-  }];
+}];

@@ -18,16 +18,16 @@ var angular = require('angular'),
     realInput = require('./decisionInstance/realInput'),
     realOutput = require('./decisionInstance/realOutput');
 
-  var ngModule = angular.module('cockpit.plugin.decisionList.views', []);
+var ngModule = angular.module('cockpit.plugin.decisionList.views', []);
 
-  ngModule.config(decisionList);
-  ngModule.config(decisionInstanceTable);
-  ngModule.config(inputTable);
-  ngModule.config(outputTable);
-  ngModule.config(highlightRules);
-  ngModule.config(realInput);
-  ngModule.config(realOutput);
+ngModule.config(decisionList);
+ngModule.config(decisionInstanceTable);
+ngModule.config(inputTable);
+ngModule.config(outputTable);
+ngModule.config(highlightRules);
+ngModule.config(realInput);
+ngModule.config(realOutput);
 
-  gotoProcessInstanceAction(ngModule);
+gotoProcessInstanceAction(ngModule);
 
-  module.exports = ngModule;
+module.exports = ngModule;

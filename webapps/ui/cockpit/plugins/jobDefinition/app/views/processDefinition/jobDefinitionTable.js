@@ -5,19 +5,18 @@ var fs = require('fs');
 var angular = require('angular');
 var template = fs.readFileSync(__dirname + '/job-definition-table.html', 'utf8');
 
-  var Controller = [
-    '$scope',
-    'Views',
-  function ($scope, Views) {
+var Controller = [
+  '$scope',
+  'Views',
+  function($scope, Views) {
 
-    var processData = $scope.processData.newChild($scope),
-        processDefinition = null;
+    var processData = $scope.processData.newChild($scope);
 
-    processData.observe([ 'filter', 'jobDefinitions', 'bpmnElements' ], function(filter, jobDefinitions, bpmnElements) {
-      updateView(filter, jobDefinitions, bpmnElements);
+    processData.observe([ 'filter', 'jobDefinitions', 'bpmnElements' ], function(filter, jobDefinitions) {
+      updateView(filter, jobDefinitions);
     });
 
-    function updateView(filter, jobDefinitions, bpmnElements) {
+    function updateView(filter, jobDefinitions) {
 
       $scope.jobDefinitions = null;
 
@@ -49,17 +48,17 @@ var template = fs.readFileSync(__dirname + '/job-definition-table.html', 'utf8')
 
   }];
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.tab', {
-      id: 'job-definition-table',
-      label: 'Job Definitions',
-      template: template,
-      controller: Controller,
-      priority: 2
-    });
-  };
+  ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.tab', {
+    id: 'job-definition-table',
+    label: 'Job Definitions',
+    template: template,
+    controller: Controller,
+    priority: 2
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

@@ -2,10 +2,10 @@
 
 var angular = require('angular');
 
-  var Controller = [ '$scope', 'processData', 'ProcessDefinitionResource',
-      function ($scope, processData, ProcessDefinitionResource) {
+var Controller = [ '$scope', 'processData', 'ProcessDefinitionResource',
+      function($scope, processData, ProcessDefinitionResource) {
 
-        processData.provide('processDefinitions', function () {
+        processData.provide('processDefinitions', function() {
           return ProcessDefinitionResource.queryStatistics({ incidents: true }).$promise;
         });
 
@@ -17,10 +17,10 @@ var angular = require('angular');
          * Returns an aggregated list over the statistics.
          *
          * Summarize the statistics of process definitions
-         * which have the same process definition key and 
-         * tenant id to one item. This item contains the 
-         * latest process definition name (if there does not 
-         * exist a name the process definition key will be 
+         * which have the same process definition key and
+         * tenant id to one item. This item contains the
+         * latest process definition name (if there does not
+         * exist a name the process definition key will be
          * used as the process definition name).
          *
          * Furthermore, the number of instances, failed jobs
@@ -36,18 +36,18 @@ var angular = require('angular');
           var result = [];
 
           // iterate over assigned statistics
-          angular.forEach(statistics, function (currentStatistic) {
+          angular.forEach(statistics, function(currentStatistic) {
             // get the statistics to the definition key of the current item
             var statisticsForDefinition = statisticsResult[currentStatistic.definition.key];
-            
+
             if(!statisticsForDefinition) {
-            	// create an array for tenants if not exists
-            	statisticsResult[currentStatistic.definition.key] = [];
+              // create an array for tenants if not exists
+              statisticsResult[currentStatistic.definition.key] = [];
             }
-            
+
             // get the statistic for the tenant id of the current item
             var statistic = statisticsResult[currentStatistic.definition.key][currentStatistic.definition.tenantId];
-            
+
             if (!statistic) {
               // if there does not exists a statistic to the definition key
               // then create a copy of the current item (currentStatistic).
@@ -86,7 +86,7 @@ var angular = require('angular');
               statistic.instances = currentInstances + currentStatistic.instances;
               statistic.failedJobs = currentFailedJobs + currentStatistic.failedJobs;
 
-              angular.forEach(currentIncidents, function (incident) {
+              angular.forEach(currentIncidents, function(incident) {
                 var incidentType = incident.incidentType;
                 var incidentCount = incident.incidentCount;
 
@@ -99,7 +99,7 @@ var angular = require('angular');
                   }
                 }
 
-                if (!!newIncident) {
+                if (newIncident) {
                   // merge the incidents
                   statistic.incidents.push(incident);
                 }
@@ -112,16 +112,16 @@ var angular = require('angular');
           return result;
         };
 
-  }];
+      }];
 
-  var Configuration = function PluginConfiguration(DataProvider) {
+var Configuration = function PluginConfiguration(DataProvider) {
 
-    DataProvider.registerData('cockpit.dashboard.data', {
-      id: 'process-definition-statistics-data',
-      controller: Controller
-    });
-  };
+  DataProvider.registerData('cockpit.dashboard.data', {
+    id: 'process-definition-statistics-data',
+    controller: Controller
+  });
+};
 
-  Configuration.$inject = ['DataProvider'];
+Configuration.$inject = ['DataProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

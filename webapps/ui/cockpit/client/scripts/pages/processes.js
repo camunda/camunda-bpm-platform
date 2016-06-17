@@ -6,17 +6,15 @@ var template = fs.readFileSync(__dirname + '/processes.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  var $ = angular.element;
-
-  var Controller = [
-    '$scope',
-    '$location',
-    '$timeout',
-    'Views',
-    'Data',
-    'dataDepend',
-    'page',
-  function (
+var Controller = [
+  '$scope',
+  '$location',
+  '$timeout',
+  'Views',
+  'Data',
+  'dataDepend',
+  'page',
+  function(
     $scope,
     $location,
     $timeout,
@@ -44,14 +42,14 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
     for(var i = 0; i < dashboardPlugins.length; i++) {
       if(typeof dashboardPlugins[i].initialize === 'function') {
-         dashboardPlugins[i].initialize(initData);
+        dashboardPlugins[i].initialize(initData);
       }
     }
 
 
     var search = $location.search();
     if (search.targetPlugin) {
-      $timeout(function () {
+      $timeout(function() {
         var el = angular.element('[data-plugin-id="' + search.targetPlugin + '"]');
         if (el.length) {
           el[0].scrollIntoView();
@@ -70,13 +68,13 @@ var angular = require('camunda-commons-ui/vendor/angular');
     page.titleSet('Processes');
   }];
 
-  var RouteConfig = [ '$routeProvider', function($routeProvider) {
-    $routeProvider.when('/processes', {
-      template: template,
-      controller: Controller,
-      authentication: 'required',
-      reloadOnSearch: false
-    });
-  }];
+var RouteConfig = [ '$routeProvider', function($routeProvider) {
+  $routeProvider.when('/processes', {
+    template: template,
+    controller: Controller,
+    authentication: 'required',
+    reloadOnSearch: false
+  });
+}];
 
-  module.exports = RouteConfig;
+module.exports = RouteConfig;

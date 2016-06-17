@@ -8,16 +8,16 @@ var confirmationTemplate = fs.readFileSync(__dirname + '/generic-confirmation.ht
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  var Controller = [
-    '$scope',
-    'page',
-    '$routeParams',
-    'search',
-    'camAPI',
-    'Notifications',
-    '$location',
-    '$modal',
-  function (
+var Controller = [
+  '$scope',
+  'page',
+  '$routeParams',
+  'search',
+  'camAPI',
+  'Notifications',
+  '$location',
+  '$modal',
+  function(
     $scope,
     pageService,
     $routeParams,
@@ -80,7 +80,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       GroupResource.get({ id : $scope.encodedGroupId }, function(err, res) {
         $scope.groupLoadingState = 'LOADED';
         $scope.group = res;
-        $scope.groupName = (!!res.name ? res.name : res.id);
+        $scope.groupName = (res.name ? res.name : res.id);
         $scope.groupCopy = angular.copy(res);
 
         pageService.titleSet($scope.groupName + ' Group');
@@ -91,7 +91,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
           href: '#/groups/' + $scope.group.id
         });
 
-      }, function () {
+      }, function() {
         $scope.groupLoadingState = 'ERROR';
       });
     };
@@ -186,7 +186,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
     };
 
     GroupResource.options({ id: $scope.encodedGroupId }, function(err, res) {
-      angular.forEach(res.links, function(link){
+      angular.forEach(res.links, function(link) {
         $scope.availableOperations[link.rel] = true;
       });
     });
@@ -194,19 +194,18 @@ var angular = require('camunda-commons-ui/vendor/angular');
     $scope.removeTenant = function(tenantId) {
       var encodedTenantId = encodeId(tenantId);
 
-      TenantResource.deleteGroupMember({ groupId: $scope.encodedGroupId, id: encodedTenantId }, function(err, res){
-          Notifications.addMessage({
-            type:'success',
-            status:'Success',
-            message:'Group '+$scope.group.id+' removed from tenant.'
-          });
-          updateGroupTenantView();
-        }
-      );
+      TenantResource.deleteGroupMember({ groupId: $scope.encodedGroupId, id: encodedTenantId }, function() {
+        Notifications.addMessage({
+          type:'success',
+          status:'Success',
+          message:'Group '+$scope.group.id+' removed from tenant.'
+        });
+        updateGroupTenantView();
+      });
     };
 
     $scope.updateGroup = function() {
-      GroupResource.update(angular.extend({}, { groupId: $scope.encodedGroupId }, $scope.group), function(err, res) {
+      GroupResource.update(angular.extend({}, { groupId: $scope.encodedGroupId }, $scope.group), function(err) {
         if( err === null ) {
           Notifications.addMessage({
             type : 'success',
@@ -229,11 +228,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
     $scope.deleteGroup = function() {
       $modal.open({
         template: confirmationTemplate,
-        controller: ['$scope', function ($dialogScope) {
+        controller: ['$scope', function($dialogScope) {
           $dialogScope.question = 'Really delete group ' + $scope.group.id + '?';
         }]
-      }).result.then(function () {
-        GroupResource.delete({ id: $scope.encodedGroupId }, function(err, res) {
+      }).result.then(function() {
+        GroupResource.delete({ id: $scope.encodedGroupId }, function(err) {
           if( err === null ) {
             Notifications.addMessage({
               type : 'success',
@@ -321,11 +320,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
   }];
 
-  module.exports = [ '$routeProvider', function($routeProvider) {
-    $routeProvider.when('/groups/:groupId', {
-      template: template,
-      controller: Controller,
-      authentication: 'required',
-      reloadOnSearch: false
-    });
-  }];
+module.exports = [ '$routeProvider', function($routeProvider) {
+  $routeProvider.when('/groups/:groupId', {
+    template: template,
+    controller: Controller,
+    authentication: 'required',
+    reloadOnSearch: false
+  });
+}];

@@ -5,11 +5,11 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/execution-metrics.html', 'utf8');
 var CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk');
 
-  var Controller = [
-   '$scope',
-   'Uri',
-   'camAPI',
-  function ($scope, Uri, camAPI) {
+var Controller = [
+  '$scope',
+  'Uri',
+  'camAPI',
+  function($scope, Uri, camAPI) {
 
     var MetricsResource = camAPI.resource('metrics');
 
@@ -23,7 +23,7 @@ var CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk');
       $scope.loadingState = 'LOADING';
       // promises??? NOPE!
       CamSDK.utils.series({
-        flowNodes: function (cb) {
+        flowNodes: function(cb) {
           MetricsResource.sum({
             name: 'activity-instance-start',
             startDate: $scope.startDate,
@@ -32,7 +32,7 @@ var CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk');
             cb(err, !err ? res.result : null);
           });
         },
-        decisionElements: function (cb) {
+        decisionElements: function(cb) {
           MetricsResource.sum({
             name: 'executed-decision-elements',
             startDate: $scope.startDate,
@@ -41,7 +41,7 @@ var CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk');
             cb(err, !err ? res.result : null);
           });
         }
-      }, function (err, res) {
+      }, function(err, res) {
         $scope.loadingState = 'LOADED';
         if (err) {
           $scope.loadingState = 'ERROR';
@@ -50,19 +50,19 @@ var CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk');
         $scope.metrics = res;
       });
 
-     };
+    };
 
     $scope.load();
 
   }];
 
-  module.exports = ['ViewsProvider', function PluginConfiguration(ViewsProvider) {
+module.exports = ['ViewsProvider', function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('admin.system', {
-      id: 'system-settings-metrics',
-      label: 'Execution Metrics',
-      template: template,
-      controller: Controller,
-      priority: 900
-    });
-  }];
+  ViewsProvider.registerDefaultView('admin.system', {
+    id: 'system-settings-metrics',
+    label: 'Execution Metrics',
+    template: template,
+    controller: Controller,
+    priority: 900
+  });
+}];

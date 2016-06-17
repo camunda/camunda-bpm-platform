@@ -4,12 +4,12 @@ var $ = require('jquery');
 
 var template = fs.readFileSync(__dirname + '/../modals/cam-tasklist-filter-modal.html', 'utf8');
 
-  module.exports = [
-    '$scope',
-    '$modal',
-    '$q',
-    'camAPI',
-    '$timeout',
+module.exports = [
+  '$scope',
+  '$modal',
+  '$q',
+  'camAPI',
+  '$timeout',
   function(
     $scope,
     $modal,
@@ -47,7 +47,7 @@ var template = fs.readFileSync(__dirname + '/../modals/cam-tasklist-filter-modal
       filterAuthorizations = filterAuthorizations || {};
       var links = filterAuthorizations.links || [];
 
-      for (var i = 0, link; !!(link = links[i]); i++) {
+      for (var i = 0, link; (link = links[i]); i++) {
         if (link.rel === 'create') {
           return true;
         }
@@ -75,7 +75,7 @@ var template = fs.readFileSync(__dirname + '/../modals/cam-tasklist-filter-modal
 
     var focusFilter = function(filter) {
       if(filter) {
-        doAfterFilterUpdate.push(function(newFilters) {
+        doAfterFilterUpdate.push(function() {
           $timeout(function() {
             $('.task-filters .content div.item.active .actions a')[0].focus();
           });
@@ -89,7 +89,7 @@ var template = fs.readFileSync(__dirname + '/../modals/cam-tasklist-filter-modal
       $('.task-filters .content h4 a')[0].focus();
     });
 
-    $scope.openModal = function ($event, filter) {
+    $scope.openModal = function($event, filter) {
       $event.stopPropagation();
 
       $modal.open({
@@ -105,7 +105,7 @@ var template = fs.readFileSync(__dirname + '/../modals/cam-tasklist-filter-modal
       }).result.then(function() {
         filtersData.changed('filters');
         focusFilter(filter);
-      }, function () {
+      }, function() {
         filtersData.changed('filters');
         focusFilter(filter);
       });

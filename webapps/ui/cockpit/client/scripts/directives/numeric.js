@@ -1,10 +1,10 @@
   'use strict';
 
-  var Directive = function () {
+  var Directive = function() {
     return {
       restrict: 'A',
       require: 'ngModel',
-      link: function (scope, element, attrs, model) {
+      link: function(scope, element, attrs, model) {
 
         var pattern = attrs.integer ? /^-?[\d]+$/ : /^(0|(-?(((0|[1-9]\d*)\.\d+)|([1-9]\d*))))([eE][-+]?[0-9]+)?$/;
 

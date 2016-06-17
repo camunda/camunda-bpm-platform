@@ -1,19 +1,20 @@
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular'),
-    dataDepend = require('angular-data-depend'),
-    camCommons = require('camunda-commons-ui/lib/index'),
+var angular = require('camunda-commons-ui/vendor/angular');
 
-    routes = require('./config/routes');
+require('angular-data-depend');
+require('camunda-commons-ui/lib/index');
 
-  var ngDeps = [
-    'cam.commons',
-    'dataDepend',
-    'ngRoute'
-  ];
+var routes = require('./config/routes');
 
-  var batchModule = angular.module('cam.cockpit.batch', ngDeps);
+var ngDeps = [
+  'cam.commons',
+  'dataDepend',
+  'ngRoute'
+];
 
-  batchModule.config(routes);
+var batchModule = angular.module('cam.cockpit.batch', ngDeps);
 
-  module.exports = batchModule;
+batchModule.config(routes);
+
+module.exports = batchModule;

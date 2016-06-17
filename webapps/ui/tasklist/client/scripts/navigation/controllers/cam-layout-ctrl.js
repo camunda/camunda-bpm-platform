@@ -1,13 +1,11 @@
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular');
+var $ = require('jquery');
+var $bdy = $('body');
 
-  var $ = require('jquery');
-  var $bdy = $('body');
-
-  module.exports = [
-    '$scope',
-    '$timeout',
+module.exports = [
+  '$scope',
+  '$timeout',
   function(
     $scope,
     $timeout
@@ -60,7 +58,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       }
 
       $bdy.toggleClass(target +'-column-close');
-      $timeout(function () {
+      $timeout(function() {
         $scope.$root.$broadcast('layout:change');
       }, 600);
     };

@@ -2,15 +2,15 @@
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  module.exports = [
-    '$scope',
-    '$q',
-    '$location',
-    '$timeout',
-    'search',
-    'dataDepend',
-    'page',
-    'camAPI',
+module.exports = [
+  '$scope',
+  '$q',
+  '$location',
+  '$timeout',
+  'search',
+  'dataDepend',
+  'page',
+  'camAPI',
   function(
     $scope,
     $q,
@@ -29,11 +29,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
     // utilities /////////////////////////////////////////////////////////////////
 
-    var updateSilently = function (params) {
+    var updateSilently = function(params) {
       search.updateSilently(params);
     };
 
-    var getPropertyFromLocation = function (property) {
+    var getPropertyFromLocation = function(property) {
       var search = $location.search() || {};
       return search[property] || null;
     };
@@ -96,7 +96,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
     }
     $timeout(updateDeploymentsListTop, 200);
 
-    repositoryData.provide('deploymentsQuery', [ 'deploymentsSearchQuery', 'deploymentsPagination', 'deploymentsSorting', function (query, pagination, sorting) {
+    repositoryData.provide('deploymentsQuery', [ 'deploymentsSearchQuery', 'deploymentsPagination', 'deploymentsSorting', function(query, pagination, sorting) {
       var deferred = $q.defer();
 
       // wait for angular to initialize the controllers, so that the search
@@ -116,7 +116,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
       Deployment.list(query, function(err, res) {
 
-        if (!!err) {
+        if (err) {
           deferred.reject(err);
         }
         else {
@@ -135,16 +135,16 @@ var angular = require('camunda-commons-ui/vendor/angular');
       var focused;
       var _deploymentId = getPropertyFromLocation('deployment');
 
-      for (var i = 0, deployment; !!(deployment = deployments[i]); i++) {
+      for (var i = 0, deployment; (deployment = deployments[i]); i++) {
 
-          if (_deploymentId === deployment.id) {
-            focused = deployment;
-            break;
-          }
+        if (_deploymentId === deployment.id) {
+          focused = deployment;
+          break;
+        }
           // auto focus first deployment
-          if(!focused) {
-            focused = deployment;
-          }
+        if(!focused) {
+          focused = deployment;
+        }
       }
 
       if (focused) {
@@ -204,7 +204,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       }
       else if (resourceName) {
         resources = resources || [];
-        for(var i=0, resource; !!(resource = resources[i]); i++) {
+        for(var i=0, resource; (resource = resources[i]); i++) {
           if (resource.name === resourceName) {
             return {
               resourceId: resource.id

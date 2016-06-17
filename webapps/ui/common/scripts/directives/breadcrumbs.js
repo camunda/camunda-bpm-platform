@@ -4,14 +4,12 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/breadcrumbs.html', 'utf8');
 
-  module.exports = [
-    '$location',
-    'routeUtil',
-    'page',
-  function (
+module.exports = [
+  '$location',
+  'routeUtil',
+  function(
     $location,
-    routeUtil,
-    page
+    routeUtil
   ) {
     return {
       scope: {
@@ -28,18 +26,18 @@ var template = fs.readFileSync(__dirname + '/breadcrumbs.html', 'utf8');
           scope.breadcrumbs = breadcrumbs;
         });
 
-        scope.getHref = function (crumb) {
+        scope.getHref = function(crumb) {
           return routeUtil.redirectTo(crumb.href, $location.search(), crumb.keepSearchParams);
         };
 
         scope.selectChoice = function(evt, choice) {
           evt.preventDefault();
           $location.path(choice.href.substr(1));
-        }
+        };
 
-        scope.getActiveChoice = function (choices) {
+        scope.getActiveChoice = function(choices) {
           var label;
-          choices.forEach(function (choice) {
+          choices.forEach(function(choice) {
             if (choice.active) {
               label = choice.label;
             }
@@ -51,12 +49,12 @@ var template = fs.readFileSync(__dirname + '/breadcrumbs.html', 'utf8');
       controller: [
         '$scope',
         'page',
-      function(
-        $scope,
-        page
-      ) {
-        // initialize the $scope breadcrumbs from the service
-        $scope.breadcrumbs = page.breadcrumbsGet();
-      }]
+        function(
+          $scope,
+          page
+        ) {
+          // initialize the $scope breadcrumbs from the service
+          $scope.breadcrumbs = page.breadcrumbsGet();
+        }]
     };
   }];

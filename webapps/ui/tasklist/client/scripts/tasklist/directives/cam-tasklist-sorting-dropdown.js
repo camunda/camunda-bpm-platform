@@ -3,10 +3,8 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-tasklist-sorting-dropdown.html', 'utf8');
 
-var angular = require('camunda-commons-ui/vendor/angular');
-
-  module.exports = ['$translate',
-  function ($translate){
+module.exports = ['$translate',
+  function($translate) {
     return {
       restrict: 'A',
 
@@ -31,13 +29,13 @@ var angular = require('camunda-commons-ui/vendor/angular');
         };
 
 
-        $scope.hasOptions = function(){
+        $scope.hasOptions = function() {
           return $scope.options && Object.keys($scope.options).length > 0;
         };
 
         // --- CONTROL FUNCTIONS ---
         $scope.resetInputs = {};
-        $scope.resetFunction = function(id, type, value){
+        $scope.resetFunction = function(id, type, value) {
           if($scope.sortableVariables[id]) {
             $scope.focusedOn = id;
             $scope.variable.varType = type;
@@ -66,7 +64,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
           caseInstanceVariable:   $translate.instant('CASE_INSTANCE_VARIABLE')
         };
 
-        $scope.showInputs = function ($event, name) {
+        $scope.showInputs = function($event, name) {
           $event.preventDefault();
           $event.stopPropagation();
           $scope.focusedOn = name;

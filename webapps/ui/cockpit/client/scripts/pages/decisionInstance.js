@@ -5,14 +5,16 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/decision-instance.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular'),
-    routeUtil = require('../../../../common/scripts/util/routeUtil'),
-    dataDepend = require('angular-data-depend'),
-    camCommons = require('camunda-commons-ui/lib');
+    routeUtil = require('../../../../common/scripts/util/routeUtil');
 
-  var ngModule = angular.module('cam.cockpit.pages.decisionInstance', ['dataDepend', camCommons.name]);
+require('angular-data-depend');
 
-  var Controller = [
-          '$scope', '$rootScope', '$q', 'dataDepend', 'page', 'camAPI', 'decisionInstance', 'Views', 'search',
+var camCommons = require('camunda-commons-ui/lib');
+
+var ngModule = angular.module('cam.cockpit.pages.decisionInstance', ['dataDepend', camCommons.name]);
+
+var Controller = [
+  '$scope', '$rootScope', '$q', 'dataDepend', 'page', 'camAPI', 'decisionInstance', 'Views', 'search',
   function($scope,   $rootScope,   $q,   dataDepend,   page,   camAPI,   decisionInstance,   Views,   search
   ) {
 
@@ -27,7 +29,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     var decisionDefinitionService = camAPI.resource('decision-definition');
 
     $scope.hovered = null;
-    $scope.hoverTitle = function (id) {
+    $scope.hoverTitle = function(id) {
       $scope.hovered = id || null;
     };
 
@@ -130,7 +132,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
       for(var i = 0; i < tablePlugins.length; i++) {
         if(typeof tablePlugins[i].initialize === 'function') {
-           tablePlugins[i].initialize(initData);
+          tablePlugins[i].initialize(initData);
         }
       }
     };
@@ -154,7 +156,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
     for(var i = 0; i < decisionPlugins.length; i++) {
       if(typeof decisionPlugins[i].initialize === 'function') {
-         decisionPlugins[i].initialize(initData);
+        decisionPlugins[i].initialize(initData);
       }
     }
 
@@ -192,8 +194,8 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
   }];
 
-  var RouteConfig = [
-    '$routeProvider',
+var RouteConfig = [
+  '$routeProvider',
   function(
     $routeProvider
   ) {
@@ -214,10 +216,10 @@ var angular = require('camunda-commons-ui/vendor/angular'),
       authentication: 'required',
       resolve: {
         decisionInstance: [ 'ResourceResolver', 'camAPI', '$q',
-        function (ResourceResolver, camAPI, $q) {
+        function(ResourceResolver, camAPI, $q) {
           return ResourceResolver.getByRouteParam('id', {
             name: 'decision instance',
-            resolve: function (id) {
+            resolve: function(id) {
               var deferred = $q.defer();
 
               var historyService = camAPI.resource('history');
@@ -247,18 +249,18 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     });
   }];
 
-  var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
-    ViewsProvider.registerDefaultView('cockpit.decisionInstance.view', {
-      id: 'history',
-      priority: 20,
-      label: 'History',
-      keepSearchParams: []
-    });
-  }];
+var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
+  ViewsProvider.registerDefaultView('cockpit.decisionInstance.view', {
+    id: 'history',
+    priority: 20,
+    label: 'History',
+    keepSearchParams: []
+  });
+}];
 
-  ngModule
+ngModule
     .config(RouteConfig)
     .config(ViewConfig)
   ;
 
-  module.exports = ngModule;
+module.exports = ngModule;

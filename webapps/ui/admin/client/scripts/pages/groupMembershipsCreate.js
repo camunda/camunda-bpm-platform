@@ -2,12 +2,12 @@
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  module.exports = [
-            '$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI', '$modalInstance', 'member', 'memberId', 'idList',
-    function($scope,   $q,   $location,   Uri,   Notifications,   camAPI,   $modalInstance,   member,   memberId,   idList) {
-      
+module.exports = [
+  '$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI', '$modalInstance', 'member', 'memberId', 'idList',
+  function($scope,   $q,   $location,   Uri,   Notifications,   camAPI,   $modalInstance,   member,   memberId,   idList) {
+
     var GroupResource = camAPI.resource('group');
-      
+
     var BEFORE_CREATE = 'beforeCreate',
         PERFORM_CREATE = 'performCancel',
         CREATE_SUCCESS = 'SUCCESS',
@@ -18,11 +18,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
     $scope.groupIdList = idList;
     $scope.userId = memberId;
 
-    $scope.$on('$routeChangeStart', function () {
+    $scope.$on('$routeChangeStart', function() {
       $modalInstance.close($scope.status);
     });
 
-    function loadAllGroups () {
+    function loadAllGroups() {
       var deferred = $q.defer();
 
       GroupResource.list(function(err, res) {
@@ -45,7 +45,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
         }
       });
       $scope.status = BEFORE_CREATE;
-    }, function (error) {
+    }, function(error) {
       $scope.status = LOADING_FAILED;
       Notifications.addError({
         'status': 'Failed',
@@ -54,11 +54,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
       });
     });
 
-    $scope.createGroupMemberships = function () {
+    $scope.createGroupMemberships = function() {
       $scope.status = PERFORM_CREATE;
 
       var selectedGroupIds = [];
-      angular.forEach($scope.availableGroups, function(group){
+      angular.forEach($scope.availableGroups, function(group) {
         if(group.checked) {
           selectedGroupIds.push(group.id);
         }
@@ -71,7 +71,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
                                 .replace(/\//g, '%2F')
                                 .replace(/\\/g, '%5C');
 
-        GroupResource.createMember({ id: encodedGroupId, userId: $scope.userId }, function(err, res) {
+        GroupResource.createMember({ id: encodedGroupId, userId: $scope.userId }, function(err) {
           completeCount++;
           if( err === null ) {
             if(completeCount == selectedGroupIds.length) {
@@ -88,7 +88,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
       deferred.promise.then(function() {
         $scope.status = CREATE_SUCCESS;
-      }, function (error) {
+      }, function(error) {
         $scope.status = CREATE_FAILED;
         Notifications.addError({
           'status': 'Failed',
@@ -99,7 +99,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
     };
 
-    $scope.close = function (status) {
+    $scope.close = function(status) {
       $modalInstance.close(status);
     };
   }];

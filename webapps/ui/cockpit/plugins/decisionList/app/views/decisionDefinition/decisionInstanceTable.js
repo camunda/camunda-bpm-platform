@@ -5,15 +5,15 @@ var fs = require('fs');
 var angular = require('angular');
 var template = fs.readFileSync(__dirname + '/decision-instance-table.html', 'utf8');
 
-  module.exports = [ 'ViewsProvider', function(ViewsProvider) {
+module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.decisionDefinition.tab', {
-      id: 'decision-instances-table',
-      label: 'Decision Instances',
-      template: template,
-      controller: [
-               '$scope', '$location', 'search', 'routeUtil', 'camAPI', 'Views', '$rootScope',
-      function ($scope,   $location,   search,   routeUtil,   camAPI,   Views,   $rootScope) {
+  ViewsProvider.registerDefaultView('cockpit.decisionDefinition.tab', {
+    id: 'decision-instances-table',
+    label: 'Decision Instances',
+    template: template,
+    controller: [
+      '$scope', '$location', 'search', 'routeUtil', 'camAPI', 'Views', '$rootScope',
+      function($scope,   $location,   search,   routeUtil,   camAPI,   Views,   $rootScope) {
 
         var processInstancePlugins = Views.getProviders({ component: 'cockpit.processInstance.view' });
 
@@ -100,6 +100,6 @@ var template = fs.readFileSync(__dirname + '/decision-instance-table.html', 'utf
 
 
       }],
-      priority: 10
-    });
-  }];
+    priority: 10
+  });
+}];

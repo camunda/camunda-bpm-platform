@@ -12,10 +12,10 @@ var angular = require('camunda-commons-ui/vendor/angular');
    * @module cam.cockpit.services.page
    */
 
-  module.exports = [
-    '$rootScope',
-    '$location',
-    'camAPI',
+module.exports = [
+  '$rootScope',
+  '$location',
+  'camAPI',
   function(
     $rootScope,
     $location,
@@ -39,7 +39,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
 
 
-    $rootScope.isActivePage = function (pageName) {
+    $rootScope.isActivePage = function(pageName) {
       return $location.path().indexOf('/' + pageName) === 0 ? 'active' : '';
     };
 
@@ -51,7 +51,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       }
 
       var userService = camAPI.resource('user');
-      userService.profile(auth.name, function (err, info) {
+      userService.profile(auth.name, function(err, info) {
         if (err) {
           $rootScope.userFullName = null;
           throw err;
@@ -59,7 +59,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
         $rootScope.userFullName = info.firstName + ' ' + info.lastName;
       });
     }
-    $rootScope.$on('authentication.changed', function (ev, auth) {
+    $rootScope.$on('authentication.changed', function(ev, auth) {
       getUserProfile(auth);
     });
     getUserProfile($rootScope.authentication);

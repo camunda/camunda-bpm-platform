@@ -2,15 +2,15 @@
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  module.exports = [
-    '$rootScope',
-    '$scope',
-    '$translate',
-    '$timeout',
-    'debounce',
-    'Notifications',
-    'processData',
-    'assignNotification',
+module.exports = [
+  '$rootScope',
+  '$scope',
+  '$translate',
+  '$timeout',
+  'debounce',
+  'Notifications',
+  'processData',
+  'assignNotification',
   function(
     $rootScope,
     $scope,
@@ -68,7 +68,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       searchValue: null
     };
 
-    $scope.triggerOnStart = function () {};
+    $scope.triggerOnStart = function() {};
 
     // observe /////////////////////////////////////////////////////////////////////////////////////
 
@@ -79,11 +79,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
       page.current = (_query.firstResult / page.size) + 1;
     });
 
-    $scope.startFormState = processStartData.observe('startForm', function (startForm) {
+    $scope.startFormState = processStartData.observe('startForm', function(startForm) {
       $scope.startForm = angular.copy(startForm);
     });
 
-    $scope.processDefinitionState = processStartData.observe('processDefinitions', function (processDefinitions) {
+    $scope.processDefinitionState = processStartData.observe('processDefinitions', function(processDefinitions) {
 
       page.total = processDefinitions.count;
 
@@ -91,19 +91,19 @@ var angular = require('camunda-commons-ui/vendor/angular');
         // order by process definition name / key and secondary by tenant id
         var aName = (a.name || a.key).toLowerCase();
         var bName = (b.name || b.key).toLowerCase();
-        
+
         var aTenantId = a.tenantId ? a.tenantId.toLowerCase() : '';
         var bTenantId = b.tenantId ? b.tenantId.toLowerCase() : '';
-        
+
         if (aName < bName)
-           return -1;
+          return -1;
         else if (aName > bName)
           return 1;
         else if (aTenantId < bTenantId)
           return -1;
         else if (aTenantId > bTenantId)
           return 1;
-        else 
+        else
           return 0;
       });
 
@@ -194,8 +194,8 @@ var angular = require('camunda-commons-ui/vendor/angular');
     var executeAfterDestroy = [];
     $scope.$on('$destroy', function() {
       var job;
-      while(!!(job = executeAfterDestroy.pop())) {
-        if(typeof job === "function") {
+      while((job = executeAfterDestroy.pop())) {
+        if(typeof job === 'function') {
           job();
         }
       }
@@ -218,18 +218,18 @@ var angular = require('camunda-commons-ui/vendor/angular');
     };
 
     // will be called on initialization of the 'form'-directive
-    $scope.registerCompletionHandler = function (fn) {
+    $scope.registerCompletionHandler = function(fn) {
       // register a handler when a process should be started
-      $scope.triggerOnStart = fn || function () {};
+      $scope.triggerOnStart = fn || function() {};
     };
 
     // will be triggered when the user select on 'Start'
-    $scope.startProcessInstance = function () {
+    $scope.startProcessInstance = function() {
       $scope.triggerOnStart();
     };
 
     // will be called the validation state has been changed
-    $scope.notifyFormValidation = function (invalid) {
+    $scope.notifyFormValidation = function(invalid) {
       $scope.$invalid = invalid;
     };
 

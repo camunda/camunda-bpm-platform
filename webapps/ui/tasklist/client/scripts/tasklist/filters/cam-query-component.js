@@ -1,16 +1,15 @@
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular');
-var moment = require('camunda-commons-ui/vendor/moment');
+require('camunda-commons-ui/vendor/moment');
 
-  module.exports = [
-    '$filter',
+module.exports = [
+  '$filter',
   function($filter) {
 
     var dateRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/;
 
     function isDateValue(value) {
-       return value.match(dateRegex);
+      return value.match(dateRegex);
     }
 
     var camDate = $filter('camDate');

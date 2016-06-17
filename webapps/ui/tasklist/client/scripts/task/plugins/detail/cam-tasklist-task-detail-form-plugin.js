@@ -5,13 +5,13 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-task-detail-form-plugi
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  var Controller = [
-   '$scope',
-   '$location',
-   '$q',
-   'camAPI',
-   'assignNotification',
-  function (
+var Controller = [
+  '$scope',
+  '$location',
+  '$q',
+  'camAPI',
+  'assignNotification',
+  function(
     $scope,
     $location,
     $q,
@@ -121,17 +121,17 @@ var angular = require('camunda-commons-ui/vendor/angular');
     };
   }];
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('tasklist.task.detail', {
-      id: 'task-detail-form',
-      label: 'FORM',
-      template: template,
-      controller: Controller,
-      priority: 1000
-    });
-  };
+  ViewsProvider.registerDefaultView('tasklist.task.detail', {
+    id: 'task-detail-form',
+    label: 'FORM',
+    template: template,
+    controller: Controller,
+    priority: 1000
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

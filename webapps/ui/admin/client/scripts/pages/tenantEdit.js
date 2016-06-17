@@ -7,16 +7,16 @@ var confirmationTemplate = fs.readFileSync(__dirname + '/generic-confirmation.ht
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  var Controller = [
-    '$scope',
-    'page',
-    '$routeParams',
-    'search',
-    'camAPI',
-    'Notifications',
-    '$location',
-    '$modal',
-  function (
+var Controller = [
+  '$scope',
+  'page',
+  '$routeParams',
+  'search',
+  'camAPI',
+  'Notifications',
+  '$location',
+  '$modal',
+  function(
     $scope,
     pageService,
     $routeParams,
@@ -30,10 +30,10 @@ var angular = require('camunda-commons-ui/vendor/angular');
     var TenantResource        = camAPI.resource('tenant'),
         GroupResource         = camAPI.resource('group'),
         UserResource          = camAPI.resource('user');
-    
+
     $scope.$root.showBreadcrumbs = true;
 
-    
+
 
     pageService.titleSet('Tenant');
 
@@ -43,9 +43,9 @@ var angular = require('camunda-commons-ui/vendor/angular');
       pageService.breadcrumbsClear();
 
       pageService.breadcrumbsAdd([{
-          label: 'Tenants',
-          href: '#/tenants'
-        }]);
+        label: 'Tenants',
+        href: '#/tenants'
+      }]);
     }
     refreshBreadcrumbs();
 
@@ -79,7 +79,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       TenantResource.get($scope.encodedTenantId , function(err, res) {
         $scope.tenantLoadingState = 'LOADED';
         $scope.tenant = res;
-        $scope.tenantName = (!!res.name ? res.name : res.id);
+        $scope.tenantName = (res.name ? res.name : res.id);
         $scope.tenantCopy = angular.copy(res);
 
         pageService.titleSet($scope.tenantName + ' Tenant');
@@ -90,8 +90,8 @@ var angular = require('camunda-commons-ui/vendor/angular');
           label: $scope.tenantName,
           href: '#/tenants/' + $scope.tenant.id
         }]);
-        
-      }, function () {
+
+      }, function() {
         $scope.tenantLoadingState = 'ERROR';
       });
     };
@@ -133,7 +133,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
           firstResult : firstResult,
           maxResults : count
         }
-      }
+      };
     }
 
     function updateTenantGroupView() {
@@ -173,7 +173,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
     }
 
     TenantResource.options($scope.encodedTenantId, function(err, res) {
-      angular.forEach(res.links, function(link){
+      angular.forEach(res.links, function(link) {
         $scope.availableOperations[link.rel] = true;
       });
     });
@@ -185,7 +185,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
         name: $scope.tenant.name
       };
 
-      TenantResource.update(updateData, function(err, res) {
+      TenantResource.update(updateData, function(err) {
         if( err === null ) {
           Notifications.addMessage({
             type : 'success',
@@ -207,11 +207,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
     $scope.deleteTenant = function() {
       $modal.open({
         template: confirmationTemplate,
-        controller: ['$scope', function ($dialogScope) {
+        controller: ['$scope', function($dialogScope) {
           $dialogScope.question = 'Really delete tenant ' + $scope.tenant.id + '?';
         }]
-      }).result.then(function () {
-        TenantResource.delete({ id: $scope.encodedTenantId }, function(err, res) {
+      }).result.then(function() {
+        TenantResource.delete({ id: $scope.encodedTenantId }, function(err) {
           if(err === null) {
             Notifications.addMessage({
               type: 'success',
@@ -252,11 +252,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
   }];
 
-  module.exports = [ '$routeProvider', function($routeProvider) {
-    $routeProvider.when('/tenants/:tenantId', {
-      template: template,
-      controller: Controller,
-      authentication: 'required',
-      reloadOnSearch: false
-    });
-  }];
+module.exports = [ '$routeProvider', function($routeProvider) {
+  $routeProvider.when('/tenants/:tenantId', {
+    template: template,
+    controller: Controller,
+    authentication: 'required',
+    reloadOnSearch: false
+  });
+}];

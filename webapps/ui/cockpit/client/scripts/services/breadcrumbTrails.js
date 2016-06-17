@@ -3,24 +3,24 @@
   module.exports = [
     'ProcessDefinitionResource',
     'page',
-  function(ProcessDefinitionResource, page) {
-    function breadcrumbTrails(processInstance, fetchSuperInstance, trail, index, urlSuffix) {
-      trail = trail || [];
+    function(ProcessDefinitionResource, page) {
+      function breadcrumbTrails(processInstance, fetchSuperInstance, trail, index, urlSuffix) {
+        trail = trail || [];
 
-      function handleSuperProcessInstance(err, superProcessInstance) {
+        function handleSuperProcessInstance(err, superProcessInstance) {
 
-        if (!superProcessInstance) {
-          page.breadcrumbsInsertAt(index, trail);
-          return;
-        }
+          if (!superProcessInstance) {
+            page.breadcrumbsInsertAt(index, trail);
+            return;
+          }
 
         // ... and fetch its process definition
-        ProcessDefinitionResource
+          ProcessDefinitionResource
         .get({
           // TODO: CAM-2017 API definition cleanup
           id: superProcessInstance.processDefinitionId || superProcessInstance.definitionId
         })
-        .$promise.then(function (response) {
+        .$promise.then(function(response) {
           // var superProcessDefinition = response.data;
           var superProcessDefinition = response;
 
@@ -39,10 +39,10 @@
 
           breadcrumbTrails(superProcessInstance, fetchSuperInstance, trail, index, urlSuffix);
         });
+        }
+
+        fetchSuperInstance(processInstance, handleSuperProcessInstance);
       }
 
-      fetchSuperInstance(processInstance, handleSuperProcessInstance);
-    }
-
-    return breadcrumbTrails;
-  }];
+      return breadcrumbTrails;
+    }];

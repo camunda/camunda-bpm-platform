@@ -1,10 +1,10 @@
 'use strict';
 
-  module.exports = [
-    '$scope',
-    '$translate',
-    'AuthenticationService',
-    'Notifications',
+module.exports = [
+  '$scope',
+  '$translate',
+  'AuthenticationService',
+  'Notifications',
   function(
     $scope,
     $translate,

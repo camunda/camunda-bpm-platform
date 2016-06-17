@@ -1,6 +1,6 @@
-__define('camunda-cockpit-bootstrap', [
+window.__define('camunda-cockpit-bootstrap', [
   './scripts/camunda-cockpit-ui'
-], function () {
+], function() {
   'use strict';
 
   var camundaCockpitUi = window.CamundaCockpitUi;
@@ -70,7 +70,7 @@ __define('camunda-cockpit-bootstrap', [
           'urlArgs',
           'scriptType'
           // 'skipDataMain' // not relevant either
-        ].forEach(function (prop) {
+        ].forEach(function(prop) {
           if (custom[prop]) {
             conf[prop] = custom[prop];
           }
@@ -118,4 +118,4 @@ __define('camunda-cockpit-bootstrap', [
 
 });
 
-requirejs(['camunda-cockpit-bootstrap'], function(){});
+requirejs(['camunda-cockpit-bootstrap'], function() {});

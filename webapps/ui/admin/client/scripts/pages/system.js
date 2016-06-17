@@ -4,12 +4,12 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/system.html', 'utf8');
 
-  var Controller = [
-    '$scope',
-    'page',
-    '$location',
-    '$routeParams',
-    'Views',
+var Controller = [
+  '$scope',
+  'page',
+  '$location',
+  '$routeParams',
+  'Views',
   function(
     $scope,
     page,
@@ -34,7 +34,7 @@ var template = fs.readFileSync(__dirname + '/system.html', 'utf8');
     $scope.systemSettingsProviders = Views.getProviders({ component: 'admin.system'});
 
     var selectedProviderId = $routeParams.section;
-    if(!!selectedProviderId) {
+    if(selectedProviderId) {
       $scope.activeSettingsProvier = Views.getProviders({
         component: 'admin.system',
         id: $routeParams.section
@@ -44,15 +44,15 @@ var template = fs.readFileSync(__dirname + '/system.html', 'utf8');
 
     $scope.activeClass = function(link) {
       var path = $location.absUrl();
-      return path.indexOf(link) != -1 ? "active" : "";
+      return path.indexOf(link) != -1 ? 'active' : '';
     };
 
   }];
 
-  module.exports = [ '$routeProvider', function($routeProvider) {
-    $routeProvider.when('/system', {
-      template: template,
-      controller: Controller,
-      authentication: 'required'
-    });
-  }];
+module.exports = [ '$routeProvider', function($routeProvider) {
+  $routeProvider.when('/system', {
+    template: template,
+    controller: Controller,
+    authentication: 'required'
+  });
+}];

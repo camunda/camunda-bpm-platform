@@ -1,15 +1,12 @@
 'use strict';
 
-var fs = require('fs');
-
 var angular = require('angular');
 
-  module.exports = [
-           '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$modalInstance', 'jobDefinition',
-  function ($scope,   $q,   Notifications,   JobDefinitionResource,   $modalInstance,   jobDefinition) {
+module.exports = [
+  '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$modalInstance', 'jobDefinition',
+  function($scope,   $q,   Notifications,   JobDefinitionResource,   $modalInstance,   jobDefinition) {
 
-    var PERFORM_UPDATE = 'PERFORM_UDPATE',
-        SUCCESS = 'SUCCESS',
+    var SUCCESS = 'SUCCESS',
         FAILED = 'FAIL';
 
     $scope.status;
@@ -17,20 +14,20 @@ var angular = require('angular');
 
     var data = $scope.data = {
       priority: jobDefinition.overridingJobPriority,
-      includeJobs: false,
+      includeJobs: false
     };
 
-    $scope.$on('$routeChangeStart', function () {
+    $scope.$on('$routeChangeStart', function() {
       var response = {};
       response.status = $scope.status;
       $modalInstance.close(response);
     });
 
-    var hasOverridingJobPriority = $scope.hasOverridingJobPriority = function () {
+    $scope.hasOverridingJobPriority = function() {
       return jobDefinition.overridingJobPriority !== null && jobDefinition.overridingJobPriority !== undefined;
     };
 
-    $scope.submit = function () {
+    $scope.submit = function() {
       var setJobPriority = $scope.setJobPriority;
       if (!setJobPriority) {
         data = {};
@@ -38,7 +35,7 @@ var angular = require('angular');
 
       JobDefinitionResource.setJobPriority({ 'id' : jobDefinition.id }, data,
 
-        function () {
+        function() {
           $scope.status = SUCCESS;
           if (setJobPriority) {
             Notifications.addMessage({ 'status': 'Finished', 'message': 'Overriding the priority completed successfully.', 'exclusive': true });
@@ -48,7 +45,7 @@ var angular = require('angular');
           }
         },
 
-        function (error) {
+        function(error) {
           $scope.status = FAILED;
           if (setJobPriority) {
             Notifications.addError({ 'status': 'Finished', 'message': 'Overriding the priority was not successful: ' + error.data.message, 'exclusive': true });
@@ -60,12 +57,12 @@ var angular = require('angular');
       );
     };
 
-    $scope.isValid = function () {
+    $scope.isValid = function() {
       var formScope = angular.element('[name="overrideJobPriorityForm"]').scope();
       return !$scope.setJobPriority || ((formScope && formScope.overrideJobPriorityForm) ? formScope.overrideJobPriorityForm.$valid : false);
     };
 
-    $scope.close = function (status) {
+    $scope.close = function(status) {
       var response = {};
       response.status = status;
       $modalInstance.close(response);

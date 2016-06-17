@@ -5,40 +5,29 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/dashboard.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular');
-var isFunction = angular.isFunction;
 var isArray = angular.isArray;
-var copy = angular.copy;
-
-var builtInResources = {
-  'application': 0,
-  'system': 0,
-  'user': 1,
-  'group': 2,
-  'group membership': 3,
-  'authorization': 4,
-};
 
 var Controller = [
   '$scope',
   'Views',
   'page',
   '$injector',
-function (
+  function(
   $scope,
   Views,
   page,
   $injector
 ) {
-  var $rootScope = $scope.$root;
+    var $rootScope = $scope.$root;
 
-  $scope.dashboardPlugins = Views.getProviders({
-    component: 'admin.dashboard.section'
-  })
-  .map(function (plugin) {
+    $scope.dashboardPlugins = Views.getProviders({
+      component: 'admin.dashboard.section'
+    })
+  .map(function(plugin) {
     if (isArray(plugin.access)) {
       var fn = $injector.invoke(plugin.access);
 
-      fn(function (err, access) {
+      fn(function(err, access) {
         if (err) { throw err; }
 
         plugin.accessible = access;
@@ -53,12 +42,12 @@ function (
     return plugin;
   });
 
-  $rootScope.showBreadcrumbs = true;
+    $rootScope.showBreadcrumbs = true;
 
-  page.breadcrumbsClear();
+    page.breadcrumbsClear();
 
-  page.titleSet('Dashboard');
-}];
+    page.titleSet('Dashboard');
+  }];
 
 module.exports = [ '$routeProvider', function($routeProvider) {
   $routeProvider.when('/', {

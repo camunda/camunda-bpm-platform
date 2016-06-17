@@ -100,7 +100,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
               continue;
             }
 
-            candidateCount += candidate.taskCount
+            candidateCount += candidate.taskCount;
           }
 
           var multipleCandidateCount = (totalCandidateCount - _unassignedCount) || 0;
@@ -110,7 +110,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
         $scope.formatGroupName = function(name) {
           return ( name == null ) ? 'without group' : name;
-        }
+        };
       } ],
 
     priority : 0

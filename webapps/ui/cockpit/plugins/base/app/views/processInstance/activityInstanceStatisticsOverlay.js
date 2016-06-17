@@ -5,14 +5,14 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/activity-instance-statistics-overlay.html', 'utf8');
 var angular = require('angular');
 
-  var Configuration = function PluginConfiguration(ViewsProvider) {
+var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cockpit.processInstance.diagram.overlay', {
-      id: 'activity-instance-statistics-overlay',
-      template: template,
-      controller: [
-               '$scope',
-      function ($scope) {
+  ViewsProvider.registerDefaultView('cockpit.processInstance.diagram.overlay', {
+    id: 'activity-instance-statistics-overlay',
+    template: template,
+    controller: [
+      '$scope',
+      function($scope) {
         var bpmnElement = $scope.bpmnElement,
             processData = $scope.processData.newChild($scope);
 
@@ -35,7 +35,7 @@ var angular = require('angular');
             }
 
             $scope.activityInstanceStatistics = { instances: instances, incidents: incidents, instancesMI: instancesMI, incidentsMI: incidentsMI };
-        });
+          });
 
         var currentFilter = processData.observe('filter', function(filter) {
           currentFilter = filter;
@@ -97,10 +97,10 @@ var angular = require('angular');
         };
 
       }],
-      priority: 20
-    });
-  };
+    priority: 20
+  });
+};
 
-  Configuration.$inject = ['ViewsProvider'];
+Configuration.$inject = ['ViewsProvider'];
 
-  module.exports = Configuration;
+module.exports = Configuration;

@@ -2,22 +2,22 @@
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  function getRefreshProvider(tasklistData) {
-    return {
-      refreshTaskList : function () {
-        tasklistData.changed('taskList');
-      }
-    };
-  }
+function getRefreshProvider(tasklistData) {
+  return {
+    refreshTaskList : function() {
+      tasklistData.changed('taskList');
+    }
+  };
+}
 
-  module.exports = [
-    '$scope',
-    '$q',
-    '$location',
-    '$interval',
-    'search',
-    'dataDepend',
-    'camAPI',
+module.exports = [
+  '$scope',
+  '$q',
+  '$location',
+  '$interval',
+  'search',
+  'dataDepend',
+  'camAPI',
   function(
     $scope,
     $q,
@@ -37,7 +37,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       search.updateSilently(params);
     }
 
-    $scope.$on('$destroy', function () {
+    $scope.$on('$destroy', function() {
       $scope.tasklistApp.refreshProvider = null;
     });
 
@@ -72,7 +72,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
         itemCount: false,
         resoureType: 'Task'
       }, function(err, res) {
-        if(!!err) {
+        if(err) {
           deferred.reject(err);
 
         }
@@ -89,16 +89,16 @@ var angular = require('camunda-commons-ui/vendor/angular');
       var focused,
           filterId = getPropertyFromLocation('filter');
 
-      for (var i = 0, filter; !!(filter = filters[i]); i++) {
+      for (var i = 0, filter; (filter = filters[i]); i++) {
 
-          if (filterId === filter.id) {
-            focused = filter;
-            break;
-          }
+        if (filterId === filter.id) {
+          focused = filter;
+          break;
+        }
           // auto focus first filter
-          if(!focused || filter.properties.priority < focused.properties.priority) {
-            focused = filter;
-          }
+        if(!focused || filter.properties.priority < focused.properties.priority) {
+          focused = filter;
+        }
       }
 
       if(currentFilter && currentFilter.id !== focused.id) {
@@ -121,10 +121,10 @@ var angular = require('camunda-commons-ui/vendor/angular');
     }]);
 
     tasklistData.provide('searchQuery', {
-        processVariables: [],
-        taskVariables: [],
-        caseInstanceVariables: []
-      });
+      processVariables: [],
+      taskVariables: [],
+      caseInstanceVariables: []
+    });
 
     tasklistData.provide('taskListQuery', ['currentFilter', 'searchQuery', function(currentFilter, searchQuery) {
       if (!currentFilter) {
@@ -158,29 +158,29 @@ var angular = require('camunda-commons-ui/vendor/angular');
      /**
       * Provide the list of tasks
       */
-     tasklistData.provide('taskList', [ 'taskListQuery', function(taskListQuery) {
-       var deferred = $q.defer();
+    tasklistData.provide('taskList', [ 'taskListQuery', function(taskListQuery) {
+      var deferred = $q.defer();
 
-       if(!taskListQuery || taskListQuery.id === null) {
+      if(!taskListQuery || taskListQuery.id === null) {
          // no filter selected
-         deferred.resolve({
-           count: 0,
-           _embedded : {}
-         });
-       }
-       else {
+        deferred.resolve({
+          count: 0,
+          _embedded : {}
+        });
+      }
+      else {
          // filter selected
-         Filter.getTasks(angular.copy(taskListQuery), function(err, res) {
-           if(err) {
-             deferred.reject(err);
-           }
-           else {
-             deferred.resolve(res);
-           }
-         });
-       }
-       return deferred.promise;
-     }]);
+        Filter.getTasks(angular.copy(taskListQuery), function(err, res) {
+          if(err) {
+            deferred.reject(err);
+          }
+          else {
+            deferred.resolve(res);
+          }
+        });
+      }
+      return deferred.promise;
+    }]);
 
    /**
      * Provide current task id
@@ -234,7 +234,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
       }
 
       if(currentFilter && currentFilter.properties.refresh) {
-        intervalPromise = $interval(function(){
+        intervalPromise = $interval(function() {
 
           if($scope.tasklistApp && $scope.tasklistApp.refreshProvider) {
             $scope.tasklistApp.refreshProvider.refreshTaskList();

@@ -10,30 +10,30 @@ var APP_NAME = 'cam.cockpit';
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-  module.exports = function(pluginDependencies) {
+module.exports = function(pluginDependencies) {
 
-    var ngDependencies = [
-      'ng',
-      'ngResource',
-      commons.name,
-      require('./repository/main').name,
-      require('./batches/main').name,
-      require('./reports/main').name,
-      require('./directives/main').name,
-      require('./filters/main').name,
-      require('./pages/main').name,
-      require('./resources/main').name,
-      require('./services/main').name,
-      require('./navigation/main').name
-    ].concat(pluginDependencies.map(function(el){
-      return el.ngModuleName;
-    }));
+  var ngDependencies = [
+    'ng',
+    'ngResource',
+    commons.name,
+    require('./repository/main').name,
+    require('./batches/main').name,
+    require('./reports/main').name,
+    require('./directives/main').name,
+    require('./filters/main').name,
+    require('./pages/main').name,
+    require('./resources/main').name,
+    require('./services/main').name,
+    require('./navigation/main').name
+  ].concat(pluginDependencies.map(function(el) {
+    return el.ngModuleName;
+  }));
 
-    var appNgModule = angular.module(APP_NAME, ngDependencies);
+  var appNgModule = angular.module(APP_NAME, ngDependencies);
 
-    var ModuleConfig = [
-      '$routeProvider',
-      'UriProvider',
+  var ModuleConfig = [
+    '$routeProvider',
+    'UriProvider',
     function(
       $routeProvider,
       UriProvider
@@ -69,10 +69,10 @@ var angular = require('camunda-commons-ui/vendor/angular');
       }]);
     }];
 
-    appNgModule.config(ModuleConfig);
+  appNgModule.config(ModuleConfig);
 
-    appNgModule.config([
-      'camDateFormatProvider',
+  appNgModule.config([
+    'camDateFormatProvider',
     function(
       camDateFormatProvider
     ) {
@@ -90,25 +90,25 @@ var angular = require('camunda-commons-ui/vendor/angular');
       }
     }]);
 
-      angular.bootstrap(document, [ appNgModule.name, 'cam.cockpit.custom' ]);
+  angular.bootstrap(document, [ appNgModule.name, 'cam.cockpit.custom' ]);
 
-      if (top !== window) {
-        window.parent.postMessage({ type: 'loadamd' }, '*');
-      }
+  if (top !== window) {
+    window.parent.postMessage({ type: 'loadamd' }, '*');
+  }
 
 
 
-  };
+};
 
-  module.exports.exposePackages = function(container) {
-    container.angular = angular;
-    container.jquery = $;
-    container['camunda-commons-ui'] = commons;
-    container['camunda-bpm-sdk-js'] = sdk;
-    container['angular-data-depend'] = dataDepend;
-    container['moment'] = require('camunda-commons-ui/vendor/moment');
-    container['events'] = require('events');
-  };
+module.exports.exposePackages = function(container) {
+  container.angular = angular;
+  container.jquery = $;
+  container['camunda-commons-ui'] = commons;
+  container['camunda-bpm-sdk-js'] = sdk;
+  container['angular-data-depend'] = dataDepend;
+  container['moment'] = require('camunda-commons-ui/vendor/moment');
+  container['events'] = require('events');
+};
 
 
 /* live-reload
