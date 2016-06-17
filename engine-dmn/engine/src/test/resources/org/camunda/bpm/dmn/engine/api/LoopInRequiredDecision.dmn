@@ -12,10 +12,10 @@
         <inputExpression><text>computerType</text></inputExpression>
       </input>
       <output id="computerModel" name="" typeRef="string" />
-      <rule id="rule3">
-        <inputEntry id="inputEntry3"><text>Lenovo</text>
+      <rule id="rule2">
+        <inputEntry id="inputEntry2"><text>Lenovo</text>
         </inputEntry>
-        <outputEntry id="outputEntry3"><text>notebook</text>
+        <outputEntry id="outputEntry2"><text>notebook</text>
         </outputEntry>
       </rule>
     </decisionTable>
@@ -23,17 +23,35 @@
 
   <decision id="buyComputer" name="buyComputer">
     <informationRequirement>
-      <requiredDecision href="#buyProduct" />
+      <requiredDecision href="#buyElectronic" />
     </informationRequirement>
     <decisionTable id="buyComputerDecisionTable">
       <input id="input1">
         <inputExpression><text>type</text></inputExpression>
       </input>
-      <output id="computerType" name="" typeRef="string" />
-      <rule id="rule2">
-        <inputEntry id="inputEntry2"><text>Computer</text>
+      <output id="output1" name="" typeRef="string" />
+      <rule id="rule1">
+        <inputEntry id="inputEntry1"><text>Computer</text>
         </inputEntry>
-        <outputEntry id="outputEntry2"><text>notebook</text>
+        <outputEntry id="outputEntry1"><text>notebook</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+
+  <decision id="buyElectronic" name="buyElectronic">
+    <informationRequirement>
+      <requiredDecision href="#buyProduct" />
+    </informationRequirement>
+    <decisionTable id="buyElectronicDecisionTable">
+      <input id="input3">
+        <inputExpression><text>type</text></inputExpression>
+      </input>
+      <output id="output3" name="" typeRef="string" />
+      <rule id="rule3">
+        <inputEntry id="inputEntry3"><text>Electronic</text>
+        </inputEntry>
+        <outputEntry id="outputEntry3"><text>Computer</text>
         </outputEntry>
       </rule>
     </decisionTable>

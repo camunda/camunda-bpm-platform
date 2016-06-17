@@ -10,6 +10,7 @@ public class DmnDecisionImpl implements DmnDecision {
   protected String key;
   protected String name;
   protected DmnDecisionTableImpl decisionTable;
+  
   protected List<DmnDecision> requiredDecision = new ArrayList<DmnDecision>();
 
   public String getKey() {

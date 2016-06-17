@@ -141,7 +141,7 @@ public class DmnTransformLogger extends DmnLogger {
   public DmnTransformException requiredDecisionLoopDetected(Decision decision) {
     return new DmnTransformException(exceptionMessage(
       "015",
-      "The decision '{}' has a loop.", decision.getId())
+      "The decision '{}' created a loop in required decisions.", decision.getId())
     );
   }
 }

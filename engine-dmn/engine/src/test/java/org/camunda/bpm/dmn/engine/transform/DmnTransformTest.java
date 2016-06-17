@@ -42,7 +42,9 @@ public class DmnTransformTest extends DmnEngineTest {
   public static final String TRANSFORM_DMN = "org/camunda/bpm/dmn/engine/transform/DmnTransformTest.dmn";
   public static final String REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/RequiredDecision.dmn";
   public static final String MULTIPLE_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/MultipleRequiredDecisions.dmn";
+  public static final String MULTI_LEVEL_MULTIPLE_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/MultiLevelMultipleRequiredDecisions.dmn";
   public static final String LOOP_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/LoopInRequiredDecision.dmn";
+  public static final String SELF_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/SelfRequiredDecision.dmn";
 
   @Test
   public void shouldTransformDecisions() {
@@ -249,10 +251,35 @@ public class DmnTransformTest extends DmnEngineTest {
       Assertions.assertThat(e)
       .hasMessageStartingWith("DMN-02004")
       .hasMessageContaining("DMN-02015")
-      .hasMessageContaining("decision 'buyProduct' has a loop");
+      .hasMessageContaining("decision 'buyElectronic' created a loop");
     }
   }
 
+  @Test
+  public void shouldDetectLoopInParseDecisionWithSelfRequiredDecision() {
+    InputStream inputStream = IoUtil.fileAsStream(SELF_REQUIRED_DECISIONS_DMN);
+    DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
+
+    try {
+      decision = dmnEngine.parseDecision("buyProduct", modelInstance);
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    } catch(DmnTransformException e) {
+      Assertions.assertThat(e)
+      .hasMessageStartingWith("DMN-02004")
+      .hasMessageContaining("DMN-02015")
+      .hasMessageContaining("decision 'buyProduct' created a loop");
+    }
+  }
+
+  @Test
+  public void shouldNotDetectLoopInMultiLevelDecisionWithMultipleRequiredDecision() {
+    InputStream inputStream = IoUtil.fileAsStream(MULTI_LEVEL_MULTIPLE_REQUIRED_DECISIONS_DMN);
+    DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
+
+    List<DmnDecision> decisions = dmnEngine.parseDecisions(modelInstance);
+    assertThat(decisions.size()).isEqualTo(8);
+  }
+  
   protected void assertDecision(DmnDecision decision, String key) {
     assertThat(decision).isNotNull();
     assertThat(decision.getKey()).isEqualTo(key);
