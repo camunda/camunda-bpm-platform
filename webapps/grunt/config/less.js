@@ -27,12 +27,12 @@ module.exports = function(config, lessConfig, pathConfig) {
     options: {
       paths: includePaths,
 
-      compress: true,
+      compress: false,
 
       sourceMap: true,
-      sourceMapFilename: (pathConfig.plugin ? 'plugin' : 'styles') + '.css.map',
-      sourceMapURL: (pathConfig.plugin ? 'plugin' : 'styles') + '.css.map',
-      sourceMapFileInline: false
+      sourceMapFilename: outputFilepath + '.map',
+      sourceMapURL: './' + (pathConfig.plugin ? 'plugin' : 'styles') + '.css.map',
+      sourceMapFileInline: true
     },
     files: file
   };
@@ -46,12 +46,12 @@ module.exports = function(config, lessConfig, pathConfig) {
       options: {
         paths: includePaths,
 
-        compress: true,
+        compress: false,
 
         sourceMap: true,
-        sourceMapFilename: 'styles-components.css.map',
+        sourceMapFilename: outputFilepath + '.map',
         sourceMapURL: './styles-components.css.map',
-        sourceMapFileInline: false
+        sourceMapFileInline: true
       },
       files: file
     };
