@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.test.api.multitenancy;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -139,7 +138,6 @@ public class TenantIdProviderTest {
     Map<String, Object> properties = new HashMap<String, Object>();
     properties.put("employeeName", "demo");
 
-    engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ID));
     ProcessInstance procInstance = engineRule.getFormService().submitStartForm(processDefinitionId, properties);
     assertNotNull(procInstance);
 
@@ -166,7 +164,6 @@ public class TenantIdProviderTest {
     Map<String, Object> properties = new HashMap<String, Object>();
     properties.put("employeeName", "demo");
 
-    engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ID));
     ProcessInstance procInstance = engineRule.getFormService().submitStartForm(processDefinitionId, properties);
     assertNotNull(procInstance);
 
@@ -190,8 +187,6 @@ public class TenantIdProviderTest {
       .startProcessInstanceByKey(PROCESS_DEFINITION_KEY)
       .getId();
     assertNotNull(engineRule.getRuntimeService().getActivityInstance(processInstanceId));
-    engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ID));
-
 
     // when a process instance is created via modification of an existing one
     engineRule.getRuntimeService().createProcessInstanceModification(processInstanceId).execute();
@@ -215,8 +210,6 @@ public class TenantIdProviderTest {
       .startProcessInstanceByKey(PROCESS_DEFINITION_KEY)
       .getId();
     assertNotNull(engineRule.getRuntimeService().getActivityInstance(processInstanceId));
-    engineRule.getIdentityService().setAuthentication("aUserId", null, Arrays.asList(TENANT_ID));
-
 
     // when a process instance is created via modification of an existing one
     engineRule.getRuntimeService().createProcessInstanceModification(processInstanceId).execute();
