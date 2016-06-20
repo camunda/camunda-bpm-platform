@@ -72,7 +72,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
   @DecisionResource(resource = GROOVY_DMN)
   public void testGlobalExpressionLanguage() {
     DmnDecisionImpl decisionEntity  = (DmnDecisionImpl) decision;
-    DmnDecisionTableImpl decisionTable = decisionEntity.getDecisionTable();
+    DmnDecisionTableImpl decisionTable = decisionEntity.getRelatedDecisionTable();
     for (DmnDecisionTableInputImpl dmnInput : decisionTable.getInputs()) {
       assertThat(dmnInput.getExpression().getExpressionLanguage()).isEqualTo("groovy");
     }

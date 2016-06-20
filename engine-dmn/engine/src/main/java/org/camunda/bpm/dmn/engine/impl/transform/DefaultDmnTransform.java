@@ -165,7 +165,7 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
 
     if (expression instanceof DecisionTable) {
       DmnDecisionTableImpl dmnDecisionTable = transformDecisionTable((DecisionTable) expression);
-      dmnDecision.setDecisionTable(dmnDecisionTable);
+      dmnDecision.setRelatedDecisionTable(dmnDecisionTable);
     } else {
       LOG.decisionTypeNotSupported(expression, decision);
       return null;

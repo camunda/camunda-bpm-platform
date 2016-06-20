@@ -264,7 +264,7 @@ public class DmnDecisionTableEvaluationListenerTest extends DmnEngineTest {
     DmnHitPolicyHandler handler = hitPolicyHandlerRegistry.getHandler(hitPolicy, aggregator);
     assertThat(handler).isNotNull();
     DmnDecisionImpl DecisionEntity = (DmnDecisionImpl) this.decision;
-    DecisionEntity.getDecisionTable().setHitPolicyHandler(handler);
+    DecisionEntity.getRelatedDecisionTable().setHitPolicyHandler(handler);
   }
 
   public DmnDecisionTableResult evaluateDecisionTable(Object input1, Object input2, Object input3, Object output1) {

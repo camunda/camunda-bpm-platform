@@ -84,7 +84,7 @@ public class DefaultDmnDecisionContext {
   public DmnDecisionTableResult evaluateDecisionTable(DmnDecision decision, VariableContext variableContext) {
     DmnDecisionTableEvaluationEventImpl evaluationResult = new DmnDecisionTableEvaluationEventImpl();
     evaluationResult.setDecisionTable(decision);
-    DmnDecisionTableImpl decisionTable = ((DmnDecisionImpl)decision).getDecisionTable();
+    DmnDecisionTableImpl decisionTable = ((DmnDecisionImpl)decision).getRelatedDecisionTable();
     evaluationResult.setExecutedDecisionElements(calculateExecutedDecisionElements(decisionTable));
 
     int inputSize = decisionTable.getInputs().size();

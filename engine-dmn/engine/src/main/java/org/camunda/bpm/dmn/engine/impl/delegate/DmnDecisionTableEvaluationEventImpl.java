@@ -86,7 +86,7 @@ public class DmnDecisionTableEvaluationEventImpl implements DmnDecisionTableEval
     return "DmnDecisionTableEvaluationEventImpl{" +
       " key="+ dmnDecision.getKey() +
       ", name="+ dmnDecision.getName() + 
-      ", decisionTable=" + dmnDecision.getDecisionTable() +
+      ", decisionTable=" + dmnDecision.getRelatedDecisionTable() +
       ", inputs=" + inputs +
       ", matchingRules=" + matchingRules +
       ", collectResultName='" + collectResultName + '\'' +

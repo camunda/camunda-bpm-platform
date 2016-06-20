@@ -72,21 +72,21 @@ public class DmnTransformTest extends DmnEngineTest {
     assertThat(decision).isInstanceOf(DmnDecisionImpl.class);
 
     DmnDecisionImpl decisionEntity = (DmnDecisionImpl) decision;
-    DmnDecisionTableImpl decisionTable = decisionEntity.getDecisionTable();
+    DmnDecisionTableImpl decisionTable = decisionEntity.getRelatedDecisionTable();
     assertThat(decisionTable.getHitPolicyHandler()).isInstanceOf(UniqueHitPolicyHandler.class);
 
     decision = decisions.get(1);
     assertThat(decision.isDecisionTable()).isTrue();
     assertThat(decision).isInstanceOf(DmnDecisionImpl.class);
 
-    decisionTable = ((DmnDecisionImpl) decision).getDecisionTable();
+    decisionTable = ((DmnDecisionImpl) decision).getRelatedDecisionTable();
     assertThat(decisionTable.getHitPolicyHandler()).isInstanceOf(FirstHitPolicyHandler.class);
   }
 
   @Test
   public void shouldTransformInputs() {
     DmnDecisionImpl decisionEntity = (DmnDecisionImpl) parseDecisionFromFile("decision1", TRANSFORM_DMN);
-    List<DmnDecisionTableInputImpl> inputs = decisionEntity.getDecisionTable().getInputs();
+    List<DmnDecisionTableInputImpl> inputs = decisionEntity.getRelatedDecisionTable().getInputs();
     assertThat(inputs).hasSize(2);
 
     DmnDecisionTableInputImpl input = inputs.get(0);
@@ -123,7 +123,7 @@ public class DmnTransformTest extends DmnEngineTest {
   @Test
   public void shouldTransformOutputs() {
     DmnDecisionImpl decisionEntity = (DmnDecisionImpl) parseDecisionFromFile("decision1", TRANSFORM_DMN);
-    List<DmnDecisionTableOutputImpl> outputs = decisionEntity.getDecisionTable().getOutputs();
+    List<DmnDecisionTableOutputImpl> outputs = decisionEntity.getRelatedDecisionTable().getOutputs();
     assertThat(outputs).hasSize(2);
 
     DmnDecisionTableOutputImpl output = outputs.get(0);
@@ -144,7 +144,7 @@ public class DmnTransformTest extends DmnEngineTest {
   @Test
   public void shouldTransformRules() {
     DmnDecisionImpl decisionEntity = (DmnDecisionImpl) parseDecisionFromFile("decision1", TRANSFORM_DMN);
-    List<DmnDecisionTableRuleImpl> rules = decisionEntity.getDecisionTable().getRules();
+    List<DmnDecisionTableRuleImpl> rules = decisionEntity.getRelatedDecisionTable().getRules();
     assertThat(rules).hasSize(1);
 
     DmnDecisionTableRuleImpl rule = rules.get(0);

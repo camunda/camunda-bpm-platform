@@ -29,11 +29,11 @@ public class DmnDecisionImpl implements DmnDecision {
     this.name = name;
   }
 
-  public void setDecisionTable(DmnDecisionTableImpl decisionTable) {
+  public void setRelatedDecisionTable(DmnDecisionTableImpl decisionTable) {
     this.decisionTable = decisionTable;   
   }
 
-  public DmnDecisionTableImpl getDecisionTable() {
+  public DmnDecisionTableImpl getRelatedDecisionTable() {
     return decisionTable;
   }
 
