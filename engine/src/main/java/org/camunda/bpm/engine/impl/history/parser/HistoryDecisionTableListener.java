@@ -16,8 +16,6 @@ package org.camunda.bpm.engine.impl.history.parser;
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationListener;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.CoreExecutionContext;
@@ -76,11 +74,8 @@ public class HistoryDecisionTableListener implements DmnDecisionTableEvaluationL
   }
 
   protected boolean isDeployedDecisionTable(DmnDecision decision) {
-    // FIX ME:
-    DmnDecisionTableImpl decisionTable =  ((DmnDecisionImpl)decision).getDecisionTable();
-    if(decisionTable instanceof DecisionDefinition) {
-      // ignore decisions that are evaluated in a script task
-      return ((DecisionDefinition) decisionTable).getId() != null;
+    if(decision instanceof DecisionDefinition) {
+      return ((DecisionDefinition) decision).getId() != null;
     } else {
       return false;
     }

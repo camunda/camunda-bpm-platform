@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.test.standalone.history;
 
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -45,8 +44,7 @@ public class DecisionInstanceHistoryTest extends ResourceProcessEngineTestCase {
     RecordHistoryLevel.ProducedHistoryEvent producedHistoryEvent = producedHistoryEvents.get(0);
     assertEquals(HistoryEventTypes.DMN_DECISION_EVALUATE, producedHistoryEvent.eventType);
 
-    // FIX ME:
-    DecisionDefinition entity = (DecisionDefinition)((DmnDecisionImpl)producedHistoryEvent.entity).getDecisionTable();
+    DecisionDefinition entity = (DecisionDefinition) producedHistoryEvent.entity;
     assertNotNull(entity);
     assertEquals(decisionDefinition.getId(), entity.getId());
   }
