@@ -548,6 +548,7 @@
         I.TASK_ID_ = T.ID_
 
     <where>
+      T.ASSIGNEE_ IS NULL
       <bind name="columnPrefix" value="'T.'"/>
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
     </where>

@@ -246,18 +246,34 @@ public class TaskCountByCandidateGroupsTest {
       testFailed = true;
 
     } catch( AuthorizationException aex ) {
-      if(!aex.getMessage().contains(userId + "' does not have 'READ' permission on resource '*' of type 'Task'")) {
+      if( !aex.getMessage().contains(userId + "' does not have 'READ' permission on resource '*' of type 'Task'") ) {
         testFailed = true;
       }
     }
 
-  // then
-  processEngineConfiguration.setAuthorizationEnabled(false);
+    // then
+    processEngineConfiguration.setAuthorizationEnabled(false);
 
-  if( testFailed ) {
-    fail("There should be an authorization exception for '" + userId + "' because of a missing 'READ' permission on 'Task'.");
+    if( testFailed ) {
+      fail("There should be an authorization exception for '" + userId + "' because of a missing 'READ' permission on 'Task'.");
+    }
   }
-}
+
+  @Test
+  public void shouldFetchCountOfTasksWithoutAssignee() {
+    // given
+    User user = identityService.newUser(userId);
+    identityService.saveUser(user);
+
+    // when
+    taskService.delegateTask(tasks.get(2), userId);
+    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
+
+    identityService.deleteUser(userId);
+
+    // then
+    assertEquals(2, results.size());
+  }
 
   protected void createTask(String groupId, String tenantId) {
     Task task = taskService.newTask();
