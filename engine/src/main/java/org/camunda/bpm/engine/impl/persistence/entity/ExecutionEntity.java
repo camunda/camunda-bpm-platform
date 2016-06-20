@@ -420,36 +420,34 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   @Override
   public void start(Map<String, Object> variables) {
     // determine tenant Id if null
-    if(tenantId == null) {
-      provideTenantId(variables);
-    }
+    provideTenantId(variables);
     super.start(variables);
   }
 
   protected void provideTenantId(Map<String, Object> variables) {
-    TenantIdProvider tenantIdProvider = Context.getProcessEngineConfiguration().getTenantIdProvider();
+    if (tenantId == null) {
+      TenantIdProvider tenantIdProvider = Context.getProcessEngineConfiguration().getTenantIdProvider();
 
-    if(tenantIdProvider != null) {
-      VariableMap variableMap = Variables.fromMap(variables);
-      ProcessDefinition processDefinition = (ProcessDefinition) getProcessDefinition();
+      if (tenantIdProvider != null) {
+        VariableMap variableMap = Variables.fromMap(variables);
+        ProcessDefinition processDefinition = (ProcessDefinition) getProcessDefinition();
 
-      TenantIdProviderProcessInstanceContext ctx = null;
+        TenantIdProviderProcessInstanceContext ctx;
+        if (superExecutionId != null) {
+          ctx = new TenantIdProviderProcessInstanceContext(processDefinition, variableMap, getSuperExecution());
+        } else if (superCaseExecutionId != null) {
+          ctx = new TenantIdProviderProcessInstanceContext(processDefinition, variableMap, getSuperCaseExecution());
+        } else {
+          ctx = new TenantIdProviderProcessInstanceContext(processDefinition, variableMap);
+        }
 
-      if(superExecutionId != null) {
-        ctx = new TenantIdProviderProcessInstanceContext(processDefinition, variableMap, getSuperExecution());
+        tenantId = tenantIdProvider.provideTenantIdForProcessInstance(ctx);
       }
-      else if(superCaseExecutionId != null) {
-        ctx = new TenantIdProviderProcessInstanceContext(processDefinition, variableMap, getSuperCaseExecution());
-      }
-      else {
-        ctx = new TenantIdProviderProcessInstanceContext(processDefinition, variableMap);
-      }
-
-      tenantId = tenantIdProvider.provideTenantIdForProcessInstance(ctx);
     }
   }
 
   public void startWithFormProperties(VariableMap properties) {
+    provideTenantId(properties);
     if (isProcessInstanceExecution()) {
       ActivityImpl initial = processDefinition.getInitial();
       ProcessInstanceStartContext processInstanceStartContext = getProcessInstanceStartContext();
@@ -464,6 +462,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       initializeTimerDeclarations();
       fireHistoricProcessStartEvent();
     }
+
     performOperation(PvmAtomicOperation.PROCESS_START);
   }
 
