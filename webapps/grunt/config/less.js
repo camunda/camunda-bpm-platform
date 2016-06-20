@@ -1,6 +1,6 @@
 module.exports = function(config, lessConfig, pathConfig) {
   'use strict';
-  var resolve = require('path').resolve;
+  var path = require('path');
 
   var file = {};
   if(pathConfig.plugin) {
@@ -8,34 +8,52 @@ module.exports = function(config, lessConfig, pathConfig) {
   } else {
     file[pathConfig.buildTarget+'/styles/styles.css'] = pathConfig.sourceDir + '/styles/styles.less';
   }
-  if (pathConfig.appName === 'cockpit' && !pathConfig.plugin) {
-    file[pathConfig.buildTarget+'/styles/styles-components.css'] = pathConfig.sourceDir + '/styles/styles-components.less';
-  }
 
-  var eePrefix = config.pkg.name === 'camunda-bpm-webapp-ee' ? 'node_modules/camunda-bpm-webapp/' : '';
+  var ee = config.pkg.name === 'camunda-bpm-webapp-ee';
+  var eePrefix = ee ? 'node_modules/camunda-bpm-webapp/' : '';
   var includePaths = [
-    resolve(process.cwd(), '<%= pkg.gruntConfig.commonsUiDir %>/lib/widgets'),
-    resolve(process.cwd(), '<%= pkg.gruntConfig.commonsUiDir %>/resources/less'),
-    resolve(process.cwd(), '<%= pkg.gruntConfig.commonsUiDir %>/resources/css'),
-    resolve(process.cwd(), '<%= pkg.gruntConfig.commonsUiDir %>/node_modules'),
-
-    resolve(process.cwd(), eePrefix + 'ui/common/styles'),
-    resolve(process.cwd(), eePrefix + 'ui/' + pathConfig.appName, 'client/styles'),
-    resolve(process.cwd(), eePrefix + 'ui/' + pathConfig.appName, 'client/scripts')
+    '<%= pkg.gruntConfig.commonsUiDir %>/lib/widgets',
+    '<%= pkg.gruntConfig.commonsUiDir %>/resources/less',
+    '<%= pkg.gruntConfig.commonsUiDir %>/resources/css',
+    '<%= pkg.gruntConfig.commonsUiDir %>/node_modules',
+    eePrefix + 'ui/common/styles',
+    eePrefix + 'ui/' + pathConfig.appName + '/client/styles',
+    eePrefix + 'ui/' + pathConfig.appName + '/client/scripts'
   ];
+
+  var outputFilepath = Object.keys(file)[0];
 
   lessConfig[pathConfig.appName + (pathConfig.plugin ? '_plugin' : '') + '_styles'] = {
     options: {
       paths: includePaths,
 
-      dumpLineNumbers: '<%= buildMode === "prod" ? "" : "comments" %>',
-      compress: '<%= buildMode === "prod" ? "true" : "" %>',
-      sourceMap: '<%= buildMode === "prod" ? "true" : "" %>',
+      compress: true,
 
-      sourceMapURL: './styles.css.map',
-      sourceMapFilename: pathConfig.plugin ? pathConfig.buildTarget+'/plugin.css.map' : pathConfig.buildTarget + '/styles/styles.css.map'
+      sourceMap: true,
+      sourceMapFilename: (pathConfig.plugin ? 'plugin' : 'styles') + '.css.map',
+      sourceMapURL: (pathConfig.plugin ? 'plugin' : 'styles') + '.css.map',
+      sourceMapFileInline: false
     },
     files: file
   };
 
+  if (pathConfig.appName === 'cockpit' && !pathConfig.plugin) {
+    file = {};
+    outputFilepath = pathConfig.buildTarget + '/styles/styles-components.css';
+    file[outputFilepath] = pathConfig.sourceDir + '/styles/styles-components.less';
+
+    lessConfig.cockpit_styles_components = {
+      options: {
+        paths: includePaths,
+
+        compress: true,
+
+        sourceMap: true,
+        sourceMapFilename: 'styles-components.css.map',
+        sourceMapURL: './styles-components.css.map',
+        sourceMapFileInline: false
+      },
+      files: file
+    };
+  }
 };
