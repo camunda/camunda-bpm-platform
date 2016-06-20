@@ -24,8 +24,11 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInstanceContext;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
@@ -55,6 +58,9 @@ import org.camunda.bpm.engine.impl.tree.ScopeCollector;
 import org.camunda.bpm.engine.impl.tree.ScopeExecutionCollector;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Daniel Meyer
@@ -234,6 +240,18 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    * perform starting behavior but don't execute the initial activity
    */
   public void startWithoutExecuting() {
+
+    if (tenantId == null) {
+      TenantIdProvider tenantIdProvider = Context.getProcessEngineConfiguration().getTenantIdProvider();
+
+      if (tenantIdProvider != null) {
+        VariableMap variableMap = Variables.createVariables();
+        ProcessDefinition procDef = (ProcessDefinition) getProcessDefinition();
+        TenantIdProviderProcessInstanceContext ctx  = new TenantIdProviderProcessInstanceContext(procDef, variableMap);
+
+        tenantId = tenantIdProvider.provideTenantIdForProcessInstance(ctx);
+      }
+    }
     initialize();
     initializeTimerDeclarations();
     fireHistoricProcessStartEvent();
