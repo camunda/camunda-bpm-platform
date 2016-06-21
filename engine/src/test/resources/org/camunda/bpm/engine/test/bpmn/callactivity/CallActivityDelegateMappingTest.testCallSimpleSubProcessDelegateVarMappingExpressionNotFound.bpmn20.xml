@@ -10,9 +10,9 @@
 
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callSubProcess" />
 
-    <callActivity id="callSubProcess" calledElement="simpleSubProcess" camunda:varMapping="org.camunda.bpm.engine.test.bpmn.callactivity.NotFoundMapping"/>
+    <callActivity id="callSubProcess" calledElement="simpleSubProcess" camunda:delegateExpression="${notFound}"/>
 
-    <sequenceFlow id="flow3" sourceRef="callSubProcess" targetRef="theEnd" />
+    <sequenceFlow id="flow4" sourceRef="callSubProcess" targetRef="theEnd" />
 
     <endEvent id="theEnd" />
 

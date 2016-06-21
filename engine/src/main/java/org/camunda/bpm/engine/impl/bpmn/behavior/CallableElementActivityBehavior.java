@@ -12,12 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateVariableMapping;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import static org.camunda.bpm.engine.impl.bpmn.behavior.ClassDelegateActivityBehavior.LOG;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement.CallableElementBinding;
 import org.camunda.bpm.engine.impl.core.model.CallableElement;
+import org.camunda.bpm.engine.impl.delegate.DelegateInvocation;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.util.ClassDelegateUtil;
@@ -30,7 +33,6 @@ import org.camunda.bpm.engine.variable.VariableMap;
 public abstract class CallableElementActivityBehavior extends AbstractBpmnActivityBehavior implements SubProcessActivityBehavior {
 
   protected CallableElement callableElement;
-  protected DelegateVariableMapping varMapping;
 
   /**
    * The expression which identifies the delegation for the variable mapping.
@@ -53,9 +55,9 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
     this.expression = expression;
   }
 
-  protected void setDelegateVariableMapping(Object instance) {
+  protected DelegateVariableMapping getDelegateVariableMapping(Object instance) {
     if (instance instanceof DelegateVariableMapping) {
-      varMapping = (DelegateVariableMapping) instance;
+      return (DelegateVariableMapping) instance;
     } else {
       throw LOG.missingDelegateVariableMappingParentClassException(
               instance.getClass().getName(),
@@ -63,35 +65,36 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
     }
   }
 
-  protected void resolveDelegation(ActivityExecution execution) {
-    if (varMapping == null) {
-      Object delegate = null;
-      if (expression != null) {
-        delegate = expression.getValue(execution);
-        setDelegateVariableMapping(delegate);
-      } else if (varMapping == null && className != null) {
-        delegate = ClassDelegateUtil.instantiateDelegate(className, null);
-      }
-      if (delegate != null) {
-        setDelegateVariableMapping(delegate);
-      }
+  protected DelegateVariableMapping resolveDelegation(ActivityExecution execution) {
+    Object delegate = null;
+    if (expression != null) {
+      delegate = expression.getValue(execution);
+    } else if (className != null) {
+      delegate = ClassDelegateUtil.instantiateDelegate(className, null);
     }
+    return delegate != null ? getDelegateVariableMapping(delegate) : null;
   }
 
   @Override
-  public void execute(ActivityExecution execution) throws Exception {
-    VariableMap variables = getInputVariables(execution);
-    resolveDelegation(execution);
+  public void execute(final ActivityExecution execution) throws Exception {
+    final VariableMap variables = getInputVariables(execution);
 
+    final DelegateVariableMapping varMapping = resolveDelegation(execution);
     if (varMapping != null) {
-      varMapping.mapInputVariables(execution, variables);
+      invokeVarMappingDelegation(new DelegateInvocation(execution, null) {
+        @Override
+        protected void invoke() throws Exception {
+          varMapping.mapInputVariables(execution, variables);
+        }
+      });
     }
+
     String businessKey = getBusinessKey(execution);
     startInstance(execution, variables, businessKey);
   }
 
   @Override
-  public void passOutputVariables(ActivityExecution execution, VariableScope subInstance) {
+  public void passOutputVariables(final ActivityExecution execution, final VariableScope subInstance) {
     // only data. no control flow available on this execution.
     VariableMap variables = getOutputVariables(subInstance);
     VariableMap localVariables = getOutputVariablesLocal(subInstance);
@@ -99,8 +102,22 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
     execution.setVariables(variables);
     execution.setVariablesLocal(localVariables);
 
+    final DelegateVariableMapping varMapping = resolveDelegation(execution);
     if (varMapping != null) {
-      varMapping.mapOutputVariables(execution, subInstance);
+      invokeVarMappingDelegation(new DelegateInvocation(execution, null) {
+        @Override
+        protected void invoke() throws Exception {
+          varMapping.mapOutputVariables(execution, subInstance);
+        }
+      });
+    }
+  }
+
+  protected void invokeVarMappingDelegation(DelegateInvocation delegation) {
+    try {
+      Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(delegation);
+    } catch (Exception ex) {
+        throw new ProcessEngineException(ex);
     }
   }
 

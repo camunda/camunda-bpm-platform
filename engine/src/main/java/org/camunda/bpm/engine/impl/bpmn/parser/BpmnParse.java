@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.findCamundaExtensionElement;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseCamundaScript;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseInputOutput;
-import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -147,6 +146,7 @@ import org.camunda.bpm.engine.impl.util.xml.Namespace;
 import org.camunda.bpm.engine.impl.util.xml.Parse;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 /**
  * Specific parsing of one BPMN 2.0 XML file, created by the {@link BpmnParser}.
@@ -189,6 +189,9 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_CONSUMES_COMPENSATION = "consumesCompensation";
   public static final String PROPERTYNAME_JOB_PRIORITY = "jobPriority";
   public static final String PROPERTYNAME_TASK_PRIORITY = "taskPriority";
+  public static final String PROPERTYNAME_CLASS = "class";
+  public static final String PROPERTYNAME_EXPRESSION = "expression";
+  public static final String PROPERTYNAME_DELEGATE_EXPRESSION = "delegateExpression";
 
   /**
    * @deprecated use {@link BpmnProperties#TYPE}
@@ -2056,9 +2059,9 @@ public class BpmnParse extends Parse {
     ActivityImpl activity = createActivityOnScope(serviceTaskElement, scope);
 
     String type = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type");
-    String className = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "class");
-    String expression = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "expression");
-    String delegateExpression = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "delegateExpression");
+    String className = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_CLASS);
+    String expression = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_EXPRESSION);
+    String delegateExpression = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_DELEGATE_EXPRESSION);
     String resultVariableName = parseResultVariable(serviceTaskElement);
 
     parseAsynchronousContinuationForActivity(serviceTaskElement, activity);
@@ -2415,7 +2418,7 @@ public class BpmnParse extends Parse {
 
   protected FieldDeclaration parseExpressionFieldDeclaration(Element fieldDeclarationElement, Element serviceTaskElement, String fieldName) {
     try {
-      String expression = getStringValueFromAttributeOrElement("expression", "expression", fieldDeclarationElement);
+      String expression = getStringValueFromAttributeOrElement(PROPERTYNAME_EXPRESSION, PROPERTYNAME_EXPRESSION, fieldDeclarationElement);
       if (expression != null && expression.trim().length() > 0) {
         return new FieldDeclaration(fieldName, Expression.class.getName(), expressionManager.createExpression(expression));
       }
@@ -2771,9 +2774,9 @@ public class BpmnParse extends Parse {
   protected TaskListener parseTaskListener(Element taskListenerElement) {
     TaskListener taskListener = null;
 
-    String className = taskListenerElement.attribute("class");
-    String expression = taskListenerElement.attribute("expression");
-    String delegateExpression = taskListenerElement.attribute("delegateExpression");
+    String className = taskListenerElement.attribute(PROPERTYNAME_CLASS);
+    String expression = taskListenerElement.attribute(PROPERTYNAME_EXPRESSION);
+    String delegateExpression = taskListenerElement.attribute(PROPERTYNAME_DELEGATE_EXPRESSION);
     Element scriptElement = taskListenerElement.elementNS(CAMUNDA_BPMN_EXTENSIONS_NS, "script");
 
     if (className != null) {
@@ -3441,7 +3444,8 @@ public class BpmnParse extends Parse {
     // parse definition key (and behavior)
     String calledElement = callActivityElement.attribute("calledElement");
     String caseRef = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "caseRef");
-    String varMapping = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "varMapping");
+    String className = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_CLASS);
+    String delegateExpression = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_DELEGATE_EXPRESSION);
 
     if (calledElement == null && caseRef == null) {
       addError("Missing attribute 'calledElement' or 'caseRef'", callActivityElement);
@@ -3461,13 +3465,11 @@ public class BpmnParse extends Parse {
     CallableElementActivityBehavior behavior = null;
 
     if (calledElement != null) {
-      if (varMapping != null) {
-        if (varMapping.startsWith("$")) {
-         Expression exp = expressionManager.createExpression(varMapping);
+      if (className != null) {
+          behavior = new CallActivityBehavior(className);
+      } else if (delegateExpression != null) {
+         Expression exp = expressionManager.createExpression(delegateExpression);
          behavior = new CallActivityBehavior(exp);
-        } else {
-          behavior = new CallActivityBehavior(varMapping);
-        }
       } else {
         behavior = new CallActivityBehavior();
       }
@@ -3944,9 +3946,9 @@ public class BpmnParse extends Parse {
   public ExecutionListener parseExecutionListener(Element executionListenerElement) {
     ExecutionListener executionListener = null;
 
-    String className = executionListenerElement.attribute("class");
-    String expression = executionListenerElement.attribute("expression");
-    String delegateExpression = executionListenerElement.attribute("delegateExpression");
+    String className = executionListenerElement.attribute(PROPERTYNAME_CLASS);
+    String expression = executionListenerElement.attribute(PROPERTYNAME_EXPRESSION);
+    String delegateExpression = executionListenerElement.attribute(PROPERTYNAME_DELEGATE_EXPRESSION);
     Element scriptElement = executionListenerElement.elementNS(CAMUNDA_BPMN_EXTENSIONS_NS, "script");
 
     if (className != null) {
@@ -4207,9 +4209,9 @@ public class BpmnParse extends Parse {
 
   private boolean isServiceTaskLike(Element element) {
 
-    return element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "class") != null
-        || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "expression") != null
-        || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "delegateExpression") != null
+    return element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_CLASS) != null
+        || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_EXPRESSION) != null
+        || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_DELEGATE_EXPRESSION) != null
         || isExternalTaskType(element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type"));
   }
 
