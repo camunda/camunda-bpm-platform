@@ -39,7 +39,8 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
   public static final String DMN_HYBRID_DECISIONS = "org/camunda/bpm/dmn/engine/evaluate/EvaluateHybridDecisions.dmn";
   public static final String DMN_DECISIONS_WITH_DIFFERENT_INPUT_OUTPUT_TYPES = "org/camunda/bpm/dmn/engine/evaluate/EvaluateDecisionsWithDifferentInputAndOutputTypes.groovy.dmn";
   public static final String DMN_DECISIONS_WITH_INVALID_INPUT_TYPE = "org/camunda/bpm/dmn/engine/evaluate/EvaluateDecisionsWithInvalidInputTypeInParent.groovy.dmn";
-
+  public static final String DMN_DECISIONS_WITH_SELF_DECISION = "org/camunda/bpm/dmn/engine/evaluate/EvaluateDecisionsWithSelfDecision.groovy.dmn";
+  
   @Test
   public void testEvaluateDecisionWithRequiredDecisionByKey() {
     List<DmnDecision> decisions = parseDecisionsFromFile(DMN_MULTI_LEVEL_MULTIPLE_INPUT_SINGLE_OUTPUT);
@@ -144,6 +145,20 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
   }
 
   @Test
+  public void testEvaluateDecisionsWithRequiredDecisionAndSelfDecision() {
+    List<DmnDecision> decisions = parseDecisionsFromFile(DMN_DECISIONS_WITH_SELF_DECISION);
+
+   DmnDecisionTableResult results = dmnEngine.evaluateDecisionTable(decisions.get(0), createVariables()
+     .putValue("ff", true)
+     .putValue("dd", 5)
+     .asVariableContext());  
+
+   assertThat(results)
+     .hasSingleResult()
+     .containsEntry("aa", 7.0);
+  }
+
+  @Test
   public void testDecisionsWithRequiredDecisionAndMultipleInputMultipleOutput() {
     List<DmnDecision> decisions = parseDecisionsFromFile(DMN_DECISIONS_WITH_MULTIPLE_INPUTS_MULTIPLE_OUTPUTS);
 
@@ -210,7 +225,23 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
   }
 
   @Test
-  public void testEvaluateDecisionsWithInvalidInputTypeInChildDecision() {
+  public void testEvaluateDecisionsWithUserInputForParentDecision() {
+    List<DmnDecision> decisions = parseDecisionsFromFile(DMN_DECISIONS_WITH_DIFFERENT_INPUT_OUTPUT_TYPES);
+
+    DmnDecisionTableResult results = dmnEngine.evaluateDecisionTable(decisions.get(0), createVariables()
+      .putValue("bb", "bb")
+      .putValue("dd", "7")
+      .putValue("ee", 2147483650L)
+      .asVariableContext());
+    
+    // input value provided by the user is overriden by the child decision
+    assertThat(results)
+      .hasSingleResult()
+      .containsEntry("aa", 7.2);
+  }
+
+  @Test
+  public void testEvaluateDecisionsWithInputTypeMisMatchInChildDecision() {
     List<DmnDecision> decisions = parseDecisionsFromFile(DMN_DECISIONS_WITH_DIFFERENT_INPUT_OUTPUT_TYPES);
 
     try {
@@ -226,7 +257,7 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
   }
 
   @Test
-  public void testEvaluateDecisionsWithInvalidInputTypeInParentDecision() {
+  public void testEvaluateDecisionsWithInputTypeMisMatchInParentDecision() {
     List<DmnDecision> decisions = parseDecisionsFromFile(DMN_DECISIONS_WITH_INVALID_INPUT_TYPE);
 
     try {
