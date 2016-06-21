@@ -1,13 +1,18 @@
 module.exports = function(config, lessConfig, pathConfig) {
   'use strict';
+
   var path = require('path');
 
   var file = {};
+  var source = pathConfig.sourceDir + '/styles/styles.less';
+  var destination = pathConfig.buildTarget+'/styles/styles.css';
+
   if(pathConfig.plugin) {
-    file[pathConfig.buildTarget+'/plugin.css'] = pathConfig.sourceDir + '/styles.less';
-  } else {
-    file[pathConfig.buildTarget+'/styles/styles.css'] = pathConfig.sourceDir + '/styles/styles.less';
+    source = pathConfig.sourceDir + '/styles.less';
+    destination = pathConfig.buildTarget+'/plugin.css';
   }
+
+  file[destination] = source;
 
   var ee = config.pkg.name === 'camunda-bpm-webapp-ee';
   var eePrefix = ee ? 'node_modules/camunda-bpm-webapp/' : '';
@@ -21,37 +26,32 @@ module.exports = function(config, lessConfig, pathConfig) {
     eePrefix + 'ui/' + pathConfig.appName + '/client/scripts'
   ];
 
-  var outputFilepath = Object.keys(file)[0];
-
   lessConfig[pathConfig.appName + (pathConfig.plugin ? '_plugin' : '') + '_styles'] = {
     options: {
       paths: includePaths,
 
-      compress: false,
-
+      compress: true,
       sourceMap: true,
-      sourceMapFilename: outputFilepath + '.map',
-      sourceMapURL: './' + (pathConfig.plugin ? 'plugin' : 'styles') + '.css.map',
-      sourceMapFileInline: true
+      sourceMapURL: './' + path.basename(destination) + '.map',
+      sourceMapFilename: destination + '.map'
     },
     files: file
   };
 
   if (pathConfig.appName === 'cockpit' && !pathConfig.plugin) {
+    source = pathConfig.sourceDir + '/styles/styles-components.less';
+    destination = pathConfig.buildTarget+'/styles/styles-components.css';
     file = {};
-    outputFilepath = pathConfig.buildTarget + '/styles/styles-components.css';
-    file[outputFilepath] = pathConfig.sourceDir + '/styles/styles-components.less';
+    file[destination] = source;
 
     lessConfig.cockpit_styles_components = {
       options: {
         paths: includePaths,
 
-        compress: false,
-
+        compress: true,
         sourceMap: true,
-        sourceMapFilename: outputFilepath + '.map',
-        sourceMapURL: './styles-components.css.map',
-        sourceMapFileInline: true
+        sourceMapURL: './' + path.basename(destination) + '.map',
+        sourceMapFilename: destination + '.map'
       },
       files: file
     };
