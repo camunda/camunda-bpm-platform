@@ -26,7 +26,8 @@ module.exports = function(config, watchConf) {
         '<%= pkg.gruntConfig.cockpitSourceDir %>/scripts/**/*.{css,less}'
       ],
       tasks: [
-        'less:cockpit_styles'
+        'less:cockpit_styles',
+        'less:cockpit_styles_components'
       ]
   };
 
