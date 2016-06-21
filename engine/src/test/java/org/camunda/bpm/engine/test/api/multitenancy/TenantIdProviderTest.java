@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInsta
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -173,48 +172,41 @@ public class TenantIdProviderTest {
 
   @Test
   public void providerCalledForStartedProcessInstanceByModificationWithoutTenantId() {
+    // given a deployment without a tenant id
     ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
     TestTenantIdProvider.delegate = tenantIdProvider;
-
-    // given a deployment without a tenant id
-    // and a started process instance
     testRule.deploy(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
                                                 .startEvent().userTask("task")
                                                 .endEvent().done(),
                                             "org/camunda/bpm/engine/test/api/form/util/request.form");
 
+    // when a process instance is created and the instance is set to a starting point
     String processInstanceId = engineRule.getRuntimeService()
-      .startProcessInstanceByKey(PROCESS_DEFINITION_KEY)
-      .getId();
+                                         .createProcessInstanceByKey(PROCESS_DEFINITION_KEY)
+                                         .startBeforeActivity("task").execute().getProcessInstanceId();
+
+    //then provider is called
     assertNotNull(engineRule.getRuntimeService().getActivityInstance(processInstanceId));
-
-    // when a process instance is created via modification of an existing one
-    engineRule.getRuntimeService().createProcessInstanceModification(processInstanceId).execute();
-
-    // then the tenant id provider is invoked
     assertThat(tenantIdProvider.parameters.size(), is(1));
   }
 
   @Test
   public void providerNotCalledForStartedProcessInstanceByModificationWithTenantId() {
+    // given a deployment with a tenant id
     ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
     TestTenantIdProvider.delegate = tenantIdProvider;
-
-    // given a deployment with a tenant id
-    Deployment deployment = testRule.deployForTenant(TENANT_ID,Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+    testRule.deployForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
                                                                    .startEvent().userTask("task")
                                                                    .endEvent().done(),
                                             "org/camunda/bpm/engine/test/api/form/util/request.form");
 
+    // when a process instance is created and the instance is set to a starting point
     String processInstanceId = engineRule.getRuntimeService()
-      .startProcessInstanceByKey(PROCESS_DEFINITION_KEY)
-      .getId();
+                                         .createProcessInstanceByKey(PROCESS_DEFINITION_KEY)
+                                         .startBeforeActivity("task").execute().getProcessInstanceId();
+
+    //then provider should not be called
     assertNotNull(engineRule.getRuntimeService().getActivityInstance(processInstanceId));
-
-    // when a process instance is created via modification of an existing one
-    engineRule.getRuntimeService().createProcessInstanceModification(processInstanceId).execute();
-
-    // then the tenant id provider is invoked
     assertThat(tenantIdProvider.parameters.size(), is(0));
   }
 

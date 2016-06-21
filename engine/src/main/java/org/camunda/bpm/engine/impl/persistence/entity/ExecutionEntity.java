@@ -424,6 +424,11 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     super.start(variables);
   }
 
+  public void startWithoutExecuting(Map<String, Object> variables) {
+    provideTenantId(variables);
+    super.startWithoutExecuting();
+  }
+
   protected void provideTenantId(Map<String, Object> variables) {
     if (tenantId == null) {
       TenantIdProvider tenantIdProvider = Context.getProcessEngineConfiguration().getTenantIdProvider();

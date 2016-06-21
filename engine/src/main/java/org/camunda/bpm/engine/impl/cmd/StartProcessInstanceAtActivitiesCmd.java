@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Thorben Lindhauer
@@ -64,13 +65,14 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
     ExecutionEntity processInstance = processDefinition
         .createProcessInstance(instantiationBuilder.getBusinessKey(), instantiationBuilder.getCaseInstanceId(), initialActivity);
     processInstance.setSkipCustomListeners(modificationBuilder.isSkipCustomListeners());
-    processInstance.startWithoutExecuting();
+    VariableMap variables = modificationBuilder.getProcessVariables();
+    processInstance.startWithoutExecuting(variables);
 
     processInstance.setActivity(null);
     processInstance.setActivityInstanceId(processInstance.getId());
 
     // set variables
-    processInstance.setVariables(modificationBuilder.getProcessVariables());
+    processInstance.setVariables(variables);
 
     // prevent ending of the process instance between instructions
     processInstance.setPreserveScope(true);
