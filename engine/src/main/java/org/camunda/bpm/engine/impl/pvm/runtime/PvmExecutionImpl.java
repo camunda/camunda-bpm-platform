@@ -239,6 +239,11 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     initializeTimerDeclarations();
     fireHistoricProcessStartEvent();
     performOperation(PvmAtomicOperation.FIRE_PROCESS_START);
+
+    setActivity(null);
+    setActivityInstanceId(getId());
+
+    // set variables
     setVariables(variables);
   }
 

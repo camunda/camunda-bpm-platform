@@ -68,12 +68,6 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
     VariableMap variables = modificationBuilder.getProcessVariables();
     processInstance.startWithoutExecuting(variables);
 
-    processInstance.setActivity(null);
-    processInstance.setActivityInstanceId(processInstance.getId());
-
-    // set variables
-    processInstance.setVariables(variables);
-
     // prevent ending of the process instance between instructions
     processInstance.setPreserveScope(true);
 
