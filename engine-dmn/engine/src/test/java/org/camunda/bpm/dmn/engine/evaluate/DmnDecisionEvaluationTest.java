@@ -38,6 +38,7 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
   public static final String DMN_DECISIONS_WITH_MULTIPLE_INPUTS_MULTIPLE_OUTPUTS = "org/camunda/bpm/dmn/engine/evaluate/EvaluateDecisionsWithMultipleInputsAndMultipleOutputs.groovy.dmn";
   public static final String DMN_HYBRID_DECISIONS = "org/camunda/bpm/dmn/engine/evaluate/EvaluateHybridDecisions.dmn";
   public static final String DMN_DECISIONS_WITH_DIFFERENT_INPUT_OUTPUT_TYPES = "org/camunda/bpm/dmn/engine/evaluate/EvaluateDecisionsWithDifferentInputAndOutputTypes.groovy.dmn";
+  public static final String DMN_DECISIONS_WITH_DEFAULT_RULE_IN_CHILD = "org/camunda/bpm/dmn/engine/evaluate/EvaluateDecisionsWithDefaultRuleInChild.groovy.dmn";
   public static final String DMN_DECISIONS_WITH_INVALID_INPUT_TYPE = "org/camunda/bpm/dmn/engine/evaluate/EvaluateDecisionsWithInvalidInputTypeInParent.groovy.dmn";
   public static final String DMN_DECISIONS_WITH_SELF_DECISION = "org/camunda/bpm/dmn/engine/evaluate/EvaluateDecisionsWithSelfDecision.groovy.dmn";
   
@@ -222,6 +223,19 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
     assertThat(results)
       .hasSingleResult()
       .containsEntry("aa", 7.2);
+  }
+
+  @Test
+  public void testEvaluateDecisionsWithDefaultRuleInChildDecision() {
+    List<DmnDecision> decisions = parseDecisionsFromFile(DMN_DECISIONS_WITH_DEFAULT_RULE_IN_CHILD);
+
+    DmnDecisionTableResult results = dmnEngine.evaluateDecisionTable(decisions.get(0), createVariables()
+      .putValue("dd", "7") // There is no rule in the table matching the input 7
+      .asVariableContext());
+    
+    assertThat(results)
+      .hasSingleResult()
+      .containsEntry("aa", 7.0);
   }
 
   @Test
