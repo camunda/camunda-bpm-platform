@@ -236,12 +236,12 @@ public class CamundaExtensionsTest {
   public void testProcessJobPriority() {
     assertThat(process.getCamundaJobPriority()).isEqualTo(TEST_PROCESS_JOB_PRIORITY);
   }
-  
+
   @Test
   public void testProcessTaskPriority() {
     assertThat(process.getCamundaTaskPriority()).isEqualTo(TEST_PROCESS_TASK_PRIORITY);
   }
-  
+
   @Test
   public void testServiceTaskPriority() {
     assertThat(serviceTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
@@ -330,8 +330,8 @@ public class CamundaExtensionsTest {
     businessRuleTask.setCamundaMapDecisionResult(TEST_STRING_API);
     assertThat(businessRuleTask.getCamundaMapDecisionResult()).isEqualTo(TEST_STRING_API);
   }
-  
-  
+
+
   @Test
   public void testTaskPriority() {
     assertThat(businessRuleTask.getCamundaTaskPriority()).isEqualTo(TEST_STRING_XML);
@@ -391,20 +391,30 @@ public class CamundaExtensionsTest {
   public void testClass() {
     assertThat(serviceTask.getCamundaClass()).isEqualTo(TEST_CLASS_XML);
     assertThat(messageEventDefinition.getCamundaClass()).isEqualTo(TEST_CLASS_XML);
+    assertThat(callActivity.getCamundaClass()).isEqualTo(TEST_CLASS_XML);
+
     serviceTask.setCamundaClass(TEST_CLASS_API);
     messageEventDefinition.setCamundaClass(TEST_CLASS_API);
+    callActivity.setCamundaClass(TEST_CLASS_API);
+
     assertThat(serviceTask.getCamundaClass()).isEqualTo(TEST_CLASS_API);
     assertThat(messageEventDefinition.getCamundaClass()).isEqualTo(TEST_CLASS_API);
+    assertThat(callActivity.getCamundaClass()).isEqualTo(TEST_CLASS_API);
   }
 
   @Test
   public void testDelegateExpression() {
     assertThat(serviceTask.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_XML);
     assertThat(messageEventDefinition.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_XML);
+    assertThat(callActivity.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_XML);
+
     serviceTask.setCamundaDelegateExpression(TEST_DELEGATE_EXPRESSION_API);
     messageEventDefinition.setCamundaDelegateExpression(TEST_DELEGATE_EXPRESSION_API);
+    callActivity.setCamundaDelegateExpression(TEST_DELEGATE_EXPRESSION_API);
+
     assertThat(serviceTask.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
     assertThat(messageEventDefinition.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
+    assertThat(callActivity.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
   }
 
   @Test

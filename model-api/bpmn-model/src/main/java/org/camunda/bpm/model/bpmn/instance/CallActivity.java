@@ -69,4 +69,13 @@ public interface CallActivity extends Activity {
   String getCamundaCaseTenantId();
 
   void setCamundaCaseTenantId(String tenantId);
+
+  String getCamundaClass();
+
+  void setCamundaClass(String camundaClass);
+
+  String getCamundaDelegateExpression();
+
+  void setCamundaDelegateExpression(String camundaExpression);
+
 }

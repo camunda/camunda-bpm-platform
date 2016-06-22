@@ -24,10 +24,12 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBU
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_REF;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_TENANT_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_VERSION;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.CallActivityBuilder;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CLASS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_DELEGATE_EXPRESSION;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 import org.camunda.bpm.model.bpmn.instance.Activity;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
 import org.camunda.bpm.model.xml.ModelBuilder;
@@ -45,6 +47,7 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
 
   protected static Attribute<String> calledElementAttribute;
 
+
   /** camunda extensions */
 
   protected static Attribute<Boolean> camundaAsyncAttribute;
@@ -56,6 +59,8 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
   protected static Attribute<String> camundaCaseBindingAttribute;
   protected static Attribute<String> camundaCaseVersionAttribute;
   protected static Attribute<String> camundaCaseTenantIdAttribute;
+  protected static Attribute<String> camundaClassAttribute;
+  protected static Attribute<String> camundaDelegateExpressionAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CallActivity.class, BPMN_ELEMENT_CALL_ACTIVITY)
@@ -104,6 +109,15 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
     camundaCaseTenantIdAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_CASE_TENANT_ID)
         .namespace(CAMUNDA_NS)
         .build();
+
+    camundaClassAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_CLASS)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaDelegateExpressionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_DELEGATE_EXPRESSION)
+      .namespace(CAMUNDA_NS)
+      .build();
+
 
     typeBuilder.build();
   }
@@ -197,4 +211,23 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
     camundaCaseTenantIdAttribute.setValue(this, tenantId);
   }
 
+  @Override
+  public String getCamundaClass() {
+    return camundaClassAttribute.getValue(this);
+  }
+
+  @Override
+  public void setCamundaClass(String camundaClass) {
+    camundaClassAttribute.setValue(this, camundaClass);
+  }
+
+  @Override
+  public String getCamundaDelegateExpression() {
+    return camundaDelegateExpressionAttribute.getValue(this);
+  }
+
+  @Override
+  public void setCamundaDelegateExpression(String camundaExpression) {
+    camundaDelegateExpressionAttribute.setValue(this, camundaExpression);
+  }
 }

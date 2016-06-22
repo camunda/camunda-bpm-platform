@@ -673,7 +673,7 @@ public class ProcessBuilderTest {
         .error("errorCode")
       .errorEventDefinitionDone()
      .endEvent().done();
- 
+
     Bpmn.writeModelToStream(System.out, modelInstance);
     assertErrorEventDefinition("start", "errorCode");
     assertErrorEventDefinitionForErrorVariables("start", "errorCodeVariable", "errorMessageVariable");
@@ -689,7 +689,7 @@ public class ProcessBuilderTest {
         .error("errorCode")
       .errorEventDefinitionDone()
      .endEvent().done();
- 
+
     Bpmn.writeModelToStream(System.out, modelInstance);
     assertErrorEventDefinition("start", "errorCode");
     assertErrorEventDefinitionForErrorVariables("start", "errorCodeVariable", "errorMessageVariable");
@@ -711,6 +711,8 @@ public class ProcessBuilderTest {
         .camundaCaseTenantId("t2")
         .camundaIn("in-source", "in-target")
         .camundaOut("out-source", "out-target")
+        .camundaClass(TEST_CLASS_API)
+        .camundaDelegateExpression(TEST_DELEGATE_EXPRESSION_API)
         .notCamundaExclusive()
         .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
       .endEvent()
@@ -736,6 +738,8 @@ public class ProcessBuilderTest {
     assertThat(camundaOut.getCamundaSource()).isEqualTo("out-source");
     assertThat(camundaOut.getCamundaTarget()).isEqualTo("out-target");
 
+    assertThat(callActivity.getCamundaClass()).isEqualTo(TEST_CLASS_API);
+    assertThat(callActivity.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
     assertCamundaFailedJobRetryTimeCycle(callActivity);
   }
 
@@ -1804,7 +1808,7 @@ public class ProcessBuilderTest {
       .boundaryEvent("boundary").error("myErrorCode")
       .endEvent("boundaryEnd")
       .done();
-    
+
     assertErrorEventDefinition("boundary", "myErrorCode");
 
     UserTask userTask = modelInstance.getModelElementById("task");
@@ -1834,7 +1838,7 @@ public class ProcessBuilderTest {
           .errorCodeVariable("errorCodeVariable")
           .errorMessageVariable("errorMessageVariable")
           .error("errorCode")
-        .errorEventDefinitionDone()  
+        .errorEventDefinitionDone()
       .endEvent("boundaryEnd")
       .done();
 
@@ -1854,7 +1858,7 @@ public class ProcessBuilderTest {
           .errorCodeVariable("errorCodeVariable")
           .errorMessageVariable("errorMessageVariable")
           .error("errorCode")
-        .errorEventDefinitionDone()  
+        .errorEventDefinitionDone()
       .endEvent("boundaryEnd")
       .done();
 
