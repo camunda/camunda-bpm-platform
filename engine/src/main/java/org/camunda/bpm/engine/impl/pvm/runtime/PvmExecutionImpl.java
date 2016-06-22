@@ -232,12 +232,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   /**
    * perform starting behavior but don't execute the initial activity
+   * @param variables the variables which are used for the start
    */
-  public void startWithoutExecuting() {
+  public void startWithoutExecuting(Map<String, Object> variables) {
     initialize();
     initializeTimerDeclarations();
     fireHistoricProcessStartEvent();
     performOperation(PvmAtomicOperation.FIRE_PROCESS_START);
+    setVariables(variables);
   }
 
   public abstract void fireHistoricProcessStartEvent();

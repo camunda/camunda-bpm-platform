@@ -424,9 +424,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     super.start(variables);
   }
 
+  @Override
   public void startWithoutExecuting(Map<String, Object> variables) {
     provideTenantId(variables);
-    super.startWithoutExecuting();
+    super.startWithoutExecuting(variables);
   }
 
   protected void provideTenantId(Map<String, Object> variables) {
