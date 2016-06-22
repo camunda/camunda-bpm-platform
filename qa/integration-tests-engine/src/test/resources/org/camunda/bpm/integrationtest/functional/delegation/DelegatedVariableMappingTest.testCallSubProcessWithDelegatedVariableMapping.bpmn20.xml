@@ -10,7 +10,7 @@
 
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callSubProcess" />
 
-    <callActivity id="callSubProcess" calledElement="simpleSubProcess" camunda:varMapping="org.camunda.bpm.integrationtest.functional.delegation.beans.DelegateVarMapping"/>
+    <callActivity id="callSubProcess" calledElement="simpleSubProcess" camunda:class="org.camunda.bpm.integrationtest.functional.delegation.beans.DelegateVarMapping"/>
 
     <sequenceFlow id="flow3" sourceRef="callSubProcess" targetRef="taskAfterSubProcess" />
 

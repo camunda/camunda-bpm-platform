@@ -12,15 +12,20 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import java.util.concurrent.Callable;
+import org.camunda.bpm.application.InvocationContext;
+import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateVariableMapping;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import static org.camunda.bpm.engine.impl.bpmn.behavior.ClassDelegateActivityBehavior.LOG;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement.CallableElementBinding;
 import org.camunda.bpm.engine.impl.core.model.CallableElement;
 import org.camunda.bpm.engine.impl.delegate.DelegateInvocation;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.util.ClassDelegateUtil;
@@ -66,13 +71,34 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
   }
 
   protected DelegateVariableMapping resolveDelegation(ActivityExecution execution) {
+    Object delegate = resolveDelegateClass(execution);
+    return delegate != null ? getDelegateVariableMapping(delegate) : null;
+  }
+
+  public Object resolveDelegateClass(final ActivityExecution execution) {
+    ProcessApplicationReference targetProcessApplication
+            = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
+    if (ProcessApplicationContextUtil.requiresContextSwitch(targetProcessApplication)) {
+      return Context.executeWithinProcessApplication(new Callable<Object>() {
+
+        @Override
+        public Object call() throws Exception {
+          return resolveDelegateClass(execution);
+        }
+      }, targetProcessApplication, new InvocationContext(execution));
+    } else {
+      return instantiateDelegateClass(execution);
+    }
+  }
+
+  protected Object instantiateDelegateClass(ActivityExecution execution) {
     Object delegate = null;
     if (expression != null) {
       delegate = expression.getValue(execution);
     } else if (className != null) {
       delegate = ClassDelegateUtil.instantiateDelegate(className, null);
     }
-    return delegate != null ? getDelegateVariableMapping(delegate) : null;
+    return delegate;
   }
 
   @Override
@@ -117,7 +143,7 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
     try {
       Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(delegation);
     } catch (Exception ex) {
-        throw new ProcessEngineException(ex);
+      throw new ProcessEngineException(ex);
     }
   }
 
