@@ -1,0 +1,11 @@
+<div cam-widget-loader
+     loading-state="{{ loadingState }}"
+     text-error="{{ loadingError }}">
+  <ul>
+    <li>
+      <a href="#/tasks" ng-if="count == 0">0 open tasks</a>
+      <a href="#/tasks" ng-if="count == 1">1 open task</a>
+      <a href="#/tasks" ng-if="count > 1">{{ count }} open tasks</a>
+    </li>
+  </ul>
+</div>

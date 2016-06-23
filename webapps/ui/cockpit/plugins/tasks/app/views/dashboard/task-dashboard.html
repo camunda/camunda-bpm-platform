@@ -1,0 +1,60 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/tasks/app/views/dashboard/task-dashboard.html -->
+<div class="open-tasks">
+
+  <h3>Open Tasks</h3>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-5">
+        <table class="cam-table" id="open-task-statistics">
+          <thead>
+          <tr>
+            <th>Total</th>
+            <th>
+              <span ng-if="!openTaskLoadingState.$loaded" class="glyphicon glyphicon-refresh animate-spin"></span>
+              <span ng-if="openTaskLoadingState.$loaded">{{ openTasksCount }}</span>
+            </th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr ng-repeat="taskCount in taskCountStatistic">
+            <td>{{ taskCount.label }}</td>
+            <td>
+              <span ng-if="!taskCount.loadingState.$loaded" class="glyphicon glyphicon-refresh animate-spin"></span>
+              <span ng-if="taskCount.loadingState.$loaded">{{ taskCount.count }}</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col-xs-12 col-sm-12 col-md-5 col-md-offset-1">
+        <table class="cam-table" id="task-group-counts">
+          <thead>
+          <tr>
+            <th>Group</th>
+            <th>Number of Tasks</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr ng-if="!taskCountStatistic[1].loadingState.$loaded">
+            <td colspan="2"><span class="glyphicon glyphicon-refresh animate-spin"></span></td>
+          </tr>
+          <tr ng-if="taskCountStatistic[1].loadingState.$loaded" ng-repeat="taskCountObj in taskCountObjects">
+            <td>{{ formatGroupName(taskCountObj.groupName) }}</td>
+            <td>{{ taskCountObj.taskCount }}</td>
+          </tr>
+          </tbody>
+        </table>
+        <p id="multiple-groups-info" ng-if="taskCountStatistic[1].loadingState.$loaded">
+          <span class="glyphicon glyphicon-info-sign"></span>
+          A task may have multiple groups.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/decisionList/app/views/dashboard/task-dashboard.html -->
