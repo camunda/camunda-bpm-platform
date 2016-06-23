@@ -4,16 +4,16 @@
   <div class="quick-filter name-filter"
        ng-if="showNameFilter">
     <label class="input-group">
+      <span class="input-group-addon"
+            tooltip="Click here to clear the field value.">
+        <span class="glyphicon glyphicon-filter"
+              ng-click="clearName()"></span>
+      </span>
       <input ng-keyup="search()"
              ng-model="name"
              name="name"
              type="text"
              class="form-control" />
-      <span class="input-group-addon"
-            tooltip="Click here to clear the field value.">
-        <span class="glyphicon glyphicon-search"
-              ng-click="clearName()"></span>
-      </span>
     </label>
     <button class="btn btn-sm btn-link btn-control-link"
             type="button"
