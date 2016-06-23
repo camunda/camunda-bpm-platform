@@ -16,6 +16,7 @@ package org.camunda.bpm.dmn.engine.evaluate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.dmn.engine.test.asserts.DmnEngineTestAssertions.assertThat;
 import static org.camunda.bpm.engine.variable.Variables.createVariables;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +42,22 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
   public static final String DMN_DECISIONS_WITH_DEFAULT_RULE_IN_CHILD = "org/camunda/bpm/dmn/engine/evaluate/EvaluateDecisionsWithDefaultRuleInChild.groovy.dmn";
   public static final String DMN_DECISIONS_WITH_INVALID_INPUT_TYPE = "org/camunda/bpm/dmn/engine/evaluate/EvaluateDecisionsWithInvalidInputTypeInParent.groovy.dmn";
   public static final String DMN_DECISIONS_WITH_SELF_DECISION = "org/camunda/bpm/dmn/engine/evaluate/EvaluateDecisionsWithSelfDecision.groovy.dmn";
-  
+  public static final String DMN_DECISIONS_WITH_DISH_DECISON_EXAMPLE = "org/camunda/bpm/dmn/engine/evaluate/EvaluateDrdDishDecisionExample.dmn";
+
+  @Test
+  public void evaluateDrdDishDecisionExample() {
+
+    List<DmnDecision> decisions = parseDecisionsFromFile(DMN_DECISIONS_WITH_DISH_DECISON_EXAMPLE);
+
+    DmnDecisionTableResult results = dmnEngine.evaluateDecisionTable(decisions.get(0), createVariables()
+      .putValue("temperature", 20)
+      .putValue("dayType", "Weekend"));
+    
+    assertThat(results)
+      .hasSingleResult()
+      .containsEntry("desiredDish", "Steak");
+  }
+
   @Test
   public void testEvaluateDecisionWithRequiredDecisionByKey() {
     List<DmnDecision> decisions = parseDecisionsFromFile(DMN_MULTI_LEVEL_MULTIPLE_INPUT_SINGLE_OUTPUT);
