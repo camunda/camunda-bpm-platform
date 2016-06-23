@@ -53,8 +53,8 @@ public class TaskCountByCandidateGroupsTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain
-                                  .outerRule(processEngineTestRule)
-                                  .around(processEngineRule);
+    .outerRule(processEngineTestRule)
+    .around(processEngineRule);
 
 
   protected TaskService taskService;
@@ -86,7 +86,8 @@ public class TaskCountByCandidateGroupsTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
 
     authenticateWithMultipleTenants();
-    for( String taskId : tasks ) {
+
+    for (String taskId : tasks ) {
       taskService.deleteTask(taskId, true);
     }
 
@@ -114,7 +115,7 @@ public class TaskCountByCandidateGroupsTest {
     List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
 
     // then
-    for( TaskCountByCandidateGroupResult result : results ) {
+    for (TaskCountByCandidateGroupResult result : results ) {
       checkResultCount(result, null, 1);
       checkResultCount(result, groups.get(0), 2);
       checkResultCount(result, groups.get(1), 1);
@@ -130,7 +131,7 @@ public class TaskCountByCandidateGroupsTest {
     List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
 
     // then
-    for( TaskCountByCandidateGroupResult result : results ) {
+    for (TaskCountByCandidateGroupResult result : results ) {
       assertTrue(checkResultName(result));
     }
   }
@@ -145,7 +146,7 @@ public class TaskCountByCandidateGroupsTest {
     List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
 
     // then
-    for( TaskCountByCandidateGroupResult result : results ) {
+    for (TaskCountByCandidateGroupResult result : results ) {
       checkResultCount(result, null, 1);
       checkResultCount(result, groups.get(0), 1);
       checkResultCount(result, groups.get(1), 1);
@@ -175,7 +176,7 @@ public class TaskCountByCandidateGroupsTest {
     List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
 
     // then
-    for( TaskCountByCandidateGroupResult result : results ) {
+    for (TaskCountByCandidateGroupResult result : results ) {
       checkResultCount(result, null, 1);
       checkResultCount(result, groups.get(0), 1);
       checkResultCount(result, groups.get(1), 1);
@@ -245,8 +246,8 @@ public class TaskCountByCandidateGroupsTest {
       taskService.createTaskReport().taskCountByCandidateGroup();
       testFailed = true;
 
-    } catch( AuthorizationException aex ) {
-      if( !aex.getMessage().contains(userId + "' does not have 'READ' permission on resource '*' of type 'Task'") ) {
+    } catch(AuthorizationException aex) {
+      if(!aex.getMessage().contains(userId + "' does not have 'READ' permission on resource '*' of type 'Task'")) {
         testFailed = true;
       }
     }
@@ -288,8 +289,8 @@ public class TaskCountByCandidateGroupsTest {
   }
 
   protected void checkResultCount(TaskCountByCandidateGroupResult result, String expectedResultName, int expectedResultCount) {
-    if( (expectedResultName == null     && result.getGroupName() == null) ||
-        (result.getGroupName() != null  && result.getGroupName().equals(expectedResultName))) {
+    if((expectedResultName == null && result.getGroupName() == null) ||
+       (result.getGroupName() != null && result.getGroupName().equals(expectedResultName))) {
       assertEquals(expectedResultCount, result.getTaskCount());
     }
   }
