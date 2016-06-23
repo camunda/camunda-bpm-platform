@@ -10,7 +10,7 @@
 
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callSubProcess" />
 
-    <callActivity id="callSubProcess" calledElement="simpleSubProcess" camunda:delegateExpression="${expr}"/>
+    <callActivity id="callSubProcess" calledElement="simpleSubProcess" camunda:variableMappingDelegateExpression="${expr}"/>
 
     <sequenceFlow id="flow3" sourceRef="callSubProcess" targetRef="taskAfterSubProcess" />
 

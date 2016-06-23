@@ -192,6 +192,8 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_CLASS = "class";
   public static final String PROPERTYNAME_EXPRESSION = "expression";
   public static final String PROPERTYNAME_DELEGATE_EXPRESSION = "delegateExpression";
+  public static final String PROPERTYNAME_VARIABLE_MAPPING_CLASS = "variableMappingClass";
+  public static final String PROPERTYNAME_VARIABLE_MAPPING_DELEGATE_EXPRESSION = "variableMappingDelegateExpression";
 
   /**
    * @deprecated use {@link BpmnProperties#TYPE}
@@ -3444,8 +3446,8 @@ public class BpmnParse extends Parse {
     // parse definition key (and behavior)
     String calledElement = callActivityElement.attribute("calledElement");
     String caseRef = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "caseRef");
-    String className = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_CLASS);
-    String delegateExpression = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_DELEGATE_EXPRESSION);
+    String className = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_VARIABLE_MAPPING_CLASS);
+    String delegateExpression = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_VARIABLE_MAPPING_DELEGATE_EXPRESSION);
 
     if (calledElement == null && caseRef == null) {
       addError("Missing attribute 'calledElement' or 'caseRef'", callActivityElement);

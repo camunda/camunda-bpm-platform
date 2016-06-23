@@ -11,7 +11,7 @@
 
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callSubProcess" />
 
-    <callActivity id="callSubProcess" calledElement="failingSubProcess" camunda:class="org.camunda.bpm.engine.test.bpmn.callactivity.DelegatedVarMapping" />
+    <callActivity id="callSubProcess" calledElement="failingSubProcess" camunda:variableMappingClass="org.camunda.bpm.engine.test.bpmn.callactivity.DelegatedVarMapping" />
 
     <sequenceFlow id="flow4" sourceRef="callSubProcess" targetRef="theEnd" />
 

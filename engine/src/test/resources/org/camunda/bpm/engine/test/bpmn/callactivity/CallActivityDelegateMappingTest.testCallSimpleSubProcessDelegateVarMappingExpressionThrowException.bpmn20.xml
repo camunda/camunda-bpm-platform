@@ -14,7 +14,7 @@
 
     <sequenceFlow id="flow2" sourceRef="taskBeforeSubProcess" targetRef="callSubProcess" />
 
-    <callActivity id="callSubProcess" calledElement="simpleSubProcess" camunda:delegateExpression="${expr}"/>
+    <callActivity id="callSubProcess" calledElement="simpleSubProcess" camunda:variableMappingDelegateExpression="${expr}"/>
     <boundaryEvent id="catchError" attachedToRef="callSubProcess">
       <!--errorRef ommitted so boundary event will catch everything-->
       <errorEventDefinition camunda:errorCodeVariable="myErrorVariable"/>
