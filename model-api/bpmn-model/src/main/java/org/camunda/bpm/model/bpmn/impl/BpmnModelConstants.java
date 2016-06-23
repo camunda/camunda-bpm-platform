@@ -457,6 +457,8 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_TYPE = "type";
   public static final String CAMUNDA_ATTRIBUTE_VALUE = "value";
   public static final String CAMUNDA_ATTRIBUTE_VARIABLE = "variable";
+  public static final String CAMUNDA_ATTRIBUTE_VARIABLE_MAPPING_CLASS = "variableMappingClass";
+  public static final String CAMUNDA_ATTRIBUTE_VARIABLE_MAPPING_DELEGATE_EXPRESSION = "variableMappingDelegateExpression";
   public static final String CAMUNDA_ATTRIBUTE_VARIABLES = "variables";
   public static final String CAMUNDA_ATTRIBUTE_WRITEABLE = "writeable";
   public static final String CAMUNDA_ATTRIBUTE_CASE_REF = "caseRef";

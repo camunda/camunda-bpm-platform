@@ -391,30 +391,24 @@ public class CamundaExtensionsTest {
   public void testClass() {
     assertThat(serviceTask.getCamundaClass()).isEqualTo(TEST_CLASS_XML);
     assertThat(messageEventDefinition.getCamundaClass()).isEqualTo(TEST_CLASS_XML);
-    assertThat(callActivity.getCamundaClass()).isEqualTo(TEST_CLASS_XML);
 
     serviceTask.setCamundaClass(TEST_CLASS_API);
     messageEventDefinition.setCamundaClass(TEST_CLASS_API);
-    callActivity.setCamundaClass(TEST_CLASS_API);
 
     assertThat(serviceTask.getCamundaClass()).isEqualTo(TEST_CLASS_API);
     assertThat(messageEventDefinition.getCamundaClass()).isEqualTo(TEST_CLASS_API);
-    assertThat(callActivity.getCamundaClass()).isEqualTo(TEST_CLASS_API);
   }
 
   @Test
   public void testDelegateExpression() {
     assertThat(serviceTask.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_XML);
     assertThat(messageEventDefinition.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_XML);
-    assertThat(callActivity.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_XML);
 
     serviceTask.setCamundaDelegateExpression(TEST_DELEGATE_EXPRESSION_API);
     messageEventDefinition.setCamundaDelegateExpression(TEST_DELEGATE_EXPRESSION_API);
-    callActivity.setCamundaDelegateExpression(TEST_DELEGATE_EXPRESSION_API);
 
     assertThat(serviceTask.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
     assertThat(messageEventDefinition.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
-    assertThat(callActivity.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
   }
 
   @Test
@@ -524,6 +518,20 @@ public class CamundaExtensionsTest {
     messageEventDefinition.setCamundaTopic(TEST_STRING_API);
     assertThat(serviceTask.getCamundaTopic()).isEqualTo(TEST_TYPE_API);
     assertThat(messageEventDefinition.getCamundaTopic()).isEqualTo(TEST_STRING_API);
+  }
+
+  @Test
+  public void testVariableMappingClass() {
+    assertThat(callActivity.getCamundaVariableMappingClass()).isEqualTo(TEST_CLASS_XML);
+    callActivity.setCamundaVariableMappingClass(TEST_CLASS_API);
+    assertThat(callActivity.getCamundaVariableMappingClass()).isEqualTo(TEST_CLASS_API);
+  }
+
+  @Test
+  public void testVariableMappingDelegateExpression() {
+    assertThat(callActivity.getCamundaVariableMappingDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_XML);
+    callActivity.setCamundaVariableMappingDelegateExpression(TEST_DELEGATE_EXPRESSION_API);
+    assertThat(callActivity.getCamundaVariableMappingDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
   }
 
   @Test

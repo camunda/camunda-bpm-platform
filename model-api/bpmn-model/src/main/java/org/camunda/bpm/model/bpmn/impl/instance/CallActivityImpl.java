@@ -27,8 +27,8 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBU
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.CallActivityBuilder;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CLASS;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_DELEGATE_EXPRESSION;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_VARIABLE_MAPPING_CLASS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_VARIABLE_MAPPING_DELEGATE_EXPRESSION;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 import org.camunda.bpm.model.bpmn.instance.Activity;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
@@ -59,8 +59,8 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
   protected static Attribute<String> camundaCaseBindingAttribute;
   protected static Attribute<String> camundaCaseVersionAttribute;
   protected static Attribute<String> camundaCaseTenantIdAttribute;
-  protected static Attribute<String> camundaClassAttribute;
-  protected static Attribute<String> camundaDelegateExpressionAttribute;
+  protected static Attribute<String> camundaVariableMappingClassAttribute;
+  protected static Attribute<String> camundaVariableMappingDelegateExpressionAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CallActivity.class, BPMN_ELEMENT_CALL_ACTIVITY)
@@ -110,11 +110,11 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
         .namespace(CAMUNDA_NS)
         .build();
 
-    camundaClassAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_CLASS)
+    camundaVariableMappingClassAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_VARIABLE_MAPPING_CLASS)
       .namespace(CAMUNDA_NS)
       .build();
 
-    camundaDelegateExpressionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_DELEGATE_EXPRESSION)
+    camundaVariableMappingDelegateExpressionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_VARIABLE_MAPPING_DELEGATE_EXPRESSION)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -212,22 +212,22 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
   }
 
   @Override
-  public String getCamundaClass() {
-    return camundaClassAttribute.getValue(this);
+  public String getCamundaVariableMappingClass() {
+    return camundaVariableMappingClassAttribute.getValue(this);
   }
 
   @Override
-  public void setCamundaClass(String camundaClass) {
-    camundaClassAttribute.setValue(this, camundaClass);
+  public void setCamundaVariableMappingClass(String camundaClass) {
+    camundaVariableMappingClassAttribute.setValue(this, camundaClass);
   }
 
   @Override
-  public String getCamundaDelegateExpression() {
-    return camundaDelegateExpressionAttribute.getValue(this);
+  public String getCamundaVariableMappingDelegateExpression() {
+    return camundaVariableMappingDelegateExpressionAttribute.getValue(this);
   }
 
   @Override
-  public void setCamundaDelegateExpression(String camundaExpression) {
-    camundaDelegateExpressionAttribute.setValue(this, camundaExpression);
+  public void setCamundaVariableMappingDelegateExpression(String camundaExpression) {
+    camundaVariableMappingDelegateExpressionAttribute.setValue(this, camundaExpression);
   }
 }

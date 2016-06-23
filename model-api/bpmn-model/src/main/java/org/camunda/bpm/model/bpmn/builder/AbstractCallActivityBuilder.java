@@ -174,28 +174,28 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
 
 
   /**
-   * Sets the camunda class attribute. It references on a class which implements the
+   * Sets the camunda variableMappingClass attribute. It references on a class which implements the
    * {@link DelegateVariableMapping} interface.
    * Is used to delegate the variable in- and output mapping to the given class.
    *
-   * @param camundaClass                  the class name to set
+   * @param camundaVariableMappingClass                  the class name to set
    * @return                              the builder object
    */
-  public B camundaClass(String camundaClass) {
-    element.setCamundaClass(camundaClass);
+  public B camundaVariableMappingClass(String camundaVariableMappingClass) {
+    element.setCamundaVariableMappingClass(camundaVariableMappingClass);
     return myself;
   }
 
   /**
-   * Sets the camunda delegateExpression attribute. The expression when is resolved
+   * Sets the camunda variableMappingDelegateExpression attribute. The expression when is resolved
    * references to an object of a class, which implements the {@link DelegateVariableMapping} interface.
    * Is used to delegate the variable in- and output mapping to the given class.
    *
-   * @param camundaDelegateExpression     the expression which references a delegate object
+   * @param camundaVariableMappingDelegateExpression     the expression which references a delegate object
    * @return                              the builder object
    */
-  public B camundaDelegateExpression(String camundaDelegateExpression) {
-    element.setCamundaDelegateExpression(camundaDelegateExpression);
+  public B camundaVariableMappingDelegateExpression(String camundaVariableMappingDelegateExpression) {
+    element.setCamundaVariableMappingDelegateExpression(camundaVariableMappingDelegateExpression);
     return myself;
   }
 }

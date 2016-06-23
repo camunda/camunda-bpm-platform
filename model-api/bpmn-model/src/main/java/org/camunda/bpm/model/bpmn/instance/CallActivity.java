@@ -70,12 +70,12 @@ public interface CallActivity extends Activity {
 
   void setCamundaCaseTenantId(String tenantId);
 
-  String getCamundaClass();
+  String getCamundaVariableMappingClass();
 
-  void setCamundaClass(String camundaClass);
+  void setCamundaVariableMappingClass(String camundaClass);
 
-  String getCamundaDelegateExpression();
+  String getCamundaVariableMappingDelegateExpression();
 
-  void setCamundaDelegateExpression(String camundaExpression);
+  void setCamundaVariableMappingDelegateExpression(String camundaExpression);
 
 }

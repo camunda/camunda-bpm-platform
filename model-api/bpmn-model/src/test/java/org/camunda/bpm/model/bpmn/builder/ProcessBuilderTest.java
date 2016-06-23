@@ -711,8 +711,8 @@ public class ProcessBuilderTest {
         .camundaCaseTenantId("t2")
         .camundaIn("in-source", "in-target")
         .camundaOut("out-source", "out-target")
-        .camundaClass(TEST_CLASS_API)
-        .camundaDelegateExpression(TEST_DELEGATE_EXPRESSION_API)
+        .camundaVariableMappingClass(TEST_CLASS_API)
+        .camundaVariableMappingDelegateExpression(TEST_DELEGATE_EXPRESSION_API)
         .notCamundaExclusive()
         .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
       .endEvent()
@@ -738,8 +738,8 @@ public class ProcessBuilderTest {
     assertThat(camundaOut.getCamundaSource()).isEqualTo("out-source");
     assertThat(camundaOut.getCamundaTarget()).isEqualTo("out-target");
 
-    assertThat(callActivity.getCamundaClass()).isEqualTo(TEST_CLASS_API);
-    assertThat(callActivity.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
+    assertThat(callActivity.getCamundaVariableMappingClass()).isEqualTo(TEST_CLASS_API);
+    assertThat(callActivity.getCamundaVariableMappingDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
     assertCamundaFailedJobRetryTimeCycle(callActivity);
   }
 
