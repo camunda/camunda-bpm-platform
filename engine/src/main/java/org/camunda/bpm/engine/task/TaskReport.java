@@ -21,6 +21,7 @@ import java.util.List;
  */
 public interface TaskReport {
 
+  /** Select a list with the number of tasks per group */
   List<TaskCountByCandidateGroupResult> taskCountByCandidateGroup();
 
 }

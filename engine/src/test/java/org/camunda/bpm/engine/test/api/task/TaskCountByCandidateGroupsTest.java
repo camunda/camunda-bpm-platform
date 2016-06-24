@@ -12,12 +12,10 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
-import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskCountByCandidateGroupResult;
@@ -33,13 +31,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.camunda.bpm.engine.authorization.Authorization.ANY;
-import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
-import static org.camunda.bpm.engine.authorization.Permissions.READ;
-import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Daniel Meyer
@@ -83,22 +76,13 @@ public class TaskCountByCandidateGroupsTest {
 
   @After
   public void cleanUp() {
-    processEngineConfiguration.setTenantCheckEnabled(false);
-
-    authenticateWithMultipleTenants();
-
-    for (String taskId : tasks ) {
+    for (String taskId : tasks) {
       taskService.deleteTask(taskId, true);
     }
-
-    processEngineConfiguration.setTenantCheckEnabled(true);
   }
 
   @Test
   public void shouldReturnTaskCountsByGroup() {
-    // given
-    authenticateWithMultipleTenants();
-
     // when
     List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
 
@@ -108,9 +92,6 @@ public class TaskCountByCandidateGroupsTest {
 
   @Test
   public void shouldProvideTaskCountForEachGroup() {
-    // given
-    authenticateWithMultipleTenants();
-
     // when
     List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
 
@@ -124,139 +105,12 @@ public class TaskCountByCandidateGroupsTest {
 
   @Test
   public void shouldProvideGroupNameForEachGroup() {
-    // given
-    authenticateWithMultipleTenants();
-
     // when
     List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
 
     // then
     for (TaskCountByCandidateGroupResult result : results ) {
       assertTrue(checkResultName(result));
-    }
-  }
-
-  @Test
-  public void shouldDecreaseTaskCountOnComplete() {
-    // given
-    authenticateWithMultipleTenants();
-    taskService.complete(tasks.get(1));
-
-    // when
-    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
-
-    // then
-    for (TaskCountByCandidateGroupResult result : results ) {
-      checkResultCount(result, null, 1);
-      checkResultCount(result, groups.get(0), 1);
-      checkResultCount(result, groups.get(1), 1);
-    }
-  }
-
-  @Test
-  public void shouldRemoveGroupNameOnComplete() {
-    // given
-    authenticateWithMultipleTenants();
-    taskService.complete(tasks.get(2));
-
-    // when
-    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
-
-    // then
-    assertEquals(2, results.size());
-  }
-
-  @Test
-  public void shouldDecreaseTaskCountOnDelete() {
-    // given
-    authenticateWithMultipleTenants();
-    taskService.deleteTask(tasks.get(1), true);
-
-    // when
-    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
-
-    // then
-    for (TaskCountByCandidateGroupResult result : results ) {
-      checkResultCount(result, null, 1);
-      checkResultCount(result, groups.get(0), 1);
-      checkResultCount(result, groups.get(1), 1);
-    }
-  }
-
-  @Test
-  public void shouldRemoveGroupNameOnDelete() {
-    // given
-    authenticateWithMultipleTenants();
-    taskService.deleteTask(tasks.get(2), true);
-
-    // when
-    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
-
-    // then
-    assertEquals(2, results.size());
-  }
-
-  @Test
-  public void shouldOnlyShowTenantSpecificTasks() {
-    // given
-    authenticateWithSingleTenant();
-
-    // when
-    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
-
-    // then
-    assertEquals(1, results.size());
-    assertEquals(groups.get(0), results.get(0).getGroupName());
-  }
-
-  @Test
-  public void shouldFetchTaskCountWithAuthorization() {
-    // given
-    User user = identityService.newUser(userId);
-    identityService.saveUser(user);
-
-    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
-    authorization.addPermission(READ);
-    authorization.setResource(TASK);
-    authorization.setResourceId(ANY);
-    authorization.setUserId(userId);
-    authorizationService.saveAuthorization(authorization);
-
-    processEngineConfiguration.setAuthorizationEnabled(true);
-    authenticateWithMultipleTenants();
-
-    // when
-    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
-    processEngineConfiguration.setAuthorizationEnabled(false);
-    authorizationService.deleteAuthorization(authorization.getId());
-    identityService.deleteUser(userId);
-
-    assertEquals(3, results.size());
-  }
-
-  @Test
-  public void shouldFailToFetchTaskCountWithMissingAuthorization() {
-    // given
-    boolean testFailed = false;
-    processEngineConfiguration.setAuthorizationEnabled(true);
-    authenticateWithMultipleTenants();
-
-    // when
-    try {
-      taskService.createTaskReport().taskCountByCandidateGroup();
-      testFailed = true;
-
-    } catch(AuthorizationException aex) {
-      if(!aex.getMessage().contains(userId + "' does not have 'READ' permission on resource '*' of type 'Task'")) {
-        testFailed = true;
-      }
-    }
-
-    // then
-    processEngineConfiguration.setAuthorizationEnabled(false);
-
-    if( testFailed ) {
-      fail("There should be an authorization exception for '" + userId + "' because of a missing 'READ' permission on 'Task'.");
     }
   }
 
@@ -281,7 +135,7 @@ public class TaskCountByCandidateGroupsTest {
     task.setTenantId(tenantId);
     taskService.saveTask(task);
 
-    if( groupId != null ) {
+    if (groupId != null) {
       taskService.addCandidateGroup(task.getId(), groupId);
     }
 
@@ -299,13 +153,5 @@ public class TaskCountByCandidateGroupsTest {
     return result.getGroupName() == null ||
            result.getGroupName().equals(groups.get(0)) ||
            result.getGroupName().equals(groups.get(1));
-  }
-
-  protected void authenticateWithSingleTenant() {
-    identityService.setAuthentication(userId, null, tenants.subList(0, 1));
-  }
-
-  protected void authenticateWithMultipleTenants() {
-    identityService.setAuthentication(userId, null, tenants);
   }
 }

@@ -19,8 +19,10 @@ package org.camunda.bpm.engine.task;
  */
 public interface TaskCountByCandidateGroupResult {
 
+  /** The number of tasks for a specific group */
   int getTaskCount();
 
+  /** The group which as the number of tasks */
   String getGroupName();
 
 }
