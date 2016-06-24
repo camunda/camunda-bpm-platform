@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.dmn.engine.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.camunda.bpm.dmn.engine.test.asserts.DmnEngineTestAssertions.assertThat;
 import static org.camunda.bpm.engine.variable.Variables.createVariables;
@@ -20,6 +21,7 @@ import static org.camunda.bpm.engine.variable.Variables.emptyVariableContext;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionRequirementDiagram;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.impl.DmnEvaluationException;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformException;
@@ -152,6 +154,42 @@ public class DmnEngineApiTest extends DmnEngineTest {
       assertThat(e)
         .hasMessageStartingWith("DMN-01001")
         .hasMessageContaining("unknown");
+    }
+  }
+
+  @Test
+  public void shouldFailParsingDrdIfInputStreamIsNull() {
+    try{
+      dmnEngine.parseDecisionRequirementDiagram((InputStream) null);
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch (IllegalArgumentException e) {
+      assertThat(e)
+        .hasMessageContaining("UTILS-02001");
+    }
+  }
+
+  @Test
+  public void shouldFailParsingDrdIfInputStreamIsInvalid() {
+    try{
+      dmnEngine.parseDecisionRequirementDiagram(createInvalidInputStream());
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    }
+    catch (DmnTransformException e) {
+      assertThat(e)
+        .hasMessageContaining("DMN-02003");
+    }
+  }
+
+  @Test
+  public void shouldFailParsingDrdIfModelInstanceIsNull() {
+    try{
+      dmnEngine.parseDecisionRequirementDiagram((DmnModelInstance) null);
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch (IllegalArgumentException e) {
+      assertThat(e)
+        .hasMessageContaining("UTILS-02001");
     }
   }
 
@@ -408,6 +446,17 @@ public class DmnEngineApiTest extends DmnEngineTest {
   @DecisionResource(resource = ONE_RULE_DMN)
   public void shouldEvaluateDecisionWithVariableContext() {
     DmnDecisionTableResult results = dmnEngine.evaluateDecisionTable(decision, createVariables().putValue("input", INPUT_VALUE).asVariableContext());
+    assertThat(results)
+      .hasSingleResult()
+      .hasSingleEntry(EXPECTED_OUTPUT_VALUE);
+  }
+
+  @Test
+  public void shouldEvaluateDecisionOfDrd() {
+    DmnDecisionRequirementDiagram drd = dmnEngine.parseDecisionRequirementDiagram(createInputStream());
+    decision = drd.getDecision("decision");
+
+    DmnDecisionTableResult results = dmnEngine.evaluateDecisionTable(decision, createVariables().putValue("input", INPUT_VALUE));
     assertThat(results)
       .hasSingleResult()
       .hasSingleEntry(EXPECTED_OUTPUT_VALUE);

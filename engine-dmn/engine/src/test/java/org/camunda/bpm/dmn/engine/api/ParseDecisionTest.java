@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionRequirementDiagram;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformException;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
 import org.camunda.bpm.model.dmn.Dmn;
@@ -45,6 +46,8 @@ public class ParseDecisionTest extends DmnEngineTest {
   public static final String WRONG_REQUIRED_DECISION_REFERENCE_DMN = "org/camunda/bpm/dmn/engine/api/WrongRequiredDecisionReference.dmn";
   public static final String MISSING_REQUIRED_DECISION_ATTRIBUTE_DMN = "org/camunda/bpm/dmn/engine/api/MissingRequiredDecisionAttribute.dmn";
   public static final String NO_INFORMATION_REQUIREMENT_ATTRIBUTE_DMN = "org/camunda/bpm/dmn/engine/api/NoInformationRequirementAttribute.dmn";
+  public static final String MISSING_DECISION_REQUIREMENT_DIAGRAM_ID_DMN = "org/camunda/bpm/dmn/engine/api/MissingIds.missingDrdId.dmn";
+
   @Test
   public void shouldParseDecisionFromInputStream() {
     InputStream inputStream = IoUtil.fileAsStream(NO_INPUT_DMN);
@@ -214,10 +217,50 @@ public class ParseDecisionTest extends DmnEngineTest {
         .hasMessageContaining("Unable to transform decisions from input stream");
     }
   }
-  
+
+  @Test
+  public void shouldParseDrdFromInputStream() {
+    InputStream inputStream = IoUtil.fileAsStream(NO_INPUT_DMN);
+    DmnDecisionRequirementDiagram drd = dmnEngine.parseDecisionRequirementDiagram(inputStream);
+
+    assertDecisionRequirementDiagram(drd, "definitions");
+  }
+
+  @Test
+  public void shouldParseDrdFromModelInstance() {
+    InputStream inputStream = IoUtil.fileAsStream(NO_INPUT_DMN);
+    DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
+
+    DmnDecisionRequirementDiagram drd = dmnEngine.parseDecisionRequirementDiagram(modelInstance);
+
+    assertDecisionRequirementDiagram(drd, "definitions");
+  }
+
+  @Test
+  public void shouldFailIfDecisionDrdIdIsMissing() {
+    try {
+      InputStream inputStream = IoUtil.fileAsStream(MISSING_DECISION_REQUIREMENT_DIAGRAM_ID_DMN);
+      dmnEngine.parseDecisionRequirementDiagram(inputStream);
+
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    }
+    catch (DmnTransformException e) {
+      assertThat(e)
+        .hasCauseExactlyInstanceOf(DmnTransformException.class)
+        .hasMessageStartingWith("DMN-02016")
+        .hasMessageContaining("DMN-02017")
+        .hasMessageContaining("DRD with Missing Id");
+    }
+  }
+
   protected void assertDecision(DmnDecision decision, String key) {
     assertThat(decision).isNotNull();
     assertThat(decision.getKey()).isEqualTo(key);
+  }
+
+  protected void assertDecisionRequirementDiagram(DmnDecisionRequirementDiagram drd, String key) {
+    assertThat(drd).isNotNull();
+    assertThat(drd.getKey()).isEqualTo(key);
   }
 
 }

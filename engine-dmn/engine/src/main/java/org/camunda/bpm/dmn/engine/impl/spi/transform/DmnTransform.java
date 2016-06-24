@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionRequirementDiagram;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 
 /**
@@ -70,6 +71,15 @@ public interface DmnTransform {
    */
   DmnTransform modelInstance(DmnModelInstance modelInstance);
 
+  /**
+   * Transform all decisions of the DMN model instance.
+   */
   <T extends DmnDecision> List<T> transformDecisions();
+
+  /**
+   * Transform the decision requirement diagram and all containing decisions of
+   * the DMN model instance.
+   */
+  <T extends DmnDecisionRequirementDiagram> T transformDecisionRequirementDiagram();
 
 }

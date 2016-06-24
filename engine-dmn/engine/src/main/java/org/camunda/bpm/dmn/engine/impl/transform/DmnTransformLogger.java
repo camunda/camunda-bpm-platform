@@ -16,6 +16,7 @@ package org.camunda.bpm.dmn.engine.impl.transform;
 import java.io.File;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionRequirementDiagram;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableInputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableOutputImpl;
@@ -51,7 +52,7 @@ public class DmnTransformLogger extends DmnLogger {
     );
   }
 
-  public DmnTransformException errorWhileTransforming(Throwable cause) {
+  public DmnTransformException errorWhileTransformingDecisions(Throwable cause) {
     return new DmnTransformException(exceptionMessage(
       "004",
       "Error while transforming decisions: " + cause.getMessage()),
@@ -105,7 +106,7 @@ public class DmnTransformLogger extends DmnLogger {
   public DmnTransformException decisionIdIsMissing(DmnDecision dmnDecision) {
     return new DmnTransformException(exceptionMessage(
       "010",
-      "The decision '{}' must have a 'id' attribute set.", dmnDecision)
+      "The decision '{}' must have an 'id' attribute set.", dmnDecision)
     );
   }
 
@@ -143,4 +144,20 @@ public class DmnTransformLogger extends DmnLogger {
       "The decision '{}' has a loop.", decision.getId())
     );
   }
+
+  public DmnTransformException errorWhileTransformingDefinitions(Throwable cause) {
+    return new DmnTransformException(exceptionMessage(
+      "016",
+      "Error while transforming decision requirement diagram: " + cause.getMessage()),
+      cause
+    );
+  }
+
+  public DmnTransformException drdIdIsMissing(DmnDecisionRequirementDiagram drd) {
+    return new DmnTransformException(exceptionMessage(
+      "017",
+      "The decision requirement diagram '{}' must have an 'id' attribute set.", drd)
+    );
+  }
+
 }

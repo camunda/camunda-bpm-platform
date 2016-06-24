@@ -17,10 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionRequirementDiagram;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableInputImpl;
@@ -188,19 +190,19 @@ public class DmnTransformTest extends DmnEngineTest {
 
     DmnDecision buyProductDecision = dmnEngine.parseDecision("buyProduct", modelInstance);
     assertDecision(buyProductDecision, "buyProduct");
-    
+
     List<DmnDecision> buyProductrequiredDecisions = buyProductDecision.getRequiredDecisions();
     assertThat(buyProductrequiredDecisions.size()).isEqualTo(1);
 
     DmnDecision buyComputerDecision = buyProductrequiredDecisions.get(0);
     assertThat(buyComputerDecision.getKey()).isEqualTo("buyComputer");
-    
+
     List<DmnDecision> buyComputerRequiredDecision = buyComputerDecision.getRequiredDecisions();
     assertThat(buyComputerRequiredDecision.size()).isEqualTo(1);
-    
+
     DmnDecision buyElectronicDecision = buyComputerRequiredDecision.get(0);
     assertThat(buyElectronicDecision.getKey()).isEqualTo("buyElectronic");
-    
+
     assertThat(buyElectronicDecision.getRequiredDecisions().size()).isEqualTo(0);
   }
 
@@ -210,19 +212,19 @@ public class DmnTransformTest extends DmnEngineTest {
     DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
 
     List<DmnDecision> decisions = dmnEngine.parseDecisions(modelInstance);
-    
+
     DmnDecision buyProductDecision = decisions.get(0);
     assertDecision(buyProductDecision, "buyProduct");
     List<DmnDecision> requiredProductDecisions = buyProductDecision.getRequiredDecisions();
     assertThat(requiredProductDecisions.size()).isEqualTo(1);
     assertThat(requiredProductDecisions.get(0).getKey()).isEqualTo("buyComputer");
-    
+
     DmnDecision buyComputerDecision = decisions.get(1);
     assertDecision(buyComputerDecision, "buyComputer");
     List<DmnDecision> buyComputerRequiredDecisions = buyComputerDecision.getRequiredDecisions();
     assertThat(buyComputerRequiredDecisions.size()).isEqualTo(1);
     assertThat(buyComputerRequiredDecisions.get(0).getKey()).isEqualTo("buyElectronic");
-    
+
     DmnDecision buyElectronicDecision = decisions.get(2);
     assertDecision(buyElectronicDecision, "buyElectronic");
     List<DmnDecision> buyElectronicRequiredDecisions = buyElectronicDecision.getRequiredDecisions();
@@ -280,7 +282,26 @@ public class DmnTransformTest extends DmnEngineTest {
     List<DmnDecision> decisions = dmnEngine.parseDecisions(modelInstance);
     assertThat(decisions.size()).isEqualTo(8);
   }
-  
+
+  @Test
+  public void shouldTransformDecisionRequirementDiagram() {
+    InputStream inputStream = IoUtil.fileAsStream(REQUIRED_DECISIONS_DMN);
+    DmnDecisionRequirementDiagram drd = dmnEngine.parseDecisionRequirementDiagram(inputStream);
+
+    assertThat(drd).isNotNull();
+    assertThat(drd.getKey()).isEqualTo("buy-decision");
+    assertThat(drd.getName()).isEqualTo("Buy Decision");
+    assertThat(drd.getDecisionKeys())
+      .hasSize(3)
+      .contains("buyProduct", "buyComputer", "buyElectronic");
+
+    Collection<DmnDecision> decisions = drd.getDecisions();
+    assertThat(decisions)
+      .hasSize(3)
+      .extracting("key")
+      .contains("buyProduct", "buyComputer", "buyElectronic");
+  }
+
   protected void assertDecision(DmnDecision decision, String key) {
     assertThat(decision).isNotNull();
     assertThat(decision.getKey()).isEqualTo(key);

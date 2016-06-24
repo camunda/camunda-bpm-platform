@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn11.xsd"
-             id="definitions"
-             name="camunda"
+             id="buy-decision"
+             name="Buy Decision"
              namespace="http://camunda.org/schema/1.0/dmn">
   <decision id="buyProduct" name="buyProduct">
      <informationRequirement>

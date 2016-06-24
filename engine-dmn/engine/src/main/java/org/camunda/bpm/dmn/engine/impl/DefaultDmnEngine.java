@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionRequirementDiagram;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
@@ -78,6 +79,20 @@ public class DefaultDmnEngine implements DmnEngine {
       }
     }
     throw LOG.unableToFindDecisionWithKey(decisionKey);
+  }
+
+  public DmnDecisionRequirementDiagram parseDecisionRequirementDiagram(InputStream inputStream) {
+    ensureNotNull("inputStream", inputStream);
+    return transformer.createTransform()
+      .modelInstance(inputStream)
+      .transformDecisionRequirementDiagram();
+  }
+
+  public DmnDecisionRequirementDiagram parseDecisionRequirementDiagram(DmnModelInstance dmnModelInstance) {
+    ensureNotNull("dmnModelInstance", dmnModelInstance);
+    return transformer.createTransform()
+      .modelInstance(dmnModelInstance)
+      .transformDecisionRequirementDiagram();
   }
 
   public DmnDecisionTableResult evaluateDecisionTable(DmnDecision decision, Map<String, Object> variables) {

@@ -24,7 +24,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionRequirementDiagram;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionRequirementDiagramImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableInputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableOutputImpl;
@@ -62,7 +64,7 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
 
   protected List<DmnTransformListener> transformListeners;
   protected DmnElementTransformHandlerRegistry handlerRegistry;
-  
+
   // context
   protected DmnModelInstance modelInstance;
   protected Object parent;
@@ -122,23 +124,57 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
   // transform ////////////////////////////////////////////////////////////////
 
   @SuppressWarnings("unchecked")
+  public <T extends DmnDecisionRequirementDiagram> T transformDecisionRequirementDiagram() {
+    try {
+      Definitions definitions = modelInstance.getDefinitions();
+      return (T) transformDefinitions(definitions);
+    }
+    catch (Exception e) {
+      throw LOG.errorWhileTransformingDefinitions(e);
+    }
+  }
+
+  protected DmnDecisionRequirementDiagram transformDefinitions(Definitions definitions) {
+    DmnElementTransformHandler<Definitions, DmnDecisionRequirementDiagramImpl> handler = handlerRegistry.getHandler(Definitions.class);
+    DmnDecisionRequirementDiagramImpl dmnDrd = handler.handleElement(this, definitions);
+
+    // validate id of drd
+    if (dmnDrd.getKey() == null) {
+      throw LOG.drdIdIsMissing(dmnDrd);
+    }
+
+    Collection<Decision> decisions = definitions.getChildElementsByType(Decision.class);
+    List<DmnDecision> dmnDecisions = transformDecisions(decisions);
+    for (DmnDecision dmnDecision : dmnDecisions) {
+      dmnDrd.addDecision(dmnDecision);
+    }
+
+    return dmnDrd;
+  }
+
+  @SuppressWarnings("unchecked")
   public <T extends DmnDecision> List<T> transformDecisions() {
     try {
       Definitions definitions = modelInstance.getDefinitions();
       Collection<Decision> decisions = definitions.getChildElementsByType(Decision.class);
-      List<DmnDecision> dmnDecisions = new ArrayList<DmnDecision>();
-      for (Decision decision : decisions) {
-        DmnDecision dmnDecision = transformDecision(decision,new ArrayList<String>());
-        if (dmnDecision != null) {
-          dmnDecisions.add(dmnDecision);
-          notifyTransformListeners(decision, dmnDecision);
-        }
-      }
-      return (List<T>) dmnDecisions;
+      return (List<T>) transformDecisions(decisions);
     }
     catch (Exception e) {
-      throw LOG.errorWhileTransforming(e);
+      throw LOG.errorWhileTransformingDecisions(e);
     }
+  }
+
+  protected List<DmnDecision> transformDecisions(Collection<Decision> decisions) {
+    List<DmnDecision> dmnDecisions = new ArrayList<DmnDecision>();
+
+    for (Decision decision : decisions) {
+      DmnDecision dmnDecision = transformDecision(decision,new ArrayList<String>());
+      if (dmnDecision != null) {
+        dmnDecisions.add(dmnDecision);
+        notifyTransformListeners(decision, dmnDecision);
+      }
+    }
+    return dmnDecisions;
   }
 
   protected DmnDecision transformDecision(Decision decision, List<String> decisionsList) {
@@ -362,4 +398,5 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
   public DmnHitPolicyHandlerRegistry getHitPolicyHandlerRegistry() {
     return hitPolicyHandlerRegistry;
   }
+
 }
