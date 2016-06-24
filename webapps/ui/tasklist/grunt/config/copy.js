@@ -110,6 +110,12 @@ module.exports = function(config, copyConf) {
           src: ['**'],
           dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/fonts/'
         },
+        {
+          expand: true,
+          cwd: '<%= pkg.gruntConfig.commonsUiDir %>/resources/img',
+          src: ['**'],
+          dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/assets/images/'
+        },
         // bpmn fonts
         {
           expand: true,
