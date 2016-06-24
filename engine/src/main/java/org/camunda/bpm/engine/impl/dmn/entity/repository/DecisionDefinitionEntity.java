@@ -38,6 +38,7 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
   protected String resourceName;
   protected String diagramResourceName;
   protected String tenantId;
+  protected String decisionRequirementDefinitionId;
 
   // firstVersion is true, when version == 1 or when
   // this definition does not have any previous definitions
@@ -137,6 +138,14 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
     this.tenantId = tenantId;
   }
 
+  public String getDecisionRequirementDefinitionId() {
+    return decisionRequirementDefinitionId;
+  }
+
+  public void setDecisionRequirementDefinitionId(String decisionRequirementDefinitionId) {
+    this.decisionRequirementDefinitionId = decisionRequirementDefinitionId;
+  }
+
   public Object getPersistentState() {
     return DecisionDefinitionEntity.class;
   }
@@ -222,6 +231,7 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
       ", category='" + category + '\'' +
       ", key='" + key + '\'' +
       ", version=" + version +
+      ", decisionRequirementDefinitionId='" + decisionRequirementDefinitionId + '\'' +
       ", deploymentId='" + deploymentId + '\'' +
       ", tenantId='" + tenantId + '\'' +
       '}';

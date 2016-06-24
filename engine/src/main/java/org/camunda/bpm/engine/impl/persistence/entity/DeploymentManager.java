@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -143,6 +144,7 @@ public class DeploymentManager extends AbstractManager {
     deleteCaseDeployment(deploymentId, cascade);
 
     deleteDecisionDeployment(deploymentId, cascade);
+    deleteDecisionRequirementDeployment(deploymentId);
 
     getResourceManager().deleteResourcesByDeploymentId(deploymentId);
 
@@ -197,7 +199,7 @@ public class DeploymentManager extends AbstractManager {
         }
       }
 
-      // delete case definitions from db
+      // delete decision definitions from db
       decisionDefinitionManager
         .deleteDecisionDefinitionsByDeploymentId(deploymentId);
 
@@ -206,13 +208,32 @@ public class DeploymentManager extends AbstractManager {
       for (DecisionDefinition decisionDefinition : decisionDefinitions) {
         String decisionDefinitionId = decisionDefinition.getId();
 
-        // remove case definitions from cache:
+        // remove decision definitions from cache:
         deploymentCache
           .removeDecisionDefinition(decisionDefinitionId);
       }
     }
   }
 
+  protected void deleteDecisionRequirementDeployment(String deploymentId) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    if (processEngineConfiguration.isDmnEnabled()) {
+      DecisionDefinitionManager decisionDefinitionManager = getDecisionDefinitionManager();
+      List<DecisionRequirementDefinition> decisionRequirementDefinitions = decisionDefinitionManager.findDecisionRequirementDefinitionByDeploymentId(deploymentId);
+
+      // delete decision requirement definitions from db
+      decisionDefinitionManager.deleteDecisionRequirementDefinitionsByDeploymentId(deploymentId);
+
+      DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
+
+      for (DecisionRequirementDefinition decisionRequirementDefinition : decisionRequirementDefinitions) {
+        String decisionDefinitionId = decisionRequirementDefinition.getId();
+
+        // remove decision requirement definitions from cache:
+        deploymentCache.removeDecisionRequirementDefinition(decisionDefinitionId);
+      }
+    }
+  }
 
   public DeploymentEntity findLatestDeploymentByName(String deploymentName) {
     List<?> list = getDbEntityManager().selectList("selectDeploymentsByName", deploymentName, 0, 1);

@@ -51,4 +51,20 @@ public class DecisionLogger extends ProcessEngineLogger {
         "003", "Cannot specify a tenant-id when evaluate a decision definition by decision definition id."));
   }
 
+  public ProcessEngineException exceptionParseDmnResource(String resouceName, Exception cause) {
+    return new ProcessEngineException(exceptionMessage(
+        "004",
+        "Unable to transform DMN resource '{}'.",
+        resouceName
+        ), cause);
+  }
+
+  public ProcessEngineException exceptionNoDrdForResource(String resourceName) {
+    return new ProcessEngineException(exceptionMessage(
+        "005",
+        "Found no decision requirement definition for DMN resource '{}'.",
+        resourceName
+      ));
+  }
+
 }

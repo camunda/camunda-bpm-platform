@@ -18,12 +18,15 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
+import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -35,6 +38,13 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class DmnDeployerTest {
+
+  protected static final String DMN_CHECK_ORDER_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testDmnDeployment.dmn11.xml";
+  protected static final String DMN_CHECK_ORDER_RESOURCE_DMN_SUFFIX = "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testDmnDeployment.dmn";
+  protected static final String DMN_SCORE_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/dmnScore.dmn11.xml";
+
+  protected static final String DRD_SCORE_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdScore.dmn11.xml";
+  protected static final String DRD_DISH_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
 
   protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -54,15 +64,15 @@ public class DmnDeployerTest {
 
   @Test
   public void dmnDeployment() {
-    String resourceName = "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testDmnDeployment.dmn11.xml";
+    String resourceName = DMN_CHECK_ORDER_RESOURCE;
     String deploymentId = testRule.deploy(resourceName).getId();
 
-    // there should be one deployment
+    // there should be decision deployment
     DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
 
     assertEquals(1, deploymentQuery.count());
 
-    // there should be one case definition
+    // there should be one decision definition
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
     assertEquals(1, query.count());
 
@@ -80,8 +90,7 @@ public class DmnDeployerTest {
 
   @Test
   public void dmnDeploymentWithDmnSuffix() {
-    String resourceName = "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testDmnDeployment.dmn";
-    String deploymentId = testRule.deploy(resourceName).getId();
+    String deploymentId = testRule.deploy(DMN_CHECK_ORDER_RESOURCE_DMN_SUFFIX).getId();
 
     // there should be one deployment
     DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
@@ -99,7 +108,7 @@ public class DmnDeployerTest {
     assertEquals("CheckOrder", decisionDefinition.getName());
     assertEquals("decision", decisionDefinition.getKey());
     assertEquals(1, decisionDefinition.getVersion());
-    assertEquals(resourceName, decisionDefinition.getResourceName());
+    assertEquals(DMN_CHECK_ORDER_RESOURCE_DMN_SUFFIX, decisionDefinition.getResourceName());
     assertEquals(deploymentId, decisionDefinition.getDeploymentId());
     assertNull(decisionDefinition.getDiagramResourceName());
   }
@@ -167,16 +176,117 @@ public class DmnDeployerTest {
     }
   }
 
-  @Deployment
   @Test
-  public void decisionWithRequiredDecision() {
-    // there should be two definitions
-    // - the root decision and the required one
-    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
+  public void drdDeployment() {
+    String deploymentId = testRule.deploy(DRD_SCORE_RESOURCE).getId();
 
-    assertEquals(2, query.count());
-    assertEquals(1, query.decisionDefinitionKey("decision").count());
-    assertEquals(1, query.decisionDefinitionKey("score").count());
+    // there should be one decision requirement definition
+    DecisionRequirementDefinitionQuery query = repositoryService.createDecisionRequirementDefinitionQuery();
+    assertEquals(1, query.count());
+
+    DecisionRequirementDefinition decisionRequirementDefinition = query.singleResult();
+
+    assertTrue(decisionRequirementDefinition.getId().startsWith("score:1:"));
+    assertEquals("score", decisionRequirementDefinition.getKey());
+    assertEquals("Score", decisionRequirementDefinition.getName());
+    assertEquals("test-drd-1", decisionRequirementDefinition.getCategory());
+    assertEquals(1, decisionRequirementDefinition.getVersion());
+    assertEquals(DRD_SCORE_RESOURCE, decisionRequirementDefinition.getResourceName());
+    assertEquals(deploymentId, decisionRequirementDefinition.getDeploymentId());
+    assertNull(decisionRequirementDefinition.getDiagramResourceName());
+
+    // both decisions should have a reference to the decision requirement definition
+    List<DecisionDefinition> decisions = repositoryService.createDecisionDefinitionQuery().orderByDecisionDefinitionKey().asc().list();
+    assertEquals(2, decisions.size());
+
+    DecisionDefinition firstDecision = decisions.get(0);
+    assertEquals("score-decision", firstDecision.getKey());
+    assertEquals(decisionRequirementDefinition.getId(), firstDecision.getDecisionRequirementDefinitionId());
+
+    DecisionDefinition secondDecision = decisions.get(1);
+    assertEquals("score-result", secondDecision.getKey());
+    assertEquals(decisionRequirementDefinition.getId(), secondDecision.getDecisionRequirementDefinitionId());
+  }
+
+  @Deployment( resources = DMN_CHECK_ORDER_RESOURCE )
+  @Test
+  public void noDrdForSingleDecisionDeployment() {
+    // when the DMN file contains only a single decision definition
+    assertEquals(1, repositoryService.createDecisionDefinitionQuery().count());
+
+    // then create no decision requirement definition
+    assertEquals(0, repositoryService.createDecisionRequirementDefinitionQuery().count());
+    // and don't link the decision to a decision requirement definition
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
+    assertNull(decisionDefinition.getDecisionRequirementDefinitionId());
+  }
+
+  @Deployment( resources = { DRD_SCORE_RESOURCE, DRD_DISH_RESOURCE })
+  @Test
+  public void multipleDrdDeployment() {
+    // there should be two decision requirement definitions
+    List<DecisionRequirementDefinition> decisionRequirementDefinitions = repositoryService
+        .createDecisionRequirementDefinitionQuery()
+        .orderByDecisionRequirementDefinitionCategory()
+        .asc()
+        .list();
+
+    assertEquals(2, decisionRequirementDefinitions.size());
+    assertEquals("score", decisionRequirementDefinitions.get(0).getKey());
+    assertEquals("dish", decisionRequirementDefinitions.get(1).getKey());
+
+    // the decisions should have a reference to the decision requirement definition
+    List<DecisionDefinition> decisions = repositoryService.createDecisionDefinitionQuery().orderByDecisionDefinitionCategory().asc().list();
+    assertEquals(5, decisions.size());
+    assertEquals(decisionRequirementDefinitions.get(0).getId(), decisions.get(0).getDecisionRequirementDefinitionId());
+    assertEquals(decisionRequirementDefinitions.get(0).getId(), decisions.get(1).getDecisionRequirementDefinitionId());
+    assertEquals(decisionRequirementDefinitions.get(1).getId(), decisions.get(2).getDecisionRequirementDefinitionId());
+    assertEquals(decisionRequirementDefinitions.get(1).getId(), decisions.get(3).getDecisionRequirementDefinitionId());
+    assertEquals(decisionRequirementDefinitions.get(1).getId(), decisions.get(4).getDecisionRequirementDefinitionId());
+  }
+
+  @Test
+  public void duplicateDrdIdInDeployment() {
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("definitions");
+
+    repositoryService.createDeployment()
+            .addClasspathResource(DMN_CHECK_ORDER_RESOURCE)
+            .addClasspathResource(DMN_CHECK_ORDER_RESOURCE_DMN_SUFFIX)
+            .name("duplicateIds")
+            .deploy();
+  }
+
+  @Test
+  public void deployDecisionIndependentFromDrd() {
+    String deploymentIdDecision = testRule.deploy(DMN_SCORE_RESOURCE).getId();
+    String deploymentIdDrd = testRule.deploy(DRD_SCORE_RESOURCE).getId();
+
+    // there should be one decision requirement definition
+    DecisionRequirementDefinitionQuery query = repositoryService.createDecisionRequirementDefinitionQuery();
+    assertEquals(1, query.count());
+
+    DecisionRequirementDefinition decisionRequirementDefinition = query.singleResult();
+    assertEquals(1, decisionRequirementDefinition.getVersion());
+    assertEquals(deploymentIdDrd, decisionRequirementDefinition.getDeploymentId());
+
+    // and two deployed decisions with different versions
+    List<DecisionDefinition> decisions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey("score-decision")
+        .orderByDecisionDefinitionVersion().asc()
+        .list();
+
+    assertEquals(2, decisions.size());
+
+    DecisionDefinition firstDecision = decisions.get(0);
+    assertEquals(1, firstDecision.getVersion());
+    assertEquals(deploymentIdDecision, firstDecision.getDeploymentId());
+    assertNull(firstDecision.getDecisionRequirementDefinitionId());
+
+    DecisionDefinition secondDecision = decisions.get(1);
+    assertEquals(2, secondDecision.getVersion());
+    assertEquals(deploymentIdDrd, secondDecision.getDeploymentId());
+    assertEquals(decisionRequirementDefinition.getId(),secondDecision.getDecisionRequirementDefinitionId());
   }
 
 }

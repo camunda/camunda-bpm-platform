@@ -157,7 +157,7 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
   DecisionDefinitionQuery orderByDeploymentId();
 
   /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of decision instances without tenant id is database-specific. */
+   * Note that the ordering of decision definitions without tenant id is database-specific. */
   DecisionDefinitionQuery orderByTenantId();
 
 }

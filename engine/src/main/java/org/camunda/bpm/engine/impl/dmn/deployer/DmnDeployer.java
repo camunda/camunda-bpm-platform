@@ -12,25 +12,33 @@
  */
 package org.camunda.bpm.engine.impl.dmn.deployer;
 
-import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnTransformer;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.core.model.Properties;
+import org.camunda.bpm.engine.impl.dmn.DecisionLogger;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 
 /**
- * {@link Deployer} responsible to parse DMN 1.1 XML files and create the
- * proper {@link DecisionDefinitionEntity}s.
+ * {@link Deployer} responsible to parse DMN 1.1 XML files and create the proper
+ * {@link DecisionDefinitionEntity}s. Since it uses the result of the
+ * {@link DrdDeployer} to avoid duplicated parsing, the DrdDeployer must
+ * process the deployment before this deployer.
  */
 public class DmnDeployer extends AbstractDefinitionDeployer<DecisionDefinitionEntity> {
+
+  protected static final DecisionLogger LOG = ProcessEngineLogger.DECISION_LOGGER;
 
   public static final String[] DMN_RESOURCE_SUFFIXES = new String[] { "dmn11.xml", "dmn" };
 
@@ -43,15 +51,40 @@ public class DmnDeployer extends AbstractDefinitionDeployer<DecisionDefinitionEn
 
   @Override
   protected List<DecisionDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource, Properties properties) {
-    byte[] bytes = resource.getBytes();
-    ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
+    List<DecisionDefinitionEntity> decisions = new ArrayList<DecisionDefinitionEntity>();
 
-    try {
-      return transformer.createTransform().modelInstance(inputStream).transformDecisions();
+    // get the decisions from the deployed drd instead of parse the DMN again
+    DecisionRequirementDefinitionEntity deployedDrd = findDeployedDrdForResource(deployment, resource.getName());
+
+    if (deployedDrd == null) {
+      throw LOG.exceptionNoDrdForResource(resource.getName());
     }
-    catch (Exception e) {
-      throw new ProcessEngineException("Unable to transform DMN resource '" + resource.getName() + "'", e);
+
+    Collection<DmnDecision> decisionsOfDrd = deployedDrd.getDecisions();
+    for (DmnDecision decisionOfDrd : decisionsOfDrd) {
+
+      DecisionDefinitionEntity decisionEntity = (DecisionDefinitionEntity) decisionOfDrd;
+      if (DrdDeployer.isDecisionRequirementDefinitionPersistable(deployedDrd)) {
+        decisionEntity.setDecisionRequirementDefinitionId(deployedDrd.getId());
+      }
+
+      decisions.add(decisionEntity);
     }
+
+    return decisions;
+  }
+
+  protected DecisionRequirementDefinitionEntity findDeployedDrdForResource(DeploymentEntity deployment, String resourceName) {
+    List<DecisionRequirementDefinitionEntity> deployedDrds = deployment.getDeployedArtifacts(DecisionRequirementDefinitionEntity.class);
+    if (deployedDrds != null) {
+
+      for (DecisionRequirementDefinitionEntity deployedDrd : deployedDrds) {
+        if (deployedDrd.getResourceName().equals(resourceName)) {
+          return deployedDrd;
+        }
+      }
+    }
+    return null;
   }
 
   @Override

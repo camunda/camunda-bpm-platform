@@ -10,19 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.camunda.bpm.engine.repository;
 
 /**
- * Definition of a decision resource
+ * Container of {@link DecisionDefinition}s which belongs to the same decision
+ * requirement diagram (i.e. DMN resource).
  */
-public interface DecisionDefinition extends ResourceDefinition {
-
-  /**
-   * Returns the id of the related decision requirement definition. Can be
-   * <code>null</code> if the decision has no relations to other decisions.
-   *
-   * @return the id of the decision requirement definition if exists.
-   */
-  String getDecisionRequirementDefinitionId();
+public interface DecisionRequirementDefinition extends ResourceDefinition {
 
 }

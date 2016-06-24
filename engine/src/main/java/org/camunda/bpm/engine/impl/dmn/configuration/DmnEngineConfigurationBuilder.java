@@ -23,12 +23,14 @@ import org.camunda.bpm.dmn.engine.impl.spi.el.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnTransformer;
 import org.camunda.bpm.engine.impl.dmn.el.ProcessEngineElProvider;
 import org.camunda.bpm.engine.impl.dmn.transformer.DecisionDefinitionHandler;
+import org.camunda.bpm.engine.impl.dmn.transformer.DecisionRequirementDefinitionTransformHandler;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.parser.HistoryDecisionTableListener;
 import org.camunda.bpm.engine.impl.history.producer.DmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.metrics.dmn.MetricsDecisionTableListener;
 import org.camunda.bpm.model.dmn.instance.Decision;
+import org.camunda.bpm.model.dmn.instance.Definitions;
 
 /**
  * Modify the given DMN engine configuration so that the DMN engine can be used
@@ -89,6 +91,7 @@ public class DmnEngineConfigurationBuilder {
 
     // override the decision table handler
     DmnTransformer dmnTransformer = dmnEngineConfiguration.getTransformer();
+    dmnTransformer.getElementTransformHandlerRegistry().addHandler(Definitions.class, new DecisionRequirementDefinitionTransformHandler());
     dmnTransformer.getElementTransformHandlerRegistry().addHandler(Decision.class, new DecisionDefinitionHandler());
 
     // do not override the script engine resolver if set
