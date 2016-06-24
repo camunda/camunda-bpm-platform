@@ -106,6 +106,14 @@ module.exports = function(config, copyConf) {
           dest: '<%= pkg.gruntConfig.adminBuildTarget %>/assets'
         },
 
+        {
+          expand: true,
+          cwd: '<%= pkg.gruntConfig.commonsUiDir %>/resources/img',
+          src: [
+            '**'
+          ],
+          dest: '<%= pkg.gruntConfig.adminBuildTarget %>/assets/images/'
+        },
         // bootstrap fonts
         {
           expand: true,

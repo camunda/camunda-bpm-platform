@@ -42,7 +42,6 @@
   <link rel="apple-touch-icon"
         sizes="114x114"
         href="$APP_ROOT/app/tasklist/assets/images/camunda.114.png" />
-
 </head>
 
 <body ng-controller="camTasklistAppCtrl">
@@ -70,7 +69,15 @@
   <div class="site-wrap">
 
     <!-- # page-content -->
-    <div class="page-wrap three-cols-layout" ng-view></div>
+    <div class="page-wrap three-cols-layout" ng-view>
+      <style type="text/css">
+        .app-splash { position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: table; }
+        .app-splash > div { display: table-cell; vertical-align: middle; text-align: center; }
+      </style>
+      <div class="app-splash"><div>
+        <img src="$APP_ROOT/app/admin/assets/images/camunda-animated-logo-140.gif" />
+      </div></div><!-- / .app-splash -->
+    </div>
     <!-- / page-content -->
 
   </div>

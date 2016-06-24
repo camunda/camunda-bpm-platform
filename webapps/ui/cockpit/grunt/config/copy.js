@@ -72,6 +72,16 @@ module.exports = function(config, copyConf) {
           dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/assets'
         },
 
+        // commons-ui images
+        {
+          expand: true,
+          cwd: '<%= pkg.gruntConfig.commonsUiDir %>/resources/img/',
+          src:  [
+            '*.*'
+          ],
+          dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/assets/images'
+        },
+
         // dojo & dojox
         {
           expand: true,
