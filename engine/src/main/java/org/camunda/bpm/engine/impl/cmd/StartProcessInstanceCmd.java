@@ -20,13 +20,14 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesEntity;
+import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serializable {
+public class StartProcessInstanceCmd implements Command<ProcessInstanceWithVariables>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -36,7 +37,7 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
     this.instantiationBuilder = instantiationBuilder;
   }
 
-  public ProcessInstance execute(CommandContext commandContext) {
+  public ProcessInstanceWithVariables execute(CommandContext commandContext) {
 
     ProcessDefinitionEntity processDefinition = new GetDeployedProcessDefinitionCmd(instantiationBuilder, false).execute(commandContext);
 
@@ -48,7 +49,7 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
     ExecutionEntity processInstance = processDefinition.createProcessInstance(instantiationBuilder.getBusinessKey(),
         instantiationBuilder.getCaseInstanceId());
     processInstance.start(instantiationBuilder.getVariables());
-    return processInstance;
+    return new ProcessInstanceWithVariablesEntity(processInstance);
   }
 
 }

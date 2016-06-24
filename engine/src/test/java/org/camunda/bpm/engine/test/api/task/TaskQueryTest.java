@@ -49,7 +49,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -1531,9 +1530,8 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByActivityInstanceId() throws Exception {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    assertTrue(processInstance instanceof ExecutionEntity);
-    ExecutionEntity execution = (ExecutionEntity) processInstance;
-    String activityInstanceId = execution.getActivityInstanceId();
+    String activityInstanceId = runtimeService.getActivityInstance(processInstance.getId())
+                                              .getChildActivityInstances()[0].getId();
 
     assertEquals(1, taskService.createTaskQuery().activityInstanceIdIn(activityInstanceId).list().size());
   }
@@ -1542,15 +1540,13 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByMultipleActivityInstanceIds() throws Exception {
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    assertTrue(processInstance1 instanceof ExecutionEntity);
-    ExecutionEntity execution1 = (ExecutionEntity) processInstance1;
-    String activityInstanceId1 = execution1.getActivityInstanceId();
+    String activityInstanceId1 = runtimeService.getActivityInstance(processInstance1.getId())
+                                              .getChildActivityInstances()[0].getId();
 
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    assertTrue(processInstance2 instanceof ExecutionEntity);
-    ExecutionEntity execution2 = (ExecutionEntity) processInstance2;
-    String activityInstanceId2 = execution2.getActivityInstanceId();
+    String activityInstanceId2 = runtimeService.getActivityInstance(processInstance2.getId())
+                                              .getChildActivityInstances()[0].getId();
 
     List<Task> result1 = taskService.createTaskQuery().activityInstanceIdIn(activityInstanceId1).list();
     assertEquals(1, result1.size());

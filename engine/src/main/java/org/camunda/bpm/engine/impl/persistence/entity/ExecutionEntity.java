@@ -81,7 +81,7 @@ import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -94,7 +94,7 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  * @author Daniel Meyer
  * @author Falko Menge
  */
-public class ExecutionEntity extends PvmExecutionImpl implements Execution, ProcessInstance, DbEntity, HasDbRevision, HasDbReferences, VariablesProvider<VariableInstanceEntity> {
+public class ExecutionEntity extends PvmExecutionImpl implements Execution, ProcessInstanceWithVariables, DbEntity, HasDbRevision, HasDbReferences, VariablesProvider<VariableInstanceEntity> {
 
   private static final long serialVersionUID = 1L;
 
@@ -224,6 +224,13 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
    * @see #setSuperCaseExecution(ExecutionEntity)
    */
   protected String superCaseExecutionId;
+
+
+  /**
+   * Contains the variables which are used during execution.
+   * Will be set if the execution was finished and cleaned up.
+   */
+  protected transient VariableMap variablesAfterExecution;
 
   public ExecutionEntity() {
   }
@@ -770,6 +777,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     return parentId == null;
   }
 
+  public VariableMap getVariablesAfterExeuction() {
+    if (variablesAfterExecution != null)
+      return variablesAfterExecution;
+    else
+      return super.getVariables();
+  }
   // activity /////////////////////////////////////////////////////////////////
 
   /** ensures initialization and returns the activity */
@@ -971,6 +984,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   @Override
   public void remove() {
     super.remove();
+
+    //saves the variables as snapshot before clean up
+    this.variablesAfterExecution = getVariablesTyped(false);
 
     // removes jobs, incidents and tasks, and
     // clears the variable store

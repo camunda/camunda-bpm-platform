@@ -18,19 +18,21 @@ public class AddVariablesService implements JavaDelegate {
     serializable.add("one");
     serializable.add("two");
     serializable.add("three");
-    
+
     // Start process instance with different types of variables
     Map<String, Object> variables = new HashMap<String, Object>();
-    
+
     variables.put("shortVar", (short) 123);
     variables.put("integerVar", 1234);
     variables.put("longVar", 928374L);
-       
+
+    variables.put("byteVar", new byte[]{12, 32, 34});
+
     variables.put("stringVar", "coca-cola");
     variables.put("dateVar", now);
     variables.put("nullVar", null);
     variables.put("serializableVar", serializable);
-    
+
     execution.setVariablesLocal(variables);
 
   }

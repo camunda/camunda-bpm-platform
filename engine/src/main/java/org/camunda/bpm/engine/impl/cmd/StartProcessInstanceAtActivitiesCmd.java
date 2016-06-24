@@ -27,17 +27,18 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInstance> {
+public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInstanceWithVariables> {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
@@ -47,7 +48,7 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
     this.instantiationBuilder = instantiationBuilder;
   }
 
-  public ProcessInstance execute(CommandContext commandContext) {
+  public ProcessInstanceWithVariables execute(CommandContext commandContext) {
 
     ProcessDefinitionEntity processDefinition = new GetDeployedProcessDefinitionCmd(instantiationBuilder, false).execute(commandContext);
 
@@ -90,7 +91,7 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
       processInstance.propagateEnd();
     }
 
-    return processInstance;
+    return new ProcessInstanceWithVariablesEntity(processInstance);
   }
 
   /**
