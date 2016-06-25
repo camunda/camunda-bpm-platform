@@ -23,7 +23,7 @@ create table ACT_RE_DECISION_REQ_DEF (
     DGRM_RESOURCE_NAME_ varchar(4000),
     TENANT_ID_ varchar(64),
     primary key (ID_)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;;
 
 alter table ACT_RE_DECISION_DEF
     add constraint ACT_FK_DEC_REQ 
