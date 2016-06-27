@@ -159,7 +159,7 @@ public class DecisionServiceTest {
 
   @Deployment( resources = DRD_DISH_RESOURCE )
   @Test
-  public void evaluateDecisionRequirementDefinition() {
+  public void evaluateDecisionWithRequiredDecisions() {
 
     DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey("dish-decision", Variables.createVariables()
           .putValue("temperature", 32)

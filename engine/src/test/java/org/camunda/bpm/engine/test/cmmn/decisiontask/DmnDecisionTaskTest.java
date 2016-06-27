@@ -280,7 +280,7 @@ public class DmnDecisionTaskTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskTest.testCallDecisionAsExpressionStartsWithDollar.cmmn",
       DRD_DISH_RESOURCE
     })
-  public void testCallDecisionRequirementDefinition() {
+  public void testCallDecisionWithRequiredDecisions() {
     // given
     CaseInstance caseInstance = createCaseInstanceByKey(CASE_KEY, Variables.createVariables()
         .putValue("testDecision", "dish-decision")

@@ -128,7 +128,7 @@ public class DmnBusinessRuleTaskTest {
 
   @Deployment( resources = DRD_DISH_RESOURCE )
   @Test
-  public void evaluateDecisionRequirementDefinition() {
+  public void evaluateDecisionWithRequiredDecisions() {
     testRule.deploy(Bpmn.createExecutableProcess("process")
         .startEvent()
         .businessRuleTask()
