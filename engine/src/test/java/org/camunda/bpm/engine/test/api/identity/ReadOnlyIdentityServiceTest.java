@@ -16,7 +16,10 @@ import static org.junit.Assert.assertTrue;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -29,8 +32,11 @@ public class ReadOnlyIdentityServiceTest {
 
   protected static final String CONFIGURATION_RESOURCE = "org/camunda/bpm/engine/test/api/identity/read.only.identity.service.camunda.cfg.xml";
 
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(CONFIGURATION_RESOURCE);
+
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule(CONFIGURATION_RESOURCE, true);
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();

@@ -34,7 +34,9 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -45,6 +47,8 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import org.junit.After;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -70,7 +74,9 @@ public class TenantIdProviderTest {
 
   protected static final String TENANT_ID = "tenant1";
 
-  protected ProcessEngineRule engineRule = new ProcessEngineRule(CONFIGURATION_RESOURCE, true);
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(CONFIGURATION_RESOURCE);
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
 
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
