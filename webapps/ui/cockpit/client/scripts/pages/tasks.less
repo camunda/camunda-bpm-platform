@@ -1,0 +1,30 @@
+.tasks-dashboard {
+  position: absolute;
+  width: 100%;
+  top: @breadcrumb-height;
+  bottom: 0;
+
+  > view {
+    margin: 0 10px @grid-gutter-width 10px;
+    overflow: visible;
+    display: block;
+    padding-bottom: @grid-gutter-width;
+
+    > h3 {
+      padding-top: (@grid-gutter-width / 2);
+      margin-top: 0;
+    }
+  }
+  &:last-child view {
+    border-bottom: 0;
+    margin-bottom: 10px;
+  }
+
+  [cam-widget-search] {
+    margin-bottom: 5px;
+  }
+
+  .pagination {
+    margin-bottom: 0;
+  }
+}
