@@ -5,7 +5,7 @@
   
   <signal id="alertSignal" name="alert" />
   
-  <process id="executionListenersProcess">
+  <process id="executionListenersProcess" isExecutable="true">
   
     
     <startEvent id="theStart" name="Start Event">

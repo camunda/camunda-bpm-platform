@@ -4,7 +4,7 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 
-  <process id="elStartFormProcess" name="The One Process With Start Form Data">
+  <process id="elStartFormProcess" name="The One Process With Start Form Data" isExecutable="true">
     <startEvent id="theStart">
       <extensionElements>
         <camunda:formData>

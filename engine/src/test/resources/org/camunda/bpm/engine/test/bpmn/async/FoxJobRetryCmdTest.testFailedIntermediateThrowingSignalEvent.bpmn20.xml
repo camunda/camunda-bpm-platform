@@ -7,7 +7,7 @@
 
   <signal id="signal" name="abort" />
 
-  <process id="failedIntermediateThrowingSignalEvent">
+  <process id="failedIntermediateThrowingSignalEvent" isExecutable="true">
 
     <startEvent id="theStart" />
     

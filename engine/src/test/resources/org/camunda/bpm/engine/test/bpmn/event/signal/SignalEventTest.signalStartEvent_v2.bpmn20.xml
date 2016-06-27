@@ -6,7 +6,7 @@
 
 	<signal id="alertSignal" name="abort" />
 
-	<process id="startBySignal">
+	<process id="startBySignal" isExecutable="true">
 
 		<startEvent id="start">
 			<signalEventDefinition signalRef="alertSignal" />

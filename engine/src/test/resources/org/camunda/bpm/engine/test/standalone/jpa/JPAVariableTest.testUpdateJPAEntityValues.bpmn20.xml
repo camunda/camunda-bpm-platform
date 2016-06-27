@@ -4,7 +4,7 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 	
-  <process id="UpdateJPAValuesProcess" name="Process updating JPA Entity value">
+  <process id="UpdateJPAValuesProcess" name="Process updating JPA Entity value" isExecutable="true">
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
     <serviceTask id="theTask" name="updateJPAEntityTask" camunda:expression="${entityToUpdate.setValue('updatedValue')}" />    

@@ -5,7 +5,7 @@
              targetNamespace="Examples">
 
 
-  <process id="callSimpleSubProcess">
+  <process id="callSimpleSubProcess" isExecutable="true">
 
     <startEvent id="theStart" />
 

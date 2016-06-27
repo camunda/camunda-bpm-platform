@@ -6,7 +6,7 @@
 
   <signal id="signal1" name="signal"/>
 
-  <process id="executionListener">
+  <process id="executionListener" isExecutable="true">
     <startEvent id="theStart" />
 
     <sequenceFlow sourceRef="theStart" targetRef="userTask" />

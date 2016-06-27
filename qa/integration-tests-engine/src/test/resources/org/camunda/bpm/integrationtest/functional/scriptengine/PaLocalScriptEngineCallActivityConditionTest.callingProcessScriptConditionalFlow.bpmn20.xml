@@ -5,7 +5,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   targetNamespace="Examples">
 
-  <process id="callingProcessScriptConditionalFlow">
+  <process id="callingProcessScriptConditionalFlow" isExecutable="true">
 
     <startEvent id="theStart" />
 

@@ -5,7 +5,7 @@
 	xmlns:fox="http://www.camunda.com/fox"
 	targetNamespace="Examples">
 
-	<process id="failedUserTask">
+	<process id="failedUserTask" isExecutable="true">
 
 		<startEvent id="theStart" />
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="failingUserTask" />

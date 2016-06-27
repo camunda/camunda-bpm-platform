@@ -6,7 +6,7 @@
 
   <signal id="alertSignal" name="alert" />
 
-  <process id="signalEventSubProcess">
+  <process id="signalEventSubProcess" isExecutable="true">
 
     <startEvent id="start" />
     <sequenceFlow sourceRef="start" targetRef="subProcess" />

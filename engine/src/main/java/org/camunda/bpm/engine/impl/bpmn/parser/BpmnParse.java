@@ -505,11 +505,11 @@ public class BpmnParse extends Parse {
    */
   public void parseProcessDefinitions() {
     for (Element processElement : rootElement.elements("process")) {
-      boolean isExecutable = true;
+      boolean isExecutable = !deployment.isNew();
       String isExecutableStr = processElement.attribute("isExecutable");
       if (isExecutableStr != null) {
-        if (!Boolean.parseBoolean(isExecutableStr)) {
-          isExecutable = false;
+        isExecutable = Boolean.parseBoolean(isExecutableStr);
+        if (!isExecutable) {
           LOG.ignoringNonExecutableProcess(processElement.attribute("id"));
         }
       } else {

@@ -6,7 +6,7 @@
 	
   <error id="myError" />
 
-  <process id="testThrowErrorWithoutErrorCode">
+  <process id="testThrowErrorWithoutErrorCode" isExecutable="true">
 
       <startEvent id="theStart" />
       <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theEnd" />

@@ -6,7 +6,7 @@
 
   <message id="messageId1" name="Message1" />
   <message id="messageId2" name="Message2" />
-  <process id="process">
+  <process id="process" isExecutable="true">
 
     <startEvent id="start" />
     <sequenceFlow sourceRef="start" targetRef="fork" />

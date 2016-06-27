@@ -11,7 +11,7 @@
    
   <signal id="testSignal" name="Test signal"/> 
   
-  <process id="signalProces" name="Signal proces">
+  <process id="signalProces" name="Signal proces" isExecutable="true">
     <startEvent id="start" />
     <userTask id="usertask1" name="User Task" camunda:assigne="kermit" />
     <boundaryEvent id="boundarysignal1" name="" cancelActivity="true" attachedToRef="usertask1">

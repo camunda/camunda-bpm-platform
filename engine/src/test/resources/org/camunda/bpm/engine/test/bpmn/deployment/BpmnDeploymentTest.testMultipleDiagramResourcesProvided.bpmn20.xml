@@ -4,19 +4,19 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
   targetNamespace="Examples">
 
-  <process id="a">
+  <process id="a" isExecutable="true">
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="end" />
     <endEvent id="end" />
   </process>
   
-  <process id="b">
+  <process id="b" isExecutable="true">
     <startEvent id="start2" />
     <sequenceFlow id="flow2" sourceRef="start2" targetRef="end2" />
     <endEvent id="end2" />
   </process>
   
-  <process id="c">
+  <process id="c" isExecutable="true">
     <startEvent id="start3" />
     <sequenceFlow id="flow3" sourceRef="start3" targetRef="end3" />
     <endEvent id="end3" />

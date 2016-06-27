@@ -7,7 +7,7 @@
 	
 	<signal id="signal" name="failedSignal" />
 
-	<process id="failedSignalEvent">
+	<process id="failedSignalEvent" isExecutable="true">
 
 		<startEvent id="theStart" />
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="failingSignalEvent" />
@@ -25,7 +25,7 @@
 
 	</process>
 	
-	<process id="catchedSignal">
+	<process id="catchedSignal" isExecutable="true">
 
 		<startEvent id="start" />
 		<sequenceFlow id="flow1a" sourceRef="start" targetRef="catchSignal" />

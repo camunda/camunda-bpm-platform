@@ -5,7 +5,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   targetNamespace="Examples">
   
-  <process id="HistoricFormPropertiesProcess">
+  <process id="HistoricFormPropertiesProcess" isExecutable="true">
   
     <startEvent id="start" />
     

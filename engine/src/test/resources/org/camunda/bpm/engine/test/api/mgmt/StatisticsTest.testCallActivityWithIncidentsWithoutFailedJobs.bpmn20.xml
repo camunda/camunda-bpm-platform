@@ -4,7 +4,7 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
-  <process id="callExampleSubProcess">
+  <process id="callExampleSubProcess" isExecutable="true">
   
     <startEvent id="theStart" />
     
@@ -18,7 +18,7 @@
     
   </process>
   
-  <process id="ExampleProcess">
+  <process id="ExampleProcess" isExecutable="true">
   
     <startEvent id="start"/>
     

@@ -5,7 +5,7 @@
   xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
   expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples">
   
-  <process id="testBeanResolutionfromClient">
+  <process id="testBeanResolutionfromClient" isExecutable="true">
   
     <startEvent id="theStart" />
 

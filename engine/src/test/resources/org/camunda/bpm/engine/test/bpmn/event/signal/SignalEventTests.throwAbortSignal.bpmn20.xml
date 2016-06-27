@@ -6,7 +6,7 @@
 	
 	<signal id="sigId" name="abort" />
 
-	<process id="throwAbort">
+	<process id="throwAbort" isExecutable="true">
 
 		<startEvent id="start" />
 

@@ -9,7 +9,7 @@
     expressionLanguage="http://www.w3.org/1999/XPath"
     targetNamespace="test">
 
-  <process id="HtmlFormEngineTest.testRenderStartForm">
+  <process id="HtmlFormEngineTest.testRenderStartForm" isExecutable="true">
 
     <startEvent id="start">
       <extensionElements>

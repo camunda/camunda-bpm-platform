@@ -6,7 +6,7 @@
 
 	<signal id="alertSignal" name="alert" />
 
-	<process id="signalBoundaryProcess">
+	<process id="signalBoundaryProcess" isExecutable="true">
 
 		<startEvent id="start" />
 

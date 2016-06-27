@@ -5,7 +5,7 @@
   targetNamespace="Examples">
 
   <error id="myError" errorCode="ERROR-OCCURED" name="name of error"/>
-  <process id="twoExternalTaskProcess">
+  <process id="twoExternalTaskProcess" isExecutable="true">
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="externalTask" />
     <serviceTask id="externalTask" camunda:type="external" camunda:topic="externalTaskTopic" />

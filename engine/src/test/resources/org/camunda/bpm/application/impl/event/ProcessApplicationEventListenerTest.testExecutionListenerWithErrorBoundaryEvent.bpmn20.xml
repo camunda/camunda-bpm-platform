@@ -6,7 +6,7 @@
 
   <error id="Error_1" errorCode="error" name="error"/>
 
-  <process id="executionListener">
+  <process id="executionListener" isExecutable="true">
     <startEvent id="theStart" />
 
     <sequenceFlow sourceRef="theStart" targetRef="serviceTask" />

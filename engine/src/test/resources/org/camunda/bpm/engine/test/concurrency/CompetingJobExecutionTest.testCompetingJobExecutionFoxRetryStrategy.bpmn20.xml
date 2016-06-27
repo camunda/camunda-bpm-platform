@@ -6,7 +6,7 @@
   xmlns:fox="http://www.camunda.com/fox"
   targetNamespace="Examples">
   
-  <process id="miParallelSubprocess">
+  <process id="miParallelSubprocess" isExecutable="true">
   
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miSubProcess" />

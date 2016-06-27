@@ -6,7 +6,7 @@
 
 	<signal id="alertSignal" name="alert" />
 
-<process id="catchSignal">
+<process id="catchSignal" isExecutable="true">
 	
 		<sequenceFlow sourceRef="timerEvent" targetRef="task1" />
 		<sequenceFlow sourceRef="signalEvent" targetRef="task2" />
