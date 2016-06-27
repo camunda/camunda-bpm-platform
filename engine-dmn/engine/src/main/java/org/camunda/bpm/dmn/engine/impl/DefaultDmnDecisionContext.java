@@ -29,11 +29,13 @@ import javax.script.ScriptException;
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationListener;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationListener;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedDecisionRule;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedInput;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedOutput;
+import org.camunda.bpm.dmn.engine.impl.delegate.DmnDecisionEvaluationEventImpl;
 import org.camunda.bpm.dmn.engine.impl.delegate.DmnDecisionTableEvaluationEventImpl;
 import org.camunda.bpm.dmn.engine.impl.delegate.DmnEvaluatedDecisionRuleImpl;
 import org.camunda.bpm.dmn.engine.impl.delegate.DmnEvaluatedInputImpl;
@@ -59,6 +61,7 @@ public class DefaultDmnDecisionContext {
   protected static final DmnEngineLogger LOG = DmnEngineLogger.ENGINE_LOGGER;
 
   protected final List<DmnDecisionTableEvaluationListener> evaluationListeners;
+  protected final List<DmnDecisionEvaluationListener> decisionEvaluationListeners;
   protected final DmnScriptEngineResolver scriptEngineResolver;
   protected final ElProvider elProvider;
   protected final FeelEngine feelEngine;
@@ -68,7 +71,7 @@ public class DefaultDmnDecisionContext {
   
   public DefaultDmnDecisionContext(DefaultDmnEngineConfiguration configuration) {
     evaluationListeners = configuration.getDecisionTableEvaluationListeners();
-
+    decisionEvaluationListeners = configuration.getDecisionEvaluationListeners();
     scriptEngineResolver = configuration.getScriptEngineResolver();
     elProvider = configuration.getElProvider();
     feelEngine = configuration.getFeelEngine();
@@ -92,24 +95,37 @@ public class DefaultDmnDecisionContext {
       || ((DmnDecisionImpl)decision).getRelatedDecisionTable() == null) {
       throw LOG.unableToFindAnyDecisionTable();
     }
-
+    long executedDecisions = 0L;
     VariableMap variableMap = buildVariableMapFromVariableContext(variableContext);
     
     Map<String, DmnDecision> requiredDecisions = new LinkedHashMap<String, DmnDecision>();
     buildDecisionTree(decision, requiredDecisions);
+    
+    List<DmnDecisionTableEvaluationEvent> evaluatedEvents = new ArrayList<DmnDecisionTableEvaluationEvent>();
+    DmnDecisionTableEvaluationEvent rootEvaluatedEvent = null;
     DmnDecisionTableResult evaluatedResult = null;
-
+    
     for (Map.Entry<String, DmnDecision> entry:requiredDecisions.entrySet()) {
       DmnDecision evaluateDecision = entry.getValue();
-      evaluatedResult =  evaluateDecisionTable(evaluateDecision, variableMap.asVariableContext());
+      DmnDecisionTableEvaluationEventImpl evaluatedEvent = evaluateDecisionTable(evaluateDecision, variableMap.asVariableContext());
+      
+      if(decision == evaluateDecision) {
+        rootEvaluatedEvent = evaluatedEvent;
+      } else {
+        evaluatedEvents.add(evaluatedEvent);  
+      }
+      executedDecisions += evaluatedEvent.getExecutedDecisionElements();
+      evaluatedResult = generateDecisionTableResult(((DmnDecisionImpl)decision).getRelatedDecisionTable(), evaluatedEvent); 
       if(decision != evaluateDecision) {
         addResultToVariableContext(evaluatedResult, variableMap);
       }
     }
+
+    generateDecisionEvaluationEvent(rootEvaluatedEvent, evaluatedEvents, executedDecisions);
     return evaluatedResult;  
    
   }
-
+  
   /**
    * Evaluate a decision table with the given {@link VariableContext}
    *
@@ -117,7 +133,7 @@ public class DefaultDmnDecisionContext {
    * @param variableContext the available variable context
    * @return the result of the decision evaluation
    */
-  public DmnDecisionTableResult evaluateDecisionTable(DmnDecision decision, VariableContext variableContext) {
+  public DmnDecisionTableEvaluationEventImpl evaluateDecisionTable(DmnDecision decision, VariableContext variableContext) {
     DmnDecisionTableEvaluationEventImpl evaluationResult = new DmnDecisionTableEvaluationEventImpl();
     evaluationResult.setDecisionTable(decision);
     DmnDecisionTableImpl decisionTable = ((DmnDecisionImpl)decision).getRelatedDecisionTable();
@@ -139,7 +155,18 @@ public class DefaultDmnDecisionContext {
     }
 
     setEvaluationOutput(decisionTable, matchingRules, variableContext, evaluationResult);
-    return generateDecisionTableResult(decisionTable, evaluationResult);
+    return evaluationResult;
+  }
+
+  protected void generateDecisionEvaluationEvent(DmnDecisionTableEvaluationEvent rootEvaluatedResult, List<DmnDecisionTableEvaluationEvent> evaluatedEvents, long requiredDecisions) {
+    DmnDecisionEvaluationEventImpl decisionEvaluationEvent = new DmnDecisionEvaluationEventImpl();
+    decisionEvaluationEvent.setDecisionResult(rootEvaluatedResult);
+    decisionEvaluationEvent.setEvaluatedDecisions(requiredDecisions);
+    decisionEvaluationEvent.setRequiredDecisions(evaluatedEvents);
+
+    for (DmnDecisionEvaluationListener evaluationListener : decisionEvaluationListeners) {
+      evaluationListener.notify(decisionEvaluationEvent);
+    }
   }
 
   protected void addResultToVariableContext(DmnDecisionTableResult evaluatedResult, VariableMap variableMap)

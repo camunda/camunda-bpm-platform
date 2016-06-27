@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationListener;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationListener;
 import org.camunda.bpm.dmn.engine.impl.el.DefaultScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.el.JuelElProvider;
@@ -45,6 +46,11 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
   protected List<DmnDecisionTableEvaluationListener> customPostDecisionTableEvaluationListeners = new ArrayList<DmnDecisionTableEvaluationListener>();
   protected List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners;
 
+  // Decision evaluation listeners
+  protected List<DmnDecisionEvaluationListener> decisionEvaluationListeners;
+  protected List<DmnDecisionEvaluationListener> customPreDecisionEvaluationListeners = new ArrayList<DmnDecisionEvaluationListener>();
+  protected List<DmnDecisionEvaluationListener> customPostDecisionEvaluationListeners = new ArrayList<DmnDecisionEvaluationListener>();
+
   protected DmnScriptEngineResolver scriptEngineResolver;
   protected ElProvider elProvider;
   protected FeelEngineFactory feelEngineFactory;
@@ -64,6 +70,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
   public void init() {
     initMetricCollector();
     initDecisionTableEvaluationListener();
+    initDecisionEvaluationListener();
     initScriptEngineResolver();
     initElProvider();
     initFeelEngine();
@@ -85,6 +92,18 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
       listeners.addAll(customPostDecisionTableEvaluationListeners);
     }
     decisionTableEvaluationListeners = listeners;
+  }
+
+  protected void initDecisionEvaluationListener() {
+    List<DmnDecisionEvaluationListener> listeners = new ArrayList<DmnDecisionEvaluationListener>();
+    if (customPreDecisionEvaluationListeners != null && !customPreDecisionEvaluationListeners.isEmpty()) {
+      listeners.addAll(customPreDecisionEvaluationListeners);
+    }
+    
+    if (customPostDecisionEvaluationListeners != null && !customPostDecisionEvaluationListeners.isEmpty()) {
+      listeners.addAll(customPostDecisionEvaluationListeners);
+    }
+    decisionEvaluationListeners = listeners;
   }
 
   protected Collection<? extends DmnDecisionTableEvaluationListener> getDefaultDmnDecisionTableEvaluationListeners() {
@@ -154,6 +173,31 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
     return this;
   }
 
+  public List<DmnDecisionEvaluationListener> getCustomPreDecisionEvaluationListeners() {
+    return customPreDecisionEvaluationListeners;
+  }
+
+  public void setCustomPreDecisionEvaluationListeners(List<DmnDecisionEvaluationListener> decisionEvaluationListeners) {
+    this.customPreDecisionEvaluationListeners = decisionEvaluationListeners;
+  }
+
+  public DefaultDmnEngineConfiguration customPreDecisionEvaluationListeners(List<DmnDecisionEvaluationListener> decisionEvaluationListeners) {
+    setCustomPreDecisionEvaluationListeners(decisionEvaluationListeners);
+    return this;
+  }
+
+  public List<DmnDecisionEvaluationListener> getCustomPostDecisionEvaluationListeners() {
+    return customPostDecisionEvaluationListeners;
+  }
+
+  public void setCustomPostDecisionEvaluationListeners(List<DmnDecisionEvaluationListener> decisionEvaluationListeners) {
+    this.customPostDecisionEvaluationListeners = decisionEvaluationListeners;
+  }
+
+  public DefaultDmnEngineConfiguration customPostDecisionEvaluationListeners(List<DmnDecisionEvaluationListener> decisionEvaluationListeners) {
+    setCustomPostDecisionEvaluationListeners(decisionEvaluationListeners);
+    return this;
+  }
   /**
    * The list of decision table evaluation listeners of the configuration. Contains
    * the pre, default and post decision table evaluation listeners. Is set during
@@ -163,6 +207,17 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
    */
   public List<DmnDecisionTableEvaluationListener> getDecisionTableEvaluationListeners() {
     return decisionTableEvaluationListeners;
+  }
+
+  /**
+   * The list of decision evaluation listeners of the configuration. Contains
+   * the pre, default and post decision evaluation listeners. Is set during
+   * the build of an engine.
+   *
+   * @return the list of decision table evaluation listeners
+   */
+  public List<DmnDecisionEvaluationListener> getDecisionEvaluationListeners() {
+    return decisionEvaluationListeners;
   }
 
   /**

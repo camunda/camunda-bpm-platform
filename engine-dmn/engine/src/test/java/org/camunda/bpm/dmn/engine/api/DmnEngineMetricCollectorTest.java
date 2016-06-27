@@ -14,10 +14,15 @@
 package org.camunda.bpm.dmn.engine.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.variable.Variables.createVariables;
 
+import java.util.List;
+
+import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.spi.DmnEngineMetricCollector;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
+import org.camunda.bpm.engine.variable.VariableMap;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +30,7 @@ import org.junit.Test;
 public class DmnEngineMetricCollectorTest extends DmnEngineTest {
 
   public static final String EXAMPLE_DMN = "org/camunda/bpm/dmn/engine/api/Example.dmn";
+  public static final String DISH_EXAMPLE_DMN = "org/camunda/bpm/dmn/engine/api/DrdDishDecisionExample.dmn";
 
   protected DmnEngineMetricCollector metricCollector;
 
@@ -66,6 +72,27 @@ public class DmnEngineMetricCollectorTest extends DmnEngineTest {
   }
 
   @Test
+  public void testDrdExecutedDecisionElementsValue() {
+    assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(0L);
+
+    assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(0L);
+    List<DmnDecision> decisions = parseDecisionsFromFile(DISH_EXAMPLE_DMN);
+    VariableMap variableMap = createVariables()
+      .putValue("temperature", 20)
+      .putValue("dayType", "Weekend");
+    
+    dmnEngine.evaluateDecisionTable(decisions.get(0), variableMap);
+    assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(30L);
+
+    dmnEngine.evaluateDecisionTable(decisions.get(0), variableMap);
+    assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(60L);
+
+    dmnEngine.evaluateDecisionTable(decisions.get(0), variableMap);
+    dmnEngine.evaluateDecisionTable(decisions.get(0), variableMap);
+    assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(120L);
+  }
+
+  @Test
   @DecisionResource(resource = EXAMPLE_DMN)
   public void testClearExecutedDecisionElementsValue() {
     assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(0L);
@@ -73,6 +100,22 @@ public class DmnEngineMetricCollectorTest extends DmnEngineTest {
     dmnEngine.evaluateDecisionTable(decision, variables);
     assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(16L);
     assertThat(metricCollector.clearExecutedDecisionElements()).isEqualTo(16L);
+
+    assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(0L);
+  }
+
+  @Test
+  public void testDrdDishDecisionExample() {
+    assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(0L);
+
+    List<DmnDecision> decisions = parseDecisionsFromFile(DISH_EXAMPLE_DMN);
+
+    dmnEngine.evaluateDecisionTable(decisions.get(0), createVariables()
+      .putValue("temperature", 20)
+      .putValue("dayType", "Weekend"));
+    
+    assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(30L);
+    assertThat(metricCollector.clearExecutedDecisionElements()).isEqualTo(30L);
 
     assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(0L);
   }
