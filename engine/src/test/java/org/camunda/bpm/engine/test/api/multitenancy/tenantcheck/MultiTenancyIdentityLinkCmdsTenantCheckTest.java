@@ -12,6 +12,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
@@ -32,7 +33,7 @@ public class MultiTenancyIdentityLinkCmdsTenantCheckTest {
     .endEvent()
     .done();
   
-  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
   

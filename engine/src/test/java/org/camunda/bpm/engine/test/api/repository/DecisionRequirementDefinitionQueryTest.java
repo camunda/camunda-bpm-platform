@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.repository.DecisionRequirementDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementDefinitionQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class DecisionRequirementDefinitionQueryTest {
   protected static final String DRD_SCORE_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdScore.dmn11.xml";
   protected static final String DRD_DISH_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
 
-  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule

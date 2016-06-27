@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.repository.DecisionRequirementDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementDefinitionQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class MultiTenancyDecisionRequirementDefinitionQueryTest {
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
-  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule

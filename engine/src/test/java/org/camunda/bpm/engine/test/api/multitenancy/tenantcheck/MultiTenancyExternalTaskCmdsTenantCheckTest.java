@@ -14,6 +14,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,7 +27,7 @@ public class MultiTenancyExternalTaskCmdsTenantCheckTest {
   
   protected static final String PROCESS_DEFINITION_KEY = "twoExternalTaskProcess";
   
-  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
   

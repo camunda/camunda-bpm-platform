@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Before;
@@ -48,7 +49,7 @@ public class DecisionServiceTest {
   protected static final String RESULT_OF_FIRST_VERSION = "ok";
   protected static final String RESULT_OF_SECOND_VERSION = "notok";
 
-  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule

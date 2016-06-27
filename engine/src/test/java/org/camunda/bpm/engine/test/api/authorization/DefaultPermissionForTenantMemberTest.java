@@ -13,6 +13,7 @@ import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,7 +27,7 @@ public class DefaultPermissionForTenantMemberTest {
   protected static final String USER_ID = "user";
   protected static final String GROUP_ID = "group";
 
-  protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 

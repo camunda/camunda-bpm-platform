@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskCountByCandidateGroupResult;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -41,7 +42,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TaskCountByCandidateGroupsTest {
 
-  public ProcessEngineRule processEngineRule = new ProcessEngineRule(true);
+  public ProcessEngineRule processEngineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule processEngineTestRule = new ProcessEngineTestRule(processEngineRule);
 
   @Rule
