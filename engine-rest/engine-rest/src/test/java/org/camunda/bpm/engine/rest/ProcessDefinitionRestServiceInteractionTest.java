@@ -864,7 +864,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   public void testSimpleProcessInstantiationWithVariables() {
     //given request with parameter withVariables to get the variables in return
     Map<String, Object> json = new HashMap<String, Object>();
-    json.put("withVariables", true);
+    json.put("withVariablesInReturn", true);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
             .contentType(POST_JSON_CONTENT_TYPE).body(json)
@@ -907,7 +907,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", parameters);
-    json.put("withVariables", true);
+    json.put("withVariablesInReturn", true);
 
     //when request then return process instance with variables
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -1120,7 +1120,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
           .getJson());
 
     json.put("startInstructions", startInstructions);
-    json.put("withVariables", true);
+    json.put("withVariablesInReturn", true);
 
     //request which should contain variables of process instance
     given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)

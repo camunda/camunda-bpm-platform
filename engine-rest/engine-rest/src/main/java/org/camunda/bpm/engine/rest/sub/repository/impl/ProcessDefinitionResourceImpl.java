@@ -114,10 +114,12 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     }
 
     ProcessInstanceDto result;
-    if (parameters.isWithVariablesInReturn())
-     result = ProcessInstanceDto.fromProcessInstance(instance);
-    else
+    if (parameters.isWithVariablesInReturn()) {
       result = ProcessInstanceWithVariablesDto.fromProcessInstance(instance);
+    }
+    else {
+     result = ProcessInstanceDto.fromProcessInstance(instance);
+    }
 
     URI uri = context.getBaseUriBuilder()
       .path(rootResourcePath)
