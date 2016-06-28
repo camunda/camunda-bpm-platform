@@ -10,10 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 /**
@@ -22,18 +23,22 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
  */
 public class DecrementJobRetriesCmd extends JobRetryCmd {
 
+  private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
+
   public DecrementJobRetriesCmd(String jobId, Throwable exception) {
     super(jobId, exception);
   }
 
   public Object execute(CommandContext commandContext) {
     JobEntity job = getJob();
-
-    job.unlock();
-    logException(job);
-    decrementRetries(job);
-    notifyAcquisition(commandContext);
-
+    if (job != null) {
+      job.unlock();
+      logException(job);
+      decrementRetries(job);
+      notifyAcquisition(commandContext);
+    } else {
+      LOG.debugFailedJobNotFound(jobId);
+    }
     return null;
   }
 
