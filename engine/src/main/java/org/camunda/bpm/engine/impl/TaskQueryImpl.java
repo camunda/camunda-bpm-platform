@@ -57,6 +57,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String involvedUser;
   protected String owner;
   protected Boolean unassigned;
+  protected Boolean assigned;
   protected boolean noDelegationState = false;
   protected DelegationState delegationState;
   protected String candidateUser;
@@ -224,6 +225,12 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   @Override
   public TaskQuery taskUnassigned() {
     this.unassigned = true;
+    return this;
+  }
+
+  @Override
+  public TaskQuery taskAssigned() {
+    this.assigned = true;
     return this;
   }
 

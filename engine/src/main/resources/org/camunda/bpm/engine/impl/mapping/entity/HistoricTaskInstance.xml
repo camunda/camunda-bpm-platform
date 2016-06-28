@@ -297,6 +297,12 @@
       <if test="taskOwnerLike != null">
         and RES.OWNER_ like #{taskOwnerLike}
       </if>
+      <if test="assigned">
+        and RES.ASSIGNEE_ is not null
+      </if>
+      <if test="unassigned">
+        and RES.ASSIGNEE_ is null
+      </if>
       <if test="taskAssignee != null">
         and RES.ASSIGNEE_ = #{taskAssignee}
       </if>

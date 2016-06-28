@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
@@ -225,4 +226,61 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     taskService.deleteTask("taskTwo",true);
     taskService.deleteTask("taskThree",true);
   }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testTaskWasAssigned() {
+    // given
+    Task taskOne = taskService.newTask("taskOne");
+    Task taskTwo = taskService.newTask("taskTwo");
+    Task taskThree = taskService.newTask("taskThree");
+
+    // when
+    taskOne.setAssignee("aUserId");
+    taskService.saveTask(taskOne);
+
+    taskTwo.setAssignee("anotherUserId");
+    taskService.saveTask(taskTwo);
+
+    taskService.saveTask(taskThree);
+
+    List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().assigned().list();
+
+    // then
+    assertEquals(list.size(), 2);
+
+    // cleanup
+    taskService.deleteTask("taskOne",true);
+    taskService.deleteTask("taskTwo",true);
+    taskService.deleteTask("taskThree",true);
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testTaskWasUnassigned() {
+    // given
+    Task taskOne = taskService.newTask("taskOne");
+    Task taskTwo = taskService.newTask("taskTwo");
+    Task taskThree = taskService.newTask("taskThree");
+
+    // when
+    taskOne.setAssignee("aUserId");
+    taskService.saveTask(taskOne);
+
+    taskTwo.setAssignee("anotherUserId");
+    taskService.saveTask(taskTwo);
+
+    taskService.saveTask(taskThree);
+
+    List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().unassigned().list();
+
+    // then
+    assertEquals(list.size(), 1);
+
+    // cleanup
+    taskService.deleteTask("taskOne",true);
+    taskService.deleteTask("taskTwo",true);
+    taskService.deleteTask("taskThree",true);
+  }
+
 }

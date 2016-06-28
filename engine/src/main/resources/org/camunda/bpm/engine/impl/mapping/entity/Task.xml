@@ -284,6 +284,9 @@
       <if test="unassigned">
         and RES.ASSIGNEE_ IS NULL
       </if>
+      <if test="assigned">
+        and RES.ASSIGNEE_ IS NOT NULL
+      </if>
       <if test="noDelegationState">
         and RES.DELEGATION_ IS NULL
       </if>

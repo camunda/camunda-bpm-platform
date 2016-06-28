@@ -50,6 +50,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected String taskDeleteReasonLike;
   protected String taskOwner;
   protected String taskOwnerLike;
+  protected Boolean assigned;
+  protected Boolean unassigned;
   protected String taskAssignee;
   protected String taskAssigneeLike;
   protected String taskDefinitionKey;
@@ -170,6 +172,16 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public HistoricTaskInstanceQueryImpl taskDeleteReasonLike(String taskDeleteReasonLike) {
     this.taskDeleteReasonLike = taskDeleteReasonLike;
+    return this;
+  }
+
+  public HistoricTaskInstanceQueryImpl assigned() {
+    this.assigned = true;
+    return this;
+  }
+
+  public HistoricTaskInstanceQueryImpl unassigned() {
+    this.unassigned = true;
     return this;
   }
 
