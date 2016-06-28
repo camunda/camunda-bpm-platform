@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -63,7 +64,8 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String candidateUser;
   protected String candidateGroup;
   protected List<String> candidateGroups;
-  protected Boolean withCandidateGroups;
+  protected Boolean withCandidateGroups = false;
+  protected Boolean withoutCandidateGroups = false;
   protected Boolean includeAssignedTasks;
   protected String processInstanceId;
   protected String executionId;
@@ -94,11 +96,11 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected SuspensionState suspensionState;
   protected boolean initializeFormKeys = false;
   protected boolean taskNameCaseInsensitive = false;
+
   protected String parentTaskId;
-
   protected boolean isTenantIdSet = false;
-  protected String[] tenantIds;
 
+  protected String[] tenantIds;
   // case management /////////////////////////////
   protected String caseDefinitionKey;
   protected String caseDefinitionId;
@@ -297,6 +299,12 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   @Override
+  public TaskQuery withoutCandidateGroups() {
+    this.withoutCandidateGroups = true;
+    return this;
+  }
+
+  @Override
   public TaskQueryImpl taskCandidateGroup(String candidateGroup) {
     ensureNotNull("Candidate group", candidateGroup);
 
@@ -359,10 +367,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery includeAssignedTasks() {
-    if (candidateUser == null && candidateGroup == null && candidateGroups == null
+    if (candidateUser == null && candidateGroup == null && candidateGroups == null && !withCandidateGroups && !withoutCandidateGroups
         && !expressions.containsKey("taskCandidateUser") && !expressions.containsKey("taskCandidateGroup")
         && !expressions.containsKey("taskCandidateGroupIn")) {
-      throw new ProcessEngineException("Invalid query usage: candidateUser, candidateGroup, candidateGroupIn has to be called before 'includeAssignedTasks'.");
+      throw new ProcessEngineException("Invalid query usage: candidateUser, candidateGroup, candidateGroupIn, withCandidateGroups, withoutCandidateGroups has to be called before 'includeAssignedTasks'.");
     }
 
     includeAssignedTasks = true;

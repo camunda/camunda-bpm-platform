@@ -60,6 +60,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected String taskHadCandidateUser;
   protected String taskHadCandidateGroup;
   protected Boolean withCandidateGroups;
+  protected Boolean withoutCandidateGroups;
   protected Integer taskPriority;
   protected boolean finished;
   protected boolean unfinished;
@@ -71,8 +72,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected Date dueBefore;
   protected Date followUpDate;
   protected Date followUpBefore;
-  protected Date followUpAfter;
 
+  protected Date followUpAfter;
   protected String[] tenantIds;
   protected String caseDefinitionId;
   protected String caseDefinitionKey;
@@ -288,6 +289,11 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public HistoricTaskInstanceQuery withCandidateGroups() {
     this.withCandidateGroups = true;
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery withoutCandidateGroups() {
+    this.withoutCandidateGroups = true;
     return this;
   }
 

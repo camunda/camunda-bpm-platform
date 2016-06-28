@@ -27,6 +27,7 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByPri
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByProcessInstanceId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySortingAndCount;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import java.text.ParseException;
@@ -436,6 +437,19 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     TaskQuery query = taskService.createTaskQuery().withCandidateGroups();
     assertEquals(4, query.count());
     assertEquals(4, query.list().size());
+
+    assertEquals(5, query.includeAssignedTasks().count());
+    assertEquals(5, query.includeAssignedTasks().list().size());
+  }
+
+  public void testQueryWithoutCandidateGroups() {
+    // test withoutCandidateGroups
+    TaskQuery query = taskService.createTaskQuery().withoutCandidateGroups();
+    assertEquals(6, query.count());
+    assertEquals(6, query.list().size());
+
+    assertEquals(7, query.includeAssignedTasks().count());
+    assertEquals(7, query.includeAssignedTasks().list().size());
   }
 
   public void testQueryByNullCandidateGroup() {

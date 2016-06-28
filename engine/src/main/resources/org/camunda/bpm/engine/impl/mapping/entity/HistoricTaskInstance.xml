@@ -230,6 +230,18 @@
          )
       </if>
 
+      <if test="withoutCandidateGroups">
+        RES.ID_ not in (
+          select
+            TASK_ID_
+          from
+            ${prefix}ACT_HI_IDENTITYLINK HIL
+          <where>
+            HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ is not null
+          </where>
+        )
+      </if>
+
       <if test="taskId != null">
         RES.ID_ = #{taskId}
       </if>

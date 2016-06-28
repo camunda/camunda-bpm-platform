@@ -458,9 +458,26 @@
         </if>
 
       </if>
+
+      <if test="withoutCandidateGroups">
+        <if test="!includeAssignedTasks">
+          and RES.ASSIGNEE_ is null
+        </if>
+        and RES.ID_ not in (
+          select
+            TASK_ID_
+          from
+            ${prefix}ACT_RU_IDENTITYLINK ARIEL
+          <where>
+            ARIEL.TYPE_ = 'candidate' and ARIEL.GROUP_ID_ is not null
+          </where>
+        )
+      </if>
+
       <if test="involvedUser != null">
         and I.USER_ID_ = #{involvedUser}
       </if>
+
       
       <!-- queryVariables -->
       <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->

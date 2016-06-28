@@ -210,6 +210,9 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   /** Only select historic task instances which have a candidate group */
   HistoricTaskInstanceQuery withCandidateGroups();
 
+  /** Only select historic task instances which have no candidate group */
+  HistoricTaskInstanceQuery withoutCandidateGroups();
+
   /**
    * Only select historic task instances which have a local task variable with the
    * given name set to the given value. Make sure history-level is configured

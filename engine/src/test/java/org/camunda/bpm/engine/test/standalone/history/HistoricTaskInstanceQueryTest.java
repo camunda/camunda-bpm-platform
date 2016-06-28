@@ -204,6 +204,26 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testWithoutCandidateGroups() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    identityService.setAuthenticatedUserId("aAssignerId");
+    taskService.addCandidateGroup(taskId, "aGroupId");
+
+    // when
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // then
+    assertEquals(historyService.createHistoricTaskInstanceQuery().count(), 2);
+    assertEquals(historyService.createHistoricTaskInstanceQuery().withoutCandidateGroups().count(), 1);
+
+    // cleanup
+    taskService.deleteTask("newTask", true);
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testGroupTaskQuery() {
     // given
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
