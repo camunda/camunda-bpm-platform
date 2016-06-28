@@ -326,6 +326,12 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(10, query.list().size());
   }
 
+  public void testQueryByAssigned() {
+    TaskQuery query = taskService.createTaskQuery().taskAssigned();
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+  }
+
   public void testQueryByCandidateUser() {
     // kermit is candidate for 12 tasks, two of them are already assigned
     TaskQuery query = taskService.createTaskQuery().taskCandidateUser("kermit");
