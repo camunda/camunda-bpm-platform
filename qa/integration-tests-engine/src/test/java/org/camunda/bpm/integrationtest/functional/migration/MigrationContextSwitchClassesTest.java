@@ -12,9 +12,6 @@
  */
 package org.camunda.bpm.integrationtest.functional.migration;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
-
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -35,6 +32,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
+
 /**
  * @author Thorben Lindhauer
  *
@@ -43,7 +43,7 @@ import org.junit.runner.RunWith;
 public class MigrationContextSwitchClassesTest extends AbstractFoxPlatformIntegrationTest {
 
   public static final BpmnModelInstance oneTaskProcess(String key) {
-    return  Bpmn.createProcess(key)
+    return  Bpmn.createExecutableProcess(key)
       .startEvent()
       .userTask("userTask")
       .endEvent()
@@ -51,7 +51,7 @@ public class MigrationContextSwitchClassesTest extends AbstractFoxPlatformIntegr
   }
 
   public static final BpmnModelInstance subProcessProcess(String key) {
-    return  Bpmn.createProcess(key)
+    return  Bpmn.createExecutableProcess(key)
       .startEvent()
       .subProcess()
       .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, InstantiationListener.class.getName())
@@ -65,7 +65,7 @@ public class MigrationContextSwitchClassesTest extends AbstractFoxPlatformIntegr
       .done();
   }
 
-  public static final BpmnModelInstance BOUNDARY_EVENT_PROCESS = Bpmn.createProcess("boundaryProcess")
+  public static final BpmnModelInstance BOUNDARY_EVENT_PROCESS = Bpmn.createExecutableProcess("boundaryProcess")
     .startEvent()
     .userTask("userTask")
     .boundaryEvent()
