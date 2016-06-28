@@ -207,7 +207,7 @@
 
   <sql id="selectTaskByQueryCriteriaSql">
     from ${prefix}ACT_RU_TASK RES
-    <if test="candidateUser != null || candidateGroups != null || involvedUser != null">
+    <if test="candidateUser != null || candidateGroups != null || involvedUser != null || withCandidateGroups">
       inner join ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
     </if>
     <if test="processDefinitionKey != null || processDefinitionName != null || processDefinitionNameLike != null ||
@@ -429,13 +429,14 @@
           and RES.TENANT_ID_ is null
         </if>
       </if>
-      <if test="candidateUser != null || candidateGroups != null">
+      <if test="candidateUser != null || candidateGroups != null || withCandidateGroups">
         <if test="!includeAssignedTasks">
           and RES.ASSIGNEE_ is null
         </if>
         and I.TYPE_ = 'candidate'
-        and
-        (
+        <if test="candidateUser != null || candidateGroups != null">
+          and
+          (
           <if test="candidateUser != null">
             I.USER_ID_ = #{candidateUser}
           </if>
@@ -449,7 +450,13 @@
               #{group}
             </foreach>
           </if>
-        )
+          )
+        </if>
+
+        <if test="withCandidateGroups">
+          and I.GROUP_ID_ is not null
+        </if>
+
       </if>
       <if test="involvedUser != null">
         and I.USER_ID_ = #{involvedUser}

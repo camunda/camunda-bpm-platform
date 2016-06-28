@@ -431,6 +431,13 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, query.list().size());
   }
 
+  public void testQueryWithCandidateGroups() {
+    // test withCandidateGroups
+    TaskQuery query = taskService.createTaskQuery().withCandidateGroups();
+    assertEquals(4, query.count());
+    assertEquals(4, query.list().size());
+  }
+
   public void testQueryByNullCandidateGroup() {
     try {
       taskService.createTaskQuery().taskCandidateGroup(null).list();

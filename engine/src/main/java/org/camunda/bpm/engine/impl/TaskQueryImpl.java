@@ -63,6 +63,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String candidateUser;
   protected String candidateGroup;
   protected List<String> candidateGroups;
+  protected Boolean withCandidateGroups;
   protected Boolean includeAssignedTasks;
   protected String processInstanceId;
   protected String executionId;
@@ -286,6 +287,12 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public TaskQuery taskInvolvedUserExpression(String involvedUserExpression) {
     ensureNotNull("Involved user expression", involvedUserExpression);
     expressions.put("taskInvolvedUser", involvedUserExpression);
+    return this;
+  }
+
+  @Override
+  public TaskQuery withCandidateGroups() {
+    this.withCandidateGroups = true;
     return this;
   }
 
