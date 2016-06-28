@@ -147,4 +147,8 @@ public class JobExecutorLogger extends ProcessEngineLogger {
         "Execute jobs for process engine '{}': {}", processEngine, jobs);
   }
 
+  public void debugFailedJobNotFound(String jobId) {
+    logDebug(
+        "024", "Failed job with id '{}' not found.", jobId);
+  }
 }

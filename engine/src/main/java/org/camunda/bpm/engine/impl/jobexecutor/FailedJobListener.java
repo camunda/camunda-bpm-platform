@@ -10,9 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.management.Metrics;
-
 
 /**
  * @author Frederik Heremans
@@ -32,6 +31,7 @@ public class FailedJobListener implements TransactionListener, CommandContextLis
   protected CommandExecutor commandExecutor;
   protected String jobId;
   protected Throwable exception;
+  private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   public FailedJobListener(CommandExecutor commandExecutor, String jobId, Throwable exception) {
     this(commandExecutor, jobId);
@@ -52,19 +52,23 @@ public class FailedJobListener implements TransactionListener, CommandContextLis
     commandExecutor.execute(new Command<Void>() {
 
       public Void execute(CommandContext commandContext) {
-        fireHistoricJobFailedEvt(jobId);
-        cmd.execute(commandContext);
+        JobEntity job = commandContext
+                .getJobManager()
+                .findJobById(jobId);
+
+        if (job != null) {
+          fireHistoricJobFailedEvt(job);
+          cmd.execute(commandContext);
+        } else {
+          LOG.debugFailedJobNotFound(jobId);
+        }
         return null;
       }
-
     });
   }
 
-  protected void fireHistoricJobFailedEvt(String jobId) {
+  protected void fireHistoricJobFailedEvt(JobEntity job) {
     CommandContext commandContext = Context.getCommandContext();
-    JobEntity job = commandContext
-        .getJobManager()
-        .findJobById(jobId);
 
     // the given job failed and a rollback happened,
     // that's why we have to increment the job
@@ -72,15 +76,15 @@ public class FailedJobListener implements TransactionListener, CommandContextLis
     job.incrementSequenceCounter();
 
     commandContext
-      .getHistoricJobLogManager()
-      .fireJobFailedEvent(job, exception);
+            .getHistoricJobLogManager()
+            .fireJobFailedEvent(job, exception);
   }
 
   protected void logJobFailure(CommandContext commandContext) {
     if (commandContext.getProcessEngineConfiguration().isMetricsEnabled()) {
       commandContext.getProcessEngineConfiguration()
-        .getMetricsRegistry()
-        .markOccurrence(Metrics.JOB_FAILED);
+              .getMetricsRegistry()
+              .markOccurrence(Metrics.JOB_FAILED);
     }
   }
 
@@ -98,7 +102,7 @@ public class FailedJobListener implements TransactionListener, CommandContextLis
 
   public void onCommandFailed(CommandContext commandContext, Throwable t) {
     // log exception if not already present
-    if(this.exception == null) {
+    if (this.exception == null) {
       this.exception = t;
     }
   }
