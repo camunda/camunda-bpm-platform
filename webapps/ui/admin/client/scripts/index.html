@@ -57,9 +57,9 @@
          authentication="authentication"
          user-name="userFullName"
          current-app="admin"
-         brand-name="Camunda Admin">
-      <ul ng-cloak
-          cam-if-logged-in
+         brand-name="Camunda Admin"
+         ng-cloak>
+      <ul cam-if-logged-in
           ng-controller="NavigationController">
 
         <li ng-class="activeClass('#/user')">
@@ -95,6 +95,7 @@
         <div ng-if="showBreadcrumbs"
              cam-breadcrumbs-panel
              divider="&raquo;"
+             ng-cloak
              class="breadcrumbs-panel"></div>
 
         <div notifications-panel
