@@ -133,6 +133,7 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected String taskInvolvedGroup;
   protected String taskHadCandidateUser;
   protected String taskHadCandidateGroup;
+  protected Boolean withCandidateGroups;
   protected List<VariableQueryParameterDto> taskVariables;
   protected List<VariableQueryParameterDto> processVariables;
 
@@ -362,6 +363,11 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     this.taskHadCandidateGroup = taskHadCandidateGroup;
   }
 
+  @CamundaQueryParam(value="withCandidateGroups", converter=BooleanConverter.class)
+  public void setWithCandidateGroups(Boolean withCandidateGroups) {
+    this.withCandidateGroups = withCandidateGroups;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -499,6 +505,9 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     }
     if(taskHadCandidateGroup != null){
       query.taskHadCandidateGroup(taskHadCandidateGroup);
+    }
+    if (withCandidateGroups != null) {
+      query.withCandidateGroups();
     }
     if (taskVariables != null) {
       for (VariableQueryParameterDto variableQueryParam : taskVariables) {

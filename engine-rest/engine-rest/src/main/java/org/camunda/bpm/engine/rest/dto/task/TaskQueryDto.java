@@ -180,6 +180,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   private List<String> candidateGroups;
   private String candidateGroupsExpression;
+  protected Boolean withCandidateGroups;
 
   private List<VariableQueryParameterDto> taskVariables;
   private List<VariableQueryParameterDto> processVariables;
@@ -286,6 +287,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam("candidateGroupExpression")
   public void setCandidateGroupExpression(String candidateGroupExpression) {
     this.candidateGroupExpression = candidateGroupExpression;
+  }
+
+  @CamundaQueryParam(value = "withCandidateGroups", converter = BooleanConverter.class)
+  public void setWithCandidateGroups(Boolean withCandidateGroups) {
+    this.withCandidateGroups = withCandidateGroups;
   }
 
   @CamundaQueryParam("candidateUser")
@@ -950,6 +956,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (candidateGroupExpression != null) {
       query.taskCandidateGroupExpression(candidateGroupExpression);
+    }
+    if (withCandidateGroups != null) {
+      query.withCandidateGroups();
     }
     if (candidateUser != null) {
       query.taskCandidateUser(candidateUser);

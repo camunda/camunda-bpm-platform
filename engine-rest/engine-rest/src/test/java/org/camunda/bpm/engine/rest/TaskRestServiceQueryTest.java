@@ -469,6 +469,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("active", true);
     parameters.put("suspended", true);
     parameters.put("withoutTenantId", true);
+    parameters.put("withCandidateGroups", true);
 
     return parameters;
   }

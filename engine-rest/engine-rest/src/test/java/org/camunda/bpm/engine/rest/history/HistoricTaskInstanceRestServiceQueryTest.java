@@ -1165,6 +1165,30 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
   }
 
   @Test
+  public void testQueryByWithCandidateGroups() {
+    given()
+      .queryParam("withCandidateGroups", true)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).withCandidateGroups();
+  }
+
+  @Test
+  public void testQueryByWithCandidateGroupsAsPost() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("withCandidateGroups", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).withCandidateGroups();
+  }
+
+  @Test
   public void testQueryByUnassigned() {
     given()
       .queryParam("unassigned", true)
