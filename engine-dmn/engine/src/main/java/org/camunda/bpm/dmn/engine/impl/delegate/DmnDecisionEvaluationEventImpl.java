@@ -23,8 +23,8 @@ import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEvent {
 
   protected DmnDecisionTableEvaluationEvent decisionResult;
-  protected Collection<DmnDecisionTableEvaluationEvent> requiredDecisions = new ArrayList<DmnDecisionTableEvaluationEvent>();
-  protected long evaluatedDecisions;
+  protected Collection<DmnDecisionTableEvaluationEvent> requiredDecisionResults = new ArrayList<DmnDecisionTableEvaluationEvent>();
+  protected long executedDecisionElements;
 
   public DmnDecisionTableEvaluationEvent getDecisionResult() {
     return decisionResult;  
@@ -34,20 +34,20 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
     this.decisionResult = decisionResult;
   }
 
-  public Collection<DmnDecisionTableEvaluationEvent> getRequiredDecisions() {
-    return requiredDecisions;
+  public Collection<DmnDecisionTableEvaluationEvent> getRequiredDecisionResults() {
+    return requiredDecisionResults;
   }
 
-  public void setRequiredDecisions(Collection<DmnDecisionTableEvaluationEvent> requiredDecisions) {
-    this.requiredDecisions = requiredDecisions;
+  public void setRequiredDecisionResults(Collection<DmnDecisionTableEvaluationEvent> requiredDecisionResults) {
+    this.requiredDecisionResults = requiredDecisionResults;
   }
 
-  public long getEvaluatedDecisions() {
-    return evaluatedDecisions;
+  public long getExecutedDecisionElements() {
+    return executedDecisionElements;
   }
 
-  public void setEvaluatedDecisions(long evaluatedDecisions) {
-    this.evaluatedDecisions = evaluatedDecisions;
+  public void setExecutedDecisionElements(long executedDecisionElements) {
+    this.executedDecisionElements = executedDecisionElements;
   }
 
   @Override
@@ -57,8 +57,8 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
       " key="+ dmnDecision.getKey() +
       ", name="+ dmnDecision.getName() + 
       ", decisionTable=" + dmnDecision.getRelatedDecisionTable() +
-      ", requiredDecisions=" + requiredDecisions +
-      ", evaluatedDecisions=" + evaluatedDecisions +
+      ", requiredDecisionResults=" + requiredDecisionResults +
+      ", executedDecisionElements=" + executedDecisionElements +
       '}';
   }
 

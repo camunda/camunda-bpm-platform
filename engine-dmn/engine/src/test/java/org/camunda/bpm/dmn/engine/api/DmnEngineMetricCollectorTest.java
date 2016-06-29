@@ -23,6 +23,7 @@ import org.camunda.bpm.dmn.engine.spi.DmnEngineMetricCollector;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.commons.utils.IoUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,8 +75,6 @@ public class DmnEngineMetricCollectorTest extends DmnEngineTest {
   @Test
   public void testDrdExecutedDecisionElementsValue() {
     assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(0L);
-
-    assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(0L);
     List<DmnDecision> decisions = parseDecisionsFromFile(DISH_EXAMPLE_DMN);
     VariableMap variableMap = createVariables()
       .putValue("temperature", 20)
@@ -108,9 +107,7 @@ public class DmnEngineMetricCollectorTest extends DmnEngineTest {
   public void testDrdDishDecisionExample() {
     assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(0L);
 
-    List<DmnDecision> decisions = parseDecisionsFromFile(DISH_EXAMPLE_DMN);
-
-    dmnEngine.evaluateDecisionTable(decisions.get(0), createVariables()
+    dmnEngine.evaluateDecisionTable("Dish", IoUtil.fileAsStream(DISH_EXAMPLE_DMN), createVariables()
       .putValue("temperature", 20)
       .putValue("dayType", "Weekend"));
     

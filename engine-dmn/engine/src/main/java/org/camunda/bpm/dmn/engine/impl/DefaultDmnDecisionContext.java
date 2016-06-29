@@ -95,44 +95,30 @@ public class DefaultDmnDecisionContext {
       || ((DmnDecisionImpl)decision).getRelatedDecisionTable() == null) {
       throw LOG.unableToFindAnyDecisionTable();
     }
-    long executedDecisions = 0L;
     VariableMap variableMap = buildVariableMapFromVariableContext(variableContext);
     
     Map<String, DmnDecision> requiredDecisions = new LinkedHashMap<String, DmnDecision>();
     buildDecisionTree(decision, requiredDecisions);
     
     List<DmnDecisionTableEvaluationEvent> evaluatedEvents = new ArrayList<DmnDecisionTableEvaluationEvent>();
-    DmnDecisionTableEvaluationEvent rootEvaluatedEvent = null;
     DmnDecisionTableResult evaluatedResult = null;
     
     for (Map.Entry<String, DmnDecision> entry:requiredDecisions.entrySet()) {
       DmnDecision evaluateDecision = entry.getValue();
       DmnDecisionTableEvaluationEventImpl evaluatedEvent = evaluateDecisionTable(evaluateDecision, variableMap.asVariableContext());
+      evaluatedEvents.add(evaluatedEvent);  
       
-      if(decision == evaluateDecision) {
-        rootEvaluatedEvent = evaluatedEvent;
-      } else {
-        evaluatedEvents.add(evaluatedEvent);  
-      }
-      executedDecisions += evaluatedEvent.getExecutedDecisionElements();
       evaluatedResult = generateDecisionTableResult(((DmnDecisionImpl)decision).getRelatedDecisionTable(), evaluatedEvent); 
       if(decision != evaluateDecision) {
         addResultToVariableContext(evaluatedResult, variableMap);
       }
     }
 
-    generateDecisionEvaluationEvent(rootEvaluatedEvent, evaluatedEvents, executedDecisions);
+    generateDecisionEvaluationEvent(evaluatedEvents);
     return evaluatedResult;  
    
   }
   
-  /**
-   * Evaluate a decision table with the given {@link VariableContext}
-   *
-   * @param decisionTable the decision table to evaluate
-   * @param variableContext the available variable context
-   * @return the result of the decision evaluation
-   */
   protected DmnDecisionTableEvaluationEventImpl evaluateDecisionTable(DmnDecision decision, VariableContext variableContext) {
     DmnDecisionTableEvaluationEventImpl evaluationResult = new DmnDecisionTableEvaluationEventImpl();
     evaluationResult.setDecisionTable(decision);
@@ -158,11 +144,22 @@ public class DefaultDmnDecisionContext {
     return evaluationResult;
   }
 
-  protected void generateDecisionEvaluationEvent(DmnDecisionTableEvaluationEvent rootEvaluatedResult, List<DmnDecisionTableEvaluationEvent> evaluatedEvents, long requiredDecisions) {
+  protected void generateDecisionEvaluationEvent(List<DmnDecisionTableEvaluationEvent> evaluatedEvents) {
+    
+    DmnDecisionTableEvaluationEvent rootEvaluatedEvent = null;
     DmnDecisionEvaluationEventImpl decisionEvaluationEvent = new DmnDecisionEvaluationEventImpl();
-    decisionEvaluationEvent.setDecisionResult(rootEvaluatedResult);
-    decisionEvaluationEvent.setEvaluatedDecisions(requiredDecisions);
-    decisionEvaluationEvent.setRequiredDecisions(evaluatedEvents);
+    long executedDecisionElements = 0L;
+
+    for(DmnDecisionTableEvaluationEvent evaluatedEvent: evaluatedEvents) {
+      executedDecisionElements += evaluatedEvent.getExecutedDecisionElements();
+      rootEvaluatedEvent = evaluatedEvent;
+    }
+    
+    decisionEvaluationEvent.setDecisionResult(rootEvaluatedEvent);
+    decisionEvaluationEvent.setExecutedDecisionElements(executedDecisionElements);
+    
+    evaluatedEvents.remove(rootEvaluatedEvent);
+    decisionEvaluationEvent.setRequiredDecisionResults(evaluatedEvents);
 
     for (DmnDecisionEvaluationListener evaluationListener : decisionEvaluationListeners) {
       evaluationListener.notify(decisionEvaluationEvent);

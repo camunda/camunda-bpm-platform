@@ -35,7 +35,7 @@ import org.junit.Test;
 
 public class DmnDecisionEvaluationListenerTest extends DmnEngineTest {
 
-  public static final String DMN_FILE = "org/camunda/bpm/dmn/engine/delegate/DrdDishDecisionExample.dmn";
+  public static final String DMN_FILE = "org/camunda/bpm/dmn/engine/delegate/DrdDishDecisionExampleWithInsufficientRules.dmn";
 
   public TestDecisionEvaluationListener listener;
 
@@ -52,25 +52,25 @@ public class DmnDecisionEvaluationListenerTest extends DmnEngineTest {
 
   @Test
   @DecisionResource(resource = DMN_FILE)
-  public void testListenerIsCalled() {
+  public void shouldCallListener() {
     evaluateDecisionTable(20, "Weekend");
     assertThat(listener.getEvaluationEvent()).isNotNull();
   }
 
   @Test
   @DecisionResource(resource = DMN_FILE)
-  public void testExecutedDecisionElements() {
+  public void shouldGetExecutedDecisionElements() {
     evaluateDecisionTable(35, "Weekend");
 
     DmnDecisionEvaluationEvent evaluationEvent = listener.getEvaluationEvent();
     assertThat(evaluationEvent).isNotNull();
-    assertThat(evaluationEvent.getEvaluatedDecisions()).isEqualTo(24L);
+    assertThat(evaluationEvent.getExecutedDecisionElements()).isEqualTo(24L);
 
-    DmnDecisionTableEvaluationEvent dmnDecisionTableEvaluationEvent = getDmnDecisionTable(evaluationEvent.getRequiredDecisions(),"Season");
+    DmnDecisionTableEvaluationEvent dmnDecisionTableEvaluationEvent = getDmnDecisionTable(evaluationEvent.getRequiredDecisionResults(),"Season");
     assertThat(dmnDecisionTableEvaluationEvent).isNotNull();
     assertThat(dmnDecisionTableEvaluationEvent.getExecutedDecisionElements()).isEqualTo(6L);
     
-    dmnDecisionTableEvaluationEvent = getDmnDecisionTable(evaluationEvent.getRequiredDecisions(),"GuestCount");
+    dmnDecisionTableEvaluationEvent = getDmnDecisionTable(evaluationEvent.getRequiredDecisionResults(),"GuestCount");
     assertThat(dmnDecisionTableEvaluationEvent).isNotNull();
     assertThat(dmnDecisionTableEvaluationEvent.getExecutedDecisionElements()).isEqualTo(6L);
     
@@ -78,7 +78,7 @@ public class DmnDecisionEvaluationListenerTest extends DmnEngineTest {
 
   @Test
   @DecisionResource(resource = DMN_FILE)
-  public void testRootDecisionResult() {
+  public void shouldVerifyRootDecisionResult() {
     evaluateDecisionTable(35, "Weekend");
     
     assertThat(listener.getEvaluationEvent()).isNotNull();
@@ -104,7 +104,7 @@ public class DmnDecisionEvaluationListenerTest extends DmnEngineTest {
 
   @Test
   @DecisionResource(resource = DMN_FILE)
-  public void testRootDecisionResultWithNoMatchingOutput() {
+  public void shouldVerifyRootDecisionResultWithNoMatchingOutput() {
     evaluateDecisionTable(20, "Weekend");
     
     assertThat(listener.getEvaluationEvent()).isNotNull();
@@ -118,11 +118,11 @@ public class DmnDecisionEvaluationListenerTest extends DmnEngineTest {
 
   @Test
   @DecisionResource(resource = DMN_FILE)
-  public void testRequiredDecisions() {
+  public void shouldVerifyRequiredDecisionResults() {
     evaluateDecisionTable(35, "Weekend");
     
     assertThat(listener.getEvaluationEvent()).isNotNull();
-    Collection<DmnDecisionTableEvaluationEvent> requiredDecisions = listener.getEvaluationEvent().getRequiredDecisions();
+    Collection<DmnDecisionTableEvaluationEvent> requiredDecisions = listener.getEvaluationEvent().getRequiredDecisionResults();
     assertThat(requiredDecisions.size()).isEqualTo(2);
     
     DmnDecisionTableEvaluationEvent dmnDecisionTableEvaluationEvent = getDmnDecisionTable(requiredDecisions,"Season");

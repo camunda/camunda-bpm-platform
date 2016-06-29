@@ -28,10 +28,10 @@ public interface DmnDecisionEvaluationEvent {
   /**
    * @return the list of required decisions
    */
-  Collection<DmnDecisionTableEvaluationEvent> getRequiredDecisions();
+  Collection<DmnDecisionTableEvaluationEvent> getRequiredDecisionResults();
 
   /**
-   * @return the number of evaluated decisions
+   * @return the number of executed decision elements during the evaluation
    */
-  long getEvaluatedDecisions();
+  long getExecutedDecisionElements();
 }
