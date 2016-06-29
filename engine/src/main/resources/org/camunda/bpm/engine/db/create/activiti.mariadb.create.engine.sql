@@ -421,8 +421,8 @@ alter table ACT_RU_VARIABLE
     unique (VAR_SCOPE_, NAME_);
 
 alter table ACT_RU_EXT_TASK
-    add constraint ACT_FK_EXT_TASK_EXE 
-    foreign key (EXECUTION_ID_) 
+    add constraint ACT_FK_EXT_TASK_EXE
+    foreign key (EXECUTION_ID_)
     references ACT_RU_EXECUTION (ID_);
 
 create index ACT_IDX_BATCH_SEED_JOB_DEF ON ACT_RU_BATCH(SEED_JOB_DEF_ID_);

@@ -1,7 +1,7 @@
 -- add new column to historic activity instance table --
 alter table ACT_HI_ACTINST
     add ACT_INST_STATE_ tinyint;
-    
+
 -- add follow-up date to tasks --
 alter table ACT_RU_TASK
     add FOLLOW_UP_DATE_ datetime2;
@@ -21,7 +21,7 @@ create table ACT_RU_JOBDEF (
     primary key (ID_)
 );
 
--- add new columns to job table -- 
+-- add new columns to job table --
 alter table ACT_RU_JOB
     add PROCESS_DEF_ID_ nvarchar(64);
 
@@ -147,7 +147,7 @@ WHERE
 
 UPDATE
   ACT_RU_VARIABLE
-  
+
 SET
   VAR_SCOPE_ = TASK_ID_
 

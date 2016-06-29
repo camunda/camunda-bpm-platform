@@ -21,7 +21,7 @@ create table ACT_RU_JOBDEF (
     primary key (ID_)
 );
 
--- add new columns to job table -- 
+-- add new columns to job table --
 alter table ACT_RU_JOB
     add PROCESS_DEF_ID_ NVARCHAR2(64);
 
@@ -122,7 +122,7 @@ drop index ACT_UNIQ_AUTH_GROUP;
 
 -- delete index on column USER_ID_ to modify the type --
 drop index ACT_UNIQ_AUTH_USER;
-    
+
 alter table ACT_RU_AUTHORIZATION
     modify (GROUP_ID_ NVARCHAR2(255));
 

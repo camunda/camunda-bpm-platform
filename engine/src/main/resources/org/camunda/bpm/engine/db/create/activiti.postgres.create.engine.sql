@@ -304,68 +304,68 @@ create index ACT_IDX_JOB_JOB_DEF_ID on ACT_RU_JOB(JOB_DEF_ID_);
 create index ACT_IDX_BYTEAR_DEPL on ACT_GE_BYTEARRAY(DEPLOYMENT_ID_);
 alter table ACT_GE_BYTEARRAY
     add constraint ACT_FK_BYTEARR_DEPL
-    foreign key (DEPLOYMENT_ID_) 
+    foreign key (DEPLOYMENT_ID_)
     references ACT_RE_DEPLOYMENT (ID_);
-    
+
 create index ACT_IDX_EXE_PROCINST on ACT_RU_EXECUTION(PROC_INST_ID_);
 alter table ACT_RU_EXECUTION
-    add constraint ACT_FK_EXE_PROCINST 
-    foreign key (PROC_INST_ID_) 
+    add constraint ACT_FK_EXE_PROCINST
+    foreign key (PROC_INST_ID_)
     references ACT_RU_EXECUTION (ID_);
 
 create index ACT_IDX_EXE_PARENT on ACT_RU_EXECUTION(PARENT_ID_);
 alter table ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_PARENT
-    foreign key (PARENT_ID_) 
+    foreign key (PARENT_ID_)
     references ACT_RU_EXECUTION (ID_);
-    
+
 create index ACT_IDX_EXE_SUPER on ACT_RU_EXECUTION(SUPER_EXEC_);
 alter table ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_SUPER
-    foreign key (SUPER_EXEC_) 
+    foreign key (SUPER_EXEC_)
     references ACT_RU_EXECUTION (ID_);
 
-create index ACT_IDX_EXE_PROCDEF on ACT_RU_EXECUTION(PROC_DEF_ID_); 
+create index ACT_IDX_EXE_PROCDEF on ACT_RU_EXECUTION(PROC_DEF_ID_);
 alter table ACT_RU_EXECUTION
-    add constraint ACT_FK_EXE_PROCDEF 
-    foreign key (PROC_DEF_ID_) 
-    references ACT_RE_PROCDEF (ID_);    
-    
+    add constraint ACT_FK_EXE_PROCDEF
+    foreign key (PROC_DEF_ID_)
+    references ACT_RE_PROCDEF (ID_);
+
 
 create index ACT_IDX_TSKASS_TASK on ACT_RU_IDENTITYLINK(TASK_ID_);
 alter table ACT_RU_IDENTITYLINK
     add constraint ACT_FK_TSKASS_TASK
-    foreign key (TASK_ID_) 
+    foreign key (TASK_ID_)
     references ACT_RU_TASK (ID_);
-    
+
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 alter table ACT_RU_IDENTITYLINK
     add constraint ACT_FK_ATHRZ_PROCEDEF
-    foreign key (PROC_DEF_ID_) 
+    foreign key (PROC_DEF_ID_)
     references ACT_RE_PROCDEF (ID_);
-    
+
 create index ACT_IDX_TASK_EXEC on ACT_RU_TASK(EXECUTION_ID_);
 alter table ACT_RU_TASK
     add constraint ACT_FK_TASK_EXE
     foreign key (EXECUTION_ID_)
     references ACT_RU_EXECUTION (ID_);
-    
+
 create index ACT_IDX_TASK_PROCINST on ACT_RU_TASK(PROC_INST_ID_);
 alter table ACT_RU_TASK
     add constraint ACT_FK_TASK_PROCINST
     foreign key (PROC_INST_ID_)
     references ACT_RU_EXECUTION (ID_);
-    
+
 create index ACT_IDX_TASK_PROCDEF on ACT_RU_TASK(PROC_DEF_ID_);
 alter table ACT_RU_TASK
   add constraint ACT_FK_TASK_PROCDEF
   foreign key (PROC_DEF_ID_)
   references ACT_RE_PROCDEF (ID_);
-  
+
 create index ACT_IDX_VAR_EXE on ACT_RU_VARIABLE(EXECUTION_ID_);
-alter table ACT_RU_VARIABLE 
+alter table ACT_RU_VARIABLE
     add constraint ACT_FK_VAR_EXE
-    foreign key (EXECUTION_ID_) 
+    foreign key (EXECUTION_ID_)
     references ACT_RU_EXECUTION (ID_);
 
 create index ACT_IDX_VAR_PROCINST on ACT_RU_VARIABLE(PROC_INST_ID_);
@@ -375,15 +375,15 @@ alter table ACT_RU_VARIABLE
     references ACT_RU_EXECUTION(ID_);
 
 create index ACT_IDX_VAR_BYTEARRAY on ACT_RU_VARIABLE(BYTEARRAY_ID_);
-alter table ACT_RU_VARIABLE 
-    add constraint ACT_FK_VAR_BYTEARRAY 
-    foreign key (BYTEARRAY_ID_) 
+alter table ACT_RU_VARIABLE
+    add constraint ACT_FK_VAR_BYTEARRAY
+    foreign key (BYTEARRAY_ID_)
     references ACT_GE_BYTEARRAY (ID_);
 
 create index ACT_IDX_JOB_EXCEPTION on ACT_RU_JOB(EXCEPTION_STACK_ID_);
-alter table ACT_RU_JOB 
+alter table ACT_RU_JOB
     add constraint ACT_FK_JOB_EXCEPTION
-    foreign key (EXCEPTION_STACK_ID_) 
+    foreign key (EXCEPTION_STACK_ID_)
     references ACT_GE_BYTEARRAY (ID_);
 
 create index ACT_IDX_EVENT_SUBSCR on ACT_RU_EVENT_SUBSCR(EXECUTION_ID_);
@@ -391,30 +391,30 @@ alter table ACT_RU_EVENT_SUBSCR
     add constraint ACT_FK_EVENT_EXEC
     foreign key (EXECUTION_ID_)
     references ACT_RU_EXECUTION(ID_);
-    
+
 alter table ACT_RU_INCIDENT
-    add constraint ACT_FK_INC_EXE 
-    foreign key (EXECUTION_ID_) 
-    references ACT_RU_EXECUTION (ID_);
-  
-alter table ACT_RU_INCIDENT
-    add constraint ACT_FK_INC_PROCINST 
-    foreign key (PROC_INST_ID_) 
+    add constraint ACT_FK_INC_EXE
+    foreign key (EXECUTION_ID_)
     references ACT_RU_EXECUTION (ID_);
 
 alter table ACT_RU_INCIDENT
-    add constraint ACT_FK_INC_PROCDEF 
-    foreign key (PROC_DEF_ID_) 
-    references ACT_RE_PROCDEF (ID_);  
-    
+    add constraint ACT_FK_INC_PROCINST
+    foreign key (PROC_INST_ID_)
+    references ACT_RU_EXECUTION (ID_);
+
 alter table ACT_RU_INCIDENT
-    add constraint ACT_FK_INC_CAUSE 
-    foreign key (CAUSE_INCIDENT_ID_) 
+    add constraint ACT_FK_INC_PROCDEF
+    foreign key (PROC_DEF_ID_)
+    references ACT_RE_PROCDEF (ID_);
+
+alter table ACT_RU_INCIDENT
+    add constraint ACT_FK_INC_CAUSE
+    foreign key (CAUSE_INCIDENT_ID_)
     references ACT_RU_INCIDENT (ID_);
 
 alter table ACT_RU_INCIDENT
-    add constraint ACT_FK_INC_RCAUSE 
-    foreign key (ROOT_CAUSE_INCIDENT_ID_) 
+    add constraint ACT_FK_INC_RCAUSE
+    foreign key (ROOT_CAUSE_INCIDENT_ID_)
     references ACT_RU_INCIDENT (ID_);
 
 create index ACT_IDX_INC_JOB_DEF on ACT_RU_INCIDENT(JOB_DEF_ID_);
@@ -426,7 +426,7 @@ alter table ACT_RU_INCIDENT
 alter table ACT_RU_AUTHORIZATION
     add constraint ACT_UNIQ_AUTH_USER
     unique (TYPE_,USER_ID_,RESOURCE_TYPE_,RESOURCE_ID_);
-    
+
 alter table ACT_RU_AUTHORIZATION
     add constraint ACT_UNIQ_AUTH_GROUP
     unique (TYPE_,GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_);
@@ -436,8 +436,8 @@ alter table ACT_RU_VARIABLE
     unique (VAR_SCOPE_, NAME_);
 
 alter table ACT_RU_EXT_TASK
-    add constraint ACT_FK_EXT_TASK_EXE 
-    foreign key (EXECUTION_ID_) 
+    add constraint ACT_FK_EXT_TASK_EXE
+    foreign key (EXECUTION_ID_)
     references ACT_RU_EXECUTION (ID_);
 
 create index ACT_IDX_BATCH_SEED_JOB_DEF ON ACT_RU_BATCH(SEED_JOB_DEF_ID_);

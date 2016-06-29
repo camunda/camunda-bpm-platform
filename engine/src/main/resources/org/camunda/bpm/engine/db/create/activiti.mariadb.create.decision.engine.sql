@@ -30,11 +30,10 @@ create table ACT_RE_DECISION_REQ_DEF (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 alter table ACT_RE_DECISION_DEF
-    add constraint ACT_FK_DEC_REQ 
-    foreign key (DEC_REQ_ID_) 
+    add constraint ACT_FK_DEC_REQ
+    foreign key (DEC_REQ_ID_)
     references ACT_RE_DECISION_REQ_DEF(ID_);
 
-create index ACT_IDX_DEC_DEF_TENANT_ID on ACT_RE_DECISION_DEF(TENANT_ID_);   
+create index ACT_IDX_DEC_DEF_TENANT_ID on ACT_RE_DECISION_DEF(TENANT_ID_);
 create index ACT_IDX_DEC_DEF_REQ_ID on ACT_RE_DECISION_DEF(DEC_REQ_ID_);
 create index ACT_IDX_DEC_REQ_DEF_TENANT_ID on ACT_RE_DECISION_REQ_DEF(TENANT_ID_);
-    

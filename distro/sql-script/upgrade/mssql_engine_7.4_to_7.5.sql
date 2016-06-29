@@ -20,7 +20,7 @@ VALUES
   ('camunda-admin-grant-tenant', 1, 'camunda-admin', 11, '*', 2147483647, 1),
   ('camunda-admin-grant-tenant-membership', 1, 'camunda-admin', 12, '*', 2147483647, 1),
   ('camunda-admin-grant-batch', 1, 'camunda-admin', 13, '*', 2147483647, 1);
-  
+
 -- tenant id --
 
 ALTER TABLE ACT_RE_DEPLOYMENT
@@ -68,7 +68,7 @@ create index ACT_IDX_JOBDEF_TENANT_ID on ACT_RU_JOBDEF(TENANT_ID_);
 
 ALTER TABLE ACT_RU_INCIDENT
   ADD TENANT_ID_ nvarchar(64);
-  
+
 ALTER TABLE ACT_RU_IDENTITYLINK
   ADD TENANT_ID_ nvarchar(64);
 
@@ -198,22 +198,22 @@ create table ACT_ID_TENANT_MEMBER (
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB
     foreign key (TENANT_ID_)
-    references ACT_ID_TENANT (ID_);  
-    
+    references ACT_ID_TENANT (ID_);
+
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB_USER
     foreign key (USER_ID_)
-    references ACT_ID_USER (ID_);    
-    
+    references ACT_ID_USER (ID_);
+
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB_GROUP
     foreign key (GROUP_ID_)
-    references ACT_ID_GROUP (ID_);    
-    
-create unique index ACT_UNIQ_TENANT_MEMB_USER on ACT_ID_TENANT_MEMBER (TENANT_ID_, USER_ID_) where USER_ID_ is not null;
-create unique index ACT_UNIQ_TENANT_MEMB_GROUP on ACT_ID_TENANT_MEMBER (TENANT_ID_, GROUP_ID_) where GROUP_ID_ is not null;  
+    references ACT_ID_GROUP (ID_);
 
---- BATCH ---
+create unique index ACT_UNIQ_TENANT_MEMB_USER on ACT_ID_TENANT_MEMBER (TENANT_ID_, USER_ID_) where USER_ID_ is not null;
+create unique index ACT_UNIQ_TENANT_MEMB_GROUP on ACT_ID_TENANT_MEMBER (TENANT_ID_, GROUP_ID_) where GROUP_ID_ is not null;
+
+--  BATCH --
 
 -- remove not null from job definition table --
 alter table ACT_RU_JOBDEF

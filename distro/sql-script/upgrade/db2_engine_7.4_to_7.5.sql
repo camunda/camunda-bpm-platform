@@ -14,7 +14,7 @@ VALUES
   ('camunda-admin-grant-tenant', 1, 'camunda-admin', 11, '*', 2147483647, 1),
   ('camunda-admin-grant-tenant-membership', 1, 'camunda-admin', 12, '*', 2147483647, 1),
   ('camunda-admin-grant-batch', 1, 'camunda-admin', 13, '*', 2147483647, 1);
-  
+
 -- tenant id --
 
 ALTER TABLE ACT_RE_DEPLOYMENT
@@ -194,22 +194,22 @@ create table ACT_ID_TENANT_MEMBER (
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB
     foreign key (TENANT_ID_)
-    references ACT_ID_TENANT (ID_);    
-    
+    references ACT_ID_TENANT (ID_);
+
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB_USER
     foreign key (USER_ID_)
-    references ACT_ID_USER (ID_);    
-    
+    references ACT_ID_USER (ID_);
+
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB_GROUP
     foreign key (GROUP_ID_)
-    references ACT_ID_GROUP (ID_);  
-    
+    references ACT_ID_GROUP (ID_);
+
 create unique index ACT_UNIQ_TENANT_MEMB_USER on ACT_ID_TENANT_MEMBER(TENANT_ID_,UNI_USER_ID_);
 create unique index ACT_UNIQ_TENANT_MEMB_GROUP on ACT_ID_TENANT_MEMBER(TENANT_ID_,UNI_GROUP_ID_);
 
---- BATCH ---
+--  BATCH --
 
 -- remove not null from job definition table --
 alter table ACT_RU_JOBDEF

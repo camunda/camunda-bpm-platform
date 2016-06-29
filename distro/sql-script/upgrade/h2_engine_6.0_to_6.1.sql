@@ -67,11 +67,11 @@ set VALUE_ = VALUE_ + 1,
 where NAME_ = 'historyLevel' and VALUE_ >= 2;
 
 alter table ACT_RU_EXECUTION
-    add constraint ACT_FK_EXE_PROCDEF 
-    foreign key (PROC_DEF_ID_) 
+    add constraint ACT_FK_EXE_PROCDEF
+    foreign key (PROC_DEF_ID_)
     references ACT_RE_PROCDEF (ID_);
 
 alter table ACT_RU_IDENTITYLINK
-    add constraint ACT_FK_ATHRZ_PROCEDEF 
-    foreign key (PROC_DEF_ID_) 
+    add constraint ACT_FK_ATHRZ_PROCEDEF
+    foreign key (PROC_DEF_ID_)
     references ACT_RE_PROCDEF (ID_);

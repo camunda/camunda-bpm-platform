@@ -200,19 +200,19 @@ alter table ACT_ID_TENANT_MEMBER
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB
     foreign key (TENANT_ID_)
-    references ACT_ID_TENANT;  
-    
+    references ACT_ID_TENANT;
+
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB_USER
     foreign key (USER_ID_)
-    references ACT_ID_USER;    
-    
+    references ACT_ID_USER;
+
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB_GROUP
     foreign key (GROUP_ID_)
     references ACT_ID_GROUP;
 
---- BATCH ---
+--  BATCH --
 
 -- remove not null from job definition table --
 alter table ACT_RU_JOBDEF
@@ -292,15 +292,15 @@ alter table ACT_RU_BATCH
     add constraint ACT_FK_BATCH_JOB_DEF
     foreign key (BATCH_JOB_DEF_ID_)
     references ACT_RU_JOBDEF (ID_);
-	
+
 -- TASK PRIORITY --
 
 ALTER TABLE ACT_RU_EXT_TASK
-  ADD PRIORITY_ bigint NOT NULL DEFAULT 0;  
+  ADD PRIORITY_ bigint NOT NULL DEFAULT 0;
 
 create index ACT_IDX_EXT_TASK_PRIORITY ON ACT_RU_EXT_TASK(PRIORITY_);
 
-	
+
 -- HI OP PROC INDECIES --
 
 create index ACT_IDX_HI_OP_LOG_PROCINST on ACT_HI_OP_LOG(PROC_INST_ID_);
