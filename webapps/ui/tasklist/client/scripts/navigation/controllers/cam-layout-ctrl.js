@@ -71,6 +71,7 @@ module.exports = [
       close('filters');
       close('list');
       open('task');
+      document.querySelector('.reset-regions').focus();
     };
 
     $scope.resetRegions = function($event) {
@@ -81,5 +82,6 @@ module.exports = [
       open('filters');
       open('list');
       open('task');
+      document.querySelector('.maximize').focus();
     };
   }];
