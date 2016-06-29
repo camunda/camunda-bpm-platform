@@ -7,7 +7,11 @@
     <bpmn2:startEvent id="StartEvent_1">
       <bpmn2:extensionElements>
         <camunda:formData>
-          <camunda:formField id="myDate" label="My Date" type="date" />         
+          <camunda:formField id="myDate" label="My Date" type="date" />
+          <camunda:formField id="myLong" label="My long" type="long" />
+          <camunda:formField id="myString" label="My string" type="string" />
+          <camunda:formField id="myBoolean" label="My boolean" type="boolean" />
+          <camunda:formField id="myEnum" label="My enum" type="enum" />
         </camunda:formData>
       </bpmn2:extensionElements>
       <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
@@ -15,15 +19,31 @@
     <bpmn2:userTask id="UserTask_1" name="User Task">
       <bpmn2:extensionElements>
         <camunda:formData>
-          <camunda:formField id="myDate" label="My Date" type="date" />         
+          <camunda:formField id="myDate" label="My Date" type="date" />
+          <camunda:formField id="myLong" label="My long" type="long" />
+          <camunda:formField id="myString" label="My string" type="string" />
+          <camunda:formField id="myBoolean" label="My boolean" type="boolean" />
+          <camunda:formField id="myEnum" label="My enum" type="enum" />
         </camunda:formData>
         <camunda:inputOutput>
           <camunda:inputParameter name="myDate">${execution.getVariable('myDate')}</camunda:inputParameter>
           <camunda:outputParameter name="myDate">${execution.getVariable('myDate')}</camunda:outputParameter>
+
+          <camunda:inputParameter name="myLong">${execution.getVariable('myLong')}</camunda:inputParameter>
+          <camunda:outputParameter name="myLong">${execution.getVariable('myLong')}</camunda:outputParameter>
+
+          <camunda:inputParameter name="myString">${execution.getVariable('myString')}</camunda:inputParameter>
+          <camunda:outputParameter name="myString">${execution.getVariable('myString')}</camunda:outputParameter>
+
+          <camunda:inputParameter name="myBoolean">${execution.getVariable('myBoolean')}</camunda:inputParameter>
+          <camunda:outputParameter name="myBoolean">${execution.getVariable('myBoolean')}</camunda:outputParameter>
+
+          <camunda:inputParameter name="myEnum">${execution.getVariable('myEnum')}</camunda:inputParameter>
+          <camunda:outputParameter name="myEnum">${execution.getVariable('myEnum')}</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn2:extensionElements>
       <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
-      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>      
+      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
     </bpmn2:userTask>
     <bpmn2:sequenceFlow id="SequenceFlow_1" name="" sourceRef="StartEvent_1" targetRef="UserTask_1" />
     <bpmn2:endEvent id="EndEvent_1">
