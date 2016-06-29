@@ -138,6 +138,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String ownerExpression;
   private Integer priority;
   private String parentTaskId;
+  protected Boolean assigned;
   private Boolean unassigned;
   private Boolean active;
   private Boolean suspended;
@@ -377,6 +378,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.parentTaskId = parentTaskId;
   }
 
+  @CamundaQueryParam(value = "assigned", converter = BooleanConverter.class)
+  public void setAssigned(Boolean assigned) {
+    this.assigned = assigned;
+  }
+  
   @CamundaQueryParam(value = "unassigned", converter = BooleanConverter.class)
   public void setUnassigned(Boolean unassigned) {
     this.unassigned = unassigned;

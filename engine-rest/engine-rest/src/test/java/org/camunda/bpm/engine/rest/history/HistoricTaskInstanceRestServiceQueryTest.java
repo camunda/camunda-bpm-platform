@@ -1141,6 +1141,54 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
   }
 
   @Test
+  public void testQueryByAssigned() {
+    given()
+      .queryParam("assigned", true)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).assigned();
+  }
+
+  @Test
+  public void testQueryByAssignedAsPost() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("assigned", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).assigned();
+  }
+
+  @Test
+  public void testQueryByUnassigned() {
+    given()
+      .queryParam("unassigned", true)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).unassigned();
+  }
+
+  @Test
+  public void testQueryByUnassignedAsPost() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("unassigned", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).unassigned();
+  }
+
+  @Test
   public void testQueryByFinished() {
     given()
       .queryParam("finished", true)
