@@ -1020,6 +1020,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (parentTaskId != null) {
       query.taskParentTaskId(parentTaskId);
     }
+    if (assigned != null && assigned) {
+      query.taskAssigned();
+    }
     if (unassigned != null && unassigned) {
       query.taskUnassigned();
     }
@@ -1311,6 +1314,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.candidateGroup = taskQuery.getCandidateGroup();
     dto.candidateGroups = taskQuery.getCandidateGroupsInternal();
     dto.includeAssignedTasks = taskQuery.isIncludeAssignedTasksInternal();
+    dto.withCandidateGroups = taskQuery.isWithCandidateGroups();
+    dto.withoutCandidateGroups = taskQuery.isWithoutCandidateGroups();
 
     dto.processInstanceBusinessKey = taskQuery.getProcessInstanceBusinessKey();
     dto.processInstanceBusinessKeyLike = taskQuery.getProcessInstanceBusinessKeyLike();
@@ -1336,6 +1341,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.nameLike = taskQuery.getNameLike();
     dto.owner = taskQuery.getOwner();
     dto.priority = taskQuery.getPriority();
+    dto.assigned = taskQuery.isAssignedInternal();
     dto.unassigned = taskQuery.isUnassignedInternal();
     dto.parentTaskId = taskQuery.getParentTaskId();
 

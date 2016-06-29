@@ -1147,7 +1147,7 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).assigned();
+    verify(mockedQuery).taskAssigned();
   }
 
   @Test
@@ -1161,7 +1161,7 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).assigned();
+    verify(mockedQuery).taskAssigned();
   }
 
   @Test
@@ -1219,7 +1219,7 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).unassigned();
+    verify(mockedQuery).taskUnassigned();
   }
 
   @Test
@@ -1233,7 +1233,7 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).unassigned();
+    verify(mockedQuery).taskUnassigned();
   }
 
   @Test

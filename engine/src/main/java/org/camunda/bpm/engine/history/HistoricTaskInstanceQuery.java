@@ -120,18 +120,18 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery taskDeleteReasonLike(String taskDeleteReasonLike);
 
   /** Only select historic task instances with an assignee. */
-  HistoricTaskInstanceQuery assigned();
+  HistoricTaskInstanceQuery taskAssigned();
 
   /** Only select historic task instances without an assignee. */
-  HistoricTaskInstanceQuery unassigned();
+  HistoricTaskInstanceQuery taskUnassigned();
 
   /**
-   * Only select historic task instances which were last assigned to the given assignee.
+   * Only select historic task instances which were last taskAssigned to the given assignee.
    */
   HistoricTaskInstanceQuery taskAssignee(String taskAssignee);
 
   /**
-   * Only select historic task instances which were last assigned to an assignee like
+   * Only select historic task instances which were last taskAssigned to an assignee like
    * the given value.
    * The syntax that should be used is the same as in SQL, eg. %activiti%.
    */

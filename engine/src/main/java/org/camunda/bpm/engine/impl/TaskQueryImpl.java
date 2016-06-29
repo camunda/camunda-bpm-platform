@@ -858,6 +858,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return null;
   }
 
+  public Boolean isWithCandidateGroups() {
+    return withCandidateGroups;
+  }
+
+  public Boolean isWithoutCandidateGroups() {
+    return withoutCandidateGroups;
+  }
+
   public List<String> getCandidateGroupsInternal() {
     return candidateGroups;
   }
@@ -1092,6 +1100,18 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return owner;
   }
 
+  public Boolean isAssigned() {
+    if (assigned == null) {
+      return false;
+    } else {
+      return assigned;
+    }
+  }
+
+  public Boolean isAssignedInternal() {
+    return assigned;
+  }
+
   public boolean isUnassigned() {
     if (unassigned == null) {
       return false;
@@ -1318,7 +1338,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     TaskQueryImpl extendingQuery = (TaskQueryImpl) extending;
     TaskQueryImpl extendedQuery = new TaskQueryImpl();
 
-    // only add add the base query's validators to the new query;
+    // only add the base query's validators to the new query;
     // this is because the extending query's validators may not be applicable to the base
     // query and should therefore be executed before extending the query
     extendedQuery.validators = new HashSet<Validator<AbstractQuery<?, ?>>>(validators);
@@ -1365,6 +1385,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       extendedQuery.taskOwner(this.getOwner());
     }
 
+    if (extendingQuery.isAssigned() || this.isAssigned()) {
+      extendedQuery.taskAssigned();
+    }
+
     if (extendingQuery.isUnassigned() || this.isUnassigned()) {
       extendedQuery.taskUnassigned();
     }
@@ -1388,6 +1412,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
     else if (this.getCandidateGroup() != null) {
       extendedQuery.taskCandidateGroup(this.getCandidateGroup());
+    }
+
+    if (extendingQuery.isWithCandidateGroups() || this.isWithCandidateGroups()) {
+      extendedQuery.withCandidateGroups();
+    }
+
+    if (extendingQuery.isWithoutCandidateGroups() || this.isWithoutCandidateGroups()) {
+      extendedQuery.withoutCandidateGroups();
     }
 
     if (extendingQuery.getCandidateGroupsInternal() != null) {
@@ -1709,7 +1741,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     // merge expressions
     mergeExpressions(extendedQuery, extendingQuery);
 
-    // include assigned tasks has to be set after expression as it asserts on already set
+    // include taskAssigned tasks has to be set after expression as it asserts on already set
     // candidate properties which could be expressions
     if (extendingQuery.isIncludeAssignedTasks() || this.isIncludeAssignedTasks()) {
       extendedQuery.includeAssignedTasks();

@@ -177,12 +177,12 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return this;
   }
 
-  public HistoricTaskInstanceQueryImpl assigned() {
+  public HistoricTaskInstanceQueryImpl taskAssigned() {
     this.assigned = true;
     return this;
   }
 
-  public HistoricTaskInstanceQueryImpl unassigned() {
+  public HistoricTaskInstanceQueryImpl taskUnassigned() {
     this.unassigned = true;
     return this;
   }
@@ -476,6 +476,22 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
+  }
+
+  public Boolean isAssigned() {
+    return assigned;
+  }
+
+  public Boolean isUnassigned() {
+    return unassigned;
+  }
+
+  public Boolean isWithCandidateGroups() {
+    return withCandidateGroups;
+  }
+
+  public Boolean isWithoutCandidateGroups() {
+    return withoutCandidateGroups;
   }
 
   public boolean isFinished() {

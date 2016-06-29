@@ -432,10 +432,10 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
       query.taskDeleteReasonLike(taskDeleteReasonLike);
     }
     if (assigned != null) {
-      query.assigned();
+      query.taskAssigned();
     }
     if (unassigned != null) {
-      query.unassigned();
+      query.taskUnassigned();
     }
     if (taskAssignee != null) {
       query.taskAssignee(taskAssignee);

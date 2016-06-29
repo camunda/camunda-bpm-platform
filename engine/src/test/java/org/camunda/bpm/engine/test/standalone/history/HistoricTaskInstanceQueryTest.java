@@ -282,7 +282,7 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
 
     taskService.saveTask(taskThree);
 
-    List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().assigned().list();
+    List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskAssigned().list();
 
     // then
     assertEquals(list.size(), 2);
@@ -310,7 +310,7 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
 
     taskService.saveTask(taskThree);
 
-    List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().unassigned().list();
+    List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskUnassigned().list();
 
     // then
     assertEquals(list.size(), 1);
