@@ -10,7 +10,7 @@
     <informationRequirement>
       <requiredDecision href="#C" />
     </informationRequirement>
-    <decisionTable id="buyLenovoDecisionTable">
+    <decisionTable id="aDecisionTable">
       <input id="input1">
         <inputExpression><text>bb</text></inputExpression>
       </input>
@@ -39,7 +39,7 @@
     <informationRequirement>
       <requiredDecision href="#F" />
     </informationRequirement>
-    <decisionTable id="buyComputerDecisionTable">
+    <decisionTable id="bDecisionTable">
       <input id="input3">
         <inputExpression><text>dd</text></inputExpression>
       </input>
@@ -67,7 +67,7 @@
     <informationRequirement>
       <requiredDecision href="#G" />
     </informationRequirement>
-    <decisionTable id="buyElectronicDecisionTable">
+    <decisionTable id="cDecisionTable">
       <input id="input6">
         <inputExpression><text>gg</text></inputExpression>
       </input>
@@ -82,7 +82,7 @@
   </decision>
   
   <decision id="D" name="D">
-    <decisionTable id="four">
+    <decisionTable id="dDecisionTable">
       <input id="input7">
         <inputExpression><text>xx</text></inputExpression>
       </input>
@@ -97,7 +97,7 @@
   </decision>
   
   <decision id="E" name="E">
-    <decisionTable id="five">
+    <decisionTable id="eDecisionTable">
       <input id="input8">
         <inputExpression><text>yy</text></inputExpression>
       </input>
@@ -112,7 +112,7 @@
   </decision>
   
   <decision id="F" name="F">
-    <decisionTable id="six">
+    <decisionTable id="fDecisionTable">
       <input id="input9">
         <inputExpression><text>zz</text></inputExpression>
       </input>
@@ -127,7 +127,7 @@
   </decision>
 
   <decision id="G" name="G">
-    <decisionTable id="seven">
+    <decisionTable id="gDecisionTable">
       <input id="input10">
         <inputExpression><text>ll</text></inputExpression>
       </input>

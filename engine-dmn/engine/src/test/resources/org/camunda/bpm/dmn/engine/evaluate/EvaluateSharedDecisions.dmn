@@ -53,11 +53,11 @@
     </informationRequirement>
     <decisionTable id="ccDecisionTable">
       <input id="input5">
-        <inputExpression><text>ff</text></inputExpression>
+        <inputExpression><text>ee</text></inputExpression>
       </input>
       <output id="output4" name="cc" typeRef="string" />
       <rule id="rule5">
-        <inputEntry id="inputEntry9"><text>"ff"</text>
+        <inputEntry id="inputEntry9"><text>"ee"</text>
         </inputEntry>
         <outputEntry id="outputEntry7"><text>"cc"</text>
         </outputEntry>
@@ -68,16 +68,16 @@
   <decision id="D" name="C">
     <decisionTable id="ddDecisionTable">
       <input id="input10">
-        <inputExpression><text>ee</text></inputExpression>
+        <inputExpression><text>ff</text></inputExpression>
       </input>
       <output id="output10" name="dd" typeRef="string" />
-      <output id="output11" name="ff" typeRef="string" />
+      <output id="output11" name="ee" typeRef="string" />
       <rule id="rule10">
-        <inputEntry id="inputEntry10"><text>"ee"</text>
+        <inputEntry id="inputEntry10"><text>"ff"</text>
         </inputEntry>
         <outputEntry id="outputEntry11"><text>"dd"</text>
         </outputEntry>
-        <outputEntry id="outputEntry12"><text>"ff"</text>
+        <outputEntry id="outputEntry12"><text>"ee"</text>
         </outputEntry>
       </rule>
     </decisionTable>

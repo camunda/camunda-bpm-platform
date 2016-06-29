@@ -133,7 +133,7 @@ public class DefaultDmnDecisionContext {
    * @param variableContext the available variable context
    * @return the result of the decision evaluation
    */
-  public DmnDecisionTableEvaluationEventImpl evaluateDecisionTable(DmnDecision decision, VariableContext variableContext) {
+  protected DmnDecisionTableEvaluationEventImpl evaluateDecisionTable(DmnDecision decision, VariableContext variableContext) {
     DmnDecisionTableEvaluationEventImpl evaluationResult = new DmnDecisionTableEvaluationEventImpl();
     evaluationResult.setDecisionTable(decision);
     DmnDecisionTableImpl decisionTable = ((DmnDecisionImpl)decision).getRelatedDecisionTable();
