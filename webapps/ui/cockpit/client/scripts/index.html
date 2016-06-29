@@ -59,9 +59,9 @@
          authentication="authentication"
          user-name="userFullName"
          current-app="cockpit"
+         ng-cloak
          brand-name="Camunda Cockpit">
-      <ul ng-cloak
-          cam-if-logged-in
+      <ul cam-if-logged-in
           ng-controller="camHeaderViewsCtrl">
         <li ng-repeat="actionProvider in navbarActions"
             ng-if="actionProvider.pagePath && actionProvider.accessible"
@@ -75,6 +75,7 @@
     <div class="ctn-main">
       <div class="ctn-wrapper">
         <div ng-if="showBreadcrumbs"
+             ng-cloak
              cam-breadcrumbs-panel
              divider="&raquo;"
              class="breadcrumbs-panel"></div>

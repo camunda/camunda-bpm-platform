@@ -52,9 +52,9 @@
        toggle-navigation="{{ 'TOGGLE_NAVIGATION' | translate }}"
        sign-out="{{ 'SIGN_OUT_ACTION' | translate }}"
        my-profile="{{ 'MY_PROFILE' | translate }}"
-       brand-name="{{ appVendor }} {{ appName }}">
+       brand-name="{{ appVendor }} {{ appName }}"
+       ng-cloak>
    <ul cam-if-logged-in
-       ng-cloak
        ng-controller="camHeaderViewsCtrl">
       <li ng-repeat="actionProvider in navbarActions"
           ng-class="actionProvider.id">
