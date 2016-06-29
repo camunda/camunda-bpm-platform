@@ -117,6 +117,18 @@ module.exports = [
             });
           }
 
+          function focusAssignee() {
+            var el = document.querySelector('[cam-tasklist-task-meta] [cam-widget-inline-field][value="assignee.id"]');
+            if(el) {
+              el.focus();
+            } else {
+              el = document.querySelector('[cam-tasklist-task-meta] .claim');
+              if(el) {
+                el.focus();
+              }
+            }
+          }
+
           function notifyOnStartEditing(property) {
             return function() {
               setEditingState(property, true);
@@ -125,8 +137,16 @@ module.exports = [
 
           function notifyOnCancelEditing(property) {
             return function() {
+              var el;
               setEditingState(property, false);
-              document.querySelector('[cam-widget-inline-field].'+(property.toLowerCase())+'-date').focus();
+              if(property === 'assignee') {
+                el = document.querySelector('[cam-tasklist-task-meta] [cam-widget-inline-field][value="assignee.id"]');
+              } else {
+                el = document.querySelector('[cam-widget-inline-field].'+(property.toLowerCase())+'-date');
+              }
+              if(el) {
+                el.focus();
+              }
             };
           }
 
@@ -230,36 +250,32 @@ module.exports = [
 
           var claim = $scope.claim = function() {
             var assignee = $scope.$root.authentication.name;
-            Task.claim($scope.task.id, assignee, notify('claimed'));
-            var el = document.querySelector('[cam-tasklist-task] .tabbed-content ul li:first-child a');
-            if(el) {
-              el.focus();
-            }
+            Task.claim($scope.task.id, assignee, function(err) {
+              doAfterAssigneeLoaded.push(focusAssignee);
+              notify('claimed')(err);
+            });
           };
           $scope.$on('shortcut:claimTask', claim);
 
           var unclaim = $scope.unclaim = function() {
-            Task.unclaim($scope.task.id, notify('unclaimed'));
-            var el = document.querySelector('[cam-tasklist-task] .tabbed-content ul li:first-child a');
-            if(el) {
-              el.focus();
-            }
+            Task.unclaim($scope.task.id, function(err) {
+              doAfterAssigneeLoaded.push(focusAssignee);
+              notify('unclaimed')(err);
+            } );
           };
 
           var setAssignee = $scope.setAssignee = function(newAssignee) {
-            Task.assignee($scope.task.id, newAssignee, notify('assigned'));
-            var el = document.querySelector('[cam-tasklist-task] .tabbed-content ul li:first-child a');
-            if(el) {
-              el.focus();
-            }
+            Task.assignee($scope.task.id, newAssignee, function(err) {
+              doAfterAssigneeLoaded.push(focusAssignee);
+              notify('assigned')(err);
+            });
           };
 
           var resetAssignee = $scope.resetAssignee = function() {
-            Task.assignee($scope.task.id, null, notify('assigneeReseted'));
-            var el = document.querySelector('[cam-tasklist-task] .tabbed-content ul li:first-child a');
-            if(el) {
-              el.focus();
-            }
+            Task.assignee($scope.task.id, null, function(err) {
+              doAfterAssigneeLoaded.push(focusAssignee);
+              notify('assigneeReseted')(err);
+            });
           };
 
           $scope.editGroups = function() {
@@ -312,6 +328,15 @@ module.exports = [
             });
             doAfterGroupsLoaded = [];
           });
+
+          var doAfterAssigneeLoaded = [];
+          $scope.$watch('assignee', function() {
+            doAfterAssigneeLoaded.forEach(function(fct) {
+              $timeout(fct);
+            });
+            doAfterAssigneeLoaded = [];
+          });
+
 
           function notify(action) {
             var messages = notifications[action];
