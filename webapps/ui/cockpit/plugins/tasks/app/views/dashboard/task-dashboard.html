@@ -12,10 +12,7 @@
             <th>Total</th>
             <th>
               <span ng-if="!openTasksState.$loaded" class="glyphicon glyphicon-refresh animate-spin"></span>
-              <span ng-if="openTasksState.$loaded && !hasSearchPlugin">{{ openTasksCount }}</span>
-              <span ng-if="openTasksState.$loaded && hasSearchPlugin">
-                <a href="#">{{ openTasksCount }}</a>
-              </span>
+              <span ng-if="openTasksState.$loaded">{{ openTasksCount }}</span>
             </th>
           </tr>
           </thead>
@@ -25,10 +22,7 @@
             <td>{{ taskStatistic.label }}</td>
             <td>
               <span ng-if="!taskStatistic.state.$loaded" class="glyphicon glyphicon-refresh animate-spin"></span>
-              <span ng-if="taskStatistic.state.$loaded && !hasSearchPlugin">{{ taskStatistic.count }}</span>
-              <span ng-if="taskStatistic.state.$loaded && hasSearchPlugin">
-                <a href="#">{{ taskStatistic.count }}</a>
-              </span>
+              <span ng-if="taskStatistic.state.$loaded">{{ taskStatistic.count }}</span>
             </td>
           </tr>
           </tbody>
