@@ -18,8 +18,6 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
         var TaskResource       = camAPI.resource('task'),
             TaskReportResource = camAPI.resource('task-report');
 
-        $scope.hasSearchPlugin = Views.getProviders({component : 'cockpit.plugin.search'}).length > 0;
-
         $scope.taskStatistics = [
           {
             // assigned to users
