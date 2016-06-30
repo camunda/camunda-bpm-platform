@@ -17,11 +17,11 @@ module.exports = Base.extend({
   },
 
   taskStatisticsList: function() {
-    return this.taskStatisticsTable().all(by.repeater('taskCount in taskCountStatistic'));
+    return this.taskStatisticsTable().all(by.repeater('taskStatistic in taskStatistics'));
   },
   
   taskGroupList: function() {
-    return this.taskGroupTable().all(by.repeater('taskCountObj in taskCountObjects'));
+    return this.taskGroupTable().all(by.repeater('taskGroup in taskGroups'));
   },
 
   taskStatisticsTableHeadCount : function() {
@@ -29,19 +29,19 @@ module.exports = Base.extend({
   },
 
   taskStatisticLabel: function(item) {
-    return this.taskStatisticsList().get(item).element(by.binding('{{ taskCount.label }}')).getText();
+    return this.taskStatisticsList().get(item).element(by.binding('{{ taskStatistic.label }}')).getText();
   },
 
   taskStatisticCount: function(item) {
-    return this.taskStatisticsList().get(item).element(by.binding('{{ taskCount.count }}')).getText();
+    return this.taskStatisticsList().get(item).element(by.binding('{{ taskStatistic.count }}')).getText();
   },
   
   taskGroupName: function(item) {
-    return this.taskGroupList().get(item).element(by.binding('{{ formatGroupName(taskCountObj.groupName) }}')).getText();
+    return this.taskGroupList().get(item).element(by.binding('{{ formatGroupName(taskGroup.groupName) }}')).getText();
   },
   
   taskGroupCount: function(item) {
-    return this.taskGroupList().get(item).element(by.binding('{{ taskCountObj.taskCount }}')).getText();
+    return this.taskGroupList().get(item).element(by.binding('{{ taskGroup.taskCount }}')).getText();
   },
 
   multipleGroupsInfo : function() {
