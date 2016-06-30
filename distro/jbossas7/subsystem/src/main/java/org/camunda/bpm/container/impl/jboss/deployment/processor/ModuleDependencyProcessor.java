@@ -64,12 +64,12 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
       // search in subdeployments for processing applications
       AttachmentList<DeploymentUnit> subDeployments = deploymentUnit.getAttachment(Attachments.SUB_DEPLOYMENTS);
       if (subDeployments != null) {
-    		for (DeploymentUnit subDeploymentUnit : subDeployments) {
-    		  if (ProcessApplicationAttachments.isProcessApplication(subDeploymentUnit)) {
-          	addCamundaSystemDependencies = true;
-      			break;
+        for (DeploymentUnit subDeploymentUnit : subDeployments) {
+          if (ProcessApplicationAttachments.isProcessApplication(subDeploymentUnit)) {
+            addCamundaSystemDependencies = true;
+            break;
           }
-    		}
+        }
       }
     }
 
@@ -86,7 +86,7 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
         }
       }
     }
-	
+  
     if (addCamundaSystemDependencies) {
       ModuleLoader moduleLoader = Module.getBootModuleLoader();
       final ModuleSpecification moduleSpecification = deploymentUnit.getAttachment(Attachments.MODULE_SPECIFICATION);
@@ -96,7 +96,7 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
     if(!isAProcessApplication) {
       return;
     }
-
+    
     // install the pa-module service
     ModuleIdentifier identifyer = deploymentUnit.getAttachment(Attachments.MODULE_IDENTIFIER);
     String moduleName = identifyer.toString();
