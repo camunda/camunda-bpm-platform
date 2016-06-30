@@ -26,7 +26,7 @@ public interface DmnDecisionEvaluationEvent {
   DmnDecisionTableEvaluationEvent getDecisionResult();
 
   /**
-   * @return the list of required decisions
+   * @return the collection of required decision results
    */
   Collection<DmnDecisionTableEvaluationEvent> getRequiredDecisionResults();
 
