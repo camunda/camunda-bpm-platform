@@ -8,8 +8,7 @@
 
   h5 {
     margin: 0 0 5px 0;
-    // padding-bottom: 8px;
-    // border-bottom: solid 1px @filters-color;
+    font-weight: 700px;
   }
 
   .footer {
@@ -47,7 +46,7 @@
     color: inherit;
     font-size: inherit;
     white-space: normal;
-    background-color: transparent;//mix(@gray-light, @gray-lighter);
+    background-color: transparent;
     border: none;
     border-radius: 0;
   }
@@ -61,34 +60,43 @@
 .filter {
   line-height: 25px;
   padding: 5px 0 8px 0;
-  // border-bottom: dotted 1px @filters-color;
   overflow: visible;
 
-  select,
-  input[type=text] {
-    margin: 0 0 5px 0;
-    width: 100%;
+  .name {
+    font-weight: 700;
   }
 
   .search-date {
     > .wrapper {
       display: table;
       overflow: hidden;
-
-      .removable-input,
-      select {
-        display: table-cell;
-        vertical-align: top;
-      }
-
-      select {
-        width: 90px;
-        border-right: none;
-      }
     }
+
+    .removable-input,
+    select {
+      display: table-cell;
+      vertical-align: top;
+    }
+
+    select {
+      min-width: 75px;
+      border-right: none;
+    }
+
     .note-error {
       display: block;
       width: 100%;
+    }
+
+    input[type=text] {
+      margin: 0 0 5px 0;
+    }
+  }
+
+  .search-date,
+  .variable-filter {
+    input[type=text] {
+      margin: 0 0 5px 0;
     }
   }
 
@@ -96,13 +104,18 @@
     display: inline-block;
     position: relative;
     width: 100%;
+
+    input {
+      padding-right: 25px;
+    }
+
+    button {
+      position: absolute;
+      top: 5px;
+      right: 0;
+    }
   }
 
-  .removable-input button {
-    position: absolute;
-    top: 0;
-    right: 0;
-  }
 
   &:last-child {
     border-style: none;
@@ -110,31 +123,27 @@
 
   .search {
     position: relative;
-  }
 
-  .search.search-text {
-    padding-right: 25px;
-    line-height: 20px;
-    margin-bottom: 5px;
-  }
+    &.search-text {
+      .form-control-static;
+      margin-bottom: 5px;
+      padding-right: 25px;
+      margin-left: @padding-base-horizontal;
 
-  .search .remove {
-    position: absolute;
-    margin-top: 8px;
-    right: 0;
-    opacity: 0.1;
-  }
+      &:hover {
+        color: @gray-base;
+      }
+    }
 
-  .search:hover .remove,
-  .search.search-date:hover .remove-date-filter {
-    opacity: 0.9;
-  }
+    &.search-date .remove-date-filter {
+      display: inline-block;
+      float: none;
+    }
 
-  .search.search-date .remove-date-filter {
-    margin-top: 6px;
-    display: inline-block;
-    float: none;
-    opacity: 0.1;
+    .remove {
+      position: absolute;
+      right: 0;
+    }
   }
 
   .alert {
@@ -144,9 +153,13 @@
     padding: 8px 14px;
   }
 
-  &.date-filter {
-    overflow: hidden;
+
+  &.business-key-filter .btn-link.remove,
+  &.variable-filter .btn-link.remove {
+    top: 7px;
   }
+
+  &.date-filter,
   &.variable-filter {
     overflow: hidden;
   }
