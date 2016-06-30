@@ -156,7 +156,12 @@ module.exports = [
 
 
             if (!scope.sortings.length) {
-              scope.addSorting('created');
+              // sort by created (descending) by default
+              scope.sortings.push({
+                order: 'desc',
+                by: 'created'
+              });
+              scope.updateSortings();
             }
 
             updateColumns();
