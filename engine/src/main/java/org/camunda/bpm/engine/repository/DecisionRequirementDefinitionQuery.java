@@ -39,7 +39,7 @@ public interface DecisionRequirementDefinitionQuery extends Query<DecisionRequir
 
   /**
    * Only select decision requirement definitions where the category matches the given parameter.
-   * The syntax that should be used is the same as in SQL, e.g., %activiti%.
+   * The syntax that should be used is the same as in SQL, e.g., %category%.
    *
    * @param categoryLike the pattern to match the decision requirement definition category
    */
@@ -54,7 +54,7 @@ public interface DecisionRequirementDefinitionQuery extends Query<DecisionRequir
 
   /**
    * Only select decision requirement definitions where the name matches the given parameter.
-   * The syntax that should be used is the same as in SQL, e.g., %activiti%.
+   * The syntax that should be used is the same as in SQL, e.g., %name%.
    *
    * @param nameLike the pattern to match the decision requirement definition name
    */
@@ -69,7 +69,7 @@ public interface DecisionRequirementDefinitionQuery extends Query<DecisionRequir
 
   /**
    * Only select decision requirement definitions where the key matches the given parameter.
-   * The syntax that should be used is the same as in SQL, e.g., %activiti%.
+   * The syntax that should be used is the same as in SQL, e.g., %key%.
    *
    * @param keyLike the pattern to match the decision requirement definition key
    */
@@ -112,7 +112,7 @@ public interface DecisionRequirementDefinitionQuery extends Query<DecisionRequir
 
   /**
    * Only select decision requirement definition with a resource name like the given.
-   * The syntax that should be used is the same as in SQL, e.g., %activiti%.
+   * The syntax that should be used is the same as in SQL, e.g., %resourceName%.
    *
    * @param resourceNameLike the pattern to match the resource name
    */

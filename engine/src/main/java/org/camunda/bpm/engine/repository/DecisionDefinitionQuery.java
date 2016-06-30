@@ -39,7 +39,7 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
 
   /**
    * Only select decision definitions where the category matches the given parameter.
-   * The syntax that should be used is the same as in SQL, eg. %activiti%
+   * The syntax that should be used is the same as in SQL, eg. %category%
    *
    * @param decisionDefinitionCategoryLike the pattern to match the decision definition category
    */
@@ -61,7 +61,7 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
 
   /**
    * Only select decision definitions where the key matches the given parameter.
-   * The syntax that should be used is the same as in SQL, eg. %activiti%
+   * The syntax that should be used is the same as in SQL, eg. %key%
    *
    * @param decisionDefinitionKeyLike the pattern to match the decision definition key
    */
@@ -69,7 +69,7 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
 
   /**
    * Only select decision definitions where the name matches the given parameter.
-   * The syntax that should be used is the same as in SQL, eg. %activiti%
+   * The syntax that should be used is the same as in SQL, eg. %name%
    *
    * @param decisionDefinitionNameLike the pattern to match the decision definition name
    */
@@ -112,7 +112,7 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
 
   /**
    * Only select decision definition with a resource name like the given.
-   * The syntax that should be used is the same as in SQL, eg. %activiti%
+   * The syntax that should be used is the same as in SQL, eg. %resourceName%
    *
    * @param resourceNameLike the pattern to match the resource name
    */

@@ -65,8 +65,7 @@ public class DmnDeployerTest {
 
   @Test
   public void dmnDeployment() {
-    String resourceName = DMN_CHECK_ORDER_RESOURCE;
-    String deploymentId = testRule.deploy(resourceName).getId();
+    String deploymentId = testRule.deploy(DMN_CHECK_ORDER_RESOURCE).getId();
 
     // there should be decision deployment
     DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
@@ -84,7 +83,7 @@ public class DmnDeployerTest {
     assertEquals("CheckOrder", decisionDefinition.getName());
     assertEquals("decision", decisionDefinition.getKey());
     assertEquals(1, decisionDefinition.getVersion());
-    assertEquals(resourceName, decisionDefinition.getResourceName());
+    assertEquals(DMN_CHECK_ORDER_RESOURCE, decisionDefinition.getResourceName());
     assertEquals(deploymentId, decisionDefinition.getDeploymentId());
     assertNull(decisionDefinition.getDiagramResourceName());
   }
