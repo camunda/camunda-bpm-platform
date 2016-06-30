@@ -85,7 +85,9 @@ button {
   }
 }
 
-
+.filters-column-close .column-left button:not(.region-toggle) {
+  display: none;
+}
 
 .three-cols-layout {
   .column-left,
@@ -270,7 +272,7 @@ body.task-column-close [cam-widget-search].multiline-pills [cam-widget-search-pi
   .filters-column-close {
     .task-filters {
       .cell.content {
-        opacity: 0;
+        display: none;
       }
     }
   }
@@ -279,7 +281,7 @@ body.task-column-close [cam-widget-search].multiline-pills [cam-widget-search-pi
   .list-column-close {
     .tasks-list {
       .cell.content {
-        opacity: 0;
+        display: none;
       }
     }
   }
@@ -287,7 +289,7 @@ body.task-column-close [cam-widget-search].multiline-pills [cam-widget-search-pi
   .task-column-close {
     .task-details {
       .cell.content {
-        opacity: 0;
+        display: none;
       }
     }
   }
