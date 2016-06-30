@@ -45,6 +45,7 @@ public class DmnDeployerTest {
   protected static final String DMN_SCORE_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/dmnScore.dmn11.xml";
 
   protected static final String DRD_SCORE_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdScore.dmn11.xml";
+  protected static final String DRD_SCORE_V2_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdScore_v2.dmn11.xml";
   protected static final String DRD_DISH_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
@@ -252,10 +253,21 @@ public class DmnDeployerTest {
     thrown.expectMessage("definitions");
 
     repositoryService.createDeployment()
-            .addClasspathResource(DMN_CHECK_ORDER_RESOURCE)
-            .addClasspathResource(DMN_CHECK_ORDER_RESOURCE_DMN_SUFFIX)
+            .addClasspathResource(DRD_SCORE_RESOURCE)
+            .addClasspathResource(DRD_SCORE_V2_RESOURCE)
             .name("duplicateIds")
             .deploy();
+  }
+
+  @Test
+  public void deployMultipleDecisionsWithSameDrdId() {
+    // when deploying two decision with the same drd id `definitions`
+    testRule.deploy(DMN_SCORE_RESOURCE, DMN_CHECK_ORDER_RESOURCE);
+
+    // then create two decision definitions and
+    // ignore the duplicated drd id since no drd is created
+    assertEquals(2, repositoryService.createDecisionDefinitionQuery().count());
+    assertEquals(0, repositoryService.createDecisionRequirementDefinitionQuery().count());
   }
 
   @Test

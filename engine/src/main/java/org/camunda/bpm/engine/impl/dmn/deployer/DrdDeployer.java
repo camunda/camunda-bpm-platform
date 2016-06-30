@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.dmn.deployer;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -86,6 +87,19 @@ public class DrdDeployer extends AbstractDefinitionDeployer<DecisionRequirementD
     if (isDecisionRequirementDefinitionPersistable(definition)) {
       deploymentCache.addDecisionRequirementDefinition(definition);
     }
+  }
+
+  @Override
+  protected void ensureNoDuplicateDefinitionKeys(List<DecisionRequirementDefinitionEntity> definitions) {
+    // ignore decision requirement definitions which will not be persistent
+    ArrayList<DecisionRequirementDefinitionEntity> persistableDefinitions = new ArrayList<DecisionRequirementDefinitionEntity>();
+    for (DecisionRequirementDefinitionEntity definition : definitions) {
+      if (isDecisionRequirementDefinitionPersistable(definition)) {
+        persistableDefinitions.add(definition);
+      }
+    }
+
+    super.ensureNoDuplicateDefinitionKeys(persistableDefinitions);
   }
 
   public static boolean isDecisionRequirementDefinitionPersistable(DecisionRequirementDefinitionEntity definition) {
