@@ -152,7 +152,7 @@
         <h5>
           Filter
           <div class="btn-group btn-control dropdown">
-            <button class="btn btn-link dropdown-toggle"
+            <button class="btn btn-xs btn-link dropdown-toggle"
                     data-toggle="dropdown">
               <span class="glyphicon glyphicon-plus-sign"></span>
             </button>
@@ -235,30 +235,28 @@
 
               <div class="search search-date"
                    ng-repeat="date in filterData.start">
-                <div class="wrapper">
-                  <select ng-model="date.type"
-                          ng-options="item as item for item in dateTypeItems"
-                          required
-                          class="form-control"
-                          cam-dynamic-name="startDateFilterType{{$index}}"
-                          ng-change="dateFilterTypeChanged(filterForm['startDateFilterType0'], filterForm['startDateFilterType1'])">
-                  </select>
+                <select ng-model="date.type"
+                        ng-options="item as item for item in dateTypeItems"
+                        required
+                        class="form-control"
+                        cam-dynamic-name="startDateFilterType{{$index}}"
+                        ng-change="dateFilterTypeChanged(filterForm['startDateFilterType0'], filterForm['startDateFilterType1'])">
+                </select>
 
-                  <div class="removable-input">
-                    <input type="text"
-                           class="form-control"
-                           date
-                           required
-                           ng-change="filterChanged()"
-                           ng-model="date.value"
-                           cam-dynamic-name="startDateFilterValue{{$index}}" />
+                <div class="removable-input">
+                  <input type="text"
+                         class="form-control"
+                         date
+                         required
+                         ng-change="filterChanged()"
+                         ng-model="date.value"
+                         cam-dynamic-name="startDateFilterValue{{$index}}" />
 
-                    <button class="btn btn-link btn-xs btn-control remove-date-filter"
-                            ng-click="removeStartDateFilter(date)">
-                      <span class="glyphicon glyphicon-remove"></span>
-                    </button>
-                  </div>
-                </div><!-- / .wrapper -->
+                  <button class="btn btn-link btn-xs btn-control remove-date-filter"
+                          ng-click="removeStartDateFilter(date)">
+                    <span class="glyphicon glyphicon-remove"></span>
+                  </button>
+                </div>
 
                 <div class="note note-error note-small"
                      ng-if="filterForm['startDateFilterValue' + $index].$invalid">
@@ -277,14 +275,13 @@
                     Only the combination <code>after/before</code> is allowed.
                   </div>
                 </div><!-- / .error -->
-
-                <a class="glyphicon glyphicon-plus-sign pull-right"
-                   tooltip="Add a start date filter"
-                   tooltip-placement="right"
-                   ng-click="addStartDateFilter()"
-                   ng-if="filterData.start.length < 2"></a>
               </div><!-- ./ ng-repeat -->
 
+              <a class="glyphicon glyphicon-plus-sign pull-right"
+                 tooltip="Add a start date filter"
+                 tooltip-placement="right"
+                 ng-click="addStartDateFilter()"
+                 ng-if="filterData.start.length < 2"></a>
             </li>
 
             <li class="variable-filter filter"

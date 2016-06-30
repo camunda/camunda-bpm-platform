@@ -8,7 +8,7 @@
 
   h5 {
     margin: 0 0 5px 0;
-    font-weight: 700px;
+    font-weight: 700;
   }
 
   .footer {
@@ -67,10 +67,8 @@
   }
 
   .search-date {
-    > .wrapper {
-      display: table;
-      overflow: hidden;
-    }
+    display: table;
+    overflow: hidden;
 
     .removable-input,
     select {
@@ -139,11 +137,6 @@
       display: inline-block;
       float: none;
     }
-
-    .remove {
-      position: absolute;
-      right: 0;
-    }
   }
 
   .alert {
@@ -153,10 +146,14 @@
     padding: 8px 14px;
   }
 
-
-  &.business-key-filter .btn-link.remove,
-  &.variable-filter .btn-link.remove {
-    top: 7px;
+  &.activity-filter,
+  &.business-key-filter,
+  &.variable-filter {
+    .btn-link.remove {
+      top: 7px;
+      position: absolute;
+      right: 0;
+    }
   }
 
   &.date-filter,
