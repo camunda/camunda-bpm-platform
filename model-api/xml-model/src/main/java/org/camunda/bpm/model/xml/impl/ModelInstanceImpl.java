@@ -18,10 +18,13 @@ import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
+import org.camunda.bpm.model.xml.impl.validation.ModelInstanceValidator;
 import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.validation.ModelElementValidator;
+import org.camunda.bpm.model.xml.validation.ValidationResults;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -128,6 +131,11 @@ public class ModelInstanceImpl implements ModelInstance {
   @Override
   public ModelInstance clone() {
       return new ModelInstanceImpl(model, modelBuilder, document.clone());
+  }
+
+  @Override
+  public ValidationResults validate(Collection<ModelElementValidator<?>> validators) {
+    return new ModelInstanceValidator(this, validators).validate();
   }
 
 }

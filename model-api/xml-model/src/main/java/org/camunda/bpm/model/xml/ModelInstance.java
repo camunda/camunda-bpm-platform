@@ -16,6 +16,8 @@ import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.validation.ModelElementValidator;
+import org.camunda.bpm.model.xml.validation.ValidationResults;
 
 import java.util.Collection;
 
@@ -105,5 +107,17 @@ public interface ModelInstance {
    * @return the new model instance
    */
   ModelInstance clone();
+
+  /**
+   * Validate semantic properties of this model instance using a collection of validators.
+   * ModelElementValidator is an SPI that can be implemented by the user to execute custom
+   * validation logic on the model. The validation results are collected into a {@link ValidationResults}
+   * object which is returned by this method.
+   *
+   * @param validators the validators to execute
+   * @return the results of the validation.
+   * @since 7.6
+   */
+  ValidationResults validate(Collection<ModelElementValidator<?>> validators);
 
 }
