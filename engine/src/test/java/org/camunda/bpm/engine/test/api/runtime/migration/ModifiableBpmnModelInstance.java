@@ -42,6 +42,8 @@ import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.validation.ModelElementValidator;
+import org.camunda.bpm.model.xml.validation.ValidationResults;
 
 public class ModifiableBpmnModelInstance implements BpmnModelInstance {
 
@@ -246,6 +248,10 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
     miCharacteristics.setCamundaAsyncAfter(true);
 
     return this;
+  }
+
+  public ValidationResults validate(Collection<ModelElementValidator<?>> validators) {
+    return null;
   }
 
 }
