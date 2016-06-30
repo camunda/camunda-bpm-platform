@@ -63,8 +63,8 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String candidateUser;
   protected String candidateGroup;
   protected List<String> candidateGroups;
-  protected Boolean withCandidateGroups = false;
-  protected Boolean withoutCandidateGroups = false;
+  protected Boolean withCandidateGroups;
+  protected Boolean withoutCandidateGroups;
   protected Boolean includeAssignedTasks;
   protected String processInstanceId;
   protected String executionId;
@@ -366,7 +366,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery includeAssignedTasks() {
-    if (candidateUser == null && candidateGroup == null && candidateGroups == null && !withCandidateGroups && !withoutCandidateGroups
+    if (candidateUser == null && candidateGroup == null && candidateGroups == null && !isWithCandidateGroups() && !isWithoutCandidateGroups()
         && !expressions.containsKey("taskCandidateUser") && !expressions.containsKey("taskCandidateGroup")
         && !expressions.containsKey("taskCandidateGroupIn")) {
       throw new ProcessEngineException("Invalid query usage: candidateUser, candidateGroup, candidateGroupIn, withCandidateGroups, withoutCandidateGroups has to be called before 'includeAssignedTasks'.");
@@ -859,10 +859,26 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   public Boolean isWithCandidateGroups() {
+    if (withCandidateGroups == null) {
+      return false;
+    } else {
+      return withCandidateGroups;
+    }
+  }
+
+  public Boolean isWithCandidateGroupsInternal() {
     return withCandidateGroups;
   }
 
   public Boolean isWithoutCandidateGroups() {
+    if (withoutCandidateGroups == null) {
+      return false;
+    } else {
+      return withoutCandidateGroups;
+    }
+  }
+
+  public Boolean isWithoutCandidateGroupsInternal() {
     return withoutCandidateGroups;
   }
 

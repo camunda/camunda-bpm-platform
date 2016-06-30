@@ -54,10 +54,13 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String INVOLVED_USER = "involvedUser";
   public static final String OWNER = "owner";
   public static final String UNASSIGNED = "unassigned";
+  public static final String ASSIGNED = "assigned";
   public static final String DELEGATION_STATE = "delegationState";
   public static final String CANDIDATE_USER = "candidateUser";
   public static final String CANDIDATE_GROUP = "candidateGroup";
   public static final String CANDIDATE_GROUPS = "candidateGroups";
+  public static final String WITH_CANDIDATE_GROUPS = "withCandidateGroups";
+  public static final String WITHOUT_CANDIDATE_GROUPS = "withoutCandidateGroups";
   public static final String INCLUDE_ASSIGNED_TASKS = "includeAssignedTasks";
   public static final String INSTANCE_ID = "instanceId";
   public static final String PROCESS_INSTANCE_ID = "processInstanceId";
@@ -131,10 +134,13 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     addField(json, INVOLVED_USER, query.getInvolvedUser());
     addField(json, OWNER, query.getOwner());
     addDefaultField(json, UNASSIGNED, false, query.isUnassigned());
+    addDefaultField(json, ASSIGNED, false, query.isAssigned());
     addField(json, DELEGATION_STATE, query.getDelegationStateString());
     addField(json, CANDIDATE_USER, query.getCandidateUser());
     addField(json, CANDIDATE_GROUP, query.getCandidateGroup());
     addListField(json, CANDIDATE_GROUPS, query.getCandidateGroupsInternal());
+    addDefaultField(json, WITH_CANDIDATE_GROUPS, false, query.isWithCandidateGroups());
+    addDefaultField(json, WITHOUT_CANDIDATE_GROUPS, false, query.isWithoutCandidateGroups());
     addField(json, INCLUDE_ASSIGNED_TASKS, query.isIncludeAssignedTasksInternal());
     addField(json, PROCESS_INSTANCE_ID, query.getProcessInstanceId());
     addField(json, EXECUTION_ID, query.getExecutionId());
@@ -276,8 +282,11 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     if (json.has(OWNER)) {
       query.taskOwner(json.getString(OWNER));
     }
+    if (json.has(ASSIGNED) && json.getBoolean(ASSIGNED)) {
+      query.taskAssigned();
+    }
     if (json.has(UNASSIGNED) && json.getBoolean(UNASSIGNED)) {
-        query.taskUnassigned();
+      query.taskUnassigned();
     }
     if (json.has(DELEGATION_STATE)) {
       query.taskDelegationState(DelegationState.valueOf(json.getString(DELEGATION_STATE)));
@@ -290,6 +299,12 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     }
     if (json.has(CANDIDATE_GROUPS) && !json.has(CANDIDATE_USER) && !json.has(CANDIDATE_GROUP)) {
       query.taskCandidateGroupIn(getList(json.getJSONArray(CANDIDATE_GROUPS)));
+    }
+    if (json.has(WITH_CANDIDATE_GROUPS) && json.getBoolean(WITH_CANDIDATE_GROUPS)) {
+      query.withCandidateGroups();
+    }
+    if (json.has(WITHOUT_CANDIDATE_GROUPS) && json.getBoolean(WITHOUT_CANDIDATE_GROUPS)) {
+      query.withoutCandidateGroups();
     }
     if (json.has(INCLUDE_ASSIGNED_TASKS) && json.getBoolean(INCLUDE_ASSIGNED_TASKS)) {
       query.includeAssignedTasksInternal();
