@@ -7,6 +7,12 @@
     <version>7.6.0-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <camunda.version.old>
+      7.5.3-SNAPSHOT
+    </camunda.version.old>
+  </properties>
+
   <artifactId>camunda-qa-db-upgrade</artifactId>
   <packaging>jar</packaging>
   <name>camunda BPM - QA - upgrade - database</name>
