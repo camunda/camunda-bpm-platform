@@ -90,7 +90,7 @@ module.exports = function(pluginDependencies) {
       }
     }]);
 
-  angular.bootstrap(document, [ appNgModule.name, 'cam.cockpit.custom' ]);
+  angular.bootstrap(document.documentElement, [ appNgModule.name, 'cam.cockpit.custom' ]);
 
   if (top !== window) {
     window.parent.postMessage({ type: 'loadamd' }, '*');
