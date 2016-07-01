@@ -125,7 +125,7 @@ module.exports = function(pluginDependencies) {
   }
 
   $(document).ready(function() {
-    angular.bootstrap(document, [ appNgModule.name, 'cam.admin.custom' ]);
+    angular.bootstrap(document.documentElement, [ appNgModule.name, 'cam.admin.custom' ]);
 
     if (top !== window) {
       window.parent.postMessage({ type: 'loadamd' }, '*');

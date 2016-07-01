@@ -19,7 +19,7 @@ var dataDepend = require('angular-data-depend');
 
 function bootstrapApp() {
   $(document).ready(function() {
-    angular.bootstrap(document, [
+    angular.bootstrap(document.documentElement, [
       'cam.tasklist',
       'cam.embedded.forms',
       'cam.tasklist.custom'
