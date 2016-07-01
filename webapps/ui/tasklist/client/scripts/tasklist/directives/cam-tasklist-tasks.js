@@ -53,6 +53,15 @@ module.exports = [function() {
           }
         };
 
+        var postLoadingJobs = [];
+        var executePostLoadingJobs = function() {
+          postLoadingJobs.forEach(function(job) {
+            job();
+          });
+          postLoadingJobs = [];
+        };
+
+
         /**
          * observe the list of tasks
          */
@@ -62,6 +71,7 @@ module.exports = [function() {
           if(taskList._embedded.assignee) {
             parseAssignees(taskList._embedded.assignee);
           }
+          executePostLoadingJobs();
         });
 
         $scope.$on('shortcut:focusList', function() {
@@ -122,6 +132,11 @@ module.exports = [function() {
           var searchParams = $location.search() || {};
           searchParams.task = taskId;
           updateSilently(searchParams);
+
+          var el = document.querySelector('[cam-tasks] .tasks-list .task [href="#/?task=' + taskId + '"]');
+          if(el) {
+            el.focus();
+          }
         };
 
         var selectNextTask = function() {
@@ -133,6 +148,12 @@ module.exports = [function() {
           if($scope.pageNum < Math.ceil($scope.totalItems / $scope.pageSize)) {
             $scope.pageNum++;
             $scope.pageChange();
+            postLoadingJobs.push(function() {
+              // wait until the html is applied so you can focus the html element
+              $timeout(function() {
+                $scope.focus(null, $scope.tasks[0]);
+              });
+            });
           }
         };
 
@@ -145,6 +166,12 @@ module.exports = [function() {
           if($scope.pageNum > 1) {
             $scope.pageNum--;
             $scope.pageChange();
+            postLoadingJobs.push(function() {
+              // wait until the html is applied so you can focus the html element
+              $timeout(function() {
+                $scope.focus(null, $scope.tasks[$scope.tasks.length - 1]);
+              });
+            });
           }
         };
 
