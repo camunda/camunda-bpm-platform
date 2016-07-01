@@ -92,12 +92,14 @@ module.exports = [
           form = camFormScope[formName];
           formController.notifyFormInitialized();
 
-          $timeout(function() {
-            var focusElement = _camForm.formElement[0].querySelectorAll('input')[0];
-            if(focusElement) {
-              focusElement.focus();
-            }
-          });
+          if($scope.options.autoFocus) {
+            $timeout(function() {
+              var focusElement = _camForm.formElement[0].querySelectorAll('input')[0];
+              if(focusElement) {
+                focusElement.focus();
+              }
+            });
+          }
         };
 
         function clearVariableManager() {

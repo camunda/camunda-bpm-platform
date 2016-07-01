@@ -133,7 +133,7 @@ module.exports = [function() {
           searchParams.task = taskId;
           updateSilently(searchParams);
 
-          var el = document.querySelector('[cam-tasks] .tasks-list .task [href="#/?task=' + taskId + '"]');
+          var el = document.querySelector('[cam-tasks] .tasks-list .task [href*="#/?task=' + taskId + '"]');
           if(el) {
             el.focus();
           }

@@ -54,6 +54,7 @@ module.exports = [
     var DEFAULT_OPTIONS = $scope.options = {
       hideCompleteButton : true,
       hideLoadVariablesButton: true,
+      autoFocus : true,
       disableForm : false,
       disableAddVariableButton: false
     };
