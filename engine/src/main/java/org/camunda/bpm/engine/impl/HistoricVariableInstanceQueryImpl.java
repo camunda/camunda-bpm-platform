@@ -48,6 +48,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   protected String[] caseExecutionIds;
   protected String[] activityInstanceIds;
   protected String[] tenantIds;
+  protected String[] processIds;
 
   protected boolean isByteArrayFetchingEnabled = true;
   protected boolean isCustomObjectDeserializationEnabled = true;
@@ -74,6 +75,13 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   public HistoricVariableInstanceQuery caseInstanceId(String caseInstanceId) {
     ensureNotNull("caseInstanceId", caseInstanceId);
     this.caseInstanceId = caseInstanceId;
+    return this;
+  }
+
+  /** Only select historic process variables with the given process instance ids. */
+  public HistoricVariableInstanceQuery processInstanceIdIn(String... processInstanceIds) {
+    ensureNotNull("Process Ids", (Object[]) processInstanceIds);
+    this.processIds = processInstanceIds;
     return this;
   }
 
@@ -211,6 +219,10 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   public String[] getActivityInstanceIds() {
     return activityInstanceIds;
+  }
+
+  public String[] getProcessIds() {
+    return processIds;
   }
 
   public String[] getTaskIds() {

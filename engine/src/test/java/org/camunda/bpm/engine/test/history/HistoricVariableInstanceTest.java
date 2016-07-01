@@ -383,6 +383,17 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().taskIdIn(tasks.get(0).getId()).count());
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testParallel.bpmn20.xml"})
+  public void testHistoricVariableInstanceQueryByProcessIds() {
+    // given
+    Map<String, Object> vars = new HashMap<String, Object>();
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc",vars);
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("myProc",vars);
+
+    // check existing variables for task ID
+    assertEquals(4, historyService.createHistoricVariableInstanceQuery().processInstanceIdIn(processInstance.getProcessInstanceId(),processInstance2.getProcessInstanceId()).count());
+  }
+
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testHistoricVariableInstanceQueryByExecutionIds() {
     // given
