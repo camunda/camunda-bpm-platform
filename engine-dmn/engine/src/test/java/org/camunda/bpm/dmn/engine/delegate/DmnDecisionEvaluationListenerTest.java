@@ -15,6 +15,7 @@ package org.camunda.bpm.dmn.engine.delegate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
+import org.camunda.commons.utils.IoUtil;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,14 +55,14 @@ public class DmnDecisionEvaluationListenerTest extends DmnEngineTest {
   @Test
   @DecisionResource(resource = DMN_FILE)
   public void shouldCallListener() {
-    evaluateDecisionTable(20, "Weekend");
+    evaluateDecision(20, "Weekend", IoUtil.fileAsStream(DMN_FILE));
     assertThat(listener.getEvaluationEvent()).isNotNull();
   }
 
   @Test
   @DecisionResource(resource = DMN_FILE)
   public void shouldGetExecutedDecisionElements() {
-    evaluateDecisionTable(35, "Weekend");
+    evaluateDecision(35, "Weekend",IoUtil.fileAsStream(DMN_FILE));
 
     DmnDecisionEvaluationEvent evaluationEvent = listener.getEvaluationEvent();
     assertThat(evaluationEvent).isNotNull();
@@ -79,7 +81,7 @@ public class DmnDecisionEvaluationListenerTest extends DmnEngineTest {
   @Test
   @DecisionResource(resource = DMN_FILE)
   public void shouldVerifyRootDecisionResult() {
-    evaluateDecisionTable(35, "Weekend");
+    evaluateDecision(35, "Weekend", IoUtil.fileAsStream(DMN_FILE));
     
     assertThat(listener.getEvaluationEvent()).isNotNull();
     DmnDecisionTableEvaluationEvent decisionResult = listener.getEvaluationEvent().getDecisionResult();
@@ -105,7 +107,7 @@ public class DmnDecisionEvaluationListenerTest extends DmnEngineTest {
   @Test
   @DecisionResource(resource = DMN_FILE)
   public void shouldVerifyRootDecisionResultWithNoMatchingOutput() {
-    evaluateDecisionTable(20, "Weekend");
+    evaluateDecision(20, "Weekend", IoUtil.fileAsStream(DMN_FILE));
     
     assertThat(listener.getEvaluationEvent()).isNotNull();
     DmnDecisionTableEvaluationEvent decisionResult = listener.getEvaluationEvent().getDecisionResult();
@@ -119,7 +121,7 @@ public class DmnDecisionEvaluationListenerTest extends DmnEngineTest {
   @Test
   @DecisionResource(resource = DMN_FILE)
   public void shouldVerifyRequiredDecisionResults() {
-    evaluateDecisionTable(35, "Weekend");
+    evaluateDecision(35, "Weekend",IoUtil.fileAsStream(DMN_FILE));
     
     assertThat(listener.getEvaluationEvent()).isNotNull();
     Collection<DmnDecisionTableEvaluationEvent> requiredDecisions = listener.getEvaluationEvent().getRequiredDecisionResults();
@@ -157,10 +159,10 @@ public class DmnDecisionEvaluationListenerTest extends DmnEngineTest {
     return null;
   }
 
-  protected DmnDecisionTableResult evaluateDecisionTable(Object input1, Object input2) {
+  protected DmnDecisionTableResult evaluateDecision(Object input1, Object input2, InputStream inputStream) {
     variables.put("temperature", input1);
     variables.put("dayType", input2);
-    return evaluateDecisionTable();
+    return dmnEngine.evaluateDecisionTable("Dish", inputStream, variables);
   }
 
   public static class TestDecisionEvaluationListenerConfiguration extends DefaultDmnEngineConfiguration {

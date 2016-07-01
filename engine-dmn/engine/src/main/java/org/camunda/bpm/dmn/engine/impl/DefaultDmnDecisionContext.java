@@ -97,14 +97,13 @@ public class DefaultDmnDecisionContext {
     }
     VariableMap variableMap = buildVariableMapFromVariableContext(variableContext);
     
-    Map<String, DmnDecision> requiredDecisions = new LinkedHashMap<String, DmnDecision>();
+    List<DmnDecision> requiredDecisions = new ArrayList<DmnDecision>();
     buildDecisionTree(decision, requiredDecisions);
     
     List<DmnDecisionTableEvaluationEvent> evaluatedEvents = new ArrayList<DmnDecisionTableEvaluationEvent>();
     DmnDecisionTableResult evaluatedResult = null;
     
-    for (Map.Entry<String, DmnDecision> entry:requiredDecisions.entrySet()) {
-      DmnDecision evaluateDecision = entry.getValue();
+    for (DmnDecision evaluateDecision:requiredDecisions) {
       DmnDecisionTableEvaluationEventImpl evaluatedEvent = evaluateDecisionTable(evaluateDecision, variableMap.asVariableContext());
       evaluatedEvents.add(evaluatedEvent);  
       
@@ -200,11 +199,14 @@ public class DefaultDmnDecisionContext {
     return variableMap;
   }
 
-  protected void buildDecisionTree(DmnDecision decision, Map<String, DmnDecision> requiredDecisions) {
+  protected void buildDecisionTree(DmnDecision decision, List<DmnDecision> requiredDecisions) {
     for(DmnDecision dmnDecision : decision.getRequiredDecisions()){
       buildDecisionTree(dmnDecision, requiredDecisions);
     }
-    requiredDecisions.put(decision.getKey(),decision);
+    if(requiredDecisions.contains(decision)) {
+      return;
+    } 
+    requiredDecisions.add(decision);
   }
 
   protected DmnEvaluatedInput evaluateInput(DmnDecisionTableInputImpl input, VariableContext variableContext) {

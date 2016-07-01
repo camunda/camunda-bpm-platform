@@ -75,19 +75,19 @@ public class DmnEngineMetricCollectorTest extends DmnEngineTest {
   @Test
   public void testDrdExecutedDecisionElementsValue() {
     assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(0L);
-    List<DmnDecision> decisions = parseDecisionsFromFile(DISH_EXAMPLE_DMN);
+    
     VariableMap variableMap = createVariables()
       .putValue("temperature", 20)
       .putValue("dayType", "Weekend");
     
-    dmnEngine.evaluateDecisionTable(decisions.get(0), variableMap);
+    dmnEngine.evaluateDecisionTable("Dish", IoUtil.fileAsStream(DISH_EXAMPLE_DMN), variableMap);
     assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(30L);
 
-    dmnEngine.evaluateDecisionTable(decisions.get(0), variableMap);
+    dmnEngine.evaluateDecisionTable("Dish", IoUtil.fileAsStream(DISH_EXAMPLE_DMN), variableMap);
     assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(60L);
 
-    dmnEngine.evaluateDecisionTable(decisions.get(0), variableMap);
-    dmnEngine.evaluateDecisionTable(decisions.get(0), variableMap);
+    dmnEngine.evaluateDecisionTable("Dish", IoUtil.fileAsStream(DISH_EXAMPLE_DMN), variableMap);
+    dmnEngine.evaluateDecisionTable("Dish", IoUtil.fileAsStream(DISH_EXAMPLE_DMN), variableMap);
     assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(120L);
   }
 

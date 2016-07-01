@@ -138,10 +138,10 @@ public class DmnTransformLogger extends DmnLogger {
     );
   }
 
-  public DmnTransformException requiredDecisionLoopDetected(Decision decision) {
+  public DmnTransformException requiredDecisionLoopDetected(String decisionId) {
     return new DmnTransformException(exceptionMessage(
       "015",
-      "The decision '{}' has a loop.", decision.getId())
+      "The decision '{}' has a loop.", decisionId)
     );
   }
 

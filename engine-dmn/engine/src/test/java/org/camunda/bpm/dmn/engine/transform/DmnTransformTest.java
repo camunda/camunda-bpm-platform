@@ -47,6 +47,7 @@ public class DmnTransformTest extends DmnEngineTest {
   public static final String MULTIPLE_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/MultipleRequiredDecisions.dmn";
   public static final String MULTI_LEVEL_MULTIPLE_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/MultilevelMultipleRequiredDecisions.dmn";
   public static final String LOOP_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/LoopInRequiredDecision.dmn";
+  public static final String LOOP_REQUIRED_DECISIONS_DIFFERENT_ORDER_DMN = "org/camunda/bpm/dmn/engine/api/LoopInRequiredDecision2.dmn";
   public static final String SELF_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/SelfRequiredDecision.dmn";
 
   @Test
@@ -255,6 +256,22 @@ public class DmnTransformTest extends DmnEngineTest {
       .hasMessageStartingWith("DMN-02004")
       .hasMessageContaining("DMN-02015")
       .hasMessageContaining("decision 'buyProduct' has a loop");
+    }
+  }
+
+  @Test
+  public void shouldDetectLoopInParseDecisionWithRequiredDecisionOfDifferentOrder() {
+    InputStream inputStream = IoUtil.fileAsStream(LOOP_REQUIRED_DECISIONS_DIFFERENT_ORDER_DMN);
+    DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
+
+    try {
+      dmnEngine.parseDecisions(modelInstance);
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    } catch(DmnTransformException e) {
+      Assertions.assertThat(e)
+      .hasMessageStartingWith("DMN-02004")
+      .hasMessageContaining("DMN-02015")
+      .hasMessageContaining("decision 'C' has a loop");
     }
   }
 

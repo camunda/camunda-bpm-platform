@@ -65,7 +65,7 @@
     </decisionTable>
   </decision>
 
-  <decision id="D" name="C">
+  <decision id="D" name="D">
     <decisionTable id="ddDecisionTable">
       <input id="input10">
         <inputExpression><text>ff</text></inputExpression>

@@ -19,8 +19,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
@@ -165,25 +167,82 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
   }
 
   protected List<DmnDecision> transformDecisions(Collection<Decision> decisions) {
-    List<DmnDecision> dmnDecisions = new ArrayList<DmnDecision>();
+    Map<String,DmnDecisionImpl> dmnDecisions = transformIndividualDecisions(decisions);
+    buildDecisionRequirements(decisions, dmnDecisions);
+    List<DmnDecision> dmnDecisionList = new ArrayList<DmnDecision>(dmnDecisions.values());
+    
+    for(Decision decision: decisions) {
+      DmnDecision dmnDecision = dmnDecisions.get(decision.getId());
+      notifyTransformListeners(decision, dmnDecision);
+    }
+    ensureNoLoopInDecisions(dmnDecisionList);
+    
+    return dmnDecisionList;
+  }
+
+  protected Map<String,DmnDecisionImpl> transformIndividualDecisions(Collection<Decision> decisions) {
+    Map<String, DmnDecisionImpl> dmnDecisions = new HashMap<String, DmnDecisionImpl>();
 
     for (Decision decision : decisions) {
-      DmnDecision dmnDecision = transformDecision(decision,new ArrayList<String>());
+      DmnDecisionImpl dmnDecision = transformDecision(decision);
       if (dmnDecision != null) {
-        dmnDecisions.add(dmnDecision);
-        notifyTransformListeners(decision, dmnDecision);
+        dmnDecisions.put(dmnDecision.getKey(), dmnDecision);
       }
     }
     return dmnDecisions;
   }
-
-  protected DmnDecision transformDecision(Decision decision, List<String> decisionsList) {
-
-    if(decisionsList.contains(decision.getId())) {
-      throw LOG.requiredDecisionLoopDetected(decision);
-    } else {
-      decisionsList.add(decision.getId());
+  
+  protected void buildDecisionRequirements(Collection<Decision> decisions, Map<String, DmnDecisionImpl> dmnDecisions) {
+    for(Decision decision: decisions) {
+      List<DmnDecision> requiredDmnDecisions = getRequiredDmnDecisions(decision, dmnDecisions);
+      DmnDecisionImpl dmnDecision = dmnDecisions.get(decision.getId());
+      
+      if(requiredDmnDecisions.size() > 0) {
+        dmnDecision.setRequiredDecision(requiredDmnDecisions);
+      }
     }
+  }
+
+  protected void ensureNoLoopInDecisions(List<DmnDecision> dmnDecisionList) {
+    List<String> visitedDecisions = new ArrayList<String>();
+    
+    for(DmnDecision decision: dmnDecisionList) {
+      ensureNoLoopInDecision(decision, new ArrayList<String>(), visitedDecisions);
+      visitedDecisions.add(decision.getKey());
+    }
+  }
+  
+  protected void ensureNoLoopInDecision(DmnDecision decision, List<String> parentDecisionList, List<String> visitedDecisions) {
+
+    if(visitedDecisions.contains(decision.getKey())) {
+      return;
+    }
+      
+    if(parentDecisionList.contains(decision.getKey())) {
+      throw LOG.requiredDecisionLoopDetected(decision.getKey());
+    } else {
+      parentDecisionList.add(decision.getKey());
+    }
+    
+    for(DmnDecision dmnDecision : decision.getRequiredDecisions()){
+      ensureNoLoopInDecision(dmnDecision, new ArrayList<String>(parentDecisionList), visitedDecisions);
+    }
+  }
+
+  protected List<DmnDecision> getRequiredDmnDecisions(Decision decision, Map<String, DmnDecisionImpl> dmnDecisions) {
+    List<DmnDecision> requiredDecisionList = new ArrayList<DmnDecision>();
+    for(InformationRequirement informationRequirement: decision.getInformationRequirements()) {
+      
+      Decision requiredDecision = informationRequirement.getRequiredDecision();
+      if(requiredDecision != null) {
+        DmnDecision requiredDmnDecision = dmnDecisions.get(requiredDecision.getId());
+        requiredDecisionList.add(requiredDmnDecision);
+      }
+    }
+    return requiredDecisionList;
+  }
+ 
+  protected DmnDecisionImpl transformDecision(Decision decision) {
 
     DmnElementTransformHandler<Decision, DmnDecisionImpl> handler = handlerRegistry.getHandler(Decision.class);
     DmnDecisionImpl dmnDecision = handler.handleElement(this, decision);
@@ -207,13 +266,6 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
       return null;
     }
 
-    for (InformationRequirement informationRequirement: decision.getInformationRequirements()) {
-      Decision requiredDecision = informationRequirement.getRequiredDecision();
-      if(requiredDecision != null) {
-        DmnDecision dmnRequiredDecision = transformDecision(requiredDecision, new ArrayList<String>(decisionsList));
-        dmnDecision.getRequiredDecisions().add(dmnRequiredDecision);
-      }
-    }
     return dmnDecision;
   }
 
