@@ -17,15 +17,6 @@
     <keepFormat>false</keepFormat>
   </properties>
 
-  <dependencies>
-    
-<dependency>
- <groupId>com.oracle.jdbc</groupId>
- <artifactId>ojdbc7</artifactId>
- <version>12.1.0.2</version>
-</dependency>
-  </dependencies>
-
   <modules>
     <module>test-scenario-util</module>
     <module>test-fixture-72</module>
