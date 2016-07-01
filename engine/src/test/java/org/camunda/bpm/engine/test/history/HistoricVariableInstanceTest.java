@@ -384,7 +384,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testParallel.bpmn20.xml"})
-  public void testHistoricVariableInstanceQueryByProcessIds() {
+  public void testHistoricVariableInstanceQueryByProcessIdIn() {
     // given
     Map<String, Object> vars = new HashMap<String, Object>();
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc",vars);
@@ -392,6 +392,21 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
 
     // check existing variables for task ID
     assertEquals(4, historyService.createHistoricVariableInstanceQuery().processInstanceIdIn(processInstance.getProcessInstanceId(),processInstance2.getProcessInstanceId()).count());
+    assertEquals(4, historyService.createHistoricVariableInstanceQuery().processInstanceIdIn(processInstance.getProcessInstanceId(),processInstance2.getProcessInstanceId()).list().size());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testParallel.bpmn20.xml"})
+  public void testHistoricVariableInstanceQueryByInvalidProcessIdIn() {
+    // given
+    Map<String, Object> vars = new HashMap<String, Object>();
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc",vars);
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("myProc",vars);
+
+    // check existing variables for task ID
+    try {
+      historyService.createHistoricVariableInstanceQuery().processInstanceIdIn(processInstance.getProcessInstanceId(),null);
+      fail("Search by process instance ID was finished");
+    } catch (ProcessEngineException e) { }
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})

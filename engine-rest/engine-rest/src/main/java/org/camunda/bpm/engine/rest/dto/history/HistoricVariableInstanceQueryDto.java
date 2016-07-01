@@ -52,6 +52,7 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   protected String[] taskIdIn;
   protected String[] activityInstanceIdIn;
   protected String[] caseExecutionIdIn;
+  protected String[] processInstanceIdIn;
   protected List<String> tenantIds;
 
   public HistoricVariableInstanceQueryDto() {
@@ -94,6 +95,11 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   @CamundaQueryParam(value="taskIdIn", converter = StringArrayConverter.class)
   public void setTaskIdIn(String[] taskIdIn) {
     this.taskIdIn = taskIdIn;
+  }
+
+  @CamundaQueryParam(value="processInstanceIdIn", converter = StringArrayConverter.class)
+  public void setProcessInstanceIdIn(String[] processInstanceIdIn) {
+    this.processInstanceIdIn = processInstanceIdIn;
   }
 
   @CamundaQueryParam(value="activityInstanceIdIn", converter = StringArrayConverter.class)
@@ -148,6 +154,9 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     }
     if (taskIdIn != null && taskIdIn.length > 0) {
       query.taskIdIn(taskIdIn);
+    }
+    if (processInstanceIdIn != null && processInstanceIdIn.length > 0) {
+      query.processInstanceIdIn(processInstanceIdIn);
     }
     if (activityInstanceIdIn != null && activityInstanceIdIn.length > 0) {
       query.activityInstanceIdIn(activityInstanceIdIn);

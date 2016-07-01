@@ -537,6 +537,39 @@ public class HistoricVariableInstanceRestServiceQueryTest extends AbstractRestSe
   }
 
   @Test
+  public void testHistoricVariableQueryByProcessInstanceIdIn () {
+    String aProcessInstanceId = "aProcessInstanceId";
+    String anotherProcessInstanceId = "anotherProcessInstanceId";
+
+    given()
+            .queryParam("processInstanceIdIn", aProcessInstanceId + "," + anotherProcessInstanceId)
+            .then().expect().statusCode(Status.OK.getStatusCode())
+            .when().get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processInstanceIdIn(aProcessInstanceId, anotherProcessInstanceId);
+  }
+
+  @Test
+  public void testHistoricVariableQueryByProcessInstanceIdInAsPOST() {
+    String aProcessInstanceId = "aProcessInstanceId";
+    String anotherProcessInstanceId = "anotherProcessInstanceId";
+
+    List<String> processInstanceIdIn= new ArrayList<String>();
+    processInstanceIdIn.add(aProcessInstanceId);
+    processInstanceIdIn.add(anotherProcessInstanceId);
+    processInstanceIdIn.add(null);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("processInstanceIdIn", processInstanceIdIn);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
+            .then().expect().statusCode(Status.OK.getStatusCode())
+            .when().post(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processInstanceIdIn(aProcessInstanceId, anotherProcessInstanceId,null);
+  }
+
+  @Test
   public void testHistoricVariableQueryByActivityInstanceIds() {
       String anActivityInstanceId = "anActivityInstanceId";
       String anotherActivityInstanceId = "anotherActivityInstanceId";
