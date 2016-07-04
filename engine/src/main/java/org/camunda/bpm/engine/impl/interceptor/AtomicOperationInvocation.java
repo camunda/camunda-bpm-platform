@@ -63,7 +63,8 @@ public class AtomicOperationInvocation {
     // execution might have ended in the meanwhile
     if(execution.isEnded() &&
         (operation == PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE
-      || operation == PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE)) {
+      || operation == PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE)
+            ) {
       return;
     }
 

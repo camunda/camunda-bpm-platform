@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
 
@@ -26,13 +24,18 @@ import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionObserverImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionVariableStoreObserverImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.variable.VariableMap;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Thorben Lindhauer
@@ -67,6 +70,13 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
         .createProcessInstance(instantiationBuilder.getBusinessKey(), instantiationBuilder.getCaseInstanceId(), initialActivity);
     processInstance.setSkipCustomListeners(modificationBuilder.isSkipCustomListeners());
     VariableMap variables = modificationBuilder.getProcessVariables();
+
+    final VariableMap vars = Variables.createVariables();
+    vars.putAll(variables);
+    final ExecutionVariableStoreObserverImpl variableStoreObserver = new ExecutionVariableStoreObserverImpl(vars);
+    processInstance.addVariableStoreObserver(variableStoreObserver);
+    processInstance.addExecutionObserver(new ExecutionObserverImpl(variableStoreObserver));
+
     processInstance.startWithoutExecuting(variables);
 
     // prevent ending of the process instance between instructions
@@ -91,8 +101,9 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
       processInstance.propagateEnd();
     }
 
-    return new ProcessInstanceWithVariablesEntity(processInstance);
+    return new ProcessInstanceWithVariablesImpl(processInstance, vars);
   }
+
 
   /**
    * get the activity that is started by the first instruction, if exists;

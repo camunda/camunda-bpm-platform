@@ -23,9 +23,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
- * Represents a process instance dto extension dto that contains additionally
- * variables which the process used during the execution.
- * 
+ * Represents a process instance dto extension dto that contains latest variables.
+ *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public class ProcessInstanceWithVariablesDto extends ProcessInstanceDto {

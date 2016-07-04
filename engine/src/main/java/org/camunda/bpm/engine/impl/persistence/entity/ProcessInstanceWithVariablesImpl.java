@@ -22,13 +22,14 @@ import org.camunda.bpm.engine.variable.VariableMap;
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class ProcessInstanceWithVariablesEntity implements ProcessInstanceWithVariables {
-
+public class ProcessInstanceWithVariablesImpl implements ProcessInstanceWithVariables {
 
   protected final ExecutionEntity executionEntity;
+  protected final VariableMap variables;
 
-  public ProcessInstanceWithVariablesEntity(ExecutionEntity executionEntity) {
+  public ProcessInstanceWithVariablesImpl(ExecutionEntity executionEntity, VariableMap variables) {
     this.executionEntity = executionEntity;
+    this.variables = variables;
   }
 
   public ExecutionEntity getExecutionEntity() {
@@ -37,7 +38,7 @@ public class ProcessInstanceWithVariablesEntity implements ProcessInstanceWithVa
 
   @Override
   public VariableMap getVariables() {
-    return executionEntity.getVariablesAfterExeuction();
+    return variables;
   }
 
   @Override

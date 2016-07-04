@@ -13,21 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.runtime;
-
-import org.camunda.bpm.engine.variable.VariableMap;
+package org.camunda.bpm.engine.impl.persistence.entity;
 
 /**
- * Represents a process instance with the corresponding latest variables.
+ * Represents an observer for the exeuction.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public interface ProcessInstanceWithVariables extends ProcessInstance {
+public interface ExecutionObserver {
 
   /**
-   * Returns the latest variables of the process instance.
+   * Callback which is called in the clearExecution method of the ExecutionEntity.
    *
-   * @return the latest variables
+   * @param execution the execution which is been observed
    */
-  VariableMap getVariables();
+  public void onRemove(ExecutionEntity execution);
 }

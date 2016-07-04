@@ -12,10 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.createJobExceptionByteArray;
-import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionStacktrace;
-import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -39,6 +36,9 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionStacktrace;
+import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 /**
  * Stub of the common parts of a Job. You will normally work with a subclass of

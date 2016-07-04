@@ -6,9 +6,7 @@
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="syncTask" />
     <serviceTask id="syncTask" camunda:expression="${true}" />
-    <sequenceFlow id="flow2" sourceRef="syncTask" targetRef="user" />
-    <userTask id="user"/>
-    <sequenceFlow id="flow3" sourceRef="user" targetRef="end" />
+    <sequenceFlow id="flow2" sourceRef="syncTask" targetRef="end" />
     <endEvent id="end" />
   </process>
 

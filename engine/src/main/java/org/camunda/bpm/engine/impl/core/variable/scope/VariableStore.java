@@ -13,8 +13,8 @@
 package org.camunda.bpm.engine.impl.core.variable.scope;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,12 +37,13 @@ public class VariableStore<T extends CoreVariableInstance> {
   protected List<VariableStoreObserver<T>> observers;
 
   public VariableStore() {
-    this(VariableCollectionProvider.<T>emptyVariables(), Collections.<VariableStoreObserver<T>>emptyList());
+    this(VariableCollectionProvider.<T>emptyVariables());
   }
 
-  public VariableStore(VariablesProvider<T> provider, List<VariableStoreObserver<T>> observers) {
+  public VariableStore(VariablesProvider<T> provider, VariableStoreObserver<T>... observers) {
     this.variablesProvider = provider;
-    this.observers = observers;
+    this.observers = new ArrayList<VariableStoreObserver<T>>();
+    this.observers.addAll(Arrays.asList(observers));
   }
 
   /**
@@ -145,6 +146,14 @@ public class VariableStore<T extends CoreVariableInstance> {
         observer.onRemove(nextVariable);
       }
     }
+  }
+
+  public void addObserver(VariableStoreObserver<T> observer) {
+    observers.add(observer);
+  }
+
+  public void removeObserver(VariableStoreObserver<T> observer) {
+    observers.remove(observer);
   }
 
   public static interface VariableStoreObserver<T extends CoreVariableInstance> {

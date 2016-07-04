@@ -15,14 +15,13 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.assertFalse;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
-import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -31,6 +30,18 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Rule;
 import org.junit.rules.RuleChain;
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertTrue;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
+import org.camunda.bpm.engine.impl.util.StringUtil;
+import org.camunda.bpm.engine.test.api.variables.JavaSerializable;
+import static org.camunda.bpm.engine.test.util.TypedValueAssert.assertObjectValueSerializedJava;
+import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Represents the test class for the process instantiation on which
@@ -38,13 +49,12 @@ import org.junit.rules.RuleChain;
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class ProcessInstantiationWithVariablesInReturn {
+public class ProcessInstantiationWithVariablesInReturnTest {
 
   protected static final String SUBPROCESS_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.subprocess.bpmn20.xml";
   protected static final String SET_VARIABLE_IN_DELEGATE_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstantiationWithVariablesInReturn.setVariableInDelegate.bpmn20.xml";
   protected static final String SET_VARIABLE_IN_DELEGATE_WITH_WAIT_STATE_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstantiationWithVariablesInReturn.setVariableInDelegateWithWaitState.bpmn20.xml";
   protected static final String SIMPLE_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstantiationWithVariablesInReturn.simpleProcess.bpmn20.xml";
-
 
 
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
@@ -53,13 +63,15 @@ public class ProcessInstantiationWithVariablesInReturn {
   @Rule
   public RuleChain chain = RuleChain.outerRule(engineRule).around(testHelper);
 
-
   private void checkVariables(VariableMap map) {
+    List<HistoricVariableInstance> variables = engineRule.getHistoryService()
+            .createHistoricVariableInstanceQuery()
+            .orderByVariableName()
+            .asc()
+            .list();
 
-    List<VariableInstance> variables = engineRule.getRuntimeService().createVariableInstanceQuery()
-            .orderByVariableName().asc().list();
     assertEquals(variables.size(), map.size());
-    for (VariableInstance instance : variables) {
+    for (HistoricVariableInstance instance : variables) {
       assertTrue(map.containsKey(instance.getName()));
       Object instanceValue = instance.getTypedValue().getValue();
       Object mapValue = map.getValueTyped(instance.getName()).getValue();
@@ -73,6 +85,53 @@ public class ProcessInstantiationWithVariablesInReturn {
     }
   }
 
+  private void testVariablesWithoutDesrialization(String processDefinitionKey) throws Exception {
+    //given serializable variable
+    JavaSerializable javaSerializable = new JavaSerializable("foo");
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    new ObjectOutputStream(baos).writeObject(javaSerializable);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
+
+    //when execute process with serialized variable and wait state
+    ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService()
+            .createProcessInstanceByKey(processDefinitionKey)
+            .setVariable("serializedVar", serializedObjectValue(serializedObject)
+              .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
+              .objectTypeName(JavaSerializable.class.getName())
+              .create())
+            .executeWithVariablesInReturn(false, false);
+
+    //then returned instance contains serialized variable
+    VariableMap map = procInstance.getVariables();
+    assertNotNull(map);
+
+    ObjectValue serializedVar = (ObjectValue) map.getValueTyped("serializedVar");
+    assertFalse(serializedVar.isDeserialized());
+    assertObjectValueSerializedJava(serializedVar, javaSerializable);
+
+    //access on value should fail because variable is not deserialized
+    try {
+      serializedVar.getValue();
+      Assert.fail("Deserialization should fail!");
+    } catch (IllegalStateException ise) {
+      assertTrue(ise.getMessage().equals("Object is not deserialized."));
+    }
+  }
+
+  @Test
+  @Deployment(resources = SIMPLE_PROCESS)
+  public void testReturnVariablesFromStartWithoutDeserialization() throws Exception {
+    testVariablesWithoutDesrialization("simpleProcess");
+  }
+
+  @Test
+  @Deployment(resources = SUBPROCESS_PROCESS)
+  public void testReturnVariablesFromStartWithoutDeserializationWithWaitstate() throws Exception {
+    testVariablesWithoutDesrialization("subprocess");
+  }
+
+  @Test
   @Deployment(resources = SIMPLE_PROCESS)
   public void testReturnVariablesFromStart() {
     //given execute process with variables
@@ -92,6 +151,7 @@ public class ProcessInstantiationWithVariablesInReturn {
     checkVariables(map);
   }
 
+  @Test
   @Deployment(resources = SUBPROCESS_PROCESS)
   public void testReturnVariablesFromStartWithWaitstate() {
     //given execute process with variables and wait state
@@ -111,6 +171,7 @@ public class ProcessInstantiationWithVariablesInReturn {
     checkVariables(map);
   }
 
+  @Test
   @Deployment(resources = SUBPROCESS_PROCESS)
   public void testReturnVariablesFromStartWithWaitstateStartInSubProcess() {
     //given execute process with variables and wait state in sub process
@@ -131,6 +192,7 @@ public class ProcessInstantiationWithVariablesInReturn {
     checkVariables(map);
   }
 
+  @Test
   @Deployment(resources = SET_VARIABLE_IN_DELEGATE_PROCESS)
   public void testReturnVariablesFromExecution() {
 
@@ -145,6 +207,7 @@ public class ProcessInstantiationWithVariablesInReturn {
     checkVariables(map);
   }
 
+  @Test
   @Deployment(resources = SET_VARIABLE_IN_DELEGATE_WITH_WAIT_STATE_PROCESS)
   public void testReturnVariablesFromExecutionWithWaitstate() {
 
@@ -159,6 +222,7 @@ public class ProcessInstantiationWithVariablesInReturn {
     checkVariables(map);
   }
 
+  @Test
   @Deployment(resources = SET_VARIABLE_IN_DELEGATE_PROCESS)
   public void testReturnVariablesFromStartAndExecution() {
 
@@ -177,6 +241,7 @@ public class ProcessInstantiationWithVariablesInReturn {
     checkVariables(map);
   }
 
+  @Test
   @Deployment(resources = SET_VARIABLE_IN_DELEGATE_WITH_WAIT_STATE_PROCESS)
   public void testReturnVariablesFromStartAndExecutionWithWaitstate() {
 
