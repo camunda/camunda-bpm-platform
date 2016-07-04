@@ -1,4 +1,3 @@
-SET default_storage_engine='InnoDB';
 create table ACT_GE_PROPERTY (
     NAME_ varchar(64),
     VALUE_ varchar(300),
