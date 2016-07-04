@@ -83,6 +83,7 @@ import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.Resource;
@@ -705,6 +706,17 @@ public abstract class MockProvider {
 
   public static final String EXAMPLE_DECISION_OUTPUT_KEY = "aDecisionOutput";
   public static final StringValue EXAMPLE_DECISION_OUTPUT_VALUE = Variables.stringValue("aDecisionOutputValue");
+
+  // decision requirement definition
+  public static final String EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID = "aDecisionRequirementsDefinitionId";
+  public static final String ANOTHER_EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID = "anotherDecisionRequirementsDefinitionId";
+  public static final String EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID_LIST = EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID + "," + ANOTHER_EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID;
+  public static final String EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY = "aDecisionRequirementsDefinitionKey";
+  public static final int EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_VERSION = 1;
+  public static final String EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_CATEGORY = "aDecisionRequirementsDefinitionCategory";
+  public static final String EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_NAME = "aDecisionRequirementsDefinitionName";
+  public static final String EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_RESOURCE_NAME = "aDecisionRequirementsDefinitionResourceName";
+  public static final String EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_DIAGRAM_RESOURCE_NAME = "aResourceName.png";
 
   // historic job log
 
@@ -2425,6 +2437,39 @@ public abstract class MockProvider {
       .id(ANOTHER_EXAMPLE_DECISION_DEFINITION_ID)
       .tenantId(ANOTHER_EXAMPLE_TENANT_ID)
       .build();
+  }
+
+  // decision requirements definition
+  public static MockDecisionRequirementsDefinitionBuilder mockDecisionRequirementsDefinition() {
+    MockDecisionRequirementsDefinitionBuilder builder = new MockDecisionRequirementsDefinitionBuilder();
+
+    return builder
+      .id(EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID)
+      .category(EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_CATEGORY)
+      .name(EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_NAME)
+      .key(EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY)
+      .version(EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_VERSION)
+      .resource(EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_RESOURCE_NAME)
+      .diagram(EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_DIAGRAM_RESOURCE_NAME)
+      .deploymentId(EXAMPLE_DEPLOYMENT_ID);
+  }
+
+  public static DecisionRequirementDefinition createMockDecisionRequirementsDefinition() {
+    return mockDecisionRequirementsDefinition().build();
+  }
+
+  public static DecisionRequirementDefinition createAnotherMockDecisionRequirementsDefinition() {
+    return mockDecisionRequirementsDefinition()
+      .id(ANOTHER_EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID)
+      .tenantId(ANOTHER_EXAMPLE_TENANT_ID)
+      .build();
+  }
+
+  public static List<DecisionRequirementDefinition> createMockTwoDecisionRequirementsDefinitions() {
+    List<DecisionRequirementDefinition> mocks = new ArrayList<DecisionRequirementDefinition>();
+    mocks.add(createMockDecisionRequirementsDefinition());
+    mocks.add(createAnotherMockDecisionRequirementsDefinition());
+    return mocks;
   }
 
   // Historic job log

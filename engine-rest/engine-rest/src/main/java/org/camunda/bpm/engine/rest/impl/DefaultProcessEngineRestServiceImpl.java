@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
 import org.camunda.bpm.engine.rest.CaseExecutionRestService;
 import org.camunda.bpm.engine.rest.CaseInstanceRestService;
 import org.camunda.bpm.engine.rest.DecisionDefinitionRestService;
+import org.camunda.bpm.engine.rest.DecisionRequirementsDefinitionRestService;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.ExternalTaskRestService;
@@ -150,6 +151,11 @@ public class DefaultProcessEngineRestServiceImpl extends AbstractProcessEngineRe
   @Path(DecisionDefinitionRestService.PATH)
   public DecisionDefinitionRestService getDecisionDefinitionRestService() {
     return super.getDecisionDefinitionRestService(null);
+  }
+
+  @Path(DecisionRequirementsDefinitionRestService.PATH)
+  public DecisionRequirementsDefinitionRestService getDecisionRequirementsDefinitionRestService() {
+    return super.getDecisionRequirementsDefinitionRestService(null);
   }
 
   @Path(ExternalTaskRestService.PATH)
