@@ -134,6 +134,9 @@ drop index ACT_IDX_BATCH_JOB_DEF;
 
 drop index ACT_IDX_PROCDEF_VER_TAG;
 
+drop index ACT_IDX_JOB_EXECUTION_ID;
+drop index ACT_IDX_JOB_HANDLER;
+
 drop table ACT_GE_PROPERTY if exists;
 drop table ACT_GE_BYTEARRAY if exists;
 drop table ACT_RE_DEPLOYMENT if exists;
