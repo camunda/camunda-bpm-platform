@@ -46,6 +46,9 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 /**
  * @author Sebastian Menski
  */
@@ -783,6 +786,29 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertNotNull(task);
     assertEquals("Task 1", task.getName());
     assertEquals("task1", task.getId());
+  }
+
+  /**
+   * CAM-6165
+   *
+   * Verify that search by name like returns case insensitive results
+   */
+  public void testTaskQueryLookupByNameLikeCaseInsensitive() {
+    TaskQuery query = taskService.createTaskQuery();
+    query.taskNameLike("%task%");
+    saveQuery(query);
+
+    List<Task> tasks = filterService.list(filter.getId());
+    assertNotNull(tasks);
+    assertThat(tasks.size(),is(3));
+
+    query = taskService.createTaskQuery();
+    query.taskNameLike("%Task%");
+    saveQuery(query);
+
+    tasks = filterService.list(filter.getId());
+    assertNotNull(tasks);
+    assertThat(tasks.size(),is(3));
   }
 
   public void testExecuteTaskQueryCount() {

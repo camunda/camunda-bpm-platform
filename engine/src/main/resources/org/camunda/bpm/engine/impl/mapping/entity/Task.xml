@@ -255,7 +255,8 @@
         and RES.NAME_ = #{name}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}
+        <!-- based on CAM-6165 name like case insensitive, this column is indexed-->
+        and upper(RES.NAME_) like upper(#{nameLike})
       </if>
       <if test="description != null">
         and RES.DESCRIPTION_ = #{description}
