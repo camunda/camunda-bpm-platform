@@ -43,7 +43,6 @@ public class DmnTransformTest extends DmnEngineTest {
 
   public static final String TRANSFORM_DMN = "org/camunda/bpm/dmn/engine/transform/DmnTransformTest.dmn";
   public static final String REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/RequiredDecision.dmn";
-  public static final String MULTI_LEVEL_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/MultilevelRequiredDecisions.dmn";
   public static final String MULTIPLE_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/MultipleRequiredDecisions.dmn";
   public static final String MULTI_LEVEL_MULTIPLE_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/MultilevelMultipleRequiredDecisions.dmn";
   public static final String LOOP_REQUIRED_DECISIONS_DMN = "org/camunda/bpm/dmn/engine/api/LoopInRequiredDecision.dmn";
@@ -192,17 +191,17 @@ public class DmnTransformTest extends DmnEngineTest {
     DmnDecision buyProductDecision = dmnEngine.parseDecision("buyProduct", modelInstance);
     assertDecision(buyProductDecision, "buyProduct");
 
-    List<DmnDecision> buyProductrequiredDecisions = buyProductDecision.getRequiredDecisions();
+    Collection<DmnDecision> buyProductrequiredDecisions = buyProductDecision.getRequiredDecisions();
     assertThat(buyProductrequiredDecisions.size()).isEqualTo(1);
 
-    DmnDecision buyComputerDecision = buyProductrequiredDecisions.get(0);
-    assertThat(buyComputerDecision.getKey()).isEqualTo("buyComputer");
+    DmnDecision buyComputerDecision = getDecision(buyProductrequiredDecisions, "buyComputer");
+    assertThat(buyComputerDecision).isNotNull();
 
-    List<DmnDecision> buyComputerRequiredDecision = buyComputerDecision.getRequiredDecisions();
+    Collection<DmnDecision> buyComputerRequiredDecision = buyComputerDecision.getRequiredDecisions();
     assertThat(buyComputerRequiredDecision.size()).isEqualTo(1);
 
-    DmnDecision buyElectronicDecision = buyComputerRequiredDecision.get(0);
-    assertThat(buyElectronicDecision.getKey()).isEqualTo("buyElectronic");
+    DmnDecision buyElectronicDecision = getDecision(buyComputerRequiredDecision, "buyElectronic");
+    assertThat(buyElectronicDecision).isNotNull();
 
     assertThat(buyElectronicDecision.getRequiredDecisions().size()).isEqualTo(0);
   }
@@ -216,19 +215,24 @@ public class DmnTransformTest extends DmnEngineTest {
 
     DmnDecision buyProductDecision = getDecision(decisions, "buyProduct");
     assertThat(buyProductDecision).isNotNull();
-    List<DmnDecision> requiredProductDecisions = buyProductDecision.getRequiredDecisions();
+    Collection<DmnDecision> requiredProductDecisions = buyProductDecision.getRequiredDecisions();
     assertThat(requiredProductDecisions.size()).isEqualTo(1);
-    assertThat(requiredProductDecisions.get(0).getKey()).isEqualTo("buyComputer");
+    
+    DmnDecision requiredProductDecision = getDecision(requiredProductDecisions, "buyComputer");
+    assertThat(requiredProductDecision).isNotNull();
 
     DmnDecision buyComputerDecision = getDecision(decisions, "buyComputer");
     assertThat(buyComputerDecision).isNotNull();
-    List<DmnDecision> buyComputerRequiredDecisions = buyComputerDecision.getRequiredDecisions();
+    Collection<DmnDecision> buyComputerRequiredDecisions = buyComputerDecision.getRequiredDecisions();
     assertThat(buyComputerRequiredDecisions.size()).isEqualTo(1);
-    assertThat(buyComputerRequiredDecisions.get(0).getKey()).isEqualTo("buyElectronic");
+    
+    DmnDecision buyComputerRequiredDecision = getDecision(buyComputerRequiredDecisions, "buyElectronic");
+    assertThat(buyComputerRequiredDecision).isNotNull();
 
     DmnDecision buyElectronicDecision = getDecision(decisions, "buyElectronic");
     assertThat(buyElectronicDecision).isNotNull();
-    List<DmnDecision> buyElectronicRequiredDecisions = buyElectronicDecision.getRequiredDecisions();
+    
+    Collection<DmnDecision> buyElectronicRequiredDecisions = buyElectronicDecision.getRequiredDecisions();
     assertThat(buyElectronicRequiredDecisions.size()).isEqualTo(0);
   }
 
@@ -237,10 +241,14 @@ public class DmnTransformTest extends DmnEngineTest {
     InputStream inputStream = IoUtil.fileAsStream(MULTIPLE_REQUIRED_DECISIONS_DMN);
     DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
     DmnDecision decision = dmnEngine.parseDecision("car",modelInstance);
-    List<DmnDecision> requiredDecisions = decision.getRequiredDecisions();
+    Collection<DmnDecision> requiredDecisions = decision.getRequiredDecisions();
     assertThat(requiredDecisions.size()).isEqualTo(2);
-    assertThat(requiredDecisions.get(0).getKey()).isEqualTo("carPrice");
-    assertThat(requiredDecisions.get(1).getKey()).isEqualTo("carSpeed");
+    
+    DmnDecision carPriceDecision = getDecision(requiredDecisions, "carPrice");
+    assertThat(carPriceDecision).isNotNull();
+    
+    DmnDecision carSpeedDecision = getDecision(requiredDecisions, "carSpeed");
+    assertThat(carSpeedDecision).isNotNull();
   }
 
   @Test
@@ -324,7 +332,7 @@ public class DmnTransformTest extends DmnEngineTest {
     assertThat(decision.getKey()).isEqualTo(key);
   }
 
-  protected DmnDecision getDecision(List<DmnDecision> decisions, String key) {
+  protected DmnDecision getDecision(Collection<DmnDecision> decisions, String key) {
     for(DmnDecision decision: decisions) {
       if(decision.getKey().equals(key)) {
         return decision;

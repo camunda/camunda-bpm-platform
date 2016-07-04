@@ -2,7 +2,7 @@
 <definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn11.xsd"
              id="buy-decision"
              name="Buy Decision"
-             namespace="http://camunda.org/schema/1.0/dmn">
+             namespace="decisionWithRequiredDecisionTransform">
   <decision id="buyProduct" name="buyProduct">
      <informationRequirement>
       <requiredDecision href="#buyComputer" />

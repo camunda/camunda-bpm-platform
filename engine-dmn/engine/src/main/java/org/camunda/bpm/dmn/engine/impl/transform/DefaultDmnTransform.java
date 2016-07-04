@@ -208,25 +208,26 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
     
     for(DmnDecision decision: dmnDecisionList) {
       ensureNoLoopInDecision(decision, new ArrayList<String>(), visitedDecisions);
-      visitedDecisions.add(decision.getKey());
     }
   }
   
   protected void ensureNoLoopInDecision(DmnDecision decision, List<String> parentDecisionList, List<String> visitedDecisions) {
-
-    if(visitedDecisions.contains(decision.getKey())) {
-      return;
-    }
-      
-    if(parentDecisionList.contains(decision.getKey())) {
-      throw LOG.requiredDecisionLoopDetected(decision.getKey());
-    } else {
-      parentDecisionList.add(decision.getKey());
-    }
     
-    for(DmnDecision dmnDecision : decision.getRequiredDecisions()){
-      ensureNoLoopInDecision(dmnDecision, new ArrayList<String>(parentDecisionList), visitedDecisions);
+    if (visitedDecisions.contains(decision.getKey())) {
+      return;  
     }
+
+    parentDecisionList.add(decision.getKey());
+    
+    for(DmnDecision requiredDecision : decision.getRequiredDecisions()){
+
+      if (parentDecisionList.contains(requiredDecision.getKey())) {
+        throw LOG.requiredDecisionLoopDetected(requiredDecision.getKey());
+      }
+
+      ensureNoLoopInDecision(requiredDecision, new ArrayList<String>(parentDecisionList), visitedDecisions);
+    }
+    visitedDecisions.add(decision.getKey());
   }
 
   protected List<DmnDecision> getRequiredDmnDecisions(Decision decision, Map<String, DmnDecisionImpl> dmnDecisions) {

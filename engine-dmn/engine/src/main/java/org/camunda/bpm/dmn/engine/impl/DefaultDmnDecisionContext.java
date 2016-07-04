@@ -200,12 +200,14 @@ public class DefaultDmnDecisionContext {
   }
 
   protected void buildDecisionTree(DmnDecision decision, List<DmnDecision> requiredDecisions) {
+    if(requiredDecisions.contains(decision)) {
+      return;
+    }
+
     for(DmnDecision dmnDecision : decision.getRequiredDecisions()){
       buildDecisionTree(dmnDecision, requiredDecisions);
     }
-    if(requiredDecisions.contains(decision)) {
-      return;
-    } 
+    
     requiredDecisions.add(decision);
   }
 

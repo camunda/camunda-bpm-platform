@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.dmn.engine;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * A decision of the DMN Engine.
@@ -51,6 +51,6 @@ public interface DmnDecision {
    * 
    * @return the list of required decisions.
    */
-  List<DmnDecision> getRequiredDecisions(); 
+  Collection<DmnDecision> getRequiredDecisions(); 
 
 }

@@ -1,6 +1,7 @@
 package org.camunda.bpm.dmn.engine.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
@@ -11,7 +12,7 @@ public class DmnDecisionImpl implements DmnDecision {
   protected String name;
   protected DmnDecisionTableImpl decisionTable;
   
-  protected List<DmnDecision> requiredDecision = new ArrayList<DmnDecision>();
+  protected Collection<DmnDecision> requiredDecision = new ArrayList<DmnDecision>();
 
   public String getKey() {
     return key;
@@ -42,7 +43,7 @@ public class DmnDecisionImpl implements DmnDecision {
   }
 
   @Override
-  public List<DmnDecision> getRequiredDecisions() {
+  public Collection<DmnDecision> getRequiredDecisions() {
     return requiredDecision;
   }
 
