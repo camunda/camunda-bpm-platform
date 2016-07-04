@@ -214,20 +214,20 @@ public class DmnTransformTest extends DmnEngineTest {
 
     List<DmnDecision> decisions = dmnEngine.parseDecisions(modelInstance);
 
-    DmnDecision buyProductDecision = decisions.get(0);
-    assertDecision(buyProductDecision, "buyProduct");
+    DmnDecision buyProductDecision = getDecision(decisions, "buyProduct");
+    assertThat(buyProductDecision).isNotNull();
     List<DmnDecision> requiredProductDecisions = buyProductDecision.getRequiredDecisions();
     assertThat(requiredProductDecisions.size()).isEqualTo(1);
     assertThat(requiredProductDecisions.get(0).getKey()).isEqualTo("buyComputer");
 
-    DmnDecision buyComputerDecision = decisions.get(1);
-    assertDecision(buyComputerDecision, "buyComputer");
+    DmnDecision buyComputerDecision = getDecision(decisions, "buyComputer");
+    assertThat(buyComputerDecision).isNotNull();
     List<DmnDecision> buyComputerRequiredDecisions = buyComputerDecision.getRequiredDecisions();
     assertThat(buyComputerRequiredDecisions.size()).isEqualTo(1);
     assertThat(buyComputerRequiredDecisions.get(0).getKey()).isEqualTo("buyElectronic");
 
-    DmnDecision buyElectronicDecision = decisions.get(2);
-    assertDecision(buyElectronicDecision, "buyElectronic");
+    DmnDecision buyElectronicDecision = getDecision(decisions, "buyElectronic");
+    assertThat(buyElectronicDecision).isNotNull();
     List<DmnDecision> buyElectronicRequiredDecisions = buyElectronicDecision.getRequiredDecisions();
     assertThat(buyElectronicRequiredDecisions.size()).isEqualTo(0);
   }
@@ -255,7 +255,7 @@ public class DmnTransformTest extends DmnEngineTest {
       Assertions.assertThat(e)
       .hasMessageStartingWith("DMN-02004")
       .hasMessageContaining("DMN-02015")
-      .hasMessageContaining("decision 'buyProduct' has a loop");
+      .hasMessageContaining("has a loop");
     }
   }
 
@@ -271,7 +271,7 @@ public class DmnTransformTest extends DmnEngineTest {
       Assertions.assertThat(e)
       .hasMessageStartingWith("DMN-02004")
       .hasMessageContaining("DMN-02015")
-      .hasMessageContaining("decision 'C' has a loop");
+      .hasMessageContaining("has a loop");
     }
   }
 
@@ -287,7 +287,7 @@ public class DmnTransformTest extends DmnEngineTest {
       Assertions.assertThat(e)
       .hasMessageStartingWith("DMN-02004")
       .hasMessageContaining("DMN-02015")
-      .hasMessageContaining("decision 'buyProduct' has a loop");
+      .hasMessageContaining("has a loop");
     }
   }
 
@@ -324,4 +324,12 @@ public class DmnTransformTest extends DmnEngineTest {
     assertThat(decision.getKey()).isEqualTo(key);
   }
 
+  protected DmnDecision getDecision(List<DmnDecision> decisions, String key) {
+    for(DmnDecision decision: decisions) {
+      if(decision.getKey().equals(key)) {
+        return decision;
+      }
+    }
+    return null;
+  }
 }
