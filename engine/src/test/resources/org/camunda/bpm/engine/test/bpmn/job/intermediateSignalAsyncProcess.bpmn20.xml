@@ -3,19 +3,19 @@
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
-  
+
   <signal id="signal" name="Signal" />
 
-  <process id="intermediateSignalJobPrioProcess" camunda:jobPriority="18">
-  
+  <process id="intermediateSignalJobPrioProcess" camunda:jobPriority="18" isExecutable="true">
+
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="signal1" />
     <intermediateThrowEvent id="signal1" camunda:jobPriority="42">
-      <signalEventDefinition signalRef="signal" camunda:async="true" />      
+      <signalEventDefinition signalRef="signal" camunda:async="true" />
     </intermediateThrowEvent>
     <sequenceFlow id="flow3" sourceRef="signal1" targetRef="end" />
     <endEvent id="end" />
-    
+
   </process>
 
 </definitions>

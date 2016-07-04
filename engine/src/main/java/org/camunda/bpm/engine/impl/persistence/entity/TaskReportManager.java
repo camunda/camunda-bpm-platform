@@ -30,12 +30,7 @@ public class TaskReportManager extends AbstractManager {
   @SuppressWarnings("unchecked")
   public List<TaskCountByCandidateGroupResult> createTaskCountByCandidateGroupReport(TaskReportImpl query) {
     configureQuery(query);
-    return getDbEntityManager().selectListWithRawParameter(
-      "selectTaskCountByCandidateGroupReportQuery",
-      query,
-      0,
-      Integer.MAX_VALUE
-    );
+    return getDbEntityManager().selectListWithRawParameter("selectTaskCountByCandidateGroupReportQuery", query, 0, Integer.MAX_VALUE);
   }
 
   protected void configureQuery(TaskReportImpl parameter) {

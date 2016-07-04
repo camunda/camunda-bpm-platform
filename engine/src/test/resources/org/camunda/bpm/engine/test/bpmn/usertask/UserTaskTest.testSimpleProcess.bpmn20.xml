@@ -7,7 +7,7 @@
   xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
 	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL">
 	
-	<process id="financialReport" name="Monthly financial report process">
+	<process id="financialReport" name="Monthly financial report process" isExecutable="true">
 	
 		<startEvent id="theStart" />
 		

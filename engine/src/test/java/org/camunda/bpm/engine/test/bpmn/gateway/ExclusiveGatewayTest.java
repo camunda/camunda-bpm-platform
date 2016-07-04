@@ -168,7 +168,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
   public void testInvalidProcessDefinition() {
     String flowWithoutConditionNoDefaultFlow = "<?xml version='1.0' encoding='UTF-8'?>" +
             "<definitions id='definitions' xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' targetNamespace='Examples'>" +
-            "  <process id='exclusiveGwDefaultSequenceFlow'> " +
+            "  <process id='exclusiveGwDefaultSequenceFlow' isExecutable='true'> " +
             "    <startEvent id='theStart' /> " +
             "    <sequenceFlow id='flow1' sourceRef='theStart' targetRef='exclusiveGw' /> " +
 
@@ -193,7 +193,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
 
     String defaultFlowWithCondition = "<?xml version='1.0' encoding='UTF-8'?>" +
             "<definitions id='definitions' xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' targetNamespace='Examples'>" +
-            "  <process id='exclusiveGwDefaultSequenceFlow'> " +
+            "  <process id='exclusiveGwDefaultSequenceFlow' isExecutable='true'> " +
             "    <startEvent id='theStart' /> " +
             "    <sequenceFlow id='flow1' sourceRef='theStart' targetRef='exclusiveGw' /> " +
 
@@ -219,7 +219,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
 
     String noOutgoingFlow = "<?xml version='1.0' encoding='UTF-8'?>" +
             "<definitions id='definitions' xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' targetNamespace='Examples'>" +
-            "  <process id='exclusiveGwDefaultSequenceFlow'> " +
+            "  <process id='exclusiveGwDefaultSequenceFlow' isExecutable='true'> " +
             "    <startEvent id='theStart' /> " +
             "    <sequenceFlow id='flow1' sourceRef='theStart' targetRef='exclusiveGw' /> " +
             "    <exclusiveGateway id='exclusiveGw' name='Exclusive Gateway' /> " +

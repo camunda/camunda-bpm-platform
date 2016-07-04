@@ -5,7 +5,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   targetNamespace="Examples">
   
-  <process id="compensateProcess">
+  <process id="compensateProcess" isExecutable="true">
 
     <startEvent id="start" />
     

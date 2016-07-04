@@ -4,7 +4,7 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
-  <process id="simpleCallActivityProcess">
+  <process id="simpleCallActivityProcess" isExecutable="true">
   
     <startEvent id="theStart" />
     

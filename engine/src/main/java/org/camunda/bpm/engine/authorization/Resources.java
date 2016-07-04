@@ -35,7 +35,8 @@ public enum Resources implements Resource {
   DECISION_DEFINITION(EntityTypes.DECISION_DEFINITION, 10),
   TENANT(EntityTypes.TENANT, 11),
   TENANT_MEMBERSHIP(EntityTypes.TENANT_MEMBERSHIP, 12),
-  BATCH(EntityTypes.BATCH, 13);
+  BATCH(EntityTypes.BATCH, 13),
+  DECISION_REQUIREMENT_DEFINITION(EntityTypes.DECISION_REQUIREMENT_DEFINITION, 14);
 
   String name;
   int id;

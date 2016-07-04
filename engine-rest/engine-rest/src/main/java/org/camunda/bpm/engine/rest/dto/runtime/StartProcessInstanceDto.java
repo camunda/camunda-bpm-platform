@@ -26,6 +26,7 @@ public class StartProcessInstanceDto {
   protected List<ProcessInstanceModificationInstructionDto> startInstructions;
   protected boolean skipCustomListeners;
   protected boolean skipIoMappings;
+  protected boolean withVariablesInReturn = false;
 
   public Map<String, VariableValueDto> getVariables() {
     return variables;
@@ -73,5 +74,13 @@ public class StartProcessInstanceDto {
 
   public void setSkipIoMappings(boolean skipIoMappings) {
     this.skipIoMappings = skipIoMappings;
+  }
+
+  public boolean isWithVariablesInReturn() {
+    return withVariablesInReturn;
+  }
+
+  public void setWithVariablesInReturn(boolean withVariablesInReturn) {
+    this.withVariablesInReturn = withVariablesInReturn;
   }
 }

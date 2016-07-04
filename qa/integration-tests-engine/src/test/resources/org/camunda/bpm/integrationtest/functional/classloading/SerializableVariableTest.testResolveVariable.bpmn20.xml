@@ -4,7 +4,7 @@
   typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples">
 
 
-  <process id="testResolveVariable">
+  <process id="testResolveVariable" isExecutable="true">
     <startEvent id="theStart" />    
     <sequenceFlow sourceRef="theStart" targetRef="servicetask1" />
     

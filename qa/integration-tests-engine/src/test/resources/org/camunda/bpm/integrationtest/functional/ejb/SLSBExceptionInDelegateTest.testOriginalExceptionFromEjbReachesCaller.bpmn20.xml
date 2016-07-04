@@ -3,7 +3,7 @@
              xmlns:camunda="http://camunda.org/schema/1.0/bpmn" typeLanguage="http://www.w3.org/2001/XMLSchema"
              expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples">
 
-  <process id="testProcessEjbWithException">
+  <process id="testProcessEjbWithException" isExecutable="true">
 
     <startEvent id="theStart" />
 

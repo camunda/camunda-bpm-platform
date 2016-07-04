@@ -8,7 +8,7 @@
   <message id="someMessage" name="someMessage" />
   <message id="someOtherMessage" name="someOtherMessage" />
 
-  <process id="messageStartEvent">
+  <process id="messageStartEvent" isExecutable="true">
 
     <startEvent id="theStart1" >
     	<messageEventDefinition messageRef="tns:someMessage" />

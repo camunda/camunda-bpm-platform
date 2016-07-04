@@ -20,6 +20,8 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
@@ -94,6 +96,8 @@ public class EntityTypeComparatorForModifications implements Comparator<Class<?>
     // 4
     typeOrder.put(ProcessDefinitionEntity.class, 4);
     typeOrder.put(CaseDefinitionEntity.class, 4);
+    typeOrder.put(DecisionDefinitionEntity.class, 4);
+    typeOrder.put(DecisionRequirementDefinitionEntity.class, 4);
     typeOrder.put(ResourceEntity.class, 4);
 
     // 5

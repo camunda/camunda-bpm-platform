@@ -27,6 +27,7 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByPri
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByProcessInstanceId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySortingAndCount;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import java.text.ParseException;
@@ -49,7 +50,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -327,6 +327,12 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(10, query.list().size());
   }
 
+  public void testQueryByAssigned() {
+    TaskQuery query = taskService.createTaskQuery().taskAssigned();
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+  }
+
   public void testQueryByCandidateUser() {
     // kermit is candidate for 12 tasks, two of them are already assigned
     TaskQuery query = taskService.createTaskQuery().taskCandidateUser("kermit");
@@ -424,6 +430,26 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     query = taskService.createTaskQuery().taskCandidateGroup("sales").includeAssignedTasks();
     assertEquals(0, query.count());
     assertEquals(0, query.list().size());
+  }
+
+  public void testQueryWithCandidateGroups() {
+    // test withCandidateGroups
+    TaskQuery query = taskService.createTaskQuery().withCandidateGroups();
+    assertEquals(4, query.count());
+    assertEquals(4, query.list().size());
+
+    assertEquals(5, query.includeAssignedTasks().count());
+    assertEquals(5, query.includeAssignedTasks().list().size());
+  }
+
+  public void testQueryWithoutCandidateGroups() {
+    // test withoutCandidateGroups
+    TaskQuery query = taskService.createTaskQuery().withoutCandidateGroups();
+    assertEquals(6, query.count());
+    assertEquals(6, query.list().size());
+
+    assertEquals(7, query.includeAssignedTasks().count());
+    assertEquals(7, query.includeAssignedTasks().list().size());
   }
 
   public void testQueryByNullCandidateGroup() {
@@ -1531,9 +1557,8 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByActivityInstanceId() throws Exception {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    assertTrue(processInstance instanceof ExecutionEntity);
-    ExecutionEntity execution = (ExecutionEntity) processInstance;
-    String activityInstanceId = execution.getActivityInstanceId();
+    String activityInstanceId = runtimeService.getActivityInstance(processInstance.getId())
+                                              .getChildActivityInstances()[0].getId();
 
     assertEquals(1, taskService.createTaskQuery().activityInstanceIdIn(activityInstanceId).list().size());
   }
@@ -1542,15 +1567,13 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByMultipleActivityInstanceIds() throws Exception {
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    assertTrue(processInstance1 instanceof ExecutionEntity);
-    ExecutionEntity execution1 = (ExecutionEntity) processInstance1;
-    String activityInstanceId1 = execution1.getActivityInstanceId();
+    String activityInstanceId1 = runtimeService.getActivityInstance(processInstance1.getId())
+                                              .getChildActivityInstances()[0].getId();
 
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    assertTrue(processInstance2 instanceof ExecutionEntity);
-    ExecutionEntity execution2 = (ExecutionEntity) processInstance2;
-    String activityInstanceId2 = execution2.getActivityInstanceId();
+    String activityInstanceId2 = runtimeService.getActivityInstance(processInstance2.getId())
+                                              .getChildActivityInstances()[0].getId();
 
     List<Task> result1 = taskService.createTaskQuery().activityInstanceIdIn(activityInstanceId1).list();
     assertEquals(1, result1.size());

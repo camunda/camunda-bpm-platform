@@ -4,13 +4,13 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 
-  <process id="callSimpleSubProcess">
+  <process id="callSimpleSubProcess" isExecutable="true">
 
     <startEvent id="theStart" />
 
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callSubProcess" />
 
-    <callActivity id="callSubProcess" calledElement="simpleSubProcess" camunda:varMapping="org.camunda.bpm.engine.test.bpmn.callactivity.DelegatedVarMapping"/>
+    <callActivity id="callSubProcess" calledElement="simpleSubProcessWithAsyncService" camunda:variableMappingClass="org.camunda.bpm.engine.test.bpmn.callactivity.DelegatedVarMapping"/>
 
     <sequenceFlow id="flow3" sourceRef="callSubProcess" targetRef="taskAfterSubProcess" />
 

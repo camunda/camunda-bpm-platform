@@ -13,7 +13,7 @@ INSERT ALL
   INTO ACT_RU_AUTHORIZATION (ID_, TYPE_, GROUP_ID_, RESOURCE_TYPE_, RESOURCE_ID_, PERMS_, REV_) VALUES ('camunda-admin-grant-tenant-membership', 1, 'camunda-admin', 12, '*', 2147483647, 1)
   INTO ACT_RU_AUTHORIZATION (ID_, TYPE_, GROUP_ID_, RESOURCE_TYPE_, RESOURCE_ID_, PERMS_, REV_) VALUES ('camunda-admin-grant-batch', 1, 'camunda-admin', 13, '*', 2147483647, 1)
 SELECT * FROM dual;
-  
+
 -- tenant id --
 
 ALTER TABLE ACT_RE_DEPLOYMENT
@@ -192,29 +192,29 @@ create index ACT_IDX_TENANT_MEMB on ACT_ID_TENANT_MEMBER(TENANT_ID_);
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB
     foreign key (TENANT_ID_)
-    references ACT_ID_TENANT (ID_);  
+    references ACT_ID_TENANT (ID_);
 
-create index ACT_IDX_TENANT_MEMB_USER on ACT_ID_TENANT_MEMBER(USER_ID_);    
+create index ACT_IDX_TENANT_MEMB_USER on ACT_ID_TENANT_MEMBER(USER_ID_);
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB_USER
     foreign key (USER_ID_)
-    references ACT_ID_USER (ID_);    
-    
-create index ACT_IDX_TENANT_MEMB_GROUP on ACT_ID_TENANT_MEMBER(GROUP_ID_);      
+    references ACT_ID_USER (ID_);
+
+create index ACT_IDX_TENANT_MEMB_GROUP on ACT_ID_TENANT_MEMBER(GROUP_ID_);
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB_GROUP
     foreign key (GROUP_ID_)
-    references ACT_ID_GROUP (ID_);    
-    
+    references ACT_ID_GROUP (ID_);
+
 create unique index ACT_UNIQ_TENANT_MEMB_USER on ACT_ID_TENANT_MEMBER
    (case when USER_ID_ is null then null else TENANT_ID_ end,
-    case when USER_ID_ is null then null else USER_ID_ end); 
-    
+    case when USER_ID_ is null then null else USER_ID_ end);
+
 create unique index ACT_UNIQ_TENANT_MEMB_GROUP on ACT_ID_TENANT_MEMBER
    (case when GROUP_ID_ is null then null else TENANT_ID_ end,
     case when GROUP_ID_ is null then null else GROUP_ID_ end);
 
---- BATCH ---
+--  BATCH --
 
 -- remove not null from job definition table --
 alter table ACT_RU_JOBDEF
@@ -300,7 +300,7 @@ alter table ACT_RU_BATCH
 
 ALTER TABLE ACT_RU_EXT_TASK
   ADD PRIORITY_ NUMBER(19,0) DEFAULT 0 NOT NULL;
-    
+
 create index ACT_IDX_EXT_TASK_PRIORITY ON ACT_RU_EXT_TASK(PRIORITY_);
 
 -- HI OP PROC INDECIES --

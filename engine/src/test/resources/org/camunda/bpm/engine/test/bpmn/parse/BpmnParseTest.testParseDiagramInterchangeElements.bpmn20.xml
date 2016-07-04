@@ -7,7 +7,7 @@
 	id="sid-2a927919-7050-4a4d-a0e9-4a408adeb093" 
 	targetNamespace="Examples">
 	
-	<process id="myProcess" >
+	<process id="myProcess"  isExecutable="true">
 	
 		<startEvent id="theStart" />
 		<sequenceFlow id="flowStartToTask1" sourceRef="theStart" targetRef="task1" />

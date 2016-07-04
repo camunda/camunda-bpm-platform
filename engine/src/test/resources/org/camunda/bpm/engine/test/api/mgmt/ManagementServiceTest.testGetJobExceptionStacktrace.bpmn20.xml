@@ -4,7 +4,7 @@
 	xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
 	targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.mgmt">
 
-	<process id="exceptionInJobExecution">
+	<process id="exceptionInJobExecution" isExecutable="true">
 
 		<startEvent id="theStart" />
 

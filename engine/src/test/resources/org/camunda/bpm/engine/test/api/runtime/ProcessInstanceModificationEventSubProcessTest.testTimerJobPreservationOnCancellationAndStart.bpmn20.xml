@@ -4,7 +4,7 @@
 
   <message id="messageId" name="newMessage" />
 
-  <process id="timerEventSubProcess">
+  <process id="timerEventSubProcess" isExecutable="true">
 
     <startEvent id="theStart" />
     <sequenceFlow sourceRef="theStart" targetRef="task" />

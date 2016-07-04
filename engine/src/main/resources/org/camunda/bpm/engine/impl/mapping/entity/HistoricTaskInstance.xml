@@ -208,7 +208,7 @@
     </if>
     <where>
 
-      <if test="taskInvolvedUser != null || taskInvolvedGroup != null || taskHadCandidateUser != null || taskHadCandidateGroup != null">
+      <if test="taskInvolvedUser != null || taskInvolvedGroup != null || taskHadCandidateUser != null || taskHadCandidateGroup != null || withCandidateGroups">
           RES.ID_ in (select TASK_ID_ from ${prefix}ACT_HI_IDENTITYLINK HIL
           <where>
             <if test= "taskInvolvedUser != null">
@@ -223,8 +223,23 @@
             <if test="taskHadCandidateGroup != null">
               and HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ = #{taskHadCandidateGroup}
             </if>
+            <if test="withCandidateGroups">
+              and HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ is not null
+            </if>
          </where>
          )
+      </if>
+
+      <if test="withoutCandidateGroups">
+        RES.ID_ not in (
+          select
+            TASK_ID_
+          from
+            ${prefix}ACT_HI_IDENTITYLINK HIL
+          <where>
+            HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ is not null
+          </where>
+        )
       </if>
 
       <if test="taskId != null">
@@ -296,6 +311,12 @@
       </if>
       <if test="taskOwnerLike != null">
         and RES.OWNER_ like #{taskOwnerLike}
+      </if>
+      <if test="assigned">
+        and RES.ASSIGNEE_ is not null
+      </if>
+      <if test="unassigned">
+        and RES.ASSIGNEE_ is null
       </if>
       <if test="taskAssignee != null">
         and RES.ASSIGNEE_ = #{taskAssignee}

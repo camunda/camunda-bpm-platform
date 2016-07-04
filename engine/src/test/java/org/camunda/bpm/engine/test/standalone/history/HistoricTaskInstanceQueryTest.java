@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
@@ -185,6 +186,44 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testWithCandidateGroups() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    identityService.setAuthenticatedUserId("aAssignerId");
+    taskService.addCandidateGroup(taskId, "aGroupId");
+
+    // then
+    assertEquals(historyService.createHistoricTaskInstanceQuery().withCandidateGroups().count(), 1);
+
+    // cleanup
+    taskService.deleteTask("newTask", true);
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testWithoutCandidateGroups() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    identityService.setAuthenticatedUserId("aAssignerId");
+    taskService.addCandidateGroup(taskId, "aGroupId");
+
+    // when
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // then
+    assertEquals(historyService.createHistoricTaskInstanceQuery().count(), 2);
+    assertEquals(historyService.createHistoricTaskInstanceQuery().withoutCandidateGroups().count(), 1);
+
+    // cleanup
+    taskService.deleteTask("newTask", true);
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testGroupTaskQuery() {
     // given
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -225,4 +264,61 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     taskService.deleteTask("taskTwo",true);
     taskService.deleteTask("taskThree",true);
   }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testTaskWasAssigned() {
+    // given
+    Task taskOne = taskService.newTask("taskOne");
+    Task taskTwo = taskService.newTask("taskTwo");
+    Task taskThree = taskService.newTask("taskThree");
+
+    // when
+    taskOne.setAssignee("aUserId");
+    taskService.saveTask(taskOne);
+
+    taskTwo.setAssignee("anotherUserId");
+    taskService.saveTask(taskTwo);
+
+    taskService.saveTask(taskThree);
+
+    List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskAssigned().list();
+
+    // then
+    assertEquals(list.size(), 2);
+
+    // cleanup
+    taskService.deleteTask("taskOne",true);
+    taskService.deleteTask("taskTwo",true);
+    taskService.deleteTask("taskThree",true);
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testTaskWasUnassigned() {
+    // given
+    Task taskOne = taskService.newTask("taskOne");
+    Task taskTwo = taskService.newTask("taskTwo");
+    Task taskThree = taskService.newTask("taskThree");
+
+    // when
+    taskOne.setAssignee("aUserId");
+    taskService.saveTask(taskOne);
+
+    taskTwo.setAssignee("anotherUserId");
+    taskService.saveTask(taskTwo);
+
+    taskService.saveTask(taskThree);
+
+    List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskUnassigned().list();
+
+    // then
+    assertEquals(list.size(), 1);
+
+    // cleanup
+    taskService.deleteTask("taskOne",true);
+    taskService.deleteTask("taskTwo",true);
+    taskService.deleteTask("taskThree",true);
+  }
+
 }

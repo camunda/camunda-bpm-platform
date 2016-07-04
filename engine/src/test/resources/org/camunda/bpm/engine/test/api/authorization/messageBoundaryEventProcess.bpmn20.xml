@@ -6,7 +6,7 @@
 
   <message id="newInvoice" name="boundaryInvoiceMessage" />
 
-	<process id="messageBoundaryProcess">
+	<process id="messageBoundaryProcess" isExecutable="true">
 
 		<startEvent id="start" />
 

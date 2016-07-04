@@ -6,7 +6,7 @@
   
   <error id="myException" errorCode="org.camunda.bpm.engine.test.bpmn.event.error.MyBusinessException"/>
   
-  <process id="testCatchExceptionThrownByScriptTask">
+  <process id="testCatchExceptionThrownByScriptTask" isExecutable="true">
   
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="scriptTask" />

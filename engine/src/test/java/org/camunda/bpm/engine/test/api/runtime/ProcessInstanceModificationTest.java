@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListe
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Ignore;
 
 /**
  * @author Thorben Lindhauer
@@ -56,6 +57,8 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   protected static final String LISTENERS_ON_SUB_PROCESS_AND_NESTED_SUB_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.listenersOnSubProcessNested.bpmn20.xml";
   protected static final String DOUBLE_NESTED_SUB_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.doubleNestedSubprocess.bpmn20.xml";
   protected static final String TRANSACTION_WITH_COMPENSATION_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.testTransactionWithCompensation.bpmn20.xml";
+  protected static final String CALL_ACTIVITY_PARENT_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.testCancelCallActivityParentProcess.bpmn";
+  protected static final String CALL_ACTIVITY_CHILD_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.testCancelCallActivityChildProcess.bpmn";
 
   @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
   public void testCancellation() {
@@ -1844,6 +1847,27 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
           + "Transition instance 'nonExistingActivityInstance' does not exist", e.getMessage());
     }
 
+  }
+
+  @Deployment(resources = {
+    CALL_ACTIVITY_PARENT_PROCESS,
+    CALL_ACTIVITY_CHILD_PROCESS
+  })
+  public void FAILING_testCancelCallActivityInstance() {
+    // given
+    ProcessInstance parentprocess = runtimeService.startProcessInstanceByKey("parentprocess");
+    ProcessInstance subProcess = runtimeService.createProcessInstanceQuery().processDefinitionKey("subprocess").singleResult();
+
+    ActivityInstance subProcessActivityInst = runtimeService.getActivityInstance(subProcess.getId());
+
+    // when
+    runtimeService.createProcessInstanceModification(subProcess.getId())
+      .startBeforeActivity("childEnd", subProcess.getId())
+      .cancelActivityInstance(getInstanceIdForActivity(subProcessActivityInst, "innerTask"))
+      .execute();
+
+    // then
+    assertProcessEnded(parentprocess.getId());
   }
 
   public void testModifyNullProcessInstance() {

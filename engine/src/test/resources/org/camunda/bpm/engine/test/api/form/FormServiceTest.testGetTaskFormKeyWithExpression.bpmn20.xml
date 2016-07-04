@@ -5,7 +5,7 @@
              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
              xmlns:camunda="http://camunda.org/schema/1.0/bpmn">
   
-  <process id="FormsProcess">
+  <process id="FormsProcess" isExecutable="true">
   
     <startEvent id="start" camunda:formKey="org/camunda/bpm/engine/test/api/form/start.form" />
 

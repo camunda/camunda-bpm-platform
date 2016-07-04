@@ -116,6 +116,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   @Deprecated
   TaskQuery taskUnnassigned();
 
+  /** Only select tasks which have an assignee. */
+  TaskQuery taskAssigned();
+
   /** Only select tasks with the given {@link DelegationState}. */
   TaskQuery taskDelegationState(DelegationState delegationState);
 
@@ -184,6 +187,12 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
    */
   TaskQuery taskInvolvedUserExpression(String involvedUserExpression);
+
+  /** Only select tasks which have a candidate group */
+  TaskQuery withCandidateGroups();
+
+  /** Only select tasks which have no candidate group */
+  TaskQuery withoutCandidateGroups();
 
   /**
    *  Only select tasks for which users in the given group are candidates.

@@ -7,7 +7,7 @@
   
   <message id="newBooking" name="newBookingMessage" />
   
-  <process id="newBookingProcess">
+  <process id="newBookingProcess" isExecutable="true">
   
     <startEvent id="theStart" >
     	<messageEventDefinition messageRef="tns:newBooking" />

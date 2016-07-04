@@ -49,7 +49,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.*;
  */
 @SuppressWarnings("rawtypes")
 @RunWith(Parameterized.class)
-public class AuthorizationQueryPerformanceTest extends AuthorizationPerformanceTestCase {
+public class RuntimeAuthorizationQueryPerformanceTest extends AuthorizationPerformanceTestCase {
 
   @Parameter(0)
   public static String name;
@@ -74,23 +74,8 @@ public class AuthorizationQueryPerformanceTest extends AuthorizationPerformanceT
     ProcessEngine processEngine = PerfTestProcessEngine.getInstance();
     RuntimeService runtimeService = processEngine.getRuntimeService();
     TaskService taskService = processEngine.getTaskService();
-    HistoryService historyService = processEngine.getHistoryService();
-    ManagementService managementService = processEngine.getManagementService();
-    RepositoryService repositoryService = processEngine.getRepositoryService();
 
     queryResourcesAndPermissions = Arrays.<Object[]>asList(
-        new Object[] {
-            "DeploymentQuery",
-            repositoryService.createDeploymentQuery(),
-            DEPLOYMENT,
-            new Permission[] { READ }
-        },
-        new Object[] {
-            "ProcessDefinitionQuery",
-            repositoryService.createProcessDefinitionQuery(),
-            DEPLOYMENT,
-            new Permission[] { READ }
-        },
         new Object[] {
             "ProcessInstanceQuery",
             runtimeService.createProcessInstanceQuery(),
@@ -108,24 +93,6 @@ public class AuthorizationQueryPerformanceTest extends AuthorizationPerformanceT
             taskService.createTaskQuery(),
             TASK,
             new Permission[] { READ }
-        },
-        new Object[] {
-            "HistoricProcessInstanceQuery",
-            historyService.createHistoricProcessInstanceQuery(),
-            PROCESS_DEFINITION,
-            new Permission[] { READ_HISTORY }
-        },
-        new Object[] {
-            "HistoricActivityInstanceQuery",
-            historyService.createHistoricActivityInstanceQuery(),
-            PROCESS_DEFINITION,
-            new Permission[] { READ_HISTORY }
-        },
-        new Object[] {
-            "ProcessDefinitionStatisticsQuery",
-            managementService.createProcessDefinitionStatisticsQuery(),
-            PROCESS_DEFINITION,
-            new Permission[] { READ_HISTORY }
         }
     );
 

@@ -134,9 +134,12 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     query.taskOwner(testString);
     query.taskOwnerExpression(testString);
     query.taskUnassigned();
+    query.taskAssigned();
     query.taskDelegationState(testDelegationState);
     query.taskCandidateGroupIn(testCandidateGroups);
     query.taskCandidateGroupInExpression(testString);
+    query.withCandidateGroups();
+    query.withoutCandidateGroups();
     query.processInstanceId(testString);
     query.executionId(testString);
     query.activityInstanceIdIn(testActivityInstances);
@@ -222,8 +225,11 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(testString, query.getOwner());
     assertEquals(testString, query.getExpressions().get("taskOwner"));
     assertTrue(query.isUnassigned());
+    assertTrue(query.isAssigned());
     assertEquals(testDelegationState, query.getDelegationState());
     assertEquals(testCandidateGroups, query.getCandidateGroups());
+    assertTrue(query.isWithCandidateGroups());
+    assertTrue(query.isWithoutCandidateGroups());
     assertEquals(testString, query.getExpressions().get("taskCandidateGroupIn"));
     assertEquals(testString, query.getProcessInstanceId());
     assertEquals(testString, query.getExecutionId());

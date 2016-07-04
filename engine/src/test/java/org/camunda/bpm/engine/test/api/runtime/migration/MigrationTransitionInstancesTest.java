@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
@@ -32,6 +31,8 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.mgmt.AlwaysFailingDelegate;
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.AsyncProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
@@ -1051,5 +1052,40 @@ public class MigrationTransitionInstancesTest {
     testHelper.assertJobMigrated("boundary", "boundary", AsyncContinuationJobHandler.TYPE);
   }
 
+  @Test
+  public void testFailMigrateFailedJobIncident() {
+    // given
+    BpmnModelInstance model = ProcessModels.newModel()
+      .startEvent()
+      .serviceTask("serviceTask")
+      .camundaAsyncBefore()
+      .camundaClass(AlwaysFailingDelegate.class.getName())
+      .endEvent()
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(model).changeElementId("serviceTask", "newServiceTask"));
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    String processInstanceId = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId()).getId();
+    testHelper.executeAvailableJobs();
+
+    // when
+    try {
+      rule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(processInstanceId)
+        .execute();
+
+      Assert.fail("should fail");
+    }
+    catch (MigratingProcessInstanceValidationException e) {
+      // then
+      Assert.assertTrue(e instanceof MigratingProcessInstanceValidationException);
+    }
+  }
 
 }

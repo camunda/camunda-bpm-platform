@@ -6,7 +6,7 @@
 
   <signal id="abort" name="abort" />
 
-  <process id="process">
+  <process id="process" isExecutable="true">
     <startEvent id="theStart" />
     <sequenceFlow sourceRef="theStart" targetRef="signal" />
     <intermediateCatchEvent id="signal">

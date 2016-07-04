@@ -939,8 +939,6 @@ public interface TaskService {
   /** The list of subtasks for this parent task */
   List<Task> getSubTasks(String parentTaskId);
 
-  /**
-   * Instantiate a task report.
-   */
+  /** Instantiate a task report */
   TaskReport createTaskReport();
 }

@@ -21,7 +21,7 @@ create table ACT_RU_JOBDEF (
     primary key (ID_)
 );
 
--- add new columns to job table -- 
+-- add new columns to job table --
 alter table ACT_RU_JOB
     add PROCESS_DEF_ID_ varchar(64);
 
@@ -95,7 +95,7 @@ alter table ACT_HI_VARINST
 
 alter table ACT_HI_DETAIL
     add VAR_INST_ID_ varchar(64);
-    
+
 alter table ACT_HI_TASKINST
     add ACT_INST_ID_ varchar(64);
 

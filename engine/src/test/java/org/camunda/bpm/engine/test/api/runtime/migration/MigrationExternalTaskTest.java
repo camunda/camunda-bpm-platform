@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -367,6 +368,36 @@ public class MigrationExternalTaskTest {
     rule.getExternalTaskService().complete(task.getId(), WORKER_ID);
 
     testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testIncidentWithoutMapExternalTask() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS)
+        .changeElementId("externalTask", "newExternalTask"));
+
+    //external task is not mapped to new external task
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    ExternalTask externalTask = rule.getExternalTaskService().createExternalTaskQuery().singleResult();
+    rule.getExternalTaskService().setRetries(externalTask.getId(), 0);
+
+    Incident incidentBeforeMigration = rule.getRuntimeService().createIncidentQuery().singleResult();
+    assertNotNull(incidentBeforeMigration);
+
+    // when migration is executed
+    try {
+      testHelper.migrateProcessInstance(migrationPlan, processInstance);
+      Assert.fail("Exception expected!");
+    } catch (Exception ex) {
+      Assert.assertTrue(ex instanceof MigratingProcessInstanceValidationException);
+    }
   }
 
   protected LockedExternalTask fetchAndLockSingleTask(String topic) {

@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.DiagramLayout;
@@ -179,6 +180,11 @@ public interface RepositoryService {
    * Query decision definitions.
    */
   DecisionDefinitionQuery createDecisionDefinitionQuery();
+
+  /**
+   * Query decision requirement definitions.
+   */
+  DecisionRequirementDefinitionQuery createDecisionRequirementDefinitionQuery();
 
   /**
    * Query process definitions.
@@ -572,7 +578,7 @@ public interface RepositoryService {
   DecisionDefinition getDecisionDefinition(String decisionDefinitionId);
 
   /**
-   * Gives access to a deployed decision model, e.g., a DMN 1.0 XML file,
+   * Gives access to a deployed decision model, e.g., a DMN 1.1 XML file,
    * through a stream of bytes.
    *
    * @param decisionDefinitionId

@@ -5,7 +5,7 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
-  <process id="parentProcess">
+  <process id="parentProcess" isExecutable="true">
   
     <startEvent id="theStart0" />
     <sequenceFlow id="flow01" sourceRef="theStart0" targetRef="callActivity0" />
@@ -26,7 +26,7 @@
   </process>
   
   
-  <process id="midProcess">
+  <process id="midProcess" isExecutable="true">
   
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miCallActivity" />
@@ -49,7 +49,7 @@
   </process>
   
     
-  <process id="childProcess">
+  <process id="childProcess" isExecutable="true">
     <startEvent id="theStart2" />
     <sequenceFlow id="flow4" sourceRef="theStart2" targetRef="task2" />
 

@@ -464,10 +464,13 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   private Map<String, Boolean> getCompleteBooleanQueryParameters() {
     Map<String, Boolean> parameters = new HashMap<String, Boolean>();
 
+    parameters.put("assigned", true);
     parameters.put("unassigned", true);
     parameters.put("active", true);
     parameters.put("suspended", true);
     parameters.put("withoutTenantId", true);
+    parameters.put("withCandidateGroups", true);
+    parameters.put("withoutCandidateGroups", true);
 
     return parameters;
   }

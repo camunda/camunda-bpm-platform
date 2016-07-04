@@ -7,7 +7,7 @@
   
   <message id="newInvoice" name="newInvoiceMessage" />
   
-  <process id="messageStartEvent">
+  <process id="messageStartEvent" isExecutable="true">
   
     <startEvent id="theStart" >
     	<messageEventDefinition messageRef="tns:newInvoice" />

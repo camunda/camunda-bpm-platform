@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             targetNamespace="Examples">
+
+
+  <process id="callSimpleSubProcess" isExecutable="true">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callSubProcess" />
+
+    <callActivity id="callSubProcess" calledElement="failingSubProcess" camunda:variableMappingClass="org.camunda.bpm.engine.test.bpmn.callactivity.DelegatedVarMapping" />
+
+    <sequenceFlow id="flow4" sourceRef="callSubProcess" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+    <boundaryEvent id="catchError" attachedToRef="callSubProcess">
+      <errorEventDefinition camunda:errorCodeVariable="myErrorVariable"
+                            camunda:errorMessageVariable="myErrorMessageVariable" />
+    </boundaryEvent>
+
+    <sequenceFlow id="flow3" sourceRef="catchError" targetRef="taskAfterSubProcess" />
+
+    <userTask id="taskAfterSubProcess" name="Task after subprocess" />
+
+    <sequenceFlow id="flow5" sourceRef="taskAfterSubProcess" targetRef="subEnd" />
+
+    <endEvent id="subEnd" />
+
+
+  </process>
+
+</definitions>

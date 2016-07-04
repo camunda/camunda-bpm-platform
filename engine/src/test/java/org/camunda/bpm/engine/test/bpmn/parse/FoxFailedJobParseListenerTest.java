@@ -2,9 +2,9 @@ package org.camunda.bpm.engine.test.bpmn.parse;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -117,13 +117,12 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTestCas
   }
 
   protected ActivityImpl findActivity(ProcessInstance pi, String activityId) {
-    assertTrue(pi instanceof ExecutionEntity);
-    ExecutionEntity execution = (ExecutionEntity) pi;
 
-    ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
-    assertNotNull(processDefinition);
+    ProcessInstanceWithVariablesEntity entity = (ProcessInstanceWithVariablesEntity) pi;
+    ProcessDefinitionEntity processDefEntity = entity.getExecutionEntity().getProcessDefinition();
 
-    ActivityImpl activity = processDefinition.findActivity(activityId);
+    assertNotNull(processDefEntity);
+    ActivityImpl activity = processDefEntity.findActivity(activityId);
     assertNotNull(activity);
     return activity;
   }

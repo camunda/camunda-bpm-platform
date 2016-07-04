@@ -50,36 +50,35 @@ create table ACT_ID_TENANT_MEMBER (
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
-alter table ACT_ID_MEMBERSHIP 
-    add constraint ACT_FK_MEMB_GROUP 
-    foreign key (GROUP_ID_) 
+alter table ACT_ID_MEMBERSHIP
+    add constraint ACT_FK_MEMB_GROUP
+    foreign key (GROUP_ID_)
     references ACT_ID_GROUP (ID_);
 
-alter table ACT_ID_MEMBERSHIP 
-    add constraint ACT_FK_MEMB_USER 
-    foreign key (USER_ID_) 
+alter table ACT_ID_MEMBERSHIP
+    add constraint ACT_FK_MEMB_USER
+    foreign key (USER_ID_)
     references ACT_ID_USER (ID_);
-    
+
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_UNIQ_TENANT_MEMB_USER
     unique (TENANT_ID_, USER_ID_);
 
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_UNIQ_TENANT_MEMB_GROUP
-    unique (TENANT_ID_, GROUP_ID_);    
-    
+    unique (TENANT_ID_, GROUP_ID_);
+
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB
     foreign key (TENANT_ID_)
-    references ACT_ID_TENANT (ID_);  
-    
+    references ACT_ID_TENANT (ID_);
+
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB_USER
     foreign key (USER_ID_)
-    references ACT_ID_USER (ID_);    
-    
+    references ACT_ID_USER (ID_);
+
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB_GROUP
     foreign key (GROUP_ID_)
     references ACT_ID_GROUP (ID_);
-    

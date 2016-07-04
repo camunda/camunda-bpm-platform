@@ -71,12 +71,10 @@ public class DateFormType extends AbstractFormFieldType {
   }
 
   public TypedValue convertToFormValue(TypedValue modelValue) {
-    if(modelValue.getType() == ValueType.DATE) {
-      if(modelValue.getValue() == null) {
-        return Variables.stringValue(null);
-      } else {
-        return Variables.stringValue(dateFormat.format(modelValue.getValue()));
-      }
+    if(modelValue.getValue() == null) {
+      return Variables.stringValue(null);
+    } else if(modelValue.getType() == ValueType.DATE) {
+      return Variables.stringValue(dateFormat.format(modelValue.getValue()));
     }
     else {
       throw new ProcessEngineException("Expected value to be of type '"+ValueType.DATE+"' but got '"+modelValue.getType()+"'.");

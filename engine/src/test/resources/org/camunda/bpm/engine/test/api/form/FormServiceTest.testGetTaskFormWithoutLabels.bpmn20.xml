@@ -9,7 +9,7 @@
     expressionLanguage="http://www.w3.org/1999/XPath"
     targetNamespace="test">
 
-  <process id="testProcess">
+  <process id="testProcess" isExecutable="true">
 
     <startEvent id="start">
     </startEvent>

@@ -10,7 +10,7 @@
 	
 	<error id="notEnoughInfoError" errorCode="not_enough_info" />
 	
-   <process id="reviewSaledLead" name="Review sales lead">
+   <process id="reviewSaledLead" name="Review sales lead" isExecutable="true">
    
       <startEvent id="theStart" camunda:initiator="initiator" />
       <sequenceFlow id="flow1" sourceRef="theStart" targetRef="provideNewSalesLead"/>

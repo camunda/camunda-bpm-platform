@@ -1,4 +1,4 @@
---------------------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 -- rename table ACT_HI_PROCVARIABLE -> ACT_HI_VARINST --
 
 create table ACT_HI_VARINST (
@@ -36,45 +36,45 @@ create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_VARINST(NAME_, VAR_TYPE_);
 --   -    DUEDATE_ timestamp null,
 --   +    DUEDATE_ timestamp,
 
--------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 -- change column types in ACT_HI_TASKINST --
 
-alter table ACT_HI_TASKINST 
+alter table ACT_HI_TASKINST
 	alter column OWNER_ varchar(255);
 
-alter table ACT_HI_TASKINST 
+alter table ACT_HI_TASKINST
 	alter column ASSIGNEE_ varchar(255);
 
 
--------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 -- change column types in ACT_RU_TASK --
 
-alter table ACT_RU_TASK 
+alter table ACT_RU_TASK
 	alter column OWNER_ varchar(255);
 
-alter table ACT_RU_TASK 
+alter table ACT_RU_TASK
 	alter column ASSIGNEE_ varchar(255);
 
 
--------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 -- change column types in ACT_RU_IDENTITYLINK --
 
 drop index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK;
-alter table ACT_RU_IDENTITYLINK 
+alter table ACT_RU_IDENTITYLINK
 	alter column USER_ID_ varchar(255);
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
 
 drop index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK;
-alter table ACT_RU_IDENTITYLINK 
+alter table ACT_RU_IDENTITYLINK
 	alter column GROUP_ID_ varchar(255);
 create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
 
-----------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 -- change column types in ACT_RU_JOB (remove NOT NULL constraint)
-alter table ACT_RU_JOB 
+alter table ACT_RU_JOB
 	alter column DUEDATE_ datetime2;
 
-----------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 -- revert introduction of new history level --
 
 update ACT_GE_PROPERTY
@@ -83,7 +83,7 @@ update ACT_GE_PROPERTY
   where NAME_ = 'historyLevel' and VALUE_ >= 2;
 
 
------------------------------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 -- change column types of type datetime to datetime2 in runtime & history --
 
 -- runtime
@@ -122,7 +122,7 @@ alter table ACT_HI_DETAIL ALTER COLUMN TIME_ datetime2 not null;
 create index ACT_IDX_HI_DETAIL_TIME on ACT_HI_DETAIL(TIME_);
 alter table ACT_HI_COMMENT ALTER COLUMN TIME_ datetime2 not null;
 
------------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 -- Additional index on PROC_INST_ID_ and ACT_ID_ for historic activity
 
 create index ACT_IDX_HI_ACT_INST_PROCINST on ACT_HI_ACTINST(PROC_INST_ID_, ACT_ID_);

@@ -3,7 +3,7 @@
 	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
 	targetNamespace="one" xmlns:tns="one">
 
-	<process id="process">
+	<process id="process" isExecutable="true">
 
 		<startEvent id="theStart">
       <timerEventDefinition>

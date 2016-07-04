@@ -6,7 +6,7 @@
   
   <signal id="signal" name="Signal" />
 
-  <process id="signalStartJobPrioProcess" camunda:jobPriority="8">
+  <process id="signalStartJobPrioProcess" camunda:jobPriority="8" isExecutable="true">
   
     <startEvent id="start" camunda:jobPriority="4">
       <signalEventDefinition signalRef="signal" />      

@@ -6,7 +6,7 @@
 
 	<signal id="panicSignal" name="panic" />
 
-	<process id="catchPanicSignal">
+	<process id="catchPanicSignal" isExecutable="true">
 
 		<startEvent id="start" />
 

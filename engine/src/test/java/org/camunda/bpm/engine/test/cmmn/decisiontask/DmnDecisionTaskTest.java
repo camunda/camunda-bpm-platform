@@ -28,6 +28,7 @@ public class DmnDecisionTaskTest extends CmmnProcessEngineTestCase {
   public static final String DECISION_OKAY_DMN = "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskTest.testDecisionOkay.dmn11.xml";
   public static final String DECISION_NOT_OKAY_DMN = "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskTest.testDecisionNotOkay.dmn11.xml";
   public static final String DECISION_POJO_DMN = "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskTest.testPojo.dmn11.xml";
+  public static final String DRD_DISH_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
 
   protected final String CASE_KEY = "case";
   protected final String DECISION_TASK = "PI_DecisionTask_1";
@@ -273,6 +274,29 @@ public class DmnDecisionTaskTest extends CmmnProcessEngineTestCase {
     // then
     assertNull(queryCaseExecutionByActivityId(DECISION_TASK));
     assertEquals("okay", getDecisionResult(caseInstance));
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTaskTest.testCallDecisionAsExpressionStartsWithDollar.cmmn",
+      DRD_DISH_RESOURCE
+    })
+  public void testCallDecisionWithRequiredDecisions() {
+    // given
+    CaseInstance caseInstance = createCaseInstanceByKey(CASE_KEY, Variables.createVariables()
+        .putValue("testDecision", "dish-decision")
+        .putValue("temperature", 32)
+        .putValue("dayType", "Weekend"));
+
+    String decisionTaskId = queryCaseExecutionByActivityId(DECISION_TASK).getId();
+
+    // when
+    caseService
+      .withCaseExecution(decisionTaskId)
+      .manualStart();
+
+    // then
+    assertNull(queryCaseExecutionByActivityId(DECISION_TASK));
+    assertEquals("Light salad", getDecisionResult(caseInstance));
   }
 
   protected Object getDecisionResult(CaseInstance caseInstance) {

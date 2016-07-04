@@ -5,7 +5,7 @@
   targetNamespace="Examples">
   
   <message id="messageId" name="Message" />
-  <process id="receiveTaskCompensationHandler">
+  <process id="receiveTaskCompensationHandler" isExecutable="true">
 
     <startEvent id="start" />
     

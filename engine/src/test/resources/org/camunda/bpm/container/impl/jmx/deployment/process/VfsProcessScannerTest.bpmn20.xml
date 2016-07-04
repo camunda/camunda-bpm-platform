@@ -1,5 +1,5 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="Examples">
-  <process id="simpleProcess">
+  <process id="simpleProcess" isExecutable="true">
     <startEvent id="theStart"/>
     <sequenceFlow sourceRef="theStart" targetRef="theEnd"/>
     <endEvent id="theEnd"/>

@@ -7,7 +7,7 @@
 	<error id="myError" />
 	<error id="myThrownError" errorCode="23" />
 
-	<process id="boundaryErrorOnEmbeddedSubprocess">
+	<process id="boundaryErrorOnEmbeddedSubprocess" isExecutable="true">
 
 		<startEvent id="theStart" />
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="subprocess" />

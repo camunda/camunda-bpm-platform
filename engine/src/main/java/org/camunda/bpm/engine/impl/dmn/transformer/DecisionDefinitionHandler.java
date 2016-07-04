@@ -13,28 +13,27 @@
 
 package org.camunda.bpm.engine.impl.dmn.transformer;
 
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformContext;
-import org.camunda.bpm.dmn.engine.impl.transform.DmnDecisionTableTransformHandler;
+import org.camunda.bpm.dmn.engine.impl.transform.DmnDecisionTransformHandler;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
-import org.camunda.bpm.model.dmn.instance.DecisionTable;
+import org.camunda.bpm.model.dmn.instance.Decision;
 
-public class DecisionDefinitionHandler extends DmnDecisionTableTransformHandler {
+public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
 
   @Override
-  protected DmnDecisionTableImpl createDmnElement(DmnElementTransformContext context, DecisionTable decisionTable) {
+  protected DmnDecisionImpl createDmnElement() {
     return new DecisionDefinitionEntity();
   }
 
   @Override
-  protected DmnDecisionTableImpl createFromDecisionTable(DmnElementTransformContext context, DecisionTable decisionTable) {
-    DecisionDefinitionEntity decisionDefinition = (DecisionDefinitionEntity) super.createFromDecisionTable(context, decisionTable);
+  protected DmnDecisionImpl createFromDecision(DmnElementTransformContext context, Decision decision) {
+    DecisionDefinitionEntity decisionDefinition = (DecisionDefinitionEntity) super.createFromDecision(context, decision);
 
     String category = context.getModelInstance().getDefinitions().getNamespace();
     decisionDefinition.setCategory(category);
 
     return decisionDefinition;
   }
-
 
 }

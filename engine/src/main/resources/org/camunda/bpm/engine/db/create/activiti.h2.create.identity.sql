@@ -71,15 +71,14 @@ alter table ACT_ID_TENANT_MEMBER
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB
     foreign key (TENANT_ID_)
-    references ACT_ID_TENANT;  
-    
+    references ACT_ID_TENANT;
+
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB_USER
     foreign key (USER_ID_)
-    references ACT_ID_USER;    
-    
+    references ACT_ID_USER;
+
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB_GROUP
     foreign key (GROUP_ID_)
-    references ACT_ID_GROUP;    
-    
+    references ACT_ID_GROUP;

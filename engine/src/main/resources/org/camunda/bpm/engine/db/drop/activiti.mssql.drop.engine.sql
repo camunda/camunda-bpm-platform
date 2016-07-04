@@ -51,7 +51,7 @@ drop index ACT_RU_EXT_TASK.ACT_IDX_EXT_TASK_TENANT_ID;
 drop index ACT_RU_EXT_TASK.ACT_IDX_EXT_TASK_PRIORITY;
 drop index ACT_RU_INCIDENT.ACT_IDX_INC_TENANT_ID;
 drop index ACT_RU_JOBDEF.ACT_IDX_JOBDEF_TENANT_ID;
-drop index ACT_RU_JOB.ACT_IDX_JOB_TENANT_ID; 
+drop index ACT_RU_JOB.ACT_IDX_JOB_TENANT_ID;
 drop index ACT_RU_EVENT_SUBSCR.ACT_IDX_EVENT_SUBSCR_TENANT_ID;
 drop index ACT_RU_VARIABLE.ACT_IDX_VARIABLE_TENANT_ID;
 drop index ACT_RU_TASK.ACT_IDX_TASK_TENANT_ID;
@@ -64,65 +64,65 @@ drop index ACT_RU_BATCH.ACT_IDX_BATCH_SEED_JOB_DEF;
 drop index ACT_RU_BATCH.ACT_IDX_BATCH_MONITOR_JOB_DEF;
 drop index ACT_RU_BATCH.ACT_IDX_BATCH_JOB_DEF;
 
-alter table ACT_GE_BYTEARRAY 
+alter table ACT_GE_BYTEARRAY
     drop constraint ACT_FK_BYTEARR_DEPL;
 
-alter table ACT_RU_EXECUTION 
-    drop constraint ACT_FK_EXE_PROCINST;    
-    
-alter table ACT_RU_EXECUTION 
+alter table ACT_RU_EXECUTION
+    drop constraint ACT_FK_EXE_PROCINST;
+
+alter table ACT_RU_EXECUTION
     drop constraint ACT_FK_EXE_PROCDEF;
-	
-alter table ACT_RU_EXECUTION 
+
+alter table ACT_RU_EXECUTION
     drop constraint ACT_FK_EXE_PARENT;
 
-alter table ACT_RU_EXECUTION 
-    drop constraint ACT_FK_EXE_SUPER;  
-	
+alter table ACT_RU_EXECUTION
+    drop constraint ACT_FK_EXE_SUPER;
+
 alter table ACT_RU_IDENTITYLINK
     drop constraint ACT_FK_TSKASS_TASK;
 
 alter table ACT_RU_IDENTITYLINK
     drop constraint ACT_FK_ATHRZ_PROCEDEF;
-    
+
 alter table ACT_RU_TASK
 	drop constraint ACT_FK_TASK_EXE;
 
 alter table ACT_RU_TASK
 	drop constraint ACT_FK_TASK_PROCINST;
-	
+
 alter table ACT_RU_TASK
 	drop constraint ACT_FK_TASK_PROCDEF;
-    
+
 alter table ACT_RU_VARIABLE
     drop constraint ACT_FK_VAR_EXE;
-    
+
 alter table ACT_RU_VARIABLE
-	drop constraint ACT_FK_VAR_PROCINST;    
+	drop constraint ACT_FK_VAR_PROCINST;
 
 alter table ACT_RU_VARIABLE
     drop constraint ACT_FK_VAR_BYTEARRAY;
 
 alter table ACT_RU_JOB
     drop constraint ACT_FK_JOB_EXCEPTION;
-    
+
 alter table ACT_RU_EVENT_SUBSCR
     drop constraint ACT_FK_EVENT_EXEC;
 
 alter table ACT_RU_INCIDENT
-    drop constraint ACT_FK_INC_EXE; 
-  
+    drop constraint ACT_FK_INC_EXE;
+
 alter table ACT_RU_INCIDENT
-    drop constraint ACT_FK_INC_PROCINST; 
+    drop constraint ACT_FK_INC_PROCINST;
 
 alter table ACT_RU_INCIDENT
     drop constraint ACT_FK_INC_PROCDEF;
-    
-alter table ACT_RU_INCIDENT
-    drop constraint ACT_FK_INC_CAUSE; 
 
 alter table ACT_RU_INCIDENT
-    drop constraint ACT_FK_INC_RCAUSE; 
+    drop constraint ACT_FK_INC_CAUSE;
+
+alter table ACT_RU_INCIDENT
+    drop constraint ACT_FK_INC_RCAUSE;
 
 alter table ACT_RU_INCIDENT
     drop constraint ACT_FK_INC_JOB_DEF;
@@ -142,7 +142,7 @@ alter table ACT_RU_BATCH
 drop index ACT_RU_IDENTITYLINK.ACT_IDX_ATHRZ_PROCEDEF;
 
 drop index ACT_RE_PROCDEF.ACT_IDX_PROCDEF_VER_TAG;
-    
+
 if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'ACT_GE_PROPERTY') drop table ACT_GE_PROPERTY;
 if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'ACT_GE_BYTEARRAY') drop table ACT_GE_BYTEARRAY;
 if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'ACT_RE_PROCDEF') drop table ACT_RE_PROCDEF;

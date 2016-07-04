@@ -7,7 +7,7 @@
 	<signal id="alertSignal" name="alert" />
 	<message id="invoiceMessage" name="newInvoice" />
 
-	<process id="catchSignal">
+	<process id="catchSignal" isExecutable="true">
 	
 		<sequenceFlow sourceRef="timerEvent" targetRef="task1" />
 		<sequenceFlow sourceRef="signalEvent" targetRef="task2" />

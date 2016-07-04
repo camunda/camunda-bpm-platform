@@ -1,4 +1,4 @@
--- ------------------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 -- rename table ACT_HI_PROCVARIABLE -> ACT_HI_VARINST
 
 create table ACT_HI_VARINST (
@@ -36,7 +36,7 @@ create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_VARINST(NAME_, VAR_TYPE_);
 --   -    DUEDATE_ timestamp null,
 --   +    DUEDATE_ timestamp,
 
--- ------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 -- change column types in ACT_HI_TASKINST
 
 alter table ACT_HI_TASKINST ALTER COLUMN OWNER_ TYPE varchar(255);
@@ -44,7 +44,7 @@ alter table ACT_HI_TASKINST ALTER COLUMN OWNER_ TYPE varchar(255);
 alter table ACT_HI_TASKINST ALTER COLUMN ASSIGNEE_ TYPE varchar(255);
 
 
--- --------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- --
 -- change column types in ACT_RU_TASK --
 
 alter table ACT_RU_TASK ALTER COLUMN OWNER_ TYPE varchar(255);
@@ -52,7 +52,7 @@ alter table ACT_RU_TASK ALTER COLUMN OWNER_ TYPE varchar(255);
 alter table ACT_RU_TASK ALTER COLUMN ASSIGNEE_ TYPE varchar(255);
 
 
--- ----------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 -- change column types in ACT_RU_IDENTITYLINK --
 
 drop index ACT_IDX_IDENT_LNK_GROUP;
@@ -61,18 +61,18 @@ create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
 
 drop index ACT_IDX_IDENT_LNK_USER;
 alter table ACT_RU_IDENTITYLINK ALTER COLUMN USER_ID_ TYPE varchar(255);
-create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);   
+create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
 
-    
--- --------------------------------------------
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 -- change column types in ACT_RU_JOB (remove NOT NULL constraint)
 alter table ACT_RU_JOB ALTER COLUMN DUEDATE_ TYPE timestamp;
 
--- --------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 -- revert introduction of new history level --
 
 update ACT_GE_PROPERTY set VALUE_ = CAST ( VALUE_ AS integer )- 1, REV_ = REV_ + 1 where NAME_ = 'historyLevel' and CAST (VALUE_ as integer) >= 2;
 
--- --------------------------------------------
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 -- Additional index on PROC_INST_ID_ and ACT_ID_ for historic activity --
 create index ACT_IDX_HI_ACT_INST_PROCINST on ACT_HI_ACTINST(PROC_INST_ID_, ACT_ID_);

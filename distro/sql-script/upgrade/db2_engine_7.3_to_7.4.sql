@@ -1,10 +1,10 @@
 -- metrics --
 
-ALTER TABLE ACT_RU_METER_LOG 
+ALTER TABLE ACT_RU_METER_LOG
   ADD REPORTER_ varchar(255);
 
 -- job prioritization --
-  
+
 ALTER TABLE ACT_RU_JOB
   ADD PRIORITY_ bigint not null
   DEFAULT 0;
@@ -39,7 +39,7 @@ alter table ACT_RE_DECISION_DEF
 
 ALTER TABLE ACT_RU_CASE_SENTRY_PART
   ADD SOURCE_ varchar(255);
-  
+
 -- create history decision instance table --
 create table ACT_HI_DECINST (
     ID_ varchar(64) NOT NULL,
@@ -62,28 +62,28 @@ create table ACT_HI_DECINST (
 -- create history decision input table --
 create table ACT_HI_DEC_IN (
     ID_ varchar(64) NOT NULL,
-    DEC_INST_ID_ varchar(64) NOT NULL,      
+    DEC_INST_ID_ varchar(64) NOT NULL,
     CLAUSE_ID_ varchar(64) NOT NULL,
     CLAUSE_NAME_ varchar(255),
-    VAR_TYPE_ varchar(100),               
+    VAR_TYPE_ varchar(100),
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double precision,
     LONG_ bigint,
     TEXT_ varchar(4000),
-    TEXT2_ varchar(4000),    
+    TEXT2_ varchar(4000),
     primary key (ID_)
 );
 
 -- create history decision output table --
 create table ACT_HI_DEC_OUT (
     ID_ varchar(64) NOT NULL,
-    DEC_INST_ID_ varchar(64) NOT NULL,         
+    DEC_INST_ID_ varchar(64) NOT NULL,
     CLAUSE_ID_ varchar(64) NOT NULL,
     CLAUSE_NAME_ varchar(255),
     RULE_ID_ varchar(64) NOT NULL,
     RULE_ORDER_ integer,
     VAR_NAME_ varchar(255),
-    VAR_TYPE_ varchar(100),               
+    VAR_TYPE_ varchar(100),
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double precision,
     LONG_ bigint,
@@ -112,7 +112,7 @@ INSERT INTO
   ACT_RU_AUTHORIZATION (ID_, TYPE_, GROUP_ID_, RESOURCE_TYPE_, RESOURCE_ID_, PERMS_, REV_)
 VALUES
   ('camunda-admin-grant-decision-definition', 1, 'camunda-admin', 10, '*', 2147483647, 1);
-  
+
 -- external tasks --
 
 create table ACT_RU_EXT_TASK (
@@ -134,20 +134,20 @@ create table ACT_RU_EXT_TASK (
 );
 
 alter table ACT_RU_EXT_TASK
-    add constraint ACT_FK_EXT_TASK_EXE 
-    foreign key (EXECUTION_ID_) 
+    add constraint ACT_FK_EXT_TASK_EXE
+    foreign key (EXECUTION_ID_)
     references ACT_RU_EXECUTION (ID_);
-    
+
 create index ACT_IDX_EXT_TASK_TOPIC ON ACT_RU_EXT_TASK(TOPIC_NAME_);
 
 -- deployment --
 
-ALTER TABLE ACT_RE_DEPLOYMENT 
+ALTER TABLE ACT_RE_DEPLOYMENT
   ADD SOURCE_ varchar(255);
 
 ALTER TABLE ACT_HI_OP_LOG
   ADD DEPLOYMENT_ID_ varchar(64);
-  
+
 -- job suspension state
 
 ALTER TABLE ACT_RU_JOB
@@ -158,9 +158,9 @@ ALTER TABLE ACT_RU_JOB
 UPDATE ACT_RU_JOB
   SET SUSPENSION_STATE_ = 1
   WHERE SUSPENSION_STATE_ IS NULL;
-  
+
 ALTER TABLE ACT_RU_JOB
   ALTER COLUMN SUSPENSION_STATE_
   SET NOT NULL;
-  
+
 CALL SYSPROC.ADMIN_CMD('REORG TABLE ACT_RU_JOB');

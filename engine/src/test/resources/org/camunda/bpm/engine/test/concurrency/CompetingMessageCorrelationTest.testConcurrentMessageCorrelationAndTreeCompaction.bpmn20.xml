@@ -5,7 +5,7 @@
   targetNamespace="Examples">
 
   <message id="messageId" name="Message" />
-  <process id="process">
+  <process id="process" isExecutable="true">
 
     <startEvent id="start" />
     <sequenceFlow sourceRef="start" targetRef="fork" />

@@ -5,7 +5,7 @@
   targetNamespace="Examples">
 
   <message id="message" name="Message" />
-  <process id="boundaryExternalTaskProcess">
+  <process id="boundaryExternalTaskProcess" isExecutable="true">
     <startEvent id="start" />
     
     <sequenceFlow id="flow1" sourceRef="start" targetRef="externalTask" />

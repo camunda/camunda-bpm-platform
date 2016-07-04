@@ -47,12 +47,43 @@ public interface ProcessInstantiationBuilder
   ProcessInstantiationBuilder caseInstanceId(String caseInstanceId);
 
   /**
+   * Start the process instance.
+   *
+   * @return the newly created process instance  
+   * @throws AuthorizationException
+   *           if the user has no {@link Permissions#CREATE} permission on
+   *           {@link Resources#PROCESS_INSTANCE} and no
+   *           {@link Permissions#CREATE_INSTANCE} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
+   * @deprecated use {@link #executeWithVariablesInReturn()} instead.
+   */
+  @Deprecated
+  ProcessInstance execute();
+
+  /**
+   * Start the process instance.
+   *
+   * @param skipCustomListeners
+   *          specifies whether custom listeners (task and execution) should be
+   *          invoked when executing the instructions. Only supported for
+   *          instructions.
+   * @param skipIoMappings
+   *          specifies whether input/output mappings for tasks should be
+   *          invoked throughout the transaction when executing the
+   *          instructions. Only supported for instructions.
+   * @return the newly created process instance
+   * @deprecated use {@link #executeWithVariablesInReturn(boolean, boolean)} instead.
+   */
+  @Deprecated
+  ProcessInstance execute(boolean skipCustomListeners, boolean skipIoMappings);
+
+  /**
    * Start the process instance. If no instantiation instructions are set then
    * the instance start at the default start activity. Otherwise, all
    * instructions are executed in the order they are submitted. Custom execution
    * and task listeners, as well as task input output mappings are triggered.
    *
-   * @return the newly created process instance
+   * @return the newly created process instance with the variables which are set during execution
    *
    * @throws AuthorizationException
    *           if the user has no {@link Permissions#CREATE} permission on
@@ -60,7 +91,7 @@ public interface ProcessInstantiationBuilder
    *           {@link Permissions#CREATE_INSTANCE} permission on
    *           {@link Resources#PROCESS_DEFINITION}.
    */
-  ProcessInstance execute();
+  ProcessInstanceWithVariables executeWithVariablesInReturn();
 
   /**
    * Start the process instance. If no instantiation instructions are set then
@@ -75,7 +106,7 @@ public interface ProcessInstantiationBuilder
    *          specifies whether input/output mappings for tasks should be
    *          invoked throughout the transaction when executing the
    *          instructions. Only supported for instructions.
-   * @return the newly created process instance
+   * @return the newly created process instance with the variables which are set during execution
    *
    * @throws AuthorizationException
    *           if the user has no {@link Permissions#CREATE} permission on
@@ -90,6 +121,5 @@ public interface ProcessInstantiationBuilder
    *           Use {@link #execute()} instead.
    *
    */
-  ProcessInstance execute(boolean skipCustomListeners, boolean skipIoMappings);
-
+  ProcessInstanceWithVariables executeWithVariablesInReturn(boolean skipCustomListeners, boolean skipIoMappings);
 }

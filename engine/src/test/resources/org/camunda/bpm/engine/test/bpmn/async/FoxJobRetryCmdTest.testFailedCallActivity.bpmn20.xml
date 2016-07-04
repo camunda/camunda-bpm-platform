@@ -5,7 +5,7 @@
 	xmlns:fox="http://www.camunda.com/fox"
 	targetNamespace="Examples">
 
-	<process id="failedCallActivity">
+	<process id="failedCallActivity" isExecutable="true">
 
 		<startEvent id="theStart" />
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="failingCallActivity" />
@@ -22,7 +22,7 @@
 
 	</process>
 	
-	<process id="asyncService">
+	<process id="asyncService" isExecutable="true">
 
 		<startEvent id="start" />
 		<sequenceFlow id="flow1a" sourceRef="start" targetRef="service" />

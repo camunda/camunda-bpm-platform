@@ -2,7 +2,7 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema"
              expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples">
 
-  <process id="callProcessWithExceptionFromEjb">
+  <process id="callProcessWithExceptionFromEjb" isExecutable="true">
 
     <startEvent id="theStart" />
 

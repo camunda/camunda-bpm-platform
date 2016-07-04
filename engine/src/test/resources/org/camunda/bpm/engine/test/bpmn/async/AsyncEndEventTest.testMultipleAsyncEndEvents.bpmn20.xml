@@ -5,7 +5,7 @@
   targetNamespace="Examples"
   xmlns:tns="Examples">
 
-  <process id="multipleAsyncEndEvent">
+  <process id="multipleAsyncEndEvent" isExecutable="true">
 
     <startEvent id="startEvent" />
 

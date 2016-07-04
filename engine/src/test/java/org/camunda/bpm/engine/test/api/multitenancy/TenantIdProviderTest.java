@@ -12,14 +12,10 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -38,12 +34,21 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import org.junit.After;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -69,7 +74,9 @@ public class TenantIdProviderTest {
 
   protected static final String TENANT_ID = "tenant1";
 
-  protected ProcessEngineRule engineRule = new ProcessEngineRule(CONFIGURATION_RESOURCE, true);
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(CONFIGURATION_RESOURCE);
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
 
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
@@ -113,6 +120,99 @@ public class TenantIdProviderTest {
     engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
 
     // then the tenant id provider is not invoked
+    assertThat(tenantIdProvider.parameters.size(), is(0));
+  }
+
+
+
+  @Test
+  public void providerCalledForStartedProcessInstanceByStartFormWithoutTenantId() {
+    ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
+    TestTenantIdProvider.delegate = tenantIdProvider;
+
+    // given a deployment without a tenant id
+    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().done(),
+                                            "org/camunda/bpm/engine/test/api/form/util/request.form");
+
+    // when a process instance is started with a start form
+    String processDefinitionId = engineRule.getRepositoryService()
+                                           .createProcessDefinitionQuery()
+                                           .singleResult()
+                                           .getId();
+
+    Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put("employeeName", "demo");
+
+    ProcessInstance procInstance = engineRule.getFormService().submitStartForm(processDefinitionId, properties);
+    assertNotNull(procInstance);
+
+    // then the tenant id provider is invoked
+    assertThat(tenantIdProvider.parameters.size(), is(1));
+  }
+
+
+  @Test
+  public void providerNotCalledForStartedProcessInstanceByStartFormWithTenantId() {
+    ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
+    TestTenantIdProvider.delegate = tenantIdProvider;
+
+    // given a deployment with a tenant id
+    testRule.deployForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().done(),
+                                            "org/camunda/bpm/engine/test/api/form/util/request.form");
+
+    // when a process instance is started with a start form
+    String processDefinitionId = engineRule.getRepositoryService()
+                                           .createProcessDefinitionQuery()
+                                           .singleResult()
+                                           .getId();
+
+    Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put("employeeName", "demo");
+
+    ProcessInstance procInstance = engineRule.getFormService().submitStartForm(processDefinitionId, properties);
+    assertNotNull(procInstance);
+
+    // then the tenant id provider is not invoked
+    assertThat(tenantIdProvider.parameters.size(), is(0));
+  }
+
+  @Test
+  public void providerCalledForStartedProcessInstanceByModificationWithoutTenantId() {
+    // given a deployment without a tenant id
+    ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
+    TestTenantIdProvider.delegate = tenantIdProvider;
+    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+                                                .startEvent().userTask("task")
+                                                .endEvent().done(),
+                                            "org/camunda/bpm/engine/test/api/form/util/request.form");
+
+    // when a process instance is created and the instance is set to a starting point
+    String processInstanceId = engineRule.getRuntimeService()
+                                         .createProcessInstanceByKey(PROCESS_DEFINITION_KEY)
+                                         .startBeforeActivity("task").execute().getProcessInstanceId();
+
+    //then provider is called
+    assertNotNull(engineRule.getRuntimeService().getActivityInstance(processInstanceId));
+    assertThat(tenantIdProvider.parameters.size(), is(1));
+  }
+
+  @Test
+  public void providerNotCalledForStartedProcessInstanceByModificationWithTenantId() {
+    // given a deployment with a tenant id
+    ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
+    TestTenantIdProvider.delegate = tenantIdProvider;
+    testRule.deployForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+                                                                   .startEvent().userTask("task")
+                                                                   .endEvent().done(),
+                                            "org/camunda/bpm/engine/test/api/form/util/request.form");
+
+    // when a process instance is created and the instance is set to a starting point
+    String processInstanceId = engineRule.getRuntimeService()
+                                         .createProcessInstanceByKey(PROCESS_DEFINITION_KEY)
+                                         .startBeforeActivity("task").execute().getProcessInstanceId();
+
+    //then provider should not be called
+    assertNotNull(engineRule.getRuntimeService().getActivityInstance(processInstanceId));
     assertThat(tenantIdProvider.parameters.size(), is(0));
   }
 

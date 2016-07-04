@@ -50,30 +50,30 @@ create table ACT_ID_TENANT_MEMBER (
     primary key (ID_)
 );
 
-alter table ACT_ID_MEMBERSHIP 
-    add constraint ACT_FK_MEMB_GROUP 
-    foreign key (GROUP_ID_) 
+alter table ACT_ID_MEMBERSHIP
+    add constraint ACT_FK_MEMB_GROUP
+    foreign key (GROUP_ID_)
     references ACT_ID_GROUP (ID_);
 
-alter table ACT_ID_MEMBERSHIP 
-    add constraint ACT_FK_MEMB_USER 
-    foreign key (USER_ID_) 
+alter table ACT_ID_MEMBERSHIP
+    add constraint ACT_FK_MEMB_USER
+    foreign key (USER_ID_)
     references ACT_ID_USER (ID_);
 
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB
     foreign key (TENANT_ID_)
-    references ACT_ID_TENANT (ID_);  
-    
+    references ACT_ID_TENANT (ID_);
+
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB_USER
     foreign key (USER_ID_)
-    references ACT_ID_USER (ID_);    
-    
+    references ACT_ID_USER (ID_);
+
 alter table ACT_ID_TENANT_MEMBER
     add constraint ACT_FK_TENANT_MEMB_GROUP
     foreign key (GROUP_ID_)
-    references ACT_ID_GROUP (ID_);    
-    
+    references ACT_ID_GROUP (ID_);
+
 create unique index ACT_UNIQ_TENANT_MEMB_USER on ACT_ID_TENANT_MEMBER (TENANT_ID_, USER_ID_) where USER_ID_ is not null;
-create unique index ACT_UNIQ_TENANT_MEMB_GROUP on ACT_ID_TENANT_MEMBER (TENANT_ID_, GROUP_ID_) where GROUP_ID_ is not null;  
+create unique index ACT_UNIQ_TENANT_MEMB_GROUP on ACT_ID_TENANT_MEMBER (TENANT_ID_, GROUP_ID_) where GROUP_ID_ is not null;

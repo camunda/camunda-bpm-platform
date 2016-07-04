@@ -6,7 +6,7 @@
 
   <error id="someError" />
 
-  <process id="testUncaughtRuntimeException">
+  <process id="testUncaughtRuntimeException" isExecutable="true">
 
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="serviceTask" />

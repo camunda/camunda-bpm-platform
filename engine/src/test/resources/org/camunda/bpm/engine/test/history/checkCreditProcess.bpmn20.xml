@@ -4,7 +4,7 @@
 	xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
 	targetNamespace="Examples">
 
-	<process id="checkCreditProcess">
+	<process id="checkCreditProcess" isExecutable="true">
 
 		<startEvent id="theStart" />
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="verifyCreditHistoryTask" />

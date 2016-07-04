@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_1339690990326" name="fox-invoice-2" targetNamespace="http://www.trisotech.com/definitions/_1339690990326">
   <message id="_1339690990375" name="startMessageBPI"/>
-  <process id="bpi-invoice">
+  <process id="bpi-invoice" isExecutable="true">
     <laneSet id="lsProcess_Engine_1">
       <lane id="Team-Assistenz_110" name="Team-Assistenz">
         <flowNodeRef>Freigebenden_zuordnen_143</flowNodeRef>

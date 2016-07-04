@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 
 /**
@@ -118,13 +119,23 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
   }
 
   public ProcessInstance execute(boolean skipCustomListeners, boolean skipIoMappings) {
+    return executeWithVariablesInReturn(skipCustomListeners, skipIoMappings);
+  }
+
+  @Override
+  public ProcessInstanceWithVariables executeWithVariablesInReturn() {
+    return executeWithVariablesInReturn(false, false);
+  }
+  
+  @Override
+  public ProcessInstanceWithVariables executeWithVariablesInReturn(boolean skipCustomListeners, boolean skipIoMappings) {
     ensureOnlyOneNotNull("either process definition id or key must be set", processDefinitionId, processDefinitionKey);
 
     if (isTenantIdSet && processDefinitionId != null) {
       throw LOG.exceptionStartProcessInstanceByIdAndTenantId();
     }
 
-    Command<ProcessInstance> command;
+    Command<ProcessInstanceWithVariables> command;
 
     if (modificationBuilder.getModificationOperations().isEmpty()) {
 

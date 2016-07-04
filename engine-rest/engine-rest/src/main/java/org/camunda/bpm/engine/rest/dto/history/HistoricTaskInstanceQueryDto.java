@@ -105,6 +105,8 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected String taskDefinitionKey;
   protected String taskDeleteReason;
   protected String taskDeleteReasonLike;
+  protected Boolean assigned;
+  protected Boolean unassigned;
   protected String taskAssignee;
   protected String taskAssigneeLike;
   protected String taskOwner;
@@ -131,6 +133,8 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected String taskInvolvedGroup;
   protected String taskHadCandidateUser;
   protected String taskHadCandidateGroup;
+  protected Boolean withCandidateGroups;
+  protected Boolean withoutCandidateGroups;
   protected List<VariableQueryParameterDto> taskVariables;
   protected List<VariableQueryParameterDto> processVariables;
 
@@ -215,6 +219,16 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     this.taskDeleteReasonLike = taskDeleteReasonLike;
   }
 
+  @CamundaQueryParam(value="assigned", converter=BooleanConverter.class)
+  public void setAssigned(Boolean assigned) {
+    this.assigned = assigned;
+  }
+
+  @CamundaQueryParam(value="unassigned", converter=BooleanConverter.class)
+  public void setUnassigned(Boolean unassigned) {
+    this.unassigned = unassigned;
+  }
+  
   @CamundaQueryParam("taskAssignee")
   public void setTaskAssignee(String taskAssignee) {
     this.taskAssignee = taskAssignee;
@@ -350,6 +364,16 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     this.taskHadCandidateGroup = taskHadCandidateGroup;
   }
 
+  @CamundaQueryParam(value="withCandidateGroups", converter=BooleanConverter.class)
+  public void setWithCandidateGroups(Boolean withCandidateGroups) {
+    this.withCandidateGroups = withCandidateGroups;
+  }
+
+  @CamundaQueryParam(value="withoutCandidateGroups", converter=BooleanConverter.class)
+  public void setWithoutCandidateGroups(Boolean withoutCandidateGroups) {
+    this.withoutCandidateGroups = withoutCandidateGroups;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -406,6 +430,12 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     }
     if (taskDeleteReasonLike != null) {
       query.taskDeleteReasonLike(taskDeleteReasonLike);
+    }
+    if (assigned != null) {
+      query.taskAssigned();
+    }
+    if (unassigned != null) {
+      query.taskUnassigned();
     }
     if (taskAssignee != null) {
       query.taskAssignee(taskAssignee);
@@ -481,6 +511,12 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     }
     if(taskHadCandidateGroup != null){
       query.taskHadCandidateGroup(taskHadCandidateGroup);
+    }
+    if (withCandidateGroups != null) {
+      query.withCandidateGroups();
+    }
+    if (withoutCandidateGroups != null) {
+      query.withoutCandidateGroups();
     }
     if (taskVariables != null) {
       for (VariableQueryParameterDto variableQueryParam : taskVariables) {

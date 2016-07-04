@@ -17,4 +17,12 @@ package org.camunda.bpm.engine.repository;
  */
 public interface DecisionDefinition extends ResourceDefinition {
 
+  /**
+   * Returns the id of the related decision requirement definition. Can be
+   * <code>null</code> if the decision has no relations to other decisions.
+   *
+   * @return the id of the decision requirement definition if exists.
+   */
+  String getDecisionRequirementDefinitionId();
+
 }

@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.junit.Ignore;
 
 /**
  * <p>Testcase verifying support for form matadata provided using
@@ -216,18 +215,21 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void failTestDateFormProperty()
+  public void testMissingFormVariables()
   {
-    Map<String, Object> variables = new HashMap<String, Object>(1);
-
-    // if i uncomment the following line, everything works fine
-    // variables.put("myDate", new Date());
-
-    // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("date-form-property-test", variables);
+    // given process definition with defined form varaibles
+    // when start process instance with no variables
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("date-form-property-test");
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    //fails
-    formService.getTaskFormData(task.getId());
+
+    // then taskFormData contains form variables with null as values
+    TaskFormData taskFormData = formService.getTaskFormData(task.getId());
+    assertNotNull(taskFormData);
+    assertEquals(5, taskFormData.getFormFields().size());
+    for (FormField field : taskFormData.getFormFields()) {
+      assertNotNull(field);
+      assertNull(field.getValue().getValue());
+    }
   }
 
 }

@@ -45,12 +45,12 @@ public class DecisionTableInvocation extends DelegateInvocation {
     this.variableContext = variableContext;
   }
 
+  @Override
   protected void invoke() throws Exception {
     final DmnEngine dmnEngine = Context.getProcessEngineConfiguration()
       .getDmnEngine();
 
-    // FIX ME:
-    invocationResult = dmnEngine.evaluateDecisionTable(((DecisionDefinitionEntity) decisionDefinition).getDecision(), variableContext);
+    invocationResult = dmnEngine.evaluateDecisionTable((DmnDecision) decisionDefinition, variableContext);
   }
 
   @Override

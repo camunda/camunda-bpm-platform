@@ -4,7 +4,7 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 
-  <process id="boundaryTimerJobPrioProcess" camunda:jobPriority="8">
+  <process id="boundaryTimerJobPrioProcess" camunda:jobPriority="8" isExecutable="true">
   
     <startEvent id="start"/>
     <sequenceFlow id="flow1" sourceRef="start" targetRef="task1" />

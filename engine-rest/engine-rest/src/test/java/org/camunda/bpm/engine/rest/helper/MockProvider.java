@@ -96,6 +96,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
@@ -949,6 +950,26 @@ public abstract class MockProvider {
     when(mockFormData.getFormFields()).thenReturn(mockFormFields);
 
     return mockFormData;
+  }
+
+  public static ProcessInstanceWithVariables createMockInstanceWithVariables() {
+    return createMockInstanceWithVariables(EXAMPLE_TENANT_ID);
+  }
+
+  public static ProcessInstanceWithVariables createMockInstanceWithVariables(String tenantId) {
+    ProcessInstanceWithVariables mock = mock(ProcessInstanceWithVariables.class);
+
+    when(mock.getId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+    when(mock.getBusinessKey()).thenReturn(EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
+    when(mock.getCaseInstanceId()).thenReturn(EXAMPLE_CASE_INSTANCE_ID);
+    when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
+    when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+    when(mock.isSuspended()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED);
+    when(mock.isEnded()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_ENDED);
+    when(mock.getTenantId()).thenReturn(tenantId);
+    when(mock.getVariables()).thenReturn(MockProvider.createMockFormVariables());
+
+    return mock;
   }
 
   public static ProcessInstance createMockInstance() {

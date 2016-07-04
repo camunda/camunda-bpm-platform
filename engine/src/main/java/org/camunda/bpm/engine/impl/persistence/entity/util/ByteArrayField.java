@@ -108,10 +108,6 @@ public class ByteArrayField {
         Context.getCommandContext()
                .getDbEntityManager()
                .delete(byteArrayValue);
-      } else {
-        Context.getCommandContext()
-               .getByteArrayManager()
-               .deleteByteArrayById(byteArrayId);
       }
 
       byteArrayId = null;
