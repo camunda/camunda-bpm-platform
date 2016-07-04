@@ -200,7 +200,7 @@ public class DefaultDmnDecisionContext {
   }
 
   protected void buildDecisionTree(DmnDecision decision, List<DmnDecision> requiredDecisions) {
-    if(requiredDecisions.contains(decision)) {
+    if (requiredDecisions.contains(decision)) {
       return;
     }
 
