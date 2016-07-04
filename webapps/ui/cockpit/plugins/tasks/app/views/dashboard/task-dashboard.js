@@ -22,19 +22,19 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
           {
             // assigned to users
             'state' : undefined,
-            'label' : 'Assigned to user',
+            'label' : 'assigned to a user',
             'count' : 0
           },
           {
             // assigned to groups
             'state' : undefined,
-            'label' : 'Assigned to group',
+            'label' : 'assigned to 1 or more groups',
             'count' : 0
           },
           {
             // assigned neither to groups nor to users
             'state' : undefined,
-            'label' : 'Not assigned to group or user',
+            'label' : 'unassigned',
             'count' : 0
           }
         ];

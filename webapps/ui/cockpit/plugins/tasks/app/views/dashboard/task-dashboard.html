@@ -1,59 +1,64 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/tasks/app/views/dashboard/task-dashboard.html -->
-<div class="open-tasks">
+<h3>Open Tasks</h3>
 
-  <h3>Open Tasks</h3>
+<div class="row">
+  <div class="col-sm-6 col-md-4 col-md-offset-1">
+    <h4>Assigments by type</h4>
+    <table class="cam-table values-left" id="open-task-statistics">
+      <thead>
+        <tr>
+          <th>Tasks</th>
+          <th>Type</th>
+        </tr>
+      </thead>
 
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-5">
-        <table class="cam-table" id="open-task-statistics">
-          <thead>
-          <tr>
-            <th>Total</th>
-            <th>
-              <span ng-if="!openTasksState.$loaded" class="glyphicon glyphicon-refresh animate-spin"></span>
-              <span ng-if="openTasksState.$loaded">{{ openTasksCount }}</span>
-            </th>
-          </tr>
-          </thead>
+      <tfoot>
+        <tr>
+          <th>
+            <span ng-if="!openTasksState.$loaded" class="glyphicon glyphicon-refresh animate-spin"></span>
+            <span ng-if="openTasksState.$loaded">{{ openTasksCount }}</span>
+          </th>
+          <th>Total</th>
+        </tr>
+      </tfoot>
 
-          <tbody>
-          <tr ng-repeat="taskStatistic in taskStatistics">
-            <td>{{ taskStatistic.label }}</td>
-            <td>
-              <span ng-if="!taskStatistic.state.$loaded" class="glyphicon glyphicon-refresh animate-spin"></span>
-              <span ng-if="taskStatistic.state.$loaded">{{ taskStatistic.count }}</span>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
+      <tbody>
+        <tr ng-repeat="taskStatistic in taskStatistics">
+          <th>
+            <span ng-if="!taskStatistic.state.$loaded" class="glyphicon glyphicon-refresh animate-spin"></span>
+            <span ng-if="taskStatistic.state.$loaded">{{ taskStatistic.count }}</span>
+          </th>
+          <td>{{ taskStatistic.label }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-      <div class="col-xs-12 col-sm-12 col-md-5 col-md-offset-1">
-        <table class="cam-table" id="task-group-counts">
-          <thead>
-          <tr>
-            <th>Group</th>
-            <th>Number of Tasks</th>
-          </tr>
-          </thead>
 
-          <tbody>
-          <tr ng-if="!taskGroupState.$loaded">
-            <td colspan="2"><span class="glyphicon glyphicon-refresh animate-spin"></span></td>
-          </tr>
-          <tr ng-if="taskGroupState.$loaded" ng-repeat="taskGroup in taskGroups">
-            <td>{{ formatGroupName(taskGroup.groupName) }}</td>
-            <td>{{ taskGroup.taskCount }}</td>
-          </tr>
-          </tbody>
-        </table>
-        <p id="multiple-groups-info" ng-if="taskGroupState.$loaded">
-          <span class="glyphicon glyphicon-info-sign"></span>
-          A task may have multiple groups.
-        </p>
-      </div>
-    </div>
+  <div class="col-sm-6 col-md-4 col-md-offset-1">
+    <h4>Assigments by group</h4>
+    <table class="cam-table values-left" id="task-group-counts">
+      <thead>
+        <tr>
+          <th>Tasks</th>
+          <th>Group</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr ng-if="!taskGroupState.$loaded">
+          <td colspan="2"><span class="glyphicon glyphicon-refresh animate-spin"></span></td>
+        </tr>
+        <tr ng-if="taskGroupState.$loaded" ng-repeat="taskGroup in taskGroups">
+          <th>{{ taskGroup.taskCount }}</th>
+          <td>{{ formatGroupName(taskGroup.groupName) }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p id="multiple-groups-info" ng-if="taskGroupState.$loaded">
+      <span class="glyphicon glyphicon-info-sign"></span>
+      A task may have multiple groups.
+    </p>
   </div>
 
 </div>
