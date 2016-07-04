@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.slf4j.Logger;
 
 /**
@@ -29,9 +30,34 @@ import org.slf4j.Logger;
  */
 public class CompetingJobExecutionTest extends PluggableProcessEngineTestCase {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   protected static ControllableThread activeThread;
+
+  public void testCompetingJobExecutionDeleteJobDuringExecution() {
+    //given a simple process with a async service task
+    deployment(Bpmn
+            .createExecutableProcess("process")
+              .startEvent()
+              .serviceTask("task")
+                .camundaAsyncBefore()
+                .camundaExpression("${true}")
+              .endEvent()
+            .done());
+    runtimeService.startProcessInstanceByKey("process");
+    Job currentJob = managementService.createJobQuery().singleResult();
+
+    // when a job is executed
+    JobExecutionThread threadOne = new JobExecutionThread(currentJob.getId());
+    threadOne.startAndWaitUntilControlIsReturned();
+    //and deleted in parallel
+    managementService.deleteJob(currentJob.getId());
+
+    // then the job fails with a OLE and the failed job listener throws no NPE
+    LOG.debug("test thread notifies thread 1");
+    threadOne.proceedAndWaitTillDone();
+    assertTrue(threadOne.exception instanceof OptimisticLockingException);
+  }
 
   @Deployment
   public void testCompetingJobExecutionDefaultRetryStrategy() {
@@ -111,6 +137,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
   }
 
   public class JobExecutionThread extends ControllableThread {
+
     OptimisticLockingException exception;
     String jobId;
 
@@ -123,16 +150,17 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+
     public void run() {
       try {
         processEngineConfiguration
-          .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new ExecuteJobsCmd(jobId)));
+                .getCommandExecutorTxRequired()
+                .execute(new ControlledCommand(activeThread, new ExecuteJobsCmd(jobId)));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      LOG.debug(getName()+" ends");
+      LOG.debug(getName() + " ends");
     }
   }
 }
