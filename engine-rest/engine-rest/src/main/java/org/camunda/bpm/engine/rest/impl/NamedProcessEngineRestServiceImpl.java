@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
 import org.camunda.bpm.engine.rest.CaseExecutionRestService;
 import org.camunda.bpm.engine.rest.CaseInstanceRestService;
 import org.camunda.bpm.engine.rest.DecisionDefinitionRestService;
+import org.camunda.bpm.engine.rest.DecisionRequirementsDefinitionRestService;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.ExternalTaskRestService;
@@ -185,6 +186,12 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
   @Path("/{name}" + DecisionDefinitionRestService.PATH)
   public DecisionDefinitionRestService getDecisionDefinitionRestService(@PathParam("name") String engineName) {
     return super.getDecisionDefinitionRestService(engineName);
+  }
+
+  @Override
+  @Path("/{name}" + DecisionRequirementsDefinitionRestService.PATH)
+  public DecisionRequirementsDefinitionRestService getDecisionRequirementsDefinitionRestService(@PathParam("name") String engineName) {
+    return super.getDecisionRequirementsDefinitionRestService(engineName);
   }
 
   @Override

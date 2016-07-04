@@ -25,6 +25,9 @@ drop index ACT_IDX_VARIABLE_TASK_ID;
 drop index ACT_IDX_METER_LOG;
 drop index ACT_IDX_EXT_TASK_TOPIC;
 
+drop index ACT_IDX_JOB_EXECUTION_ID;
+drop index ACT_IDX_JOB_HANDLER;
+
 alter table ACT_GE_BYTEARRAY
     drop constraint ACT_FK_BYTEARR_DEPL;
 

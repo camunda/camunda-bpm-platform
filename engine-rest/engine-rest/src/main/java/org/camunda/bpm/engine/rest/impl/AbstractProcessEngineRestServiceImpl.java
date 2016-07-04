@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
 import org.camunda.bpm.engine.rest.CaseExecutionRestService;
 import org.camunda.bpm.engine.rest.CaseInstanceRestService;
 import org.camunda.bpm.engine.rest.DecisionDefinitionRestService;
+import org.camunda.bpm.engine.rest.DecisionRequirementsDefinitionRestService;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.ExternalTaskRestService;
@@ -207,6 +208,13 @@ public abstract class AbstractProcessEngineRestServiceImpl {
   public DecisionDefinitionRestService getDecisionDefinitionRestService(String engineName) {
     String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
     DecisionDefinitionRestServiceImpl subResource = new DecisionDefinitionRestServiceImpl(engineName, getObjectMapper());
+    subResource.setRelativeRootResourceUri(rootResourcePath);
+    return subResource;
+  }
+
+  public DecisionRequirementsDefinitionRestService getDecisionRequirementsDefinitionRestService(String engineName) {
+    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+    DecisionRequirementsDefinitionRestServiceImpl subResource = new DecisionRequirementsDefinitionRestServiceImpl(engineName, getObjectMapper());
     subResource.setRelativeRootResourceUri(rootResourcePath);
     return subResource;
   }
