@@ -209,10 +209,10 @@
         and RES.NAME_ like #{variableNameLike}
       </if>
 
-      <!-- provcessIds -->
-      <if test="processIds != null &amp;&amp; processIds.length > 0">
+      <!-- processInstanceIds -->
+      <if test="processInstanceIds != null &amp;&amp; processInstanceIds.length > 0">
         and RES.PROC_INST_ID_ in
-        <foreach item="item" index="index" collection="processIds"
+        <foreach item="item" index="index" collection="processInstanceIds"
                  open="(" separator="," close=")">
           #{item}
         </foreach>
