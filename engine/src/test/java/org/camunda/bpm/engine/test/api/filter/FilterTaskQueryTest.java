@@ -788,6 +788,29 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   /**
+   * CAM-6363
+   *
+   * Verify that search by name returns case insensitive results
+   */
+  public void testTaskQueryLookupByNameCaseInsensitive() {
+    TaskQuery query = taskService.createTaskQuery();
+    query.taskName("task 1");
+    saveQuery(query);
+
+    List<Task> tasks = filterService.list(filter.getId());
+    assertNotNull(tasks);
+    assertThat(tasks.size(),is(1));
+
+    query = taskService.createTaskQuery();
+    query.taskName("tASk 2");
+    saveQuery(query);
+
+    tasks = filterService.list(filter.getId());
+    assertNotNull(tasks);
+    assertThat(tasks.size(),is(1));
+  }
+
+  /**
    * CAM-6165
    *
    * Verify that search by name like returns case insensitive results

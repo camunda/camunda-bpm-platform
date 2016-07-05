@@ -251,12 +251,12 @@
       <if test="taskId != null">
         RES.ID_ = #{taskId}
       </if>
-      <!-- based on CAM-6363 name like case insensitive -->
       <if test="name != null">
-        and UPPER(RES.NAME_) = UPPER (#{name})
+        <!-- based on CAM-6363 compare name case insensitive -->
+        and UPPER(RES.NAME_) = UPPER(#{name})
       </if>
       <if test="nameLike != null">
-        <!-- based on CAM-6165 name like case insensitive -->
+        <!-- based on CAM-6165 compare name like case insensitive -->
         and UPPER(RES.NAME_) like UPPER(#{nameLike})
       </if>
       <if test="description != null">
