@@ -207,7 +207,7 @@
 .ctn-content-bottom {
   top: auto;
   bottom: 0;
-  height: @ctn-content-bottom-height;
+  // height: @ctn-content-bottom-height;
   border-top: 1px solid @gray-lighter;
   background: @custom-gray-lighter;
   overflow: auto;
@@ -255,6 +255,20 @@ a.expand-collapse {
     right: 0;
     border-width: 0 0 1px 1px;
     border-radius: 0 0 0 4px;
+  }
+
+  &.vertical-collapse {
+    border-width: 1px 1px 0 0;
+    border-radius: 0 4px 0 0;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    &.show-collapsable {
+      border-width: 0 1px 1px 0;
+      border-radius: 0 0 4px 0;
+      top: 0;
+      bottom: auto;
+    }
   }
 }
 
