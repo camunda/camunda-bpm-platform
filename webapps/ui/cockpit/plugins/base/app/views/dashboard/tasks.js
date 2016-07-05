@@ -27,15 +27,15 @@ module.exports = [
           $scope.count = 0;
           $scope.loadingState = 'LOADING';
 
-          var TaskResource = camAPI.resource('task');
-          TaskResource.count({}, function(err, count) {
+          var HistoryResource = camAPI.resource('history');
+          HistoryResource.taskCount({ unfinished: true }, function(err, count) {
             if (err) {
               $scope.loadingError = err.message;
               $scope.loadingState = 'ERROR';
               throw err;
             }
             $scope.loadingState = 'LOADED';
-            $scope.count = count || 0;
+            $scope.count = count.count || 0;
           });
         }],
 
