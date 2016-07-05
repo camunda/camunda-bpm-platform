@@ -255,7 +255,7 @@
         and RES.NAME_ = #{name}
       </if>
       <if test="nameLike != null">
-        <!-- based on CAM-6165 name like case insensitive, this column is indexed-->
+        <!-- based on CAM-6165 name like case insensitive -->
         and upper(RES.NAME_) like upper(#{nameLike})
       </if>
       <if test="description != null">
