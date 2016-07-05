@@ -2,11 +2,11 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementDefinitionEntity">
+<mapper namespace="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity">
 
   <!-- INSERT -->
 
-  <insert id="insertDecisionRequirementDefinition" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementDefinitionEntity">
+  <insert id="insertDecisionRequirementsDefinition" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity">
     insert into ${prefix}ACT_RE_DECISION_REQ_DEF(
       ID_, 
       CATEGORY_, 
@@ -33,7 +33,7 @@
 
   <!-- UPDATE -->
 
-  <update id="updateDecisionRequirementDefinition" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementDefinitionEntity">
+  <update id="updateDecisionRequirementsDefinition" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity">
     update ${prefix}ACT_RE_DECISION_REQ_DEF set
       REV_ = #{revisionNext, jdbcType=INTEGER}
     where ID_ = #{id, jdbcType=VARCHAR}
@@ -42,13 +42,13 @@
 
   <!-- DELETE -->
 
-  <delete id="deleteDecisionRequirementDefinitionsByDeploymentId" parameterType="string">
+  <delete id="deleteDecisionRequirementsDefinitionsByDeploymentId" parameterType="string">
     delete from ${prefix}ACT_RE_DECISION_REQ_DEF where DEPLOYMENT_ID_ = #{deploymentId}
   </delete>
 
   <!-- RESULTMAP -->
 
-  <resultMap id="decisionRequirementDefinitionResultMap" type="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementDefinitionEntity">
+  <resultMap id="decisionRequirementsDefinitionsResultMap" type="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" />
     <result property="category" column="CATEGORY_" />
@@ -63,22 +63,22 @@
 
   <!-- SELECT -->
 
-  <select id="selectDecisionRequirementDefinition" parameterType="string" resultMap="decisionRequirementDefinitionResultMap">
-    select * from ${prefix}ACT_RE_DECISION_REQ_DEF where ID_ = #{decisionRequirementDefinitionId}
+  <select id="selectDecisionRequirementsDefinition" parameterType="string" resultMap="decisionRequirementsDefinitionsResultMap">
+    select * from ${prefix}ACT_RE_DECISION_REQ_DEF where ID_ = #{decisionRequirementsDefinitionId}
   </select>
   
-  <select id="selectDecisionRequirementDefinitionByDeploymentId" parameterType="string" resultMap="decisionRequirementDefinitionResultMap">
+  <select id="selectDecisionRequirementsDefinitionByDeploymentId" parameterType="string" resultMap="decisionRequirementsDefinitionsResultMap">
     select * from ${prefix}ACT_RE_DECISION_REQ_DEF where DEPLOYMENT_ID_ = #{parameter}
   </select>
 
-  <select id="selectDecisionRequirementDefinitionByDeploymentAndKey" parameterType="map" resultMap="decisionRequirementDefinitionResultMap">
+  <select id="selectDecisionRequirementsDefinitionByDeploymentAndKey" parameterType="map" resultMap="decisionRequirementsDefinitionsResultMap">
     select *
     from ${prefix}ACT_RE_DECISION_REQ_DEF
     where DEPLOYMENT_ID_ = #{deploymentId}
-      and KEY_ = #{decisionRequirementDefinitionKey}
+      and KEY_ = #{decisionRequirementsDefinitionKey}
   </select>
 
-  <select id="selectLatestDecisionRequirementDefinitionByKey" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="decisionRequirementDefinitionResultMap">
+  <select id="selectLatestDecisionRequirementsDefinitionByKey" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="decisionRequirementsDefinitionsResultMap">
     select *
     from ${prefix}ACT_RE_DECISION_REQ_DEF d1
       inner join
@@ -92,29 +92,29 @@
           (d1.TENANT_ID_ = d2.TENANT_ID_ or (d1.TENANT_ID_ is null and d2.TENANT_ID_ is null))
   </select>
   
-  <select id="selectLatestDecisionRequirementDefinitionByKeyWithoutTenantId" parameterType="map" resultMap="decisionRequirementDefinitionResultMap">
+  <select id="selectLatestDecisionRequirementsDefinitionByKeyWithoutTenantId" parameterType="map" resultMap="decisionRequirementsDefinitionsResultMap">
     select *
     from ${prefix}ACT_RE_DECISION_REQ_DEF 
-    where KEY_ = #{decisionRequirementDefinitionKey}
+    where KEY_ = #{decisionRequirementsDefinitionKey}
           and TENANT_ID_ is null
           and VERSION_ = (
               select max(VERSION_) 
               from ${prefix}ACT_RE_DECISION_REQ_DEF 
-              where KEY_ = #{decisionRequirementDefinitionKey} and TENANT_ID_ is null)
+              where KEY_ = #{decisionRequirementsDefinitionKey} and TENANT_ID_ is null)
   </select>
   
-  <select id="selectLatestDecisionRequirementDefinitionByKeyAndTenantId" parameterType="map" resultMap="decisionRequirementDefinitionResultMap">
+  <select id="selectLatestDecisionRequirementsDefinitionByKeyAndTenantId" parameterType="map" resultMap="decisionRequirementsDefinitionsResultMap">
     select *
     from ${prefix}ACT_RE_DECISION_REQ_DEF RES
-    where KEY_ = #{decisionRequirementDefinitionKey}
+    where KEY_ = #{decisionRequirementsDefinitionKey}
           and TENANT_ID_ = #{tenantId}
           and VERSION_ = (
               select max(VERSION_) 
               from ${prefix}ACT_RE_DECISION_REQ_DEF 
-              where KEY_ = #{decisionRequirementDefinitionKey} and TENANT_ID_ = #{tenantId})
+              where KEY_ = #{decisionRequirementsDefinitionKey} and TENANT_ID_ = #{tenantId})
   </select>
 
-  <select id="selectPreviousDecisionRequirementDefinitionId" parameterType="map" resultType="string">
+  <select id="selectPreviousDecisionRequirementsDefinitionId" parameterType="map" resultType="string">
     select distinct RES.*
       from ${prefix}ACT_RE_DECISION_REQ_DEF RES
      where RES.KEY_ = #{key}
@@ -137,38 +137,38 @@
           AND VERSION_ &lt; #{version})
   </select>
 
-  <select id="selectDecisionRequirementDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementDefinitionQueryImpl" resultMap="decisionRequirementDefinitionResultMap">
+  <select id="selectDecisionRequirementsDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl" resultMap="decisionRequirementsDefinitionsResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
-    <include refid="selectDecisionRequirementDefinitionsByQueryCriteriaSql"/>
+    <include refid="selectDecisionRequirementsDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
   </select>
 
-  <select id="selectDecisionRequirementDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementDefinitionQueryImpl" resultType="long">
+  <select id="selectDecisionRequirementsDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl" resultType="long">
     select count(distinct RES.ID_)
-    <include refid="selectDecisionRequirementDefinitionsByQueryCriteriaSql"/>
+    <include refid="selectDecisionRequirementsDefinitionsByQueryCriteriaSql"/>
   </select>
    
   <!-- mysql specific sql -->
-  <select id="selectDecisionRequirementDefinitionsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementDefinitionQueryImpl" resultMap="decisionRequirementDefinitionResultMap">
+  <select id="selectDecisionRequirementsDefinitionsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl" resultMap="decisionRequirementsDefinitionsResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
-    <include refid="selectDecisionRequirementDefinitionsByQueryCriteriaSql"/>
+    <include refid="selectDecisionRequirementsDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
   </select>
 
-  <select id="selectDecisionRequirementDefinitionCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementDefinitionQueryImpl" resultType="long">
+  <select id="selectDecisionRequirementsDefinitionCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl" resultType="long">
     select count(distinct RES.ID_)
-    <include refid="selectDecisionRequirementDefinitionsByQueryCriteriaSql"/>
+    <include refid="selectDecisionRequirementsDefinitionsByQueryCriteriaSql"/>
   </select>
 
-  <sql id="selectDecisionRequirementDefinitionsByQueryCriteriaSql">
+  <sql id="selectDecisionRequirementsDefinitionsByQueryCriteriaSql">
     from ${prefix}ACT_RE_DECISION_REQ_DEF RES
     <if test="latest">
       inner join

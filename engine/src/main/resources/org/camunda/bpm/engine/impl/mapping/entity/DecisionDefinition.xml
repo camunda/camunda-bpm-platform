@@ -27,7 +27,7 @@
             #{deploymentId, jdbcType=VARCHAR},
             #{resourceName, jdbcType=VARCHAR},
             #{diagramResourceName, jdbcType=VARCHAR},
-            #{decisionRequirementDefinitionId, jdbcType=VARCHAR},
+            #{decisionRequirementsDefinitionId, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR},
             1
            )
@@ -60,7 +60,7 @@
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
     <result property="diagramResourceName" column="DGRM_RESOURCE_NAME_" jdbcType="VARCHAR"/>
-    <result property="decisionRequirementDefinitionId" column="DEC_REQ_ID_" jdbcType="VARCHAR"/>
+    <result property="decisionRequirementsDefinitionId" column="DEC_REQ_ID_" jdbcType="VARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
 

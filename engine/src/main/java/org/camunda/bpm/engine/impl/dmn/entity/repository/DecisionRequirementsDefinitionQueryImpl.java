@@ -22,10 +22,10 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 
-public class DecisionRequirementDefinitionQueryImpl extends AbstractQuery<DecisionRequirementDefinitionQuery, DecisionRequirementDefinition> implements DecisionRequirementDefinitionQuery {
+public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<DecisionRequirementsDefinitionQuery, DecisionRequirementsGraph> implements DecisionRequirementsDefinitionQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -47,142 +47,142 @@ public class DecisionRequirementDefinitionQueryImpl extends AbstractQuery<Decisi
   protected String[] tenantIds;
   protected boolean includeDefinitionsWithoutTenantId = false;
 
-  public DecisionRequirementDefinitionQueryImpl() {
+  public DecisionRequirementsDefinitionQueryImpl() {
   }
 
-  public DecisionRequirementDefinitionQueryImpl(CommandExecutor commandExecutor) {
+  public DecisionRequirementsDefinitionQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
 
   // Query parameter //////////////////////////////////////////////////////////////
 
-  public DecisionRequirementDefinitionQuery decisionRequirementDefinitionId(String id) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionId(String id) {
     ensureNotNull(NotValidException.class, "id", id);
     this.id = id;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery decisionRequirementDefinitionIdIn(String... ids) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionIdIn(String... ids) {
     this.ids = ids;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery decisionRequirementDefinitionCategory(String category) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionCategory(String category) {
     ensureNotNull(NotValidException.class, "category", category);
     this.category = category;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery decisionRequirementDefinitionCategoryLike(String categoryLike) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionCategoryLike(String categoryLike) {
     ensureNotNull(NotValidException.class, "categoryLike", categoryLike);
     this.categoryLike = categoryLike;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery decisionRequirementDefinitionName(String name) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionName(String name) {
     ensureNotNull(NotValidException.class, "name", name);
     this.name = name;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery decisionRequirementDefinitionNameLike(String nameLike) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionNameLike(String nameLike) {
     ensureNotNull(NotValidException.class, "nameLike", nameLike);
     this.nameLike = nameLike;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery decisionRequirementDefinitionKey(String key) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionKey(String key) {
     ensureNotNull(NotValidException.class, "key", key);
     this.key = key;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery decisionRequirementDefinitionKeyLike(String keyLike) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionKeyLike(String keyLike) {
     ensureNotNull(NotValidException.class, "keyLike", keyLike);
     this.keyLike = keyLike;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery deploymentId(String deploymentId) {
+  public DecisionRequirementsDefinitionQuery deploymentId(String deploymentId) {
     ensureNotNull(NotValidException.class, "deploymentId", deploymentId);
     this.deploymentId = deploymentId;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery decisionRequirementDefinitionVersion(Integer version) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionVersion(Integer version) {
     ensureNotNull(NotValidException.class, "version", version);
     ensurePositive(NotValidException.class, "version", version.longValue());
     this.version = version;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery latestVersion() {
+  public DecisionRequirementsDefinitionQuery latestVersion() {
     this.latest = true;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery decisionRequirementDefinitionResourceName(String resourceName) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionResourceName(String resourceName) {
     ensureNotNull(NotValidException.class, "resourceName", resourceName);
     this.resourceName = resourceName;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery decisionRequirementDefinitionResourceNameLike(String resourceNameLike) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionResourceNameLike(String resourceNameLike) {
     ensureNotNull(NotValidException.class, "resourceNameLike", resourceNameLike);
     this.resourceNameLike = resourceNameLike;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery tenantIdIn(String... tenantIds) {
+  public DecisionRequirementsDefinitionQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
     isTenantIdSet = true;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery withoutTenantId() {
+  public DecisionRequirementsDefinitionQuery withoutTenantId() {
     isTenantIdSet = true;
     this.tenantIds = null;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery includeDecisionRequirementDefinitionsWithoutTenantId() {
+  public DecisionRequirementsDefinitionQuery includeDecisionRequirementsDefinitionsWithoutTenantId() {
     this.includeDefinitionsWithoutTenantId  = true;
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery orderByDecisionRequirementDefinitionCategory() {
-    orderBy(DecisionRequirementDefinitionQueryProperty.DECISION_REQUIREMENT_DEFINITION_CATEGORY);
+  public DecisionRequirementsDefinitionQuery orderByDecisionRequirementsDefinitionCategory() {
+    orderBy(DecisionRequirementsDefinitionQueryProperty.DECISION_REQUIREMENTS_DEFINITION_CATEGORY);
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery orderByDecisionRequirementDefinitionKey() {
-    orderBy(DecisionRequirementDefinitionQueryProperty.DECISION_REQUIREMENT_DEFINITION_KEY);
+  public DecisionRequirementsDefinitionQuery orderByDecisionRequirementsDefinitionKey() {
+    orderBy(DecisionRequirementsDefinitionQueryProperty.DECISION_REQUIREMENTS_DEFINITION_KEY);
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery orderByDecisionRequirementDefinitionId() {
-    orderBy(DecisionRequirementDefinitionQueryProperty.DECISION_REQUIREMENT_DEFINITION_ID);
+  public DecisionRequirementsDefinitionQuery orderByDecisionRequirementsDefinitionId() {
+    orderBy(DecisionRequirementsDefinitionQueryProperty.DECISION_REQUIREMENTS_DEFINITION_ID);
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery orderByDecisionRequirementDefinitionVersion() {
-    orderBy(DecisionRequirementDefinitionQueryProperty.DECISION_REQUIREMENT_DEFINITION_VERSION);
+  public DecisionRequirementsDefinitionQuery orderByDecisionRequirementsDefinitionVersion() {
+    orderBy(DecisionRequirementsDefinitionQueryProperty.DECISION_REQUIREMENTS_DEFINITION_VERSION);
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery orderByDecisionRequirementDefinitionName() {
-    orderBy(DecisionRequirementDefinitionQueryProperty.DECISION_REQUIREMENT_DEFINITION_NAME);
+  public DecisionRequirementsDefinitionQuery orderByDecisionRequirementsDefinitionName() {
+    orderBy(DecisionRequirementsDefinitionQueryProperty.DECISION_REQUIREMENTS_DEFINITION_NAME);
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery orderByDeploymentId() {
-    orderBy(DecisionRequirementDefinitionQueryProperty.DEPLOYMENT_ID);
+  public DecisionRequirementsDefinitionQuery orderByDeploymentId() {
+    orderBy(DecisionRequirementsDefinitionQueryProperty.DEPLOYMENT_ID);
     return this;
   }
 
-  public DecisionRequirementDefinitionQuery orderByTenantId() {
-    return orderBy(DecisionRequirementDefinitionQueryProperty.TENANT_ID);
+  public DecisionRequirementsDefinitionQuery orderByTenantId() {
+    return orderBy(DecisionRequirementsDefinitionQueryProperty.TENANT_ID);
   }
 
   //results ////////////////////////////////////////////
@@ -192,15 +192,15 @@ public class DecisionRequirementDefinitionQueryImpl extends AbstractQuery<Decisi
     checkQueryOk();
     return commandContext
       .getDecisionDefinitionManager()
-      .findDecisionRequirementDefinitionCountByQueryCriteria(this);
+      .findDecisionRequirementsDefinitionCountByQueryCriteria(this);
   }
 
   @Override
-  public List<DecisionRequirementDefinition> executeList(CommandContext commandContext, Page page) {
+  public List<DecisionRequirementsGraph> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext
       .getDecisionDefinitionManager()
-      .findDecisionRequirementDefinitionsByQueryCriteria(this, page);
+      .findDecisionRequirementsDefinitionsByQueryCriteria(this, page);
   }
 
   @Override
@@ -266,5 +266,4 @@ public class DecisionRequirementDefinitionQueryImpl extends AbstractQuery<Decisi
   public boolean isLatest() {
     return latest;
   }
-
 }

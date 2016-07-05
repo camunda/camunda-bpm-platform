@@ -14,7 +14,7 @@ create table ACT_RE_DECISION_DEF (
     primary key (ID_)
 );
 
--- create decision requirement definition table --
+-- create decision requirements definition table --
 create table ACT_RE_DECISION_REQ_DEF (
     ID_ nvarchar(64) NOT NULL,
     REV_ int,

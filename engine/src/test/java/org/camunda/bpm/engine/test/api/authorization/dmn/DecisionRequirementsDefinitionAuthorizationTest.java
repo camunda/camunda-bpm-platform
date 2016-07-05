@@ -14,7 +14,7 @@
 package org.camunda.bpm.engine.test.api.authorization.dmn;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
-import static org.camunda.bpm.engine.authorization.Resources.DECISION_REQUIREMENT_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.DECISION_REQUIREMENTS_DEFINITION;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -27,8 +27,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
@@ -45,7 +45,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class DecisionRequirementDefinitionAuthorizationTest {
+public class DecisionRequirementsDefinitionAuthorizationTest {
 
   protected static final String DMN_FILE = "org/camunda/bpm/engine/test/dmn/deployment/drdScore.dmn11.xml";
   protected static final String ANOTHER_DMN = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
@@ -73,16 +73,16 @@ public class DecisionRequirementDefinitionAuthorizationTest {
           .succeeds(), expectedDefinitions() },
       { scenario()
           .withAuthorizations(
-            grant(DECISION_REQUIREMENT_DEFINITION, DEFINITION_KEY, "userId", Permissions.READ))
+            grant(DECISION_REQUIREMENTS_DEFINITION, DEFINITION_KEY, "userId", Permissions.READ))
           .succeeds(), expectedDefinitions(DEFINITION_KEY) },
       { scenario()
         .withAuthorizations(
-          grant(DECISION_REQUIREMENT_DEFINITION, ANY, "userId", Permissions.READ))
+          grant(DECISION_REQUIREMENTS_DEFINITION, ANY, "userId", Permissions.READ))
         .succeeds(), expectedDefinitions(DEFINITION_KEY, ANOTHER_DEFINITION_KEY) },
       { scenario()
           .withAuthorizations(
-            grant(DECISION_REQUIREMENT_DEFINITION, DEFINITION_KEY, "userId", Permissions.READ),
-            grant(DECISION_REQUIREMENT_DEFINITION, ANY, "userId", Permissions.READ))
+            grant(DECISION_REQUIREMENTS_DEFINITION, DEFINITION_KEY, "userId", Permissions.READ),
+            grant(DECISION_REQUIREMENTS_DEFINITION, ANY, "userId", Permissions.READ))
           .succeeds(), expectedDefinitions(DEFINITION_KEY, ANOTHER_DEFINITION_KEY) }
     });
   }
@@ -99,12 +99,12 @@ public class DecisionRequirementDefinitionAuthorizationTest {
 
   @Test
   @Deployment(resources = { DMN_FILE, ANOTHER_DMN })
-  public void queryDecisionRequirementDefinitions() {
+  public void queryDecisionRequirementsDefinitions() {
 
     // when
-    authRule.init(scenario).withUser("userId").bindResource("decisionRequirementDefinitionKey", DEFINITION_KEY).start();
+    authRule.init(scenario).withUser("userId").bindResource("decisionRequirementsDefinitionKey", DEFINITION_KEY).start();
 
-    DecisionRequirementDefinitionQuery query = engineRule.getRepositoryService().createDecisionRequirementDefinitionQuery();
+    DecisionRequirementsDefinitionQuery query = engineRule.getRepositoryService().createDecisionRequirementsDefinitionQuery();
     long count = query.count();
 
     // then
@@ -116,9 +116,9 @@ public class DecisionRequirementDefinitionAuthorizationTest {
     }
   }
 
-  protected List<String> getDefinitionKeys(List<DecisionRequirementDefinition> definitions) {
+  protected List<String> getDefinitionKeys(List<DecisionRequirementsGraph> definitions) {
     List<String> definitionKeys = new ArrayList<String>();
-    for (DecisionRequirementDefinition definition : definitions) {
+    for (DecisionRequirementsGraph definition : definitions) {
       definitionKeys.add(definition.getKey());
     }
     return definitionKeys;

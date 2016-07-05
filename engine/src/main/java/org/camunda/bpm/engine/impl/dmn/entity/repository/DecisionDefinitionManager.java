@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
 
 public class DecisionDefinitionManager extends AbstractManager {
 
@@ -133,63 +133,63 @@ public class DecisionDefinitionManager extends AbstractManager {
     return getDbEntityManager().selectList("selectDecisionDefinitionByDeploymentId", deploymentId);
   }
 
-  public void insertDecisionRequirementDefinition(DecisionRequirementDefinitionEntity decisionRequirementDefinition) {
-    getDbEntityManager().insert(decisionRequirementDefinition);
-    createDefaultAuthorizations(decisionRequirementDefinition);
+  public void insertDecisionRequirementsDefinition(DecisionRequirementsDefinitionEntity decisionRequirementsDefinition) {
+    getDbEntityManager().insert(decisionRequirementsDefinition);
+    createDefaultAuthorizations(decisionRequirementsDefinition);
   }
 
-  public void deleteDecisionRequirementDefinitionsByDeploymentId(String deploymentId) {
-    getDbEntityManager().delete(DecisionDefinitionEntity.class, "deleteDecisionRequirementDefinitionsByDeploymentId", deploymentId);
+  public void deleteDecisionRequirementsDefinitionsByDeploymentId(String deploymentId) {
+    getDbEntityManager().delete(DecisionDefinitionEntity.class, "deleteDecisionRequirementsDefinitionsByDeploymentId", deploymentId);
   }
 
-  public DecisionRequirementDefinitionEntity findDecisionRequirementDefinitionById(String decisionRequirementDefinitionId) {
-    return getDbEntityManager().selectById(DecisionRequirementDefinitionEntity.class, decisionRequirementDefinitionId);
+  public DecisionRequirementsDefinitionEntity findDecisionRequirementsDefinitionById(String decisionRequirementsDefinitionId) {
+    return getDbEntityManager().selectById(DecisionRequirementsDefinitionEntity.class, decisionRequirementsDefinitionId);
   }
 
-  public String findPreviousDecisionRequirementDefinitionId(String decisionRequirementDefinitionKey, Integer version, String tenantId) {
+  public String findPreviousDecisionRequirementsDefinitionId(String decisionRequirementsDefinitionKey, Integer version, String tenantId) {
     Map<String, Object> params = new HashMap<String, Object>();
-    params.put("key", decisionRequirementDefinitionKey);
+    params.put("key", decisionRequirementsDefinitionKey);
     params.put("version", version);
     params.put("tenantId", tenantId);
-    return (String) getDbEntityManager().selectOne("selectPreviousDecisionRequirementDefinitionId", params);
+    return (String) getDbEntityManager().selectOne("selectPreviousDecisionRequirementsDefinitionId", params);
   }
 
   @SuppressWarnings("unchecked")
-  public List<DecisionRequirementDefinition> findDecisionRequirementDefinitionByDeploymentId(String deploymentId) {
-    return getDbEntityManager().selectList("selectDecisionRequirementDefinitionByDeploymentId", deploymentId);
+  public List<DecisionRequirementsGraph> findDecisionRequirementsDefinitionByDeploymentId(String deploymentId) {
+    return getDbEntityManager().selectList("selectDecisionRequirementsDefinitionByDeploymentId", deploymentId);
   }
 
-  public DecisionRequirementDefinitionEntity findDecisionRequirementDefinitionByDeploymentAndKey(String deploymentId, String decisionRequirementDefinitionKey) {
+  public DecisionRequirementsDefinitionEntity findDecisionRequirementsDefinitionByDeploymentAndKey(String deploymentId, String decisionRequirementsDefinitionKey) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("deploymentId", deploymentId);
-    parameters.put("decisionRequirementDefinitionKey", decisionRequirementDefinitionKey);
-    return (DecisionRequirementDefinitionEntity) getDbEntityManager().selectOne("selectDecisionRequirementDefinitionByDeploymentAndKey", parameters);
+    parameters.put("decisionRequirementsDefinitionKey", decisionRequirementsDefinitionKey);
+    return (DecisionRequirementsDefinitionEntity) getDbEntityManager().selectOne("selectDecisionRequirementsDefinitionByDeploymentAndKey", parameters);
   }
 
   /**
-   * @return the latest version of the decision requirement definition with the given key and tenant id
+   * @return the latest version of the decision requirements definition with the given key and tenant id
    */
-  public DecisionRequirementDefinitionEntity findLatestDecisionRequirementDefinitionByKeyAndTenantId(String decisionRequirementDefinitionKey, String tenantId) {
+  public DecisionRequirementsDefinitionEntity findLatestDecisionRequirementsDefinitionByKeyAndTenantId(String decisionRequirementsDefinitionKey, String tenantId) {
     Map<String, String> parameters = new HashMap<String, String>();
-    parameters.put("decisionRequirementDefinitionKey", decisionRequirementDefinitionKey);
+    parameters.put("decisionRequirementsDefinitionKey", decisionRequirementsDefinitionKey);
     parameters.put("tenantId", tenantId);
 
     if (tenantId == null) {
-      return (DecisionRequirementDefinitionEntity) getDbEntityManager().selectOne("selectLatestDecisionRequirementDefinitionByKeyWithoutTenantId", parameters);
+      return (DecisionRequirementsDefinitionEntity) getDbEntityManager().selectOne("selectLatestDecisionRequirementsDefinitionByKeyWithoutTenantId", parameters);
     } else {
-      return (DecisionRequirementDefinitionEntity) getDbEntityManager().selectOne("selectLatestDecisionRequirementDefinitionByKeyAndTenantId", parameters);
+      return (DecisionRequirementsDefinitionEntity) getDbEntityManager().selectOne("selectLatestDecisionRequirementsDefinitionByKeyAndTenantId", parameters);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public List<DecisionRequirementDefinition> findDecisionRequirementDefinitionsByQueryCriteria(DecisionRequirementDefinitionQueryImpl query, Page page) {
-    configureDecisionRequirementDefinitionQuery(query);
-    return getDbEntityManager().selectList("selectDecisionRequirementDefinitionsByQueryCriteria", query, page);
+  public List<DecisionRequirementsGraph> findDecisionRequirementsDefinitionsByQueryCriteria(DecisionRequirementsDefinitionQueryImpl query, Page page) {
+    configureDecisionRequirementsDefinitionQuery(query);
+    return getDbEntityManager().selectList("selectDecisionRequirementsDefinitionsByQueryCriteria", query, page);
   }
 
-  public long findDecisionRequirementDefinitionCountByQueryCriteria(DecisionRequirementDefinitionQueryImpl query) {
-    configureDecisionRequirementDefinitionQuery(query);
-    return (Long) getDbEntityManager().selectOne("selectDecisionRequirementDefinitionCountByQueryCriteria", query);
+  public long findDecisionRequirementsDefinitionCountByQueryCriteria(DecisionRequirementsDefinitionQueryImpl query) {
+    configureDecisionRequirementsDefinitionQuery(query);
+    return (Long) getDbEntityManager().selectOne("selectDecisionRequirementsDefinitionCountByQueryCriteria", query);
   }
 
   protected void createDefaultAuthorizations(DecisionDefinition decisionDefinition) {
@@ -200,10 +200,10 @@ public class DecisionDefinitionManager extends AbstractManager {
     }
   }
 
-  protected void createDefaultAuthorizations(DecisionRequirementDefinition decisionRequirementDefinition) {
+  protected void createDefaultAuthorizations(DecisionRequirementsGraph decisionRequirementsDefinition) {
     if(isAuthorizationEnabled()) {
       ResourceAuthorizationProvider provider = getResourceAuthorizationProvider();
-      AuthorizationEntity[] authorizations = provider.newDecisionRequirementDefinition(decisionRequirementDefinition);
+      AuthorizationEntity[] authorizations = provider.newDecisionRequirementsDefinition(decisionRequirementsDefinition);
       saveDefaultAuthorizations(authorizations);
     }
   }
@@ -213,8 +213,8 @@ public class DecisionDefinitionManager extends AbstractManager {
     getTenantManager().configureQuery(query);
   }
 
-  protected void configureDecisionRequirementDefinitionQuery(DecisionRequirementDefinitionQueryImpl query) {
-    getAuthorizationManager().configureDecisionRequirementDefinitionQuery(query);
+  protected void configureDecisionRequirementsDefinitionQuery(DecisionRequirementsDefinitionQueryImpl query) {
+    getAuthorizationManager().configureDecisionRequirementsDefinitionQuery(query);
     getTenantManager().configureQuery(query);
   }
 

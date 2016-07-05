@@ -13,17 +13,17 @@
 
 package org.camunda.bpm.engine.impl.dmn.transformer;
 
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionRequirementDiagramImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionRequirementsGraphImpl;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformContext;
-import org.camunda.bpm.dmn.engine.impl.transform.DmnDecisionRequirementDiagramTransformHandler;
-import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementDefinitionEntity;
+import org.camunda.bpm.dmn.engine.impl.transform.DmnDecisionRequirementsGraphTransformHandler;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.model.dmn.instance.Definitions;
 
-public class DecisionRequirementDefinitionTransformHandler extends DmnDecisionRequirementDiagramTransformHandler {
+public class DecisionRequirementsDefinitionTransformHandler extends DmnDecisionRequirementsGraphTransformHandler {
 
   @Override
-  protected DmnDecisionRequirementDiagramImpl createFromDefinitions(DmnElementTransformContext context, Definitions definitions) {
-    DecisionRequirementDefinitionEntity entity = (DecisionRequirementDefinitionEntity) super.createFromDefinitions(context, definitions);
+  protected DmnDecisionRequirementsGraphImpl createFromDefinitions(DmnElementTransformContext context, Definitions definitions) {
+    DecisionRequirementsDefinitionEntity entity = (DecisionRequirementsDefinitionEntity) super.createFromDefinitions(context, definitions);
 
     entity.setCategory(definitions.getNamespace());
 
@@ -31,8 +31,8 @@ public class DecisionRequirementDefinitionTransformHandler extends DmnDecisionRe
   }
 
   @Override
-  protected DmnDecisionRequirementDiagramImpl createDmnElement() {
-    return new DecisionRequirementDefinitionEntity();
+  protected DmnDecisionRequirementsGraphImpl createDmnElement() {
+    return new DecisionRequirementsDefinitionEntity();
   }
 
 }

@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
-import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementDefinitionEntity;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
@@ -56,7 +56,7 @@ public class RedeploymentRegistrationTest {
   protected static final String CMMN_RESOURCE_1 = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
   protected static final String CMMN_RESOURCE_2 = "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn";
 
-  protected static final String DMN_RESOURCE_1 = "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testDmnDeployment.dmn11.xml";
+  protected static final String DMN_RESOURCE_1 = "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDmnDeployment.dmn11.xml";
   protected static final String DMN_RESOURCE_2 = "org/camunda/bpm/engine/test/dmn/deployment/dmnScore.dmn11.xml";
 
   protected static final String DRD_RESOURCE_1 = "org/camunda/bpm/engine/test/dmn/deployment/drdScore.dmn11.xml";
@@ -94,7 +94,7 @@ public class RedeploymentRegistrationTest {
       { BPMN_RESOURCE_1, BPMN_RESOURCE_2, "processOne", "processTwo", processDefinitionTestProvider() },
       { CMMN_RESOURCE_1, CMMN_RESOURCE_2, "oneTaskCase", "twoTaskCase", caseDefinitionTestProvider() },
       { DMN_RESOURCE_1, DMN_RESOURCE_2, "decision", "score-decision", decisionDefinitionTestProvider() },
-      { DRD_RESOURCE_1, DRD_RESOURCE_2, "score", "dish", decisionRequirementDefinitionTestProvider() }
+      { DRD_RESOURCE_1, DRD_RESOURCE_2, "score", "dish", decisionRequirementsDefinitionTestProvider() }
     });
   }
 
@@ -486,7 +486,7 @@ public class RedeploymentRegistrationTest {
     processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
     processEngineConfiguration.getDeploymentCache().discardCaseDefinitionCache();
     processEngineConfiguration.getDeploymentCache().discardDecisionDefinitionCache();
-    processEngineConfiguration.getDeploymentCache().discardDecisionRequirementDefinitionCache();
+    processEngineConfiguration.getDeploymentCache().discardDecisionRequirementsDefinitionCache();
   }
 
   protected String getLatestDefinitionIdByKey(String key) {
@@ -576,7 +576,7 @@ public class RedeploymentRegistrationTest {
     };
   }
 
-  protected static TestProvider decisionRequirementDefinitionTestProvider() {
+  protected static TestProvider decisionRequirementsDefinitionTestProvider() {
     return new TestProvider() {
 
       @Override
@@ -586,7 +586,7 @@ public class RedeploymentRegistrationTest {
           public ProcessApplicationReference execute(CommandContext commandContext) {
             ProcessEngineConfigurationImpl configuration = commandContext.getProcessEngineConfiguration();
             DeploymentCache deploymentCache = configuration.getDeploymentCache();
-            DecisionRequirementDefinitionEntity definition = deploymentCache.findDeployedDecisionRequirementDefinitionById(definitionId);
+            DecisionRequirementsDefinitionEntity definition = deploymentCache.findDeployedDecisionRequirementsDefinitionById(definitionId);
             return ProcessApplicationContextUtil.getTargetProcessApplication(definition);
           }
         };
@@ -594,7 +594,7 @@ public class RedeploymentRegistrationTest {
 
       @Override
       public String getLatestDefinitionIdByKey(RepositoryService repositoryService, String key) {
-        return repositoryService.createDecisionRequirementDefinitionQuery().decisionRequirementDefinitionKey(key).latestVersion().singleResult().getId();
+        return repositoryService.createDecisionRequirementsDefinitionQuery().decisionRequirementsDefinitionKey(key).latestVersion().singleResult().getId();
       }
 
     };

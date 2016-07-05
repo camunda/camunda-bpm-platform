@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.impl.dmn.entity.repository;
 
 import java.io.Serializable;
 
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionRequirementDiagramImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionRequirementsGraphImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
@@ -23,9 +23,9 @@ import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
 
-public class DecisionRequirementDefinitionEntity extends DmnDecisionRequirementDiagramImpl implements DecisionRequirementDefinition, ResourceDefinitionEntity, DbEntity, HasDbRevision, Serializable {
+public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirementsGraphImpl implements DecisionRequirementsGraph, ResourceDefinitionEntity, DbEntity, HasDbRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -43,7 +43,7 @@ public class DecisionRequirementDefinitionEntity extends DmnDecisionRequirementD
   // firstVersion is true, when version == 1 or when
   // this definition does not have any previous definitions
   protected boolean firstVersion = false;
-  protected String previousDecisionRequirementDefinitionId;
+  protected String previousDecisionRequirementsDefinitionId;
 
   @Override
   public String getId() {
@@ -107,7 +107,7 @@ public class DecisionRequirementDefinitionEntity extends DmnDecisionRequirementD
 
   @Override
   public Object getPersistentState() {
-    return DecisionRequirementDefinitionEntity.class;
+    return DecisionRequirementsDefinitionEntity.class;
   }
 
   @Override
@@ -157,19 +157,19 @@ public class DecisionRequirementDefinitionEntity extends DmnDecisionRequirementD
 
   @Override
   public ResourceDefinitionEntity getPreviousDefinition() {
-    DecisionRequirementDefinitionEntity previousDecisionDefinition = null;
+    DecisionRequirementsDefinitionEntity previousDecisionDefinition = null;
 
-    String previousDecisionDefinitionId = getPreviousDecisionRequirementDefinitionId();
+    String previousDecisionDefinitionId = getPreviousDecisionRequirementsDefinitionId();
     if (previousDecisionDefinitionId != null) {
 
-      previousDecisionDefinition = loadDecisionRequirementDefinition(previousDecisionDefinitionId);
+      previousDecisionDefinition = loadDecisionRequirementsDefinition(previousDecisionDefinitionId);
 
       if (previousDecisionDefinition == null) {
-        resetPreviousDecisionRequirementDefinitionId();
-        previousDecisionDefinitionId = getPreviousDecisionRequirementDefinitionId();
+        resetPreviousDecisionRequirementsDefinitionId();
+        previousDecisionDefinitionId = getPreviousDecisionRequirementsDefinitionId();
 
         if (previousDecisionDefinitionId != null) {
-          previousDecisionDefinition = loadDecisionRequirementDefinition(previousDecisionDefinitionId);
+          previousDecisionDefinition = loadDecisionRequirementsDefinition(previousDecisionDefinitionId);
         }
       }
     }
@@ -180,47 +180,47 @@ public class DecisionRequirementDefinitionEntity extends DmnDecisionRequirementD
   /**
    * Returns the cached version if exists; does not update the entity from the database in that case
    */
-  protected DecisionRequirementDefinitionEntity loadDecisionRequirementDefinition(String decisionRequirementDefinitionId) {
+  protected DecisionRequirementsDefinitionEntity loadDecisionRequirementsDefinition(String decisionRequirementsDefinitionId) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     DeploymentCache deploymentCache = configuration.getDeploymentCache();
 
-    DecisionRequirementDefinitionEntity decisionRequirementDefinition = deploymentCache.findDecisionRequirementDefinitionFromCache(decisionRequirementDefinitionId);
+    DecisionRequirementsDefinitionEntity decisionRequirementsDefinition = deploymentCache.findDecisionRequirementsDefinitionFromCache(decisionRequirementsDefinitionId);
 
-    if (decisionRequirementDefinition == null) {
+    if (decisionRequirementsDefinition == null) {
       CommandContext commandContext = Context.getCommandContext();
       DecisionDefinitionManager decisionDefinitionManager = commandContext.getDecisionDefinitionManager();
-      decisionRequirementDefinition = decisionDefinitionManager.findDecisionRequirementDefinitionById(decisionRequirementDefinitionId);
+      decisionRequirementsDefinition = decisionDefinitionManager.findDecisionRequirementsDefinitionById(decisionRequirementsDefinitionId);
 
-      if (decisionRequirementDefinition != null) {
-        decisionRequirementDefinition = deploymentCache.resolveDecisionRequirementDefinition(decisionRequirementDefinition);
+      if (decisionRequirementsDefinition != null) {
+        decisionRequirementsDefinition = deploymentCache.resolveDecisionRequirementsDefinition(decisionRequirementsDefinition);
       }
     }
 
-    return decisionRequirementDefinition;
+    return decisionRequirementsDefinition;
   }
 
-  public String getPreviousDecisionRequirementDefinitionId() {
-    ensurePreviousDecisionRequirementDefinitionIdInitialized();
-    return previousDecisionRequirementDefinitionId;
+  public String getPreviousDecisionRequirementsDefinitionId() {
+    ensurePreviousDecisionRequirementsDefinitionIdInitialized();
+    return previousDecisionRequirementsDefinitionId;
   }
 
   public void setPreviousDecisionDefinitionId(String previousDecisionDefinitionId) {
-    this.previousDecisionRequirementDefinitionId = previousDecisionDefinitionId;
+    this.previousDecisionRequirementsDefinitionId = previousDecisionDefinitionId;
   }
 
-  protected void resetPreviousDecisionRequirementDefinitionId() {
-    previousDecisionRequirementDefinitionId = null;
-    ensurePreviousDecisionRequirementDefinitionIdInitialized();
+  protected void resetPreviousDecisionRequirementsDefinitionId() {
+    previousDecisionRequirementsDefinitionId = null;
+    ensurePreviousDecisionRequirementsDefinitionIdInitialized();
   }
 
-  protected void ensurePreviousDecisionRequirementDefinitionIdInitialized() {
-    if (previousDecisionRequirementDefinitionId == null && !firstVersion) {
-      previousDecisionRequirementDefinitionId = Context
+  protected void ensurePreviousDecisionRequirementsDefinitionIdInitialized() {
+    if (previousDecisionRequirementsDefinitionId == null && !firstVersion) {
+      previousDecisionRequirementsDefinitionId = Context
           .getCommandContext()
           .getDecisionDefinitionManager()
-          .findPreviousDecisionRequirementDefinitionId(key, version, tenantId);
+          .findPreviousDecisionRequirementsDefinitionId(key, version, tenantId);
 
-      if (previousDecisionRequirementDefinitionId == null) {
+      if (previousDecisionRequirementsDefinitionId == null) {
         firstVersion = true;
       }
     }
@@ -228,7 +228,7 @@ public class DecisionRequirementDefinitionEntity extends DmnDecisionRequirementD
 
   @Override
   public String toString() {
-    return "DecisionRequirementDefinitionEntity [id=" + id + ", revision=" + revision + ", name=" + name + ", category=" + category + ", key=" + key
+    return "DecisionRequirementsDefinitionEntity [id=" + id + ", revision=" + revision + ", name=" + name + ", category=" + category + ", key=" + key
         + ", version=" + version + ", deploymentId=" + deploymentId + ", tenantId=" + tenantId + "]";
   }
 

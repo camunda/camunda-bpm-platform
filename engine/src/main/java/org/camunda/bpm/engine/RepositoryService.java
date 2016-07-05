@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.DiagramLayout;
@@ -182,9 +182,9 @@ public interface RepositoryService {
   DecisionDefinitionQuery createDecisionDefinitionQuery();
 
   /**
-   * Query decision requirement definitions.
+   * Query decision requirements definition.
    */
-  DecisionRequirementDefinitionQuery createDecisionRequirementDefinitionQuery();
+  DecisionRequirementsDefinitionQuery createDecisionRequirementsDefinitionQuery();
 
   /**
    * Query process definitions.

@@ -63,7 +63,7 @@
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricDecisionInstance.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricDecisionInputInstance.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricDecisionOutputInstance.xml" />
-    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/DecisionRequirementDefinition.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/DecisionRequirementsDefinition.xml" />
 
 	</mappers>
 </configuration>

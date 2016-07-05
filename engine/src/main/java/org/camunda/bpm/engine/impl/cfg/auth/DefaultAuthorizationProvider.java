@@ -41,7 +41,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -276,8 +276,8 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     return null;
   }
 
-  public AuthorizationEntity[] newDecisionRequirementDefinition(DecisionRequirementDefinition decisionRequirementDefinition) {
-    // no default authorizations on decision requirement definitions.
+  public AuthorizationEntity[] newDecisionRequirementsDefinition(DecisionRequirementsGraph decisionRequirementsDefinition) {
+    // no default authorizations on decision requirements definitions.
     return null;
   }
 

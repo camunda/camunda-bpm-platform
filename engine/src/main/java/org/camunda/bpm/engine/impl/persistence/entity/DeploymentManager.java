@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -219,18 +219,18 @@ public class DeploymentManager extends AbstractManager {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     if (processEngineConfiguration.isDmnEnabled()) {
       DecisionDefinitionManager decisionDefinitionManager = getDecisionDefinitionManager();
-      List<DecisionRequirementDefinition> decisionRequirementDefinitions = decisionDefinitionManager.findDecisionRequirementDefinitionByDeploymentId(deploymentId);
+      List<DecisionRequirementsGraph> decisionRequirementsDefinitions = decisionDefinitionManager.findDecisionRequirementsDefinitionByDeploymentId(deploymentId);
 
-      // delete decision requirement definitions from db
-      decisionDefinitionManager.deleteDecisionRequirementDefinitionsByDeploymentId(deploymentId);
+      // delete decision requirements definitions from db
+      decisionDefinitionManager.deleteDecisionRequirementsDefinitionsByDeploymentId(deploymentId);
 
       DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
 
-      for (DecisionRequirementDefinition decisionRequirementDefinition : decisionRequirementDefinitions) {
-        String decisionDefinitionId = decisionRequirementDefinition.getId();
+      for (DecisionRequirementsGraph decisionRequirementsDefinition : decisionRequirementsDefinitions) {
+        String decisionDefinitionId = decisionRequirementsDefinition.getId();
 
-        // remove decision requirement definitions from cache:
-        deploymentCache.removeDecisionRequirementDefinition(decisionDefinitionId);
+        // remove decision requirements definitions from cache:
+        deploymentCache.removeDecisionRequirementsDefinition(decisionDefinitionId);
       }
     }
   }

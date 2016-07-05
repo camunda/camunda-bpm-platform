@@ -6,7 +6,7 @@ INSERT INTO
 VALUES
   ('camunda-admin-grant-drd', 1, 'camunda-admin', 14, '*', 2147483647, 1);
 
--- decision requirement definition --
+-- decision requirements definition --
 
 ALTER TABLE ACT_RE_DECISION_DEF
   ADD DEC_REQ_ID_ NVARCHAR2(64);

@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.dmn.DecisionLogger;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
-import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementDefinitionEntity;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
@@ -33,10 +33,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 /**
  * {@link Deployer} responsible to parse DMN 1.1 XML files and create the proper
  * {@link DecisionDefinitionEntity}s. Since it uses the result of the
- * {@link DrdDeployer} to avoid duplicated parsing, the DrdDeployer must
+ * {@link DecisionRequirementsDefinitionDeployer} to avoid duplicated parsing, the DecisionRequirementsDefinitionDeployer must
  * process the deployment before this deployer.
  */
-public class DmnDeployer extends AbstractDefinitionDeployer<DecisionDefinitionEntity> {
+public class DecisionDefinitionDeployer extends AbstractDefinitionDeployer<DecisionDefinitionEntity> {
 
   protected static final DecisionLogger LOG = ProcessEngineLogger.DECISION_LOGGER;
 
@@ -54,7 +54,7 @@ public class DmnDeployer extends AbstractDefinitionDeployer<DecisionDefinitionEn
     List<DecisionDefinitionEntity> decisions = new ArrayList<DecisionDefinitionEntity>();
 
     // get the decisions from the deployed drd instead of parse the DMN again
-    DecisionRequirementDefinitionEntity deployedDrd = findDeployedDrdForResource(deployment, resource.getName());
+    DecisionRequirementsDefinitionEntity deployedDrd = findDeployedDrdForResource(deployment, resource.getName());
 
     if (deployedDrd == null) {
       throw LOG.exceptionNoDrdForResource(resource.getName());
@@ -64,8 +64,8 @@ public class DmnDeployer extends AbstractDefinitionDeployer<DecisionDefinitionEn
     for (DmnDecision decisionOfDrd : decisionsOfDrd) {
 
       DecisionDefinitionEntity decisionEntity = (DecisionDefinitionEntity) decisionOfDrd;
-      if (DrdDeployer.isDecisionRequirementDefinitionPersistable(deployedDrd)) {
-        decisionEntity.setDecisionRequirementDefinitionId(deployedDrd.getId());
+      if (DecisionRequirementsDefinitionDeployer.isDecisionRequirementsDefinitionPersistable(deployedDrd)) {
+        decisionEntity.setDecisionRequirementsDefinitionId(deployedDrd.getId());
       }
 
       decisions.add(decisionEntity);
@@ -74,11 +74,11 @@ public class DmnDeployer extends AbstractDefinitionDeployer<DecisionDefinitionEn
     return decisions;
   }
 
-  protected DecisionRequirementDefinitionEntity findDeployedDrdForResource(DeploymentEntity deployment, String resourceName) {
-    List<DecisionRequirementDefinitionEntity> deployedDrds = deployment.getDeployedArtifacts(DecisionRequirementDefinitionEntity.class);
+  protected DecisionRequirementsDefinitionEntity findDeployedDrdForResource(DeploymentEntity deployment, String resourceName) {
+    List<DecisionRequirementsDefinitionEntity> deployedDrds = deployment.getDeployedArtifacts(DecisionRequirementsDefinitionEntity.class);
     if (deployedDrds != null) {
 
-      for (DecisionRequirementDefinitionEntity deployedDrd : deployedDrds) {
+      for (DecisionRequirementsDefinitionEntity deployedDrd : deployedDrds) {
         if (deployedDrd.getResourceName().equals(resourceName)) {
           return deployedDrd;
         }
