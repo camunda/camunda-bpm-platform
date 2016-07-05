@@ -26,14 +26,14 @@ import java.util.Collection;
 public interface DmnDecision {
 
   /**
-   * The unique identifier of the element if exists.
+   * The unique identifier of the decision if exists.
    *
    * @return the identifier or null if not set
    */
   String getKey();
 
   /**
-   * The human readable name of the element if exists.
+   * The human readable name of the decision if exists.
    *
    * @return the name or null if not set
    */
@@ -41,16 +41,16 @@ public interface DmnDecision {
 
   /**
    * Check if the decision is implemented as Decision Table.
-   * 
+   *
    *  @return true if the decision is implement as Decision Table, false otherwise
    */
   boolean isDecisionTable();
-  
+
   /**
-   * Gets the list of required decisions. 
-   * 
-   * @return the list of required decisions.
+   * Returns the required decisions of this decision.
+   *
+   * @return the required decisions or an empty collection if not exists.
    */
-  Collection<DmnDecision> getRequiredDecisions(); 
+  Collection<DmnDecision> getRequiredDecisions();
 
 }
