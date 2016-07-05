@@ -49,6 +49,9 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
 
   HistoricVariableInstanceQuery orderByVariableName();
 
+  /** Only select historic process variables with the given process instance ids. */
+  HistoricVariableInstanceQuery processInstanceIdIn(String... processInstanceIds);
+
   /** Only select historic variable instances which have one of the task ids. **/
   HistoricVariableInstanceQuery taskIdIn(String... taskIds);
 

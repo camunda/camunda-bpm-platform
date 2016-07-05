@@ -27,6 +27,7 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByPri
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByProcessInstanceId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySortingAndCount;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
@@ -216,6 +217,28 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
 
     }
+  }
+
+  /**
+   * CAM-6165
+   *
+   * Verify that search by name like returns case insensitive results
+   */
+  public void testTaskQueryLookupByNameLikeCaseInsensitive() {
+    TaskQuery query = taskService.createTaskQuery();
+    query.taskNameLike("%task%");
+
+
+    List<Task> tasks = query.list();
+    assertNotNull(tasks);
+    assertThat(tasks.size(),is(10));
+
+    query = taskService.createTaskQuery();
+    query.taskNameLike("%Task%");
+
+    tasks = query.list();
+    assertNotNull(tasks);
+    assertThat(tasks.size(),is(10));
   }
 
   public void testQueryByDescriptionLike() {

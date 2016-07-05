@@ -266,4 +266,12 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
     assertThat(recordedEvents.get(0).isCanceled(), is(true));
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/executionlistener/MultipleServiceTaskExecutionListenerCall.bpmn20.xml"})
+  public void FAILING_testMultipleServiceTaskExecutionListenerCall() {
+    runtimeService.startProcessInstanceByKey("Process");
+    Task task = taskService.createTaskQuery().taskDefinitionKey("Second").singleResult();
+    formService.submitTaskForm(task.getId(), null);
+    
+    assertEquals(0, taskService.createTaskQuery().list().size());
+   }
 }
