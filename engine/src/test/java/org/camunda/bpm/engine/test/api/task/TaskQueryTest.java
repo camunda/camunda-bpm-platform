@@ -235,7 +235,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertThat(tasks.size(),is(6));
 
     query = taskService.createTaskQuery();
-    query.taskNameLike("TeStTaSk");
+    query.taskName("TeStTaSk");
 
     tasks = query.list();
     assertNotNull(tasks);
