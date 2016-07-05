@@ -73,7 +73,7 @@ To start the server in development mode, call
 ```sh
 mvn jetty:run -Pdevelop
 ```
-The webapps are then available pointing a browser at [http://localhost:8080](http://localhost:8080)
+The webapps are then available pointing a browser at [http://localhost:8080](http://localhost:8080). To login as admin user, use `jonny1` as username and password.
 
 You can now start developing using the `grunt auto-build` command in the webapp directory. To shorten compile times, you can specify the project you are going to make changes to by calling `grunt auto-build:cockpit`
 
