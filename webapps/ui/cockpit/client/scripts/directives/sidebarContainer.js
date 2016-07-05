@@ -36,15 +36,13 @@ module.exports = function() {
           compensateElement
             .children('.show-collapsable')
               .addClass('expand-collapse')
-              .append('<i class="glyphicon glyphicon-chevron-right"></i>')
-              .attr('title', 'Show sidebar');
+              .append('<i class="glyphicon glyphicon-chevron-' + (vertical ? 'right' : 'down') + '"></i>');
 
       var hideHandle =
           collapsableElement
             .children('.hide-collapsable')
               .addClass('expand-collapse')
-              .append('<i class="glyphicon glyphicon-chevron-left"></i>')
-              .attr('title', 'Hide sidebar');
+              .append('<i class="glyphicon glyphicon-chevron-' + (vertical ? 'left' : 'up') + '"></i>');
 
         /**
          * Toggle show / hide handles
