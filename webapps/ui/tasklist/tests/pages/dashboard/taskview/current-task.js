@@ -85,18 +85,18 @@ module.exports = Page.extend({
   },
 
   clickClaimedUserField: function() {
-    element(by.css('[class="set-value ng-isolate-scope"] [ng-click="startEditing()"]')).click();
+    element(by.css('[class="set-value ng-isolate-scope"] [ng-click*="startEditing()"]')).click();
   },
 
   editClaimedUser: function(userName) {
     this.clickClaimedUserField();
     this.claimedUserFieldEditMode().clear();
     this.claimedUserFieldEditMode().sendKeys(userName);
-    element(by.css('[ng-click="applyChange($event)"]')).click();
+    element(by.css('[ng-click*="applyChange($event)"]')).click();
   },
 
   cancelEditClaimedUser: function() {
-    element(by.css('[ng-click="cancelChange($event)"]')).click();
+    element(by.css('[ng-click*="cancelChange($event)"]')).click();
   },
 
   datePickerDialogElement: function() {
@@ -118,7 +118,7 @@ module.exports = Page.extend({
       // ToDo: implement date editing
     };
 
-    datePickerButton.element(by.css('[ng-click="applyChange($event)"]')).click();
+    datePickerButton.element(by.css('[ng-click*="applyChange($event)"]')).click();
     this.waitForElementToBeNotPresent(datePickerField);
   },
 
@@ -127,7 +127,7 @@ module.exports = Page.extend({
   },
 
   setFollowUpDate: function(newTime, newDate) {
-    this.followUpDateElement().element(by.css('[ng-click="startEditing()"]')).click();
+    this.followUpDateElement().element(by.css('[ng-click*="startEditing()"]')).click();
     this.editDate(newTime, newDate);
     browser.sleep(500);
   },
@@ -150,7 +150,7 @@ module.exports = Page.extend({
   },
 
   setDueDate: function(newTime, newDate) {
-    this.dueDateElement().element(by.css('[ng-click="startEditing()"]')).click();
+    this.dueDateElement().element(by.css('[ng-click*="startEditing()"]')).click();
     this.editDate(newTime, newDate);
     browser.sleep(500);
   },
@@ -167,7 +167,7 @@ module.exports = Page.extend({
     this.waitForElementToBeVisible(tooltipWidget);
     return tooltipWidget.getText();
   },
-  
+
   taskTenantIdField: function() {
     return this.formElement().element(by.css('.tenant-id'));
   }
