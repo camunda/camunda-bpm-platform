@@ -23,9 +23,9 @@ import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
-import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 
-public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirementsGraphImpl implements DecisionRequirementsGraph, ResourceDefinitionEntity, DbEntity, HasDbRevision, Serializable {
+public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirementsGraphImpl implements DecisionRequirementsDefinition, ResourceDefinitionEntity, DbEntity, HasDbRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
 

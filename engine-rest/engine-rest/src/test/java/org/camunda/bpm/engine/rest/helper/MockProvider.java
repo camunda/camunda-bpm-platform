@@ -83,7 +83,7 @@ import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.Resource;
@@ -2454,19 +2454,19 @@ public abstract class MockProvider {
       .deploymentId(EXAMPLE_DEPLOYMENT_ID);
   }
 
-  public static DecisionRequirementsGraph createMockDecisionRequirementsDefinition() {
+  public static DecisionRequirementsDefinition createMockDecisionRequirementsDefinition() {
     return mockDecisionRequirementsDefinition().build();
   }
 
-  public static DecisionRequirementsGraph createAnotherMockDecisionRequirementsDefinition() {
+  public static DecisionRequirementsDefinition createAnotherMockDecisionRequirementsDefinition() {
     return mockDecisionRequirementsDefinition()
       .id(ANOTHER_EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID)
       .tenantId(ANOTHER_EXAMPLE_TENANT_ID)
       .build();
   }
 
-  public static List<DecisionRequirementsGraph> createMockTwoDecisionRequirementsDefinitions() {
-    List<DecisionRequirementsGraph> mocks = new ArrayList<DecisionRequirementsGraph>();
+  public static List<DecisionRequirementsDefinition> createMockTwoDecisionRequirementsDefinitions() {
+    List<DecisionRequirementsDefinition> mocks = new ArrayList<DecisionRequirementsDefinition>();
     mocks.add(createMockDecisionRequirementsDefinition());
     mocks.add(createAnotherMockDecisionRequirementsDefinition());
     return mocks;

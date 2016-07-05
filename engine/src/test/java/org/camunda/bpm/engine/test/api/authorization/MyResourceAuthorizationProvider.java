@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -154,7 +154,7 @@ public class MyResourceAuthorizationProvider implements ResourceAuthorizationPro
     return null;
   }
 
-  public AuthorizationEntity[] newDecisionRequirementsDefinition(DecisionRequirementsGraph decisionRequirementsDefinition) {
+  public AuthorizationEntity[] newDecisionRequirementsDefinition(DecisionRequirementsDefinition decisionRequirementsDefinition) {
     return null;
   }
 

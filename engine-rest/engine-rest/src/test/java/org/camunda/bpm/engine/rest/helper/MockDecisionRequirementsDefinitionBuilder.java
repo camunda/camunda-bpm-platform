@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.rest.helper;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 
 public class MockDecisionRequirementsDefinitionBuilder {
 
@@ -74,8 +74,8 @@ public class MockDecisionRequirementsDefinitionBuilder {
     return this;
   }
 
-  public DecisionRequirementsGraph build() {
-    DecisionRequirementsGraph mockDefinition = mock(DecisionRequirementsGraph.class);
+  public DecisionRequirementsDefinition build() {
+    DecisionRequirementsDefinition mockDefinition = mock(DecisionRequirementsDefinition.class);
 
     when(mockDefinition.getId()).thenReturn(id);
     when(mockDefinition.getCategory()).thenReturn(category);

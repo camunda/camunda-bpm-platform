@@ -17,6 +17,6 @@ package org.camunda.bpm.engine.repository;
  * Container of {@link DecisionDefinition}s which belongs to the same decision
  * requirements graph (i.e. DMN resource).
  */
-public interface DecisionRequirementsGraph extends ResourceDefinition {
+public interface DecisionRequirementsDefinition extends ResourceDefinition {
 
 }

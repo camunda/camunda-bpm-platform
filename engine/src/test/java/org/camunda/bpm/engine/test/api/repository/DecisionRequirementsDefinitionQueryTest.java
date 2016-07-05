@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThat;
 import java.util.List;
 
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -189,7 +189,7 @@ public class DecisionRequirementsDefinitionQueryTest {
 
   @Test
   public void orderByDecisionRequirementsDefinitionId() {
-    List<DecisionRequirementsGraph> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
+    List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionId().asc().list();
 
     assertThat(decisionRequirementsDefinitions.size(), is(3));
@@ -207,7 +207,7 @@ public class DecisionRequirementsDefinitionQueryTest {
 
   @Test
   public void orderByDecisionRequirementsDefinitionKey() {
-    List<DecisionRequirementsGraph> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
+    List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionKey().asc().list();
 
     assertThat(decisionRequirementsDefinitions.size(), is(3));
@@ -225,7 +225,7 @@ public class DecisionRequirementsDefinitionQueryTest {
 
   @Test
   public void orderByDecisionRequirementsDefinitionName() {
-    List<DecisionRequirementsGraph> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
+    List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionName().asc().list();
 
     assertThat(decisionRequirementsDefinitions.size(), is(3));
@@ -243,7 +243,7 @@ public class DecisionRequirementsDefinitionQueryTest {
 
   @Test
   public void orderByDecisionRequirementsDefinitionCategory() {
-    List<DecisionRequirementsGraph> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
+    List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionCategory().asc().list();
 
     assertThat(decisionRequirementsDefinitions.size(), is(3));
@@ -261,7 +261,7 @@ public class DecisionRequirementsDefinitionQueryTest {
 
   @Test
   public void orderByDecisionRequirementsDefinitionVersion() {
-    List<DecisionRequirementsGraph> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
+    List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionVersion().asc().list();
 
     assertThat(decisionRequirementsDefinitions.size(), is(3));
@@ -279,7 +279,7 @@ public class DecisionRequirementsDefinitionQueryTest {
 
   @Test
   public void orderByDeploymentId() {
-    List<DecisionRequirementsGraph> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
+    List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDeploymentId().asc().list();
 
     assertThat(decisionRequirementsDefinitions.size(), is(3));

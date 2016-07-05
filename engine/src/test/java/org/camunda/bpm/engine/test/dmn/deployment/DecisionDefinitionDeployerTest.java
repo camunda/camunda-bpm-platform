@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
-import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.test.Deployment;
@@ -185,7 +185,7 @@ public class DecisionDefinitionDeployerTest {
     DecisionRequirementsDefinitionQuery query = repositoryService.createDecisionRequirementsDefinitionQuery();
     assertEquals(1, query.count());
 
-    DecisionRequirementsGraph decisionRequirementsDefinition = query.singleResult();
+    DecisionRequirementsDefinition decisionRequirementsDefinition = query.singleResult();
 
     assertTrue(decisionRequirementsDefinition.getId().startsWith("score:1:"));
     assertEquals("score", decisionRequirementsDefinition.getKey());
@@ -226,7 +226,7 @@ public class DecisionDefinitionDeployerTest {
   @Test
   public void multipleDrdDeployment() {
     // there should be two decision requirements definitions
-    List<DecisionRequirementsGraph> decisionRequirementsDefinitions = repositoryService
+    List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = repositoryService
         .createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionCategory()
         .asc()
@@ -279,7 +279,7 @@ public class DecisionDefinitionDeployerTest {
     DecisionRequirementsDefinitionQuery query = repositoryService.createDecisionRequirementsDefinitionQuery();
     assertEquals(1, query.count());
 
-    DecisionRequirementsGraph decisionRequirementsDefinition = query.singleResult();
+    DecisionRequirementsDefinition decisionRequirementsDefinition = query.singleResult();
     assertEquals(1, decisionRequirementsDefinition.getVersion());
     assertEquals(deploymentIdDrd, decisionRequirementsDefinition.getDeploymentId());
 

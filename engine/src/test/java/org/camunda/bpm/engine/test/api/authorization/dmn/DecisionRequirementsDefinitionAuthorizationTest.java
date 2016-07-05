@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -116,9 +116,9 @@ public class DecisionRequirementsDefinitionAuthorizationTest {
     }
   }
 
-  protected List<String> getDefinitionKeys(List<DecisionRequirementsGraph> definitions) {
+  protected List<String> getDefinitionKeys(List<DecisionRequirementsDefinition> definitions) {
     List<String> definitionKeys = new ArrayList<String>();
-    for (DecisionRequirementsGraph definition : definitions) {
+    for (DecisionRequirementsDefinition definition : definitions) {
       definitionKeys.add(definition.getKey());
     }
     return definitionKeys;

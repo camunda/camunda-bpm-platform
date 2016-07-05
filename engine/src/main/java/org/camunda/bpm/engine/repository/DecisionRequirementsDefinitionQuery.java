@@ -14,7 +14,7 @@ package org.camunda.bpm.engine.repository;
 
 import org.camunda.bpm.engine.query.Query;
 
-public interface DecisionRequirementsDefinitionQuery extends Query<DecisionRequirementsDefinitionQuery, DecisionRequirementsGraph> {
+public interface DecisionRequirementsDefinitionQuery extends Query<DecisionRequirementsDefinitionQuery, DecisionRequirementsDefinition> {
 
   /**
    * Only select decision requirements definition with the given id.

@@ -40,7 +40,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -738,11 +738,11 @@ public class DeploymentCache {
   protected void removeAllDecisionRequirementsDefinitionsByDeploymentId(String deploymentId) {
     // remove all decision requirements definitions for a specific deployment
 
-    List<DecisionRequirementsGraph> allDefinitionsForDeployment = new DecisionRequirementsDefinitionQueryImpl()
+    List<DecisionRequirementsDefinition> allDefinitionsForDeployment = new DecisionRequirementsDefinitionQueryImpl()
         .deploymentId(deploymentId)
         .list();
 
-      for (DecisionRequirementsGraph decisionRequirementsDefinition : allDefinitionsForDeployment) {
+      for (DecisionRequirementsDefinition decisionRequirementsDefinition : allDefinitionsForDeployment) {
         try {
           removeDecisionDefinition(decisionRequirementsDefinition.getId());
         } catch(Exception e) {

@@ -22,10 +22,10 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 
-public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<DecisionRequirementsDefinitionQuery, DecisionRequirementsGraph> implements DecisionRequirementsDefinitionQuery {
+public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<DecisionRequirementsDefinitionQuery, DecisionRequirementsDefinition> implements DecisionRequirementsDefinitionQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -196,7 +196,7 @@ public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<Decis
   }
 
   @Override
-  public List<DecisionRequirementsGraph> executeList(CommandContext commandContext, Page page) {
+  public List<DecisionRequirementsDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext
       .getDecisionDefinitionManager()

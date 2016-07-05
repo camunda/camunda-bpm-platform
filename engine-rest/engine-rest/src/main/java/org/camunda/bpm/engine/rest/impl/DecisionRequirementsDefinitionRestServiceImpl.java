@@ -18,7 +18,7 @@ import java.util.List;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.rest.DecisionRequirementsDefinitionRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
@@ -41,7 +41,7 @@ public class DecisionRequirementsDefinitionRestServiceImpl extends AbstractRestP
     ProcessEngine engine = getProcessEngine();
     DecisionRequirementsDefinitionQuery query = queryDto.toQuery(engine);
 
-    List<DecisionRequirementsGraph> matchingDefinitions = null;
+    List<DecisionRequirementsDefinition> matchingDefinitions = null;
 
     if (firstResult != null || maxResults != null) {
       matchingDefinitions = executePaginatedQuery(query, firstResult, maxResults);
@@ -49,14 +49,14 @@ public class DecisionRequirementsDefinitionRestServiceImpl extends AbstractRestP
       matchingDefinitions = query.list();
     }
 
-    for (DecisionRequirementsGraph definition : matchingDefinitions) {
+    for (DecisionRequirementsDefinition definition : matchingDefinitions) {
       DecisionRequirementsDefinitionDto dto = DecisionRequirementsDefinitionDto.fromDecisionRequirementsDefinition(definition);
       dtos.add(dto);
     }
     return dtos;
   }
 
-  private List<DecisionRequirementsGraph> executePaginatedQuery(DecisionRequirementsDefinitionQuery query, Integer firstResult, Integer maxResults) {
+  private List<DecisionRequirementsDefinition> executePaginatedQuery(DecisionRequirementsDefinitionQuery query, Integer firstResult, Integer maxResults) {
     if (firstResult == null) {
       firstResult = 0;
     }

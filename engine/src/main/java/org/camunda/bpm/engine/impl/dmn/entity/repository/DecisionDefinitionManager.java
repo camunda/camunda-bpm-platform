@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 
 public class DecisionDefinitionManager extends AbstractManager {
 
@@ -155,7 +155,7 @@ public class DecisionDefinitionManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<DecisionRequirementsGraph> findDecisionRequirementsDefinitionByDeploymentId(String deploymentId) {
+  public List<DecisionRequirementsDefinition> findDecisionRequirementsDefinitionByDeploymentId(String deploymentId) {
     return getDbEntityManager().selectList("selectDecisionRequirementsDefinitionByDeploymentId", deploymentId);
   }
 
@@ -182,7 +182,7 @@ public class DecisionDefinitionManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<DecisionRequirementsGraph> findDecisionRequirementsDefinitionsByQueryCriteria(DecisionRequirementsDefinitionQueryImpl query, Page page) {
+  public List<DecisionRequirementsDefinition> findDecisionRequirementsDefinitionsByQueryCriteria(DecisionRequirementsDefinitionQueryImpl query, Page page) {
     configureDecisionRequirementsDefinitionQuery(query);
     return getDbEntityManager().selectList("selectDecisionRequirementsDefinitionsByQueryCriteria", query, page);
   }
@@ -200,7 +200,7 @@ public class DecisionDefinitionManager extends AbstractManager {
     }
   }
 
-  protected void createDefaultAuthorizations(DecisionRequirementsGraph decisionRequirementsDefinition) {
+  protected void createDefaultAuthorizations(DecisionRequirementsDefinition decisionRequirementsDefinition) {
     if(isAuthorizationEnabled()) {
       ResourceAuthorizationProvider provider = getResourceAuthorizationProvider();
       AuthorizationEntity[] authorizations = provider.newDecisionRequirementsDefinition(decisionRequirementsDefinition);

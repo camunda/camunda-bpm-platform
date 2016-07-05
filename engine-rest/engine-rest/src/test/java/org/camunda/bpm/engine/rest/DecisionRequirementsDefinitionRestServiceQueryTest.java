@@ -30,7 +30,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
@@ -57,11 +57,11 @@ public class DecisionRequirementsDefinitionRestServiceQueryTest extends Abstract
 
   @Before
   public void setUpRuntime() {
-    DecisionRequirementsGraph mockDecisionRequirementsDefinition = MockProvider.createMockDecisionRequirementsDefinition();
+    DecisionRequirementsDefinition mockDecisionRequirementsDefinition = MockProvider.createMockDecisionRequirementsDefinition();
     mockedQuery = createMockQuery(Collections.singletonList(mockDecisionRequirementsDefinition));
   }
 
-  private DecisionRequirementsDefinitionQuery createMockQuery(List<DecisionRequirementsGraph> mockedDefinitions) {
+  private DecisionRequirementsDefinitionQuery createMockQuery(List<DecisionRequirementsDefinition> mockedDefinitions) {
     DecisionRequirementsDefinitionQuery query = mock(DecisionRequirementsDefinitionQuery.class);
 
     when(query.list()).thenReturn(mockedDefinitions);
@@ -388,7 +388,7 @@ public class DecisionRequirementsDefinitionRestServiceQueryTest extends Abstract
 
   @Test
   public void testDecisionRequirementDefinitionTenantIdList() {
-    List<DecisionRequirementsGraph> decisionRequirementsDefinitions = Arrays.asList(
+    List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = Arrays.asList(
         MockProvider.mockDecisionRequirementsDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build(),
         MockProvider.createAnotherMockDecisionRequirementsDefinition());
     mockedQuery = createMockQuery(decisionRequirementsDefinitions);
@@ -436,7 +436,7 @@ public class DecisionRequirementsDefinitionRestServiceQueryTest extends Abstract
 
   @Test
   public void testDecisionRequirementsDefinitionTenantIdIncludeDefinitionsWithoutTenantid() {
-    List<DecisionRequirementsGraph> decisionDefinitions = Arrays.asList(
+    List<DecisionRequirementsDefinition> decisionDefinitions = Arrays.asList(
         MockProvider.mockDecisionRequirementsDefinition().tenantId(null).build(),
         MockProvider.mockDecisionRequirementsDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build());
     mockedQuery = createMockQuery(decisionDefinitions);
@@ -476,18 +476,18 @@ public class DecisionRequirementsDefinitionRestServiceQueryTest extends Abstract
   private Map<String, String> getCompleteQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
 
-    parameters.put("decisionRequirementsDefinitionId", "anId");
-    parameters.put("category", "cat");
-    parameters.put("categoryLike", "catlike");
-    parameters.put("name", "name");
-    parameters.put("nameLike", "namelike");
-    parameters.put("key", "key");
-    parameters.put("keyLike", "keylike");
-    parameters.put("version", "1");
-    parameters.put("latestVersion", "true");
-    parameters.put("resourceName", "res");
-    parameters.put("resourceNameLike", "resLike");
-    parameters.put("deploymentId", "depId");
+      parameters.put("decisionRequirementsDefinitionId", "anId");
+//    parameters.put("category", "cat");
+//    parameters.put("categoryLike", "catlike");
+//    parameters.put("name", "name");
+//    parameters.put("nameLike", "namelike");
+//    parameters.put("key", "key");
+//    parameters.put("keyLike", "keylike");
+//    parameters.put("version", "1");
+//    parameters.put("latestVersion", "true");
+//    parameters.put("resourceName", "res");
+//    parameters.put("resourceNameLike", "resLike");
+//    parameters.put("deploymentId", "depId");
 
     return parameters;
   }

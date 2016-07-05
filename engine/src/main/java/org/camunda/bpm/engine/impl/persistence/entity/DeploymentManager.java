@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -219,14 +219,14 @@ public class DeploymentManager extends AbstractManager {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     if (processEngineConfiguration.isDmnEnabled()) {
       DecisionDefinitionManager decisionDefinitionManager = getDecisionDefinitionManager();
-      List<DecisionRequirementsGraph> decisionRequirementsDefinitions = decisionDefinitionManager.findDecisionRequirementsDefinitionByDeploymentId(deploymentId);
+      List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = decisionDefinitionManager.findDecisionRequirementsDefinitionByDeploymentId(deploymentId);
 
       // delete decision requirements definitions from db
       decisionDefinitionManager.deleteDecisionRequirementsDefinitionsByDeploymentId(deploymentId);
 
       DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
 
-      for (DecisionRequirementsGraph decisionRequirementsDefinition : decisionRequirementsDefinitions) {
+      for (DecisionRequirementsDefinition decisionRequirementsDefinition : decisionRequirementsDefinitions) {
         String decisionDefinitionId = decisionRequirementsDefinition.getId();
 
         // remove decision requirements definitions from cache:
