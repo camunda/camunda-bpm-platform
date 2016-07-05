@@ -31,19 +31,19 @@ describe('Cockpit Tasks Dashboard Spec', function() {
       it('should show task counts for assigned/claimed tasks', function() {
 
         // then
-        expect(tasksPage.openTasksStatistics.taskStatisticLabel(0)).to.eventually.eql('Assigned to user');
+        expect(tasksPage.openTasksStatistics.taskStatisticLabel(0)).to.eventually.eql('assigned to a user');
         expect(tasksPage.openTasksStatistics.taskStatisticCount(0)).to.eventually.eql('1');
       });
 
       it('should show tasks counts for tasks with a group', function() {
         // then
-        expect(tasksPage.openTasksStatistics.taskStatisticLabel(1)).to.eventually.eql('Assigned to group');
+        expect(tasksPage.openTasksStatistics.taskStatisticLabel(1)).to.eventually.eql('assigned to 1 or more groups');
         expect(tasksPage.openTasksStatistics.taskStatisticCount(1)).to.eventually.eql('1');
       });
 
       it('should show tasks counts for tasks without a user or a group', function() {
         // then
-        expect(tasksPage.openTasksStatistics.taskStatisticLabel(2)).to.eventually.eql('Not assigned to group or user');
+        expect(tasksPage.openTasksStatistics.taskStatisticLabel(2)).to.eventually.eql('unassigned');
         expect(tasksPage.openTasksStatistics.taskStatisticCount(2)).to.eventually.eql('1');
       })
     });
