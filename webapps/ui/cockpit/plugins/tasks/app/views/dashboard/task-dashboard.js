@@ -183,9 +183,13 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
             search.updateSilently({ searchQuery: JSON.stringify(searchLinks) }, true);
             searchLinks = resetSearch();
           };
+
+          // prevents the initializer from overwriting the exisiting search
+          if(!search().hasOwnProperty('searchQuery')) {
+            resetSearch();
+            search.updateSilently({ searchQuery: JSON.stringify(searchLinks) }, true);
+          }
         }
-
-
       }],
 
     priority : 0
