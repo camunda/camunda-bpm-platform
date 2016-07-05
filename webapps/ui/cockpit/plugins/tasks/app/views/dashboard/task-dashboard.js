@@ -10,12 +10,12 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
     label : 'Task Dashboard',
     template : template,
     controller : [
-      '$scope', '$q', 'Views', 'camAPI', 'dataDepend',
-      function($scope, $q, Views, camAPI, dataDepend) {
+      '$scope', '$q', 'Views', 'camAPI', 'dataDepend', 'search', 'Notifications',
+      function($scope, $q, Views, camAPI, dataDepend, search, Notifications) {
 
         var tasksPluginData = dataDepend.create($scope);
 
-        var TaskResource       = camAPI.resource('task'),
+        var HistoryResource       = camAPI.resource('history'),
             TaskReportResource = camAPI.resource('task-report');
 
         $scope.taskStatistics = [
@@ -23,28 +23,35 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
             // assigned to users
             'state' : undefined,
             'label' : 'assigned to a user',
-            'count' : 0
+            'count' : 0,
+            'search': 'openAssignedTasks'
           },
           {
             // assigned to groups
             'state' : undefined,
             'label' : 'assigned to 1 or more groups',
-            'count' : 0
+            'count' : 0,
+            'search': 'openGroupTasks'
           },
           {
             // assigned neither to groups nor to users
             'state' : undefined,
             'label' : 'unassigned',
-            'count' : 0
+            'count' : 0,
+            'search': 'openUnassignedTasks'
           }
         ];
 
         // -- provide task data --------------
-        var provideResourceData = function(resource, method, params) {
+        var provideResourceData = function(resourceName, resource, method, params) {
           var deferred = $q.defer();
 
           var resourceCallback = function(err, res) {
             if (err) {
+              Notifications.addError({
+                status: 'Could not fetch the resource for \'' + resourceName + '\'',
+                message: err.toString()
+              });
               deferred.reject(err);
             } else {
               deferred.resolve(res);
@@ -60,42 +67,56 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
           return deferred.promise;
         };
 
+        var defaultParameter = function() {
+          return {
+            unfinished: true
+          };
+        };
+
         tasksPluginData.provide('openTaskCount', function() {
-          return provideResourceData(TaskResource, 'count', {});
+          return provideResourceData('Open tasks', HistoryResource, 'taskCount', defaultParameter());
         });
 
         tasksPluginData.provide('assignedToUserCount', function() {
-          return provideResourceData(TaskResource, 'count', {'assigned' : true});
+          var params = defaultParameter();
+          params.assigned = true;
+          return provideResourceData('Tasks assigned to users', HistoryResource, 'taskCount', params);
         });
 
         tasksPluginData.provide('assignedToGroupCount', function() {
-          return provideResourceData(TaskResource, 'count', {'unassigned' : true, 'withCandidateGroups' : true});
+          var params = defaultParameter();
+          params.unassigned = true;
+          params.withCandidateGroups = true;
+          return provideResourceData('Tasks assigned to groups', HistoryResource, 'taskCount', params);
         });
 
         tasksPluginData.provide('notAssignedCount', function() {
-          return provideResourceData(TaskResource, 'count', {'unassigned' : true, 'withoutCandidateGroups' : true});
+          var params = defaultParameter();
+          params.unassigned = true;
+          params.withoutCandidateGroups = true;
+          return provideResourceData('Unassigned tasks', HistoryResource, 'taskCount', params);
         });
 
         tasksPluginData.provide('countByCandidateGroup', function() {
-          return provideResourceData(TaskReportResource, 'countByCandidateGroup');
+          return provideResourceData('Tasks per group', TaskReportResource, 'countByCandidateGroup');
         });
 
         // -- observe task data --------------
 
         $scope.openTasksState = tasksPluginData.observe(['openTaskCount'], function(_count) {
-          $scope.openTasksCount = _count || 0;
+          $scope.openTasksCount = _count.count || 0;
         });
 
         $scope.taskStatistics[0].state = tasksPluginData.observe(['assignedToUserCount'], function(_userCount) {
-          $scope.taskStatistics[0].count = (_userCount) || 0;
+          $scope.taskStatistics[0].count = (_userCount.count) || 0;
         });
 
         $scope.taskStatistics[1].state = tasksPluginData.observe(['assignedToGroupCount'], function(_groupCount) {
-          $scope.taskStatistics[1].count = (_groupCount) || 0;
+          $scope.taskStatistics[1].count = (_groupCount.count) || 0;
         });
 
         $scope.taskStatistics[2].state = tasksPluginData.observe(['notAssignedCount'], function(_notAssignedCount) {
-          $scope.taskStatistics[2].count = (_notAssignedCount) || 0;
+          $scope.taskStatistics[2].count = (_notAssignedCount.count) || 0;
         });
 
         $scope.taskGroupState = tasksPluginData.observe(['countByCandidateGroup'], function(_candidateGroupCounts) {
@@ -105,6 +126,66 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
         $scope.formatGroupName = function(name) {
           return ( name == null ) ? 'without group' : name;
         };
+
+        var taskDashboardPlugins = Views.getProviders({component: 'cockpit.tasks.dashboard'});
+        var hasSearchPlugin = $scope.hasSearchPlugin = taskDashboardPlugins.filter(function(plugin) {
+          return plugin.id === 'search-tasks';
+        }).length > 0;
+
+        // -- SEARCH PLUGIN REQUIRED ------
+        if (hasSearchPlugin) {
+          var addTermToSearch = function(type, operator, value) {
+            if(arguments.length < 3) {
+              operator = 'eq';
+              value = '';
+            }
+
+            return {
+              'type' : type,
+              'operator' : operator,
+              'value' : value,
+              'name' : ''
+            };
+          };
+
+          // we take all data from unfinished tasks for the open task dashboard
+          var resetSearch = function() {
+            return [ addTermToSearch('TAunfinished') ];
+          };
+
+          var searchLinks = resetSearch();
+
+          $scope.createSearch = function(identifier, group) {
+            if(group === 'statistics') {
+              switch (identifier) {
+              case 'openAssignedTasks':
+                searchLinks.push(addTermToSearch('TAassigned'));
+                break;
+              case 'openGroupTasks':
+                searchLinks.push(addTermToSearch('TAwithCandidateGroups'));
+                searchLinks.push(addTermToSearch('TAunassigned'));
+                break;
+              case 'openUnassignedTasks':
+                searchLinks.push(addTermToSearch('TAwithoutCandidateGroups'));
+                searchLinks.push(addTermToSearch('TAunassigned'));
+                break;
+              }
+            } else {
+              if(identifier != null) {
+                searchLinks.push(addTermToSearch('TAtaskHadCandidateGroup', 'eq', identifier));
+              } else {
+                // without group!
+                searchLinks.push(addTermToSearch('TAwithoutCandidateGroups'));
+                searchLinks.push(addTermToSearch('TAunassigned'));
+              }
+            }
+
+            search.updateSilently({ searchQuery: JSON.stringify(searchLinks) }, true);
+            searchLinks = resetSearch();
+          };
+        }
+
+
       }],
 
     priority : 0

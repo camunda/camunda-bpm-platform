@@ -63,7 +63,7 @@ describe('Cockpit Tasks Dashboard Spec', function() {
 
       it('should show an info that a task can have multiple groups', function() {
         // then
-        expect(tasksPage.openTasksStatistics.multipleGroupsInfo()).to.eventually.be.true;
+        expect(tasksPage.openTasksStatistics.multipleGroupsInfo()).to.eventually.eql(true);
       })
     })
   });
