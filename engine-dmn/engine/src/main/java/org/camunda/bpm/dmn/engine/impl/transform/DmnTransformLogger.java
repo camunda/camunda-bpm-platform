@@ -16,7 +16,7 @@ package org.camunda.bpm.dmn.engine.impl.transform;
 import java.io.File;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionRequirementDiagram;
+import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableInputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableOutputImpl;
@@ -148,15 +148,15 @@ public class DmnTransformLogger extends DmnLogger {
   public DmnTransformException errorWhileTransformingDefinitions(Throwable cause) {
     return new DmnTransformException(exceptionMessage(
       "016",
-      "Error while transforming decision requirement diagram: " + cause.getMessage()),
+      "Error while transforming decision requirements graph: " + cause.getMessage()),
       cause
     );
   }
 
-  public DmnTransformException drdIdIsMissing(DmnDecisionRequirementDiagram drd) {
+  public DmnTransformException drdIdIsMissing(DmnDecisionRequirementsGraph drd) {
     return new DmnTransformException(exceptionMessage(
       "017",
-      "The decision requirement diagram '{}' must have an 'id' attribute set.", drd)
+      "The decision requirements graph '{}' must have an 'id' attribute set.", drd)
     );
   }
 

@@ -89,7 +89,7 @@ public interface DmnEngine {
   DmnDecision parseDecision(String decisionKey, DmnModelInstance dmnModelInstance);
 
   /**
-   * Parse the decision requirement diagram in a DMN decision model.
+   * Parse the decision requirements graph in a DMN decision model.
    *
    * @param inputStream the {@link InputStream} of the DMN file
    * @return a list of the {@link DmnDecision}s of the DMN file
@@ -97,10 +97,10 @@ public interface DmnEngine {
    * @throws DmnEngineException
    *           if an error occurs during the parsing of the decision model
    */
-  DmnDecisionRequirementDiagram parseDecisionRequirementDiagram(InputStream inputStream);
+  DmnDecisionRequirementsGraph parseDecisionRequirementsGraph(InputStream inputStream);
 
   /**
-   * Parse the decision requirement diagram in a DMN decision model.
+   * Parse the decision requirements graph in a DMN decision model.
    *
    * @param dmnModelInstance the {@link DmnModelInstance} of the DMN decision model
    * @return a list of the {@link DmnDecision}s of the DMN file
@@ -108,7 +108,7 @@ public interface DmnEngine {
    * @throws DmnEngineException
    *           if an error occurs during the parsing of the decision model
    */
-  DmnDecisionRequirementDiagram parseDecisionRequirementDiagram(DmnModelInstance dmnModelInstance);
+  DmnDecisionRequirementsGraph parseDecisionRequirementsGraph(DmnModelInstance dmnModelInstance);
 
   /**
    * Evaluates a decision which is implemented as decision table.

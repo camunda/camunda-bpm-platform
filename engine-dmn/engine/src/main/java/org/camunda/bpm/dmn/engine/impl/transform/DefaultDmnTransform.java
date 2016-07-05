@@ -26,9 +26,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionRequirementDiagram;
+import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionRequirementDiagramImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionRequirementsGraphImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableInputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableOutputImpl;
@@ -126,7 +126,7 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
   // transform ////////////////////////////////////////////////////////////////
 
   @SuppressWarnings("unchecked")
-  public <T extends DmnDecisionRequirementDiagram> T transformDecisionRequirementDiagram() {
+  public <T extends DmnDecisionRequirementsGraph> T transformDecisionRequirementsGraph() {
     try {
       Definitions definitions = modelInstance.getDefinitions();
       return (T) transformDefinitions(definitions);
@@ -136,9 +136,9 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
     }
   }
 
-  protected DmnDecisionRequirementDiagram transformDefinitions(Definitions definitions) {
-    DmnElementTransformHandler<Definitions, DmnDecisionRequirementDiagramImpl> handler = handlerRegistry.getHandler(Definitions.class);
-    DmnDecisionRequirementDiagramImpl dmnDrd = handler.handleElement(this, definitions);
+  protected DmnDecisionRequirementsGraph transformDefinitions(Definitions definitions) {
+    DmnElementTransformHandler<Definitions, DmnDecisionRequirementsGraphImpl> handler = handlerRegistry.getHandler(Definitions.class);
+    DmnDecisionRequirementsGraphImpl dmnDrd = handler.handleElement(this, definitions);
 
     // validate id of drd
     if (dmnDrd.getKey() == null) {

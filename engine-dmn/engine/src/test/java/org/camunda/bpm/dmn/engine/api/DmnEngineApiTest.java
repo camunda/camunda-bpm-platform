@@ -21,7 +21,7 @@ import static org.camunda.bpm.engine.variable.Variables.emptyVariableContext;
 import java.io.InputStream;
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionRequirementDiagram;
+import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.impl.DmnEvaluationException;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformException;
@@ -160,7 +160,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   @Test
   public void shouldFailParsingDrdIfInputStreamIsNull() {
     try{
-      dmnEngine.parseDecisionRequirementDiagram((InputStream) null);
+      dmnEngine.parseDecisionRequirementsGraph((InputStream) null);
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
     }
     catch (IllegalArgumentException e) {
@@ -172,7 +172,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   @Test
   public void shouldFailParsingDrdIfInputStreamIsInvalid() {
     try{
-      dmnEngine.parseDecisionRequirementDiagram(createInvalidInputStream());
+      dmnEngine.parseDecisionRequirementsGraph(createInvalidInputStream());
       failBecauseExceptionWasNotThrown(DmnTransformException.class);
     }
     catch (DmnTransformException e) {
@@ -184,7 +184,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   @Test
   public void shouldFailParsingDrdIfModelInstanceIsNull() {
     try{
-      dmnEngine.parseDecisionRequirementDiagram((DmnModelInstance) null);
+      dmnEngine.parseDecisionRequirementsGraph((DmnModelInstance) null);
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
     }
     catch (IllegalArgumentException e) {
@@ -453,7 +453,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
 
   @Test
   public void shouldEvaluateDecisionOfDrd() {
-    DmnDecisionRequirementDiagram drd = dmnEngine.parseDecisionRequirementDiagram(createInputStream());
+    DmnDecisionRequirementsGraph drd = dmnEngine.parseDecisionRequirementsGraph(createInputStream());
     decision = drd.getDecision("decision");
 
     DmnDecisionTableResult results = dmnEngine.evaluateDecisionTable(decision, createVariables().putValue("input", INPUT_VALUE));

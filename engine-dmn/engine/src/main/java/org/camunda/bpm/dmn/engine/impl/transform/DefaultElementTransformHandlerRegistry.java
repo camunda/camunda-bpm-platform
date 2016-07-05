@@ -36,7 +36,7 @@ public class DefaultElementTransformHandlerRegistry implements DmnElementTransfo
   protected static Map<Class<? extends DmnModelElementInstance>, DmnElementTransformHandler> getDefaultElementTransformHandlers() {
     Map<Class<? extends DmnModelElementInstance>, DmnElementTransformHandler> handlers = new HashMap<Class<? extends DmnModelElementInstance>, DmnElementTransformHandler>();
 
-    handlers.put(Definitions.class, new DmnDecisionRequirementDiagramTransformHandler());
+    handlers.put(Definitions.class, new DmnDecisionRequirementsGraphTransformHandler());
     handlers.put(Decision.class, new DmnDecisionTransformHandler());
     handlers.put(DecisionTable.class, new DmnDecisionTableTransformHandler());
     handlers.put(Input.class, new DmnDecisionTableInputTransformHandler());

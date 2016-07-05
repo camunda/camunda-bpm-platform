@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionRequirementDiagram;
+import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformException;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
 import org.camunda.bpm.model.dmn.Dmn;
@@ -221,9 +221,9 @@ public class ParseDecisionTest extends DmnEngineTest {
   @Test
   public void shouldParseDrdFromInputStream() {
     InputStream inputStream = IoUtil.fileAsStream(NO_INPUT_DMN);
-    DmnDecisionRequirementDiagram drd = dmnEngine.parseDecisionRequirementDiagram(inputStream);
+    DmnDecisionRequirementsGraph drd = dmnEngine.parseDecisionRequirementsGraph(inputStream);
 
-    assertDecisionRequirementDiagram(drd, "definitions");
+    assertDecisionRequirementsGraph(drd, "definitions");
   }
 
   @Test
@@ -231,16 +231,16 @@ public class ParseDecisionTest extends DmnEngineTest {
     InputStream inputStream = IoUtil.fileAsStream(NO_INPUT_DMN);
     DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
 
-    DmnDecisionRequirementDiagram drd = dmnEngine.parseDecisionRequirementDiagram(modelInstance);
+    DmnDecisionRequirementsGraph drd = dmnEngine.parseDecisionRequirementsGraph(modelInstance);
 
-    assertDecisionRequirementDiagram(drd, "definitions");
+    assertDecisionRequirementsGraph(drd, "definitions");
   }
 
   @Test
   public void shouldFailIfDecisionDrdIdIsMissing() {
     try {
       InputStream inputStream = IoUtil.fileAsStream(MISSING_DECISION_REQUIREMENT_DIAGRAM_ID_DMN);
-      dmnEngine.parseDecisionRequirementDiagram(inputStream);
+      dmnEngine.parseDecisionRequirementsGraph(inputStream);
 
       failBecauseExceptionWasNotThrown(DmnTransformException.class);
     }
@@ -258,7 +258,7 @@ public class ParseDecisionTest extends DmnEngineTest {
     assertThat(decision.getKey()).isEqualTo(key);
   }
 
-  protected void assertDecisionRequirementDiagram(DmnDecisionRequirementDiagram drd, String key) {
+  protected void assertDecisionRequirementsGraph(DmnDecisionRequirementsGraph drd, String key) {
     assertThat(drd).isNotNull();
     assertThat(drd.getKey()).isEqualTo(key);
   }

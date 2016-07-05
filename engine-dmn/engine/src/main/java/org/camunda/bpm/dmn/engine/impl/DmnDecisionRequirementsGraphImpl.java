@@ -18,9 +18,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionRequirementDiagram;
+import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph;
 
-public class DmnDecisionRequirementDiagramImpl implements DmnDecisionRequirementDiagram {
+public class DmnDecisionRequirementsGraphImpl implements DmnDecisionRequirementsGraph {
 
   protected String key;
   protected String name;
@@ -65,7 +65,7 @@ public class DmnDecisionRequirementDiagramImpl implements DmnDecisionRequirement
 
   @Override
   public String toString() {
-    return "DmnDecisionRequirementDiagramImpl [key=" + key + ", name=" + name + ", decisions=" + decisions + "]";
+    return "DmnDecisionRequirementsGraphImpl [key=" + key + ", name=" + name + ", decisions=" + decisions + "]";
   }
 
 

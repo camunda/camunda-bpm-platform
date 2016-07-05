@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionRequirementDiagram;
+import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableInputImpl;
@@ -309,9 +309,9 @@ public class DmnTransformTest extends DmnEngineTest {
   }
 
   @Test
-  public void shouldTransformDecisionRequirementDiagram() {
+  public void shouldTransformDecisionRequirementsGraph() {
     InputStream inputStream = IoUtil.fileAsStream(REQUIRED_DECISIONS_DMN);
-    DmnDecisionRequirementDiagram drd = dmnEngine.parseDecisionRequirementDiagram(inputStream);
+    DmnDecisionRequirementsGraph drd = dmnEngine.parseDecisionRequirementsGraph(inputStream);
 
     assertThat(drd).isNotNull();
     assertThat(drd.getKey()).isEqualTo("buy-decision");

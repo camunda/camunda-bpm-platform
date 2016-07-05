@@ -17,9 +17,9 @@ import java.util.Set;
 
 /**
  * Container of {@link DmnDecision}s which belongs to the same decision
- * requirement diagram (i.e. DMN resource).
+ * requirements graph (i.e. DMN resource).
  */
-public interface DmnDecisionRequirementDiagram {
+public interface DmnDecisionRequirementsGraph {
 
   /**
    * The unique identifier of the diagram if exists.
