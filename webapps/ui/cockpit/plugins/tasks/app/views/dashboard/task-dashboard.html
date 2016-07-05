@@ -16,7 +16,10 @@
         <tr>
           <th>
             <span ng-if="!openTasksState.$loaded" class="glyphicon glyphicon-refresh animate-spin"></span>
-            <span ng-if="openTasksState.$loaded">{{ openTasksCount }}</span>
+            <span ng-if="openTasksState.$loaded && !hasSearchPlugin"">{{ openTasksCount }}</span>
+            <span ng-if="openTasksState.$loaded && hasSearchPlugin">
+              <a class="search-link" ng-click="createSearch('allOpenTasks', 'statistics')">{{ openTasksCount }}</a>
+            </span>
           </th>
           <th>Total</th>
         </tr>
@@ -26,7 +29,10 @@
         <tr ng-repeat="taskStatistic in taskStatistics">
           <th>
             <span ng-if="!taskStatistic.state.$loaded" class="glyphicon glyphicon-refresh animate-spin"></span>
-            <span ng-if="taskStatistic.state.$loaded">{{ taskStatistic.count }}</span>
+            <span ng-if="taskStatistic.state.$loaded && !hasSearchPlugin">{{ taskStatistic.count }}</span>
+            <span ng-if="taskStatistic.state.$loaded && hasSearchPlugin">
+              <a class="search-link" ng-click="createSearch(taskStatistic.search, 'statistics')"> {{ taskStatistic.count }}</a>
+            </span>
           </th>
           <td>{{ taskStatistic.label }}</td>
         </tr>
@@ -50,7 +56,10 @@
           <td colspan="2"><span class="glyphicon glyphicon-refresh animate-spin"></span></td>
         </tr>
         <tr ng-if="taskGroupState.$loaded" ng-repeat="taskGroup in taskGroups">
-          <th>{{ taskGroup.taskCount }}</th>
+          <td ng-if="!hasSearchPlugin">{{ taskGroup.taskCount }}</td>
+          <td ng-if="hasSearchPlugin">
+            <a class="search-link" ng-click="createSearch(taskGroup.groupName, 'group')">{{ taskGroup.taskCount }}</a>
+          </td>
           <td>{{ formatGroupName(taskGroup.groupName) }}</td>
         </tr>
       </tbody>
