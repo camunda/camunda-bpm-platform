@@ -217,7 +217,7 @@ public class DmnTransformTest extends DmnEngineTest {
     assertThat(buyProductDecision).isNotNull();
     Collection<DmnDecision> requiredProductDecisions = buyProductDecision.getRequiredDecisions();
     assertThat(requiredProductDecisions.size()).isEqualTo(1);
-    
+
     DmnDecision requiredProductDecision = getDecision(requiredProductDecisions, "buyComputer");
     assertThat(requiredProductDecision).isNotNull();
 
@@ -225,13 +225,13 @@ public class DmnTransformTest extends DmnEngineTest {
     assertThat(buyComputerDecision).isNotNull();
     Collection<DmnDecision> buyComputerRequiredDecisions = buyComputerDecision.getRequiredDecisions();
     assertThat(buyComputerRequiredDecisions.size()).isEqualTo(1);
-    
+
     DmnDecision buyComputerRequiredDecision = getDecision(buyComputerRequiredDecisions, "buyElectronic");
     assertThat(buyComputerRequiredDecision).isNotNull();
 
     DmnDecision buyElectronicDecision = getDecision(decisions, "buyElectronic");
     assertThat(buyElectronicDecision).isNotNull();
-    
+
     Collection<DmnDecision> buyElectronicRequiredDecisions = buyElectronicDecision.getRequiredDecisions();
     assertThat(buyElectronicRequiredDecisions.size()).isEqualTo(0);
   }
@@ -243,10 +243,10 @@ public class DmnTransformTest extends DmnEngineTest {
     DmnDecision decision = dmnEngine.parseDecision("car",modelInstance);
     Collection<DmnDecision> requiredDecisions = decision.getRequiredDecisions();
     assertThat(requiredDecisions.size()).isEqualTo(2);
-    
+
     DmnDecision carPriceDecision = getDecision(requiredDecisions, "carPrice");
     assertThat(carPriceDecision).isNotNull();
-    
+
     DmnDecision carSpeedDecision = getDecision(requiredDecisions, "carSpeed");
     assertThat(carSpeedDecision).isNotNull();
   }
@@ -311,16 +311,16 @@ public class DmnTransformTest extends DmnEngineTest {
   @Test
   public void shouldTransformDecisionRequirementsGraph() {
     InputStream inputStream = IoUtil.fileAsStream(REQUIRED_DECISIONS_DMN);
-    DmnDecisionRequirementsGraph drd = dmnEngine.parseDecisionRequirementsGraph(inputStream);
+    DmnDecisionRequirementsGraph drg = dmnEngine.parseDecisionRequirementsGraph(inputStream);
 
-    assertThat(drd).isNotNull();
-    assertThat(drd.getKey()).isEqualTo("buy-decision");
-    assertThat(drd.getName()).isEqualTo("Buy Decision");
-    assertThat(drd.getDecisionKeys())
+    assertThat(drg).isNotNull();
+    assertThat(drg.getKey()).isEqualTo("buy-decision");
+    assertThat(drg.getName()).isEqualTo("Buy Decision");
+    assertThat(drg.getDecisionKeys())
       .hasSize(3)
       .contains("buyProduct", "buyComputer", "buyElectronic");
 
-    Collection<DmnDecision> decisions = drd.getDecisions();
+    Collection<DmnDecision> decisions = drg.getDecisions();
     assertThat(decisions)
       .hasSize(3)
       .extracting("key")

@@ -158,7 +158,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   }
 
   @Test
-  public void shouldFailParsingDrdIfInputStreamIsNull() {
+  public void shouldFailParsingDrgIfInputStreamIsNull() {
     try{
       dmnEngine.parseDecisionRequirementsGraph((InputStream) null);
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
@@ -170,7 +170,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   }
 
   @Test
-  public void shouldFailParsingDrdIfInputStreamIsInvalid() {
+  public void shouldFailParsingDrgIfInputStreamIsInvalid() {
     try{
       dmnEngine.parseDecisionRequirementsGraph(createInvalidInputStream());
       failBecauseExceptionWasNotThrown(DmnTransformException.class);
@@ -182,7 +182,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   }
 
   @Test
-  public void shouldFailParsingDrdIfModelInstanceIsNull() {
+  public void shouldFailParsingDrgIfModelInstanceIsNull() {
     try{
       dmnEngine.parseDecisionRequirementsGraph((DmnModelInstance) null);
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
@@ -452,7 +452,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   }
 
   @Test
-  public void shouldEvaluateDecisionOfDrd() {
+  public void shouldEvaluateDecisionOfDrg() {
     DmnDecisionRequirementsGraph drd = dmnEngine.parseDecisionRequirementsGraph(createInputStream());
     decision = drd.getDecision("decision");
 

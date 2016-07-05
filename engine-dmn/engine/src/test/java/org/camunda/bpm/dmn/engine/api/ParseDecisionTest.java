@@ -219,25 +219,25 @@ public class ParseDecisionTest extends DmnEngineTest {
   }
 
   @Test
-  public void shouldParseDrdFromInputStream() {
+  public void shouldParseDrgFromInputStream() {
     InputStream inputStream = IoUtil.fileAsStream(NO_INPUT_DMN);
-    DmnDecisionRequirementsGraph drd = dmnEngine.parseDecisionRequirementsGraph(inputStream);
+    DmnDecisionRequirementsGraph drg = dmnEngine.parseDecisionRequirementsGraph(inputStream);
 
-    assertDecisionRequirementsGraph(drd, "definitions");
+    assertDecisionRequirementsGraph(drg, "definitions");
   }
 
   @Test
-  public void shouldParseDrdFromModelInstance() {
+  public void shouldParseDrgFromModelInstance() {
     InputStream inputStream = IoUtil.fileAsStream(NO_INPUT_DMN);
     DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
 
-    DmnDecisionRequirementsGraph drd = dmnEngine.parseDecisionRequirementsGraph(modelInstance);
+    DmnDecisionRequirementsGraph drg = dmnEngine.parseDecisionRequirementsGraph(modelInstance);
 
-    assertDecisionRequirementsGraph(drd, "definitions");
+    assertDecisionRequirementsGraph(drg, "definitions");
   }
 
   @Test
-  public void shouldFailIfDecisionDrdIdIsMissing() {
+  public void shouldFailIfDecisionDrgIdIsMissing() {
     try {
       InputStream inputStream = IoUtil.fileAsStream(MISSING_DECISION_REQUIREMENT_DIAGRAM_ID_DMN);
       dmnEngine.parseDecisionRequirementsGraph(inputStream);
@@ -258,9 +258,9 @@ public class ParseDecisionTest extends DmnEngineTest {
     assertThat(decision.getKey()).isEqualTo(key);
   }
 
-  protected void assertDecisionRequirementsGraph(DmnDecisionRequirementsGraph drd, String key) {
-    assertThat(drd).isNotNull();
-    assertThat(drd.getKey()).isEqualTo(key);
+  protected void assertDecisionRequirementsGraph(DmnDecisionRequirementsGraph drg, String key) {
+    assertThat(drg).isNotNull();
+    assertThat(drg.getKey()).isEqualTo(key);
   }
 
 }
