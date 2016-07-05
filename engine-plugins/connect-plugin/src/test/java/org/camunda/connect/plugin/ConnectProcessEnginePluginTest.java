@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -235,6 +236,27 @@ public class ConnectProcessEnginePluginTest extends PluggableProcessEngineTestCa
     } catch(RuntimeException re){
       assertThat(re.getMessage(), containsString("Invalid format"));
     }
+  }
+  
+  @Deployment
+  public void testSendTaskWithConnector() {
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("process_sending_with_connector");
+    assertProcessEnded(processInstance.getId());
+  }
+  
+  @Deployment
+  public void testIntermediateMessageThrowEventWithConnector() {
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("process_sending_with_connector");
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment
+  public void testMessageEndEventWithConnector() {
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("process_sending_with_connector");
+    assertProcessEnded(processInstance.getId());
   }
 
 }

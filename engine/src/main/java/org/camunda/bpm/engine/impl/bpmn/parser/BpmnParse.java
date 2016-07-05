@@ -166,6 +166,7 @@ import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDele
  * @author Ronny Bräunlich
  * @author Christopher Zell
  * @author Deivarayan Azhagappan
+ * @author Ingo Richtsmeier
  */
 public class BpmnParse extends Parse {
 
@@ -4214,7 +4215,16 @@ public class BpmnParse extends Parse {
     return element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_CLASS) != null
         || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_EXPRESSION) != null
         || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_DELEGATE_EXPRESSION) != null
-        || isExternalTaskType(element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type"));
+        || isExternalTaskType(element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type"))
+        || hasConnector(element);
+  }
+
+  private boolean hasConnector(Element element) {
+    Element extensionElements = element.element("extensionElements");
+    if (extensionElements != null && extensionElements.element("connector") != null) {
+      return true;
+    }
+    return false;
   }
 
   protected boolean isExternalTaskType(String type) {
