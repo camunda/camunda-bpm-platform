@@ -299,7 +299,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   }
 
   @Override
-  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners(AbstractVariableScope sourceScope) {
+  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners() {
     return Collections.emptyList();
   }
 

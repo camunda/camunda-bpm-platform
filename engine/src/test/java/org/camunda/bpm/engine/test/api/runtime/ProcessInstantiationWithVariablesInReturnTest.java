@@ -24,6 +24,7 @@ import static junit.framework.TestCase.assertFalse;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -34,7 +35,9 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.test.api.variables.JavaSerializable;
 import static org.camunda.bpm.engine.test.util.TypedValueAssert.assertObjectValueSerializedJava;
@@ -49,6 +52,7 @@ import org.junit.Test;
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
+@RequiredHistoryLevel(ProcessEngineConfigurationImpl.HISTORY_AUDIT)
 public class ProcessInstantiationWithVariablesInReturnTest {
 
   protected static final String SUBPROCESS_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.subprocess.bpmn20.xml";
@@ -63,12 +67,14 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   @Rule
   public RuleChain chain = RuleChain.outerRule(engineRule).around(testHelper);
 
-  private void checkVariables(VariableMap map) {
+  private void checkVariables(VariableMap map, int expectedSize) {
     List<HistoricVariableInstance> variables = engineRule.getHistoryService()
             .createHistoricVariableInstanceQuery()
             .orderByVariableName()
             .asc()
             .list();
+
+    assertEquals(expectedSize, variables.size());
 
     assertEquals(variables.size(), map.size());
     for (HistoricVariableInstance instance : variables) {
@@ -148,7 +154,7 @@ public class ProcessInstantiationWithVariablesInReturnTest {
     assertNotNull(map);
 
     // then variables equal to variables which are accessible via query
-    checkVariables(map);
+    checkVariables(map, 4);
   }
 
   @Test
@@ -168,7 +174,7 @@ public class ProcessInstantiationWithVariablesInReturnTest {
     assertNotNull(map);
 
     // then variables equal to variables which are accessible via query
-    checkVariables(map);
+    checkVariables(map, 4);
   }
 
   @Test
@@ -189,7 +195,7 @@ public class ProcessInstantiationWithVariablesInReturnTest {
     assertNotNull(map);
 
     // then variables equal to variables which are accessible via query
-    checkVariables(map);
+    checkVariables(map, 4);
   }
 
   @Test
@@ -198,13 +204,13 @@ public class ProcessInstantiationWithVariablesInReturnTest {
 
     //given executed process which sets variables in java delegate
     ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService().createProcessInstanceByKey("variableProcess")
-            .executeWithVariablesInReturn(false, false);
+            .executeWithVariablesInReturn();
     //when returned instance contains variables
     VariableMap map = procInstance.getVariables();
     assertNotNull(map);
 
     // then variables equal to variables which are accessible via query
-    checkVariables(map);
+    checkVariables(map, 8);
   }
 
   @Test
@@ -213,13 +219,13 @@ public class ProcessInstantiationWithVariablesInReturnTest {
 
     //given executed process which sets variables in java delegate
     ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService().createProcessInstanceByKey("variableProcess")
-            .executeWithVariablesInReturn(false, false);
+            .executeWithVariablesInReturn();
     //when returned instance contains variables
     VariableMap map = procInstance.getVariables();
     assertNotNull(map);
 
     // then variables equal to variables which are accessible via query
-    checkVariables(map);
+    checkVariables(map, 8);
   }
 
   @Test
@@ -232,32 +238,33 @@ public class ProcessInstantiationWithVariablesInReturnTest {
             .setVariableLocal("aVariable2", "aValue2")
             .setVariables(Variables.createVariables().putValue("aVariable3", "aValue3"))
             .setVariablesLocal(Variables.createVariables().putValue("aVariable4", new byte[]{127, 34, 64}))
-            .executeWithVariablesInReturn(false, false);
+            .executeWithVariablesInReturn();
     //when returned instance contains variables
     VariableMap map = procInstance.getVariables();
     assertNotNull(map);
 
     // then variables equal to variables which are accessible via query
-    checkVariables(map);
+    checkVariables(map, 12);
   }
 
   @Test
   @Deployment(resources = SET_VARIABLE_IN_DELEGATE_WITH_WAIT_STATE_PROCESS)
   public void testReturnVariablesFromStartAndExecutionWithWaitstate() {
 
-    //given executed process which sets variables in java delegate
+    //given executed process which overwrites these four variables in java delegate
+    // and adds four additional variables
     ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService().createProcessInstanceByKey("variableProcess")
-            .setVariable("aVariable1", "aValue1")
-            .setVariableLocal("aVariable2", "aValue2")
-            .setVariables(Variables.createVariables().putValue("aVariable3", "aValue3"))
-            .setVariablesLocal(Variables.createVariables().putValue("aVariable4", new byte[]{127, 34, 64}))
+            .setVariable("stringVar", "aValue1")
+            .setVariableLocal("integerVar", 56789)
+            .setVariables(Variables.createVariables().putValue("longVar", 123L))
+            .setVariablesLocal(Variables.createVariables().putValue("byteVar", new byte[]{127, 34, 64}))
             .executeWithVariablesInReturn(false, false);
     //when returned instance contains variables
     VariableMap map = procInstance.getVariables();
     assertNotNull(map);
 
     // then variables equal to variables which are accessible via query
-    checkVariables(map);
+    checkVariables(map, 8);
   }
 
 }

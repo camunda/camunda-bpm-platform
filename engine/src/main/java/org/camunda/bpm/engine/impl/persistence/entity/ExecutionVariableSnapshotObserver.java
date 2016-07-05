@@ -15,37 +15,42 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariableStoreObserver;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
- * Represents an implementation of the the variable store observer interface,
- * which observes the used variables.
+ * Provides access to the snapshot of latest variables of an execution.
+ *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class ExecutionVariableStoreObserverImpl implements VariableStoreObserver<VariableInstanceEntity> {
+public class ExecutionVariableSnapshotObserver implements ExecutionObserver {
 
   /**
    * The variables which are observed during the execution.
    */
-  protected final VariableMap variables;
+  protected VariableMap variableSnapshot;
 
-  public ExecutionVariableStoreObserverImpl(VariableMap variables) {
-    this.variables = variables;
+  protected ExecutionEntity execution;
+
+  public ExecutionVariableSnapshotObserver(ExecutionEntity executionEntity) {
+    this.execution = executionEntity;
+    this.execution.addExecutionObserver(this);
   }
 
   @Override
-  public void onAdd(VariableInstanceEntity variable) {
-    variables.putValueTyped(variable.getName(), variable.getTypedValue(false));
+  public void onClear(ExecutionEntity execution) {
+    if (variableSnapshot == null)
+    {
+      variableSnapshot = execution.getVariablesLocalTyped(false);
+    }
   }
 
-  @Override
-  public void onUpdate(VariableInstanceEntity variable) {
-    variables.putValueTyped(variable.getName(), variable.getTypedValue(false));
-  }
-
-  @Override
-  public void onRemove(VariableInstanceEntity variable) {
-    variables.remove(variable.getName());
+  public VariableMap getVariables() {
+    if (variableSnapshot == null)
+    {
+      return execution.getVariablesLocalTyped(false);
+    }
+    else {
+      return variableSnapshot;
+    }
   }
 }

@@ -477,7 +477,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   @Override
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners(AbstractVariableScope sourceScope) {
+  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners() {
     return Arrays.<VariableInstanceLifecycleListener<CoreVariableInstance>>asList(
         (VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE,
         (VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE,

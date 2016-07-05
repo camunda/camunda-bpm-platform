@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
-import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariableStoreObserver;
 
 /**
@@ -31,10 +30,6 @@ public class CaseExecutionEntityReferencer implements VariableStoreObserver<Vari
   @Override
   public void onAdd(VariableInstanceEntity variable) {
     variable.setCaseExecution(caseExecution);
-  }
-
-  @Override
-  public void onUpdate(VariableInstanceEntity variable) {
   }
 
   @Override

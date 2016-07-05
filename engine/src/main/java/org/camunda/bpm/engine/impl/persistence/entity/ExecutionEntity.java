@@ -229,6 +229,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
    */
   protected transient List<ExecutionObserver> executionObservers = new ArrayList<ExecutionObserver>();
 
+  protected transient List<VariableInstanceLifecycleListener<VariableInstanceEntity>> registeredVariableListeners
+    = new ArrayList<VariableInstanceLifecycleListener<VariableInstanceEntity>>();
+
   public ExecutionEntity() {
   }
 
@@ -516,7 +519,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     //call the onRemove method of the execution observers
     //so they can do some clean up before
     for (ExecutionObserver observer : executionObservers) {
-      observer.onRemove(this);
+      observer.onClear(this);
     }
 
     // delete all the variable instances
@@ -1195,12 +1198,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   // variables ////////////////////////////////////////////////////////////////
 
-  public void addVariableStoreObserver(VariableStoreObserver<VariableInstanceEntity> observer) {
-    variableStore.addObserver(observer);
+  public void addVariableListener(VariableInstanceLifecycleListener<VariableInstanceEntity> listener) {
+    registeredVariableListeners.add(listener);
   }
 
-  public void removeVariableStoreObserver(VariableStoreObserver<VariableInstanceEntity> observer) {
-    variableStore.removeObserver(observer);
+  public void removeVariableListener(VariableInstanceLifecycleListener<VariableInstanceEntity> listener) {
+    registeredVariableListeners.remove(listener);
   }
 
   public boolean isExecutingScopeLeafActivity() {
@@ -1646,7 +1649,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @Override
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners(final AbstractVariableScope sourceScope) {
+  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners() {
 
     List<VariableInstanceLifecycleListener<CoreVariableInstance>> listeners = new ArrayList<VariableInstanceLifecycleListener<CoreVariableInstance>>();
 
@@ -1659,6 +1662,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
 
     listeners.add((VariableInstanceLifecycleListener) VariableListenerInvocationListener.INSTANCE);
+
+    listeners.addAll((List) registeredVariableListeners);
 
     return listeners;
   }

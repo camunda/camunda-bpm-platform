@@ -89,6 +89,14 @@ public class VariableStore<T extends CoreVariableInstance> {
     }
   }
 
+  public void updateVariable(T value)
+  {
+    if (!containsKey(value.getName()))
+    {
+      throw ProcessEngineLogger.CORE_LOGGER.duplicateVariableInstanceException(value);
+    }
+  }
+
   public boolean isEmpty() {
     return getVariablesMap().isEmpty();
   }
@@ -159,8 +167,6 @@ public class VariableStore<T extends CoreVariableInstance> {
   public static interface VariableStoreObserver<T extends CoreVariableInstance> {
 
     void onAdd(T variable);
-
-    void onUpdate(T variable);
 
     void onRemove(T variable);
   }

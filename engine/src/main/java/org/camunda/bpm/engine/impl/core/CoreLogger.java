@@ -53,4 +53,12 @@ public class CoreLogger extends ProcessEngineLogger {
       ));
   }
 
+  public ProcessEngineException missingVariableInstanceException(CoreVariableInstance variableInstance) {
+    return new ProcessEngineException(exceptionMessage(
+        "004",
+        "Cannot update variable instance with name {}. Variable does not exist",
+        variableInstance.getName()
+      ));
+  }
+
 }

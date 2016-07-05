@@ -27,5 +27,5 @@ public interface ExecutionObserver {
    *
    * @param execution the execution which is been observed
    */
-  public void onRemove(ExecutionEntity execution);
+  public void onClear(ExecutionEntity execution);
 }

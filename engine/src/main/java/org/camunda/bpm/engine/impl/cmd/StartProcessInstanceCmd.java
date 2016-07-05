@@ -19,13 +19,10 @@ import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionObserverImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionVariableStoreObserverImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionVariableSnapshotObserver;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
-import org.camunda.bpm.engine.variable.VariableMap;
-import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Tom Baeyens
@@ -53,13 +50,10 @@ public class StartProcessInstanceCmd implements Command<ProcessInstanceWithVaria
     ExecutionEntity processInstance = processDefinition.createProcessInstance(instantiationBuilder.getBusinessKey(),
         instantiationBuilder.getCaseInstanceId());
 
-    final VariableMap vars = Variables.createVariables();
-    final ExecutionVariableStoreObserverImpl variableStoreObserver = new ExecutionVariableStoreObserverImpl(vars);
-    processInstance.addVariableStoreObserver(variableStoreObserver);
-    processInstance.addExecutionObserver(new ExecutionObserverImpl(variableStoreObserver));
+    final ExecutionVariableSnapshotObserver variablesListener = new ExecutionVariableSnapshotObserver(processInstance);
 
     processInstance.start(instantiationBuilder.getVariables());
-    return new ProcessInstanceWithVariablesImpl(processInstance, vars);
+    return new ProcessInstanceWithVariablesImpl(processInstance, variablesListener.getVariables());
   }
 
 }
