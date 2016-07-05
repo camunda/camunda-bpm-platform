@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.repository;
 
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
 
 public class DecisionRequirementsDefinitionDto {
 
@@ -57,7 +57,7 @@ public class DecisionRequirementsDefinitionDto {
     return tenantId;
   }
 
-  public static DecisionRequirementsDefinitionDto fromDecisionRequirementsDefinition(DecisionRequirementDefinition definition) {
+  public static DecisionRequirementsDefinitionDto fromDecisionRequirementsDefinition(DecisionRequirementsGraph definition) {
     DecisionRequirementsDefinitionDto dto = new DecisionRequirementsDefinitionDto();
 
     dto.id = definition.getId();

@@ -18,8 +18,8 @@ import java.util.List;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.rest.DecisionRequirementsDefinitionRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionDto;
@@ -39,9 +39,9 @@ public class DecisionRequirementsDefinitionRestServiceImpl extends AbstractRestP
     List<DecisionRequirementsDefinitionDto> dtos = new ArrayList<DecisionRequirementsDefinitionDto>();
 
     ProcessEngine engine = getProcessEngine();
-    DecisionRequirementDefinitionQuery query = queryDto.toQuery(engine);
+    DecisionRequirementsDefinitionQuery query = queryDto.toQuery(engine);
 
-    List<DecisionRequirementDefinition> matchingDefinitions = null;
+    List<DecisionRequirementsGraph> matchingDefinitions = null;
 
     if (firstResult != null || maxResults != null) {
       matchingDefinitions = executePaginatedQuery(query, firstResult, maxResults);
@@ -49,14 +49,14 @@ public class DecisionRequirementsDefinitionRestServiceImpl extends AbstractRestP
       matchingDefinitions = query.list();
     }
 
-    for (DecisionRequirementDefinition definition : matchingDefinitions) {
+    for (DecisionRequirementsGraph definition : matchingDefinitions) {
       DecisionRequirementsDefinitionDto dto = DecisionRequirementsDefinitionDto.fromDecisionRequirementsDefinition(definition);
       dtos.add(dto);
     }
     return dtos;
   }
 
-  private List<DecisionRequirementDefinition> executePaginatedQuery(DecisionRequirementDefinitionQuery query, Integer firstResult, Integer maxResults) {
+  private List<DecisionRequirementsGraph> executePaginatedQuery(DecisionRequirementsDefinitionQuery query, Integer firstResult, Integer maxResults) {
     if (firstResult == null) {
       firstResult = 0;
     }
@@ -71,7 +71,7 @@ public class DecisionRequirementsDefinitionRestServiceImpl extends AbstractRestP
     DecisionRequirementsDefinitionQueryDto queryDto = new DecisionRequirementsDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 
     ProcessEngine engine = getProcessEngine();
-    DecisionRequirementDefinitionQuery query = queryDto.toQuery(engine);
+    DecisionRequirementsDefinitionQuery query = queryDto.toQuery(engine);
 
     long count = query.count();
     CountResultDto result = new CountResultDto();

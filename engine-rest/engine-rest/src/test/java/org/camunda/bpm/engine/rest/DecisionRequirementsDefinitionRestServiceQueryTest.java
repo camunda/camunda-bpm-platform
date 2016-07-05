@@ -30,8 +30,8 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementsGraph;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
@@ -53,20 +53,20 @@ public class DecisionRequirementsDefinitionRestServiceQueryTest extends Abstract
   protected static final String DECISION_REQUIREMENTS_DEFINITION_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/decision-requirements-definition";
   protected static final String DECISION_REQUIREMENTS_DEFINITION_COUNT_QUERY_URL = DECISION_REQUIREMENTS_DEFINITION_QUERY_URL + "/count";
 
-  private DecisionRequirementDefinitionQuery mockedQuery;
+  private DecisionRequirementsDefinitionQuery mockedQuery;
 
   @Before
   public void setUpRuntime() {
-    DecisionRequirementDefinition mockDecisionRequirementsDefinition = MockProvider.createMockDecisionRequirementsDefinition();
+    DecisionRequirementsGraph mockDecisionRequirementsDefinition = MockProvider.createMockDecisionRequirementsDefinition();
     mockedQuery = createMockQuery(Collections.singletonList(mockDecisionRequirementsDefinition));
   }
 
-  private DecisionRequirementDefinitionQuery createMockQuery(List<DecisionRequirementDefinition> mockedDefinitions) {
-    DecisionRequirementDefinitionQuery query = mock(DecisionRequirementDefinitionQuery.class);
+  private DecisionRequirementsDefinitionQuery createMockQuery(List<DecisionRequirementsGraph> mockedDefinitions) {
+    DecisionRequirementsDefinitionQuery query = mock(DecisionRequirementsDefinitionQuery.class);
 
     when(query.list()).thenReturn(mockedDefinitions);
     when(query.count()).thenReturn((long) mockedDefinitions.size());
-    when(processEngine.getRepositoryService().createDecisionRequirementDefinitionQuery()).thenReturn(query);
+    when(processEngine.getRepositoryService().createDecisionRequirementsDefinitionQuery()).thenReturn(query);
 
     return query;
   }
@@ -156,27 +156,27 @@ public class DecisionRequirementsDefinitionRestServiceQueryTest extends Abstract
     // asc
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("id", "asc", Status.OK);
-    inOrder.verify(mockedQuery).orderByDecisionRequirementDefinitionId();
+    inOrder.verify(mockedQuery).orderByDecisionRequirementsDefinitionId();
     inOrder.verify(mockedQuery).asc();
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("name", "asc", Status.OK);
-    inOrder.verify(mockedQuery).orderByDecisionRequirementDefinitionName();
+    inOrder.verify(mockedQuery).orderByDecisionRequirementsDefinitionName();
     inOrder.verify(mockedQuery).asc();
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("version", "asc", Status.OK);
-    inOrder.verify(mockedQuery).orderByDecisionRequirementDefinitionVersion();
+    inOrder.verify(mockedQuery).orderByDecisionRequirementsDefinitionVersion();
     inOrder.verify(mockedQuery).asc();
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("key", "asc", Status.OK);
-    inOrder.verify(mockedQuery).orderByDecisionRequirementDefinitionKey();
+    inOrder.verify(mockedQuery).orderByDecisionRequirementsDefinitionKey();
     inOrder.verify(mockedQuery).asc();
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("category", "asc", Status.OK);
-    inOrder.verify(mockedQuery).orderByDecisionRequirementDefinitionCategory();
+    inOrder.verify(mockedQuery).orderByDecisionRequirementsDefinitionCategory();
     inOrder.verify(mockedQuery).asc();
 
     inOrder = Mockito.inOrder(mockedQuery);
@@ -192,27 +192,27 @@ public class DecisionRequirementsDefinitionRestServiceQueryTest extends Abstract
     // desc
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("id", "desc", Status.OK);
-    inOrder.verify(mockedQuery).orderByDecisionRequirementDefinitionId();
+    inOrder.verify(mockedQuery).orderByDecisionRequirementsDefinitionId();
     inOrder.verify(mockedQuery).desc();
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("name", "desc", Status.OK);
-    inOrder.verify(mockedQuery).orderByDecisionRequirementDefinitionName();
+    inOrder.verify(mockedQuery).orderByDecisionRequirementsDefinitionName();
     inOrder.verify(mockedQuery).desc();
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("version", "desc", Status.OK);
-    inOrder.verify(mockedQuery).orderByDecisionRequirementDefinitionVersion();
+    inOrder.verify(mockedQuery).orderByDecisionRequirementsDefinitionVersion();
     inOrder.verify(mockedQuery).desc();
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("key", "desc", Status.OK);
-    inOrder.verify(mockedQuery).orderByDecisionRequirementDefinitionKey();
+    inOrder.verify(mockedQuery).orderByDecisionRequirementsDefinitionKey();
     inOrder.verify(mockedQuery).desc();
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("category", "desc", Status.OK);
-    inOrder.verify(mockedQuery).orderByDecisionRequirementDefinitionCategory();
+    inOrder.verify(mockedQuery).orderByDecisionRequirementsDefinitionCategory();
     inOrder.verify(mockedQuery).desc();
 
     inOrder = Mockito.inOrder(mockedQuery);
@@ -330,7 +330,7 @@ public class DecisionRequirementsDefinitionRestServiceQueryTest extends Abstract
 
     // assert query invocation
     InOrder inOrder = Mockito.inOrder(mockedQuery);
-    inOrder.verify(mockedQuery).decisionRequirementDefinitionIdIn(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID, MockProvider.ANOTHER_EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID);
+    inOrder.verify(mockedQuery).decisionRequirementsDefinitionIdIn(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID, MockProvider.ANOTHER_EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID);
     inOrder.verify(mockedQuery).list();
 
     String content = response.asString();
@@ -355,7 +355,7 @@ public class DecisionRequirementsDefinitionRestServiceQueryTest extends Abstract
 
     // assert query invocation
     InOrder inOrder = Mockito.inOrder(mockedQuery);
-    inOrder.verify(mockedQuery, never()).decisionRequirementDefinitionIdIn(Matchers.<String[]>anyVararg());
+    inOrder.verify(mockedQuery, never()).decisionRequirementsDefinitionIdIn(Matchers.<String[]>anyVararg());
     inOrder.verify(mockedQuery).list();
   }
 
@@ -371,24 +371,24 @@ public class DecisionRequirementsDefinitionRestServiceQueryTest extends Abstract
         .get(DECISION_REQUIREMENTS_DEFINITION_QUERY_URL);
 
     // assert query invocation
-    verify(mockedQuery).decisionRequirementDefinitionId(queryParameters.get("decisionRequirementsDefinitionId"));
-    verify(mockedQuery).decisionRequirementDefinitionCategory(queryParameters.get("category"));
-    verify(mockedQuery).decisionRequirementDefinitionCategoryLike(queryParameters.get("categoryLike"));
-    verify(mockedQuery).decisionRequirementDefinitionName(queryParameters.get("name"));
-    verify(mockedQuery).decisionRequirementDefinitionNameLike(queryParameters.get("nameLike"));
-    verify(mockedQuery).decisionRequirementDefinitionKey(queryParameters.get("key"));
-    verify(mockedQuery).decisionRequirementDefinitionKeyLike(queryParameters.get("keyLike"));
-    verify(mockedQuery).decisionRequirementDefinitionVersion(Integer.parseInt(queryParameters.get("version")));
+    verify(mockedQuery).decisionRequirementsDefinitionId(queryParameters.get("decisionRequirementsDefinitionId"));
+    verify(mockedQuery).decisionRequirementsDefinitionCategory(queryParameters.get("category"));
+    verify(mockedQuery).decisionRequirementsDefinitionCategoryLike(queryParameters.get("categoryLike"));
+    verify(mockedQuery).decisionRequirementsDefinitionName(queryParameters.get("name"));
+    verify(mockedQuery).decisionRequirementsDefinitionNameLike(queryParameters.get("nameLike"));
+    verify(mockedQuery).decisionRequirementsDefinitionKey(queryParameters.get("key"));
+    verify(mockedQuery).decisionRequirementsDefinitionKeyLike(queryParameters.get("keyLike"));
+    verify(mockedQuery).decisionRequirementsDefinitionVersion(Integer.parseInt(queryParameters.get("version")));
     verify(mockedQuery).latestVersion();
-    verify(mockedQuery).decisionRequirementDefinitionResourceName(queryParameters.get("resourceName"));
-    verify(mockedQuery).decisionRequirementDefinitionResourceNameLike(queryParameters.get("resourceNameLike"));
+    verify(mockedQuery).decisionRequirementsDefinitionResourceName(queryParameters.get("resourceName"));
+    verify(mockedQuery).decisionRequirementsDefinitionResourceNameLike(queryParameters.get("resourceNameLike"));
     verify(mockedQuery).deploymentId(queryParameters.get("deploymentId"));
     verify(mockedQuery).list();
   }
 
   @Test
   public void testDecisionRequirementDefinitionTenantIdList() {
-    List<DecisionRequirementDefinition> decisionRequirementsDefinitions = Arrays.asList(
+    List<DecisionRequirementsGraph> decisionRequirementsDefinitions = Arrays.asList(
         MockProvider.mockDecisionRequirementsDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build(),
         MockProvider.createAnotherMockDecisionRequirementsDefinition());
     mockedQuery = createMockQuery(decisionRequirementsDefinitions);
@@ -436,7 +436,7 @@ public class DecisionRequirementsDefinitionRestServiceQueryTest extends Abstract
 
   @Test
   public void testDecisionRequirementsDefinitionTenantIdIncludeDefinitionsWithoutTenantid() {
-    List<DecisionRequirementDefinition> decisionDefinitions = Arrays.asList(
+    List<DecisionRequirementsGraph> decisionDefinitions = Arrays.asList(
         MockProvider.mockDecisionRequirementsDefinition().tenantId(null).build(),
         MockProvider.mockDecisionRequirementsDefinition().tenantId(MockProvider.EXAMPLE_TENANT_ID).build());
     mockedQuery = createMockQuery(decisionDefinitions);
@@ -450,7 +450,7 @@ public class DecisionRequirementsDefinitionRestServiceQueryTest extends Abstract
       .get(DECISION_REQUIREMENTS_DEFINITION_QUERY_URL);
 
     verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID);
-    verify(mockedQuery).includeDecisionRequirementDefinitionsWithoutTenantId();
+    verify(mockedQuery).includeDecisionRequirementsDefinitionsWithoutTenantId();
     verify(mockedQuery).list();
 
     String content = response.asString();
