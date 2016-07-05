@@ -476,18 +476,18 @@ public class DecisionRequirementsDefinitionRestServiceQueryTest extends Abstract
   private Map<String, String> getCompleteQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
 
-      parameters.put("decisionRequirementsDefinitionId", "anId");
-//    parameters.put("category", "cat");
-//    parameters.put("categoryLike", "catlike");
-//    parameters.put("name", "name");
-//    parameters.put("nameLike", "namelike");
-//    parameters.put("key", "key");
-//    parameters.put("keyLike", "keylike");
-//    parameters.put("version", "1");
-//    parameters.put("latestVersion", "true");
-//    parameters.put("resourceName", "res");
-//    parameters.put("resourceNameLike", "resLike");
-//    parameters.put("deploymentId", "depId");
+    parameters.put("decisionRequirementsDefinitionId", "anId");
+    parameters.put("category", "cat");
+    parameters.put("categoryLike", "catlike");
+    parameters.put("name", "name");
+    parameters.put("nameLike", "namelike");
+    parameters.put("key", "key");
+    parameters.put("keyLike", "keylike");
+    parameters.put("version", "1");
+    parameters.put("latestVersion", "true");
+    parameters.put("resourceName", "res");
+    parameters.put("resourceNameLike", "resLike");
+    parameters.put("deploymentId", "depId");
 
     return parameters;
   }
