@@ -13,13 +13,22 @@ module.exports = function() {
       var containerId = attrs.ctnCollapsableParent;
 
         // the element being collapsed
-        // var collapsableElement = container.children('.ctn-collapsable');
       var collapsableElement = $('[ctn-collapsable]', container).eq(0);
 
         // the direction into which to collapse
-        // var direction = collapsableElement.attr('collapse') || 'left';
       var direction = collapsableElement.attr('ctn-collapsable') || 'left';
       var vertical = direction === 'left' || direction === 'right';
+
+      var minWidth = 0;
+      if (attrs.ctnMinWidth) {
+        var minWidthEls = $('.ctn-' + containerId + ' ' + attrs.ctnMinWidth, container);
+        minWidthEls.each(function(e, el) {
+          minWidth += $(el).outerWidth(true);
+        });
+
+        // just to avoid half pixels glitches
+        minWidth = minWidth ? (minWidth + 10) : 0;
+      }
 
       var originalCollapsabled = localStorage ? localStorage.getItem('ctnCollapsableParent:collapsed:'+ containerId) : 'no';
 
@@ -98,6 +107,8 @@ module.exports = function() {
           originalCollapsableSize = (storedPos !== null ? storedPos : originalCollapsableSize);
         }
 
+        originalCollapsableSize = originalCollapsableSize < minWidth ? minWidth : originalCollapsableSize;
+
         if (originalCollapsabled === 'yes') {
           collapsableElement.css(changeAttr, 0);
           compensateElement.css(direction, 3 +'px');
@@ -134,6 +145,8 @@ module.exports = function() {
                 pos = container.height() - position.top;
               }
 
+              pos = pos < minWidth ? 0 : pos;
+
               // update collapsed state on drag
               setCollapsed(pos < 10);
 
@@ -145,6 +158,8 @@ module.exports = function() {
               }
             })
             .on('dragstop', function(event) {
+              updateResizeHandlePosition();
+
               scope.$broadcast('resize', [ event ]);
             });
 
@@ -159,9 +174,9 @@ module.exports = function() {
         showHandle.click(function() {
           setCollapsed(false);
 
-          resizeHandle.animate(createOffset(originalCollapsableSize));
-          collapsableElement.animate(createSize(originalCollapsableSize));
-          compensateElement.animate(createOffset(originalCollapsableSize));
+          resizeHandle.animate(createOffset(minWidth || originalCollapsableSize));
+          collapsableElement.animate(createSize(minWidth || originalCollapsableSize));
+          compensateElement.animate(createOffset(minWidth || originalCollapsableSize));
         });
 
         $(window).on('resize', updateResizeHandlePosition);
