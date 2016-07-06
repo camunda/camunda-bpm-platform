@@ -138,20 +138,21 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
 
   protected DmnDecisionRequirementsGraph transformDefinitions(Definitions definitions) {
     DmnElementTransformHandler<Definitions, DmnDecisionRequirementsGraphImpl> handler = handlerRegistry.getHandler(Definitions.class);
-    DmnDecisionRequirementsGraphImpl dmnDrd = handler.handleElement(this, definitions);
+    DmnDecisionRequirementsGraphImpl dmnDrg = handler.handleElement(this, definitions);
 
     // validate id of drd
-    if (dmnDrd.getKey() == null) {
-      throw LOG.drdIdIsMissing(dmnDrd);
+    if (dmnDrg.getKey() == null) {
+      throw LOG.drdIdIsMissing(dmnDrg);
     }
 
     Collection<Decision> decisions = definitions.getChildElementsByType(Decision.class);
     List<DmnDecision> dmnDecisions = transformDecisions(decisions);
     for (DmnDecision dmnDecision : dmnDecisions) {
-      dmnDrd.addDecision(dmnDecision);
+      dmnDrg.addDecision(dmnDecision);
     }
 
-    return dmnDrd;
+    notifyTransformListeners(definitions, dmnDrg);
+    return dmnDrg;
   }
 
   @SuppressWarnings("unchecked")
@@ -415,6 +416,12 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
   protected void notifyTransformListeners(Input input, DmnDecisionTableInputImpl dmnInput) {
     for (DmnTransformListener transformListener : transformListeners) {
       transformListener.transformDecisionTableInput(input, dmnInput);
+    }
+  }
+
+  protected void notifyTransformListeners(Definitions definitions, DmnDecisionRequirementsGraphImpl dmnDecisionRequirementsGraph) {
+    for (DmnTransformListener transformListener : transformListeners) {
+      transformListener.transformDecisionRequirementsGraph(definitions, dmnDecisionRequirementsGraph);
     }
   }
 

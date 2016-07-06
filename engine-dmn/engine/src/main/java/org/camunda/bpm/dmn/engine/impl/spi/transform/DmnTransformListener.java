@@ -14,10 +14,12 @@
 package org.camunda.bpm.dmn.engine.impl.spi.transform;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableInputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableOutputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableRuleImpl;
 import org.camunda.bpm.model.dmn.instance.Decision;
+import org.camunda.bpm.model.dmn.instance.Definitions;
 import org.camunda.bpm.model.dmn.instance.Input;
 import org.camunda.bpm.model.dmn.instance.Output;
 import org.camunda.bpm.model.dmn.instance.Rule;
@@ -59,4 +61,12 @@ public interface DmnTransformListener {
    */
   void transformDecisionTableRule(Rule rule, DmnDecisionTableRuleImpl dmnRule);
 
+  /**
+   * Notified after a Decision Requirements Graph was transformed
+   * 
+   * @param definitions
+   * @param dmnDecisionGraph
+   */
+  void transformDecisionRequirementsGraph(Definitions definitions, DmnDecisionRequirementsGraph dmnDecisionRequirementsGraph);
+  
 }
