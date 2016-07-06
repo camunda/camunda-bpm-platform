@@ -90,16 +90,20 @@
          ctn-collapsable-parent="tabs">
 
       <!-- content top pane -->
-      <div class="ctn-row ctn-content-top">
+      <div class="ctn-row ctn-content-top"
+           ctn-collapsable="top">
         <div decision-table="tableXml"
              control="control"
              on-load="initializeTablePlugins()"
              style="height: 100%;padding:20px 10px;margin:0;"></div>
+        <a class="hide-collapsable vertical-collapse"
+           title="Show tabs"></a>
       </div>
 
       <!-- content bottom pane -->
-      <div class="ctn-row ctn-content-bottom ctn-tabbed"
-           ctn-collapsable="bottom">
+      <div class="ctn-row ctn-content-bottom ctn-tabbed">
+        <a class="show-collapsable vertical-collapse"
+           title="Hide tabs"></a>
         <ul class="nav nav-tabs"
             ng-if="decisionDefinitionTabs.length > 1">
           <li ng-class="{ active: selectedTab == tabProvider }"
