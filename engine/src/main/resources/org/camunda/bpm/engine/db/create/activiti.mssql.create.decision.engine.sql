@@ -10,6 +10,7 @@ create table ACT_RE_DECISION_DEF (
     RESOURCE_NAME_ nvarchar(4000),
     DGRM_RESOURCE_NAME_ nvarchar(4000),
     DEC_REQ_ID_ nvarchar(64),
+    DEC_REQ_KEY_ nvarchar(255),
     TENANT_ID_ nvarchar(64),
     primary key (ID_)
 );

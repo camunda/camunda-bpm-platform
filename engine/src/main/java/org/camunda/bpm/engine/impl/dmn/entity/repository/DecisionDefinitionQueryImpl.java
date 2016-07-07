@@ -43,6 +43,10 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   protected Integer version;
   protected boolean latest = false;
 
+  protected String decisionRequirementsDefinitionId;
+  protected String decisionRequirementsDefinitionKey;
+  protected boolean withoutDecisionRequirementsDefinition = false;
+
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
   protected boolean includeDefinitionsWithoutTenantId = false;
@@ -130,6 +134,23 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   public DecisionDefinitionQuery decisionDefinitionResourceNameLike(String resourceNameLike) {
     ensureNotNull(NotValidException.class, "resourceNameLike", resourceNameLike);
     this.resourceNameLike = resourceNameLike;
+    return this;
+  }
+
+  public DecisionDefinitionQuery decisionRequirementsDefinitionId(String decisionRequirementsDefinitionId) {
+    ensureNotNull(NotValidException.class, "decisionRequirementsDefinitionId", decisionRequirementsDefinitionId);
+    this.decisionRequirementsDefinitionId = decisionRequirementsDefinitionId;
+    return this;
+  }
+
+  public DecisionDefinitionQuery decisionRequirementsDefinitionKey(String decisionRequirementsDefinitionKey) {
+    ensureNotNull(NotValidException.class, "decisionRequirementsDefinitionKey", decisionRequirementsDefinitionKey);
+    this.decisionRequirementsDefinitionKey = decisionRequirementsDefinitionKey;
+    return this;
+  }
+
+  public DecisionDefinitionQuery withoutDecisionRequirementsDefinition() {
+    withoutDecisionRequirementsDefinition = true;
     return this;
   }
 

@@ -203,10 +203,12 @@ public class DecisionDefinitionDeployerTest {
     DecisionDefinition firstDecision = decisions.get(0);
     assertEquals("score-decision", firstDecision.getKey());
     assertEquals(decisionRequirementsDefinition.getId(), firstDecision.getDecisionRequirementsDefinitionId());
+    assertEquals("score", firstDecision.getDecisionRequirementsDefinitionKey());
 
     DecisionDefinition secondDecision = decisions.get(1);
     assertEquals("score-result", secondDecision.getKey());
     assertEquals(decisionRequirementsDefinition.getId(), secondDecision.getDecisionRequirementsDefinitionId());
+    assertEquals("score", secondDecision.getDecisionRequirementsDefinitionKey());
   }
 
   @Deployment( resources = DMN_CHECK_ORDER_RESOURCE )
@@ -220,6 +222,7 @@ public class DecisionDefinitionDeployerTest {
     // and don't link the decision to a decision requirements definition
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
     assertNull(decisionDefinition.getDecisionRequirementsDefinitionId());
+    assertNull(decisionDefinition.getDecisionRequirementsDefinitionKey());
   }
 
   @Deployment( resources = { DRD_SCORE_RESOURCE, DRD_DISH_RESOURCE })

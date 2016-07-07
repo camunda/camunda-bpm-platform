@@ -17,6 +17,7 @@
       RESOURCE_NAME_, 
       DGRM_RESOURCE_NAME_, 
       DEC_REQ_ID_,
+      DEC_REQ_KEY_,
       TENANT_ID_,
       REV_)
     values (#{id, jdbcType=VARCHAR},
@@ -28,6 +29,7 @@
             #{resourceName, jdbcType=VARCHAR},
             #{diagramResourceName, jdbcType=VARCHAR},
             #{decisionRequirementsDefinitionId, jdbcType=VARCHAR},
+            #{decisionRequirementsDefinitionKey, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR},
             1
            )
@@ -61,6 +63,7 @@
     <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
     <result property="diagramResourceName" column="DGRM_RESOURCE_NAME_" jdbcType="VARCHAR"/>
     <result property="decisionRequirementsDefinitionId" column="DEC_REQ_ID_" jdbcType="VARCHAR"/>
+    <result property="decisionRequirementsDefinitionKey" column="DEC_REQ_KEY_" jdbcType="VARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
 
@@ -261,6 +264,15 @@
       <if test="latest">
        and RES.VERSION_ = VER.MAX_VERSION and 
           (RES.TENANT_ID_ = VER.TENANT_ID_ or (RES.TENANT_ID_ is null and VER.TENANT_ID_ is null)) 
+      </if>
+      <if test="decisionRequirementsDefinitionId != null">
+        and RES.DEC_REQ_ID_ = #{decisionRequirementsDefinitionId}
+      </if>
+      <if test="decisionRequirementsDefinitionKey != null">
+        and RES.DEC_REQ_KEY_ = #{decisionRequirementsDefinitionKey}
+      </if>
+      <if test="withoutDecisionRequirementsDefinition">
+        and RES.DEC_REQ_ID_ is null
       </if>
       <if test="isTenantIdSet">
         <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">

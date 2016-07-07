@@ -25,4 +25,12 @@ public interface DecisionDefinition extends ResourceDefinition {
    */
   String getDecisionRequirementsDefinitionId();
 
+  /**
+   * Returns the key of the related decision requirements definition. Can be
+   * <code>null</code> if the decision has no relations to other decisions.
+   *
+   * @return the key of the decision requirements definition if exists.
+   */
+  String getDecisionRequirementsDefinitionKey();
+
 }

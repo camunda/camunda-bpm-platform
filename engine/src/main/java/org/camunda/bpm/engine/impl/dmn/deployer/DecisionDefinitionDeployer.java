@@ -66,6 +66,7 @@ public class DecisionDefinitionDeployer extends AbstractDefinitionDeployer<Decis
       DecisionDefinitionEntity decisionEntity = (DecisionDefinitionEntity) decisionOfDrd;
       if (DecisionRequirementsDefinitionDeployer.isDecisionRequirementsDefinitionPersistable(deployedDrd)) {
         decisionEntity.setDecisionRequirementsDefinitionId(deployedDrd.getId());
+        decisionEntity.setDecisionRequirementsDefinitionKey(deployedDrd.getKey());
       }
 
       decisions.add(decisionEntity);

@@ -2425,7 +2425,9 @@ public abstract class MockProvider {
       .version(EXAMPLE_DECISION_DEFINITION_VERSION)
       .resource(EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME)
       .diagram(EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME)
-      .deploymentId(EXAMPLE_DEPLOYMENT_ID);
+      .deploymentId(EXAMPLE_DEPLOYMENT_ID)
+      .decisionRequirementsDefinitionId(EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID)
+      .decisionRequirementsDefinitionKey(EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY);
   }
 
   public static DecisionDefinition createMockDecisionDefinition() {

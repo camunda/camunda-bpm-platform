@@ -307,6 +307,8 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     int returnedVersion = from(content).getInt("[0].version");
     String returnedResource = from(content).getString("[0].resource");
     String returnedDeploymentId = from(content).getString("[0].deploymentId");
+    String returnedDecisionRequirementsDefinitionId = from(content).getString("[0].decisionRequirementsDefinitionId");
+    String returnedDecisionRequirementsDefinitionKey = from(content).getString("[0].decisionRequirementsDefinitionKey");
     String returnedTenantId = from(content).getString("[0].tenantId");
 
     assertThat(returnedId).isEqualTo(MockProvider.EXAMPLE_DECISION_DEFINITION_ID);
@@ -316,6 +318,8 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     assertThat(returnedVersion).isEqualTo(MockProvider.EXAMPLE_DECISION_DEFINITION_VERSION);
     assertThat(returnedResource).isEqualTo(MockProvider.EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME);
     assertThat(returnedDeploymentId).isEqualTo(MockProvider.EXAMPLE_DEPLOYMENT_ID);
+    assertThat(returnedDecisionRequirementsDefinitionId).isEqualTo(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID);
+    assertThat(returnedDecisionRequirementsDefinitionKey).isEqualTo(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY);
     assertThat(returnedTenantId).isEqualTo(null);
   }
 
@@ -385,6 +389,9 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     verify(mockedQuery).latestVersion();
     verify(mockedQuery).decisionDefinitionResourceName(queryParameters.get("resourceName"));
     verify(mockedQuery).decisionDefinitionResourceNameLike(queryParameters.get("resourceNameLike"));
+    verify(mockedQuery).decisionRequirementsDefinitionId(queryParameters.get("decisionRequirementsDefinitionId"));
+    verify(mockedQuery).decisionRequirementsDefinitionKey(queryParameters.get("decisionRequirementsDefinitionKey"));
+    verify(mockedQuery).withoutDecisionRequirementsDefinition();
     verify(mockedQuery).list();
   }
 
@@ -490,6 +497,9 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     parameters.put("latestVersion", "true");
     parameters.put("resourceName", "res");
     parameters.put("resourceNameLike", "resLike");
+    parameters.put("decisionRequirementsDefinitionId", MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID);
+    parameters.put("decisionRequirementsDefinitionKey", MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY);
+    parameters.put("withoutDecisionRequirementsDefinition", "true");
 
     return parameters;
   }

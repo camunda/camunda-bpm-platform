@@ -68,6 +68,9 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
   protected String resourceNameLike;
   protected Integer version;
   protected Boolean latestVersion;
+  protected String decisionRequirementsDefinitionId;
+  protected String decisionRequirementsDefinitionKey;
+  protected Boolean withoutDecisionRequirementsDefinition;
   protected List<String> tenantIds;
   protected Boolean withoutTenantId;
   protected Boolean includeDefinitionsWithoutTenantId;
@@ -143,6 +146,21 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
     this.latestVersion = latestVersion;
   }
 
+  @CamundaQueryParam(value = "decisionRequirementsDefinitionId")
+  public void setDecisionRequirementsDefinitionId(String decisionRequirementsDefinitionId) {
+    this.decisionRequirementsDefinitionId = decisionRequirementsDefinitionId;
+  }
+
+  @CamundaQueryParam(value = "decisionRequirementsDefinitionKey")
+  public void setDecisionRequirementsDefinitionKey(String decisionRequirementsDefinitionKey) {
+    this.decisionRequirementsDefinitionKey = decisionRequirementsDefinitionKey;
+  }
+
+  @CamundaQueryParam(value = "withoutDecisionRequirementsDefinition", converter = BooleanConverter.class)
+  public void setWithoutDecisionRequirementsDefinition(Boolean withoutDecisionRequirementsDefinition) {
+    this.withoutDecisionRequirementsDefinition = withoutDecisionRequirementsDefinition;
+  }
+
   @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
   public void setTenantIdIn(List<String> tenantIds) {
     this.tenantIds = tenantIds;
@@ -208,6 +226,15 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
     }
     if (TRUE.equals(latestVersion)) {
       query.latestVersion();
+    }
+    if (decisionRequirementsDefinitionId != null) {
+      query.decisionRequirementsDefinitionId(decisionRequirementsDefinitionId);
+    }
+    if (decisionRequirementsDefinitionKey != null) {
+      query.decisionRequirementsDefinitionKey(decisionRequirementsDefinitionKey);
+    }
+    if (TRUE.equals(withoutDecisionRequirementsDefinition)) {
+      query.withoutDecisionRequirementsDefinition();
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
