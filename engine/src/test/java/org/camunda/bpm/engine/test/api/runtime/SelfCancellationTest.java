@@ -34,10 +34,10 @@ import org.camunda.bpm.model.bpmn.instance.TerminateEventDefinition;
 import org.junit.Assert;
 import org.junit.Before;
 
-import static org.junit.Assert.assertEquals;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for when delegate code synchronously cancels the activity instance it belongs to.
