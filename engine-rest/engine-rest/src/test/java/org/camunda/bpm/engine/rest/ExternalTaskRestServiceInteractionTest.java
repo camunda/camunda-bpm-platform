@@ -440,7 +440,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
 
-    verify(externalTaskService).handleFailure("anExternalTaskId", "aWorkerId", "anErrorMessage", 5, 12345);
+    verify(externalTaskService).handleFailure("anExternalTaskId", "aWorkerId", "anErrorMessage", null, 5, 12345);
     verifyNoMoreInteractions(externalTaskService);
   }
 
@@ -471,7 +471,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testHandleFailureNonExistingTask() {
     doThrow(new NotFoundException())
       .when(externalTaskService)
-      .handleFailure(any(String.class), any(String.class), any(String.class), anyInt(), anyLong());
+      .handleFailure(any(String.class), any(String.class), any(String.class),any(String.class), anyInt(), anyLong());
 
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("workerId", "aWorkerId");
@@ -496,7 +496,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testHandleFailureThrowsAuthorizationException() {
     doThrow(new AuthorizationException("aMessage"))
       .when(externalTaskService)
-      .handleFailure(any(String.class), any(String.class), any(String.class), anyInt(), anyLong());
+      .handleFailure(any(String.class), any(String.class), any(String.class),any(String.class), anyInt(), anyLong());
 
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("workerId", "aWorkerId");
@@ -521,7 +521,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testHandleFailureThrowsBadUserRequestException() {
     doThrow(new BadUserRequestException("aMessage"))
       .when(externalTaskService)
-      .handleFailure(any(String.class), any(String.class), any(String.class), anyInt(), anyLong());
+      .handleFailure(any(String.class), any(String.class), any(String.class),any(String.class), anyInt(), anyLong());
 
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("workerId", "aWorkerId");
