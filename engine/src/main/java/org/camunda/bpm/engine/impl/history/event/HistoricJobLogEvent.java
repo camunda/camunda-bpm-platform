@@ -11,15 +11,13 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.impl.history.event;
-
-import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionStacktrace;
-
 import java.util.Date;
 
 import org.camunda.bpm.engine.history.JobState;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 
 /**
  * @author Roman Smirnov
@@ -123,7 +121,7 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   public String getExceptionStacktrace() {
     ByteArrayEntity byteArray = getExceptionByteArray();
-    return getJobExceptionStacktrace(byteArray);
+    return ExceptionUtil.getExceptionStacktrace(byteArray);
   }
 
   protected ByteArrayEntity getExceptionByteArray() {

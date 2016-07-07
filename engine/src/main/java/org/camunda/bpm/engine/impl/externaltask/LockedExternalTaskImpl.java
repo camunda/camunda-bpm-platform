@@ -33,6 +33,7 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
   protected Date lockExpirationTime;
   protected Integer retries;
   protected String errorMessage;
+  protected String errorDetails;
   protected String processInstanceId;
   protected String executionId;
   protected String activityId;
@@ -99,6 +100,10 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
     return variables;
   }
 
+  public String getErrorDetails() {
+    return errorDetails;
+  }
+
   @Override
   public long getPriority() {
     return priority;
@@ -112,6 +117,7 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
     result.lockExpirationTime = externalTaskEntity.getLockExpirationTime();
     result.retries = externalTaskEntity.getRetries();
     result.errorMessage = externalTaskEntity.getErrorMessage();
+    result.errorDetails = externalTaskEntity.getErrorDetails();
 
     result.processInstanceId = externalTaskEntity.getProcessInstanceId();
     result.executionId = externalTaskEntity.getExecutionId();

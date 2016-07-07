@@ -14,12 +14,15 @@ package org.camunda.bpm.engine.rest.dto.externaltask;
 
 /**
  * @author Thorben Lindhauer
- *
+ * @author Askar Akhmerov
  */
 public class ExternalTaskFailureDto {
 
   protected String workerId;
+  //short error description
   protected String errorMessage;
+  //full stack trace or error information
+  protected String errorDetails;
   protected long retryTimeout;
   protected int retries;
 
@@ -46,5 +49,13 @@ public class ExternalTaskFailureDto {
   }
   public void setRetries(int retries) {
     this.retries = retries;
+  }
+
+  public String getErrorDetails() {
+    return errorDetails;
+  }
+
+  public void setErrorDetails(String errorDetails) {
+    this.errorDetails = errorDetails;
   }
 }

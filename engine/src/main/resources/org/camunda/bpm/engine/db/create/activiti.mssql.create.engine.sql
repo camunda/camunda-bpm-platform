@@ -248,6 +248,8 @@ create table ACT_RU_EXT_TASK (
   TOPIC_NAME_ nvarchar(255),
   RETRIES_ int,
   ERROR_MSG_ nvarchar(4000),
+    -- CAM-5284
+  ERROR_DETAILS_ID_ nvarchar(64),
   LOCK_EXP_TIME_ datetime2,
   SUSPENSION_STATE_ tinyint,
   EXECUTION_ID_ nvarchar(64),

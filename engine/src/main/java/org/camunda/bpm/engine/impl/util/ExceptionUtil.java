@@ -20,17 +20,17 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 
 /**
  * @author Roman Smirnov
- *
+ * @author Askar Akhmerov
  */
-public class JobExceptionUtil {
+public class ExceptionUtil {
 
-  public static String getJobExceptionStacktrace(Throwable exception) {
+  public static String getExceptionStacktrace(Throwable exception) {
     StringWriter stringWriter = new StringWriter();
     exception.printStackTrace(new PrintWriter(stringWriter));
     return stringWriter.toString();
   }
 
-  public static String getJobExceptionStacktrace(ByteArrayEntity byteArray) {
+  public static String getExceptionStacktrace(ByteArrayEntity byteArray) {
     String result = null;
     if(byteArray != null) {
       result = StringUtil.fromBytes(byteArray.getBytes());
@@ -39,14 +39,30 @@ public class JobExceptionUtil {
   }
 
   public static ByteArrayEntity createJobExceptionByteArray(byte[] byteArray) {
+    return createExceptionByteArray("job.exceptionByteArray", byteArray);
+  }
+
+  /**
+   * CAM-5284
+   *
+   * create ByteArrayEntity with specified name and payload and make sure it's
+   * persisted
+   *
+   * used in Jobs and ExternalTasks
+   *
+   * @param name - type\source of the exception
+   * @param byteArray - payload of the exception
+   * @return persisted entity
+   */
+  public static ByteArrayEntity createExceptionByteArray(String name, byte[] byteArray) {
     ByteArrayEntity result = null;
 
     if (byteArray != null) {
-      result = new ByteArrayEntity("job.exceptionByteArray", byteArray);
+      result = new ByteArrayEntity(name, byteArray);
       Context
-        .getCommandContext()
-        .getDbEntityManager()
-        .insert(result);
+          .getCommandContext()
+          .getDbEntityManager()
+          .insert(result);
     }
 
     return result;

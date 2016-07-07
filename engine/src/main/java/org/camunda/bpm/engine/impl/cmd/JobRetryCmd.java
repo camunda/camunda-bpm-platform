@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionStacktrace;
-
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
@@ -23,6 +21,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageAddedNotification;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 
 /**
  * @author Roman Smirnov
@@ -59,7 +58,7 @@ public abstract class JobRetryCmd implements Command<Object> {
   }
 
   protected String getExceptionStacktrace() {
-    return getJobExceptionStacktrace(exception);
+    return ExceptionUtil.getExceptionStacktrace(exception);
   }
 
   protected boolean shouldDecrementRetriesFor(Throwable t) {

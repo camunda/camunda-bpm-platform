@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.createJobExceptionByteArray;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.createJobExceptionByteArray;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -33,11 +33,11 @@ import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionStacktrace;
 import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 /**
@@ -362,7 +362,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
   public String getExceptionStacktrace() {
     ByteArrayEntity byteArray = getExceptionByteArray();
-    return getJobExceptionStacktrace(byteArray);
+    return ExceptionUtil.getExceptionStacktrace(byteArray);
   }
 
   public void setSuspensionState(int state) {

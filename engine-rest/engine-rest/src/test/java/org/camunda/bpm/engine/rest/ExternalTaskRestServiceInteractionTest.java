@@ -71,6 +71,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   protected static final String FETCH_EXTERNAL_TASK_URL = EXTERNAL_TASK_URL + "/fetchAndLock";
   protected static final String SINGLE_EXTERNAL_TASK_URL = EXTERNAL_TASK_URL + "/{id}";
   protected static final String COMPLETE_EXTERNAL_TASK_URL = SINGLE_EXTERNAL_TASK_URL + "/complete";
+  protected static final String GET_EXTERNAL_TASK_ERROR_DETAILS_URL = SINGLE_EXTERNAL_TASK_URL + "/errorDetails";
   protected static final String HANDLE_EXTERNAL_TASK_FAILURE_URL = SINGLE_EXTERNAL_TASK_URL + "/failure";
   protected static final String HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL = SINGLE_EXTERNAL_TASK_URL + "/bpmnError";
   protected static final String UNLOCK_EXTERNAL_TASK_URL = SINGLE_EXTERNAL_TASK_URL + "/unlock";
@@ -145,6 +146,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
       .body("[0].processDefinitionKey", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY))
       .body("[0].tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
       .body("[0].retries", equalTo(MockProvider.EXTERNAL_TASK_RETRIES))
+      .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
       .body("[0].errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
       .body("[0].priority", equalTo(MockProvider.EXTERNAL_TASK_PRIORITY))
       .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME,
@@ -371,6 +373,56 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   }
 
   @Test
+  public void testGetErrorDetails() {
+    given()
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .get(GET_EXTERNAL_TASK_ERROR_DETAILS_URL);
+
+    verify(externalTaskService).getExternalTaskErrorDetails("anExternalTaskId");
+    verifyNoMoreInteractions(externalTaskService);
+  }
+
+  @Test
+  public void testGetErrorDetailsExistingTask() {
+    doThrow(new NotFoundException()).when(externalTaskService).getExternalTaskErrorDetails(any(String.class));
+
+    given()
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("External task with id anExternalTaskId does not exist"))
+    .when()
+      .get(GET_EXTERNAL_TASK_ERROR_DETAILS_URL);
+
+    verify(externalTaskService).getExternalTaskErrorDetails("anExternalTaskId");
+    verifyNoMoreInteractions(externalTaskService);
+  }
+
+  @Test
+  public void testGetErrorDetailsThrowsAuthorizationException() {
+    doThrow(new AuthorizationException("aMessage")).when(externalTaskService).getExternalTaskErrorDetails(any(String.class));
+
+    given()
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo("aMessage"))
+    .when()
+      .get(GET_EXTERNAL_TASK_ERROR_DETAILS_URL);
+
+    verify(externalTaskService).getExternalTaskErrorDetails("anExternalTaskId");
+    verifyNoMoreInteractions(externalTaskService);
+  }
+
+  @Test
   public void testHandleFailure() {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("workerId", "aWorkerId");
@@ -389,6 +441,29 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
       .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
 
     verify(externalTaskService).handleFailure("anExternalTaskId", "aWorkerId", "anErrorMessage", 5, 12345);
+    verifyNoMoreInteractions(externalTaskService);
+  }
+
+  @Test
+  public void testHandleFailureWithStackTrace() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("workerId", "aWorkerId");
+    parameters.put("errorMessage", "anErrorMessage");
+    parameters.put("errorDetails", "aStackTrace");
+    parameters.put("retries", 5);
+    parameters.put("retryTimeout", 12345);
+
+    given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .pathParam("id", "anExternalTaskId")
+        .then()
+        .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .when()
+        .post(HANDLE_EXTERNAL_TASK_FAILURE_URL);
+
+    verify(externalTaskService).handleFailure("anExternalTaskId", "aWorkerId", "anErrorMessage","aStackTrace", 5, 12345);
     verifyNoMoreInteractions(externalTaskService);
   }
 
