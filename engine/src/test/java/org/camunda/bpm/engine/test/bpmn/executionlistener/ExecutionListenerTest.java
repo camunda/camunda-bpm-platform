@@ -332,18 +332,18 @@ public class ExecutionListenerTest {
   public static final BpmnModelInstance PROCESS_SERVICE_TASK_WITH_EXECUTION_START_LISTENER = Bpmn.createExecutableProcess("Process")
           .startEvent()
           .parallelGateway("fork")
-          .userTask("userTask")
+          .userTask("userTask1")
           .serviceTask("sendTask")
             .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, SendMessageDelegate.class.getName())
             .camundaExpression("${true}")
           .endEvent("endEvent")
             .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
           .moveToLastGateway()
-          .userTask()
+          .userTask("userTask2")
           .boundaryEvent("boundaryEvent")
           .message(MESSAGE)
           .endEvent("endBoundaryEvent")
-          .moveToNode("userTask")
+          .moveToNode("userTask2")
           .endEvent()
           .done();
 
@@ -351,7 +351,7 @@ public class ExecutionListenerTest {
   public void testServiceTaskExecutionListenerCall() {
     testHelper.deploy(PROCESS_SERVICE_TASK_WITH_EXECUTION_START_LISTENER);
     runtimeService.startProcessInstanceByKey("Process");
-    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask").singleResult();
+    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask1").singleResult();
     taskService.complete(task.getId());
 
     assertEquals(0, taskService.createTaskQuery().list().size());
@@ -369,7 +369,7 @@ public class ExecutionListenerTest {
   public void testServiceTaskTwoExecutionListenerCall() {
     testHelper.deploy(PROCESS_SERVICE_TASK_WITH_TWO_EXECUTION_START_LISTENER);
     runtimeService.startProcessInstanceByKey("Process");
-    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask").singleResult();
+    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask1").singleResult();
     taskService.complete(task.getId());
 
     assertEquals(0, taskService.createTaskQuery().list().size());
@@ -396,8 +396,9 @@ public class ExecutionListenerTest {
               .interrupting(false)
               .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
               .message(MESSAGE)
-            .endEvent("endSubProcess")
+            .userTask("subProcessTask")
               .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
+            .endEvent("endSubProcess")
           .done();
 
   @Test
@@ -407,11 +408,12 @@ public class ExecutionListenerTest {
     Task task = taskService.createTaskQuery().taskDefinitionKey("userTask").singleResult();
     taskService.complete(task.getId());
 
-    assertEquals(0, taskService.createTaskQuery().list().size());
+    assertEquals(1, taskService.createTaskQuery().list().size());
+
     List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
     assertEquals(4, recordedEvents.size());
     assertEquals("startSubProcess", recordedEvents.get(0).getActivityId());
-    assertEquals("endSubProcess", recordedEvents.get(1).getActivityId());
+    assertEquals("subProcessTask", recordedEvents.get(1).getActivityId());
     assertEquals("sendTask", recordedEvents.get(2).getActivityId());
     assertEquals("endEvent", recordedEvents.get(3).getActivityId());
   }
