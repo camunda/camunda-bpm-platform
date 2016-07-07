@@ -131,20 +131,15 @@
                     <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
                     <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
 
-                    <!-- concatenated patches for last minor version -->
-                    <!--
-                         There are no patches of the old version, since the old version contains everything in the create scripts.
-                         After a new release of the old version, which is set in this pom and after creation of new patch scripts
-                         we have to add these new patch scripts here.
-                         See the following example:
-                    -->
+                    <!-- patches for last minor version -->
+                    <!-- only add patch scripts which are after the camunda.version.old -->
                     <!-- example:
-                      <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" />
+                      <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch_${camunda.old.majorVersion}.${camunda.old.minorVersion}.X_to_${camunda.old.majorVersion}.${camunda.old.minorVersion}.Y.sql" />
                     -->
 
                     <!-- patches for current minor version if any -->
                     <!-- example:
-                      <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch_{camunda.current.majorVersion}.${camunda.current.minorVersion}.0_to_{camunda.current.majorVersion}.${camunda.current.minorVersion}.1.sql" />
+                      <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch_${camunda.current.majorVersion}.${camunda.current.minorVersion}.0_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.1.sql" />
                     -->
 
                   </target>
@@ -252,8 +247,9 @@
                 <configuration>
                   <srcFiles>
                     <!-- now patch old version of the schema -->
+                    <!-- only add patch scripts which are after the camunda.version.old -->
                     <!-- example:
-                         <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql</srcFile>
+                      <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch_${camunda.old.majorVersion}.${camunda.old.minorVersion}.X_to_${camunda.old.majorVersion}.${camunda.old.minorVersion}.Y.sql</srcFile>
                     -->
                   </srcFiles>
                 </configuration>
@@ -284,7 +280,7 @@
                   <srcFiles>
                     <!-- now patch new version of the schema, apply any patches explicitly -->
                     <!-- example:
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch_{camunda.current.majorVersion}.${camunda.current.minorVersion}.0_to_{camunda.current.majorVersion}.${camunda.current.minorVersion}.1.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch_${camunda.current.majorVersion}.${camunda.current.minorVersion}.0_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.1.sql</srcFile>
                     -->
                   </srcFiles>
                 </configuration>
