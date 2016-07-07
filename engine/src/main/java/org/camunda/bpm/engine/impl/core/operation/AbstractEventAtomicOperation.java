@@ -48,13 +48,13 @@ public abstract class AbstractEventAtomicOperation<T extends CoreExecution> impl
         execution.setEventSource(scope);
         DelegateListener<? extends BaseDelegateExecution> listener = listeners.get(listenerIndex);
         try {
+          execution.setListenerIndex(listenerIndex+1);
           execution.invokeListener(listener);
         } catch (RuntimeException e) {
           throw e;
         } catch (Exception e) {
           throw new PvmException("couldn't execute event listener : "+e.getMessage(), e);
         }
-        execution.setListenerIndex(listenerIndex+1);
         execution.performOperationSync(this);
 
       } else {
