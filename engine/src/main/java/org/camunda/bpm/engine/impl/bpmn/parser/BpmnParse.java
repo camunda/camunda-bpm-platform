@@ -2074,7 +2074,7 @@ public class BpmnParse extends Parse {
         parseEmailServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
       } else if (type.equalsIgnoreCase("shell")) {
         parseShellServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
-      } else if (isExternalTaskType(type)) {
+      } else if (type.equalsIgnoreCase("external")) {
         parseExternalServiceTask(activity, serviceTaskElement);
       } else {
         addError("Invalid usage of type attribute on " + elementName + ": '" + type + "'", serviceTaskElement);
@@ -2274,17 +2274,7 @@ public class BpmnParse extends Parse {
 
       parseAsynchronousContinuationForActivity(sendTaskElement, activity);
 
-      // for e-mail
-      String type = sendTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type");
-
-      // for e-mail
-      if (type != null) {
-        if (type.equalsIgnoreCase("mail")) {
-          parseEmailServiceTask(activity, sendTaskElement, parseFieldDeclarations(sendTaskElement));
-        } else {
-          addError("Invalid usage of type attribute: '" + type + "'", sendTaskElement);
-        }
-      } else {
+      if (sendTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type") == null) {
         addError("One of the attributes 'class', 'delegateExpression', 'type', or 'expression' is mandatory on sendTask.", sendTaskElement);
       }
 
@@ -4215,7 +4205,7 @@ public class BpmnParse extends Parse {
     return element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_CLASS) != null
         || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_EXPRESSION) != null
         || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_DELEGATE_EXPRESSION) != null
-        || isExternalTaskType(element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type"))
+        || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type") != null
         || hasConnector(element);
   }
 
@@ -4225,10 +4215,6 @@ public class BpmnParse extends Parse {
       return true;
     }
     return false;
-  }
-
-  protected boolean isExternalTaskType(String type) {
-    return "external".equalsIgnoreCase(type);
   }
 
   public Map<String, List<JobDeclaration<?, ?>>> getJobDeclarations() {
