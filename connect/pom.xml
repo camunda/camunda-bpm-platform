@@ -67,7 +67,6 @@
           <configuration>
             <instructions>
               <Export-Package>
-                !*impl*,
                 org.camunda.connect*
               </Export-Package>
             </instructions>
