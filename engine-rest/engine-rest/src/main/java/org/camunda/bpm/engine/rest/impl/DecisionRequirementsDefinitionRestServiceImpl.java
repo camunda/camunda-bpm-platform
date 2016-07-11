@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
@@ -24,6 +25,9 @@ import org.camunda.bpm.engine.rest.DecisionRequirementsDefinitionRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionQueryDto;
+import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.sub.repository.DecisionRequirementsDefinitionResource;
+import org.camunda.bpm.engine.rest.sub.repository.impl.DecisionRequirementsDefinitionResourceImpl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -77,6 +81,43 @@ public class DecisionRequirementsDefinitionRestServiceImpl extends AbstractRestP
     CountResultDto result = new CountResultDto();
     result.setCount(count);
     return result;
+  }
+
+  @Override
+  public DecisionRequirementsDefinitionResource getDecisionRequirementsDefinitionById(String decisionRequirementsDefinitionId) {
+    return new DecisionRequirementsDefinitionResourceImpl(getProcessEngine(), decisionRequirementsDefinitionId);
+  }
+
+  @Override
+  public DecisionRequirementsDefinitionResource getDecisionRequirementsDefinitionByKey(String decisionRequirementsDefinitionKey) {
+    DecisionRequirementsDefinition decisionRequirementsDefinition = getProcessEngine().getRepositoryService()
+      .createDecisionRequirementsDefinitionQuery()
+      .decisionRequirementsDefinitionKey(decisionRequirementsDefinitionKey)
+      .withoutTenantId().latestVersion().singleResult();
+    
+    if (decisionRequirementsDefinition == null) {
+      String errorMessage = String.format("No matching decision requirements definition with key: %s and no tenant-id", decisionRequirementsDefinitionKey);
+      throw new RestException(Status.NOT_FOUND, errorMessage);
+      
+    } else {
+      return getDecisionRequirementsDefinitionById(decisionRequirementsDefinition.getId());
+    }
+  }
+
+  @Override
+  public DecisionRequirementsDefinitionResource getDecisionRequirementsDefinitionByKeyAndTenantId(String decisionRequirementsDefinitionKey, String tenantId) {
+    DecisionRequirementsDefinition decisionRequirementsDefinition = getProcessEngine().getRepositoryService()
+      .createDecisionRequirementsDefinitionQuery()
+      .decisionRequirementsDefinitionKey(decisionRequirementsDefinitionKey)
+      .tenantIdIn(tenantId).latestVersion().singleResult();
+    
+    if (decisionRequirementsDefinition == null) {
+      String errorMessage = String.format("No matching decision requirements definition with key: %s and tenant-id: %s", decisionRequirementsDefinitionKey, tenantId);
+      throw new RestException(Status.NOT_FOUND, errorMessage);
+      
+    } else {
+      return getDecisionRequirementsDefinitionById(decisionRequirementsDefinition.getId());
+    }
   }
 
 }

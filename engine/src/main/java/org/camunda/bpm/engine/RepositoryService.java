@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
@@ -576,6 +577,17 @@ public interface RepositoryService {
    *          If the user has no {@link Permissions#READ} permission on {@link Resources#DECISION_DEFINITION}.
    */
   DecisionDefinition getDecisionDefinition(String decisionDefinitionId);
+
+  /**
+   * Returns the {@link DecisionDefinition}.
+   *
+   * @throws NotValidException when the given decision requirements definition id is null
+   * @throws NotFoundException when no decision requirements definition is found for the given decision requirements definition id
+   * @throws ProcessEngineException when an internal exception happens during the execution of the command.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#DECISION_REQUIREMENTS_DEFINITION}.
+   */
+  DecisionRequirementsDefinition getDecisionRequirementsDefinition(String decisionRequirementsDefinitionId);
 
   /**
    * Gives access to a deployed decision model, e.g., a DMN 1.1 XML file,
