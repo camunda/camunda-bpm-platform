@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.externaltask;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -109,6 +110,19 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
     return priority;
   }
 
+  /**
+   * Construct representation of locked ExternalTask from corresponding entity.
+   * During mapping variables will be collected,during collection variables will not be deserialized
+   * and scope will not be set to local.
+   *
+   * @see {@link org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope#collectVariables(VariableMapImpl, Collection, boolean, boolean)}
+   *
+   * @param externalTaskEntity - source persistent entity to use for fields
+   * @param variablesToFetch - list of variable names to fetch, if null then all variables will be fetched
+   *
+   * @return object with all fields copied from the ExternalTaskEntity, error details fetched from the
+   * database and variables attached
+   */
   public static LockedExternalTaskImpl fromEntity(ExternalTaskEntity externalTaskEntity, List<String> variablesToFetch) {
     LockedExternalTaskImpl result = new LockedExternalTaskImpl();
     result.id = externalTaskEntity.getId();

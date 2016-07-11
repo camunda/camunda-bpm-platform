@@ -418,6 +418,61 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchVariables.bpmn20.xml")
+  public void testFetchAllVariables() {
+    // given
+    runtimeService.startProcessInstanceByKey("subProcessExternalTask",
+        Variables.createVariables()
+            .putValue("processVar1", 42)
+            .putValue("processVar2", 43));
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    // then
+    LockedExternalTask task = externalTasks.get(0);
+    verifyVariables(task);
+
+    runtimeService.startProcessInstanceByKey("subProcessExternalTask",
+        Variables.createVariables()
+            .putValue("processVar1", 42)
+            .putValue("processVar2", 43));
+
+    externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .variables((String[]) null)
+        .execute();
+
+    task = externalTasks.get(0);
+    verifyVariables(task);
+
+    runtimeService.startProcessInstanceByKey("subProcessExternalTask",
+        Variables.createVariables()
+            .putValue("processVar1", 42)
+            .putValue("processVar2", 43));
+
+    List<String> list = null;
+    externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .variables(list)
+        .execute();
+
+    task = externalTasks.get(0);
+    verifyVariables(task);
+  }
+
+  private void verifyVariables(LockedExternalTask task) {
+    VariableMap variables = task.getVariables();
+    assertEquals(4, variables.size());
+
+    assertEquals(42, variables.get("processVar1"));
+    assertEquals(43, variables.get("processVar2"));
+    assertEquals(44L, variables.get("subProcessVar"));
+    assertEquals(45L, variables.get("taskVar"));
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testFetchNonExistingVariable() {
     // given
