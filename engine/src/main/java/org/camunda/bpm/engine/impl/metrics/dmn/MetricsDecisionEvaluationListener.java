@@ -13,16 +13,17 @@
 
 package org.camunda.bpm.engine.impl.metrics.dmn;
 
-import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
-import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationListener;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationEvent;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.management.Metrics;
 
-public class MetricsDecisionTableListener implements DmnDecisionTableEvaluationListener {
+public class MetricsDecisionEvaluationListener implements DmnDecisionEvaluationListener {
 
-  public void notify(DmnDecisionTableEvaluationEvent evaluationEvent) {
+  public void notify(DmnDecisionEvaluationEvent evaluationEvent) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+
     if (processEngineConfiguration != null && processEngineConfiguration.isMetricsEnabled()) {
       processEngineConfiguration
         .getMetricsRegistry()

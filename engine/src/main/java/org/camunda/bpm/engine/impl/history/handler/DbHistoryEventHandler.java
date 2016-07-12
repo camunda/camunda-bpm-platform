@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
-import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionEvaluationEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoricScopeInstanceEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
@@ -37,8 +37,8 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
 
     if (historyEvent instanceof HistoricVariableUpdateEventEntity) {
       insertHistoricVariableUpdateEntity((HistoricVariableUpdateEventEntity) historyEvent);
-    } else if(historyEvent instanceof HistoricDecisionInstanceEntity) {
-      insertHistoricDecisionInstanceEntity((HistoricDecisionInstanceEntity) historyEvent);
+    } else if(historyEvent instanceof HistoricDecisionEvaluationEvent) {
+      insertHistoricDecisionEvaluationEvent((HistoricDecisionEvaluationEvent) historyEvent);
     } else {
       insertOrUpdate(historyEvent);
     }
@@ -135,12 +135,12 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
   }
 
 
-  protected void insertHistoricDecisionInstanceEntity(HistoricDecisionInstanceEntity historicDecisionInstanceEntity) {
+  protected void insertHistoricDecisionEvaluationEvent(HistoricDecisionEvaluationEvent event) {
 
     Context
       .getCommandContext()
       .getHistoricDecisionInstanceManager()
-      .insertHistoricDecisionInstance(historicDecisionInstanceEntity);
+      .insertHistoricDecisionInstances(event);
   }
 
 

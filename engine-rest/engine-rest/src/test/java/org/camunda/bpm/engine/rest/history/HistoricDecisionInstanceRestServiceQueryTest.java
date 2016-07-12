@@ -247,6 +247,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     List<HistoricDecisionOutputInstanceDto> returnedOutputs = from(content).getList("[0].outputs");
     Double returnedCollectResultValue = from(content).getDouble("[0].collectResultValue");
     String returnedTenantId = from(content).getString("[0].tenantId");
+    String returnedRootDecisionInstanceId = from(content).getString("[0].rootDecisionInstanceId");
 
     assertThat(returnedHistoricDecisionInstanceId, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID));
     assertThat(returnedDecisionDefinitionId, is(MockProvider.EXAMPLE_DECISION_DEFINITION_ID));
@@ -265,6 +266,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     assertThat(returnedOutputs, is(nullValue()));
     assertThat(returnedCollectResultValue, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_COLLECT_RESULT_VALUE));
     assertThat(returnedTenantId, is(MockProvider.EXAMPLE_TENANT_ID));
+    assertThat(returnedRootDecisionInstanceId, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID));
   }
 
   @Test
@@ -456,6 +458,20 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
   }
 
   @Test
+  public void testRootDecisionInstancesOnly() {
+
+    given()
+        .queryParam("rootDecisionInstancesOnly", true)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_DECISION_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).rootDecisionInstancesOnly();
+    verify(mockedQuery).list();
+  }
+
+  @Test
   public void testTenantIdListParameter() {
     mockedQuery = setUpMockHistoricDecisionInstanceQuery(createMockHistoricDecisionInstancesTwoTenants());
 
@@ -505,6 +521,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     parameters.put("evaluatedBefore", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATED_BEFORE);
     parameters.put("evaluatedAfter", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATED_AFTER);
     parameters.put("userId", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_USER_ID);
+    parameters.put("rootDecisionInstanceId", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID);
 
     return parameters;
   }
@@ -529,6 +546,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     verify(mockedQuery).evaluatedBefore(DateTimeUtil.parseDate(stringQueryParameters.get("evaluatedBefore")));
     verify(mockedQuery).evaluatedAfter(DateTimeUtil.parseDate(stringQueryParameters.get("evaluatedAfter")));
     verify(mockedQuery).userId(stringQueryParameters.get("userId"));
+    verify(mockedQuery).rootDecisionInstanceId(stringQueryParameters.get("rootDecisionInstanceId"));
 
     verify(mockedQuery).list();
   }

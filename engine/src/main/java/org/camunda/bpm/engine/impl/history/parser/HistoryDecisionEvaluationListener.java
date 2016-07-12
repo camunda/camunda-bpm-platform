@@ -14,8 +14,8 @@
 package org.camunda.bpm.engine.impl.history.parser;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
-import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationListener;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationEvent;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationListener;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.CoreExecutionContext;
@@ -27,17 +27,17 @@ import org.camunda.bpm.engine.impl.history.producer.DmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 
-public class HistoryDecisionTableListener implements DmnDecisionTableEvaluationListener {
+public class HistoryDecisionEvaluationListener implements DmnDecisionEvaluationListener {
 
   protected DmnHistoryEventProducer eventProducer;
   protected HistoryLevel historyLevel;
 
-  public HistoryDecisionTableListener(DmnHistoryEventProducer historyEventProducer, HistoryLevel historyLevel) {
+  public HistoryDecisionEvaluationListener(DmnHistoryEventProducer historyEventProducer, HistoryLevel historyLevel) {
     this.eventProducer = historyEventProducer;
     this.historyLevel = historyLevel;
   }
 
-  public void notify(DmnDecisionTableEvaluationEvent evaluationEvent) {
+  public void notify(DmnDecisionEvaluationEvent evaluationEvent) {
    HistoryEvent historyEvent = createHistoryEvent(evaluationEvent);
 
     if(historyEvent != null) {
@@ -47,8 +47,8 @@ public class HistoryDecisionTableListener implements DmnDecisionTableEvaluationL
     }
   }
 
-  protected HistoryEvent createHistoryEvent(DmnDecisionTableEvaluationEvent evaluationEvent) {
-    DmnDecision decisionTable = evaluationEvent.getDecisionTable();
+  protected HistoryEvent createHistoryEvent(DmnDecisionEvaluationEvent evaluationEvent) {
+    DmnDecision decisionTable = evaluationEvent.getDecisionResult().getDecisionTable();
     if(isDeployedDecisionTable(decisionTable) && historyLevel.isHistoryEventProduced(HistoryEventTypes.DMN_DECISION_EVALUATE, decisionTable)) {
 
       CoreExecutionContext<? extends CoreExecution> executionContext = Context.getCoreExecutionContext();

@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.engine.impl.history.producer;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationEvent;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -35,13 +35,13 @@ public interface DmnHistoryEventProducer {
    *
    * @param execution
    *          the current execution
-   * @param decisionTableEvaluationEvent
+   * @param decisionEvaluationEvent
    *          the evaluation event
    * @return the history event
    *
-   * @see #createDecisionEvaluatedEvt(DmnDecisionTableEvaluationEvent)
+   * @see #createDecisionEvaluatedEvt(DmnDecisionEvaluationEvent)
    */
-  HistoryEvent createDecisionEvaluatedEvt(DelegateExecution execution, DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent);
+  HistoryEvent createDecisionEvaluatedEvt(DelegateExecution execution, DmnDecisionEvaluationEvent decisionEvaluationEvent);
 
   /**
    * Creates the history event fired when a decision is evaluated while execute
@@ -49,25 +49,23 @@ public interface DmnHistoryEventProducer {
    *
    * @param execution
    *          the current case execution
-   * @param decisionTable
-   *          the evaluated decision table
-   * @param decisionTableResult
-   *          the decision table evaluation result
+   * @param decisionEvaluationEvent
+   *          the evaluation event
    * @return the history event
    *
-   * @see #createDecisionEvaluatedEvt(DmnDecisionTable, DmnDecisionTableResult)
+   * @see #createDecisionEvaluatedEvt(DmnDecisionEvaluationEvent)
    */
-  HistoryEvent createDecisionEvaluatedEvt(DelegateCaseExecution execution, DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent);
+  HistoryEvent createDecisionEvaluatedEvt(DelegateCaseExecution execution, DmnDecisionEvaluationEvent decisionEvaluationEvent);
 
   /**
    * Creates the history event fired when a decision is evaluated. If the
    * decision is evaluated while execute a process instance then you should use
    * {@link #createDecisionEvaluatedEvt(DelegateExecution, DmnDecisionTableEvaluationEvent)} instead.
    *
-   * @param decisionTableEvaluationEvent
+   * @param decisionEvaluationEvent
    *          the evaluation event
    * @return the history event
    */
-  HistoryEvent createDecisionEvaluatedEvt(DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent);
+  HistoryEvent createDecisionEvaluatedEvt(DmnDecisionEvaluationEvent decisionEvaluationEvent);
 
 }

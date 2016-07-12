@@ -23,6 +23,7 @@
       EVAL_TIME_,
       COLLECT_VALUE_,
       USER_ID_,
+      ROOT_DEC_INST_ID_,
       TENANT_ID_)
     values (#{id, jdbcType=VARCHAR},
             #{decisionDefinitionId, jdbcType=VARCHAR},
@@ -39,6 +40,7 @@
             #{evaluationTime, jdbcType=TIMESTAMP},
             #{collectResultValue, jdbcType=DOUBLE},
             #{userId, jdbcType=VARCHAR},
+            #{rootDecisionInstanceId, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR}
            )
   </insert>
@@ -67,6 +69,7 @@
     <result property="evaluationTime" column="EVAL_TIME_" jdbcType="TIMESTAMP"/>
     <result property="collectResultValue" column="COLLECT_VALUE_" jdbcType="DOUBLE"/>
     <result property="userId" column="USER_ID_" jdbcType="VARCHAR"/>
+    <result property="rootDecisionInstanceId" column="ROOT_DEC_INST_ID_" jdbcType="VARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
 
@@ -199,6 +202,15 @@
       
       <if test="userId != null">
         and RES.USER_ID_ = #{userId} 
+      </if>
+      
+      <if test="rootDecisionInstanceId != null">
+        and (RES.ROOT_DEC_INST_ID_ = #{rootDecisionInstanceId} or 
+          (RES.ROOT_DEC_INST_ID_ is null and RES.ID_ = #{rootDecisionInstanceId}))
+      </if>
+      
+      <if test="rootDecisionInstancesOnly">
+        and RES.ROOT_DEC_INST_ID_ is null
       </if>
 
       <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
