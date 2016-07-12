@@ -50,6 +50,7 @@ import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionDefinitionCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionDiagramCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionModelCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionRequirementsDefinitionCmd;
+import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionRequirementsModelCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDmnModelInstanceCmd;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl;
@@ -343,6 +344,18 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   public InputStream getDecisionModel(String decisionDefinitionId) {
     try {
       return commandExecutor.execute(new GetDeploymentDecisionModelCmd(decisionDefinitionId));
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+    } catch (DecisionDefinitionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+    } catch (DeploymentResourceNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+    }
+  }
+
+  public InputStream getDecisionRequirementsModel(String decisionRequirementsDefinitionId) {
+    try {
+      return commandExecutor.execute(new GetDeploymentDecisionRequirementsModelCmd(decisionRequirementsDefinitionId));
     } catch (NullValueException e) {
       throw new NotValidException(e.getMessage(), e);
     } catch (DecisionDefinitionNotFoundException e) {

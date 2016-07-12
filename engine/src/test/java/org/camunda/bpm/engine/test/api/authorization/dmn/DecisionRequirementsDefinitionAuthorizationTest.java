@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSc
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.InputStream;
 import java.util.Collection;
 
 import org.camunda.bpm.engine.RepositoryService;
@@ -106,4 +107,23 @@ public class DecisionRequirementsDefinitionAuthorizationTest {
     }
   }
 
+  @Test
+  @Deployment(resources = { DMN_FILE })
+  public void getDecisionRequirementsModel() {
+
+    // given
+    String decisionRequirementsDefinitionId = repositoryService
+      .createDecisionRequirementsDefinitionQuery()
+      .decisionRequirementsDefinitionKey(DEFINITION_KEY)
+      .singleResult().getId();
+
+    // when
+    authRule.init(scenario).withUser("userId").bindResource("decisionRequirementsDefinitionKey", DEFINITION_KEY).start();
+
+    InputStream decisionRequirementsModel = repositoryService.getDecisionRequirementsModel(decisionRequirementsDefinitionId);
+
+    if (authRule.assertScenario(scenario)) {
+      assertNotNull(decisionRequirementsModel);
+    }
+  }
 }

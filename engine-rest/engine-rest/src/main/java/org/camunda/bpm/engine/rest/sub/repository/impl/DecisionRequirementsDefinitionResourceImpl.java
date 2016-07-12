@@ -12,23 +12,27 @@
  */
 package org.camunda.bpm.engine.rest.sub.repository.impl;
 
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
+import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionXmlDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.DecisionRequirementsDefinitionResource;
+
 /**
  * 
  * @author Deivarayan Azhagappan
  *
  */
-
 public class DecisionRequirementsDefinitionResourceImpl implements DecisionRequirementsDefinitionResource {
 
   protected ProcessEngine engine;
@@ -60,5 +64,31 @@ public class DecisionRequirementsDefinitionResourceImpl implements DecisionRequi
     }
 
     return DecisionRequirementsDefinitionDto.fromDecisionRequirementsDefinition(definition);
+  }
+
+  @Override
+  public DecisionRequirementsDefinitionXmlDto getDecisionRequirementsDefinitionDmnXml() {
+    InputStream decisionRequirementsModelInputStream = null;
+    try {
+      decisionRequirementsModelInputStream = engine.getRepositoryService().getDecisionRequirementsModel(decisionRequirementsDefinitionId);
+
+      byte[] decisionRequirementsModel = IoUtil.readInputStream(decisionRequirementsModelInputStream, "decisionRequirementsModelDmnXml");
+      return DecisionRequirementsDefinitionXmlDto.create(decisionRequirementsDefinitionId, new String(decisionRequirementsModel, "UTF-8"));
+
+    } catch (NotFoundException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e, e.getMessage());
+
+    } catch (NotValidException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, e.getMessage());
+
+    } catch (ProcessEngineException e) {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e);
+
+    } catch (UnsupportedEncodingException e) {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e);
+
+    } finally {
+      IoUtil.closeSilently(decisionRequirementsModelInputStream);
+    }
   }
 }

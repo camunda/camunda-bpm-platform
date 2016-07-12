@@ -13,9 +13,11 @@
 package org.camunda.bpm.engine.rest.sub.repository;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionXmlDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionDto;
 
 public interface DecisionRequirementsDefinitionResource {
@@ -23,5 +25,10 @@ public interface DecisionRequirementsDefinitionResource {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   DecisionRequirementsDefinitionDto getDecisionRequirementsDefinition();
-  
+
+  @GET
+  @Path("/xml")
+  @Produces(MediaType.APPLICATION_JSON)
+  DecisionRequirementsDefinitionXmlDto getDecisionRequirementsDefinitionDmnXml();
+
 }

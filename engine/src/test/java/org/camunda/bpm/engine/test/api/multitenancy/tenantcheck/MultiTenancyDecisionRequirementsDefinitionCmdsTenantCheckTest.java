@@ -14,8 +14,10 @@
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
+import java.io.InputStream;
 import java.util.Arrays;
 
 import org.camunda.bpm.engine.IdentityService;
@@ -98,5 +100,35 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
     DecisionRequirementsDefinition definition = repositoryService.getDecisionRequirementsDefinition(decisionRequirementsDefinitionId);
 
     assertThat(definition.getTenantId(), is(TENANT_ONE));
+  }
+
+  @Test
+  public void failToGetDecisionRequirementsModelNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    // declare expected exception
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot get the decision requirements definition");
+
+    repositoryService.getDecisionRequirementsModel(decisionRequirementsDefinitionId);
+  }
+
+  @Test
+  public void getDecisionRequirementsModelWithAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    InputStream inputStream = repositoryService.getDecisionRequirementsModel(decisionRequirementsDefinitionId);
+
+    assertThat(inputStream, notNullValue());
+  }
+
+  @Test
+  public void getDecisionRequirementsModelDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    InputStream inputStream = repositoryService.getDecisionRequirementsModel(decisionRequirementsDefinitionId);
+
+    assertThat(inputStream, notNullValue());
   }
 }

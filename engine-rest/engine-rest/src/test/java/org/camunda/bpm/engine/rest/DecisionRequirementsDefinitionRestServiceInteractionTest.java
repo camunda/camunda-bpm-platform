@@ -23,6 +23,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.InputStream;
 import java.util.Collections;
 
 import javax.ws.rs.core.Response.Status;
@@ -30,16 +31,19 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 
 public class DecisionRequirementsDefinitionRestServiceInteractionTest extends AbstractRestServiceTest {
 
@@ -50,6 +54,10 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
   protected static final String SINGLE_DECISION_REQUIREMENTS_DEFINITION_ID_URL = DECISION_REQUIREMENTS_DEFINITION_URL + "/{id}";
   protected static final String SINGLE_DECISION_REQUIREMENTS_DEFINITION_KEY_URL = DECISION_REQUIREMENTS_DEFINITION_URL + "/key/{key}";
   protected static final String SINGLE_DECISION_REQUIREMENTS_DEFINITION_KEY_AND_TENANT_ID_URL = DECISION_REQUIREMENTS_DEFINITION_URL + "/key/{key}/tenant-id/{tenant-id}";
+
+  protected static final String XML_DEFINITION_URL = SINGLE_DECISION_REQUIREMENTS_DEFINITION_ID_URL + "/xml";
+  protected static final String XML_DEFINITION_BY_KEY_URL = SINGLE_DECISION_REQUIREMENTS_DEFINITION_KEY_URL + "/xml";
+  protected static final String XML_DEFINITION_BY_KEY_AND_TENANT_ID_URL = SINGLE_DECISION_REQUIREMENTS_DEFINITION_KEY_AND_TENANT_ID_URL + "/xml";
 
   protected RepositoryService repositoryServiceMock;
   protected DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionQueryMock;
@@ -192,12 +200,103 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
     .when().get(SINGLE_DECISION_REQUIREMENTS_DEFINITION_KEY_AND_TENANT_ID_URL);
   }
 
+  // dmn xml retrieval
+  @Test
+  public void testDecisionRequirementsDefinitionDmnXmlRetrieval() {
+    Response response = given()
+      .pathParam("id", MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID)
+      .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(XML_DEFINITION_URL);
+
+    String responseContent = response.asString();
+    Assert.assertTrue(responseContent.contains(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID));
+    Assert.assertTrue(responseContent.contains("<?xml"));
+  }
+
+  @Test
+  public void testDecisionRequirementsDefinitionDmnXmlRetrievalByKey() {
+    Response response = given()
+      .pathParam("key", MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY)
+      .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(XML_DEFINITION_BY_KEY_URL);
+
+    String responseContent = response.asString();
+    Assert.assertTrue(responseContent.contains(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID));
+    Assert.assertTrue(responseContent.contains("<?xml"));
+  }
+
+  @Test
+  public void testDecisionRequirementsDefinitionDmnXmlRetrievalByNonExistingKey() {
+
+    String nonExistingKey = "aNonExistingRequirementsDefinitionKey";
+
+    when(repositoryServiceMock.createDecisionRequirementsDefinitionQuery()
+      .decisionRequirementsDefinitionKey(nonExistingKey))
+      .thenReturn(decisionRequirementsDefinitionQueryMock);
+
+    when(decisionRequirementsDefinitionQueryMock.singleResult()).thenReturn(null);
+ 
+    given()
+      .pathParam("key", nonExistingKey)
+    .then()
+      .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", is(RestException.class.getSimpleName()))
+        .body("message", containsString("No matching decision requirements definition with key: " + nonExistingKey))
+    .when()
+      .get(XML_DEFINITION_BY_KEY_URL);
+
+  }
+
+  @Test
+  public void testDecisionRequirementsDefinitionDmnXmlRetrievalByKeyAndTenantId() {
+    Response response = given()
+      .pathParam("key", MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY)
+      .pathParam("tenant-id", MockProvider.EXAMPLE_TENANT_ID)
+      .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(XML_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+
+    String responseContent = response.asString();
+    Assert.assertTrue(responseContent.contains(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID));
+    Assert.assertTrue(responseContent.contains("<?xml"));
+  }
+
+  @Test
+  public void testNonExistingDecisionRequirementsDefinitionDmnXmlRetrievalByKeyAndTenantId() {
+    String nonExistingKey = "aNonExistingDecisionDefinitionRequirementsDefinitionKey";
+    String nonExistingTenantId = "aNonExistingTenantId";
+
+    when(repositoryServiceMock.createDecisionRequirementsDefinitionQuery()
+      .decisionRequirementsDefinitionKey(nonExistingKey))
+      .thenReturn(decisionRequirementsDefinitionQueryMock);
+    when(decisionRequirementsDefinitionQueryMock.singleResult()).thenReturn(null);
+
+    given()
+      .pathParam("key", nonExistingKey)
+      .pathParam("tenant-id", nonExistingTenantId)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", is(RestException.class.getSimpleName()))
+      .body("message", containsString("No matching decision requirements definition with key: " + nonExistingKey + " and tenant-id: " + nonExistingTenantId))
+    .when().get(XML_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+  }
+
   protected void setUpRuntimeData(DecisionRequirementsDefinition mockDecisionRequirementsDefinition) {
     repositoryServiceMock = mock(RepositoryService.class);
 
     when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
     when(repositoryServiceMock.getDecisionRequirementsDefinition(eq(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID))).thenReturn(mockDecisionRequirementsDefinition);
-    
+    when(repositoryServiceMock.getDecisionRequirementsModel(eq(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID))).thenReturn(createMockDecisionRequirementsDefinitionDmnXml());
+
     decisionRequirementsDefinitionQueryMock = mock(DecisionRequirementsDefinitionQuery.class);
     when(decisionRequirementsDefinitionQueryMock.decisionRequirementsDefinitionKey(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY)).thenReturn(decisionRequirementsDefinitionQueryMock);
     when(decisionRequirementsDefinitionQueryMock.tenantIdIn(anyString())).thenReturn(decisionRequirementsDefinitionQueryMock);
@@ -206,5 +305,12 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
     when(decisionRequirementsDefinitionQueryMock.singleResult()).thenReturn(mockDecisionRequirementsDefinition);
     when(decisionRequirementsDefinitionQueryMock.list()).thenReturn(Collections.singletonList(mockDecisionRequirementsDefinition));
     when(repositoryServiceMock.createDecisionRequirementsDefinitionQuery()).thenReturn(decisionRequirementsDefinitionQueryMock);
+  }
+
+  protected InputStream createMockDecisionRequirementsDefinitionDmnXml() {
+    // do not close the input stream, will be done in implementation
+    InputStream dmnXmlInputStream = ReflectUtil.getResourceAsStream("decisions/decision-requirements-model.dmn");
+    Assert.assertNotNull(dmnXmlInputStream);
+    return dmnXmlInputStream;
   }
 }

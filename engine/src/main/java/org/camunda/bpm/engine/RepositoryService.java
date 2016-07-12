@@ -605,6 +605,21 @@ public interface RepositoryService {
   InputStream getDecisionModel(String decisionDefinitionId);
 
   /**
+   * Gives access to a deployed decision requirements model, e.g., a DMN 1.1 XML file,
+   * through a stream of bytes.
+   *
+   * @param decisionRequirementsDefinitionId
+   *          id of a {@link DecisionRequirementsDefinition}, cannot be null.
+   *
+   * @throws NotValidException when the given decision requirements definition id or deployment id or resource name is null
+   * @throws NotFoundException when no decision requirements definition or deployment resource is found for the given decision requirements definition id
+   * @throws ProcessEngineException when an internal exception happens during the execution of the command
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#DECISION_REQUIREMENTS_DEFINITION}.
+   */
+  InputStream getDecisionRequirementsModel(String decisionRequirementsDefinitionId);
+
+  /**
    * Gives access to a deployed decision diagram, e.g., a PNG image, through a
    * stream of bytes.
    *
