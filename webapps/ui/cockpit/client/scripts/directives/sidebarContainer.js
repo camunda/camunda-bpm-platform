@@ -27,7 +27,9 @@ module.exports = function() {
         });
 
         // just to avoid half pixels glitches
-        minWidth = minWidth ? (minWidth + 10) : 0;
+        if(minWidth) {
+          minWidth += 10;
+        }
       }
 
       var originalCollapsabled = localStorage ? localStorage.getItem('ctnCollapsableParent:collapsed:'+ containerId) : 'no';
@@ -107,7 +109,7 @@ module.exports = function() {
           originalCollapsableSize = (storedPos !== null ? storedPos : originalCollapsableSize);
         }
 
-        originalCollapsableSize = originalCollapsableSize < minWidth ? minWidth : originalCollapsableSize;
+        originalCollapsableSize = Math.max(minWidth, originalCollapsableSize);
 
         if (originalCollapsabled === 'yes') {
           collapsableElement.css(changeAttr, 0);
@@ -145,7 +147,9 @@ module.exports = function() {
                 pos = container.height() - position.top;
               }
 
-              pos = pos < minWidth ? 0 : pos;
+              if(pos < minWidth) {
+                pos = 0;
+              }
 
               // update collapsed state on drag
               setCollapsed(pos < 10);
