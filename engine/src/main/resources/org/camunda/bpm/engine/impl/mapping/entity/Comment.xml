@@ -113,7 +113,6 @@
   </select>
 
   <sql id="selectEventsByTaskIdSql">
-    <bind name="orderByColumns" value="orderBy"/>
     ${limitBefore}
     select distinct RES.* ${limitBetween}
     from (

@@ -24,7 +24,7 @@ public interface ExternalTaskQueryTopicBuilder extends ExternalTaskQueryBuilder 
    * Define variables to fetch with all tasks for the current topic. Calling
    * this method multiple times overrides the previously specified variables.
    *
-   * @param variables the variable names to fetch
+   * @param variables the variable names to fetch, if null all variables will be fetched
    * @return this builder
    */
   public ExternalTaskQueryTopicBuilder variables(String... variables);
@@ -33,7 +33,7 @@ public interface ExternalTaskQueryTopicBuilder extends ExternalTaskQueryBuilder 
    * Define variables to fetch with all tasks for the current topic. Calling
    * this method multiple times overrides the previously specified variables.
    *
-   * @param variables the variable names to fetch
+   * @param variables the variable names to fetch, if null all variables will be fetched
    * @return this builder
    */
   public ExternalTaskQueryTopicBuilder variables(List<String> variables);
