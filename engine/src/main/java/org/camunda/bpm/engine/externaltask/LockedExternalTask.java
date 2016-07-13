@@ -90,8 +90,8 @@ public interface LockedExternalTask {
   String getErrorMessage();
 
   /**
-   * @return the short error message submitted with the latest reported failure executing this task;
-   *   <code>null</code> if no failure was reported previously or if no error message
+   * @return error details submitted with the latest reported failure executing this task;
+   *   <code>null</code> if no failure was reported previously or if no error details
    *   was submitted
    *
    * @see ExternalTaskService#handleFailure(String, String, String, String, int, long)

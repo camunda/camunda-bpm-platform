@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 public class HandleExternalTaskFailureCmd extends HandleExternalTaskCmd {
 
   protected String errorMessage;
-  protected String exceptionStackTrace;
+  protected String errorDetails;
   protected long retryDuration;
   protected int retries;
 
@@ -38,22 +38,22 @@ public class HandleExternalTaskFailureCmd extends HandleExternalTaskCmd {
    * @param externalTaskId
    * @param workerId
    * @param errorMessage
-   * @param exceptionStackTrace
+   * @param errorDetails
    * @param retries
    * @param retryDuration
    */
   public HandleExternalTaskFailureCmd(String externalTaskId, String workerId,
-                                      String errorMessage, String exceptionStackTrace, int retries, long retryDuration) {
+                                      String errorMessage, String errorDetails, int retries, long retryDuration) {
     super(externalTaskId, workerId);
     this.errorMessage = errorMessage;
-    this.exceptionStackTrace = exceptionStackTrace;
+    this.errorDetails = errorDetails;
     this.retries = retries;
     this.retryDuration = retryDuration;
   }
 
   @Override
   public void execute(ExternalTaskEntity externalTask) {
-    externalTask.failed(errorMessage, exceptionStackTrace, retries, retryDuration);
+    externalTask.failed(errorMessage, errorDetails, retries, retryDuration);
   }
 
   @Override

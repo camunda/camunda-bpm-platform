@@ -59,23 +59,23 @@ public abstract class HandleExternalTaskAuthorizationReadOnlyTest {
       scenario()
         .withoutAuthorizations()
         .failsDueToRequired(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId", Permissions.UPDATE_INSTANCE)),
+          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.READ),
+          grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId", Permissions.READ_INSTANCE)),
       scenario()
         .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE))
+          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.READ))
         .succeeds(),
       scenario()
         .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE))
+          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.READ))
         .succeeds(),
       scenario()
         .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE_INSTANCE))
+          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.READ_INSTANCE))
         .succeeds(),
       scenario()
         .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
+          grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.READ_INSTANCE))
         .succeeds()
       );
   }
@@ -103,6 +103,8 @@ public abstract class HandleExternalTaskAuthorizationReadOnlyTest {
 
     LockedExternalTask task = tasks.get(0);
 
+    doPreProcessing(task);
+
     // when
     authRule
       .init(scenario)
@@ -118,7 +120,15 @@ public abstract class HandleExternalTaskAuthorizationReadOnlyTest {
       assertExternalTaskResults();
     }
   }
-  
+
+  /**
+   * For specific cases there is a need to prepare data in additional step without any permissions set
+   * before execution
+   *
+   * @param task
+   */
+  protected abstract void doPreProcessing(LockedExternalTask task);
+
   /**
    * Tests or either executes the external task api.
    * The given locked external task is used to test there api.

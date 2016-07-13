@@ -43,8 +43,6 @@ public class ExceptionUtil {
   }
 
   /**
-   * CAM-5284
-   *
    * create ByteArrayEntity with specified name and payload and make sure it's
    * persisted
    *

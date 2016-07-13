@@ -46,7 +46,6 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   protected static final String WORKER_ID = "aWorkerId";
   protected static final String TOPIC_NAME = "externalTaskTopic";
   protected static final String ERROR_MESSAGE = "error";
-  public static final String STACK_TRACE = "stackTrace";
 
   protected void setUp() throws Exception {
     ClockUtil.setCurrentTime(new Date());

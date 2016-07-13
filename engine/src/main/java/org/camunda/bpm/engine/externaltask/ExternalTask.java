@@ -88,7 +88,7 @@ public interface ExternalTask {
    *
    * @see ExternalTaskService#handleFailure(String, String,String, String, int, long)
    *
-   * To get the full exception stacktrace,
+   * To get the full error details,
    * use {@link ExternalTaskService#getExternalTaskErrorDetails(String)}
    */
   String getErrorMessage();

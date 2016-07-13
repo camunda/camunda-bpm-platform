@@ -387,7 +387,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   }
 
   @Test
-  public void testGetErrorDetailsExistingTask() {
+  public void testGetErrorDetailsNonExistingTask() {
     doThrow(new NotFoundException()).when(externalTaskService).getExternalTaskErrorDetails(any(String.class));
 
     given()

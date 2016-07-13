@@ -1010,7 +1010,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
-  public void testHandleFailureWithException() {
+  public void testHandleFailureWithErrorDetails() {
     // given
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 
@@ -1034,6 +1034,9 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     } catch (RuntimeException e) {
       exceptionStackTrace = ExceptionUtils.getStackTrace(e);
       errorMessage = e.getMessage();
+      while (errorMessage.length() < 1000) {
+        errorMessage = errorMessage + ":" + e.getMessage();
+      }
     }
     Assert.assertThat(exceptionStackTrace,is(notNullValue()));
 //  make sure that stack trace is longer then errorMessage DB field length
@@ -1047,7 +1050,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
 
     // verify that exception is accessible properly
     task = tasks.get(0);
-    Assert.assertThat(task.getErrorMessage(),is(errorMessage));
+    Assert.assertThat(task.getErrorMessage(),is(errorMessage.substring(0,666)));
     Assert.assertThat(task.getRetries(),is(5));
     Assert.assertThat(externalTaskService.getExternalTaskErrorDetails(task.getId()),is(exceptionStackTrace));
     Assert.assertThat(task.getErrorDetails(),is(exceptionStackTrace));

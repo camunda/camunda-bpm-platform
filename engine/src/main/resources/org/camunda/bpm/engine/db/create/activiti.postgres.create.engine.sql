@@ -248,7 +248,6 @@ create table ACT_RU_EXT_TASK (
   TOPIC_NAME_ varchar(255),
   RETRIES_ integer,
   ERROR_MSG_ varchar(4000),
-  -- CAM-5284
   ERROR_DETAILS_ID_ varchar(64),
   LOCK_EXP_TIME_ timestamp,
   SUSPENSION_STATE_ integer,
@@ -462,6 +461,11 @@ alter table ACT_RU_BATCH
     add constraint ACT_FK_BATCH_JOB_DEF
     foreign key (BATCH_JOB_DEF_ID_)
     references ACT_RU_JOBDEF (ID_);
+
+alter table ACT_RU_EXT_TASK
+    add constraint ACT_FK_EXTERNAL_TASK_ERROR_DETAILS
+    foreign key (ERROR_DETAILS_ID_)
+    references ACT_GE_BYTEARRAY (ID_);
 
 -- indexes for deadlock problems - https://app.camunda.com/jira/browse/CAM-2567 --
 create index ACT_IDX_INC_CAUSEINCID on ACT_RU_INCIDENT(CAUSE_INCIDENT_ID_);

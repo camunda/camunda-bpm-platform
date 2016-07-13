@@ -10,7 +10,6 @@
     <result property="topicName" column="TOPIC_NAME_" jdbcType="VARCHAR"/>
     <result property="workerId" column="WORKER_ID_" jdbcType="VARCHAR" />
     <result property="retries" column="RETRIES_" jdbcType="INTEGER" />
-    <!-- CAM-5284 -->
     <result property="errorMessage" column="ERROR_MSG_" jdbcType="VARCHAR"/>
     <result property="errorDetailsByteArrayId" column="ERROR_DETAILS_ID_" jdbcType="VARCHAR" />
 

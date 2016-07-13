@@ -29,7 +29,7 @@ public class LockedExternalTaskDto {
   protected String activityId;
   protected String activityInstanceId;
   protected String errorMessage;
-  protected String exceptionStackTrace;
+  protected String errorDetails;
   protected String executionId;
   protected String id;
   protected Date lockExpirationTime;
@@ -94,8 +94,8 @@ public class LockedExternalTaskDto {
     return priority;
   }
 
-  public String getExceptionStackTrace() {
-    return exceptionStackTrace;
+  public String getErrorDetails() {
+    return errorDetails;
   }
 
   public static LockedExternalTaskDto fromLockedExternalTask(LockedExternalTask task) {
@@ -103,7 +103,7 @@ public class LockedExternalTaskDto {
     dto.activityId = task.getActivityId();
     dto.activityInstanceId = task.getActivityInstanceId();
     dto.errorMessage = task.getErrorMessage();
-    dto.exceptionStackTrace = task.getErrorDetails();
+    dto.errorDetails = task.getErrorDetails();
     dto.executionId = task.getExecutionId();
     dto.id = task.getId();
     dto.lockExpirationTime = task.getLockExpirationTime();

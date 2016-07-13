@@ -47,7 +47,6 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
   private static final String EXCEPTION_NAME = "externalTask.exceptionByteArray";
 
-  //why 666??? field length is set to 4000 in both Job and ExternalTask on the database level
   /**
    * Note: {@link String#length()} counts Unicode supplementary
    * characters twice, so for a String consisting only of those,
@@ -238,7 +237,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     }
   }
 
-  protected void setExceptionStacktrace(String exception) {
+  protected void setErrorDetails(String exception) {
     EnsureUtil.ensureNotNull("exception", exception);
 
     byte[] exceptionBytes = toByteArray(exception);
@@ -282,7 +281,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
       .getExternalTaskManager()
       .delete(this);
 
-    // Also delete the external tasks's exception byte array
+    // Also delete the external tasks's error details byte array
     if (errorDetailsByteArrayId != null) {
       commandContext.getByteArrayManager().deleteByteArrayById(errorDetailsByteArrayId);
     }
@@ -304,19 +303,19 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
   /**
    * process failed state, make sure that binary entity is created for the errorMessage, shortError
-   * message does not exceed limit, handle properly retry counst and incidents
+   * message does not exceed limit, handle properly retry counts and incidents
    *
    * @param errorMessage - short error message text
-   * @param exceptionStackTrace - full stack trace of exception
+   * @param errorDetails - full error details
    * @param retries - updated value of retries left
    * @param retryDuration - used for lockExpirationTime calculation
    */
-  public void failed(String errorMessage, String exceptionStackTrace, int retries, long retryDuration) {
+  public void failed(String errorMessage, String errorDetails, int retries, long retryDuration) {
     ensureActive();
 
     this.setErrorMessage(errorMessage);
-    if (exceptionStackTrace != null) {
-      setExceptionStacktrace(exceptionStackTrace);
+    if (errorDetails != null) {
+      setErrorDetails(errorDetails);
     }
     this.lockExpirationTime = new Date(ClockUtil.getCurrentTime().getTime() + retryDuration);
     setRetriesAndManageIncidents(retries);

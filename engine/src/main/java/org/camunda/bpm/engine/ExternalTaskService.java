@@ -260,8 +260,8 @@ public interface ExternalTaskService {
   public ExternalTaskQuery createExternalTaskQuery();
 
   /**
-   * Returns the full stacktrace of the exception that occurred while running external task
-   * with the given id. Returns null when the external task has no exception stacktrace.
+   * Returns the full error details that occurred while running external task
+   * with the given id. Returns null when the external task has no error details.
    *
    * @param externalTaskId id of the external task, cannot be null.
    *

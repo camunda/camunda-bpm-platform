@@ -25,7 +25,7 @@ public class ExternalTaskDto {
   protected String activityId;
   protected String activityInstanceId;
   protected String errorMessage;
-  protected String exceptionStackTrace;
+  protected String errorDetails;
   protected String executionId;
   protected String id;
   protected Date lockExpirationTime;
@@ -86,8 +86,8 @@ public class ExternalTaskDto {
     return priority;
   }
 
-  public String getExceptionStackTrace() {
-    return exceptionStackTrace;
+  public String getErrorDetails() {
+    return errorDetails;
   }
 
   public static ExternalTaskDto fromExternalTask(ExternalTask task) {
