@@ -63,6 +63,9 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   protected String rootDecisionInstanceId;
   protected boolean rootDecisionInstancesOnly = false;
 
+  protected String decisionRequirementsDefinitionId;
+  protected String decisionRequirementsDefinitionKey;
+
   protected String[] tenantIds;
 
   public HistoricDecisionInstanceQueryImpl() {
@@ -302,6 +305,7 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   }
 
   public HistoricDecisionInstanceQuery rootDecisionInstanceId(String rootDecisionInstanceId) {
+    ensureNotNull(NotValidException.class, "rootDecisionInstanceId", rootDecisionInstanceId);
     this.rootDecisionInstanceId = rootDecisionInstanceId;
     return this;
   }
@@ -313,5 +317,27 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   public HistoricDecisionInstanceQuery rootDecisionInstancesOnly() {
     this.rootDecisionInstancesOnly = true;
     return this;
+  }
+
+  @Override
+  public HistoricDecisionInstanceQuery decisionRequirementsDefinitionId(String decisionRequirementsDefinitionId) {
+    ensureNotNull(NotValidException.class, "decisionRequirementsDefinitionId", decisionRequirementsDefinitionId);
+    this.decisionRequirementsDefinitionId = decisionRequirementsDefinitionId;
+    return this;
+  }
+
+  @Override
+  public HistoricDecisionInstanceQuery decisionRequirementsDefinitionKey(String decisionRequirementsDefinitionKey) {
+    ensureNotNull(NotValidException.class, "decisionRequirementsDefinitionKey", decisionRequirementsDefinitionKey);
+    this.decisionRequirementsDefinitionKey = decisionRequirementsDefinitionKey;
+    return this;
+  }
+
+  public String getDecisionRequirementsDefinitionId() {
+    return decisionRequirementsDefinitionId;
+  }
+
+  public String getDecisionRequirementsDefinitionKey() {
+    return decisionRequirementsDefinitionKey;
   }
 }

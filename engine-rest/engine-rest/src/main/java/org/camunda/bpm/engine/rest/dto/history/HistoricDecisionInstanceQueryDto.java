@@ -68,6 +68,8 @@ public class HistoricDecisionInstanceQueryDto extends AbstractQueryDto<HistoricD
   protected Boolean disableCustomObjectDeserialization;
   protected String rootDecisionInstanceId;
   protected Boolean rootDecisionInstancesOnly;
+  protected String decisionRequirementsDefinitionId;
+  protected String decisionRequirementsDefinitionKey;
   protected List<String> tenantIds;
 
   public HistoricDecisionInstanceQueryDto() {
@@ -187,6 +189,16 @@ public class HistoricDecisionInstanceQueryDto extends AbstractQueryDto<HistoricD
     this.rootDecisionInstancesOnly = rootDecisionInstancesOnly;
   }
 
+  @CamundaQueryParam(value = "decisionRequirementsDefinitionId")
+  public void setDecisionRequirementsDefinitionId(String decisionRequirementsDefinitionId) {
+    this.decisionRequirementsDefinitionId = decisionRequirementsDefinitionId;
+  }
+
+  @CamundaQueryParam(value = "decisionRequirementsDefinitionKey")
+  public void setDecisionRequirementsDefinitionKey(String decisionRequirementsDefinitionKey) {
+    this.decisionRequirementsDefinitionKey = decisionRequirementsDefinitionKey;
+  }
+
   @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
   public void setTenantIdIn(List<String> tenantIds) {
     this.tenantIds = tenantIds;
@@ -269,6 +281,12 @@ public class HistoricDecisionInstanceQueryDto extends AbstractQueryDto<HistoricD
     }
     if (TRUE.equals(rootDecisionInstancesOnly)) {
       query.rootDecisionInstancesOnly();
+    }
+    if (decisionRequirementsDefinitionId != null) {
+      query.decisionRequirementsDefinitionId(decisionRequirementsDefinitionId);
+    }
+    if (decisionRequirementsDefinitionKey != null) {
+      query.decisionRequirementsDefinitionKey(decisionRequirementsDefinitionKey);
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));

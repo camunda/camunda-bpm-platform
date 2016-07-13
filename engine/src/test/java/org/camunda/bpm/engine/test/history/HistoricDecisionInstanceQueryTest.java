@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -392,13 +393,13 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
     assertThat(query.count(), is(3L));
 
     String rootDecisionInstanceId = query.decisionDefinitionKey("dish-decision").singleResult().getId();
-    String leafDecisionInstanceId1 = query.decisionDefinitionKey("season").singleResult().getId();
-    String leafDecisionInstanceId2 = query.decisionDefinitionKey("guestCount").singleResult().getId();
+    String requiredDecisionInstanceId1 = query.decisionDefinitionKey("season").singleResult().getId();
+    String requiredDecisionInstanceId2 = query.decisionDefinitionKey("guestCount").singleResult().getId();
 
     query = historyService.createHistoricDecisionInstanceQuery();
     assertThat(query.rootDecisionInstanceId(rootDecisionInstanceId).count(), is(3L));
-    assertThat(query.rootDecisionInstanceId(leafDecisionInstanceId1).count(), is(0L));
-    assertThat(query.rootDecisionInstanceId(leafDecisionInstanceId2).count(), is(0L));
+    assertThat(query.rootDecisionInstanceId(requiredDecisionInstanceId1).count(), is(0L));
+    assertThat(query.rootDecisionInstanceId(requiredDecisionInstanceId2).count(), is(0L));
   }
 
   @Deployment(resources = { DRG_DMN })
@@ -412,6 +413,32 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
     assertThat(query.count(), is(3L));
     assertThat(query.rootDecisionInstancesOnly().count(), is(1L));
     assertThat(query.rootDecisionInstancesOnly().singleResult().getDecisionDefinitionKey(), is("dish-decision"));
+  }
+
+  @Deployment(resources = { DRG_DMN })
+  public void testQueryByDecisionRequirementsDefinitionId() {
+    decisionService.evaluateDecisionTableByKey("dish-decision")
+      .variables(Variables.createVariables().putValue("temperature", 21).putValue("dayType", "Weekend"))
+      .evaluate();
+
+    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery().singleResult();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
+    assertThat(query.decisionRequirementsDefinitionId("notExisting").count(), is(0L));
+    assertThat(query.decisionRequirementsDefinitionId(decisionRequirementsDefinition.getId()).count(), is(3L));
+  }
+
+  @Deployment(resources = { DRG_DMN })
+  public void testQueryByDecisionRequirementsDefinitionKey() {
+    decisionService.evaluateDecisionTableByKey("dish-decision")
+      .variables(Variables.createVariables().putValue("temperature", 21).putValue("dayType", "Weekend"))
+      .evaluate();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
+    assertThat(query.decisionRequirementsDefinitionKey("notExisting").count(), is(0L));
+    assertThat(query.decisionRequirementsDefinitionKey("dish").count(), is(3L));
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })

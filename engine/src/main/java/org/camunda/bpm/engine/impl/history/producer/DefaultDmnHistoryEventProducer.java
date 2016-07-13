@@ -182,7 +182,12 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     event.setDecisionDefinitionKey(decision.getKey());
     event.setDecisionDefinitionName(decision.getName());
 
-    if(evaluationEvent.getCollectResultValue() != null) {
+    if (decision.getDecisionRequirementsDefinitionId() != null) {
+      event.setDecisionRequirementsDefinitionId(decision.getDecisionRequirementsDefinitionId());
+      event.setDecisionRequirementsDefinitionKey(decision.getDecisionRequirementsDefinitionKey());
+    }
+
+    if (evaluationEvent.getCollectResultValue() != null) {
       Double collectResultValue = getCollectResultValue(evaluationEvent.getCollectResultValue());
       event.setCollectResultValue(collectResultValue);
     }

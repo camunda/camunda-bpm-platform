@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -70,6 +71,8 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   public static final String DECISION_COLLECT_SUM_DMN = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionCollectSum.dmn11.xml";
   public static final String DECISION_RETURNS_TRUE = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.returnsTrue.dmn11.xml";
 
+  public static final String DRG_DMN = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
+
   public static final String DECISION_DEFINITION_KEY = "testDecision";
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -103,6 +106,8 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(historicDecisionInstance.getActivityInstanceId(), is(activityInstanceId));
 
     assertThat(historicDecisionInstance.getRootDecisionInstanceId(), is(nullValue()));
+    assertThat(historicDecisionInstance.getDecisionRequirementsDefinitionId(), is(nullValue()));
+    assertThat(historicDecisionInstance.getDecisionRequirementsDefinitionKey(), is(nullValue()));
 
     assertThat(historicDecisionInstance.getEvaluationTime(), is(notNullValue()));
   }
@@ -458,6 +463,35 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
 
     assertThat(historicDecisionInstance.getCollectResultValue(), is(notNullValue()));
     assertThat(historicDecisionInstance.getCollectResultValue(), is(3.0));
+  }
+
+  @Deployment(resources = { DRG_DMN})
+  public void testDecisionInstancePropertiesOfDrdDecision() {
+
+    decisionService.evaluateDecisionTableByKey("dish-decision")
+      .variables(Variables.createVariables().putValue("temperature", 21).putValue("dayType", "Weekend"))
+      .evaluate();
+
+    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery().singleResult();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+    assertThat(query.count(), is(3L));
+
+    HistoricDecisionInstance rootHistoricDecisionInstance = query.decisionDefinitionKey("dish-decision").singleResult();
+    HistoricDecisionInstance requiredHistoricDecisionInstance1 = query.decisionDefinitionKey("season").singleResult();
+    HistoricDecisionInstance requiredHistoricDecisionInstance2 = query.decisionDefinitionKey("guestCount").singleResult();
+
+    assertThat(rootHistoricDecisionInstance.getRootDecisionInstanceId(), is(nullValue()));
+    assertThat(rootHistoricDecisionInstance.getDecisionRequirementsDefinitionId(), is(decisionRequirementsDefinition.getId()));
+    assertThat(rootHistoricDecisionInstance.getDecisionRequirementsDefinitionKey(), is(decisionRequirementsDefinition.getKey()));
+
+    assertThat(requiredHistoricDecisionInstance1.getRootDecisionInstanceId(), is(rootHistoricDecisionInstance.getId()));
+    assertThat(requiredHistoricDecisionInstance1.getDecisionRequirementsDefinitionId(), is(decisionRequirementsDefinition.getId()));
+    assertThat(requiredHistoricDecisionInstance1.getDecisionRequirementsDefinitionKey(), is(decisionRequirementsDefinition.getKey()));
+
+    assertThat(requiredHistoricDecisionInstance2.getRootDecisionInstanceId(), is(rootHistoricDecisionInstance.getId()));
+    assertThat(requiredHistoricDecisionInstance2.getDecisionRequirementsDefinitionId(), is(decisionRequirementsDefinition.getId()));
+    assertThat(requiredHistoricDecisionInstance2.getDecisionRequirementsDefinitionKey(), is(decisionRequirementsDefinition.getKey()));
   }
 
   public void testTableNames() {

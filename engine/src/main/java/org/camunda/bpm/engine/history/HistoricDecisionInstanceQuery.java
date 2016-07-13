@@ -108,6 +108,12 @@ public interface HistoricDecisionInstanceQuery extends Query<HistoricDecisionIns
   /** Only select historic decision instances of evaluation root decisions. */
   HistoricDecisionInstanceQuery rootDecisionInstancesOnly();
 
+  /** Only select historic decision instances that belongs to a decision requirements definition with the given id. */
+  HistoricDecisionInstanceQuery decisionRequirementsDefinitionId(String decisionRequirementsDefinitionId);
+
+  /** Only select historic decision instances that belongs to a decision requirements definition with the given key. */
+  HistoricDecisionInstanceQuery decisionRequirementsDefinitionKey(String decisionRequirementsDefinitionKey);
+
   /** Only select historic decision instances with one of the given tenant ids. */
   HistoricDecisionInstanceQuery tenantIdIn(String... tenantIds);
 
