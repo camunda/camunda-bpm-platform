@@ -44,6 +44,7 @@ public class HistoricDecisionInstanceDto {
   protected List<HistoricDecisionInputInstanceDto> inputs;
   protected List<HistoricDecisionOutputInstanceDto> outputs;
   protected Double collectResultValue;
+  protected String rootDecisionInstanceId;
   protected String tenantId;
 
   public String getId() {
@@ -97,7 +98,7 @@ public class HistoricDecisionInstanceDto {
   public String getActivityInstanceId() {
     return activityInstanceId;
   }
-  
+
   public String getUserId() {
     return userId;
   }
@@ -114,6 +115,10 @@ public class HistoricDecisionInstanceDto {
 
   public Double getCollectResultValue() {
     return collectResultValue;
+  }
+
+  public String getRootDecisionInstanceId() {
+    return rootDecisionInstanceId;
   }
 
   public String getTenantId() {
@@ -138,6 +143,7 @@ public class HistoricDecisionInstanceDto {
     dto.activityInstanceId = historicDecisionInstance.getActivityInstanceId();
     dto.userId = historicDecisionInstance.getUserId();
     dto.collectResultValue = historicDecisionInstance.getCollectResultValue();
+    dto.rootDecisionInstanceId = historicDecisionInstance.getRootDecisionInstanceId();
     dto.tenantId = historicDecisionInstance.getTenantId();
 
     try {

@@ -51,7 +51,7 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
 
   protected Date evaluatedBefore;
   protected Date evaluatedAfter;
-  
+
   protected String userId;
 
   protected boolean includeInput = false;
@@ -59,6 +59,9 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
 
   protected boolean isByteArrayFetchingEnabled = true;
   protected boolean isCustomObjectDeserializationEnabled = true;
+
+  protected String rootDecisionInstanceId;
+  protected boolean rootDecisionInstancesOnly = false;
 
   protected String[] tenantIds;
 
@@ -283,7 +286,7 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   @Override
   public HistoricDecisionInstanceQuery disableCustomObjectDeserialization() {
     isCustomObjectDeserializationEnabled = false;
-    return null;
+    return this;
   }
 
   public boolean isByteArrayFetchingEnabled() {
@@ -292,5 +295,23 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
 
   public boolean isCustomObjectDeserializationEnabled() {
     return isCustomObjectDeserializationEnabled;
+  }
+
+  public String getRootDecisionInstanceId() {
+    return rootDecisionInstanceId;
+  }
+
+  public HistoricDecisionInstanceQuery rootDecisionInstanceId(String rootDecisionInstanceId) {
+    this.rootDecisionInstanceId = rootDecisionInstanceId;
+    return this;
+  }
+
+  public boolean isRootDecisionInstancesOnly() {
+    return rootDecisionInstancesOnly;
+  }
+
+  public HistoricDecisionInstanceQuery rootDecisionInstancesOnly() {
+    this.rootDecisionInstancesOnly = true;
+    return this;
   }
 }

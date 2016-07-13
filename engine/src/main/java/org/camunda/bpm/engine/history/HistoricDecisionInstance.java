@@ -94,6 +94,13 @@ public interface HistoricDecisionInstance {
   Double getCollectResultValue();
 
   /**
+   * The unique identifier of the historic decision instance of the evaluation's root decision.
+   * Can be <code>null</code> if this decision is the root decision of the evaluation,
+   * or this decision has no related decision requirements definition.
+   */
+  String getRootDecisionInstanceId();
+
+  /**
    * The id of the tenant this historic decision instance belongs to. Can be <code>null</code>
    * if the historic decision instance belongs to no single tenant.
    */

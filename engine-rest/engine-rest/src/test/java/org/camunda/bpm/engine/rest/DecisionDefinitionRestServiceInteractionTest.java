@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineException;

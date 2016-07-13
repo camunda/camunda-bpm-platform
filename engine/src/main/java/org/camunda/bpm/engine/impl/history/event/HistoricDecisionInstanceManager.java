@@ -78,13 +78,25 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     }
   }
 
-  public void insertHistoricDecisionInstance(HistoricDecisionInstanceEntity historicDecisionInstance) {
+  public void insertHistoricDecisionInstances(HistoricDecisionEvaluationEvent event) {
     if (isHistoryEnabled()) {
-      getDbEntityManager().insert(historicDecisionInstance);
 
-      insertHistoricDecisionInputInstances(historicDecisionInstance.getInputs(), historicDecisionInstance.getId());
-      insertHistoricDecisionOutputInstances(historicDecisionInstance.getOutputs(), historicDecisionInstance.getId());
+      HistoricDecisionInstanceEntity rootHistoricDecisionInstance = event.getRootHistoricDecisionInstance();
+      insertHistoricDecisionInstance(rootHistoricDecisionInstance);
+
+      for (HistoricDecisionInstanceEntity requiredHistoricDecisionInstances : event.getRequiredHistoricDecisionInstances()) {
+        requiredHistoricDecisionInstances.setRootDecisionInstanceId(rootHistoricDecisionInstance.getId());
+
+        insertHistoricDecisionInstance(requiredHistoricDecisionInstances);
+      }
     }
+  }
+
+  protected void insertHistoricDecisionInstance(HistoricDecisionInstanceEntity historicDecisionInstance) {
+    getDbEntityManager().insert(historicDecisionInstance);
+
+    insertHistoricDecisionInputInstances(historicDecisionInstance.getInputs(), historicDecisionInstance.getId());
+    insertHistoricDecisionOutputInstances(historicDecisionInstance.getOutputs(), historicDecisionInstance.getId());
   }
 
   protected void insertHistoricDecisionInputInstances(List<HistoricDecisionInputInstance> inputs, String decisionInstanceId) {

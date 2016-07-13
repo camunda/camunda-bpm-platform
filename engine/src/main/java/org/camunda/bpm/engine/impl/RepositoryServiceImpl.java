@@ -49,6 +49,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImp
 import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionDefinitionCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionDiagramCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionModelCmd;
+import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionRequirementsDefinitionCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDmnModelInstanceCmd;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl;
@@ -60,6 +61,7 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -321,6 +323,16 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   public DecisionDefinition getDecisionDefinition(String decisionDefinitionId) {
     try {
       return commandExecutor.execute(new GetDeploymentDecisionDefinitionCmd(decisionDefinitionId));
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+    } catch (DecisionDefinitionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+    }
+  }
+
+  public DecisionRequirementsDefinition getDecisionRequirementsDefinition(String decisionRequirementsDefinitionId) {
+    try {
+      return commandExecutor.execute(new GetDeploymentDecisionRequirementsDefinitionCmd(decisionRequirementsDefinitionId));
     } catch (NullValueException e) {
       throw new NotValidException(e.getMessage(), e);
     } catch (DecisionDefinitionNotFoundException e) {

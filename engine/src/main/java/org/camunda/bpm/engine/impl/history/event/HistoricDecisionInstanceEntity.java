@@ -48,6 +48,8 @@ public class HistoricDecisionInstanceEntity extends HistoryEvent implements Hist
 
   protected Double collectResultValue;
 
+  protected String rootDecisionInstanceId;
+
   protected String userId;
   protected String tenantId;
 
@@ -171,5 +173,13 @@ public class HistoricDecisionInstanceEntity extends HistoryEvent implements Hist
 
   public void setCollectResultValue(Double collectResultValue) {
     this.collectResultValue = collectResultValue;
+  }
+
+  public String getRootDecisionInstanceId() {
+    return rootDecisionInstanceId;
+  }
+
+  public void setRootDecisionInstanceId(String rootDecisionInstanceId) {
+    this.rootDecisionInstanceId = rootDecisionInstanceId;
   }
 }

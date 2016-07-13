@@ -49,6 +49,8 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -475,6 +477,35 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/repository/drg.dmn" })
+  public void testGetDecisionRequirementsDefinition() {
+    DecisionRequirementsDefinitionQuery query = repositoryService.createDecisionRequirementsDefinitionQuery();
+
+    DecisionRequirementsDefinition decisionRequirementsDefinition = query.singleResult();
+    String decisionRequirementsDefinitionId = decisionRequirementsDefinition.getId();
+
+    DecisionRequirementsDefinition definition = repositoryService.getDecisionRequirementsDefinition(decisionRequirementsDefinitionId);
+
+    assertNotNull(definition);
+    assertEquals(decisionRequirementsDefinitionId, definition.getId());
+  }
+
+  public void testGetDecisionRequirementsDefinitionByInvalidId() {
+    try {
+      repositoryService.getDecisionRequirementsDefinition("invalid");
+      fail();
+    } catch (Exception e) {
+      assertTextPresent("no deployed decision requirements definition found with id 'invalid'", e.getMessage());
+    }
+
+    try {
+      repositoryService.getDecisionRequirementsDefinition(null);
+      fail();
+    } catch (NotValidException e) {
+      assertTextPresent("decisionRequirementsDefinitionId is null", e.getMessage());
+    }
+  }
+  
   @Deployment(resources = { "org/camunda/bpm/engine/test/repository/one.dmn" })
   public void testGetDecisionModel() throws Exception {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
