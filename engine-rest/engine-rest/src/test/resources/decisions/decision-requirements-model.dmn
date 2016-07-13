@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn11.xsd"
-             id="definitions"
-             name="camunda"
-             namespace="Examples">
+             id="score"
+             name="Score"
+             namespace="Score-Example">
   <decision id="one" name="One">
     <informationRequirement>
       <requiredDecision href="#two" />
@@ -12,14 +12,8 @@
         <inputExpression id="inputExpression1" typeRef="string">
           <text>status</text>
         </inputExpression>
-        <inputValues>
-          <text>"a","b"</text>
-        </inputValues>
       </input>
       <output id="clause2" label="Output" name="result" typeRef="string">
-        <outputValues>
-          <text>"ok","notok"</text>
-        </outputValues>
       </output>
       <rule id="rule1">
         <inputEntry id="inputEntry1">
