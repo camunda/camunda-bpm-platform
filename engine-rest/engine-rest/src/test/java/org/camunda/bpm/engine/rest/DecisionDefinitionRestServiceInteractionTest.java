@@ -188,6 +188,8 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
         .body("deploymentId", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_ID))
         .body("version", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_VERSION))
         .body("resource", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME))
+        .body("decisionRequirementsDefinitionId", equalTo(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID))
+        .body("decisionRequirementsDefinitionKey", equalTo(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY))
         .body("tenantId", equalTo(null))
     .when()
       .get(SINGLE_DECISION_DEFINITION_BY_KEY_URL);
@@ -234,6 +236,8 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
         .body("deploymentId", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_ID))
         .body("version", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_VERSION))
         .body("resource", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME))
+        .body("decisionRequirementsDefinitionId", equalTo(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID))
+        .body("decisionRequirementsDefinitionKey", equalTo(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY))
         .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
     .when()
       .get(SINGLE_DECISION_DEFINITION_BY_KEY_AND_TENANT_ID_URL);

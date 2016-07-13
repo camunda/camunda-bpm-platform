@@ -217,9 +217,9 @@ public class DecisionDefinitionDeployerTest {
     // when the DMN file contains only a single decision definition
     assertEquals(1, repositoryService.createDecisionDefinitionQuery().count());
 
-    // then create no decision requirements definition
+    // then no decision requirements definition should be created
     assertEquals(0, repositoryService.createDecisionRequirementsDefinitionQuery().count());
-    // and don't link the decision to a decision requirements definition
+    // and the decision should not be linked to a decision requirements definition
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
     assertNull(decisionDefinition.getDecisionRequirementsDefinitionId());
     assertNull(decisionDefinition.getDecisionRequirementsDefinitionKey());
