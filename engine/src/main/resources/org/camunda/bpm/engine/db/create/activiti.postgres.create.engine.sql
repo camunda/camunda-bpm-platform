@@ -463,7 +463,7 @@ alter table ACT_RU_BATCH
     references ACT_RU_JOBDEF (ID_);
 
 alter table ACT_RU_EXT_TASK
-    add constraint ACT_FK_EXTERNAL_TASK_ERROR_DETAILS
+    add constraint ACT_FK_EXT_TASK_ERROR_DETAILS
     foreign key (ERROR_DETAILS_ID_)
     references ACT_GE_BYTEARRAY (ID_);
 
