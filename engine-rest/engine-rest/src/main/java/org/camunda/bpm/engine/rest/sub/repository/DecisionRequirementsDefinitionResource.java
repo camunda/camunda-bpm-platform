@@ -16,6 +16,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionXmlDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionDto;
@@ -31,4 +32,7 @@ public interface DecisionRequirementsDefinitionResource {
   @Produces(MediaType.APPLICATION_JSON)
   DecisionRequirementsDefinitionXmlDto getDecisionRequirementsDefinitionDmnXml();
 
+  @GET
+  @Path("/diagram")
+  Response getDecisionRequirementsDefinitionDiagram();
 }

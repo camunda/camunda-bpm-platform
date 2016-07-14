@@ -50,6 +50,7 @@ import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionDefinitionCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionDiagramCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionModelCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionRequirementsDefinitionCmd;
+import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionRequirementsDiagramCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionRequirementsModelCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDmnModelInstanceCmd;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
@@ -367,6 +368,10 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
 
   public InputStream getDecisionDiagram(String decisionDefinitionId) {
     return commandExecutor.execute(new GetDeploymentDecisionDiagramCmd(decisionDefinitionId));
+  }
+
+  public InputStream getDecisionRequirementsDiagram(String decisionRequirementsDefinitionId) {
+    return commandExecutor.execute(new GetDeploymentDecisionRequirementsDiagramCmd(decisionRequirementsDefinitionId));
   }
 
 }

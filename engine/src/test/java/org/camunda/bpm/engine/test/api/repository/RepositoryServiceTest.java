@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test.api.repository;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
@@ -58,6 +60,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
+import org.junit.Assert;
 
 /**
  * @author Frederik Heremans
@@ -569,6 +572,37 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
       repositoryService.getDecisionRequirementsModel(null);
       fail();
     } catch (NotValidException e) {
+      assertTextPresent("decisionRequirementsDefinitionId is null", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/repository/drg.dmn", 
+                           "org/camunda/bpm/engine/test/repository/drg.png" })
+  public void testGetDecisionRequirementsDiagram() throws Exception {
+
+    DecisionRequirementsDefinitionQuery query = repositoryService.createDecisionRequirementsDefinitionQuery();
+
+    DecisionRequirementsDefinition decisionRequirementsDefinition = query.singleResult();
+    String decisionRequirementsDefinitionId = decisionRequirementsDefinition.getId();
+
+    InputStream actualDrd = repositoryService.getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
+
+    assertNotNull(actualDrd);
+    
+    byte[] expectedDrd = IoUtil.readInputStream(new FileInputStream("src/test/resources/org/camunda/bpm/engine/test/repository/drg.png"), "decision requirements diagram");
+    Assert.assertArrayEquals(expectedDrd, IOUtils.toByteArray(actualDrd));
+  }
+
+  public void testGetDecisionRequirementsDiagramByInvalidId() throws Exception {
+    try {
+      repositoryService.getDecisionRequirementsDiagram("invalid");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("no deployed decision requirements definition found with id 'invalid'", e.getMessage());
+    }
+    
+    try {
+      repositoryService.getDecisionRequirementsDiagram(null);
+    } catch (ProcessEngineException e) {
       assertTextPresent("decisionRequirementsDefinitionId is null", e.getMessage());
     }
   }

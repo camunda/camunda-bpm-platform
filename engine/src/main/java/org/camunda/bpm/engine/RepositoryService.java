@@ -631,5 +631,17 @@ public interface RepositoryService {
    */
   InputStream getDecisionDiagram(String decisionDefinitionId);
 
+  /**
+   * Gives access to a deployed decision requirements diagram, e.g., a PNG image, through a
+   * stream of bytes.
+   *
+   * @param decisionRequirementsDefinitionId id of a {@link DecisionRequirementsDefinition}, cannot be null.
+   * @return null when the diagram resource name of a {@link DecisionRequirementsDefinition} is null.
+   * @throws ProcessEngineException when the process diagram doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#DECISION_REQUIREMENTS_DEFINITION}.
+   */
+  InputStream getDecisionRequirementsDiagram(String decisionRequirementsDefinitionId);
+
 }
 

@@ -48,9 +48,10 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class DecisionRequirementsDefinitionAuthorizationTest {
 
-  protected static final String DMN_FILE = "org/camunda/bpm/engine/test/dmn/deployment/drdScore.dmn11.xml";
+  protected static final String DMN_FILE = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
+  protected static final String DRD_FILE = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.png";
  
-  protected static final String DEFINITION_KEY = "score";
+  protected static final String DEFINITION_KEY = "dish";
  
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
@@ -124,6 +125,26 @@ public class DecisionRequirementsDefinitionAuthorizationTest {
 
     if (authRule.assertScenario(scenario)) {
       assertNotNull(decisionRequirementsModel);
+    }
+  }
+
+  @Test
+  @Deployment(resources = { DMN_FILE, DRD_FILE })
+  public void getDecisionRequirementsDiagram() {
+
+    // given
+    String decisionRequirementsDefinitionId = repositoryService
+      .createDecisionRequirementsDefinitionQuery()
+      .decisionRequirementsDefinitionKey(DEFINITION_KEY)
+      .singleResult().getId();
+
+    // when
+    authRule.init(scenario).withUser("userId").bindResource("decisionRequirementsDefinitionKey", DEFINITION_KEY).start();
+
+    InputStream decisionRequirementsDiagram = repositoryService.getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
+
+    if (authRule.assertScenario(scenario)) {
+      assertNotNull(decisionRequirementsDiagram);
     }
   }
 }

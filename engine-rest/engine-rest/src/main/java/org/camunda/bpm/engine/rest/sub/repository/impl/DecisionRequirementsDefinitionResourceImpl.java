@@ -14,7 +14,10 @@ package org.camunda.bpm.engine.rest.sub.repository.impl;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
@@ -22,8 +25,8 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
-import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionXmlDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionDto;
+import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionXmlDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.DecisionRequirementsDefinitionResource;
@@ -89,6 +92,19 @@ public class DecisionRequirementsDefinitionResourceImpl implements DecisionRequi
 
     } finally {
       IoUtil.closeSilently(decisionRequirementsModelInputStream);
+    }
+  }
+
+  @Override
+  public Response getDecisionRequirementsDefinitionDiagram() {
+    DecisionRequirementsDefinition definition = engine.getRepositoryService().getDecisionRequirementsDefinition(decisionRequirementsDefinitionId);
+    InputStream decisionRequirementsDiagram = engine.getRepositoryService().getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
+    if (decisionRequirementsDiagram == null) {
+      return Response.noContent().build();
+    } else {
+      String fileName = definition.getDiagramResourceName();
+      return Response.ok(decisionRequirementsDiagram).header("Content-Disposition", "attachment; filename=" + fileName)
+          .type(ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix(fileName)).build();
     }
   }
 }

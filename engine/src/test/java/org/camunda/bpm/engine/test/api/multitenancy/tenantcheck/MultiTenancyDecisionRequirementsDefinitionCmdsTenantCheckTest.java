@@ -44,6 +44,8 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
   protected static final String TENANT_ONE = "tenant1";
 
   protected static final String DRG_DMN = "org/camunda/bpm/engine/test/api/multitenancy/DecisionRequirementsGraph.dmn";
+  
+  protected static final String DRD_DMN = "org/camunda/bpm/engine/test/api/multitenancy/DecisionRequirementsGraph.png";
 
   protected ProcessEngineRule engineRule = new ProcessEngineRule();
 
@@ -67,7 +69,7 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
     repositoryService = engineRule.getRepositoryService();
     identityService = engineRule.getIdentityService();
 
-    testRule.deployForTenant(TENANT_ONE, DRG_DMN);
+    testRule.deployForTenant(TENANT_ONE, DRG_DMN, DRD_DMN);
     decisionRequirementsDefinitionId = repositoryService.createDecisionRequirementsDefinitionQuery()
       .singleResult().getId();
   }
@@ -131,4 +133,35 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
 
     assertThat(inputStream, notNullValue());
   }
+
+  @Test
+  public void failToGetDecisionRequirementsDiagramNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    // declare expected exception
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot get the decision requirements definition");
+
+    repositoryService.getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
+  }
+
+  @Test
+  public void getDecisionDiagramWithAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    InputStream inputStream = repositoryService.getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
+
+    assertThat(inputStream, notNullValue());
+  }
+
+  @Test
+  public void getDecisionDiagramDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    InputStream inputStream = repositoryService.getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
+
+    assertThat(inputStream, notNullValue());
+  }
+
 }
