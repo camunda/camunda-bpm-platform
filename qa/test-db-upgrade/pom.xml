@@ -18,7 +18,7 @@
          See CAM-6338
     -->
     <camunda.version.old>
-      7.5.3-SNAPSHOT
+      7.5.3-ee
     </camunda.version.old>
   </properties>
 
