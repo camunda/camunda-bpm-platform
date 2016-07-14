@@ -96,7 +96,8 @@ public class GetErrorDetailsAuthorizationTest {
 
     LockedExternalTask task = tasks.get(0);
 
-    doPreProcessing(task);
+    //preconditions method
+    engineRule.getExternalTaskService().handleFailure(task.getId(),task.getWorkerId(),"anError",ERROR_DETAILS,1,1000L);
 
     // when
     authRule
@@ -106,23 +107,14 @@ public class GetErrorDetailsAuthorizationTest {
         .bindResource("processDefinitionKey", "oneExternalTaskProcess")
         .start();
 
-    testExternalTaskApi(task);
+    //execution method
+    currentDetails = engineRule.getExternalTaskService().getExternalTaskErrorDetails(task.getId());
 
     // then
     if (authRule.assertScenario(scenario)) {
-      assertExternalTaskResults();
+      //assertion method
+      assertThat(currentDetails,is(ERROR_DETAILS));
     }
   }
 
-  protected void doPreProcessing(LockedExternalTask task) {
-    engineRule.getExternalTaskService().handleFailure(task.getId(),task.getWorkerId(),"anError",ERROR_DETAILS,1,1000L);
-  }
-
-  public void testExternalTaskApi(LockedExternalTask task) {
-    currentDetails = engineRule.getExternalTaskService().getExternalTaskErrorDetails(task.getId());
-  }
-
-  public void assertExternalTaskResults() {
-    assertThat(currentDetails,is(ERROR_DETAILS));
-  }
 }
