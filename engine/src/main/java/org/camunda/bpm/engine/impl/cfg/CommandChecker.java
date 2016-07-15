@@ -231,6 +231,11 @@ public interface CommandChecker {
   void checkReadHistoryAnyProcessDefinition();
 
   /**
+   * Check if it is allowed to read the history for any task instance
+   */
+  void checkReadHistoryAnyTaskInstance();
+
+  /**
    * Check if it is allowed to update a case instance of the given case execution.
    */
   void checkUpdateCaseInstance(CaseExecution caseExecution);

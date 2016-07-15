@@ -37,7 +37,9 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceReport;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceDurationReport;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceReport;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricActivityInstanceQuery;
@@ -209,6 +211,20 @@ public interface HistoryService {
    * @since 7.5
    */
   HistoricProcessInstanceReport createHistoricProcessInstanceReport();
+
+  /**
+   * Creates a new programmatic query to create a historic task instance report.
+   *
+   * @since 7.6
+   */
+  HistoricTaskInstanceReport createHistoricTaskInstanceReport();
+
+  /**
+   * Creates a new programmatic query to create a historic task instance duration report.
+   *
+   * @since 7.6
+   */
+  HistoricTaskInstanceDurationReport createHistoricTaskInstanceDurationReport();
 
   /**
    * Creates a query to search for {@link org.camunda.bpm.engine.batch.history.HistoricBatch} instances.

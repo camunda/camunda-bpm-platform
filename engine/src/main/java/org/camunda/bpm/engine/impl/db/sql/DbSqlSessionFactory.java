@@ -214,6 +214,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificIfNull.put(ORACLE, "NVL");
 
     addDatabaseSpecificStatement(ORACLE, "selectHistoricProcessInstanceDurationReport", "selectHistoricProcessInstanceDurationReport_oracle");
+    addDatabaseSpecificStatement(ORACLE, "selectHistoricTaskInstanceDurationReport", "selectHistoricTaskInstanceDurationReport_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectFilterByQueryCriteria", "selectFilterByQueryCriteria_oracleDb2");
 
     constants = new HashMap<String, String>();
