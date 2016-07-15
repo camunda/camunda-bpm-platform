@@ -57,26 +57,46 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
 
     final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
 
-    if(!ProcessApplicationAttachments.isProcessApplication(deploymentUnit)) {
+    final boolean isAProcessApplication = ProcessApplicationAttachments.isProcessApplication(deploymentUnit);
+    boolean addCamundaSystemDependencies = isAProcessApplication;
+
+    if (!addCamundaSystemDependencies) {
+      // search in subdeployments for processing applications
+      AttachmentList<DeploymentUnit> subDeployments = deploymentUnit.getAttachment(Attachments.SUB_DEPLOYMENTS);
+      if (subDeployments != null) {
+        for (DeploymentUnit subDeploymentUnit : subDeployments) {
+          if (ProcessApplicationAttachments.isProcessApplication(subDeploymentUnit)) {
+            addCamundaSystemDependencies = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!addCamundaSystemDependencies) {
+      // search in sibling debloyments (including self) for processing applications
+      DeploymentUnit parent = deploymentUnit.getParent();
+      if (parent != null) {
+        AttachmentList<DeploymentUnit> siblingDeployments = parent.getAttachment(Attachments.SUB_DEPLOYMENTS);
+        for (DeploymentUnit siblingDeploymentUnit : siblingDeployments) {
+          if (ProcessApplicationAttachments.isProcessApplication(siblingDeploymentUnit)) {
+            addCamundaSystemDependencies = true;
+            break;
+          }
+        }
+      }
+    }
+  
+    if (addCamundaSystemDependencies) {
+      ModuleLoader moduleLoader = Module.getBootModuleLoader();
+      final ModuleSpecification moduleSpecification = deploymentUnit.getAttachment(Attachments.MODULE_SPECIFICATION);
+      addSystemDependencies(moduleLoader, moduleSpecification);
+    }
+
+    if(!isAProcessApplication) {
       return;
     }
-
-    ModuleLoader moduleLoader = Module.getBootModuleLoader();
-    DeploymentUnit parent = deploymentUnit.getParent() == null ? deploymentUnit : deploymentUnit.getParent();
-
-    if(parent != deploymentUnit) {
-      // add dependency to all submodules
-      AttachmentList<DeploymentUnit> subdeployments = parent.getAttachment(Attachments.SUB_DEPLOYMENTS);
-      for (DeploymentUnit subdeploymentUnit : subdeployments) {
-        final ModuleSpecification moduleSpecification = subdeploymentUnit.getAttachment(Attachments.MODULE_SPECIFICATION);
-        addSystemDependencies(moduleLoader, moduleSpecification);
-      }
-
-    }
-
-    final ModuleSpecification moduleSpecification = parent.getAttachment(Attachments.MODULE_SPECIFICATION);
-    addSystemDependencies(moduleLoader, moduleSpecification);
-
+    
     // install the pa-module service
     ModuleIdentifier identifyer = deploymentUnit.getAttachment(Attachments.MODULE_IDENTIFIER);
     String moduleName = identifyer.toString();
