@@ -579,7 +579,7 @@ public interface RepositoryService {
   DecisionDefinition getDecisionDefinition(String decisionDefinitionId);
 
   /**
-   * Returns the {@link DecisionDefinition}.
+   * Returns the {@link DecisionRequirementsDefinition}.
    *
    * @throws NotValidException when the given decision requirements definition id is null
    * @throws NotFoundException when no decision requirements definition is found for the given decision requirements definition id
@@ -625,7 +625,7 @@ public interface RepositoryService {
    *
    * @param decisionDefinitionId id of a {@link DecisionDefinition}, cannot be null.
    * @return null when the diagram resource name of a {@link DecisionDefinition} is null.
-   * @throws ProcessEngineException when the process diagram doesn't exist.
+   * @throws ProcessEngineException when the decision diagram doesn't exist.
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#READ} permission on {@link Resources#DECISION_DEFINITION}.
    */
@@ -637,7 +637,7 @@ public interface RepositoryService {
    *
    * @param decisionRequirementsDefinitionId id of a {@link DecisionRequirementsDefinition}, cannot be null.
    * @return null when the diagram resource name of a {@link DecisionRequirementsDefinition} is null.
-   * @throws ProcessEngineException when the process diagram doesn't exist.
+   * @throws ProcessEngineException when the decision requirements diagram doesn't exist.
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#READ} permission on {@link Resources#DECISION_REQUIREMENTS_DEFINITION}.
    */

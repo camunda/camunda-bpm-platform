@@ -74,7 +74,11 @@ public class DecisionRequirementsDefinitionAuthorizationTest {
       scenario()
         .withAuthorizations(
           grant(DECISION_REQUIREMENTS_DEFINITION, DEFINITION_KEY, "userId", Permissions.READ))
-          .succeeds()
+          .succeeds(),
+      scenario()
+          .withAuthorizations(
+            grant(DECISION_REQUIREMENTS_DEFINITION, "*", "userId", Permissions.READ))
+            .succeeds()
       );
   }
 
@@ -94,9 +98,9 @@ public class DecisionRequirementsDefinitionAuthorizationTest {
   public void getDecisionRequirementsDefinition() {
 
     String decisionRequirementsDefinitionId = repositoryService
-    .createDecisionRequirementsDefinitionQuery()
-    .decisionRequirementsDefinitionKey(DEFINITION_KEY)
-    .singleResult().getId();
+      .createDecisionRequirementsDefinitionQuery()
+      .decisionRequirementsDefinitionKey(DEFINITION_KEY)
+      .singleResult().getId();
     
     // when
     authRule.init(scenario).withUser("userId").bindResource("decisionRequirementsDefinitionKey", DEFINITION_KEY).start();

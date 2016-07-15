@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 
 
 /**
- * Gives access to a deployed decision requirements model, e.g., a DMN 1.0 XML file, through a stream of bytes.
+ * Gives access to a deployed decision requirements model, e.g., a DMN 1.1 XML file, through a stream of bytes.
  */
 public class GetDeploymentDecisionRequirementsModelCmd implements Command<InputStream>, Serializable {
 

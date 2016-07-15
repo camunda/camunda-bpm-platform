@@ -60,18 +60,14 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
-  protected static final String DECISION_REQUIREMENTS_DEFINITION_URL = "/rest-test/decision-requirements-definition";
+  protected static final String DECISION_REQUIREMENTS_DEFINITION_URL = TEST_RESOURCE_ROOT_PATH + "/decision-requirements-definition";
   protected static final String SINGLE_DECISION_REQUIREMENTS_DEFINITION_ID_URL = DECISION_REQUIREMENTS_DEFINITION_URL + "/{id}";
   protected static final String SINGLE_DECISION_REQUIREMENTS_DEFINITION_KEY_URL = DECISION_REQUIREMENTS_DEFINITION_URL + "/key/{key}";
   protected static final String SINGLE_DECISION_REQUIREMENTS_DEFINITION_KEY_AND_TENANT_ID_URL = DECISION_REQUIREMENTS_DEFINITION_URL + "/key/{key}/tenant-id/{tenant-id}";
 
   protected static final String XML_DEFINITION_URL = SINGLE_DECISION_REQUIREMENTS_DEFINITION_ID_URL + "/xml";
-  protected static final String XML_DEFINITION_BY_KEY_URL = SINGLE_DECISION_REQUIREMENTS_DEFINITION_KEY_URL + "/xml";
-  protected static final String XML_DEFINITION_BY_KEY_AND_TENANT_ID_URL = SINGLE_DECISION_REQUIREMENTS_DEFINITION_KEY_AND_TENANT_ID_URL + "/xml";
-
+  
   protected static final String DIAGRAM_DEFINITION_URL = SINGLE_DECISION_REQUIREMENTS_DEFINITION_ID_URL + "/diagram";
-  protected static final String DIAGRAM_DEFINITION_BY_KEY_URL = SINGLE_DECISION_REQUIREMENTS_DEFINITION_KEY_URL + "/diagram";
-  protected static final String DIAGRAM_DEFINITION_BY_KEY_AND_TENANT_ID_URL = SINGLE_DECISION_REQUIREMENTS_DEFINITION_KEY_AND_TENANT_ID_URL + "/diagram";
   
   protected RepositoryService repositoryServiceMock;
   protected DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionQueryMock;
@@ -229,83 +225,9 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
     Assert.assertTrue(responseContent.contains("<?xml"));
   }
 
-  @Test
-  public void decisionRequirementsDefinitionDmnXmlRetrievalByKey() {
-    Response response = given()
-      .pathParam("key", MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY)
-      .then()
-        .expect()
-        .statusCode(Status.OK.getStatusCode())
-      .when()
-        .get(XML_DEFINITION_BY_KEY_URL);
-
-    String responseContent = response.asString();
-    Assert.assertTrue(responseContent.contains(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID));
-    Assert.assertTrue(responseContent.contains("<?xml"));
-  }
-
-  @Test
-  public void decisionRequirementsDefinitionDmnXmlRetrievalByNonExistingKey() {
-
-    String nonExistingKey = "aNonExistingRequirementsDefinitionKey";
-
-    when(repositoryServiceMock.createDecisionRequirementsDefinitionQuery()
-      .decisionRequirementsDefinitionKey(nonExistingKey))
-      .thenReturn(decisionRequirementsDefinitionQueryMock);
-
-    when(decisionRequirementsDefinitionQueryMock.singleResult()).thenReturn(null);
- 
-    given()
-      .pathParam("key", nonExistingKey)
-    .then()
-      .expect()
-        .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", is(RestException.class.getSimpleName()))
-        .body("message", containsString("No matching decision requirements definition with key: " + nonExistingKey))
-    .when()
-      .get(XML_DEFINITION_BY_KEY_URL);
-
-  }
-
-  @Test
-  public void decisionRequirementsDefinitionDmnXmlRetrievalByKeyAndTenantId() {
-    Response response = given()
-      .pathParam("key", MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY)
-      .pathParam("tenant-id", MockProvider.EXAMPLE_TENANT_ID)
-      .then()
-        .expect()
-        .statusCode(Status.OK.getStatusCode())
-      .when()
-        .get(XML_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
-
-    String responseContent = response.asString();
-    Assert.assertTrue(responseContent.contains(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID));
-    Assert.assertTrue(responseContent.contains("<?xml"));
-  }
-
-  @Test
-  public void nonExistingDecisionRequirementsDefinitionDmnXmlRetrievalByKeyAndTenantId() {
-    String nonExistingKey = "aNonExistingDecisionDefinitionRequirementsDefinitionKey";
-    String nonExistingTenantId = "aNonExistingTenantId";
-
-    when(repositoryServiceMock.createDecisionRequirementsDefinitionQuery()
-      .decisionRequirementsDefinitionKey(nonExistingKey))
-      .thenReturn(decisionRequirementsDefinitionQueryMock);
-    when(decisionRequirementsDefinitionQueryMock.singleResult()).thenReturn(null);
-
-    given()
-      .pathParam("key", nonExistingKey)
-      .pathParam("tenant-id", nonExistingTenantId)
-    .then().expect()
-      .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", is(RestException.class.getSimpleName()))
-      .body("message", containsString("No matching decision requirements definition with key: " + nonExistingKey + " and tenant-id: " + nonExistingTenantId))
-    .when().get(XML_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
-  }
-
   // DRD retrieval
   @Test
-  public void decisionDiagramRetrieval() throws FileNotFoundException, URISyntaxException {
+  public void decisionRequirementsDiagramRetrieval() throws FileNotFoundException, URISyntaxException {
     byte[] actual = given().pathParam("id", MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID)
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -319,88 +241,6 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
 
     byte[] expected = IoUtil.readInputStream(new FileInputStream(getFile()), "decision requirements diagram");
     Assert.assertArrayEquals(expected, actual);
-  }
-
-  @Test
-  public void decisionDiagramRetrievalByKey() throws FileNotFoundException, URISyntaxException {
-    byte[] actual = given().pathParam("key", MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY)
-      .expect()
-        .statusCode(Status.OK.getStatusCode())
-        .contentType("image/png")
-        .header("Content-Disposition", "attachment; filename=" +
-            MockProvider.EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME)
-      .when().get(DIAGRAM_DEFINITION_BY_KEY_URL).getBody().asByteArray();
-
-    verify(repositoryServiceMock).getDecisionRequirementsDefinition(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID);
-    verify(repositoryServiceMock).getDecisionRequirementsDiagram(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID);
-
-    byte[] expected = IoUtil.readInputStream(new FileInputStream(getFile()), "decision requirements diagram");
-    Assert.assertArrayEquals(expected, actual);
-  }
-
-  @Test
-  public void decisionRequirementsDiagramRetrievalByNonExistingKey() {
-
-    String nonExistingKey = "aNonExistingRequirementsDefinitionKey";
-
-    when(repositoryServiceMock.createDecisionRequirementsDefinitionQuery()
-      .decisionRequirementsDefinitionKey(nonExistingKey))
-      .thenReturn(decisionRequirementsDefinitionQueryMock);
-
-    when(decisionRequirementsDefinitionQueryMock.singleResult()).thenReturn(null);
- 
-    given()
-      .pathParam("key", nonExistingKey)
-    .then()
-      .expect()
-        .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", is(RestException.class.getSimpleName()))
-        .body("message", containsString("No matching decision requirements definition with key: " + nonExistingKey))
-    .when()
-      .get(DIAGRAM_DEFINITION_BY_KEY_URL);
-
-  }
-
-  @Test
-  public void decisionDiagramRetrievalByKeyAndTenantId() throws FileNotFoundException, URISyntaxException {
-    byte[] actual = given()
-        .pathParam("key", MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY)
-        .pathParam("tenant-id", MockProvider.EXAMPLE_TENANT_ID)
-      .expect()
-        .statusCode(Status.OK.getStatusCode())
-        .contentType("image/png")
-        .header("Content-Disposition", "attachment; filename=" +
-            MockProvider.EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME)
-      .when().get(DIAGRAM_DEFINITION_BY_KEY_AND_TENANT_ID_URL).getBody().asByteArray();
-
-    verify(repositoryServiceMock).getDecisionRequirementsDefinition(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID);
-    verify(repositoryServiceMock).getDecisionRequirementsDiagram(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID);
-
-    byte[] expected = IoUtil.readInputStream(new FileInputStream(getFile()), "decision requirements diagram");
-    Assert.assertArrayEquals(expected, actual);
-  }
-
-  @Test
-  public void decisionRequirementsDiagramRetrievalByNonExistingKeyAndTenantId() {
-
-    String nonExistingKey = "aNonExistingDecisionDefinitionRequirementsDefinitionKey";
-    String nonExistingTenantId = "aNonExistingTenantId";
-
-    when(repositoryServiceMock.createDecisionRequirementsDefinitionQuery()
-      .decisionRequirementsDefinitionKey(nonExistingKey))
-      .thenReturn(decisionRequirementsDefinitionQueryMock);
-    when(decisionRequirementsDefinitionQueryMock.singleResult()).thenReturn(null);
-
-    given()
-      .pathParam("key", nonExistingKey)
-      .pathParam("tenant-id", nonExistingTenantId)
-    .then().expect()
-      .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", is(RestException.class.getSimpleName()))
-      .body("message", containsString("No matching decision requirements definition with key: " + nonExistingKey + " and tenant-id: " + nonExistingTenantId))
-    .when().get(DIAGRAM_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
-
-
   }
 
   protected void setUpRuntimeData(DecisionRequirementsDefinition mockDecisionRequirementsDefinition) throws FileNotFoundException, URISyntaxException {
