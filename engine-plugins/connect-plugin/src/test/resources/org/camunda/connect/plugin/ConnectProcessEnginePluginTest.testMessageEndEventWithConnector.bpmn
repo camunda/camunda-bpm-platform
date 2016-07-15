@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.2.0">
+  <bpmn:process id="process_sending_with_connector" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_0o8enrc" name="send with connector wanted">
+      <bpmn:outgoing>SequenceFlow_1lzfh2c</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1lzfh2c" sourceRef="StartEvent_0o8enrc" targetRef="EndEvent_10sv23n" />
+    <bpmn:endEvent id="EndEvent_10sv23n" name="message with connector sent">
+      <bpmn:extensionElements />
+      <bpmn:incoming>SequenceFlow_1lzfh2c</bpmn:incoming>
+      <bpmn:messageEventDefinition>
+        <bpmn:extensionElements>
+          <camunda:connector>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="reqParam1">${someInputVariable}</camunda:inputParameter>
+              <camunda:outputParameter name="out1">${someOutputParameter}</camunda:outputParameter>
+            </camunda:inputOutput>
+            <camunda:connectorId>testConnector</camunda:connectorId>
+          </camunda:connector>
+        </bpmn:extensionElements>
+      </bpmn:messageEventDefinition>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="process_sending_with_connector">
+      <bpmndi:BPMNShape id="StartEvent_0o8enrc_di" bpmnElement="StartEvent_0o8enrc">
+        <dc:Bounds x="23" y="17" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-4" y="53" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1lzfh2c_di" bpmnElement="SequenceFlow_1lzfh2c">
+        <di:waypoint xsi:type="dc:Point" x="59" y="35" />
+        <di:waypoint xsi:type="dc:Point" x="168" y="35" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="47.5" y="10" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_10sv23n_di" bpmnElement="EndEvent_10sv23n">
+        <dc:Bounds x="168" y="17" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="141" y="53" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
