@@ -174,6 +174,8 @@ public class CmmnModelConstants {
   public static final String CAMUNDA_ELEMENT_EXPRESSION = "expression";
   public static final String CAMUNDA_ELEMENT_STRING = "string";
   public static final String CAMUNDA_ELEMENT_SCRIPT = "script";
+  public static final String CAMUNDA_ELEMENT_VARIABLE_ON_PART = "variableOnPart";
+  public static final String CAMUNDA_ELEMENT_VARIABLE_EVENT = "variableEvent";
 
   // attributes /////////////////////////////////////////////////////////////////////////
 
@@ -254,5 +256,6 @@ public class CmmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_DECISION_VERSION = "decisionVersion";
   public static final String CAMUNDA_ATTRIBUTE_DECISION_TENANT_ID = "decisionTenantId";
   public static final String CAMUNDA_ATTRIBUTE_MAP_DECISION_RESULT = "mapDecisionResult";
+  public static final String CAMUNDA_ATTRIBUTE_VARIABLE_NAME = "variableName";
 
 }
