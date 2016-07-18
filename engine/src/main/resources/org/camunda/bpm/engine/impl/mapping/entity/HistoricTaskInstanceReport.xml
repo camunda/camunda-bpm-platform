@@ -32,6 +32,8 @@
 
     GROUP BY
       <include refid="groupByFunction" />
+    ORDER BY
+      <include refid="groupByFunction" /> ASC
   </select>
 
   <sql id="groupByFunction">
