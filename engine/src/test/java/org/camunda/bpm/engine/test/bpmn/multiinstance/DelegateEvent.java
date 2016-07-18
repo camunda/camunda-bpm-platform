@@ -306,6 +306,11 @@ public class DelegateEvent implements DelegateExecution {
   }
 
   @Override
+  public void setVariable(String variableName, Object value, String activityId) {
+    this.cannotModifyState();
+  }
+
+  @Override
   public DelegateExecution getProcessInstance() {
     throw notYetImplemented();
   }

@@ -91,4 +91,13 @@ public interface DelegateExecution extends BaseDelegateExecution, BpmnModelExecu
    */
   String getTenantId();
 
+  /**
+   * Method to store variable in a specific scope identified by activity ID.
+   *
+   * @param variableName - name of the variable
+   * @param value - value of the variable
+   * @param activityId - activity ID which is associated with destination execution, if not existing - nothing happens
+   */
+  void setVariable (String variableName, Object value, String activityId);
+
 }
