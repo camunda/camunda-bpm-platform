@@ -91,7 +91,7 @@ public class HistoricTaskReportTest {
 
     // then
     assertEquals(3, taskReportResults.size());
-    assertEquals(1, taskReportResults.get(1).getCount(), 0);
+    assertEquals(2, taskReportResults.get(1).getCount(), 0);
   }
 
   @Test
