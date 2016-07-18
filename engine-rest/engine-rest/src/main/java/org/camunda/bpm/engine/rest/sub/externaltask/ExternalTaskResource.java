@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.dto.externaltask.CompleteExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskBpmnError;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskFailureDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskLockExpTimeDto;
 import org.camunda.bpm.engine.rest.dto.runtime.PriorityDto;
 import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
 
@@ -47,11 +48,16 @@ public interface ExternalTaskResource {
   @Path("/retries")
   @Consumes(MediaType.APPLICATION_JSON)
   void setRetries(RetriesDto dto);
-  
+
   @PUT
   @Path("/priority")
   @Consumes(MediaType.APPLICATION_JSON)
   void setPriority(PriorityDto dto);
+
+  @PUT
+  @Path("/expiration")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void setExpiration(ExternalTaskLockExpTimeDto dto);
 
   @POST
   @Path("/complete")
@@ -62,7 +68,7 @@ public interface ExternalTaskResource {
   @Path("/failure")
   @Consumes(MediaType.APPLICATION_JSON)
   void handleFailure(ExternalTaskFailureDto dto);
-  
+
   @POST
   @Path("/bpmnError")
   @Consumes(MediaType.APPLICATION_JSON)

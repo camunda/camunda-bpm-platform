@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.CompleteExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskFailureDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskLockExpTimeDto;
 import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.externaltask.ExternalTaskResource;
@@ -97,6 +98,17 @@ public class ExternalTaskResourceImpl implements ExternalTaskResource {
   }
 
   @Override
+  public void setExpiration(ExternalTaskLockExpTimeDto dto) {
+    ExternalTaskService externalTaskService = engine.getExternalTaskService();
+
+    try {
+      externalTaskService.setExpiration(externalTaskId, dto.getExpiration());
+    } catch (NotFoundException e) {
+      throw new RestException(Status.NOT_FOUND, e, "External task with id " + externalTaskId + " does not exist");
+    }
+  }
+
+  @Override
   public void complete(CompleteExternalTaskDto dto) {
     ExternalTaskService externalTaskService = engine.getExternalTaskService();
 
@@ -133,7 +145,7 @@ public class ExternalTaskResourceImpl implements ExternalTaskResource {
   @Override
   public void handleBpmnError(ExternalTaskBpmnError dto) {
     ExternalTaskService externalTaskService = engine.getExternalTaskService();
-    
+
     try {
       externalTaskService.handleBpmnError(externalTaskId, dto.getWorkerId(), dto.getErrorCode());
     } catch (NotFoundException e) {
