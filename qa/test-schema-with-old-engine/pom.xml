@@ -1,0 +1,405 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm.qa</groupId>
+    <artifactId>camunda-qa</artifactId>
+    <version>7.5.3-ee</version>
+  </parent>
+
+  <properties>
+    <!--
+         We have to override the old camunda version, since
+         we had invalid characters in the scripts before.
+         In the version which is set as old version the invalid characters are removed.
+         The sql-maven-plugin property keepFormat is set to true so it uses
+         the present scripts, which makes it possible to test them correctly.
+
+         See CAM-6338
+    -->
+    <camunda.version.old>
+      7.5.3-ee
+    </camunda.version.old>
+    <camunda.version.current>
+      7.6.0-SNAPSHOT
+    </camunda.version.current>
+  </properties>
+
+  <artifactId>camunda-new-schema-old-engine</artifactId>
+  <packaging>jar</packaging>
+  <name>camunda BPM - QA - test new schema with old engine</name>
+
+  
+  <build>
+    <testSourceDirectory>${project.build.directory}/engine-test-sources</testSourceDirectory>
+    <testResources>
+      <testResource>
+        <directory>${project.build.directory}/engine-test-sources</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+          <exclude>camunda.cfg.xml</exclude>
+        </excludes>
+      </testResource>
+      <testResource>
+        <directory>config</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>old-engine</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.camunda.bpm.distro</groupId>
+          <artifactId>camunda-sql-scripts</artifactId>
+          <version>${camunda.version.current}</version>
+          <type>test-jar</type>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine</artifactId>
+          <version>${camunda.version.old}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-core</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <!-- parse version properties from qa/pom.xml -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>parse-current-version</id>
+                <goals>
+                  <goal>parse-version</goal>
+                </goals>
+                <configuration>
+                  <propertyPrefix>camunda.current</propertyPrefix>
+                </configuration>
+              </execution>
+              <execution>
+                <id>parse-old-version</id>
+                <goals>
+                  <goal>parse-version</goal>
+                </goals>
+                <configuration>
+                  <propertyPrefix>camunda.old</propertyPrefix>
+                  <versionString>${camunda.version.old}</versionString>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>create-sql-script-stubs</id>
+                <phase>generate-test-sources</phase>
+                <configuration>
+                  <target>
+
+                    <!-- create the SQL scripts so that the files exist even if they do not exist in the distribution.
+                    (this can be the case if there are no db upgrades (yet) for a particular release ) -->
+
+                    <mkdir dir="${project.build.directory}/scripts-current/sql/upgrade/" />
+
+                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
+                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
+
+                    <!-- patches for last minor version -->
+                    <!-- only add patch scripts which are after the camunda.version.old -->
+                    <!-- example:
+                      <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch_${camunda.old.majorVersion}.${camunda.old.minorVersion}.X_to_${camunda.old.majorVersion}.${camunda.old.minorVersion}.Y.sql" />
+                    -->
+
+                    <!-- patches for current minor version if any -->
+                    <!-- example:
+                      <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch_${camunda.current.majorVersion}.${camunda.current.minorVersion}.0_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.1.sql" />
+                    -->
+
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>unpack-engine-tests</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm</groupId>
+                      <artifactId>camunda-engine</artifactId>
+                      <version>${camunda.old.version}</version>
+                      <type>test-jar</type>
+                      <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+              <execution>
+                <id>unpack-old-scripts</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.distro</groupId>
+                      <artifactId>camunda-sql-scripts</artifactId>
+                      <version>${camunda.version.old}</version>
+                      <outputDirectory>${project.build.directory}/scripts-old</outputDirectory>
+                      <overWrite>true</overWrite>
+                    </artifactItem>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.distro</groupId>
+                      <artifactId>camunda-sql-scripts</artifactId>
+                      <version>${camunda.version.current}</version>
+                      <type>test-jar</type>
+                      <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
+                      <overWrite>true</overWrite>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>sql-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>drop-db-if-present</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- first: try dropping the DB -->
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${camunda.version.current}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${camunda.version.current}.sql</srcFile>
+                  </srcFiles>
+                  <autocommit>true</autocommit>
+                  <onError>continue</onError>
+                </configuration>
+              </execution>
+              <execution>
+                <id>create-old-schema</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- now create old version of the schema -->
+                    <srcFile>${project.build.directory}/scripts-old/sql/create/${database.type}_engine_${camunda.version.old}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-old/sql/create/${database.type}_identity_${camunda.version.old}.sql</srcFile>
+                  </srcFiles>
+                </configuration>
+              </execution>
+              <execution>
+                <id>patch-old-schema</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- now patch old version of the schema -->
+                    <!-- only add patch scripts which are after the camunda.version.old -->
+                    <!-- example:
+                      <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch_${camunda.old.majorVersion}.${camunda.old.minorVersion}.X_to_${camunda.old.majorVersion}.${camunda.old.minorVersion}.Y.sql</srcFile>
+                    -->
+                  </srcFiles>
+                </configuration>
+              </execution>
+              <execution>
+                <id>upgrade-db</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- now perform the schema migrations -->
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
+                    <!-- clear authorization table when upgrading from 7.4 to 7.5 -->
+                    <srcFile>${project.basedir}/clear.authorization.table.sql</srcFile>
+                  </srcFiles>
+                </configuration>
+              </execution>
+              <execution>
+                <id>patch-new-schema</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- now patch new version of the schema, apply any patches explicitly -->
+                    <!-- example:
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch_${camunda.current.majorVersion}.${camunda.current.minorVersion}.0_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.1.sql</srcFile>
+                    -->
+                  </srcFiles>
+                </configuration>
+              </execution>
+              <execution>
+                <id>drop-db</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- finally drop db -->
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${camunda.version.current}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${camunda.version.current}.sql</srcFile>
+                  </srcFiles>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/*TestCase.java</exclude>
+
+                <exclude>**/ClassPathScannerTest.java</exclude>
+                <exclude>**/MultipleClasspathRootsClassPathScannerTest.java</exclude>
+
+                <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
+                <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
+                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
+                <exclude>**/RepeatingServiceTaskTest.java</exclude>
+
+                <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
+              </excludes>
+              <testFailureIgnore>false</testFailureIgnore>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>            
+            </configuration>
+          </plugin>
+
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.fasterxml.uuid</groupId>
+      <artifactId>java-uuid-generator</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.openjpa</groupId>
+      <artifactId>openjpa</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.subethamail</groupId>
+      <artifactId>subethasmtp-wiser</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.python</groupId>
+      <artifactId>jython</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jruby</groupId>
+      <artifactId>jruby-complete</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+  </dependencies>
+
+</project>
