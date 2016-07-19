@@ -209,7 +209,7 @@
   bottom: 0;
   border-top: 1px solid @gray-lighter;
   background: @custom-gray-lighter;
-  overflow: auto;
+  overflow: hidden;
 }
 
 // because `.ctn-content > div`
@@ -273,8 +273,13 @@ a.expand-collapse {
 
 
 .ctn-tabbed .ctn-tabbed-content {
-  margin: 10px;
+  margin: 0;
   overflow: auto;
+  position: absolute;
+  top: 42px;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 .ctn-tabbed.ctn-content-bottom > h4 {
