@@ -113,7 +113,7 @@ module.exports = function() {
 
         if (originalCollapsabled === 'yes') {
           collapsableElement.css(changeAttr, 0);
-          compensateElement.css(direction, 3 +'px');
+          compensateElement.css(direction, 0 +'px');
         }
         else {
           collapsableElement.css(changeAttr, originalCollapsableSize);
@@ -155,7 +155,7 @@ module.exports = function() {
               setCollapsed(pos < 10);
 
               collapsableElement.css(changeAttr, pos);
-              compensateElement.css(direction, (pos + 3) +'px');
+              compensateElement.css(direction, (pos + 0) +'px');
 
               if (localStorage) {
                 localStorage.setItem('ctnCollapsableParent:size:'+ containerId, pos);
