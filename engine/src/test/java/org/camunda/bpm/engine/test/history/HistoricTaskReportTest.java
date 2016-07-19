@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -41,6 +42,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Stefan Hentschel.
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricTaskReportTest {
 
   public ProcessEngineRule processEngineRule = new ProvidedProcessEngineRule();
