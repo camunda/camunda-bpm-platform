@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.delegate;
 
+import org.camunda.bpm.engine.ProcessEngineException;
+
 /**
  * Execution used in {@link JavaDelegate}s and {@link ExecutionListener}s.
  *
@@ -96,7 +98,9 @@ public interface DelegateExecution extends BaseDelegateExecution, BpmnModelExecu
    *
    * @param variableName - name of the variable
    * @param value - value of the variable
-   * @param activityId - activity ID which is associated with destination execution, if not existing - nothing happens
+   * @param activityId - activity ID which is associated with destination execution,
+   *                   if not existing - exception will be thrown
+   * @throws ProcessEngineException if scope with specified activity ID is not found
    */
   void setVariable (String variableName, Object value, String activityId);
 
