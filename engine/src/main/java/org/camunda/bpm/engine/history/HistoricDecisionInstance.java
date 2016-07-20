@@ -94,9 +94,8 @@ public interface HistoricDecisionInstance {
   Double getCollectResultValue();
 
   /**
-   * The unique identifier of the historic decision instance of the evaluation's root decision.
-   * Can be <code>null</code> if this decision is the root decision of the evaluation,
-   * or this decision has no related decision requirements definition.
+   * The unique identifier of the historic decision instance of the evaluated root decision.
+   * Can be <code>null</code> if this instance is the root decision instance of the evaluation.
    */
   String getRootDecisionInstanceId();
 
