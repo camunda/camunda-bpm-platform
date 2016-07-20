@@ -87,21 +87,8 @@ module.exports = function (operations, noReset, done) {
         }
         if( res == 0 ) {
           try {
-
             done(err, {});
-
-            var controlFlowObserver = setInterval(function(){
-              // HAXX: For unknown reasons, the controlFlow sometimes does not emit an idle event
-              if(!browser.controlFlow().activeFrame_) {
-                browser.controlFlow().emit('idle');
-              }
-            }, 1000);
-
-            browser.controlFlow().once('idle', function() {
-              clearInterval(controlFlowObserver);
-              deferred.fulfill();
-            });
-
+            deferred.fulfill();
           } catch(err) {
             deferred.reject(err);
           }
