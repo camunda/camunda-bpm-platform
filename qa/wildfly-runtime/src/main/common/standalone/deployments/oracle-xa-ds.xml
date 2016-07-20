@@ -23,6 +23,7 @@
 		<pad-xid>false</pad-xid>
 		<wrap-xa-resource>true</wrap-xa-resource>
 	  </xa-pool>
+	  <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
 	  <validation>
 		<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.oracle.OracleValidConnectionChecker"/>
 		<validate-on-match>false</validate-on-match>

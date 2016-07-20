@@ -1302,7 +1302,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (isDmnEnabled()) {
       DecisionRequirementsDefinitionDeployer decisionRequirementsDefinitionDeployer = getDecisionRequirementsDefinitionDeployer();
       DecisionDefinitionDeployer decisionDefinitionDeployer = getDecisionDefinitionDeployer();
-      // the DecisionRequirementsDefinition deployer must be before the DecisionDefinitionDeployer 
+      // the DecisionRequirementsDefinition deployer must be before the DecisionDefinitionDeployer
       defaultDeployers.add(decisionRequirementsDefinitionDeployer);
       defaultDeployers.add(decisionDefinitionDeployer);
     }
@@ -1498,36 +1498,36 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // history //////////////////////////////////////////////////////////////////
 
   public void initHistoryLevel() {
-    if(historyLevel == null) {
-      if(historyLevels == null) {
-        historyLevels = new ArrayList<HistoryLevel>();
-        historyLevels.add(HistoryLevel.HISTORY_LEVEL_NONE);
-        historyLevels.add(HistoryLevel.HISTORY_LEVEL_ACTIVITY);
-        historyLevels.add(HistoryLevel.HISTORY_LEVEL_AUDIT);
-        historyLevels.add(HistoryLevel.HISTORY_LEVEL_FULL);
-      }
+    if (historyLevel != null) {
+      setHistory(historyLevel.getName());
+    }
 
-      if(customHistoryLevels != null) {
-        historyLevels.addAll(customHistoryLevels);
-      }
+    if(historyLevels == null) {
+      historyLevels = new ArrayList<HistoryLevel>();
+      historyLevels.add(HistoryLevel.HISTORY_LEVEL_NONE);
+      historyLevels.add(HistoryLevel.HISTORY_LEVEL_ACTIVITY);
+      historyLevels.add(HistoryLevel.HISTORY_LEVEL_AUDIT);
+      historyLevels.add(HistoryLevel.HISTORY_LEVEL_FULL);
+    }
 
-      if(HISTORY_VARIABLE.equalsIgnoreCase(history)) {
-        historyLevel = HistoryLevel.HISTORY_LEVEL_ACTIVITY;
-        LOG.usingDeprecatedHistoryLevelVariable();
+    if(customHistoryLevels != null) {
+      historyLevels.addAll(customHistoryLevels);
+    }
 
-      } else {
-        for (HistoryLevel historyLevel : historyLevels) {
-          if(historyLevel.getName().equalsIgnoreCase(history)) {
-            this.historyLevel = historyLevel;
-          }
+    if(HISTORY_VARIABLE.equalsIgnoreCase(history)) {
+      historyLevel = HistoryLevel.HISTORY_LEVEL_ACTIVITY;
+      LOG.usingDeprecatedHistoryLevelVariable();
+    } else {
+      for (HistoryLevel historyLevel : historyLevels) {
+        if(historyLevel.getName().equalsIgnoreCase(history)) {
+          this.historyLevel = historyLevel;
         }
       }
+    }
 
-
-      // do allow null for history level in case of "auto"
-      if(historyLevel == null && !ProcessEngineConfiguration.HISTORY_AUTO.equalsIgnoreCase(history)) {
-        throw new ProcessEngineException("invalid history level: "+history);
-      }
+    // do allow null for history level in case of "auto"
+    if(historyLevel == null && !ProcessEngineConfiguration.HISTORY_AUTO.equalsIgnoreCase(history)) {
+      throw new ProcessEngineException("invalid history level: "+history);
     }
   }
 
