@@ -57,6 +57,7 @@
               url="${database.url}"
               username="${database.username}"
               password="${database.password}"
+              defaultTransactionIsolation="READ_COMMITTED"
               maxActive="20"
               minIdle="5" />
               
