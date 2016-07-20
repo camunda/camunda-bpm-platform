@@ -14,6 +14,7 @@
 package org.camunda.bpm.dmn.feel.impl.juel;
 
 import java.util.Properties;
+
 import javax.el.ELException;
 import javax.el.ExpressionFactory;
 
@@ -24,6 +25,8 @@ import org.camunda.bpm.dmn.feel.impl.juel.el.FeelElContextFactory;
 import org.camunda.bpm.dmn.feel.impl.juel.el.FeelTypeConverter;
 import org.camunda.bpm.dmn.feel.impl.juel.transform.FeelToJuelTransform;
 import org.camunda.bpm.dmn.feel.impl.juel.transform.FeelToJuelTransformImpl;
+import org.camunda.commons.utils.cache.Cache;
+import org.camunda.commons.utils.cache.ConcurrentLruCache;
 
 import de.odysseus.el.ExpressionFactoryImpl;
 
@@ -31,9 +34,19 @@ public class FeelEngineFactoryImpl implements FeelEngineFactory {
 
   public static final FeelEngineLogger LOG = FeelLogger.ENGINE_LOGGER;
 
-  protected FeelEngine feelEngine;
+  public static final int DEFAULT_EXPRESSION_CACHE_SIZE = 1000;
+
+  protected final FeelEngine feelEngine;
+
+  protected final int expressionCacheSize;
 
   public FeelEngineFactoryImpl() {
+    this(DEFAULT_EXPRESSION_CACHE_SIZE);
+  }
+
+  public FeelEngineFactoryImpl(int expressionCacheSize) {
+    this.expressionCacheSize = expressionCacheSize;
+
     feelEngine = createFeelEngine();
   }
 
@@ -45,7 +58,8 @@ public class FeelEngineFactoryImpl implements FeelEngineFactory {
     FeelToJuelTransform transform = createFeelToJuelTransform();
     ExpressionFactory expressionFactory = createExpressionFactory();
     ElContextFactory elContextFactory = createElContextFactory();
-    return new FeelEngineImpl(transform, expressionFactory, elContextFactory);
+    Cache<TransformExpressionCacheKey, String> transformExpressionCache = createTransformExpressionCache();
+    return new FeelEngineImpl(transform, expressionFactory, elContextFactory, transformExpressionCache);
   }
 
   protected FeelToJuelTransform createFeelToJuelTransform() {
@@ -53,8 +67,11 @@ public class FeelEngineFactoryImpl implements FeelEngineFactory {
   }
 
   protected ExpressionFactory createExpressionFactory() {
+    Properties properties = new Properties();
+    properties.put(ExpressionFactoryImpl.PROP_CACHE_SIZE, String.valueOf(expressionCacheSize));
+
     try {
-      return new ExpressionFactoryImpl((Properties) null, createTypeConverter());
+      return new ExpressionFactoryImpl(properties, createTypeConverter());
     }
     catch (ELException e) {
       throw LOG.unableToInitializeFeelEngine(e);
@@ -67,6 +84,10 @@ public class FeelEngineFactoryImpl implements FeelEngineFactory {
 
   protected ElContextFactory createElContextFactory() {
     return new FeelElContextFactory();
+  }
+
+  protected Cache<TransformExpressionCacheKey, String> createTransformExpressionCache() {
+    return new ConcurrentLruCache<TransformExpressionCacheKey, String>(expressionCacheSize);
   }
 
 }

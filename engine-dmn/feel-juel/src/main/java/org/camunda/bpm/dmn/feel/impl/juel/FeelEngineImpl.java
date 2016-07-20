@@ -22,6 +22,7 @@ import org.camunda.bpm.dmn.feel.impl.FeelEngine;
 import org.camunda.bpm.dmn.feel.impl.juel.el.ElContextFactory;
 import org.camunda.bpm.dmn.feel.impl.juel.transform.FeelToJuelTransform;
 import org.camunda.bpm.engine.variable.context.VariableContext;
+import org.camunda.commons.utils.cache.Cache;
 
 public class FeelEngineImpl implements FeelEngine {
 
@@ -30,11 +31,14 @@ public class FeelEngineImpl implements FeelEngine {
   protected FeelToJuelTransform transform;
   protected ExpressionFactory expressionFactory;
   protected ElContextFactory elContextFactory;
+  protected Cache<TransformExpressionCacheKey, String> transformExpressionCache;
 
-  public FeelEngineImpl(FeelToJuelTransform transform, ExpressionFactory expressionFactory, ElContextFactory elContextFactory) {
+  public FeelEngineImpl(FeelToJuelTransform transform, ExpressionFactory expressionFactory, ElContextFactory elContextFactory,
+      Cache<TransformExpressionCacheKey, String> transformExpressionCache) {
     this.transform = transform;
     this.expressionFactory = expressionFactory;
     this.elContextFactory = elContextFactory;
+    this.transformExpressionCache = transformExpressionCache;
   }
 
   public <T> T evaluateSimpleExpression(String simpleExpression, VariableContext variableContext) {
@@ -76,13 +80,27 @@ public class FeelEngineImpl implements FeelEngine {
   }
 
   protected ValueExpression transformSimpleUnaryTests(String simpleUnaryTests, String inputName, ELContext elContext) {
-    String juelExpression = transform.transformSimpleUnaryTests(simpleUnaryTests, inputName);
+
+    String juelExpression = transformToJuelExpression(simpleUnaryTests, inputName);
+
     try {
       return expressionFactory.createValueExpression(elContext, juelExpression, Object.class);
     }
     catch (ELException e) {
       throw LOG.invalidExpression(simpleUnaryTests, e);
     }
+  }
+
+  protected String transformToJuelExpression(String simpleUnaryTests, String inputName) {
+
+    TransformExpressionCacheKey cacheKey = new TransformExpressionCacheKey(simpleUnaryTests, inputName);
+    String juelExpression = transformExpressionCache.get(cacheKey);
+
+    if (juelExpression == null) {
+      juelExpression = transform.transformSimpleUnaryTests(simpleUnaryTests, inputName);
+      transformExpressionCache.put(cacheKey, juelExpression);
+    }
+    return juelExpression;
   }
 
 }
