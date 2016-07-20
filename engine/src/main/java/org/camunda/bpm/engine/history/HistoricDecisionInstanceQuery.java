@@ -99,13 +99,13 @@ public interface HistoricDecisionInstanceQuery extends Query<HistoricDecisionIns
   HistoricDecisionInstanceQuery disableCustomObjectDeserialization();
 
   /**
-   * Only select historic decision instances that belongs to an evaluation's
-   * root historic decision instance with the given id. This also includes the
-   * historic decision instance with the given id.
+   * Only select historic decision instances with a given root historic decision
+   * instance id. This also includes the historic decision instance with the
+   * given id.
    */
   HistoricDecisionInstanceQuery rootDecisionInstanceId(String decisionInstanceId);
 
-  /** Only select historic decision instances of evaluation root decisions. */
+  /** Only select historic decision instances that are the root decision instance of an evaluation. */
   HistoricDecisionInstanceQuery rootDecisionInstancesOnly();
 
   /** Only select historic decision instances that belongs to a decision requirements definition with the given id. */

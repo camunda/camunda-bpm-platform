@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.impl.history.producer;
 
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationEvent;
-import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
@@ -60,7 +59,7 @@ public interface DmnHistoryEventProducer {
   /**
    * Creates the history event fired when a decision is evaluated. If the
    * decision is evaluated while execute a process instance then you should use
-   * {@link #createDecisionEvaluatedEvt(DelegateExecution, DmnDecisionTableEvaluationEvent)} instead.
+   * {@link #createDecisionEvaluatedEvt(DelegateExecution, DmnDecisionEvaluationEvent)} instead.
    *
    * @param decisionEvaluationEvent
    *          the evaluation event
