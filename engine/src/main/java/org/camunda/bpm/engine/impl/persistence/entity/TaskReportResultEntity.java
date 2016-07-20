@@ -12,17 +12,17 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.history.TaskReportResult;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
 
 /**
  * @author Stefan Hentschel.
  */
-public class TaskReportResultEntity implements TaskReportResult {
+public class TaskReportResultEntity implements HistoricTaskInstanceReportResult {
 
   protected String definition;
   protected Long count;
 
-  public String getDefinition() {
+  public String getDefinitionKey() {
     return definition;
   }
 

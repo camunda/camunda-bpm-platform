@@ -16,8 +16,7 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.DurationReportResult;
-import org.camunda.bpm.engine.history.TaskReportResult;
-import org.camunda.bpm.engine.impl.HistoricTaskInstanceDurationReportImpl;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
 import org.camunda.bpm.engine.impl.HistoricTaskInstanceReportImpl;
 import org.camunda.bpm.engine.impl.TaskReportImpl;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
@@ -38,23 +37,24 @@ public class TaskReportManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<TaskReportResult> createHistoricTaskReport(HistoricTaskInstanceReportImpl query) {
+  public List<HistoricTaskInstanceReportResult> selectHistoricTaskInstanceCountByTaskDefKeyReport(HistoricTaskInstanceReportImpl query) {
     configureQuery(query);
-    return getDbEntityManager().selectListWithRawParameter("selectHistoricTaskReportQuery", query, 0, Integer.MAX_VALUE);
+    return getDbEntityManager().selectListWithRawParameter("selectHistoricTaskInstanceCountByTaskDefKeyReport", query, 0, Integer.MAX_VALUE);
   }
 
   @SuppressWarnings("unchecked")
-  public List<DurationReportResult> createHistoricTaskDurationReport(HistoricTaskInstanceDurationReportImpl query) {
+  public List<HistoricTaskInstanceReportResult> selectHistoricTaskInstanceCountByProcDefKeyReport(HistoricTaskInstanceReportImpl query) {
+    configureQuery(query);
+    return getDbEntityManager().selectListWithRawParameter("selectHistoricTaskInstanceCountByProcDefKeyReport", query, 0, Integer.MAX_VALUE);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<DurationReportResult> createHistoricTaskDurationReport(HistoricTaskInstanceReportImpl query) {
     configureQuery(query);
     return getDbEntityManager().selectListWithRawParameter("selectHistoricTaskInstanceDurationReport", query, 0, Integer.MAX_VALUE);
   }
 
   protected void configureQuery(HistoricTaskInstanceReportImpl parameter) {
-    getAuthorizationManager().checkAuthorization(Permissions.READ_HISTORY, Resources.TASK, Authorization.ANY);
-    getTenantManager().configureTenantCheck(parameter.getTenantCheck());
-  }
-
-  protected void configureQuery(HistoricTaskInstanceDurationReportImpl parameter) {
     getAuthorizationManager().checkAuthorization(Permissions.READ_HISTORY, Resources.TASK, Authorization.ANY);
     getTenantManager().configureTenantCheck(parameter.getTenantCheck());
   }

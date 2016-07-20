@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.test.history;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.history.TaskReportResult;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -89,11 +89,11 @@ public class HistoricTaskReportTest {
     startAndCompleteProcessInstance(PROCESS_DEFINITION_KEY, 2016, 7, 14, 12, 1);
 
     // when
-    List<TaskReportResult> taskReportResults = historyService.createHistoricTaskInstanceReport().taskReport();
+    List<HistoricTaskInstanceReportResult> historicTaskInstanceReportResults = historyService.createHistoricTaskInstanceReport().countByTaskDefinitionKey();
 
     // then
-    assertEquals(3, taskReportResults.size());
-    assertEquals(2, taskReportResults.get(0).getCount(), 0);
+    assertEquals(3, historicTaskInstanceReportResults.size());
+    assertEquals(2, historicTaskInstanceReportResults.get(0).getCount(), 0);
   }
 
   @Test
@@ -108,13 +108,12 @@ public class HistoricTaskReportTest {
     startAndCompleteProcessInstance(PROCESS_DEFINITION_KEY, 2016, 7, 14, 12, 1);
 
     // when
-    List<TaskReportResult> taskReportResults = historyService
+    List<HistoricTaskInstanceReportResult> historicTaskInstanceReportResults = historyService
       .createHistoricTaskInstanceReport()
-      .groupByProcessDefinitionKey()
-      .taskReport();
+      .countByProcessDefinitionKey();
 
     // then
-    assertEquals(2, taskReportResults.size());
+    assertEquals(2, historicTaskInstanceReportResults.size());
   }
 
   @Test
@@ -128,14 +127,14 @@ public class HistoricTaskReportTest {
     Calendar calendar = Calendar.getInstance();
     calendar.set(2016, 11, 14, 12, 5);
 
-    List<TaskReportResult> taskReportResults = historyService
+    List<HistoricTaskInstanceReportResult> historicTaskInstanceReportResults = historyService
       .createHistoricTaskInstanceReport()
       .completedAfter(calendar.getTime())
-      .taskReport();
+      .countByProcessDefinitionKey();
 
     // then
-    assertEquals(1, taskReportResults.size());
-    assertEquals(1, taskReportResults.get(0).getCount(), 0);
+    assertEquals(1, historicTaskInstanceReportResults.size());
+    assertEquals(1, historicTaskInstanceReportResults.get(0).getCount(), 0);
   }
 
   @Test
@@ -149,14 +148,14 @@ public class HistoricTaskReportTest {
     Calendar calendar = Calendar.getInstance();
     calendar.set(2016, 11, 14, 12, 5);
 
-    List<TaskReportResult> taskReportResults = historyService
+    List<HistoricTaskInstanceReportResult> historicTaskInstanceReportResults = historyService
       .createHistoricTaskInstanceReport()
       .completedBefore(calendar.getTime())
-      .taskReport();
+      .countByProcessDefinitionKey();
 
     // then
-    assertEquals(2, taskReportResults.size());
-    assertEquals(1, taskReportResults.get(0).getCount(), 0);
+    assertEquals(2, historicTaskInstanceReportResults.size());
+    assertEquals(1, historicTaskInstanceReportResults.get(0).getCount(), 0);
   }
 
   @Test
@@ -165,7 +164,7 @@ public class HistoricTaskReportTest {
       historyService
         .createHistoricTaskInstanceReport()
         .completedAfter(null)
-        .taskReport();
+        .countByProcessDefinitionKey();
 
       fail("Expected NotValidException");
     } catch( NotValidException nve) {
@@ -179,7 +178,7 @@ public class HistoricTaskReportTest {
       historyService
         .createHistoricTaskInstanceReport()
         .completedBefore(null)
-        .taskReport();
+        .countByProcessDefinitionKey();
 
       fail("Expected NotValidException");
     } catch( NotValidException nve) {

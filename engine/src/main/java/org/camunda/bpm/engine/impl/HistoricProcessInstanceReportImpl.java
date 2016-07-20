@@ -15,20 +15,26 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.CompareUtil.areNotInAscendingOrder;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceReport;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.TenantCheck;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.query.PeriodUnit;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class HistoricProcessInstanceReportImpl extends AbstractHistoricProcessInstanceReport implements HistoricProcessInstanceReport {
+public class HistoricProcessInstanceReportImpl implements HistoricProcessInstanceReport {
 
   private static final long serialVersionUID = 1L;
 
@@ -37,8 +43,14 @@ public class HistoricProcessInstanceReportImpl extends AbstractHistoricProcessIn
   protected String[] processDefinitionIdIn;
   protected String[] processDefinitionKeyIn;
 
+  protected PeriodUnit durationPeriodUnit;
+
+  protected CommandExecutor commandExecutor;
+
+  protected TenantCheck tenantCheck = new TenantCheck();
+
   public HistoricProcessInstanceReportImpl(CommandExecutor commandExecutor) {
-    super(commandExecutor);
+    this.commandExecutor = commandExecutor;
   }
 
   // query parameter ///////////////////////////////////////////////
@@ -69,15 +81,48 @@ public class HistoricProcessInstanceReportImpl extends AbstractHistoricProcessIn
 
   // report execution /////////////////////////////////////////////
 
-  @Override
-  protected boolean hasExcludingConditions() {
-    return areNotInAscendingOrder(startedAfter, startedBefore);
+  public List<DurationReportResult> duration(PeriodUnit periodUnit) {
+    ensureNotNull(NotValidException.class, "periodUnit", periodUnit);
+    this.durationPeriodUnit = periodUnit;
+
+    CommandContext commandContext = Context.getCommandContext();
+
+    if(commandContext == null) {
+      return commandExecutor.execute(new Command<List<DurationReportResult>>() {
+
+        @Override
+        public List<DurationReportResult> execute(CommandContext commandContext) {
+          return executeDurationReport(commandContext);
+        }
+
+      });
+    }
+    else {
+      return executeDurationReport(commandContext);
+    }
+
   }
 
   public List<DurationReportResult> executeDurationReport(CommandContext commandContext) {
+
+    doAuthCheck(commandContext);
+
+    if(areNotInAscendingOrder(startedAfter, startedBefore)) {
+      return Collections.emptyList();
+    }
+
     return commandContext
       .getHistoricReportManager()
-      .createHistoricProcessInstanceDurationReport(this);
+      .selectHistoricProcessInstanceDurationReport(this);
+
+  }
+
+  protected void doAuthCheck(CommandContext commandContext) {
+    // since a report does only make sense in context of historic
+    // data, the authorization check will be performed here
+    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkReadHistoryAnyProcessDefinition();
+    }
   }
 
   // getter //////////////////////////////////////////////////////
@@ -96,6 +141,14 @@ public class HistoricProcessInstanceReportImpl extends AbstractHistoricProcessIn
 
   public String[] getProcessDefinitionKeyIn() {
     return processDefinitionKeyIn;
+  }
+
+  public TenantCheck getTenantCheck() {
+    return tenantCheck;
+  }
+
+  public String getReportPeriodUnitName() {
+    return durationPeriodUnit.name();
   }
 
 }

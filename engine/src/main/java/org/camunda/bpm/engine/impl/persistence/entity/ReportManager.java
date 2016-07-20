@@ -25,9 +25,9 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 public class ReportManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
-  public List<DurationReportResult> createHistoricProcessInstanceDurationReport(HistoricProcessInstanceReportImpl query) {
+  public List<DurationReportResult> selectHistoricProcessInstanceDurationReport(HistoricProcessInstanceReportImpl query) {
     configureQuery(query);
-    return getDbEntityManager().selectList("selectHistoricProcessInstanceDurationReport", query);
+    return getDbEntityManager().selectListWithRawParameter("selectHistoricProcessInstanceDurationReport", query, 0, Integer.MAX_VALUE);
   }
 
   protected void configureQuery(HistoricProcessInstanceReportImpl parameter) {

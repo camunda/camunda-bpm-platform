@@ -25,7 +25,6 @@
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricVariableInstance.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricTaskInstance.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricTaskInstanceReport.xml" />
-    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricTaskInstanceDurationReport.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricJobLog.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/UserOperationLogEntry.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/IdentityInfo.xml" />

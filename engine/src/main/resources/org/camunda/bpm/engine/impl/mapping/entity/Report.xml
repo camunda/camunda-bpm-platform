@@ -56,9 +56,7 @@
     FROM
       ${prefix}ACT_HI_PROCINST HPI
     <where>
-      <if test="reportTypeName.equals('DURATION')">
         END_TIME_ IS NOT NULL
-      </if>
       <if test="processDefinitionIdIn != null and processDefinitionIdIn.length > 0">
         AND PROC_DEF_ID_ IN
         <foreach item="item" index="index" collection="processDefinitionIdIn" open="(" separator="," close=")">

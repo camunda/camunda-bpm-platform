@@ -87,7 +87,7 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
   public HistoricIdentityLinkLogQueryImpl createHistoricIdentityLinkLogQuery() {
     return new HistoricIdentityLinkLogQueryImpl(commandExecutor);
   }
-  
+
   public HistoricCaseInstanceQuery createHistoricCaseInstanceQuery() {
     return new HistoricCaseInstanceQueryImpl(commandExecutor);
   }
@@ -158,10 +158,6 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
 
   public HistoricTaskInstanceReport createHistoricTaskInstanceReport() {
     return new HistoricTaskInstanceReportImpl(commandExecutor);
-  }
-
-  public HistoricTaskInstanceDurationReportImpl createHistoricTaskInstanceDurationReport() {
-    return new HistoricTaskInstanceDurationReportImpl(commandExecutor);
   }
 
   public HistoricBatchQuery createHistoricBatchQuery() {

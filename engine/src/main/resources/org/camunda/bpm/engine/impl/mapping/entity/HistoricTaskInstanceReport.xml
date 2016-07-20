@@ -23,27 +23,33 @@
     <result property="count" column="COUNT_" jdbcType="BIGINT" />
   </resultMap>
 
-  <select id="selectHistoricTaskReportQuery" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceReportImpl" resultMap="historicTaskReportResultMap">
+  <select id="selectHistoricTaskInstanceCountByTaskDefKeyReport" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceReportImpl" resultMap="historicTaskReportResultMap">
     SELECT
       COUNT(DISTINCT(HTI.ID_)) AS COUNT_,
-     <include refid="groupByFunction" /> AS DEF_
+     HTI.TASK_DEF_KEY_ AS DEF_
 
-    <include refid="selectHistoricTaskInstancesByCriteria" />
+    <include refid="selectHistoricTaskInstancesForReportByCriteria" />
 
     GROUP BY
-      <include refid="groupByFunction" />
+      HTI.TASK_DEF_KEY_
     ORDER BY
-      <include refid="groupByFunction" /> ASC
+      HTI.TASK_DEF_KEY_ ASC
   </select>
 
-  <sql id="groupByFunction">
-    <choose>
-      <when test="groupByProcessDefinitionKey">HTI.PROC_DEF_KEY_</when>
-      <otherwise>HTI.TASK_DEF_KEY_</otherwise>
-    </choose>
-  </sql>
+  <select id="selectHistoricTaskInstanceCountByProcDefKeyReport" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceReportImpl" resultMap="historicTaskReportResultMap">
+    SELECT
+      COUNT(DISTINCT(HTI.ID_)) AS COUNT_,
+     HTI.PROC_DEF_KEY_ AS DEF_
 
-  <sql id="selectHistoricTaskInstancesByCriteria">
+    <include refid="selectHistoricTaskInstancesForReportByCriteria" />
+
+    GROUP BY
+      HTI.PROC_DEF_KEY_
+    ORDER BY
+      HTI.PROC_DEF_KEY_ ASC
+  </select>
+
+  <sql id="selectHistoricTaskInstancesForReportByCriteria">
     FROM
     ${prefix}ACT_HI_TASKINST HTI
     <where>
@@ -60,4 +66,51 @@
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
     </where>
   </sql>
+
+  <!-- DURATION REPORT -->
+
+  <select id="selectHistoricTaskInstanceDurationReport" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceReportImpl" resultMap="org.camunda.bpm.engine.impl.persistence.entity.ReportResultEntity.durationReportResultMap">
+    SELECT
+      MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, '${reportPeriodUnitName}' AS PERIOD_UNIT_
+    FROM
+      (
+        SELECT
+          ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.ReportResultEntity.periodUnitFunction"/>${datepart2}HTI.END_TIME_${datepart3} AS PERIOD_, HTI.DURATION_
+          <include refid="selectHistoricTaskInstancesByCriteria"/>
+      ) RES
+    GROUP BY
+      PERIOD_
+  </select>
+
+  <select id="selectHistoricTaskInstanceDurationReport_oracle" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceReportImpl" resultMap="org.camunda.bpm.engine.impl.persistence.entity.ReportResultEntity.durationReportResultMap">
+    SELECT
+      MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, '${reportPeriodUnitName}' AS PERIOD_UNIT_
+    FROM
+      (
+        SELECT
+          ${datepart1}HTI.END_TIME_${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.ReportResultEntity.periodUnitFunction"/>${datepart3} AS PERIOD_, HTI.DURATION_
+          <include refid="selectHistoricTaskInstancesByCriteria"/>
+      ) RES
+    GROUP BY
+      PERIOD_
+  </select>
+
+  <sql id="selectHistoricTaskInstancesByCriteria">
+    FROM
+      ${prefix}ACT_HI_TASKINST HTI
+    <where>
+      END_TIME_ IS NOT NULL
+
+      <if test="completedBefore != null">
+        AND END_TIME_ &lt;= #{completedBefore}
+      </if>
+      <if test="completedAfter != null">
+        AND END_TIME_ &gt;= #{completedAfter}
+      </if>
+
+      <bind name="columnPrefix" value="'HPI.'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+    </where>
+  </sql>
+  
 </mapper>

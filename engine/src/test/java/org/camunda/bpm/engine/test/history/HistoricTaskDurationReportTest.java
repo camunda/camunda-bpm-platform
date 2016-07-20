@@ -86,7 +86,7 @@ public class HistoricTaskDurationReportTest {
     startAndCompleteProcessInstance(ANOTHER_PROCESS_DEFINITION_KEY, 2016, 8, 14, 11, 43);
 
     // when
-    List<DurationReportResult> taskReportResults = historyService.createHistoricTaskInstanceDurationReport().duration(PeriodUnit.MONTH);
+    List<DurationReportResult> taskReportResults = historyService.createHistoricTaskInstanceReport().duration(PeriodUnit.MONTH);
 
     // then
     assertEquals(3, taskReportResults.size());
@@ -104,7 +104,7 @@ public class HistoricTaskDurationReportTest {
     calendar.set(2016, 11, 14, 12, 5);
 
     List<DurationReportResult> taskReportResults = historyService
-      .createHistoricTaskInstanceDurationReport()
+      .createHistoricTaskInstanceReport()
       .completedAfter(calendar.getTime())
       .duration(PeriodUnit.MONTH);
 
@@ -124,7 +124,7 @@ public class HistoricTaskDurationReportTest {
     calendar.set(2016, 11, 14, 12, 5);
 
     List<DurationReportResult> taskReportResults = historyService
-      .createHistoricTaskInstanceDurationReport()
+      .createHistoricTaskInstanceReport()
       .completedBefore(calendar.getTime())
       .duration(PeriodUnit.MONTH);
 
@@ -138,7 +138,7 @@ public class HistoricTaskDurationReportTest {
     startAndCompleteProcessInstance(PROCESS_DEFINITION_KEY, 2016, 7, 14, 11, 43);
 
     DurationReportResult taskReportResult = historyService
-      .createHistoricTaskInstanceDurationReport()
+      .createHistoricTaskInstanceReport()
       .duration(PeriodUnit.MONTH).get(0);
 
     List<HistoricTaskInstance> historicTaskInstances = historyService
@@ -170,7 +170,7 @@ public class HistoricTaskDurationReportTest {
   public void testCompletedAfterWithNullValue() {
     try {
       historyService
-        .createHistoricTaskInstanceDurationReport()
+        .createHistoricTaskInstanceReport()
         .completedAfter(null)
         .duration(PeriodUnit.MONTH);
 
@@ -184,7 +184,7 @@ public class HistoricTaskDurationReportTest {
   public void testCompletedBeforeWithNullValue() {
     try {
       historyService
-        .createHistoricTaskInstanceDurationReport()
+        .createHistoricTaskInstanceReport()
         .completedBefore(null)
         .duration(PeriodUnit.MONTH);
 
