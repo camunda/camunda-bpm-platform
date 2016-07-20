@@ -12,8 +12,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
+import java.sql.Connection;
 import java.sql.SQLException;
 
+import static org.camunda.bpm.integrationtest.util.TestContainer.addContainerSpecificResourcesForNonPaWithoutWeld;
 import static org.junit.Assert.assertEquals;
 
 
@@ -22,7 +24,9 @@ public class TransactionIsolationLevelTest extends AbstractFoxPlatformIntegratio
 
   @Deployment
   public static WebArchive processArchive() {
-    return initWebArchiveDeployment();
+    WebArchive archive = initWebArchiveDeployment();
+    addContainerSpecificResourcesForNonPaWithoutWeld(archive);
+    return archive;
   }
 
   @Inject
@@ -36,8 +40,9 @@ public class TransactionIsolationLevelTest extends AbstractFoxPlatformIntegratio
         .openSession();
     try {
       int transactionIsolation = sqlSession.getConnection().getTransactionIsolation();
-      assertEquals("TransactionIsolationLevel for connection is " + transactionIsolation + " instead of " + TransactionIsolationLevel.READ_COMMITTED,
-          TransactionIsolationLevel.READ_COMMITTED.getLevel(), transactionIsolation);
+      System.out.println("Current transaction isolation: " + transactionIsolation);
+      assertEquals("TransactionIsolationLevel for connection is " + transactionIsolation + " instead of " + Connection.TRANSACTION_READ_COMMITTED,
+          Connection.TRANSACTION_READ_COMMITTED, transactionIsolation);
     } catch (SQLException e) {
       e.printStackTrace();
     }
