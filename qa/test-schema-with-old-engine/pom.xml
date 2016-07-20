@@ -102,6 +102,7 @@
                 </goals>
                 <configuration>
                   <propertyPrefix>camunda.current</propertyPrefix>
+                  <versionString>${camunda.version.current}</versionString>
                 </configuration>
               </execution>
               <execution>
