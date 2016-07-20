@@ -92,6 +92,9 @@ alter table ACT_RU_BATCH
 alter table ACT_RU_BATCH
     drop constraint ACT_FK_BATCH_JOB_DEF;
 
+alter table ACT_RU_EXT_TASK
+    drop CONSTRAINT ACT_FK_EXT_TASK_ERROR_DETAILS;
+
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
 

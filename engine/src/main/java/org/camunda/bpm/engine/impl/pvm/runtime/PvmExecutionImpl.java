@@ -252,7 +252,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   @Override
   public void destroy() {
     LOG.destroying(this);
-
     setScope(false);
   }
 
@@ -316,6 +315,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    */
   @Override
   public void end(boolean completeScope) {
+
 
     setCompleteScope(completeScope);
 
@@ -1530,6 +1530,30 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return getParent();
   }
 
+  /**
+   * Method to store variable in a specific scope identified by activity ID.
+   *
+   * @param variableName - name of the variable
+   * @param value - value of the variable
+   * @param activityId - activity ID which is associated with destination execution,
+   *                   if not existing - exception will be thrown
+   * @throws ProcessEngineException if scope with specified activity ID is not found
+   */
+  public void setVariable (String variableName, Object value, String activityId) {
+    Map<ScopeImpl, PvmExecutionImpl> mapping = this.createActivityExecutionMapping();
+    boolean found = false;
+    for (ScopeImpl scope : mapping.keySet()) {
+      if (scope.getId().equals(activityId)) {
+        mapping.get(scope).setVariableLocal(variableName,value);
+        found = true;
+      }
+    }
+    if (!found) {
+      throw new ProcessEngineException("Scope with specified activity ID [" + activityId + "] not found");
+    }
+  }
+
+
   // sequence counter ///////////////////////////////////////////////////////////
 
   public long getSequenceCounter() {
@@ -1631,7 +1655,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public void setCompleteScope(boolean completeScope) {
-    if (completeScope) {
+    if (completeScope && !isCanceled()) {
       activityInstanceState = ActivityInstanceState.SCOPE_COMPLETE.getStateCode();
     }
   }

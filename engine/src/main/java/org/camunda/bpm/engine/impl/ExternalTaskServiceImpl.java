@@ -17,17 +17,13 @@ import java.util.Map;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
-import org.camunda.bpm.engine.impl.cmd.CompleteExternalTaskCmd;
-import org.camunda.bpm.engine.impl.cmd.HandleExternalTaskBpmnErrorCmd;
-import org.camunda.bpm.engine.impl.cmd.HandleExternalTaskFailureCmd;
-import org.camunda.bpm.engine.impl.cmd.SetExternalTaskPriorityCmd;
-import org.camunda.bpm.engine.impl.cmd.SetExternalTaskRetriesCmd;
-import org.camunda.bpm.engine.impl.cmd.UnlockExternalTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.*;
 import org.camunda.bpm.engine.impl.externaltask.ExternalTaskQueryTopicBuilderImpl;
 
 /**
  * @author Thorben Lindhauer
  * @author Christopher Zell
+ * @author Askar Akhmerov
  */
 public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTaskService {
 
@@ -50,7 +46,11 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
   }
 
   public void handleFailure(String externalTaskId, String workerId, String errorMessage, int retries, long retryDuration) {
-    commandExecutor.execute(new HandleExternalTaskFailureCmd(externalTaskId, workerId, errorMessage, retries, retryDuration));
+    this.handleFailure(externalTaskId,workerId,errorMessage,null,retries,retryDuration);
+  }
+
+  public void handleFailure(String externalTaskId, String workerId, String errorMessage, String errorDetails, int retries, long retryDuration) {
+    commandExecutor.execute(new HandleExternalTaskFailureCmd(externalTaskId, workerId, errorMessage, errorDetails, retries, retryDuration));
   }
   
   @Override
@@ -76,4 +76,8 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
   }
 
 
+  @Override
+  public String getExternalTaskErrorDetails(String externalTaskId) {
+    return commandExecutor.execute(new GetExternalTaskErrorDetailsCmd(externalTaskId));
+  }
 }

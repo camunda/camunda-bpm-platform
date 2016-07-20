@@ -81,13 +81,22 @@ public interface LockedExternalTask {
   Integer getRetries();
 
   /**
-   * @return the error message submitted with the latest reported failure executing this task;
+   * @return the full error message submitted with the latest reported failure executing this task;
    *   <code>null</code> if no failure was reported previously or if no error message
    *   was submitted
    *
    * @see ExternalTaskService#handleFailure(String, String, String, int, long)
    */
   String getErrorMessage();
+
+  /**
+   * @return error details submitted with the latest reported failure executing this task;
+   *   <code>null</code> if no failure was reported previously or if no error details
+   *   was submitted
+   *
+   * @see ExternalTaskService#handleFailure(String, String, String, String, int, long)
+   */
+  String getErrorDetails();
 
   /**
    * @return a map of variables that contains an entry for every variable

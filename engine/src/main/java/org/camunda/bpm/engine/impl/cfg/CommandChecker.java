@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
@@ -189,6 +190,11 @@ public interface CommandChecker {
   void checkReadDecisionDefinition(DecisionDefinitionEntity decisionDefinition);
 
   /**
+   * Checks if it is allowed to read the given decision requirements definition.
+   */
+  void checkReadDecisionRequirementsDefinition(DecisionRequirementsDefinitionEntity decisionRequirementsDefinition);
+
+  /**
    * Checks if it is allowed to read the given case definition.
    */
   void checkReadCaseDefinition(CaseDefinition caseDefinition);
@@ -223,6 +229,11 @@ public interface CommandChecker {
    * Check if it is allowed to read the history for any process definition.
    */
   void checkReadHistoryAnyProcessDefinition();
+
+  /**
+   * Check if it is allowed to read the history for any task instance
+   */
+  void checkReadHistoryAnyTaskInstance();
 
   /**
    * Check if it is allowed to update a case instance of the given case execution.

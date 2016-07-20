@@ -23,7 +23,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
 import static org.camunda.bpm.engine.authorization.Resources.BATCH;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
-import static org.camunda.bpm.engine.authorization.Resources.DECISION_REQUIREMENT_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.DECISION_REQUIREMENTS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
@@ -82,7 +82,7 @@ import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
-import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementDefinitionQueryImpl;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
@@ -792,8 +792,8 @@ public class AuthorizationManager extends AbstractManager {
     configureQuery(query, DECISION_DEFINITION, "RES.KEY_");
   }
 
-  public void configureDecisionRequirementDefinitionQuery(DecisionRequirementDefinitionQueryImpl query) {
-    configureQuery(query, DECISION_REQUIREMENT_DEFINITION, "RES.KEY_");
+  public void configureDecisionRequirementsDefinitionQuery(DecisionRequirementsDefinitionQueryImpl query) {
+    configureQuery(query, DECISION_REQUIREMENTS_DEFINITION, "RES.KEY_");
   }
 
   public void configureBatchQuery(BatchQueryImpl query) {

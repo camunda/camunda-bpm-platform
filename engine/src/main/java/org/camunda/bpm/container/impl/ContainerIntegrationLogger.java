@@ -33,7 +33,7 @@ import org.jboss.vfs.VirtualFile;
  * @author Daniel Meyer
  *
  */
-public class ContainerIntegrationLogger extends ProcessEngineLogger {
+public class ContainerIntegrationLogger extends ProcessEngineLogger { 
 
   public ProcessEngineException couldNotInstantiateJobExecutorClass(Exception e) {
     return new ProcessEngineException(exceptionMessage(

@@ -25,9 +25,11 @@ public class MockDecisionDefinitionBuilder {
   private String name = null;
   private int version = 0;
   private String resource = null;
-  protected String diagramResource = null;
+  private String diagramResource = null;
   private String deploymentId = null;
   private String tenantId = null;
+  private String decisionRequirementsDefinitionId = null;
+  private String decisionRequirementsDefinitionKey = null;
 
   public MockDecisionDefinitionBuilder id(String id) {
     this.id = id;
@@ -74,6 +76,16 @@ public class MockDecisionDefinitionBuilder {
     return this;
   }
 
+  public MockDecisionDefinitionBuilder decisionRequirementsDefinitionId(String decisionRequirementsDefinitionId) {
+    this.decisionRequirementsDefinitionId = decisionRequirementsDefinitionId;
+    return this;
+  }
+
+  public MockDecisionDefinitionBuilder decisionRequirementsDefinitionKey(String decisionRequirementsDefinitionKey) {
+    this.decisionRequirementsDefinitionKey = decisionRequirementsDefinitionKey;
+    return this;
+  }
+
   public DecisionDefinition build() {
     DecisionDefinition mockDefinition = mock(DecisionDefinition.class);
 
@@ -86,6 +98,8 @@ public class MockDecisionDefinitionBuilder {
     when(mockDefinition.getDiagramResourceName()).thenReturn(diagramResource);
     when(mockDefinition.getDeploymentId()).thenReturn(deploymentId);
     when(mockDefinition.getTenantId()).thenReturn(tenantId);
+    when(mockDefinition.getDecisionRequirementsDefinitionId()).thenReturn(decisionRequirementsDefinitionId);
+    when(mockDefinition.getDecisionRequirementsDefinitionKey()).thenReturn(decisionRequirementsDefinitionKey);
 
     return mockDefinition;
   }

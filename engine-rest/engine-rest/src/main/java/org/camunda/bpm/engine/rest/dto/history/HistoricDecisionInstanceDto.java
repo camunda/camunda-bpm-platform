@@ -44,6 +44,9 @@ public class HistoricDecisionInstanceDto {
   protected List<HistoricDecisionInputInstanceDto> inputs;
   protected List<HistoricDecisionOutputInstanceDto> outputs;
   protected Double collectResultValue;
+  protected String rootDecisionInstanceId;
+  protected String decisionRequirementsDefinitionId;
+  protected String decisionRequirementsDefinitionKey;
   protected String tenantId;
 
   public String getId() {
@@ -97,7 +100,7 @@ public class HistoricDecisionInstanceDto {
   public String getActivityInstanceId() {
     return activityInstanceId;
   }
-  
+
   public String getUserId() {
     return userId;
   }
@@ -116,8 +119,20 @@ public class HistoricDecisionInstanceDto {
     return collectResultValue;
   }
 
+  public String getRootDecisionInstanceId() {
+    return rootDecisionInstanceId;
+  }
+
   public String getTenantId() {
     return tenantId;
+  }
+
+  public String getDecisionRequirementsDefinitionId() {
+    return decisionRequirementsDefinitionId;
+  }
+
+  public String getDecisionRequirementsDefinitionKey() {
+    return decisionRequirementsDefinitionKey;
   }
 
   public static HistoricDecisionInstanceDto fromHistoricDecisionInstance(HistoricDecisionInstance historicDecisionInstance) {
@@ -138,6 +153,9 @@ public class HistoricDecisionInstanceDto {
     dto.activityInstanceId = historicDecisionInstance.getActivityInstanceId();
     dto.userId = historicDecisionInstance.getUserId();
     dto.collectResultValue = historicDecisionInstance.getCollectResultValue();
+    dto.rootDecisionInstanceId = historicDecisionInstance.getRootDecisionInstanceId();
+    dto.decisionRequirementsDefinitionId = historicDecisionInstance.getDecisionRequirementsDefinitionId();
+    dto.decisionRequirementsDefinitionKey = historicDecisionInstance.getDecisionRequirementsDefinitionKey();
     dto.tenantId = historicDecisionInstance.getTenantId();
 
     try {

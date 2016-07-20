@@ -27,18 +27,32 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.runtime.Incident;
+
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.createExceptionByteArray;
+import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 /**
  * @author Thorben Lindhauer
+ * @author Askar Akhmerov
  *
  */
 public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
+  private static final String EXCEPTION_NAME = "externalTask.exceptionByteArray";
+
+  /**
+   * Note: {@link String#length()} counts Unicode supplementary
+   * characters twice, so for a String consisting only of those,
+   * the limit is effectively MAX_EXCEPTION_MESSAGE_LENGTH / 2
+   */
+  private static final int MAX_EXCEPTION_MESSAGE_LENGTH = 666;
 
   protected String id;
   protected int revision;
@@ -48,6 +62,9 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected Date lockExpirationTime;
   protected Integer retries;
   protected String errorMessage;
+
+  protected ByteArrayEntity errorDetailsByteArray;
+  protected String errorDetailsByteArrayId;
 
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
   protected String executionId;
@@ -155,9 +172,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   public String getErrorMessage() {
     return errorMessage;
   }
-  public void setErrorMessage(String errorMessage) {
-    this.errorMessage = errorMessage;
-  }
+
   public boolean areRetriesLeft() {
     return retries == null || retries > 0;
   }
@@ -188,6 +203,10 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     persistentState.put("tenantId", tenantId);
     persistentState.put("priority", priority);
 
+    if(errorDetailsByteArrayId != null) {
+      persistentState.put("errorDetailsByteArrayId", errorDetailsByteArrayId);
+    }
+
     return persistentState;
   }
 
@@ -199,12 +218,73 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     getExecution().addExternalTask(this);
   }
 
+  /**
+   * Method implementation relies on the command context object,
+   * therefore should be invoked from the commands only
+   *
+   * @return error details persisted in byte array table
+   */
+  public String getErrorDetails() {
+    ByteArrayEntity byteArray = getErrorByteArray();
+    return ExceptionUtil.getExceptionStacktrace(byteArray);
+  }
+
+  public void setErrorMessage(String errorMessage) {
+    if(errorMessage != null && errorMessage.length() > MAX_EXCEPTION_MESSAGE_LENGTH) {
+      this.errorMessage = errorMessage.substring(0, MAX_EXCEPTION_MESSAGE_LENGTH);
+    } else {
+      this.errorMessage = errorMessage;
+    }
+  }
+
+  protected void setErrorDetails(String exception) {
+    EnsureUtil.ensureNotNull("exception", exception);
+
+    byte[] exceptionBytes = toByteArray(exception);
+
+    ByteArrayEntity byteArray = getErrorByteArray();
+
+    if(byteArray == null) {
+      byteArray = createExceptionByteArray(EXCEPTION_NAME,exceptionBytes);
+      errorDetailsByteArrayId = byteArray.getId();
+      errorDetailsByteArray = byteArray;
+    }
+    else {
+      byteArray.setBytes(exceptionBytes);
+    }
+  }
+
+  protected String getErrorDetailsByteArrayId() {
+    return errorDetailsByteArrayId;
+  }
+
+  protected ByteArrayEntity getErrorByteArray() {
+    ensureErrorByteArrayInitialized();
+    return errorDetailsByteArray;
+  }
+
+  protected void ensureErrorByteArrayInitialized() {
+    if (errorDetailsByteArray == null && errorDetailsByteArrayId != null) {
+      errorDetailsByteArray = Context
+          .getCommandContext()
+          .getDbEntityManager()
+          .selectById(ByteArrayEntity.class, errorDetailsByteArrayId);
+    }
+  }
+
   public void delete() {
     getExecution().removeExternalTask(this);
 
-    Context.getCommandContext()
+    CommandContext commandContext = Context.getCommandContext();
+
+    commandContext
       .getExternalTaskManager()
       .delete(this);
+
+    // Also delete the external tasks's error details byte array
+    if (errorDetailsByteArrayId != null) {
+      commandContext.getByteArrayManager().deleteByteArrayById(errorDetailsByteArrayId);
+    }
   }
 
   public void complete(Map<String, Object> variables) {
@@ -221,10 +301,22 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     associatedExecution.signal(null, null);
   }
 
-  public void failed(String errorMessage, int retries, long retryDuration) {
+  /**
+   * process failed state, make sure that binary entity is created for the errorMessage, shortError
+   * message does not exceed limit, handle properly retry counts and incidents
+   *
+   * @param errorMessage - short error message text
+   * @param errorDetails - full error details
+   * @param retries - updated value of retries left
+   * @param retryDuration - used for lockExpirationTime calculation
+   */
+  public void failed(String errorMessage, String errorDetails, int retries, long retryDuration) {
     ensureActive();
 
-    this.errorMessage = errorMessage;
+    this.setErrorMessage(errorMessage);
+    if (errorDetails != null) {
+      setErrorDetails(errorDetails);
+    }
     this.lockExpirationTime = new Date(ClockUtil.getCurrentTime().getTime() + retryDuration);
     setRetriesAndManageIncidents(retries);
   }
@@ -318,6 +410,9 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
         + ", workerId=" + workerId
         + ", lockExpirationTime=" + lockExpirationTime
         + ", priority=" + priority
+        + ", errorMessage=" + errorMessage
+        + ", errorDetailsByteArray=" + errorDetailsByteArray
+        + ", errorDetailsByteArrayId=" + errorDetailsByteArrayId
         + ", executionId=" + executionId + "]";
   }
 

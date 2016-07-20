@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariableStoreObserver;
 
 /**
@@ -30,10 +29,6 @@ public class ExecutionEntityReferencer implements VariableStoreObserver<Variable
   @Override
   public void onAdd(VariableInstanceEntity variable) {
     variable.setExecution(execution);
-  }
-
-  @Override
-  public void onUpdate(VariableInstanceEntity variable) {
   }
 
   @Override

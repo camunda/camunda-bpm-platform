@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
@@ -286,6 +287,12 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  public void checkReadDecisionRequirementsDefinition(DecisionRequirementsDefinitionEntity decisionRequirementsDefinition) {
+    if (decisionRequirementsDefinition != null && !getTenantManager().isAuthenticatedTenant(decisionRequirementsDefinition.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("get the decision requirements definition '"+ decisionRequirementsDefinition.getId() + "'");
+    }
+  }
+
   public void checkReadCaseDefinition(CaseDefinition caseDefinition) {
     if (caseDefinition != null && !getTenantManager().isAuthenticatedTenant(caseDefinition.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("get the case definition '"+ caseDefinition.getId() + "'");
@@ -330,6 +337,14 @@ public class TenantCommandChecker implements CommandChecker {
 
   @Override
   public void checkReadHistoryAnyProcessDefinition() {
+    // No tenant check here because it is called in the SQL query:
+    // Report.selectHistoricProcessInstanceDurationReport
+    // It is necessary to make the check there because the query may be return only the
+    // historic process instances which belong to the authenticated tenant.
+  }
+
+  @Override
+  public void checkReadHistoryAnyTaskInstance() {
     // No tenant check here because it is called in the SQL query:
     // Report.selectHistoricProcessInstanceDurationReport
     // It is necessary to make the check there because the query may be return only the

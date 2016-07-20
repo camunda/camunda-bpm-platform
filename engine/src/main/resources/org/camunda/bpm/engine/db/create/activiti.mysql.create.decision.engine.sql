@@ -10,11 +10,12 @@ create table ACT_RE_DECISION_DEF (
     RESOURCE_NAME_ varchar(4000),
     DGRM_RESOURCE_NAME_ varchar(4000),
     DEC_REQ_ID_ varchar(64),
+    DEC_REQ_KEY_ varchar(255),
     TENANT_ID_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
--- create decision requirement definition table --
+-- create decision requirements definition table --
 create table ACT_RE_DECISION_REQ_DEF (
     ID_ varchar(64) NOT NULL,
     REV_ integer,

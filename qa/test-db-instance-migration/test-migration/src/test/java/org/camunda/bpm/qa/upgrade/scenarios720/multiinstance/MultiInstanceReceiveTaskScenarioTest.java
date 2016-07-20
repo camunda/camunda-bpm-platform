@@ -3,12 +3,14 @@ package org.camunda.bpm.qa.upgrade.scenarios720.multiinstance;
 import static org.camunda.bpm.qa.upgrade.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.qa.upgrade.util.ActivityInstanceAssert.describeActivityInstanceTree;
 
+import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.qa.upgrade.Origin;
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
 import org.camunda.bpm.qa.upgrade.UpgradeTestRule;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -63,6 +65,27 @@ public class MultiInstanceReceiveTaskScenarioTest {
   }
 
   @Test
+  @Ignore("CAM-6408")
+  @ScenarioUnderTest("initParallel.4")
+  public void testInitParallelMigration() {
+    // given
+    ProcessInstance instance = rule.processInstance();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(instance.getProcessDefinitionId(), instance.getProcessDefinitionId())
+      .mapEqualActivities()
+      .build();
+
+    // when
+    rule.getRuntimeService().newMigration(migrationPlan)
+      .processInstanceIds(instance.getId())
+      .execute();
+
+    // then the receive task messages can be correlated
+    rule.messageCorrelation("Message").correlateAll();
+    rule.assertScenarioEnded();
+  }
+
+  @Test
   @ScenarioUnderTest("initSequential.1")
   public void testInitSequentialCompletion() {
     // when the receive task messages are correlated
@@ -101,6 +124,30 @@ public class MultiInstanceReceiveTaskScenarioTest {
     rule.getRuntimeService().deleteProcessInstance(instance.getId(), null);
 
     // then
+    rule.assertScenarioEnded();
+  }
+
+  @Test
+  @Ignore("CAM-6408")
+  @ScenarioUnderTest("initSequential.4")
+  public void testInitSequentialMigration() {
+    // given
+    ProcessInstance instance = rule.processInstance();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(instance.getProcessDefinitionId(), instance.getProcessDefinitionId())
+      .mapEqualActivities()
+      .build();
+
+    // when
+    rule.getRuntimeService().newMigration(migrationPlan)
+      .processInstanceIds(instance.getId())
+      .execute();
+
+    // then the receive task messages can be correlated
+    for (int i = 0; i < 3; i++) {
+      rule.messageCorrelation("Message").correlate();
+    }
+
     rule.assertScenarioEnded();
   }
 

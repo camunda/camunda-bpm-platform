@@ -82,11 +82,14 @@ public interface ExternalTask {
   Integer getRetries();
 
   /**
-   * @return the error message submitted with the latest reported failure executing this task;
+   * @return short error message submitted with the latest reported failure executing this task;
    *   <code>null</code> if no failure was reported previously or if no error message
    *   was submitted
    *
-   * @see ExternalTaskService#handleFailure(String, String, String, int, long)
+   * @see ExternalTaskService#handleFailure(String, String,String, String, int, long)
+   *
+   * To get the full error details,
+   * use {@link ExternalTaskService#getExternalTaskErrorDetails(String)}
    */
   String getErrorMessage();
 

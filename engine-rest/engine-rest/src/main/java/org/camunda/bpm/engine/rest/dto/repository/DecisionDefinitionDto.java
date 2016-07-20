@@ -24,6 +24,8 @@ public class DecisionDefinitionDto {
   protected String resource;
   protected String deploymentId;
   protected String tenantId;
+  protected String decisionRequirementsDefinitionId;
+  protected String decisionRequirementsDefinitionKey;
 
   public String getId() {
     return id;
@@ -57,6 +59,14 @@ public class DecisionDefinitionDto {
     return tenantId;
   }
 
+  public String getDecisionRequirementsDefinitionId() {
+    return decisionRequirementsDefinitionId;
+  }
+
+  public String getDecisionRequirementsDefinitionKey() {
+    return decisionRequirementsDefinitionKey;
+  }
+
   public static DecisionDefinitionDto fromDecisionDefinition(DecisionDefinition definition) {
     DecisionDefinitionDto dto = new DecisionDefinitionDto();
 
@@ -67,6 +77,8 @@ public class DecisionDefinitionDto {
     dto.version = definition.getVersion();
     dto.resource = definition.getResourceName();
     dto.deploymentId = definition.getDeploymentId();
+    dto.decisionRequirementsDefinitionId = definition.getDecisionRequirementsDefinitionId();
+    dto.decisionRequirementsDefinitionKey = definition.getDecisionRequirementsDefinitionKey();
     dto.tenantId = definition.getTenantId();
 
     return dto;

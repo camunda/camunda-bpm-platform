@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
 
 /**
  * @author Thorben Lindhauer
+ * @author Askar Akhmerov
  *
  */
 public interface ExternalTaskResource {
@@ -36,6 +37,11 @@ public interface ExternalTaskResource {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   ExternalTaskDto getExternalTask();
+
+  @GET
+  @Path("/errorDetails")
+  @Produces(MediaType.TEXT_PLAIN)
+  String getErrorDetails();
 
   @PUT
   @Path("/retries")

@@ -19,8 +19,9 @@ import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionVariableSnapshotObserver;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 
 /**
@@ -48,8 +49,11 @@ public class StartProcessInstanceCmd implements Command<ProcessInstanceWithVaria
     // Start the process instance
     ExecutionEntity processInstance = processDefinition.createProcessInstance(instantiationBuilder.getBusinessKey(),
         instantiationBuilder.getCaseInstanceId());
+
+    final ExecutionVariableSnapshotObserver variablesListener = new ExecutionVariableSnapshotObserver(processInstance);
+
     processInstance.start(instantiationBuilder.getVariables());
-    return new ProcessInstanceWithVariablesEntity(processInstance);
+    return new ProcessInstanceWithVariablesImpl(processInstance, variablesListener.getVariables());
   }
 
 }

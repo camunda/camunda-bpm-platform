@@ -390,9 +390,13 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc",vars);
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("myProc",vars);
 
-    // check existing variables for task ID
+    // check existing variables for process instance ID
     assertEquals(4, historyService.createHistoricVariableInstanceQuery().processInstanceIdIn(processInstance.getProcessInstanceId(),processInstance2.getProcessInstanceId()).count());
     assertEquals(4, historyService.createHistoricVariableInstanceQuery().processInstanceIdIn(processInstance.getProcessInstanceId(),processInstance2.getProcessInstanceId()).list().size());
+
+    //add check with not existing search
+    String notExistingSearch = processInstance.getProcessInstanceId() + "-notExisting";
+    assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceIdIn(notExistingSearch,processInstance2.getProcessInstanceId()).count());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testParallel.bpmn20.xml"})
@@ -400,11 +404,15 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     // given
     Map<String, Object> vars = new HashMap<String, Object>();
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc",vars);
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("myProc",vars);
 
     // check existing variables for task ID
     try {
       historyService.createHistoricVariableInstanceQuery().processInstanceIdIn(processInstance.getProcessInstanceId(),null);
+      fail("Search by process instance ID was finished");
+    } catch (ProcessEngineException e) { }
+
+    try {
+      historyService.createHistoricVariableInstanceQuery().processInstanceIdIn(null,processInstance.getProcessInstanceId());
       fail("Search by process instance ID was finished");
     } catch (ProcessEngineException e) { }
   }

@@ -3,7 +3,7 @@ package org.camunda.bpm.engine.test.bpmn.parse;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -118,7 +118,7 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTestCas
 
   protected ActivityImpl findActivity(ProcessInstance pi, String activityId) {
 
-    ProcessInstanceWithVariablesEntity entity = (ProcessInstanceWithVariablesEntity) pi;
+    ProcessInstanceWithVariablesImpl entity = (ProcessInstanceWithVariablesImpl) pi;
     ProcessDefinitionEntity processDefEntity = entity.getExecutionEntity().getProcessDefinition();
 
     assertNotNull(processDefEntity);

@@ -49,6 +49,8 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -475,6 +477,35 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/repository/drg.dmn" })
+  public void testGetDecisionRequirementsDefinition() {
+    DecisionRequirementsDefinitionQuery query = repositoryService.createDecisionRequirementsDefinitionQuery();
+
+    DecisionRequirementsDefinition decisionRequirementsDefinition = query.singleResult();
+    String decisionRequirementsDefinitionId = decisionRequirementsDefinition.getId();
+
+    DecisionRequirementsDefinition definition = repositoryService.getDecisionRequirementsDefinition(decisionRequirementsDefinitionId);
+
+    assertNotNull(definition);
+    assertEquals(decisionRequirementsDefinitionId, definition.getId());
+  }
+
+  public void testGetDecisionRequirementsDefinitionByInvalidId() {
+    try {
+      repositoryService.getDecisionRequirementsDefinition("invalid");
+      fail();
+    } catch (Exception e) {
+      assertTextPresent("no deployed decision requirements definition found with id 'invalid'", e.getMessage());
+    }
+
+    try {
+      repositoryService.getDecisionRequirementsDefinition(null);
+      fail();
+    } catch (NotValidException e) {
+      assertTextPresent("decisionRequirementsDefinitionId is null", e.getMessage());
+    }
+  }
+  
   @Deployment(resources = { "org/camunda/bpm/engine/test/repository/one.dmn" })
   public void testGetDecisionModel() throws Exception {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
@@ -506,6 +537,67 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
       fail();
     } catch (NotValidException e) {
       assertTextPresent("decisionDefinitionId is null", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/repository/drg.dmn" })
+  public void testGetDecisionRequirementsModel() throws Exception {
+    DecisionRequirementsDefinitionQuery query = repositoryService.createDecisionRequirementsDefinitionQuery();
+
+    DecisionRequirementsDefinition decisionRequirementsDefinition = query.singleResult();
+    String decisionRequirementsDefinitionId = decisionRequirementsDefinition.getId();
+
+    InputStream decisionRequirementsModel = repositoryService.getDecisionRequirementsModel(decisionRequirementsDefinitionId);
+
+    assertNotNull(decisionRequirementsModel);
+
+    byte[] readInputStream = IoUtil.readInputStream(decisionRequirementsModel, "decisionRequirementsModel");
+    String model = new String(readInputStream, "UTF-8");
+
+    assertTrue(model.contains("<definitions id=\"dish\" name=\"Dish\" namespace=\"test-drg\""));
+    IoUtil.closeSilently(decisionRequirementsModel);
+  }
+
+  public void testGetDecisionRequirementsModelByInvalidId() throws Exception {
+    try {
+      repositoryService.getDecisionRequirementsModel("invalid");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("no deployed decision requirements definition found with id 'invalid'", e.getMessage());
+    }
+
+    try {
+      repositoryService.getDecisionRequirementsModel(null);
+      fail();
+    } catch (NotValidException e) {
+      assertTextPresent("decisionRequirementsDefinitionId is null", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/repository/drg.dmn", 
+                           "org/camunda/bpm/engine/test/repository/drg.png" })
+  public void testGetDecisionRequirementsDiagram() throws Exception {
+
+    DecisionRequirementsDefinitionQuery query = repositoryService.createDecisionRequirementsDefinitionQuery();
+
+    DecisionRequirementsDefinition decisionRequirementsDefinition = query.singleResult();
+    String decisionRequirementsDefinitionId = decisionRequirementsDefinition.getId();
+
+    InputStream actualDrd = repositoryService.getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
+
+    assertNotNull(actualDrd);
+  }
+
+  public void testGetDecisionRequirementsDiagramByInvalidId() throws Exception {
+    try {
+      repositoryService.getDecisionRequirementsDiagram("invalid");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("no deployed decision requirements definition found with id 'invalid'", e.getMessage());
+    }
+    
+    try {
+      repositoryService.getDecisionRequirementsDiagram(null);
+    } catch (ProcessEngineException e) {
+      assertTextPresent("decisionRequirementsDefinitionId is null", e.getMessage());
     }
   }
 

@@ -21,7 +21,7 @@ import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class DecisionRequirementsDefinitionQueryDto extends AbstractQueryDto<DecisionRequirementDefinitionQuery> {
+public class DecisionRequirementsDefinitionQueryDto extends AbstractQueryDto<DecisionRequirementsDefinitionQuery> {
 
   private static final String SORT_BY_ID_VALUE = "id";
   private static final String SORT_BY_KEY_VALUE = "key";
@@ -164,47 +164,47 @@ public class DecisionRequirementsDefinitionQueryDto extends AbstractQueryDto<Dec
   }
 
   @Override
-  protected DecisionRequirementDefinitionQuery createNewQuery(ProcessEngine engine) {
-    return engine.getRepositoryService().createDecisionRequirementDefinitionQuery();
+  protected DecisionRequirementsDefinitionQuery createNewQuery(ProcessEngine engine) {
+    return engine.getRepositoryService().createDecisionRequirementsDefinitionQuery();
   }
 
   @Override
-  protected void applyFilters(DecisionRequirementDefinitionQuery query) {
+  protected void applyFilters(DecisionRequirementsDefinitionQuery query) {
     if (decisionRequirementsDefinitionId != null) {
-      query.decisionRequirementDefinitionId(decisionRequirementsDefinitionId);
+      query.decisionRequirementsDefinitionId(decisionRequirementsDefinitionId);
     }
     if (decisionRequirementsDefinitionIdIn != null && !decisionRequirementsDefinitionIdIn.isEmpty()) {
-      query.decisionRequirementDefinitionIdIn(decisionRequirementsDefinitionIdIn.toArray(new String[decisionRequirementsDefinitionIdIn.size()]));
+      query.decisionRequirementsDefinitionIdIn(decisionRequirementsDefinitionIdIn.toArray(new String[decisionRequirementsDefinitionIdIn.size()]));
     }
     if (category != null) {
-      query.decisionRequirementDefinitionCategory(category);
+      query.decisionRequirementsDefinitionCategory(category);
     }
     if (categoryLike != null) {
-      query.decisionRequirementDefinitionCategoryLike(categoryLike);
+      query.decisionRequirementsDefinitionCategoryLike(categoryLike);
     }
     if (name != null) {
-      query.decisionRequirementDefinitionName(name);
+      query.decisionRequirementsDefinitionName(name);
     }
     if (nameLike != null) {
-      query.decisionRequirementDefinitionNameLike(nameLike);
+      query.decisionRequirementsDefinitionNameLike(nameLike);
     }
     if (deploymentId != null) {
       query.deploymentId(deploymentId);
     }
     if (key != null) {
-      query.decisionRequirementDefinitionKey(key);
+      query.decisionRequirementsDefinitionKey(key);
     }
     if (keyLike != null) {
-      query.decisionRequirementDefinitionKeyLike(keyLike);
+      query.decisionRequirementsDefinitionKeyLike(keyLike);
     }
     if (resourceName != null) {
-      query.decisionRequirementDefinitionResourceName(resourceName);
+      query.decisionRequirementsDefinitionResourceName(resourceName);
     }
     if (resourceNameLike != null) {
-      query.decisionRequirementDefinitionResourceNameLike(resourceNameLike);
+      query.decisionRequirementsDefinitionResourceNameLike(resourceNameLike);
     }
     if (version != null) {
-      query.decisionRequirementDefinitionVersion(version);
+      query.decisionRequirementsDefinitionVersion(version);
     }
     if (TRUE.equals(latestVersion)) {
       query.latestVersion();
@@ -216,22 +216,22 @@ public class DecisionRequirementsDefinitionQueryDto extends AbstractQueryDto<Dec
       query.withoutTenantId();
     }
     if (TRUE.equals(includeDefinitionsWithoutTenantId)) {
-      query.includeDecisionRequirementDefinitionsWithoutTenantId();
+      query.includeDecisionRequirementsDefinitionsWithoutTenantId();
     }
   }
 
   @Override
-  protected void applySortBy(DecisionRequirementDefinitionQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+  protected void applySortBy(DecisionRequirementsDefinitionQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
     if (sortBy.equals(SORT_BY_CATEGORY_VALUE)) {
-      query.orderByDecisionRequirementDefinitionCategory();
+      query.orderByDecisionRequirementsDefinitionCategory();
     } else if (sortBy.equals(SORT_BY_KEY_VALUE)) {
-      query.orderByDecisionRequirementDefinitionKey();
+      query.orderByDecisionRequirementsDefinitionKey();
     } else if (sortBy.equals(SORT_BY_ID_VALUE)) {
-      query.orderByDecisionRequirementDefinitionId();
+      query.orderByDecisionRequirementsDefinitionId();
     } else if (sortBy.equals(SORT_BY_VERSION_VALUE)) {
-      query.orderByDecisionRequirementDefinitionVersion();
+      query.orderByDecisionRequirementsDefinitionVersion();
     } else if (sortBy.equals(SORT_BY_NAME_VALUE)) {
-      query.orderByDecisionRequirementDefinitionName();
+      query.orderByDecisionRequirementsDefinitionName();
     } else if (sortBy.equals(SORT_BY_DEPLOYMENT_ID_VALUE)) {
       query.orderByDeploymentId();
     } else if (sortBy.equals(SORT_BY_TENANT_ID)) {

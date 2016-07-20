@@ -118,8 +118,8 @@ import org.camunda.bpm.engine.impl.delegate.DefaultDelegateInterceptor;
 import org.camunda.bpm.engine.impl.digest.PasswordEncryptor;
 import org.camunda.bpm.engine.impl.digest.ShaHashDigest;
 import org.camunda.bpm.engine.impl.dmn.configuration.DmnEngineConfigurationBuilder;
-import org.camunda.bpm.engine.impl.dmn.deployer.DmnDeployer;
-import org.camunda.bpm.engine.impl.dmn.deployer.DrdDeployer;
+import org.camunda.bpm.engine.impl.dmn.deployer.DecisionDefinitionDeployer;
+import org.camunda.bpm.engine.impl.dmn.deployer.DecisionRequirementsDefinitionDeployer;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
 import org.camunda.bpm.engine.impl.el.CommandContextFunctionMapper;
 import org.camunda.bpm.engine.impl.el.DateTimeFunctionMapper;
@@ -1300,11 +1300,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     if (isDmnEnabled()) {
-      DrdDeployer drdDeployer = getDrdDeployer();
-      DmnDeployer dmnDeployer = getDmnDeployer();
-      // the DRD deployer must be before the DMN deployer
-      defaultDeployers.add(drdDeployer);
-      defaultDeployers.add(dmnDeployer);
+      DecisionRequirementsDefinitionDeployer decisionRequirementsDefinitionDeployer = getDecisionRequirementsDefinitionDeployer();
+      DecisionDefinitionDeployer decisionDefinitionDeployer = getDecisionDefinitionDeployer();
+      // the DecisionRequirementsDefinition deployer must be before the DecisionDefinitionDeployer
+      defaultDeployers.add(decisionRequirementsDefinitionDeployer);
+      defaultDeployers.add(decisionDefinitionDeployer);
     }
 
     return defaultDeployers;
@@ -1384,15 +1384,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return defaultListener;
   }
 
-  protected DmnDeployer getDmnDeployer() {
-    DmnDeployer dmnDeployer = new DmnDeployer();
-    dmnDeployer.setIdGenerator(idGenerator);
-    dmnDeployer.setTransformer(dmnEngineConfiguration.getTransformer());
-    return dmnDeployer;
+  protected DecisionDefinitionDeployer getDecisionDefinitionDeployer() {
+    DecisionDefinitionDeployer decisionDefinitionDeployer = new DecisionDefinitionDeployer();
+    decisionDefinitionDeployer.setIdGenerator(idGenerator);
+    decisionDefinitionDeployer.setTransformer(dmnEngineConfiguration.getTransformer());
+    return decisionDefinitionDeployer;
   }
 
-  protected DrdDeployer getDrdDeployer() {
-    DrdDeployer drdDeployer = new DrdDeployer();
+  protected DecisionRequirementsDefinitionDeployer getDecisionRequirementsDefinitionDeployer() {
+    DecisionRequirementsDefinitionDeployer drdDeployer = new DecisionRequirementsDefinitionDeployer();
     drdDeployer.setIdGenerator(idGenerator);
     drdDeployer.setTransformer(dmnEngineConfiguration.getTransformer());
     return drdDeployer;
@@ -1498,36 +1498,36 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // history //////////////////////////////////////////////////////////////////
 
   public void initHistoryLevel() {
-    if(historyLevel == null) {
-      if(historyLevels == null) {
-        historyLevels = new ArrayList<HistoryLevel>();
-        historyLevels.add(HistoryLevel.HISTORY_LEVEL_NONE);
-        historyLevels.add(HistoryLevel.HISTORY_LEVEL_ACTIVITY);
-        historyLevels.add(HistoryLevel.HISTORY_LEVEL_AUDIT);
-        historyLevels.add(HistoryLevel.HISTORY_LEVEL_FULL);
-      }
+    if (historyLevel != null) {
+      setHistory(historyLevel.getName());
+    }
 
-      if(customHistoryLevels != null) {
-        historyLevels.addAll(customHistoryLevels);
-      }
+    if(historyLevels == null) {
+      historyLevels = new ArrayList<HistoryLevel>();
+      historyLevels.add(HistoryLevel.HISTORY_LEVEL_NONE);
+      historyLevels.add(HistoryLevel.HISTORY_LEVEL_ACTIVITY);
+      historyLevels.add(HistoryLevel.HISTORY_LEVEL_AUDIT);
+      historyLevels.add(HistoryLevel.HISTORY_LEVEL_FULL);
+    }
 
-      if(HISTORY_VARIABLE.equalsIgnoreCase(history)) {
-        historyLevel = HistoryLevel.HISTORY_LEVEL_ACTIVITY;
-        LOG.usingDeprecatedHistoryLevelVariable();
+    if(customHistoryLevels != null) {
+      historyLevels.addAll(customHistoryLevels);
+    }
 
-      } else {
-        for (HistoryLevel historyLevel : historyLevels) {
-          if(historyLevel.getName().equalsIgnoreCase(history)) {
-            this.historyLevel = historyLevel;
-          }
+    if(HISTORY_VARIABLE.equalsIgnoreCase(history)) {
+      historyLevel = HistoryLevel.HISTORY_LEVEL_ACTIVITY;
+      LOG.usingDeprecatedHistoryLevelVariable();
+    } else {
+      for (HistoryLevel historyLevel : historyLevels) {
+        if(historyLevel.getName().equalsIgnoreCase(history)) {
+          this.historyLevel = historyLevel;
         }
       }
+    }
 
-
-      // do allow null for history level in case of "auto"
-      if(historyLevel == null && !ProcessEngineConfiguration.HISTORY_AUTO.equalsIgnoreCase(history)) {
-        throw new ProcessEngineException("invalid history level: "+history);
-      }
+    // do allow null for history level in case of "auto"
+    if(historyLevel == null && !ProcessEngineConfiguration.HISTORY_AUTO.equalsIgnoreCase(history)) {
+      throw new ProcessEngineException("invalid history level: "+history);
     }
   }
 

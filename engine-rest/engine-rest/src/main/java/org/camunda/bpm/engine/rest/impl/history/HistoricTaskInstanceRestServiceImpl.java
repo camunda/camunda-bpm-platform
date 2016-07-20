@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceQueryDto;
+import org.camunda.bpm.engine.rest.history.HistoricTaskInstanceReportService;
 import org.camunda.bpm.engine.rest.history.HistoricTaskInstanceRestService;
 
 import javax.ws.rs.core.UriInfo;
@@ -91,6 +92,11 @@ public class HistoricTaskInstanceRestServiceImpl implements HistoricTaskInstance
     result.setCount(count);
 
     return result;
+  }
+
+  @Override
+  public HistoricTaskInstanceReportService getHistoricTaskInstanceReportResource() {
+    return new HistoricTaskInstanceReportServiceImpl(processEngine, objectMapper);
   }
 
 }

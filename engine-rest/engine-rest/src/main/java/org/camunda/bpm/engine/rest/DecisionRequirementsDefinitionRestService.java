@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -24,11 +25,22 @@ import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionDto;
+import org.camunda.bpm.engine.rest.sub.repository.DecisionRequirementsDefinitionResource;
 
 @Produces(MediaType.APPLICATION_JSON)
 public interface DecisionRequirementsDefinitionRestService {
 
   public static final String PATH = "/decision-requirements-definition";
+
+  @Path("/{id}")
+  DecisionRequirementsDefinitionResource getDecisionRequirementsDefinitionById(@PathParam("id") String decisionRequirementsDefinitionId);
+
+  @Path("/key/{key}")
+  DecisionRequirementsDefinitionResource getDecisionRequirementsDefinitionByKey(@PathParam("key") String decisionRequirementsDefinitionKey);
+
+  @Path("/key/{key}/tenant-id/{tenant-id}")
+  DecisionRequirementsDefinitionResource getDecisionRequirementsDefinitionByKeyAndTenantId(@PathParam("key") String decisionRequirementsDefinitionKey,
+                                                                   @PathParam("tenant-id") String tenantId);
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)

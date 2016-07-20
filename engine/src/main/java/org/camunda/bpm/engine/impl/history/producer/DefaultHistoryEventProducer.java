@@ -12,9 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.history.producer;
 
-import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.createJobExceptionByteArray;
-import static org.camunda.bpm.engine.impl.util.JobExceptionUtil.getJobExceptionStacktrace;
-import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.createJobExceptionByteArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +59,9 @@ import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.task.IdentityLink;
+
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.getExceptionStacktrace;
+import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 /**
  * @author Daniel Meyer
@@ -864,7 +865,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       event.setJobExceptionMessage(exception.getMessage());
 
       // stacktrace
-      String exceptionStacktrace = getJobExceptionStacktrace(exception);
+      String exceptionStacktrace = getExceptionStacktrace(exception);
       byte[] exceptionBytes = toByteArray(exceptionStacktrace);
       ByteArrayEntity byteArray = createJobExceptionByteArray(exceptionBytes);
       event.setExceptionByteArrayId(byteArray.getId());

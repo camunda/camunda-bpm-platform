@@ -64,6 +64,17 @@ public class ExternalTaskResourceImpl implements ExternalTaskResource {
   }
 
   @Override
+  public String getErrorDetails() {
+    ExternalTaskService externalTaskService = engine.getExternalTaskService();
+
+    try {
+      return externalTaskService.getExternalTaskErrorDetails(externalTaskId);
+    } catch (NotFoundException e) {
+      throw new RestException(Status.NOT_FOUND, e, "External task with id " + externalTaskId + " does not exist");
+    }
+  }
+
+  @Override
   public void setRetries(RetriesDto dto) {
     ExternalTaskService externalTaskService = engine.getExternalTaskService();
 
@@ -109,6 +120,7 @@ public class ExternalTaskResourceImpl implements ExternalTaskResource {
       externalTaskService.handleFailure(externalTaskId,
           dto.getWorkerId(),
           dto.getErrorMessage(),
+          dto.getErrorDetails(),
           dto.getRetries(),
           dto.getRetryTimeout());
     } catch (NotFoundException e) {

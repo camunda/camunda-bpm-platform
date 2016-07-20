@@ -14,6 +14,7 @@
 	  <xa-datasource-property name="User">${database.username}</xa-datasource-property>
 	  <xa-datasource-property name="password">${database.password}</xa-datasource-property>
 	  <driver>com.microsoft.sqlserver</driver>
+	  <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
 	  <validation>
 		<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mssql.MSSQLValidConnectionChecker"></valid-connection-checker>
 	  </validation>

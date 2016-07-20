@@ -93,13 +93,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
   public ProcessInstanceDto startProcessInstance(UriInfo context, StartProcessInstanceDto parameters) {
     ProcessInstanceWithVariables instance = null;
     try {
-      if (parameters.getStartInstructions() == null || parameters.getStartInstructions().isEmpty()) {
-        instance = startProcessInstance(parameters);
-      }
-      else {
-        instance = startProcessInstanceAtActivities(parameters);
-      }
-
+      instance = startProcessInstanceAtActivities(parameters);
     } catch (AuthorizationException e) {
       throw e;
 
@@ -132,15 +126,6 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     return result;
   }
 
-  protected ProcessInstanceWithVariables startProcessInstance(StartProcessInstanceDto dto) {
-    Map<String, Object> variables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
-    String businessKey = dto.getBusinessKey();
-    String caseInstanceId = dto.getCaseInstanceId();
-
-    return (ProcessInstanceWithVariables) engine.getRuntimeService()
-        .startProcessInstanceById(processDefinitionId, businessKey, caseInstanceId, variables);
-  }
-
   protected ProcessInstanceWithVariables startProcessInstanceAtActivities(StartProcessInstanceDto dto) {
     Map<String, Object> processInstanceVariables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
     String businessKey = dto.getBusinessKey();
@@ -152,8 +137,10 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
         .caseInstanceId(caseInstanceId)
         .setVariables(processInstanceVariables);
 
-    for (ProcessInstanceModificationInstructionDto instruction : dto.getStartInstructions()) {
-      instruction.applyTo(instantiationBuilder, engine, objectMapper);
+    if (dto.getStartInstructions() != null && !dto.getStartInstructions().isEmpty()) {
+      for (ProcessInstanceModificationInstructionDto instruction : dto.getStartInstructions()) {
+        instruction.applyTo(instantiationBuilder, engine, objectMapper);
+      }
     }
 
     return instantiationBuilder.executeWithVariablesInReturn(dto.isSkipCustomListeners(), dto.isSkipIoMappings());

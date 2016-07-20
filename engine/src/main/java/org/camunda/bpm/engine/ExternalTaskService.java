@@ -122,6 +122,7 @@ public interface ExternalTaskService {
    */
   public void complete(String externalTaskId, String workerId, Map<String, Object> variables);
 
+
   /**
    * <p>Signals that an external task could not be successfully executed.
    * The task must be assigned to the given worker. The number of retries left can be specified. In addition, a timeout can be
@@ -132,7 +133,7 @@ public interface ExternalTaskService {
    *
    * @param externalTaskId the id of the external task to report a failure for
    * @param workerId the id of the worker that reports the failure
-   * @param errorMessage the error message related to this failure. This message can be retrieved via
+   * @param errorMessage short error message related to this failure. This message can be retrieved via
    *   {@link ExternalTask#getErrorMessage()} and is used as the incident message in case <code>retries</code> is <code>null</code>.
    *   May be <code>null</code>.
    * @param retries the number of retries left. External tasks with 0 retries cannot be fetched anymore unless
@@ -148,6 +149,35 @@ public interface ExternalTaskService {
    *   </ul>
    */
   public void handleFailure(String externalTaskId, String workerId, String errorMessage, int retries, long retryTimeout);
+
+  /**
+   * <p>Signals that an external task could not be successfully executed.
+   * The task must be assigned to the given worker. The number of retries left can be specified. In addition, a timeout can be
+   * provided, such that the task cannot be fetched before <code>now + retryTimeout</code> again.</p>
+   *
+   * <p>If <code>retries</code> is 0, an incident with the given error message is created. The incident gets resolved,
+   * once the number of retries is increased again.</p>
+   *
+   * @param externalTaskId the id of the external task to report a failure for
+   * @param workerId the id of the worker that reports the failure
+   * @param errorMessage short error message related to this failure. This message can be retrieved via
+   *   {@link ExternalTask#getErrorMessage()} and is used as the incident message in case <code>retries</code> is <code>null</code>.
+   *   May be <code>null</code>.
+   * @param errorDetails full error message related to this failure. This message can be retrieved via
+   *   {@link ExternalTaskService#getExternalTaskErrorDetails(String)} ()}
+   * @param retries the number of retries left. External tasks with 0 retries cannot be fetched anymore unless
+   *   the number of retries is increased via API. Must be >= 0.
+   * @param retryTimeout the timeout before the task can be fetched again. Must be >= 0.
+   *
+   * @throws NotFoundException if no external task with the given id exists
+   * @throws BadUserRequestException if the task is assigned to a different worker
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   */
+  public void handleFailure(String externalTaskId, String workerId, String errorMessage, String errorDetails, int retries, long retryTimeout);
 
   /**
    * <p>Signals that an business error appears, which should be handled by the process engine. 
@@ -229,4 +259,18 @@ public interface ExternalTaskService {
    */
   public ExternalTaskQuery createExternalTaskQuery();
 
+  /**
+   * Returns the full error details that occurred while running external task
+   * with the given id. Returns null when the external task has no error details.
+   *
+   * @param externalTaskId id of the external task, cannot be null.
+   *
+   * @throws ProcessEngineException
+   *          When no external task exists with the given id.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#READ_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @since 7.6
+   */
+  String getExternalTaskErrorDetails(String externalTaskId);
 }

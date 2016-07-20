@@ -118,6 +118,25 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
    */
   DecisionDefinitionQuery decisionDefinitionResourceNameLike(String resourceNameLike);
 
+  /**
+   * Only select decision definitions which belongs to a decision requirements definition with the given id.
+   *
+   * @param decisionRequirementsDefinitionId id of the related decision requirements definition
+   */
+  DecisionDefinitionQuery decisionRequirementsDefinitionId(String decisionRequirementsDefinitionId);
+
+  /**
+   * Only select decision definitions which belongs to a decision requirements definition with the given key.
+   *
+   * @param decisionRequirementsDefinitionKey key of the related decision requirements definition
+   */
+  DecisionDefinitionQuery decisionRequirementsDefinitionKey(String decisionRequirementsDefinitionKey);
+
+  /**
+   * Only select decision definitions which belongs to no decision requirements definition.
+   */
+  DecisionDefinitionQuery withoutDecisionRequirementsDefinition();
+
   /** Only select decision definitions with one of the given tenant ids. */
   DecisionDefinitionQuery tenantIdIn(String... tenantIds);
 

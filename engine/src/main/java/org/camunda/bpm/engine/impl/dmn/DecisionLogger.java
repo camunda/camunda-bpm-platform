@@ -62,7 +62,7 @@ public class DecisionLogger extends ProcessEngineLogger {
   public ProcessEngineException exceptionNoDrdForResource(String resourceName) {
     return new ProcessEngineException(exceptionMessage(
         "005",
-        "Found no decision requirement definition for DMN resource '{}'.",
+        "Found no decision requirements definition for DMN resource '{}'.",
         resourceName
       ));
   }

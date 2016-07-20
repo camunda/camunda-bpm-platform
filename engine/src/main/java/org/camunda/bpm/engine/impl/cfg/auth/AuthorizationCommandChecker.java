@@ -30,6 +30,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
 import static org.camunda.bpm.engine.authorization.Resources.BATCH;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.DECISION_REQUIREMENTS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
@@ -46,6 +47,7 @@ import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
@@ -424,6 +426,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
     getAuthorizationManager().checkAuthorization(READ, DECISION_DEFINITION, decisionDefinition.getKey());
   }
 
+  public void checkReadDecisionRequirementsDefinition(DecisionRequirementsDefinitionEntity decisionRequirementsDefinition) {
+    getAuthorizationManager().checkAuthorization(READ, DECISION_REQUIREMENTS_DEFINITION, decisionRequirementsDefinition.getKey());
+  }
+
   @Override
   public void checkReadCaseDefinition(CaseDefinition caseDefinition) {
   }
@@ -461,6 +467,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   public void checkReadHistoryAnyProcessDefinition() {
     getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, ANY);
+  }
+
+  public void checkReadHistoryAnyTaskInstance() {
+    getAuthorizationManager().checkAuthorization(READ_HISTORY, TASK, ANY);
   }
 
   @Override

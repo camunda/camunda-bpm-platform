@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.findCamundaExtensionElement;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseCamundaScript;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseInputOutput;
+import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -146,7 +147,6 @@ import org.camunda.bpm.engine.impl.util.xml.Namespace;
 import org.camunda.bpm.engine.impl.util.xml.Parse;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 /**
  * Specific parsing of one BPMN 2.0 XML file, created by the {@link BpmnParser}.
@@ -166,6 +166,7 @@ import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDele
  * @author Ronny Bräunlich
  * @author Christopher Zell
  * @author Deivarayan Azhagappan
+ * @author Ingo Richtsmeier
  */
 public class BpmnParse extends Parse {
 
@@ -2073,7 +2074,7 @@ public class BpmnParse extends Parse {
         parseEmailServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
       } else if (type.equalsIgnoreCase("shell")) {
         parseShellServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
-      } else if (isExternalTaskType(type)) {
+      } else if (type.equalsIgnoreCase("external")) {
         parseExternalServiceTask(activity, serviceTaskElement);
       } else {
         addError("Invalid usage of type attribute on " + elementName + ": '" + type + "'", serviceTaskElement);
@@ -2264,34 +2265,24 @@ public class BpmnParse extends Parse {
    */
   public ActivityImpl parseSendTask(Element sendTaskElement, ScopeImpl scope) {
     if (isServiceTaskLike(sendTaskElement)) {
-      // CAM-942: If expression or class is set on a SendTask it behaves like a
-      // service task
+      // CAM-942: If expression or class is set on a SendTask it behaves like a service task
       // to allow implementing the send handling yourself
       return parseServiceTaskLike("sendTask", sendTaskElement, scope);
     } else {
       ActivityImpl activity = createActivityOnScope(sendTaskElement, scope);
 
       parseAsynchronousContinuationForActivity(sendTaskElement, activity);
-
-      // for e-mail
-      String type = sendTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type");
-
-      // for e-mail
-      if (type != null) {
-        if (type.equalsIgnoreCase("mail")) {
-          parseEmailServiceTask(activity, sendTaskElement, parseFieldDeclarations(sendTaskElement));
-        } else {
-          addError("Invalid usage of type attribute: '" + type + "'", sendTaskElement);
-        }
-      } else {
-        addError("One of the attributes 'class', 'delegateExpression', 'type', or 'expression' is mandatory on sendTask.", sendTaskElement);
-      }
-
       parseExecutionListenersOnScope(sendTaskElement, activity);
 
       for (BpmnParseListener parseListener : parseListeners) {
         parseListener.parseSendTask(sendTaskElement, scope, activity);
       }
+
+      // activity behavior could be set by a listener; thus, check is after listener invocation
+      if (activity.getActivityBehavior() == null) {
+        addError("One of the attributes 'class', 'delegateExpression', 'type', or 'expression' is mandatory on sendTask.", sendTaskElement);
+      }
+
       return activity;
     }
   }
@@ -4209,16 +4200,18 @@ public class BpmnParse extends Parse {
     return "true".equals(element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "asyncAfter"));
   }
 
-  private boolean isServiceTaskLike(Element element) {
+  protected boolean isServiceTaskLike(Element element) {
 
     return element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_CLASS) != null
         || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_EXPRESSION) != null
         || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_DELEGATE_EXPRESSION) != null
-        || isExternalTaskType(element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type"));
+        || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type") != null
+        || hasConnector(element);
   }
 
-  protected boolean isExternalTaskType(String type) {
-    return "external".equalsIgnoreCase(type);
+  protected boolean hasConnector(Element element) {
+    Element extensionElements = element.element("extensionElements");
+    return extensionElements != null && extensionElements.element("connector") != null;
   }
 
   public Map<String, List<JobDeclaration<?, ?>>> getJobDeclarations() {

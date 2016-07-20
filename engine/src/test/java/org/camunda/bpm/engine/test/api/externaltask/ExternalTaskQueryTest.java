@@ -19,6 +19,8 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.externalT
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.externalTaskByProcessInstanceId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,6 +29,7 @@ import java.util.List;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -42,6 +45,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
 
   protected static final String WORKER_ID = "aWorkerId";
   protected static final String TOPIC_NAME = "externalTaskTopic";
+  protected static final String ERROR_MESSAGE = "error";
 
   protected void setUp() throws Exception {
     ClockUtil.setCurrentTime(new Date());
@@ -421,8 +425,8 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     startInstancesByKey("oneExternalTaskProcess", 5);
 
     List<LockedExternalTask> tasks = lockInstances(TOPIC_NAME, 10000L, 3, WORKER_ID);
-    failInstances(tasks.subList(0, 2), "error", 0, 5000L);  // two tasks have no retries left
-    failInstances(tasks.subList(2, 3), "error", 4, 5000L);  // one task has retries left
+    failInstances(tasks.subList(0, 2), ERROR_MESSAGE, 0, 5000L);  // two tasks have no retries left
+    failInstances(tasks.subList(2, 3), ERROR_MESSAGE, 4, 5000L);  // one task has retries left
 
     // when
     List<ExternalTask> tasksWithRetries = externalTaskService
@@ -495,8 +499,12 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   protected void failInstances(List<LockedExternalTask> tasks, String errorMessage, int retries, long retryTimeout) {
+    this.failInstances(tasks,errorMessage,null,retries,retryTimeout);
+  }
+
+  protected void failInstances(List<LockedExternalTask> tasks, String errorMessage, String errorDetails, int retries, long retryTimeout) {
     for (LockedExternalTask task : tasks) {
-      externalTaskService.handleFailure(task.getId(), task.getWorkerId(), errorMessage, retries, retryTimeout);
+      externalTaskService.handleFailure(task.getId(), task.getWorkerId(), errorMessage, errorDetails, retries, retryTimeout);
     }
   }
 

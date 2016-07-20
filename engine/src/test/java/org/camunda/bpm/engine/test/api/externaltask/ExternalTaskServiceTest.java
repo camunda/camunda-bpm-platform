@@ -12,11 +12,8 @@
  */
 package org.camunda.bpm.engine.test.api.externaltask;
 
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
-
-import java.util.Date;
-import java.util.List;
-
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.ibatis.jdbc.RuntimeSqlException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
@@ -37,7 +34,16 @@ import org.camunda.bpm.engine.test.util.AssertUtil;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.joda.time.DateTime;
+import org.junit.Assert;
+
+import java.util.Date;
+import java.util.List;
+
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 
 /**
  * @author Thorben Lindhauer
@@ -410,6 +416,61 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(44L, variables.get("subProcessVar"));
     assertEquals(45L, variables.get("taskVar"));
 
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchVariables.bpmn20.xml")
+  public void testFetchAllVariables() {
+    // given
+    runtimeService.startProcessInstanceByKey("subProcessExternalTask",
+        Variables.createVariables()
+            .putValue("processVar1", 42)
+            .putValue("processVar2", 43));
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    // then
+    LockedExternalTask task = externalTasks.get(0);
+    verifyVariables(task);
+
+    runtimeService.startProcessInstanceByKey("subProcessExternalTask",
+        Variables.createVariables()
+            .putValue("processVar1", 42)
+            .putValue("processVar2", 43));
+
+    externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .variables((String[]) null)
+        .execute();
+
+    task = externalTasks.get(0);
+    verifyVariables(task);
+
+    runtimeService.startProcessInstanceByKey("subProcessExternalTask",
+        Variables.createVariables()
+            .putValue("processVar1", 42)
+            .putValue("processVar2", 43));
+
+    List<String> list = null;
+    externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .variables(list)
+        .execute();
+
+    task = externalTasks.get(0);
+    verifyVariables(task);
+  }
+
+  private void verifyVariables(LockedExternalTask task) {
+    VariableMap variables = task.getVariables();
+    assertEquals(4, variables.size());
+
+    assertEquals(42, variables.get("processVar1"));
+    assertEquals(43, variables.get("processVar2"));
+    assertEquals(44L, variables.get("subProcessVar"));
+    assertEquals(45L, variables.get("taskVar"));
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
@@ -949,6 +1010,53 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testHandleFailureWithErrorDetails() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = tasks.get(0);
+
+    // when submitting a failure (after a simulated processing time of three seconds)
+    ClockUtil.setCurrentTime(nowPlus(3000L));
+
+    String errorMessage;
+    String exceptionStackTrace;
+    try {
+      RuntimeSqlException cause = new RuntimeSqlException("test cause");
+      for (int i = 0; i < 10; i++) {
+        cause = new RuntimeSqlException(cause);
+      }
+      throw cause;
+    } catch (RuntimeException e) {
+      exceptionStackTrace = ExceptionUtils.getStackTrace(e);
+      errorMessage = e.getMessage();
+      while (errorMessage.length() < 1000) {
+        errorMessage = errorMessage + ":" + e.getMessage();
+      }
+    }
+    Assert.assertThat(exceptionStackTrace,is(notNullValue()));
+//  make sure that stack trace is longer then errorMessage DB field length
+    Assert.assertThat(exceptionStackTrace.length(),is(greaterThan(4000)));
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, exceptionStackTrace, 5, 3000L);
+    ClockUtil.setCurrentTime(nowPlus(4000L));
+    tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+    Assert.assertThat(tasks.size(), is(1));
+
+    // verify that exception is accessible properly
+    task = tasks.get(0);
+    Assert.assertThat(task.getErrorMessage(),is(errorMessage.substring(0,666)));
+    Assert.assertThat(task.getRetries(),is(5));
+    Assert.assertThat(externalTaskService.getExternalTaskErrorDetails(task.getId()),is(exceptionStackTrace));
+    Assert.assertThat(task.getErrorDetails(),is(exceptionStackTrace));
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testHandleFailureZeroRetries() {
     // given
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
@@ -1152,6 +1260,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
 
     assertEquals(5, (int) task.getRetries());
     assertNull(task.getErrorMessage());
+    assertNull(externalTaskService.getExternalTaskErrorDetails(task.getId()));
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")

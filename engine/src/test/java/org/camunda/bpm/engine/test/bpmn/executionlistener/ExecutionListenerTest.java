@@ -10,34 +10,88 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.test.bpmn.executionlistener;
 
 import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import junit.framework.AssertionFailedError;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.CurrentActivityExecutionListener.CurrentActivity;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Frederik Heremans
  */
-public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
+public class ExecutionListenerTest {
 
+  public ProcessEngineRule processEngineRule = new ProvidedProcessEngineRule();
+  public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(processEngineRule);
 
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(processEngineRule).around(testHelper);
+
+  protected RuntimeService runtimeService;
+  protected TaskService taskService;
+  protected HistoryService historyService;
+  protected ManagementService managementService;
+
+  @Before
+  public void clearRecorderListener() {
+    RecorderExecutionListener.clear();
+  }
+
+  @Before
+  public void initServices() {
+    runtimeService = processEngineRule.getRuntimeService();
+    taskService = processEngineRule.getTaskService();
+    historyService = processEngineRule.getHistoryService();
+    managementService = processEngineRule.getManagementService();
+  }
+
+  public void assertProcessEnded(final String processInstanceId) {
+    ProcessInstance processInstance = runtimeService
+            .createProcessInstanceQuery()
+            .processInstanceId(processInstanceId)
+            .singleResult();
+
+    if (processInstance != null) {
+      throw new AssertionFailedError("Expected finished process instance '" + processInstanceId + "' but it was still in the db");
+    }
+  }
+
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/executionlistener/ExecutionListenersProcess.bpmn20.xml"})
   public void testExecutionListenersOnAllPossibleElements() {
 
@@ -82,6 +136,7 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstance.getId());
   }
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/executionlistener/ExecutionListenersStartEndEvent.bpmn20.xml"})
   public void testExecutionListenersOnStartEndEvents() {
     RecorderExecutionListener.clear();
@@ -118,7 +173,7 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/executionlistener/ExecutionListenersFieldInjectionProcess.bpmn20.xml"})
   public void testExecutionListenerFieldInjection() {
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -134,6 +189,7 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
     assertEquals("Yes, I am listening!", varSetByListener);
   }
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/executionlistener/ExecutionListenersCurrentActivity.bpmn20.xml"})
   public void testExecutionListenerCurrentActivity() {
 
@@ -155,6 +211,7 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
     assertEquals("End Event", currentActivities.get(2).getActivityName());
   }
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/executionlistener/ExecutionListenerTest.testOnBoundaryEvents.bpmn20.xml"})
   public void testOnBoundaryEvents() {
     RecorderExecutionListener.clear();
@@ -185,12 +242,14 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
     assertThat(recordedEvents.get(1).isCanceled(), is(false));
   }
 
+  @Test
   @Deployment
   public void testScriptListener() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     assertTrue(processInstance.isEnded());
 
-    if (processEngineConfiguration.getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+
+    if (processEngineRule.getProcessEngineConfiguration().getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
       HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
       long count = query.count();
       assertEquals(5, count);
@@ -205,6 +264,7 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/executionlistener/ExecutionListenerTest.testScriptResourceListener.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/executionlistener/executionListener.groovy"
@@ -213,7 +273,7 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     assertTrue(processInstance.isEnded());
 
-    if (processEngineConfiguration.getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+    if (processEngineRule.getProcessEngineConfiguration().getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
       HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
       long count = query.count();
       assertEquals(5, count);
@@ -228,6 +288,7 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   @Deployment
   public void testExecutionListenerOnTerminateEndEvent() {
     RecorderExecutionListener.clear();
@@ -246,6 +307,7 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/executionlistener/ExecutionListenerTest.testOnCancellingBoundaryEvent.bpmn"})
   public void testOnCancellingBoundaryEvents() {
     RecorderExecutionListener.clear();
@@ -266,12 +328,102 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
     assertThat(recordedEvents.get(0).isCanceled(), is(true));
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/executionlistener/MultipleServiceTaskExecutionListenerCall.bpmn20.xml"})
-  public void FAILING_testMultipleServiceTaskExecutionListenerCall() {
+  private static final String MESSAGE = "cancelMessage";
+  public static final BpmnModelInstance PROCESS_SERVICE_TASK_WITH_EXECUTION_START_LISTENER = Bpmn.createExecutableProcess("Process")
+          .startEvent()
+          .parallelGateway("fork")
+          .userTask("userTask1")
+          .serviceTask("sendTask")
+            .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, SendMessageDelegate.class.getName())
+            .camundaExpression("${true}")
+          .endEvent("endEvent")
+            .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
+          .moveToLastGateway()
+          .userTask("userTask2")
+          .boundaryEvent("boundaryEvent")
+          .message(MESSAGE)
+          .endEvent("endBoundaryEvent")
+          .moveToNode("userTask2")
+          .endEvent()
+          .done();
+
+  @Test
+  public void testServiceTaskExecutionListenerCall() {
+    testHelper.deploy(PROCESS_SERVICE_TASK_WITH_EXECUTION_START_LISTENER);
     runtimeService.startProcessInstanceByKey("Process");
-    Task task = taskService.createTaskQuery().taskDefinitionKey("Second").singleResult();
-    formService.submitTaskForm(task.getId(), null);
-    
+    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask1").singleResult();
+    taskService.complete(task.getId());
+
     assertEquals(0, taskService.createTaskQuery().list().size());
-   }
+    List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+    assertEquals(1, recordedEvents.size());
+    assertEquals("endEvent", recordedEvents.get(0).getActivityId());
+  }
+
+  public static final BpmnModelInstance PROCESS_SERVICE_TASK_WITH_TWO_EXECUTION_START_LISTENER = modify(PROCESS_SERVICE_TASK_WITH_EXECUTION_START_LISTENER)
+          .activityBuilder("sendTask")
+          .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
+          .done();
+
+  @Test
+  public void testServiceTaskTwoExecutionListenerCall() {
+    testHelper.deploy(PROCESS_SERVICE_TASK_WITH_TWO_EXECUTION_START_LISTENER);
+    runtimeService.startProcessInstanceByKey("Process");
+    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask1").singleResult();
+    taskService.complete(task.getId());
+
+    assertEquals(0, taskService.createTaskQuery().list().size());
+    List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+    assertEquals(2, recordedEvents.size());
+    assertEquals("sendTask", recordedEvents.get(0).getActivityId());
+    assertEquals("endEvent", recordedEvents.get(1).getActivityId());
+  }
+
+  public static final BpmnModelInstance PROCESS_SERVICE_TASK_WITH_EXECUTION_START_LISTENER_AND_SUB_PROCESS = modify(Bpmn.createExecutableProcess("Process")
+          .startEvent()
+          .userTask("userTask")
+          .serviceTask("sendTask")
+            .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, SendMessageDelegate.class.getName())
+            .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
+            .camundaExpression("${true}")
+          .endEvent("endEvent")
+            .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
+          .done())
+          .addSubProcessTo("Process")
+            .triggerByEvent()
+            .embeddedSubProcess()
+            .startEvent("startSubProcess")
+              .interrupting(false)
+              .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
+              .message(MESSAGE)
+            .userTask("subProcessTask")
+              .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
+            .endEvent("endSubProcess")
+          .done();
+
+  @Test
+  public void testServiceTaskExecutionListenerCallAndSubProcess() {
+    testHelper.deploy(PROCESS_SERVICE_TASK_WITH_EXECUTION_START_LISTENER_AND_SUB_PROCESS);
+    runtimeService.startProcessInstanceByKey("Process");
+    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask").singleResult();
+    taskService.complete(task.getId());
+
+    assertEquals(1, taskService.createTaskQuery().list().size());
+
+    List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+    assertEquals(4, recordedEvents.size());
+    assertEquals("startSubProcess", recordedEvents.get(0).getActivityId());
+    assertEquals("subProcessTask", recordedEvents.get(1).getActivityId());
+    assertEquals("sendTask", recordedEvents.get(2).getActivityId());
+    assertEquals("endEvent", recordedEvents.get(3).getActivityId());
+  }
+
+  public static class SendMessageDelegate implements JavaDelegate {
+
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+      RuntimeService runtimeService = execution.getProcessEngineServices().getRuntimeService();
+      runtimeService.correlateMessage(MESSAGE);
+    }
+  }
 }

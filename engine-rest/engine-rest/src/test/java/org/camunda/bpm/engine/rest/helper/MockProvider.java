@@ -12,23 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.helper;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.EntityTypes;
@@ -66,6 +49,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.history.TaskReportResult;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
@@ -83,7 +67,7 @@ import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.Resource;
@@ -112,6 +96,23 @@ import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Provides mocks for the basic engine entities, such as
@@ -798,6 +799,11 @@ public abstract class MockProvider {
   public static final int EXAMPLE_BATCH_FAILED_JOBS = 23;
 
   // tasks
+  public static final Long EXAMPLE_HISTORIC_TASK_REPORT_COUNT = 12L;
+  public static final String EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION = "aTaskDefinition";
+  public static final String EXAMPLE_HISTORIC_TASK_START_TIME = "2016-04-12T15:29:33";
+  public static final String EXAMPLE_HISTORIC_TASK_END_TIME = "2016-04-12T16:23:34";
+
   public static Task createMockTask() {
     return mockTask().build();
   }
@@ -916,6 +922,14 @@ public abstract class MockProvider {
     List<TaskCountByCandidateGroupResult> mockList = new ArrayList<TaskCountByCandidateGroupResult>();
     mockList.add(mock);
     return mockList;
+  }
+
+  public static List<TaskReportResult> createMockHistoricTaskInstanceReport() {
+    TaskReportResult mock = mock(TaskReportResult.class);
+    when(mock.getCount()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_COUNT);
+    when(mock.getDefinition()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION);
+
+    return Collections.singletonList(mock);
   }
 
   // form data
@@ -2425,7 +2439,9 @@ public abstract class MockProvider {
       .version(EXAMPLE_DECISION_DEFINITION_VERSION)
       .resource(EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME)
       .diagram(EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME)
-      .deploymentId(EXAMPLE_DEPLOYMENT_ID);
+      .deploymentId(EXAMPLE_DEPLOYMENT_ID)
+      .decisionRequirementsDefinitionId(EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID)
+      .decisionRequirementsDefinitionKey(EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY);
   }
 
   public static DecisionDefinition createMockDecisionDefinition() {
@@ -2454,19 +2470,19 @@ public abstract class MockProvider {
       .deploymentId(EXAMPLE_DEPLOYMENT_ID);
   }
 
-  public static DecisionRequirementDefinition createMockDecisionRequirementsDefinition() {
+  public static DecisionRequirementsDefinition createMockDecisionRequirementsDefinition() {
     return mockDecisionRequirementsDefinition().build();
   }
 
-  public static DecisionRequirementDefinition createAnotherMockDecisionRequirementsDefinition() {
+  public static DecisionRequirementsDefinition createAnotherMockDecisionRequirementsDefinition() {
     return mockDecisionRequirementsDefinition()
       .id(ANOTHER_EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID)
       .tenantId(ANOTHER_EXAMPLE_TENANT_ID)
       .build();
   }
 
-  public static List<DecisionRequirementDefinition> createMockTwoDecisionRequirementsDefinitions() {
-    List<DecisionRequirementDefinition> mocks = new ArrayList<DecisionRequirementDefinition>();
+  public static List<DecisionRequirementsDefinition> createMockTwoDecisionRequirementsDefinitions() {
+    List<DecisionRequirementsDefinition> mocks = new ArrayList<DecisionRequirementsDefinition>();
     mocks.add(createMockDecisionRequirementsDefinition());
     mocks.add(createAnotherMockDecisionRequirementsDefinition());
     return mocks;
@@ -2545,6 +2561,9 @@ public abstract class MockProvider {
     when(mock.getEvaluationTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATION_TIME));
     when(mock.getUserId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_USER_ID);
     when(mock.getCollectResultValue()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_COLLECT_RESULT_VALUE);
+    when(mock.getRootDecisionInstanceId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_ID);
+    when(mock.getDecisionRequirementsDefinitionId()).thenReturn(EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID);
+    when(mock.getDecisionRequirementsDefinitionKey()).thenReturn(EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY);
     when(mock.getTenantId()).thenReturn(tenantId);
 
     return mock;

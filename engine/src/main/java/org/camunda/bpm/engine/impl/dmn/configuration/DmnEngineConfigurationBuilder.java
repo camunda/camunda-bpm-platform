@@ -17,18 +17,18 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationListener;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationListener;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.spi.el.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnTransformer;
 import org.camunda.bpm.engine.impl.dmn.el.ProcessEngineElProvider;
 import org.camunda.bpm.engine.impl.dmn.transformer.DecisionDefinitionHandler;
-import org.camunda.bpm.engine.impl.dmn.transformer.DecisionRequirementDefinitionTransformHandler;
+import org.camunda.bpm.engine.impl.dmn.transformer.DecisionRequirementsDefinitionTransformHandler;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.history.parser.HistoryDecisionTableListener;
+import org.camunda.bpm.engine.impl.history.parser.HistoryDecisionEvaluationListener;
 import org.camunda.bpm.engine.impl.history.producer.DmnHistoryEventProducer;
-import org.camunda.bpm.engine.impl.metrics.dmn.MetricsDecisionTableListener;
+import org.camunda.bpm.engine.impl.metrics.dmn.MetricsDecisionEvaluationListener;
 import org.camunda.bpm.model.dmn.instance.Decision;
 import org.camunda.bpm.model.dmn.instance.Definitions;
 
@@ -86,12 +86,12 @@ public class DmnEngineConfigurationBuilder {
    */
   public DefaultDmnEngineConfiguration build() {
 
-    List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners = createCustomPostDecisionTableEvaluationListeners();
-    dmnEngineConfiguration.setCustomPostDecisionTableEvaluationListeners(decisionTableEvaluationListeners);
+    List<DmnDecisionEvaluationListener> decisionEvaluationListeners = createCustomPostDecisionEvaluationListeners();
+    dmnEngineConfiguration.setCustomPostDecisionEvaluationListeners(decisionEvaluationListeners);
 
     // override the decision table handler
     DmnTransformer dmnTransformer = dmnEngineConfiguration.getTransformer();
-    dmnTransformer.getElementTransformHandlerRegistry().addHandler(Definitions.class, new DecisionRequirementDefinitionTransformHandler());
+    dmnTransformer.getElementTransformHandlerRegistry().addHandler(Definitions.class, new DecisionRequirementsDefinitionTransformHandler());
     dmnTransformer.getElementTransformHandlerRegistry().addHandler(Decision.class, new DecisionDefinitionHandler());
 
     // do not override the script engine resolver if set
@@ -112,18 +112,18 @@ public class DmnEngineConfigurationBuilder {
     return dmnEngineConfiguration;
   }
 
-  protected List<DmnDecisionTableEvaluationListener> createCustomPostDecisionTableEvaluationListeners() {
+  protected List<DmnDecisionEvaluationListener> createCustomPostDecisionEvaluationListeners() {
     ensureNotNull("dmnHistoryEventProducer", dmnHistoryEventProducer);
     // note that the history level may be null - see CAM-5165
 
-    HistoryDecisionTableListener historyDecisionTableListener = new HistoryDecisionTableListener(dmnHistoryEventProducer, historyLevel);
+    HistoryDecisionEvaluationListener historyDecisionEvaluationListener = new HistoryDecisionEvaluationListener(dmnHistoryEventProducer, historyLevel);
 
-    List<DmnDecisionTableEvaluationListener> customPostDecisionTableEvaluationListeners = dmnEngineConfiguration
-        .getCustomPostDecisionTableEvaluationListeners();
-    customPostDecisionTableEvaluationListeners.add(new MetricsDecisionTableListener());
-    customPostDecisionTableEvaluationListeners.add(historyDecisionTableListener);
+    List<DmnDecisionEvaluationListener> customPostDecisionEvaluationListeners = dmnEngineConfiguration
+        .getCustomPostDecisionEvaluationListeners();
+    customPostDecisionEvaluationListeners.add(new MetricsDecisionEvaluationListener());
+    customPostDecisionEvaluationListeners.add(historyDecisionEvaluationListener);
 
-    return customPostDecisionTableEvaluationListeners;
+    return customPostDecisionEvaluationListeners;
   }
 
 }

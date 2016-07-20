@@ -120,6 +120,8 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   private FormService formServiceMock;
   private ManagementService managementServiceMock;
   private ProcessDefinitionQuery processDefinitionQueryMock;
+  private ProcessInstanceWithVariables mockInstance;
+  private ProcessInstantiationBuilder mockInstantiationBuilder;
 
   @Before
   public void setUpRuntimeData() {
@@ -142,13 +144,19 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   }
 
   private void setUpRuntimeDataForDefinition(ProcessDefinition mockDefinition) {
-    ProcessInstanceWithVariables mockInstance = MockProvider.createMockInstanceWithVariables();
+    mockInstance = MockProvider.createMockInstanceWithVariables();
 
     // we replace this mock with every test in order to have a clean one (in terms of invocations) for verification
     runtimeServiceMock = mock(RuntimeService.class);
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
     when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
     when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), anyString(), anyString(), Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
+
+
+    mockInstantiationBuilder = setUpMockInstantiationBuilder();
+    when(mockInstantiationBuilder.executeWithVariablesInReturn(anyBoolean(), anyBoolean())).thenReturn(mockInstance);
+    when(runtimeServiceMock.createProcessInstanceById(anyString())).thenReturn(mockInstantiationBuilder);
+
 
     repositoryServiceMock = mock(RepositoryService.class);
     when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
@@ -862,51 +870,14 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSimpleProcessInstantiationWithVariables() {
-    //given request with parameter withVariables to get the variables in return
-    Map<String, Object> json = new HashMap<String, Object>();
-    json.put("withVariablesInReturn", true);
-
-    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-            .contentType(POST_JSON_CONTENT_TYPE).body(json)
-            .then().expect()
-            .statusCode(Status.OK.getStatusCode())
-            .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
-            .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".value",
-                    equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
-            .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type",
-                    equalTo("String"))
-            .when().post(START_PROCESS_INSTANCE_URL);
-
-    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), isNull(String.class), isNull(String.class), isNull(Map.class));
-  }
-
-  @Test
-  public void testProcessInstantiationWithParametersAndVariablesInReturn() {
-    //given parameters and variables
-    Map<String, Object> parameters = VariablesBuilder.create()
-        .variable("aBoolean", Boolean.TRUE)
-        .variable("aString", "aStringVariableValue")
-        .variable("anInteger", 42).getVariables();
-
-    VariableMap variables = Variables.createVariables()
-            .putValueTyped("aBoolean", Variables.booleanValue(Boolean.TRUE))
-            .putValueTyped("aString", Variables.stringValue("aStringVariableValue"))
-            .putValueTyped("anInteger", Variables.integerValue(42))
-            .putValueTyped(EXAMPLE_VARIABLE_INSTANCE_NAME, EXAMPLE_PRIMITIVE_VARIABLE_VALUE);
-
-
-    //mock process instance and runtime service
+    //mock process instance
     ProcessInstanceWithVariables mockInstance = MockProvider.createMockInstanceWithVariables();
-    when(mockInstance.getVariables()).thenReturn(variables);
+    ProcessInstantiationBuilder mockInstantiationBuilder = setUpMockInstantiationBuilder();
+    when(mockInstantiationBuilder.executeWithVariablesInReturn(anyBoolean(), anyBoolean())).thenReturn(mockInstance);
+    when(runtimeServiceMock.createProcessInstanceById(anyString())).thenReturn(mockInstantiationBuilder);
 
-    runtimeServiceMock = mock(RuntimeService.class);
-    when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
-    when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID),
-            anyString(), anyString(), Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
-
-
+    //given request with parameter withVariables to get variables in return
     Map<String, Object> json = new HashMap<String, Object>();
-    json.put("variables", parameters);
     json.put("withVariablesInReturn", true);
 
     //when request then return process instance with variables
@@ -919,21 +890,10 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
                     equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
             .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type",
                     equalTo("String"))
-            .body("variables.aBoolean.type", equalTo("Boolean"))
-            .body("variables.aBoolean.value", equalTo(Boolean.TRUE))
-            .body("variables.aString.type", equalTo("String"))
-            .body("variables.aString.value", equalTo("aStringVariableValue"))
-            .body("variables.anInteger.type", equalTo("Integer"))
-            .body("variables.anInteger.value", equalTo(42))
             .when().post(START_PROCESS_INSTANCE_URL);
 
-    Map<String, Object> expectedParameters = new HashMap<String, Object>();
-    expectedParameters.put("aBoolean", Boolean.TRUE);
-    expectedParameters.put("aString", "aStringVariableValue");
-    expectedParameters.put("anInteger", 42);
-
-    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID),
-            isNull(String.class), isNull(String.class), argThat(new EqualsMap(expectedParameters)));
+    verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+    verify(mockInstantiationBuilder).executeWithVariablesInReturn(anyBoolean(), anyBoolean());
 
   }
 
@@ -959,8 +919,9 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     expectedParameters.put("aString", "aStringVariableValue");
     expectedParameters.put("anInteger", 42);
 
-    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), isNull(String.class), isNull(String.class), argThat(new EqualsMap(expectedParameters)));
-
+    verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+    verify(mockInstantiationBuilder).setVariables(argThat(new EqualsMap(expectedParameters)));
+    verify(mockInstantiationBuilder).executeWithVariablesInReturn(anyBoolean(), anyBoolean());
   }
 
   @Test
@@ -975,8 +936,9 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .when().post(START_PROCESS_INSTANCE_URL);
 
-    verify(runtimeServiceMock).startProcessInstanceById(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, "myBusinessKey", null, null);
-
+    verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+    verify(mockInstantiationBuilder).businessKey("myBusinessKey");
+    verify(mockInstantiationBuilder).executeWithVariablesInReturn(anyBoolean(), anyBoolean());
   }
 
   @Test
@@ -1003,14 +965,14 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     expectedParameters.put("aString", "aStringVariableValue");
     expectedParameters.put("anInteger", 42);
 
-    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), eq("myBusinessKey"), isNull(String.class), argThat(new EqualsMap(expectedParameters)));
-
+    verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+    verify(mockInstantiationBuilder).businessKey("myBusinessKey");
+    verify(mockInstantiationBuilder).setVariables(argThat(new EqualsMap(expectedParameters)));
+    verify(mockInstantiationBuilder).executeWithVariablesInReturn(anyBoolean(), anyBoolean());
   }
 
   @Test
   public void testProcessInstantiationAtActivitiesById() {
-    ProcessInstantiationBuilder mockInstantiationBuilder = setUpMockInstantiationBuilder();
-    when(runtimeServiceMock.createProcessInstanceById(anyString())).thenReturn(mockInstantiationBuilder);
 
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", VariablesBuilder.create()
@@ -1337,7 +1299,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
    */
   @Test
   public void testUnsuccessfulInstantiation() {
-    when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), anyString(), anyString(), Matchers.<Map<String, Object>>any()))
+    when(mockInstantiationBuilder.executeWithVariablesInReturn(anyBoolean(), anyBoolean()))
       .thenThrow(new ProcessEngineException("expected exception"));
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -1352,7 +1314,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   @Test
   public void testStartProcessInstanceByIdThrowsAuthorizationException() {
     String message = "expected exception";
-    when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), anyString(), anyString(), Matchers.<Map<String, Object>>any()))
+    when(mockInstantiationBuilder.executeWithVariablesInReturn(anyBoolean(), anyBoolean()))
       .thenThrow(new AuthorizationException(message));
 
     given()
@@ -2708,8 +2670,9 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     expectedParameters.put("aString", "aStringVariableValue");
     expectedParameters.put("anInteger", 42);
 
-    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), isNull(String.class), isNull(String.class), argThat(new EqualsMap(expectedParameters)));
-
+    verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+    verify(mockInstantiationBuilder).setVariables(argThat(new EqualsMap(expectedParameters)));
+    verify(mockInstantiationBuilder).executeWithVariablesInReturn(anyBoolean(), anyBoolean());
   }
 
   @Test
@@ -2724,8 +2687,9 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
 
-    verify(runtimeServiceMock).startProcessInstanceById(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, "myBusinessKey", null, null);
-
+    verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+    verify(mockInstantiationBuilder).businessKey("myBusinessKey");
+    verify(mockInstantiationBuilder).executeWithVariablesInReturn(anyBoolean(), anyBoolean());
   }
 
   @Test
@@ -2752,8 +2716,10 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     expectedParameters.put("aString", "aStringVariableValue");
     expectedParameters.put("anInteger", 42);
 
-    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), eq("myBusinessKey"), isNull(String.class), argThat(new EqualsMap(expectedParameters)));
-
+    verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+    verify(mockInstantiationBuilder).businessKey("myBusinessKey");
+    verify(mockInstantiationBuilder).setVariables(argThat(new EqualsMap(expectedParameters)));
+    verify(mockInstantiationBuilder).executeWithVariablesInReturn(anyBoolean(), anyBoolean());
   }
 
   /**
@@ -2761,7 +2727,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
    */
   @Test
   public void testUnsuccessfulInstantiation_ByKey() {
-    when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), anyString(), anyString(), Matchers.<Map<String, Object>>any()))
+    when(mockInstantiationBuilder.executeWithVariablesInReturn(anyBoolean(), anyBoolean()))
       .thenThrow(new ProcessEngineException("expected exception"));
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -2776,7 +2742,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   @Test
   public void testStartProcessInstanceByKeyThrowsAuthorizationException() {
     String message = "expected exception";
-    when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), anyString(), anyString(), Matchers.<Map<String, Object>>any()))
+    when(mockInstantiationBuilder.executeWithVariablesInReturn(anyBoolean(), anyBoolean()))
       .thenThrow(new AuthorizationException(message));
 
     given()
@@ -3334,8 +3300,9 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .when().post(START_PROCESS_INSTANCE_URL);
 
-    verify(runtimeServiceMock).startProcessInstanceById(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, null, "myCaseInstanceId", null);
-
+    verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+    verify(mockInstantiationBuilder).caseInstanceId("myCaseInstanceId");
+    verify(mockInstantiationBuilder).executeWithVariablesInReturn(anyBoolean(), anyBoolean());
   }
 
   @Test
@@ -3351,8 +3318,10 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .when().post(START_PROCESS_INSTANCE_URL);
 
-    verify(runtimeServiceMock).startProcessInstanceById(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, "myBusinessKey", "myCaseInstanceId", null);
-
+    verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+    verify(mockInstantiationBuilder).businessKey("myBusinessKey");
+    verify(mockInstantiationBuilder).caseInstanceId("myCaseInstanceId");
+    verify(mockInstantiationBuilder).executeWithVariablesInReturn(anyBoolean(), anyBoolean());
   }
 
   @Test
@@ -3380,8 +3349,11 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     expectedParameters.put("aString", "aStringVariableValue");
     expectedParameters.put("anInteger", 42);
 
-    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), eq("myBusinessKey"), eq("myCaseInstanceId"), argThat(new EqualsMap(expectedParameters)));
-
+    verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+    verify(mockInstantiationBuilder).businessKey("myBusinessKey");
+    verify(mockInstantiationBuilder).caseInstanceId("myCaseInstanceId");
+    verify(mockInstantiationBuilder).setVariables(argThat(new EqualsMap(expectedParameters)));
+    verify(mockInstantiationBuilder).executeWithVariablesInReturn(anyBoolean(), anyBoolean());
   }
 
   @Test

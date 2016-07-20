@@ -10,11 +10,12 @@ create table ACT_RE_DECISION_DEF (
     RESOURCE_NAME_ NVARCHAR2(2000),
     DGRM_RESOURCE_NAME_ NVARCHAR2(2000),
     DEC_REQ_ID_ NVARCHAR2(64),
+    DEC_REQ_KEY_ NVARCHAR2(255),
     TENANT_ID_ NVARCHAR2(64),
     primary key (ID_)
 );
 
--- create decision requirement definition table --
+-- create decision requirements definition table --
 create table ACT_RE_DECISION_REQ_DEF (
     ID_ NVARCHAR2(64) NOT NULL,
     REV_ INTEGER,

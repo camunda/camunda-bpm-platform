@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,13 +39,11 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableCollectionProvider;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableListenerInvocationListener;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
-import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariableStoreObserver;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariablesProvider;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -81,7 +78,7 @@ import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -94,7 +91,7 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  * @author Daniel Meyer
  * @author Falko Menge
  */
-public class ExecutionEntity extends PvmExecutionImpl implements Execution, ProcessInstanceWithVariables, DbEntity, HasDbRevision, HasDbReferences, VariablesProvider<VariableInstanceEntity> {
+public class ExecutionEntity extends PvmExecutionImpl implements Execution, ProcessInstance, DbEntity, HasDbRevision, HasDbReferences, VariablesProvider<VariableInstanceEntity> {
 
   private static final long serialVersionUID = 1L;
 
@@ -161,8 +158,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @SuppressWarnings("unchecked")
   protected transient VariableStore<VariableInstanceEntity> variableStore =
-      new VariableStore<VariableInstanceEntity>(this, Arrays.<VariableStoreObserver<VariableInstanceEntity>>asList(
-          new ExecutionEntityReferencer(this)));
+      new VariableStore<VariableInstanceEntity>(this, new ExecutionEntityReferencer(this));
 
   // replaced by //////////////////////////////////////////////////////////////
 
@@ -225,12 +221,14 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
    */
   protected String superCaseExecutionId;
 
-
   /**
-   * Contains the variables which are used during execution.
-   * Will be set if the execution was finished and cleaned up.
+   * Contains observers which are observe the execution.
+   * @since 7.6
    */
-  protected transient VariableMap variablesAfterExecution;
+  protected transient List<ExecutionObserver> executionObservers = new ArrayList<ExecutionObserver>();
+
+  protected transient List<VariableInstanceLifecycleListener<VariableInstanceEntity>> registeredVariableListeners
+    = new ArrayList<VariableInstanceLifecycleListener<VariableInstanceEntity>>();
 
   public ExecutionEntity() {
   }
@@ -516,6 +514,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   protected void clearExecution() {
+    //call the onRemove method of the execution observers
+    //so they can do some clean up before
+    for (ExecutionObserver observer : executionObservers) {
+      observer.onClear(this);
+    }
+
     // delete all the variable instances
     for (VariableInstanceEntity variableInstance : variableStore.getVariables()) {
       invokeVariableLifecycleListenersDelete(
@@ -666,6 +670,14 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   // executions ///////////////////////////////////////////////////////////////
 
+  public void addExecutionObserver(ExecutionObserver observer) {
+    executionObservers.add(observer);
+  }
+
+  public void removeExecutionObserver(ExecutionObserver observer) {
+    executionObservers.remove(observer);
+  }
+
   @Override
   public List<ExecutionEntity> getExecutions() {
     ensureExecutionsInitialized();
@@ -777,12 +789,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     return parentId == null;
   }
 
-  public VariableMap getVariablesAfterExeuction() {
-    if (variablesAfterExecution != null)
-      return variablesAfterExecution;
-    else
-      return super.getVariables();
-  }
   // activity /////////////////////////////////////////////////////////////////
 
   /** ensures initialization and returns the activity */
@@ -985,9 +991,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   public void remove() {
     super.remove();
 
-    //saves the variables as snapshot before clean up
-    this.variablesAfterExecution = getVariablesTyped(false);
-
     // removes jobs, incidents and tasks, and
     // clears the variable store
     clearExecution();
@@ -1078,6 +1081,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   @Override
   public void replace(PvmExecutionImpl execution) {
     ExecutionEntity replacedExecution = (ExecutionEntity) execution;
+
+    setListenerIndex(replacedExecution.getListenerIndex());
+    replacedExecution.setListenerIndex(0);
 
     // update the related tasks
     replacedExecution.moveTasksTo(this);
@@ -1192,6 +1198,14 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   // variables ////////////////////////////////////////////////////////////////
+
+  public void addVariableListener(VariableInstanceLifecycleListener<VariableInstanceEntity> listener) {
+    registeredVariableListeners.add(listener);
+  }
+
+  public void removeVariableListener(VariableInstanceLifecycleListener<VariableInstanceEntity> listener) {
+    registeredVariableListeners.remove(listener);
+  }
 
   public boolean isExecutingScopeLeafActivity() {
     return isActive && getActivity() != null && getActivity().isScope() && activityInstanceId != null
@@ -1636,7 +1650,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @Override
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners(final AbstractVariableScope sourceScope) {
+  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners() {
 
     List<VariableInstanceLifecycleListener<CoreVariableInstance>> listeners = new ArrayList<VariableInstanceLifecycleListener<CoreVariableInstance>>();
 
@@ -1649,6 +1663,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
 
     listeners.add((VariableInstanceLifecycleListener) VariableListenerInvocationListener.INSTANCE);
+
+    listeners.addAll((List) registeredVariableListeners);
 
     return listeners;
   }
@@ -1852,6 +1868,4 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   public ProcessEngineServices getProcessEngineServices() {
     return Context.getProcessEngineConfiguration().getProcessEngine();
   }
-
-
 }

@@ -45,7 +45,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
   protected abstract VariableStore<CoreVariableInstance> getVariableStore();
   protected abstract VariableInstanceFactory<CoreVariableInstance> getVariableInstanceFactory();
-  protected abstract List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners(AbstractVariableScope sourceScope);
+  protected abstract List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners();
 
 
   public abstract AbstractVariableScope getParentVariableScope();
@@ -320,7 +320,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   }
 
   protected void invokeVariableLifecycleListenersCreate(CoreVariableInstance variableInstance, AbstractVariableScope sourceScope) {
-    invokeVariableLifecycleListenersCreate(variableInstance, sourceScope, getVariableInstanceLifecycleListeners(sourceScope));
+    invokeVariableLifecycleListenersCreate(variableInstance, sourceScope, getVariableInstanceLifecycleListeners());
   }
 
   protected void invokeVariableLifecycleListenersCreate(CoreVariableInstance variableInstance, AbstractVariableScope sourceScope,
@@ -331,7 +331,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   }
 
   protected void invokeVariableLifecycleListenersDelete(CoreVariableInstance variableInstance, AbstractVariableScope sourceScope) {
-    invokeVariableLifecycleListenersDelete(variableInstance, sourceScope, getVariableInstanceLifecycleListeners(sourceScope));
+    invokeVariableLifecycleListenersDelete(variableInstance, sourceScope, getVariableInstanceLifecycleListeners());
   }
 
   protected void invokeVariableLifecycleListenersDelete(CoreVariableInstance variableInstance, AbstractVariableScope sourceScope,
@@ -342,7 +342,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   }
 
   protected void invokeVariableLifecycleListenersUpdate(CoreVariableInstance variableInstance, AbstractVariableScope sourceScope) {
-    invokeVariableLifecycleListenersUpdate(variableInstance, sourceScope, getVariableInstanceLifecycleListeners(sourceScope));
+    invokeVariableLifecycleListenersUpdate(variableInstance, sourceScope, getVariableInstanceLifecycleListeners());
   }
 
   protected void invokeVariableLifecycleListenersUpdate(CoreVariableInstance variableInstance, AbstractVariableScope sourceScope,

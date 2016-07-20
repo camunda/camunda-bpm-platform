@@ -248,6 +248,7 @@ create table ACT_RU_EXT_TASK (
   TOPIC_NAME_ varchar(255),
   RETRIES_ integer,
   ERROR_MSG_ varchar(4000),
+  ERROR_DETAILS_ID_ varchar(64),
   LOCK_EXP_TIME_ timestamp(3) NULL,
   SUSPENSION_STATE_ integer,
   EXECUTION_ID_ varchar(64),
@@ -404,6 +405,11 @@ alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_RCAUSE
     foreign key (ROOT_CAUSE_INCIDENT_ID_)
     references ACT_RU_INCIDENT (ID_) on delete cascade on update cascade;
+
+alter table ACT_RU_EXT_TASK
+    add constraint ACT_FK_EXT_TASK_ERROR_DETAILS
+    foreign key (ERROR_DETAILS_ID_)
+    references ACT_GE_BYTEARRAY (ID_);
 
 create index ACT_IDX_INC_JOB_DEF on ACT_RU_INCIDENT(JOB_DEF_ID_);
 alter table ACT_RU_INCIDENT

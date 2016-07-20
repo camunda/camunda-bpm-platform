@@ -12,40 +12,100 @@
  */
 package org.camunda.bpm.application.impl.deployment;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.application.ProcessApplicationExecutionException;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.query.Query;
-import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
+import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.DecisionService;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
-import org.camunda.bpm.model.bpmn.Bpmn;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTestCase {
+@RunWith(Parameterized.class)
+public class RedeploymentProcessApplicationTest {
 
   protected static final String DEPLOYMENT_NAME = "my-deployment";
 
-  protected static final String PROCESS_KEY_1 = "process-1";
-  protected static final String PROCESS_KEY_2 = "process-2";
-
-  protected static final String BPMN_RESOURCE_1 = "path/to/my/process1.bpmn";
-  protected static final String BPMN_RESOURCE_2 = "path/to/my/process2.bpmn";
-
-  protected static final String CASE_KEY_1 = "oneTaskCase";
-  protected static final String CASE_KEY_2 = "twoTaskCase";
+  protected static final String BPMN_RESOURCE_1 = "org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml";
+  protected static final String BPMN_RESOURCE_2 = "org/camunda/bpm/engine/test/api/repository/processTwo.bpmn20.xml";
 
   protected static final String CMMN_RESOURCE_1 = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
   protected static final String CMMN_RESOURCE_2 = "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn";
 
-  public void testProcessOnePreviousDeploymentWithPA() {
+  protected static final String DMN_RESOURCE_1 = "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDmnDeployment.dmn11.xml";
+  protected static final String DMN_RESOURCE_2 = "org/camunda/bpm/engine/test/dmn/deployment/dmnScore.dmn11.xml";
+
+  protected static final String DRD_RESOURCE_1 = "org/camunda/bpm/engine/test/dmn/deployment/drdScore.dmn11.xml";
+  protected static final String DRD_RESOURCE_2 = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
+
+  @Rule
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+
+  protected static RepositoryService repositoryService;
+  protected static RuntimeService runtimeService;
+  protected static CaseService caseService;
+  protected static DecisionService decisionService;
+  protected static ManagementService managementService;
+
+  @Parameter(0)
+  public String resource1;
+
+  @Parameter(1)
+  public String resource2;
+
+  @Parameter(2)
+  public String definitionKey1;
+
+  @Parameter(3)
+  public String definitionKey2;
+
+  @Parameter(4)
+  public TestProvider testProvider;
+
+  @Parameters(name = "scenario {index}")
+  public static Collection<Object[]> scenarios() {
+    return Arrays.asList(new Object[][] {
+      { BPMN_RESOURCE_1, BPMN_RESOURCE_2, "processOne", "processTwo", processDefinitionTestProvider() },
+      { CMMN_RESOURCE_1, CMMN_RESOURCE_2, "oneTaskCase", "twoTaskCase", caseDefinitionTestProvider() },
+      { DMN_RESOURCE_1, DMN_RESOURCE_2, "decision", "score-decision", decisionDefinitionTestProvider() },
+      { DRD_RESOURCE_1, DRD_RESOURCE_2, "score", "dish", decisionRequirementsDefinitionTestProvider() }
+    });
+  }
+
+  @Before
+  public void init() throws Exception {
+    repositoryService = engineRule.getRepositoryService();
+    runtimeService = engineRule.getRuntimeService();
+    caseService = engineRule.getCaseService();
+    decisionService = engineRule.getDecisionService();
+    managementService = engineRule.getManagementService();
+  }
+
+  @Test
+	public void definitionOnePreviousDeploymentWithPA() {
     // given
 
     MyEmbeddedProcessApplication application = new MyEmbeddedProcessApplication();
@@ -54,7 +114,7 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     Deployment deployment1 = repositoryService
         .createDeployment(application.getReference())
         .name(DEPLOYMENT_NAME)
-        .addModelInstance(BPMN_RESOURCE_1, createProcessWithServiceTask(PROCESS_KEY_1))
+        .addClasspathResource(resource1)
         .deploy();
 
     // second deployment
@@ -64,10 +124,10 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
         .addDeploymentResources(deployment1.getId())
         .deploy();
 
-    verifyQueryResults(processDefinitionQueryByKey(PROCESS_KEY_1), 2);
+    assertEquals(2, testProvider.countDefinitionsByKey(definitionKey1));
 
     // when
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY_1);
+    testProvider.createInstanceByDefinitionKey(definitionKey1);
 
     // then
     assertTrue(application.isCalled());
@@ -75,7 +135,8 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     deleteDeployments(deployment1, deployment2);
   }
 
-  public void testProcessTwoPreviousDeploymentWithPA() {
+  @Test
+	public void definitionTwoPreviousDeploymentWithPA() {
     // given
 
     // first deployment
@@ -83,7 +144,7 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     Deployment deployment1 = repositoryService
         .createDeployment(application1.getReference())
         .name(DEPLOYMENT_NAME)
-        .addModelInstance(BPMN_RESOURCE_1, createProcessWithServiceTask(PROCESS_KEY_1))
+        .addClasspathResource(resource1)
         .deploy();
 
     // second deployment
@@ -91,7 +152,7 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     Deployment deployment2 = repositoryService
         .createDeployment(application2.getReference())
         .name(DEPLOYMENT_NAME)
-        .addModelInstance(BPMN_RESOURCE_1, createProcessWithServiceTask(PROCESS_KEY_1))
+        .addClasspathResource(resource1)
         .deploy();
 
     // second deployment
@@ -101,10 +162,10 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
         .addDeploymentResources(deployment1.getId())
         .deploy();
 
-    verifyQueryResults(processDefinitionQueryByKey(PROCESS_KEY_1), 3);
+    assertEquals(3, testProvider.countDefinitionsByKey(definitionKey1));
 
     // when
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY_1);
+    testProvider.createInstanceByDefinitionKey(definitionKey1);
 
     // then
     assertFalse(application1.isCalled());
@@ -113,7 +174,8 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     deleteDeployments(deployment1, deployment2, deployment3);
   }
 
-  public void testProcessTwoPreviousDeploymentFirstDeploymentWithPA() {
+  @Test
+	public void definitionTwoPreviousDeploymentFirstDeploymentWithPA() {
     // given
 
     // first deployment
@@ -121,14 +183,14 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     Deployment deployment1 = repositoryService
         .createDeployment(application1.getReference())
         .name(DEPLOYMENT_NAME)
-        .addModelInstance(BPMN_RESOURCE_1, createProcessWithServiceTask(PROCESS_KEY_1))
+        .addClasspathResource(resource1)
         .deploy();
 
     // second deployment
     Deployment deployment2 = repositoryService
         .createDeployment()
         .name(DEPLOYMENT_NAME)
-        .addModelInstance(BPMN_RESOURCE_1, createProcessWithServiceTask(PROCESS_KEY_1))
+        .addClasspathResource(resource1)
         .deploy();
 
     // second deployment
@@ -138,10 +200,10 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
         .addDeploymentResources(deployment1.getId())
         .deploy();
 
-    verifyQueryResults(processDefinitionQueryByKey(PROCESS_KEY_1), 3);
+    assertEquals(3, testProvider.countDefinitionsByKey(definitionKey1));
 
     // when
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY_1);
+    testProvider.createInstanceByDefinitionKey(definitionKey1);
 
     // then
     assertTrue(application1.isCalled());
@@ -149,7 +211,8 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     deleteDeployments(deployment1, deployment2, deployment3);
   }
 
-  public void testProcessTwoPreviousDeploymentDeleteSecondDeployment() {
+  @Test
+	public void definitionTwoPreviousDeploymentDeleteSecondDeployment() {
     // given
 
     // first deployment
@@ -157,7 +220,7 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     Deployment deployment1 = repositoryService
         .createDeployment(application1.getReference())
         .name(DEPLOYMENT_NAME)
-        .addModelInstance(BPMN_RESOURCE_1, createProcessWithServiceTask(PROCESS_KEY_1))
+        .addClasspathResource(resource1)
         .deploy();
 
     // second deployment
@@ -165,7 +228,7 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     Deployment deployment2 = repositoryService
         .createDeployment(application2.getReference())
         .name(DEPLOYMENT_NAME)
-        .addModelInstance(BPMN_RESOURCE_1, createProcessWithServiceTask(PROCESS_KEY_1))
+        .addClasspathResource(resource1)
         .deploy();
 
     // second deployment
@@ -175,11 +238,11 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
         .addDeploymentResources(deployment1.getId())
         .deploy();
 
-    verifyQueryResults(processDefinitionQueryByKey(PROCESS_KEY_1), 3);
+    assertEquals(3, testProvider.countDefinitionsByKey(definitionKey1));
 
     // when
     deleteDeployments(deployment2);
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY_1);
+    testProvider.createInstanceByDefinitionKey(definitionKey1);
 
     // then
     assertTrue(application1.isCalled());
@@ -188,7 +251,8 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     deleteDeployments(deployment1, deployment3);
   }
 
-  public void testProcessTwoPreviousDeploymentUnregisterSecondPA() {
+  @Test
+	public void definitionTwoPreviousDeploymentUnregisterSecondPA() {
     // given
 
     // first deployment
@@ -196,7 +260,7 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     Deployment deployment1 = repositoryService
         .createDeployment(application1.getReference())
         .name(DEPLOYMENT_NAME)
-        .addModelInstance(BPMN_RESOURCE_1, createProcessWithServiceTask(PROCESS_KEY_1))
+        .addClasspathResource(resource1)
         .deploy();
 
     // second deployment
@@ -204,7 +268,7 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     Deployment deployment2 = repositoryService
         .createDeployment(application2.getReference())
         .name(DEPLOYMENT_NAME)
-        .addModelInstance(BPMN_RESOURCE_1, createProcessWithServiceTask(PROCESS_KEY_1))
+        .addClasspathResource(resource1)
         .deploy();
 
     // second deployment
@@ -214,11 +278,11 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
         .addDeploymentResources(deployment1.getId())
         .deploy();
 
-    verifyQueryResults(processDefinitionQueryByKey(PROCESS_KEY_1), 3);
+    assertEquals(3, testProvider.countDefinitionsByKey(definitionKey1));
 
     // when
     managementService.unregisterProcessApplication(deployment2.getId(), true);
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY_1);
+    testProvider.createInstanceByDefinitionKey(definitionKey1);
 
     // then
     assertTrue(application1.isCalled());
@@ -227,7 +291,8 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     deleteDeployments(deployment1, deployment2, deployment3);
   }
 
-  public void testProcessTwoDifferentPreviousDeploymentsWithDifferentPA() {
+  @Test
+	public void definitionTwoDifferentPreviousDeploymentsWithDifferentPA() {
     // given
 
     // first deployment
@@ -235,7 +300,7 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     Deployment deployment1 = repositoryService
         .createDeployment(application1.getReference())
         .name(DEPLOYMENT_NAME + "-1")
-        .addModelInstance(BPMN_RESOURCE_1, createProcessWithServiceTask(PROCESS_KEY_1))
+        .addClasspathResource(resource1)
         .deploy();
 
     // second deployment
@@ -243,7 +308,7 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     Deployment deployment2 = repositoryService
         .createDeployment(application2.getReference())
         .name(DEPLOYMENT_NAME + "-2")
-        .addModelInstance(BPMN_RESOURCE_2, createProcessWithServiceTask(PROCESS_KEY_2))
+        .addClasspathResource(resource2)
         .deploy();
 
     // second deployment
@@ -254,11 +319,11 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
         .addDeploymentResources(deployment2.getId())
         .deploy();
 
-    verifyQueryResults(processDefinitionQueryByKey(PROCESS_KEY_1), 2);
-    verifyQueryResults(processDefinitionQueryByKey(PROCESS_KEY_2), 2);
+    assertEquals(2, testProvider.countDefinitionsByKey(definitionKey1));
+    assertEquals(2, testProvider.countDefinitionsByKey(definitionKey2));
 
     // when (1)
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY_1);
+    testProvider.createInstanceByDefinitionKey(definitionKey1);
 
     // then (1)
     assertTrue(application1.isCalled());
@@ -268,7 +333,7 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     application1.setCalled(false);
 
     // when (2)
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY_2);
+    testProvider.createInstanceByDefinitionKey(definitionKey2);
 
     // then (2)
     assertFalse(application1.isCalled());
@@ -277,7 +342,8 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     deleteDeployments(deployment1, deployment2, deployment3);
   }
 
-  public void testProcessTwoPreviousDeploymentsWithDifferentPA() {
+  @Test
+	public void definitionTwoPreviousDeploymentsWithDifferentPA() {
     // given
 
     // first deployment
@@ -285,8 +351,8 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     Deployment deployment1 = repositoryService
       .createDeployment(application1.getReference())
       .name(DEPLOYMENT_NAME)
-      .addModelInstance(BPMN_RESOURCE_1, createProcessWithServiceTask(PROCESS_KEY_1))
-      .addModelInstance(BPMN_RESOURCE_2, createProcessWithServiceTask(PROCESS_KEY_2))
+      .addClasspathResource(resource1)
+      .addClasspathResource(resource2)
       .deploy();
 
     // second deployment
@@ -294,7 +360,7 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     Deployment deployment2 = repositoryService
         .createDeployment(application2.getReference())
         .name(DEPLOYMENT_NAME)
-        .addModelInstance(BPMN_RESOURCE_1, createProcessWithServiceTask(PROCESS_KEY_1))
+        .addClasspathResource(resource1)
         .deploy();
 
     // third deployment
@@ -304,11 +370,11 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
         .addDeploymentResources(deployment1.getId())
         .deploy();
 
-    verifyQueryResults(processDefinitionQueryByKey(PROCESS_KEY_1), 3);
-    verifyQueryResults(processDefinitionQueryByKey(PROCESS_KEY_2), 2);
+    assertEquals(3, testProvider.countDefinitionsByKey(definitionKey1));
+    assertEquals(2, testProvider.countDefinitionsByKey(definitionKey2));
 
     // when (1)
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY_1);
+    testProvider.createInstanceByDefinitionKey(definitionKey1);
 
     // then (1)
     assertFalse(application1.isCalled());
@@ -318,307 +384,13 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     application2.setCalled(false);
 
     // when (2)
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY_2);
+    testProvider.createInstanceByDefinitionKey(definitionKey2);
 
     // then (2)
     assertTrue(application1.isCalled());
     assertFalse(application2.isCalled());
 
     deleteDeployments(deployment1, deployment2, deployment3);
-  }
-
-  public void testCaseOnePreviousDeploymentWithPA() {
-    // given
-
-    MyEmbeddedProcessApplication application = new MyEmbeddedProcessApplication();
-
-    // first deployment
-    Deployment deployment1 = repositoryService
-        .createDeployment(application.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(CMMN_RESOURCE_1)
-        .deploy();
-
-    // second deployment
-    Deployment deployment2 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
-
-    verifyQueryResults(caseDefinitionQueryByKey(CASE_KEY_1), 2);
-
-    // when
-    caseService.createCaseInstanceByKey(CASE_KEY_1);
-
-    // then
-    assertTrue(application.isCalled());
-
-    deleteDeployments(deployment1, deployment2);
-  }
-
-  public void testCaseTwoPreviousDeploymentWithPA() {
-    // given
-
-    // first deployment
-    MyEmbeddedProcessApplication application1 = new MyEmbeddedProcessApplication();
-    Deployment deployment1 = repositoryService
-        .createDeployment(application1.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(CMMN_RESOURCE_1)
-        .deploy();
-
-    // second deployment
-    MyEmbeddedProcessApplication application2 = new MyEmbeddedProcessApplication();
-    Deployment deployment2 = repositoryService
-        .createDeployment(application2.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(CMMN_RESOURCE_1)
-        .deploy();
-
-    // second deployment
-    Deployment deployment3 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
-
-    verifyQueryResults(caseDefinitionQueryByKey(CASE_KEY_1), 3);
-
-    // when
-    caseService.createCaseInstanceByKey(CASE_KEY_1);
-
-    // then
-    assertFalse(application1.isCalled());
-    assertTrue(application2.isCalled());
-
-    deleteDeployments(deployment1, deployment2, deployment3);
-  }
-
-  public void testCaseTwoPreviousDeploymentFirstDeploymentWithPA() {
-    // given
-
-    // first deployment
-    MyEmbeddedProcessApplication application1 = new MyEmbeddedProcessApplication();
-    Deployment deployment1 = repositoryService
-        .createDeployment(application1.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(CMMN_RESOURCE_1)
-        .deploy();
-
-    // second deployment
-    Deployment deployment2 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(CMMN_RESOURCE_1)
-        .deploy();
-
-    // second deployment
-    Deployment deployment3 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
-
-    verifyQueryResults(caseDefinitionQueryByKey(CASE_KEY_1), 3);
-
-    // when
-    caseService.createCaseInstanceByKey(CASE_KEY_1);
-
-    // then
-    assertTrue(application1.isCalled());
-
-    deleteDeployments(deployment1, deployment2, deployment3);
-  }
-
-  public void testCaseTwoPreviousDeploymentDeleteSecondDeployment() {
-    // given
-
-    // first deployment
-    MyEmbeddedProcessApplication application1 = new MyEmbeddedProcessApplication();
-    Deployment deployment1 = repositoryService
-        .createDeployment(application1.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(CMMN_RESOURCE_1)
-        .deploy();
-
-    // second deployment
-    MyEmbeddedProcessApplication application2 = new MyEmbeddedProcessApplication();
-    Deployment deployment2 = repositoryService
-        .createDeployment(application2.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(CMMN_RESOURCE_1)
-        .deploy();
-
-    // second deployment
-    Deployment deployment3 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
-
-    verifyQueryResults(caseDefinitionQueryByKey(CASE_KEY_1), 3);
-
-    // when
-    deleteDeployments(deployment2);
-    caseService.createCaseInstanceByKey(CASE_KEY_1);
-
-    // then
-    assertTrue(application1.isCalled());
-    assertFalse(application2.isCalled());
-
-    deleteDeployments(deployment1, deployment3);
-  }
-
-  public void testCaseTwoPreviousDeploymentUnregisterSecondPA() {
-    // given
-
-    // first deployment
-    MyEmbeddedProcessApplication application1 = new MyEmbeddedProcessApplication();
-    Deployment deployment1 = repositoryService
-        .createDeployment(application1.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(CMMN_RESOURCE_1)
-        .deploy();
-
-    // second deployment
-    MyEmbeddedProcessApplication application2 = new MyEmbeddedProcessApplication();
-    Deployment deployment2 = repositoryService
-        .createDeployment(application2.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(CMMN_RESOURCE_1)
-        .deploy();
-
-    // second deployment
-    Deployment deployment3 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
-
-    verifyQueryResults(caseDefinitionQueryByKey(CASE_KEY_1), 3);
-
-    // when
-    managementService.unregisterProcessApplication(deployment2.getId(), true);
-    caseService.createCaseInstanceByKey(CASE_KEY_1);
-
-    // then
-    assertTrue(application1.isCalled());
-    assertFalse(application2.isCalled());
-
-    deleteDeployments(deployment1, deployment2, deployment3);
-  }
-
-  public void testCaseTwoDifferentPreviousDeploymentsWithDifferentPA() {
-    // given
-
-    // first deployment
-    MyEmbeddedProcessApplication application1 = new MyEmbeddedProcessApplication();
-    Deployment deployment1 = repositoryService
-        .createDeployment(application1.getReference())
-        .name(DEPLOYMENT_NAME + "-1")
-        .addClasspathResource(CMMN_RESOURCE_1)
-        .deploy();
-
-    // second deployment
-    MyEmbeddedProcessApplication application2 = new MyEmbeddedProcessApplication();
-    Deployment deployment2 = repositoryService
-        .createDeployment(application2.getReference())
-        .name(DEPLOYMENT_NAME + "-2")
-        .addClasspathResource(CMMN_RESOURCE_2)
-        .deploy();
-
-    // second deployment
-    Deployment deployment3 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME + "-3")
-        .addDeploymentResources(deployment1.getId())
-        .addDeploymentResources(deployment2.getId())
-        .deploy();
-
-    verifyQueryResults(caseDefinitionQueryByKey(CASE_KEY_1), 2);
-    verifyQueryResults(caseDefinitionQueryByKey(CASE_KEY_2), 2);
-
-    // when (1)
-    caseService.createCaseInstanceByKey(CASE_KEY_1);
-
-    // then (1)
-    assertTrue(application1.isCalled());
-    assertFalse(application2.isCalled());
-
-    // reset flag
-    application1.setCalled(false);
-
-    // when (2)
-    caseService.createCaseInstanceByKey(CASE_KEY_2);
-
-    // then (2)
-    assertFalse(application1.isCalled());
-    assertTrue(application2.isCalled());
-
-    deleteDeployments(deployment1, deployment2, deployment3);
-  }
-
-  public void testCaseTwoPreviousDeploymentsWithDifferentPA() {
-    // given
-
-    // first deployment
-    MyEmbeddedProcessApplication application1 = new MyEmbeddedProcessApplication();
-    Deployment deployment1 = repositoryService
-      .createDeployment(application1.getReference())
-      .name(DEPLOYMENT_NAME)
-      .addClasspathResource(CMMN_RESOURCE_1)
-      .addClasspathResource(CMMN_RESOURCE_2)
-      .deploy();
-
-    // second deployment
-    MyEmbeddedProcessApplication application2 = new MyEmbeddedProcessApplication();
-    Deployment deployment2 = repositoryService
-        .createDeployment(application2.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(CMMN_RESOURCE_1)
-        .deploy();
-
-    // third deployment
-    Deployment deployment3 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
-
-    verifyQueryResults(caseDefinitionQueryByKey(CASE_KEY_1), 3);
-    verifyQueryResults(caseDefinitionQueryByKey(CASE_KEY_2), 2);
-
-    // when (1)
-    caseService.createCaseInstanceByKey(CASE_KEY_1);
-
-    // then (1)
-    assertFalse(application1.isCalled());
-    assertTrue(application2.isCalled());
-
-    // reset flag
-    application2.setCalled(false);
-
-    // when (2)
-    caseService.createCaseInstanceByKey(CASE_KEY_2);
-
-    // then (2)
-    assertTrue(application1.isCalled());
-    assertFalse(application2.isCalled());
-
-    deleteDeployments(deployment1, deployment2, deployment3);
-  }
-
-  protected void verifyQueryResults(Query<?, ?> query, int countExpected) {
-    assertEquals(countExpected, query.count());
-  }
-
-  protected ProcessDefinitionQuery processDefinitionQueryByKey(String key) {
-    return repositoryService.createProcessDefinitionQuery().processDefinitionKey(key);
-  }
-
-  protected CaseDefinitionQuery caseDefinitionQueryByKey(String key) {
-    return repositoryService.createCaseDefinitionQuery().caseDefinitionKey(key);
   }
 
   protected void deleteDeployments(Deployment... deployments){
@@ -628,13 +400,74 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     }
   }
 
-  protected BpmnModelInstance createProcessWithServiceTask(String key) {
-    return Bpmn.createExecutableProcess(key)
-      .startEvent()
-      .serviceTask()
-        .camundaExpression("${true}")
-      .endEvent()
-    .done();
+  protected interface TestProvider {
+    long countDefinitionsByKey(String definitionKey);
+
+    void createInstanceByDefinitionKey(String definitionKey);
+  }
+
+  protected static TestProvider processDefinitionTestProvider() {
+    return new TestProvider() {
+
+      public long countDefinitionsByKey(String definitionKey) {
+        return repositoryService.createProcessDefinitionQuery().processDefinitionKey(definitionKey).count();
+      }
+
+      public void createInstanceByDefinitionKey(String definitionKey) {
+        runtimeService.startProcessInstanceByKey(definitionKey, Variables.createVariables()
+            .putValue("a", 1).putValue("b", 1));
+      }
+
+    };
+  }
+
+  protected static TestProvider caseDefinitionTestProvider() {
+    return new TestProvider() {
+
+      public long countDefinitionsByKey(String definitionKey) {
+        return repositoryService.createCaseDefinitionQuery().caseDefinitionKey(definitionKey).count();
+      }
+
+      public void createInstanceByDefinitionKey(String definitionKey) {
+        caseService.createCaseInstanceByKey(definitionKey);
+      }
+
+    };
+  }
+
+  protected static TestProvider decisionDefinitionTestProvider() {
+    return new TestProvider() {
+
+      public long countDefinitionsByKey(String definitionKey) {
+        return repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(definitionKey).count();
+      }
+
+      public void createInstanceByDefinitionKey(String definitionKey) {
+        decisionService.evaluateDecisionTableByKey(definitionKey)
+          .variables(Variables.createVariables().putValue("input", "john"))
+          .evaluate();
+      }
+
+    };
+  }
+
+  protected static TestProvider decisionRequirementsDefinitionTestProvider() {
+    return new TestProvider() {
+
+      public long countDefinitionsByKey(String definitionKey) {
+        return repositoryService.createDecisionRequirementsDefinitionQuery().decisionRequirementsDefinitionKey(definitionKey).count();
+      }
+
+      public void createInstanceByDefinitionKey(String definitionKey) {
+        decisionService.evaluateDecisionTableByKey(definitionKey + "-decision")
+          .variables(Variables.createVariables()
+              .putValue("temperature", 21)
+              .putValue("dayType", "Weekend")
+              .putValue("input", "John"))
+          .evaluate();
+      }
+
+    };
   }
 
   public class MyEmbeddedProcessApplication extends EmbeddedProcessApplication {
@@ -642,6 +475,7 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     protected ProcessApplicationReference reference;
     protected boolean called;
 
+    @Override
     public ProcessApplicationReference getReference() {
       if (reference == null) {
         reference = super.getReference();
@@ -649,6 +483,7 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
       return reference;
     }
 
+    @Override
     public <T> T execute(Callable<T> callable) throws ProcessApplicationExecutionException {
       called = true;
       return super.execute(callable);

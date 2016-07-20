@@ -60,10 +60,17 @@ public class AtomicOperationInvocation {
       }
     }
 
+    //execution was canceled for example via terminate end event
+    if (execution.isCanceled() &&
+         (operation == PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_END
+         || operation == PvmAtomicOperation.ACTIVITY_NOTIFY_LISTENER_END)) {
+      return;
+    }
+
     // execution might have ended in the meanwhile
     if(execution.isEnded() &&
         (operation == PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE
-      || operation == PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE)) {
+        || operation == PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE)) {
       return;
     }
 

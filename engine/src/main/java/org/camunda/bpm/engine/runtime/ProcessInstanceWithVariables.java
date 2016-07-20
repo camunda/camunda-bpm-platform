@@ -18,18 +18,16 @@ package org.camunda.bpm.engine.runtime;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
- * Represents a process instance with the corresponding variables,
- * which are set during the execution.
+ * Represents a process instance with the corresponding latest variables.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public interface ProcessInstanceWithVariables extends ProcessInstance {
 
   /**
-   * Returns the variables of the process instance
-   * which are set during the execution.
+   * Returns the latest variables of the process instance.
    *
-   * @return the variables which are set during execution
+   * @return the latest variables
    */
   VariableMap getVariables();
 }

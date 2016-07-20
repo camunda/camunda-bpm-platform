@@ -39,12 +39,10 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
-import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableListenerInvocationListener;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
-import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariableStoreObserver;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariablesProvider;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
@@ -114,9 +112,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   @SuppressWarnings({ "unchecked" })
   protected VariableStore<VariableInstanceEntity> variableStore = new VariableStore<VariableInstanceEntity>(
-      this,
-      Arrays.<VariableStoreObserver<VariableInstanceEntity>>asList(
-          new CaseExecutionEntityReferencer(this)));
+      this, new CaseExecutionEntityReferencer(this));
 
   // Persistence //////////////////////////////////////////////////////////////
 
@@ -713,7 +709,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   @Override
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners(AbstractVariableScope sourceScope) {
+  protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners() {
     return Arrays.<VariableInstanceLifecycleListener<CoreVariableInstance>>asList(
         (VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE,
         (VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE,

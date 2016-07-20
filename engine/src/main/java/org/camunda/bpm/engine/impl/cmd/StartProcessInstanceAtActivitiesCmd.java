@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -26,8 +27,9 @@ import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionVariableSnapshotObserver;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
@@ -67,6 +69,9 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
         .createProcessInstance(instantiationBuilder.getBusinessKey(), instantiationBuilder.getCaseInstanceId(), initialActivity);
     processInstance.setSkipCustomListeners(modificationBuilder.isSkipCustomListeners());
     VariableMap variables = modificationBuilder.getProcessVariables();
+
+    final ExecutionVariableSnapshotObserver variablesListener = new ExecutionVariableSnapshotObserver(processInstance);
+
     processInstance.startWithoutExecuting(variables);
 
     // prevent ending of the process instance between instructions
@@ -91,8 +96,9 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
       processInstance.propagateEnd();
     }
 
-    return new ProcessInstanceWithVariablesEntity(processInstance);
+    return new ProcessInstanceWithVariablesImpl(processInstance, variablesListener.getVariables());
   }
+
 
   /**
    * get the activity that is started by the first instruction, if exists;

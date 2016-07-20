@@ -27,7 +27,8 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
-import org.camunda.bpm.engine.repository.DecisionRequirementDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.DiagramLayout;
@@ -182,9 +183,9 @@ public interface RepositoryService {
   DecisionDefinitionQuery createDecisionDefinitionQuery();
 
   /**
-   * Query decision requirement definitions.
+   * Query decision requirements definition.
    */
-  DecisionRequirementDefinitionQuery createDecisionRequirementDefinitionQuery();
+  DecisionRequirementsDefinitionQuery createDecisionRequirementsDefinitionQuery();
 
   /**
    * Query process definitions.
@@ -578,6 +579,17 @@ public interface RepositoryService {
   DecisionDefinition getDecisionDefinition(String decisionDefinitionId);
 
   /**
+   * Returns the {@link DecisionRequirementsDefinition}.
+   *
+   * @throws NotValidException when the given decision requirements definition id is null
+   * @throws NotFoundException when no decision requirements definition is found for the given decision requirements definition id
+   * @throws ProcessEngineException when an internal exception happens during the execution of the command.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#DECISION_REQUIREMENTS_DEFINITION}.
+   */
+  DecisionRequirementsDefinition getDecisionRequirementsDefinition(String decisionRequirementsDefinitionId);
+
+  /**
    * Gives access to a deployed decision model, e.g., a DMN 1.1 XML file,
    * through a stream of bytes.
    *
@@ -593,16 +605,43 @@ public interface RepositoryService {
   InputStream getDecisionModel(String decisionDefinitionId);
 
   /**
+   * Gives access to a deployed decision requirements model, e.g., a DMN 1.1 XML file,
+   * through a stream of bytes.
+   *
+   * @param decisionRequirementsDefinitionId
+   *          id of a {@link DecisionRequirementsDefinition}, cannot be null.
+   *
+   * @throws NotValidException when the given decision requirements definition id or deployment id or resource name is null
+   * @throws NotFoundException when no decision requirements definition or deployment resource is found for the given decision requirements definition id
+   * @throws ProcessEngineException when an internal exception happens during the execution of the command
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#DECISION_REQUIREMENTS_DEFINITION}.
+   */
+  InputStream getDecisionRequirementsModel(String decisionRequirementsDefinitionId);
+
+  /**
    * Gives access to a deployed decision diagram, e.g., a PNG image, through a
    * stream of bytes.
    *
    * @param decisionDefinitionId id of a {@link DecisionDefinition}, cannot be null.
    * @return null when the diagram resource name of a {@link DecisionDefinition} is null.
-   * @throws ProcessEngineException when the process diagram doesn't exist.
+   * @throws ProcessEngineException when the decision diagram doesn't exist.
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#READ} permission on {@link Resources#DECISION_DEFINITION}.
    */
   InputStream getDecisionDiagram(String decisionDefinitionId);
+
+  /**
+   * Gives access to a deployed decision requirements diagram, e.g., a PNG image, through a
+   * stream of bytes.
+   *
+   * @param decisionRequirementsDefinitionId id of a {@link DecisionRequirementsDefinition}, cannot be null.
+   * @return null when the diagram resource name of a {@link DecisionRequirementsDefinition} is null.
+   * @throws ProcessEngineException when the decision requirements diagram doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#DECISION_REQUIREMENTS_DEFINITION}.
+   */
+  InputStream getDecisionRequirementsDiagram(String decisionRequirementsDefinitionId);
 
 }
 
