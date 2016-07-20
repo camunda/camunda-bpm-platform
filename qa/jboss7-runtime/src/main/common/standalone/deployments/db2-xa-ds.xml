@@ -31,6 +31,7 @@
       <is-same-rm-override>false</is-same-rm-override>
       <no-tx-separate-pools>true</no-tx-separate-pools>
     </xa-pool>
+    <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
     <validation>
       <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2ValidConnectionChecker"/>
       <stale-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2StaleConnectionChecker"/>
