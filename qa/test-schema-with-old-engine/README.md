@@ -1,19 +1,21 @@
-To test the database upgrade you have to build the SQL scripts
+This test suite tests the engine of the last version with the current database schema.
+This guarantees that an old engine can execute on a newer database schema,
+which is needed for rolling upgrades.
+
+The test of the old engine with the new database schema,
+needs the database SQL scripts. These script
+should been build before.
 
 ```
 cd camunda-bpm-platform/distro/sql-script
 mvn clean install
 ```
 
-and the engine test jar
+The test jar which contains the tests of the old engine
+will be integrated via mvn dependency.
+
+The test suite is executed like this:
 
 ```
-cd camunda-bpm-platform/engine
-mvn clean install -Pcreate-test-jar
-```
-
-Then you can execute the test for the current major version (e.g. 72) and database (e.g. postgres)
-
-```
-mvn clean install -Pupgrade,${CURRENT_MAJOR_VERSION},${DATABASE}
+mvn clean install -Pold-engine,${DATABASE}
 ```
