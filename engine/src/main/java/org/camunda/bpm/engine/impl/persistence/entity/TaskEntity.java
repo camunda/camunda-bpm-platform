@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +68,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tom Baeyens
@@ -1411,5 +1412,4 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public void addIdentityLinkChanges(String type, String oldProperty, String newProperty) {
     identityLinkChanges.add(new PropertyChange(type, oldProperty, newProperty));
   }
-
 }

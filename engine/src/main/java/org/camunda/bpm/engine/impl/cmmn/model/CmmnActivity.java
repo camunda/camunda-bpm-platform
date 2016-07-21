@@ -215,5 +215,4 @@ public class CmmnActivity extends CoreActivity {
 
     return resolvedListenersForEvent;
   }
-
 }

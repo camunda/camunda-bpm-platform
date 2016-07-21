@@ -742,8 +742,6 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     assertTrue(milestone.isAvailable());
 
-    suspend(milestoneId);
-
     caseService
       .withCaseExecution(caseInstanceId)
       .setVariable("value", 99)
@@ -760,9 +758,6 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
     assertTrue(secondHumanTask.isAvailable());
 
-    milestone = queryCaseExecutionById(milestoneId);
-    assertTrue(((CaseExecutionEntity) milestone).isSuspended());
-
     // (2) when
     caseService
       .withCaseExecution(caseInstanceId)
@@ -770,24 +765,11 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
       .execute();
 
     // (2) then
-
-    // Note: this is a current limitation! if the variable has
-    // been changed then the satisfied sentries should be also
-    // fired, so that the secondHumanTask should be enabled.
-    secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
-    assertTrue(secondHumanTask.isAvailable());
-
-    milestone = queryCaseExecutionById(milestoneId);
-    assertTrue(((CaseExecutionEntity) milestone).isSuspended());
-
-    // (3) when
-    resume(milestoneId);
-
-    // (3)
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
     assertTrue(secondHumanTask.isEnabled());
 
     milestone = queryCaseExecutionById(milestoneId);
+    // milestone occurs when the sentry was evaluated successfully after value is set to 101
     assertNull(milestone);
   }
 

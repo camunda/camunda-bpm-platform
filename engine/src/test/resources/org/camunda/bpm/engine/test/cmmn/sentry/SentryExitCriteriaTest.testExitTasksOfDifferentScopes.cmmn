@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cmmn:definitions xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:camunda="http://camunda.org/schema/1.0/cmmn" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Test" targetNamespace="http://bpmn.io/schema/cmmn" exporter="Camunda Modeler" exporterVersion="1.2.0">
+  <cmmn:case id="Case_1">
+    <cmmn:casePlanModel id="CasePlanModel_1" name="A CasePlanModel">
+      <cmmn:planItem id="Stage_1" name="Stage1" definitionRef="Stage_1ov96ve" />
+      <cmmn:planItem id="Stage_2" name="Stage2" definitionRef="Stage_04vi6wu" />
+      <cmmn:stage id="Stage_1ov96ve" name="Stage 1">
+        <cmmn:planItem id="HumanTask_1" name="HumanTask1" definitionRef="HumanTask_0vdnlek">
+          <cmmn:exitCriterion id="Sentry_1" sentryRef="Sentry_16p13bv" />
+        </cmmn:planItem>
+        <cmmn:sentry id="Sentry_16p13bv" >
+          <cmmn:extensionElements>
+            <camunda:variableOnPart variableName = "value">
+              <camunda:variableEvent>create</camunda:variableEvent>
+             </camunda:variableOnPart>
+          </cmmn:extensionElements>
+        </cmmn:sentry>  
+        <cmmn:humanTask id="HumanTask_0vdnlek" name="HumanTask 1" />
+      </cmmn:stage>
+      <cmmn:stage id="Stage_04vi6wu" name="Stage 2">
+        <cmmn:planItem id="HumanTask_2" name="HumanTask 2" definitionRef="HumanTask_0sw2ycw">
+          <cmmn:exitCriterion id="Sentry_2" sentryRef="Sentry_18xa467" />
+        </cmmn:planItem>
+        <cmmn:sentry id="Sentry_18xa467" >
+         <cmmn:extensionElements>
+            <camunda:variableOnPart variableName = "value">
+              <camunda:variableEvent>create</camunda:variableEvent>
+             </camunda:variableOnPart>
+          </cmmn:extensionElements>
+        </cmmn:sentry>
+        <cmmn:humanTask id="HumanTask_0sw2ycw" name="HumanTask2" />
+      </cmmn:stage>
+    </cmmn:casePlanModel>
+  </cmmn:case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="_5a66685b-5f57-4e2f-b1d1-acca4fae04b2">
+      <cmmndi:Size xsi:type="dc:Dimension" width="500" height="500" />
+      <cmmndi:CMMNShape id="DI_CasePlanModel_1" cmmnElementRef="CasePlanModel_1">
+        <dc:Bounds x="369" y="149" width="833" height="448" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_08qidwo_di" cmmnElementRef="Stage_1">
+        <dc:Bounds x="389" y="209" width="350" height="200" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_0rm9mci_di" cmmnElementRef="Stage_2">
+        <dc:Bounds x="805" y="209" width="350" height="200" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="ExitCriterion_0vcfjzk_di" cmmnElementRef="Sentry_1">
+        <dc:Bounds x="596" y="271" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_0vg0ps9_di" cmmnElementRef="HumanTask_1">
+        <dc:Bounds x="506" y="249" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_1qd0wdy_di" cmmnElementRef="HumanTask_2">
+        <dc:Bounds x="914" y="250" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="ExitCriterion_0njqs9j_di" cmmnElementRef="Sentry_2">
+        <dc:Bounds x="1004" y="277" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</cmmn:definitions>

@@ -33,7 +33,6 @@ import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
-import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
@@ -315,5 +314,4 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
   public CmmnModelInstance getCmmnModelInstance() {
     throw LOG.unsupportedTransientOperationException(CmmnModelExecutionContext.class.getName());
   }
-
 }

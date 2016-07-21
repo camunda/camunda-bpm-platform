@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableListenerInvocationListener;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableOnPartListener;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariablesProvider;
 import org.camunda.bpm.engine.impl.db.DbEntity;
@@ -98,7 +99,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   /** nested case sentry parts */
   protected List<CaseSentryPartEntity> caseSentryParts;
   protected Map<String, List<CmmnSentryPart>> sentries;
-
+  
   /** reference to a sub process instance, not-null if currently subprocess is started from this execution */
   protected transient ExecutionEntity subProcessInstance;
 
@@ -714,7 +715,8 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
         (VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE,
         (VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE,
         (VariableInstanceLifecycleListener) VariableInstanceHistoryListener.INSTANCE,
-        (VariableInstanceLifecycleListener) VariableListenerInvocationListener.INSTANCE
+        (VariableInstanceLifecycleListener) VariableListenerInvocationListener.INSTANCE,
+        (VariableInstanceLifecycleListener) new VariableOnPartListener(this)
       );
   }
 
@@ -861,5 +863,4 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     Context.getCommandContext()
       .performOperation((CmmnAtomicOperation) operation, this);
   }
-
 }
