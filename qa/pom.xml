@@ -66,6 +66,8 @@
         <module>integration-tests-engine</module>
         <module>test-db-upgrade</module>
         <module>test-db-instance-migration</module>
+        <module>test-old-engine-instances</module>
+        <module>test-schema-with-old-engine</module>
       </modules>
     </profile>
 
@@ -143,6 +145,20 @@
       <id>instance-migration</id>
       <modules>
         <module>test-db-instance-migration</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>old-engine-instances</id>
+      <modules>
+        <module>test-old-engine-instances</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>old-engine</id>
+      <modules>
+        <module>test-schema-with-old-engine</module>
       </modules>
     </profile>
   </profiles>
