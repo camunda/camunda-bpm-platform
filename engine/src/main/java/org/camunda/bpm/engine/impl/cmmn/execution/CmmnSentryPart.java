@@ -26,6 +26,8 @@ public abstract class CmmnSentryPart implements Serializable {
   protected String sentryId;
   protected String standardEvent;
   protected String source;
+  protected String variableEvent;
+  protected String variableName;
   protected boolean satisfied = false;
 
   public abstract CmmnExecution getCaseInstance();
@@ -94,4 +96,20 @@ public abstract class CmmnSentryPart implements Serializable {
     this.satisfied = satisfied;
   }
 
+  public String getVariableEvent() {
+    return variableEvent;
+  }
+
+  public void setVariableEvent(String variableEvent) {
+    this.variableEvent = variableEvent;
+  }
+
+  public String getVariableName() {
+    return variableName;
+  }
+
+  public void setVariableName(String variableName) {
+    this.variableName = variableName;
+  }
+  
 }

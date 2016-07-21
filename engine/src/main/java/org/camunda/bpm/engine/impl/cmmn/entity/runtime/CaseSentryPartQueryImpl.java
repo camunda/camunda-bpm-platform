@@ -38,6 +38,8 @@ public class CaseSentryPartQueryImpl extends AbstractQuery<CaseSentryPartQueryIm
   protected String type;
   protected String sourceCaseExecutionId;
   protected String standardEvent;
+  protected String variableEvent;
+  protected String variableName;
   protected boolean satisfied;
 
   public CaseSentryPartQueryImpl() {
@@ -86,6 +88,18 @@ public class CaseSentryPartQueryImpl extends AbstractQuery<CaseSentryPartQueryIm
   public CaseSentryPartQueryImpl standardEvent(String standardEvent) {
     ensureNotNull(NotValidException.class, "standardEvent", standardEvent);
     this.standardEvent = standardEvent;
+    return this;
+  }
+
+  public CaseSentryPartQueryImpl variableEvent(String variableEvent) {
+    ensureNotNull(NotValidException.class, "variableEvent", variableEvent);
+    this.variableEvent = variableEvent;
+    return this;
+  }
+
+  public CaseSentryPartQueryImpl variableName(String variableName) {
+    ensureNotNull(NotValidException.class, "variableName", variableName);
+    this.variableName = variableName;
     return this;
   }
 
@@ -167,6 +181,14 @@ public class CaseSentryPartQueryImpl extends AbstractQuery<CaseSentryPartQueryIm
 
   public String getStandardEvent() {
     return standardEvent;
+  }
+
+  public String getVariableEvent() {
+    return variableEvent;
+  }
+
+  public String getVariableName() {
+    return variableName;
   }
 
   public boolean isSatisfied() {

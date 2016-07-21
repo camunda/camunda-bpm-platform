@@ -28,7 +28,8 @@ public class CmmnSentryDeclaration implements Serializable {
 
   public static final String PLAN_ITEM_ON_PART = "planItemOnPart";
   public static final String IF_PART = "ifPart";
-  
+  public static final String VARIABLE_ON_PART = "variableOnPart";
+
   protected String id;
 
   protected Map<String, List<CmmnOnPartDeclaration>> onPartMap = new HashMap<String, List<CmmnOnPartDeclaration>>();

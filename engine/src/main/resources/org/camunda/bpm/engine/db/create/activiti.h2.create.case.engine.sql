@@ -45,6 +45,8 @@ create table ACT_RU_CASE_SENTRY_PART (
     SOURCE_CASE_EXEC_ID_ varchar(64),
     STANDARD_EVENT_ varchar(255),
     SOURCE_ varchar(255),
+    VARIABLE_EVENT_ varchar(255),
+    VARIABLE_NAME_ varchar(255),
     SATISFIED_ bit,
     TENANT_ID_ varchar(64),
     primary key (ID_)

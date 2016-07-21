@@ -29,6 +29,7 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERM
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATING_ON_TERMINATION;
 import static org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration.IF_PART;
 import static org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration.PLAN_ITEM_ON_PART;
+import static org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration.VARIABLE_ON_PART;
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_COMPLETE;
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_CREATE;
 import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_DELETE_CASCADE;
@@ -77,6 +78,7 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnIfPartDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnOnPartDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnVariableOnPartDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
@@ -243,6 +245,12 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
           addSentryPart(onPart);
         }
 
+        List<CmmnVariableOnPartDeclaration> variableOnPartDeclarations = sentryDeclaration.getVariableOnParts();
+        for(CmmnVariableOnPartDeclaration variableOnPartDeclaration: variableOnPartDeclarations) {
+          CmmnSentryPart variableOnPart = createVariableOnPart(sentryDeclaration, variableOnPartDeclaration);
+          addSentryPart(variableOnPart);
+        }
+
       }
     }
   }
@@ -268,6 +276,20 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   protected CmmnSentryPart createIfPart(CmmnSentryDeclaration sentryDeclaration, CmmnIfPartDeclaration ifPartDeclaration) {
     return createSentryPart(sentryDeclaration, IF_PART);
+  }
+
+  protected CmmnSentryPart createVariableOnPart(CmmnSentryDeclaration sentryDeclaration, CmmnVariableOnPartDeclaration variableOnPartDeclaration) {
+    CmmnSentryPart sentryPart = createSentryPart(sentryDeclaration, VARIABLE_ON_PART);
+
+    // set the variable event
+    String variableEvent = variableOnPartDeclaration.getVariableEvent();
+    sentryPart.setVariableEvent(variableEvent);
+
+    // set the variable name
+    String variableName = variableOnPartDeclaration.getVariableName();
+    sentryPart.setVariableName(variableName);
+
+    return sentryPart;
   }
 
   protected CmmnSentryPart createSentryPart(CmmnSentryDeclaration sentryDeclaration, String type) {
