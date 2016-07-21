@@ -47,22 +47,22 @@ module.exports = [
           var procStats = $scope.procDefStats = {
             definitions: {
               label: [
-                'process definition',
-                'process definitions'
+                'Process definition',
+                'Process definitions'
               ],
               link: '#/processes?targetPlugin=process-definition'
             },
             instances: {
               label: [
-                'running instance',
-                'running instances'
+                'Running instance',
+                'Running instances'
               ],
               link: '#/processes?targetPlugin=search-process-instances&searchQuery=%5B%7B%22type%22:%22PIunfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D'
             },
             incidents: {
               label: [
-                'process instance with incidents',
-                'process instances with incidents'
+                'Instance with incidents',
+                'Instances with incidents'
               ],
               link: '#/processes?targetPlugin=search-process-instances&searchQuery=%5B%7B%22type%22:%22PIwithIncidents%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D'
             }
