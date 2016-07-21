@@ -234,7 +234,8 @@
 
   <select id="selectHistoricActivityInstanceByNativeQuery_mssql_or_db2" parameterType="java.util.Map" resultMap="historicActivityInstanceResultMap">
     <if test="resultType == 'LIST_PAGE'">
-        ${limitBeforeNativeQuery}
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+      ${limitBeforeNativeQuery}
     </if>
     ${sql}
     <if test="resultType == 'LIST_PAGE'">
