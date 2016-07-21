@@ -99,6 +99,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   protected boolean deleteRoot;
   protected String deleteReason;
+  protected transient boolean externallyTerminated;
 
   //state/type of execution //////////////////////////////////////////////////
 
@@ -534,11 +535,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public void deleteCascade(String deleteReason, boolean skipCustomListeners, boolean skipIoMappings) {
+    deleteCascade(deleteReason,skipCustomListeners,skipIoMappings,false);
+  }
+
+  public void deleteCascade(String deleteReason, boolean skipCustomListeners, boolean skipIoMappings, boolean externallyTerminated) {
     this.deleteReason = deleteReason;
     this.deleteRoot = true;
     this.isEnded = true;
     this.skipCustomListeners = skipCustomListeners;
     this.skipIoMapping = skipIoMappings;
+    this.externallyTerminated = externallyTerminated;
     performOperation(PvmAtomicOperation.DELETE_CASCADE);
   }
 
@@ -1584,6 +1590,15 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   // Getter / Setters ///////////////////////////////////
+
+
+  public boolean isExternallyTerminated() {
+    return externallyTerminated;
+  }
+
+  public void setExternallyTerminated(boolean externallyTerminated) {
+    this.externallyTerminated = externallyTerminated;
+  }
 
   public String getDeleteReason() {
     return deleteReason;

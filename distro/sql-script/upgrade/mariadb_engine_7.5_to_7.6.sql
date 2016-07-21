@@ -66,3 +66,9 @@ alter table ACT_RU_EXT_TASK
   add constraint ACT_FK_EXT_TASK_ERROR_DETAILS
   foreign key (ERROR_DETAILS_ID_)
   references ACT_GE_BYTEARRAY (ID_);
+
+ALTER TABLE ACT_HI_PROCINST
+  ADD STATE_ varchar(255);
+
+update ACT_HI_PROCINST set STATE_ = 'ACTIVE' where END_TIME_ is null;
+update ACT_HI_PROCINST set STATE_ = 'COMPLETED' where END_TIME_ is not null;

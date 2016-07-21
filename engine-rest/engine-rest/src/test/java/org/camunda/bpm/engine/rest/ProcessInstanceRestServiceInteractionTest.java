@@ -511,12 +511,12 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().delete(SINGLE_PROCESS_INSTANCE_URL);
 
-    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null);
+    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, false, true);
   }
 
   @Test
   public void testDeleteNonExistingProcessInstance() {
-    doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).deleteProcessInstance(anyString(), anyString());
+    doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).deleteProcessInstance(anyString(), anyString(),anyBoolean(),anyBoolean());
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
@@ -528,7 +528,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testDeleteProcessInstanceThrowsAuthorizationException() {
     String message = "expected exception";
-    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).deleteProcessInstance(anyString(), anyString());
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).deleteProcessInstance(anyString(), anyString(),anyBoolean(),anyBoolean());
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
@@ -547,7 +547,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().delete(SINGLE_PROCESS_INSTANCE_URL);
 
-    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null);
+    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, false, true);
   }
 
   @Test

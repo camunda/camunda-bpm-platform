@@ -15,6 +15,7 @@ create table ACT_HI_PROCINST (
     CASE_INST_ID_ nvarchar(64),
     DELETE_REASON_ nvarchar(4000),
     TENANT_ID_ nvarchar(64),
+    STATE_ nvarchar(255),
     primary key (ID_),
     unique (PROC_INST_ID_)
 );

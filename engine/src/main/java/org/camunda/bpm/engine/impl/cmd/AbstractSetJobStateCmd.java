@@ -149,4 +149,8 @@ public abstract class AbstractSetJobStateCmd extends AbstractSetStateCmd {
       processInstanceId, processDefinitionId, processDefinitionKey, propertyChange);
   }
 
+  @Override
+  protected void triggerHistoryEvent(CommandContext commandContext){
+
+  };
 }

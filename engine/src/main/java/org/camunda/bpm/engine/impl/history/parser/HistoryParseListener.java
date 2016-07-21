@@ -56,6 +56,7 @@ public class HistoryParseListener implements BpmnParseListener {
   // configurations wired
   protected ExecutionListener PROCESS_INSTANCE_START_LISTENER;
   protected ExecutionListener PROCESS_INSTANCE_END_LISTENER;
+  protected ExecutionListener PROCESS_INSTANCE_UPDATE_LISTENER;
 
   protected ExecutionListener ACTIVITY_INSTANCE_START_LISTENER;
   protected ExecutionListener ACTIVITY_INSTANCE_END_LISTENER;
@@ -74,6 +75,7 @@ public class HistoryParseListener implements BpmnParseListener {
   protected void initExecutionListeners(HistoryEventProducer historyEventProducer, HistoryLevel historyLevel) {
     PROCESS_INSTANCE_START_LISTENER = new ProcessInstanceStartListener(historyEventProducer, historyLevel);
     PROCESS_INSTANCE_END_LISTENER = new ProcessInstanceEndListener(historyEventProducer, historyLevel);
+    PROCESS_INSTANCE_UPDATE_LISTENER = new ProcessInstanceUpdateListener(historyEventProducer, historyLevel);
 
     ACTIVITY_INSTANCE_START_LISTENER = new ActivityInstanceStartListener(historyEventProducer, historyLevel);
     ACTIVITY_INSTANCE_END_LISTENER = new ActivityInstanceEndListener(historyEventProducer, historyLevel);

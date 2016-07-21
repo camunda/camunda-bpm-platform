@@ -37,7 +37,8 @@
         SUPER_CASE_INSTANCE_ID_,
         CASE_INST_ID_,
         DELETE_REASON_,
-        TENANT_ID_
+        TENANT_ID_,
+        STATE_
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
@@ -54,7 +55,8 @@
         #{superCaseInstanceId, jdbcType=VARCHAR},
         #{caseInstanceId, jdbcType=VARCHAR},
         #{deleteReason, jdbcType=VARCHAR},
-        #{tenantId, jdbcType=VARCHAR}
+        #{tenantId, jdbcType=VARCHAR},
+        #{state, jdbcType=VARCHAR}
       )
   </insert>
 
@@ -65,7 +67,8 @@
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
       END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
-      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR}
+      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
+      STATE_ = #{state, jdbcType=VARCHAR}
 
       <if test="endTime!=null">
         , END_TIME_ = #{endTime, jdbcType=TIMESTAMP}
@@ -107,6 +110,7 @@
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="state" column="STATE_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- HISTORIC PROCESS INSTANCE SELECT -->

@@ -60,7 +60,7 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
   public void deleteProcessInstance() {
     RuntimeService runtimeService = engine.getRuntimeService();
     try {
-      runtimeService.deleteProcessInstance(processInstanceId, null);
+      runtimeService.deleteProcessInstance(processInstanceId, null, false, true);
     } catch (AuthorizationException e) {
       throw e;
     } catch (ProcessEngineException e) {

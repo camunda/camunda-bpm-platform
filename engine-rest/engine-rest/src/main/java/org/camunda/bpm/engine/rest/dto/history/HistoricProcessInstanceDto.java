@@ -32,6 +32,7 @@ public class HistoricProcessInstanceDto {
   private String superCaseInstanceId;
   private String caseInstanceId;
   private String tenantId;
+  private String state;
 
   public String getId() {
     return id;
@@ -89,6 +90,14 @@ public class HistoricProcessInstanceDto {
     return tenantId;
   }
 
+  public String getState() {
+    return state;
+  }
+
+  public void setState(String state) {
+    this.state = state;
+  }
+
   public static HistoricProcessInstanceDto fromHistoricProcessInstance(HistoricProcessInstance historicProcessInstance) {
 
     HistoricProcessInstanceDto dto = new HistoricProcessInstanceDto();
@@ -107,6 +116,7 @@ public class HistoricProcessInstanceDto {
     dto.superCaseInstanceId = historicProcessInstance.getSuperCaseInstanceId();
     dto.caseInstanceId = historicProcessInstance.getCaseInstanceId();
     dto.tenantId = historicProcessInstance.getTenantId();
+    dto.state = historicProcessInstance.getState();
 
     return dto;
   }

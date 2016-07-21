@@ -20,10 +20,18 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /** A single execution of a whole process definition that is stored permanently.
+ *  states are not implemented using enum in order to allow customization without exploding.
  *
  * @author Christian Stettler
+ * @author Askar Akhmerov
  */
 public interface HistoricProcessInstance {
+
+  String ACTIVE = "ACTIVE";
+  String SUSPENDED = "SUSPENDED";
+  String COMPLETED = "COMPLETED";
+  String EXTERNALLY_TERMINATED = "EXTERNALLY_TERMINATED";
+  String INTERNALLY_TERMINATED = "INTERNALLY_TERMINATED";
 
   /** The process instance id (== as the id for the runtime {@link ProcessInstance process instance}). */
   String getId();
@@ -85,4 +93,15 @@ public interface HistoricProcessInstance {
    */
   String getTenantId();
 
+  /**
+   * Return current state of HistoricProcessInstance, possible values are:
+   *  ACTIVE - running process instance
+   *  SUSPENDED - suspended process instances
+   *  COMPLETED - completed through normal end event
+   *  EXTERNALLY_TERMINATED - terminated externally, for instance through REST API
+   *  INTERNALLY_TERMINATED - terminated internally, for instance by terminating boundary event
+   *
+   * @return state representation wrapped into enum
+   */
+  String getState();
 }

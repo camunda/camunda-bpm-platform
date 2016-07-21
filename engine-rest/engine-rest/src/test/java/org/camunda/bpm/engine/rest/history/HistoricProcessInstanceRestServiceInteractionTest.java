@@ -87,6 +87,7 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
     String returnedSuperCaseInstanceId = from(content).getString("superCaseInstanceId");
     String returnedCaseInstanceId = from(content).getString("caseInstanceId");
     String returnedTenantId = from(content).getString("tenantId");
+    String returnedState = from(content).getString("state");
 
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY, returnedProcessInstanceBusinessKey);
@@ -102,6 +103,7 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_CASE_INSTANCE_ID, returnedSuperCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_CASE_INSTANCE_ID, returnedCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STATE, returnedState);
 
   }
 

@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.IncidentState;
 import org.camunda.bpm.engine.history.JobState;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
@@ -29,17 +30,7 @@ import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
-import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
-import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
-import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
+import org.camunda.bpm.engine.impl.history.event.*;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntry;
@@ -53,6 +44,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
@@ -460,6 +452,9 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       evt.setSuperProcessInstanceId(superExecution.getProcessInstanceId());
     }
 
+    //state
+    evt.setState(HistoricProcessInstance.ACTIVE);
+
     // set start user Id
     evt.setStartUserId(Context.getCommandContext().getAuthenticatedUserId());
 
@@ -474,6 +469,12 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     // initialize event
     initProcessInstanceEvent(evt, executionEntity, HistoryEventTypes.PROCESS_INSTANCE_UPDATE);
+
+    if (executionEntity.isSuspended()) {
+      evt.setState(HistoricProcessInstance.SUSPENDED);
+    } else {
+      evt.setState(HistoricProcessInstance.ACTIVE);
+    }
 
     return evt;
   }
@@ -500,6 +501,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     // initialize event
     initProcessInstanceEvent(evt, executionEntity, HistoryEventTypes.PROCESS_INSTANCE_END);
 
+    determineEndState(executionEntity, evt);
+
     // set end activity id
     evt.setEndActivityId(executionEntity.getActivityId());
     evt.setEndTime(ClockUtil.getCurrentTime());
@@ -514,6 +517,17 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
 
     return evt;
+  }
+
+  private void determineEndState(ExecutionEntity executionEntity, HistoricProcessInstanceEventEntity evt) {
+    //determine state
+    if (executionEntity.getActivity() != null) {
+      evt.setState(HistoricProcessInstance.COMPLETED);
+    } else if (executionEntity.getActivity() == null && executionEntity.isExternallyTerminated()) {
+      evt.setState(HistoricProcessInstance.EXTERNALLY_TERMINATED);
+    } else if (executionEntity.getActivity() == null && !executionEntity.isExternallyTerminated()) {
+      evt.setState(HistoricProcessInstance.INTERNALLY_TERMINATED);
+    }
   }
 
   public HistoryEvent createActivityInstanceStartEvt(DelegateExecution execution) {

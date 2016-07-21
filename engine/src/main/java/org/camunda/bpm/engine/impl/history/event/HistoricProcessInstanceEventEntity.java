@@ -47,6 +47,8 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
   /** id of the tenant which belongs to the process instance  */
   protected String tenantId;
 
+  protected String state;
+
   // getters / setters ////////////////////////////////////////
 
   public String getEndActivityId() {
@@ -111,6 +113,14 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
 
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
+  }
+
+  public String getState() {
+    return state;
+  }
+
+  public void setState(String state) {
+    this.state = state;
   }
 
   @Override

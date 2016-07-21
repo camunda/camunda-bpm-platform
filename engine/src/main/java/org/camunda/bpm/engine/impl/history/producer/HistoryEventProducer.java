@@ -52,7 +52,7 @@ public interface HistoryEventProducer {
   /**
    * Creates the history event fired when a process instance is <strong>updated</strong>.
    *
-   * @param processExecution the process instance
+   * @param execution the process instance
    * @return the created history event
    */
   HistoryEvent createProcessInstanceUpdateEvt(DelegateExecution execution);
@@ -60,7 +60,7 @@ public interface HistoryEventProducer {
   /**
    * Creates the history event fired when a process instance is <strong>migrated</strong>.
    *
-   * @param processExecution the process instance
+   * @param execution the process instance
    * @return the created history event
    */
   HistoryEvent createProcessInstanceMigrateEvt(DelegateExecution execution);

@@ -20,6 +20,11 @@ import java.util.Collections;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -34,14 +39,20 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
+  protected boolean externallyTerminated;
   protected String processInstanceId;
   protected String deleteReason;
   protected boolean skipCustomListeners;
 
   public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason, boolean skipCustomListeners) {
+    this(processInstanceId,deleteReason,skipCustomListeners,false);
+  }
+
+  public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated) {
     this.processInstanceId = processInstanceId;
     this.deleteReason = deleteReason;
     this.skipCustomListeners = skipCustomListeners;
+    this.externallyTerminated = externallyTerminated;
   }
 
   public Void execute(CommandContext commandContext) {
@@ -49,7 +60,8 @@ public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
 
     // fetch process instance
     ExecutionManager executionManager = commandContext.getExecutionManager();
-    ExecutionEntity execution = executionManager.findExecutionById(processInstanceId);
+    final ExecutionEntity execution = executionManager.findExecutionById(processInstanceId);
+
     ensureNotNull(BadUserRequestException.class, "No process instance found for id '" + processInstanceId + "'", "processInstance", execution);
 
     checkDeleteProcessInstance(execution, commandContext);
@@ -57,7 +69,9 @@ public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
     // delete process instance
     commandContext
       .getExecutionManager()
-      .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners);
+      .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners,externallyTerminated);
+
+    handleHistory(commandContext, execution);
 
     // create user operation log
     commandContext.getOperationLogManager()
@@ -65,6 +79,18 @@ public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
           null, null, Collections.singletonList(PropertyChange.EMPTY_CHANGE));
 
     return null;
+  }
+
+  private void handleHistory(CommandContext commandContext, final ExecutionEntity execution) {
+    HistoryLevel historyLevel = commandContext.getProcessEngineConfiguration().getHistoryLevel();
+    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_END, execution)) {
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createProcessInstanceEndEvt(execution);
+        }
+      });
+    }
   }
 
   protected void checkDeleteProcessInstance(ExecutionEntity execution, CommandContext commandContext) {

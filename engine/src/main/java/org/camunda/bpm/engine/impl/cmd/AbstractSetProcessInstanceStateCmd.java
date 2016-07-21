@@ -16,13 +16,14 @@ import java.util.Collections;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskManager;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
-import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
+import org.camunda.bpm.engine.impl.persistence.entity.*;
 import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
 
 /**
@@ -99,6 +100,24 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
       executionManager.updateExecutionSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
       taskManager.updateTaskSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
       externalTaskManager.updateExternalTaskSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
+    }
+  }
+
+  @Override
+  protected void triggerHistoryEvent(CommandContext commandContext){
+    HistoryLevel historyLevel = commandContext.getProcessEngineConfiguration().getHistoryLevel();
+    final ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+    //suspension state is not updated synchronously
+    if (getNewSuspensionState() != null && processInstance != null) {
+      processInstance.setSuspensionState(getNewSuspensionState().getStateCode());
+      if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_UPDATE, processInstance)) {
+        HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+          @Override
+          public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+            return producer.createProcessInstanceUpdateEvt(processInstance);
+          }
+        });
+      }
     }
   }
 
