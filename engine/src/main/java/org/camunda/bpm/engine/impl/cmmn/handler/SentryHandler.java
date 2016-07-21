@@ -53,8 +53,9 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
     String id = element.getId();
     Collection<OnPart> onParts = element.getOnParts();
     IfPart ifPart = element.getIfPart();
+    List<CamundaVariableOnPart> variableOnParts = queryExtensionElementsByClass(element, CamundaVariableOnPart.class);
 
-    if (ifPart == null || ifPart.getConditions().isEmpty()) {
+    if ((ifPart == null || ifPart.getConditions().isEmpty()) && variableOnParts.isEmpty()) {
 
       if (onParts == null || onParts.isEmpty()) {
         LOG.ignoredSentryWithMissingCondition(id);
@@ -85,7 +86,7 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
     initializeIfPart(ifPart, sentryDeclaration, context);
 
     // the variableOnParts will be initialized immediately as it does not have any dependency
-    initializeVariableOnParts(element, sentryDeclaration, context);
+    initializeVariableOnParts(element, sentryDeclaration, context, variableOnParts);
     
     // ...whereas the onParts will be initialized later because the
     // the reference to the plan items (sourceRef) and the reference
@@ -178,8 +179,8 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
     sentryDeclaration.setIfPart(ifPartDeclaration);
   }
 
-  protected void initializeVariableOnParts(CmmnElement element, CmmnSentryDeclaration sentryDeclaration, CmmnHandlerContext context) {
-    List<CamundaVariableOnPart> variableOnParts = queryExtensionElementsByClass(element, CamundaVariableOnPart.class);
+  protected void initializeVariableOnParts(CmmnElement element, CmmnSentryDeclaration sentryDeclaration, 
+    CmmnHandlerContext context, List<CamundaVariableOnPart> variableOnParts) {
     for(CamundaVariableOnPart variableOnPart: variableOnParts) {
       initializeVariableOnPart(variableOnPart, sentryDeclaration, context);
     }

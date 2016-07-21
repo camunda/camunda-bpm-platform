@@ -16,7 +16,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
@@ -29,7 +28,7 @@ public class HistoryLevelTest {
 
   @Test
   public void shouldInitHistoryLevelByObject() throws Exception {
-    ProcessEngineConfigurationImpl config = new StandaloneInMemProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl config = createConfig();
     config.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_FULL);
 
     ProcessEngineConfigurationImpl processEngineConfiguration = buildProcessEngine(config);
@@ -41,7 +40,7 @@ public class HistoryLevelTest {
 
   @Test
   public void shouldInitHistoryLevelByString() throws Exception {
-    ProcessEngineConfigurationImpl config = new StandaloneInMemProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl config = createConfig();
     config.setHistory(HistoryLevel.HISTORY_LEVEL_FULL.getName());
 
     ProcessEngineConfigurationImpl processEngineConfiguration = buildProcessEngine(config);
@@ -53,7 +52,8 @@ public class HistoryLevelTest {
 
   protected ProcessEngineConfigurationImpl createConfig() {
     StandaloneInMemProcessEngineConfiguration configuration = new StandaloneInMemProcessEngineConfiguration();
-    configuration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE);
+    configuration.setProcessEngineName("process-engine-HistoryTest");
+    configuration.setJdbcUrl("jdbc:h2:mem:HistoryTest");
     return configuration;
   }
 
