@@ -21,6 +21,7 @@
       <pad-xid>false</pad-xid>
       <wrap-xa-resource>true</wrap-xa-resource>
     </xa-pool>
+    <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
     <security>
       <user-name>${database.username}</user-name>
       <password>${database.password}</password>

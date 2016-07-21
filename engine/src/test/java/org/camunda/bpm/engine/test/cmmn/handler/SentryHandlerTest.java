@@ -28,17 +28,25 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnIfPartDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnOnPartDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnVariableOnPartDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformException;
 import org.camunda.bpm.model.cmmn.PlanItemTransition;
+import org.camunda.bpm.model.cmmn.VariableTransition;
 import org.camunda.bpm.model.cmmn.instance.Body;
 import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
+import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
 import org.camunda.bpm.model.cmmn.instance.IfPart;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.cmmn.instance.PlanItemOnPart;
 import org.camunda.bpm.model.cmmn.instance.PlanItemTransitionStandardEvent;
 import org.camunda.bpm.model.cmmn.instance.Sentry;
 import org.camunda.bpm.model.cmmn.instance.Task;
+import org.camunda.bpm.model.cmmn.instance.camunda.CamundaVariableOnPart;
+import org.camunda.bpm.model.cmmn.instance.camunda.CamundaVariableTransitionEvent;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Roman Smirnov
@@ -48,10 +56,15 @@ public class SentryHandlerTest extends CmmnElementHandlerTest {
 
   protected Sentry sentry;
   protected PlanItemOnPart onPart;
+  protected CamundaVariableOnPart variableOnPart;
   protected Task task;
   protected PlanItem planItem;
+  protected ExtensionElements extensionElements;
   protected TaskItemHandler taskItemHandler = new TaskItemHandler();
   protected SentryHandler sentryHandler = new SentryHandler();
+
+  @Rule
+  public ExpectedException thrown= ExpectedException.none();
 
   @Before
   public void setUp() {
@@ -66,6 +79,7 @@ public class SentryHandlerTest extends CmmnElementHandlerTest {
     onPart.setSource(planItem);
     createElement(onPart, null, PlanItemTransitionStandardEvent.class);
     onPart.setStandardEvent(PlanItemTransition.complete);
+  
   }
 
   @Test
@@ -232,4 +246,143 @@ public class SentryHandlerTest extends CmmnElementHandlerTest {
 
   }
 
+  // variableOnParts
+  @Test
+  public void sentryTransformWithVariableOnPart() {
+    // given
+    ExtensionElements extensionElements = createElement(sentry, "extensionElements", ExtensionElements.class);
+    CamundaVariableOnPart variableOnPart = createElement(extensionElements, null, CamundaVariableOnPart.class);
+    createElement(variableOnPart, null, CamundaVariableTransitionEvent.class);
+    variableOnPart.setVariableEvent(VariableTransition.create);
+    variableOnPart.setVariableName("aVariable");
+
+    CmmnSentryDeclaration sentryDeclaration = sentryHandler.handleElement(sentry, context);
+   
+    // then
+    assertNotNull(sentryDeclaration);
+    List<CmmnVariableOnPartDeclaration> variableOnParts = sentryDeclaration.getVariableOnParts();
+    assertNotNull(variableOnParts);
+    assertFalse(variableOnParts.isEmpty());
+    assertEquals(1, variableOnParts.size());
+
+    CmmnVariableOnPartDeclaration transformedVariableOnPart = variableOnParts.get(0);
+    assertEquals("aVariable", transformedVariableOnPart.getVariableName());
+    assertEquals(VariableTransition.create.name(), transformedVariableOnPart.getVariableEvent());
+
+  }
+  
+  @Test
+  public void sentryTransformWithMultipleVariableOnPart() {
+    // given
+    ExtensionElements extensionElements = createElement(sentry, "extensionElements", ExtensionElements.class);
+    CamundaVariableOnPart variableOnPart = createElement(extensionElements, null, CamundaVariableOnPart.class);
+    createElement(variableOnPart, null, CamundaVariableTransitionEvent.class);
+    variableOnPart.setVariableEvent(VariableTransition.create);
+    variableOnPart.setVariableName("aVariable");
+
+    CamundaVariableOnPart additionalVariableOnPart = createElement(extensionElements, null, CamundaVariableOnPart.class);
+    createElement(additionalVariableOnPart, null, CamundaVariableTransitionEvent.class);
+    additionalVariableOnPart.setVariableEvent(VariableTransition.update);
+    additionalVariableOnPart.setVariableName("bVariable");
+
+    CmmnSentryDeclaration sentryDeclaration = sentryHandler.handleElement(sentry, context);
+   
+    // then
+    assertNotNull(sentryDeclaration);
+    List<CmmnVariableOnPartDeclaration> variableOnParts = sentryDeclaration.getVariableOnParts();
+    assertNotNull(variableOnParts);
+    assertFalse(variableOnParts.isEmpty());
+    assertEquals(2, variableOnParts.size());
+
+  }
+
+  @Test
+  public void sentryTransformWithSameVariableOnPartTwice() {
+    // given
+    ExtensionElements extensionElements = createElement(sentry, "extensionElements", ExtensionElements.class);
+    CamundaVariableOnPart variableOnPart = createElement(extensionElements, null, CamundaVariableOnPart.class);
+    createElement(variableOnPart, null, CamundaVariableTransitionEvent.class);
+    variableOnPart.setVariableEvent(VariableTransition.create);
+    variableOnPart.setVariableName("aVariable");
+
+    CamundaVariableOnPart additionalVariableOnPart = createElement(extensionElements, null, CamundaVariableOnPart.class);
+    createElement(additionalVariableOnPart, null, CamundaVariableTransitionEvent.class);
+    additionalVariableOnPart.setVariableEvent(VariableTransition.create);
+    additionalVariableOnPart.setVariableName("aVariable");
+
+    CmmnSentryDeclaration sentryDeclaration = sentryHandler.handleElement(sentry, context);
+   
+    // then
+    assertNotNull(sentryDeclaration);
+    List<CmmnVariableOnPartDeclaration> variableOnParts = sentryDeclaration.getVariableOnParts();
+    assertNotNull(variableOnParts);
+    assertFalse(variableOnParts.isEmpty());
+    assertEquals(1, variableOnParts.size());
+
+  }
+
+  @Test
+  public void sentryTransformShouldFailWithMissingVariableEvent() {
+    // given
+    ExtensionElements extensionElements = createElement(sentry, "extensionElements", ExtensionElements.class);
+    CamundaVariableOnPart variableOnPart = createElement(extensionElements, null, CamundaVariableOnPart.class);
+    variableOnPart.setVariableName("aVariable");
+    
+    thrown.expect(CmmnTransformException.class);
+    thrown.expectMessage("The variableOnPart of the sentry with id 'aSentry' must have one valid variable event.");
+    sentryHandler.handleElement(sentry, context);
+  }
+
+  @Test
+  public void sentryTransformShouldFailWithInvalidVariableEvent() {
+    // given
+    ExtensionElements extensionElements = createElement(sentry, "extensionElements", ExtensionElements.class);
+    CamundaVariableOnPart variableOnPart = createElement(extensionElements, null, CamundaVariableOnPart.class);
+    CamundaVariableTransitionEvent transitionEvent = createElement(variableOnPart, null, CamundaVariableTransitionEvent.class);
+    transitionEvent.setTextContent("invalid");
+    variableOnPart.setVariableName("aVariable");
+    
+    thrown.expect(CmmnTransformException.class);
+    thrown.expectMessage("The variableOnPart of the sentry with id 'aSentry' must have one valid variable event.");
+    sentryHandler.handleElement(sentry, context);
+  }
+
+  @Test
+  public void sentryTransformWithMultipleVariableEvent() {
+    // given
+    ExtensionElements extensionElements = createElement(sentry, "extensionElements", ExtensionElements.class);
+    CamundaVariableOnPart variableOnPart = createElement(extensionElements, null, CamundaVariableOnPart.class);
+    CamundaVariableTransitionEvent transitionEvent = createElement(variableOnPart, null, CamundaVariableTransitionEvent.class);
+    transitionEvent.setTextContent("create");
+    CamundaVariableTransitionEvent additionalTransitionEvent = createElement(variableOnPart, null, CamundaVariableTransitionEvent.class);
+    additionalTransitionEvent.setTextContent("delete");
+    variableOnPart.setVariableName("aVariable");
+    
+    CmmnSentryDeclaration sentryDeclaration = sentryHandler.handleElement(sentry, context);
+    
+    // then
+    assertNotNull(sentryDeclaration);
+    List<CmmnVariableOnPartDeclaration> variableOnParts = sentryDeclaration.getVariableOnParts();
+    assertNotNull(variableOnParts);
+    assertFalse(variableOnParts.isEmpty());
+    assertEquals(1, variableOnParts.size());
+
+    CmmnVariableOnPartDeclaration transformedVariableOnPart = variableOnParts.get(0);
+    assertEquals("aVariable", transformedVariableOnPart.getVariableName());
+    // when there are multiple variable events then, only first variable event is considered.
+    assertEquals(VariableTransition.create.name(), transformedVariableOnPart.getVariableEvent());
+  }
+
+  @Test
+  public void sentryTransformShouldFailWithMissingVariableName() {
+    // given
+    ExtensionElements extensionElements = createElement(sentry, "extensionElements", ExtensionElements.class);
+    CamundaVariableOnPart variableOnPart = createElement(extensionElements, null, CamundaVariableOnPart.class);
+    createElement(variableOnPart, null, CamundaVariableTransitionEvent.class);
+    variableOnPart.setVariableEvent(VariableTransition.create);
+    
+    thrown.expect(CmmnTransformException.class);
+    thrown.expectMessage("The variableOnPart of the sentry with id 'aSentry' must have variable name.");
+    sentryHandler.handleElement(sentry, context);
+  }
 }
