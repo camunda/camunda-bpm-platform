@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.impl.cmmn.transformer;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.model.cmmn.CmmnModelException;
 
 /**
  * @author Stefan Hentschel.
@@ -60,4 +59,19 @@ public class CmmnTransformerLogger extends ProcessEngineLogger {
     );
   }
 
+  public CmmnTransformException nonMatchingVariableEvents(String id) {
+    return new CmmnTransformException(exceptionMessage(
+      "007",
+      "The variableOnPart of the sentry with id '{}' must have one valid variable event. ",
+      id
+    ));
+  }
+
+  public CmmnTransformException emptyVariableName(String id) {
+    return new CmmnTransformException(exceptionMessage(
+      "008",
+      "The variableOnPart of the sentry with id '{}' must have variable name. ",
+      id
+    ));
+  }
 }
