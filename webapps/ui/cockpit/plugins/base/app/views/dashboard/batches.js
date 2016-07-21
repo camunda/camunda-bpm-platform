@@ -17,24 +17,18 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
       $scope,
       camAPI
     ) {
+        $scope.countRunning = 0;
+        $scope.countAll = 0;
         var batchService = camAPI.resource('batch');
         batchService.count(function(err, count) {
-          if (err) {
-            $scope.countRunning = 'unknown';
-            throw err;
-          }
           $scope.countRunning = count || 0;
         });
         var historyService = camAPI.resource('history');
         historyService.batchCount(function(err, count) {
-          if (err) {
-            $scope.countAll = 'unknown';
-            throw err;
-          }
           $scope.countAll = count.count || 0;
         });
       }],
 
-    priority: 0
+    priority: -5
   });
 }];

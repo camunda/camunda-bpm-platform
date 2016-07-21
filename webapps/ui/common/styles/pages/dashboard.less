@@ -1,23 +1,40 @@
-.ctn-view.dashboard {
-  position: absolute;
+.ctn-view.dashboard, // cockpit
+.ctn-wrapper > [ng-view] > .dashboard { // admin
   width: 100%;
-  top: @breadcrumb-height;
   bottom: 0;
 }
 
-.dasboard > .sections {
-  overflow: auto;
+.ctn-view.dashboard {
+  top: @breadcrumb-height;
+}
+
+.ctn-wrapper > [ng-view] > .dashboard {
+  top: 0;
 }
 
 .dashboard {
+  position: absolute;
+  background-color: @custom-gray-light;
+  display: block;
+  overflow: auto;
+
+  > .sections {
+    overflow: auto;
+  }
+
   section {
-    min-height: 200px;
-    @media (max-width: @screen-xs-max) {
-      min-height: auto;
-    }
     padding: @grid-gutter-width * 0.5;
 
-    > header {
+    > .inner {
+      background-color: @body-bg;
+      padding: @grid-gutter-width * 0.5;
+
+      @media (min-width: 1200px) {
+        min-height: 250px;
+      }
+    }
+
+    header {
       border-bottom: 1px solid @custom-gray-light;
     }
   }
@@ -30,38 +47,13 @@
   li {
     list-style: none;
     padding: 0;
-    margin: 0 0 10px 0;
-  }
-
-
-  [data-plugin-id="processes"] {
-    li {
-      height: 40px;
-      line-height: 45px;
-      clear: both;
-      > * {
-        display: inline-block;
-        float: left;
-        height: 40px;
-      }
-    }
-
-    .value,
-    .no-value {
-      text-align: right;
-      min-width: 90px;
-      padding-right: 5px;
-    }
-
-    .value {
-      font-size: 2em;
-      font-weight: 700;
-      line-height: 34px;
-    }
+    margin: 0 0 (@grid-gutter-width * 0.5) 0;
   }
 
   .section-title {
     font-size: 2rem;
+    margin-top: 5px;
+    font-weight: 100;
   }
 
   .stats {
@@ -69,6 +61,13 @@
     padding-top: @grid-gutter-width * 0.5;
   }
 
+
+  .value,
+  .no-value {
+    display: block;
+    font-size: 2em;
+    font-weight: 100;
+  }
 
   .prop-incidents,
   .prop-failedJobs {

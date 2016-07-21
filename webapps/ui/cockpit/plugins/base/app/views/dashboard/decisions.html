@@ -3,9 +3,14 @@
      text-error="{{ loadingError }}">
   <ul>
     <li>
-      <a href="#/decisions" ng-if="count == 0">0 decision definitions</a>
-      <a href="#/decisions" ng-if="count == 1">1 decision definition</a>
-      <a href="#/decisions" ng-if="count > 1">{{ count }} decision definitions</a>
+      <a href="#/decisions" ng-if="count.definitions == 0 || count.definitions > 1">Decision definitions</a>
+      <a href="#/decisions" ng-if="count.definitions == 1">Decision definition</a>
+      <span class="value">{{ (count.definitions | abbreviateNumber) || 0 }}</span>
+    </li>
+    <li>
+      <a href="#/decisions" ng-if="count.instances == 0 || count.instances > 1">Decision evaluations</a>
+      <a href="#/decisions" ng-if="count.instances == 1">Decision evaluation</a>
+      <span class="value">{{ (count.instances | abbreviateNumber) || 0 }}</span>
     </li>
   </ul>
 </div>

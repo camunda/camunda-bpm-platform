@@ -3,9 +3,14 @@
      text-error="{{ loadingError }}">
   <ul>
     <li>
-      <a href="#/tasks" ng-if="count == 0">0 open tasks</a>
-      <a href="#/tasks" ng-if="count == 1">1 open task</a>
-      <a href="#/tasks" ng-if="count > 1">{{ count }} open tasks</a>
+      <a href="#/tasks" ng-if="count.unfinished == 0 || count.unfinished > 1">Open tasks</a>
+      <a href="#/tasks" ng-if="count.unfinished == 1">Open task</a>
+      <span class="value">{{ count.unfinished | abbreviateNumber }}</span>
+    </li>
+    <li>
+      <a href="#/tasks" ng-if="count.finished == 0 || count.finished > 1">Completed tasks</a>
+      <a href="#/tasks" ng-if="count.finished == 1">Completed task</a>
+      <span class="value">{{ count.finished | abbreviateNumber }}</span>
     </li>
   </ul>
 </div>

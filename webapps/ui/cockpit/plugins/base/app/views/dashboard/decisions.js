@@ -4,6 +4,8 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/decisions.html', 'utf8');
 
+var series = require('camunda-bpm-sdk-js').utils.series;
+
 module.exports = [
   'ViewsProvider',
   function(
@@ -26,20 +28,32 @@ module.exports = [
     ) {
           $scope.count = 0;
           $scope.loadingState = 'LOADING';
-          var service = camAPI.resource('decision-definition');
-          service.count({
-            latestVersion: true
-          }, function(err, count) {
+
+
+          var decisionDefinitionService = camAPI.resource('decision-definition');
+          var historyService = camAPI.resource('history');
+          series({
+            definitions: function(cb) {
+              decisionDefinitionService.count({
+                latestVersion: true
+              }, cb);
+            },
+            instances: function(cb) {
+              historyService.decisionInstanceCount({}, function(err, data) {
+                cb(err, data ? data.count : null);
+              });
+            }
+          }, function(err, results) {
             if (err) {
               $scope.loadingError = err.message;
               $scope.loadingState = 'ERROR';
               throw err;
             }
             $scope.loadingState = 'LOADED';
-            $scope.count = count || 0;
+            $scope.count = results;
           });
         }],
 
-      priority: 0
+      priority: -1
     });
   }];

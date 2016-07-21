@@ -31,6 +31,6 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         };
       }],
 
-    priority: 0
+    priority: -4
   });
 }];
