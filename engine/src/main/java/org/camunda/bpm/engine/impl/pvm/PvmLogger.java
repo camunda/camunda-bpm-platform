@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.pvm;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
@@ -63,9 +65,9 @@ public class PvmLogger extends ProcessEngineLogger {
         "008", "Enter activity instance {} parent: {}", pvmExecutionImpl, parentActivityInstanceId);
   }
 
-  public void execptionWhileCompletingSupProcess(PvmExecutionImpl execution, Exception e) {
+  public void exceptionWhileCompletingSupProcess(PvmExecutionImpl execution, Exception e) {
     logError(
-        "009", "Execption while completing subprocess of execution {}", execution, e);
+        "009", "Exception while completing subprocess of execution {}", execution, e);
   }
 
   public void createScope(PvmExecutionImpl execution, PvmExecutionImpl propagatingExecution) {

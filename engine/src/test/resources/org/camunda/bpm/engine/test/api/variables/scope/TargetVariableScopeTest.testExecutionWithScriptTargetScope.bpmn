@@ -22,7 +22,7 @@
           <camunda:in source="orderId" target="orderId" />
           <camunda:out source="orderId" target="targetOrderId" local="true" />
           <camunda:executionListener event="end">
-            <camunda:script scriptFormat="groovy"><![CDATA[execution.setVariable("targetOrderId", execution.getVariableLocal("targetOrderId"),"SubProcess_1");]]></camunda:script>
+            <camunda:script scriptFormat="groovy"><![CDATA[execution.setVariable("targetOrderId",targetOrderId,"SubProcess_1");]]></camunda:script>
           </camunda:executionListener>
         </bpmn2:extensionElements>
         <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
@@ -32,11 +32,7 @@
       <bpmn2:scriptTask id="ServiceTask_LogOrderId" name="log &#10;&#10;targetOrderId" scriptFormat="groovy">
         <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
         <bpmn2:outgoing>SequenceFlow_4</bpmn2:outgoing>
-        <bpmn2:script><![CDATA[println "orderId : " + targetOrderId;
-targetOrderId.each {
-println "TargetOrder: $it"
-}
-println "execution" + execution;]]></bpmn2:script>
+        <bpmn2:script><![CDATA[]]></bpmn2:script>
       </bpmn2:scriptTask>
       <bpmn2:sequenceFlow id="SequenceFlow_0pohyk9" sourceRef="Task_0wouv2l" targetRef="EndEvent_1" />
       <bpmn2:serviceTask id="Task_0wouv2l" name="assertion" camunda:class="org.camunda.bpm.engine.test.api.variables.scope.AssertVariableScopeDelegate">

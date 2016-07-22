@@ -57,10 +57,10 @@ public class PvmAtomicOperationProcessEnd extends PvmAtomicOperationActivityInst
       try {
         subProcessActivityBehavior.passOutputVariables(superExecution, execution);
       } catch (RuntimeException e) {
-        LOG.execptionWhileCompletingSupProcess(execution, e);
+        LOG.exceptionWhileCompletingSupProcess(execution, e);
         throw e;
       } catch (Exception e) {
-        LOG.execptionWhileCompletingSupProcess(execution, e);
+        LOG.exceptionWhileCompletingSupProcess(execution, e);
         throw new ProcessEngineException("Error while completing sub process of execution " + execution, e);
       }
     } else if (superCaseExecution != null) {
@@ -69,10 +69,10 @@ public class PvmAtomicOperationProcessEnd extends PvmAtomicOperationActivityInst
       try {
         transferVariablesBehavior.transferVariables(execution, superCaseExecution);
       } catch (RuntimeException e) {
-        LOG.execptionWhileCompletingSupProcess(execution, e);
+        LOG.exceptionWhileCompletingSupProcess(execution, e);
         throw e;
       } catch (Exception e) {
-        LOG.execptionWhileCompletingSupProcess(execution, e);
+        LOG.exceptionWhileCompletingSupProcess(execution, e);
         throw new ProcessEngineException("Error while completing sub process of execution " + execution, e);
       }
     }
@@ -86,10 +86,10 @@ public class PvmAtomicOperationProcessEnd extends PvmAtomicOperationActivityInst
       try {
         subProcessActivityBehavior.completed(superExecution);
       } catch (RuntimeException e) {
-        LOG.execptionWhileCompletingSupProcess(execution, e);
+        LOG.exceptionWhileCompletingSupProcess(execution, e);
         throw e;
       } catch (Exception e) {
-        LOG.execptionWhileCompletingSupProcess(execution, e);
+        LOG.exceptionWhileCompletingSupProcess(execution, e);
         throw new ProcessEngineException("Error while completing sub process of execution " + execution, e);
       }
     } else if (superCaseExecution != null) {

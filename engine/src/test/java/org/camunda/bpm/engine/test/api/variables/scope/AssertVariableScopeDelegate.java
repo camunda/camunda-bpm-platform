@@ -17,16 +17,9 @@ import static org.junit.Assert.assertThat;
  * @author Askar Akhmerov
  */
 public class AssertVariableScopeDelegate implements JavaDelegate {
-  private static final String TEST_SCOPE = "SubProcess_1";
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    Map<ScopeImpl, PvmExecutionImpl> mapping = ((ExecutionEntity) execution).createActivityExecutionMapping();
-    for (ScopeImpl scope : mapping.keySet()) {
-      if (scope.getId().equals(TEST_SCOPE)) {
-        assertThat(mapping.get(scope).getVariableLocal("targetOrderId"),is(notNullValue()));
-      }
-    }
-
+    assertThat(execution.getVariableLocal("targetOrderId"),is(notNullValue()));
   }
 }
