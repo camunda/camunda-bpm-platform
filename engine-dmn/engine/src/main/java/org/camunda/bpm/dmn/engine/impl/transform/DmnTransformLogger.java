@@ -160,4 +160,11 @@ public class DmnTransformLogger extends DmnLogger {
     );
   }
 
+  public DmnTransformException decisionVariableIsMissing(String decisionId) {
+    return new DmnTransformException(exceptionMessage(
+        "018",
+        "The decision '{}' must have an 'variable' element if it contains a literal expression.",
+        decisionId));
+  }
+
 }

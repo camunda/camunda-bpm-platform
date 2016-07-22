@@ -42,6 +42,9 @@ public class ParseDecisionTest extends DmnEngineTest {
   public static final String MISSING_RULE_ID_DMN = "org/camunda/bpm/dmn/engine/api/MissingIds.missingRuleId.dmn";
   public static final String MISSING_COMPOUND_OUTPUT_NAME_DMN = "org/camunda/bpm/dmn/engine/api/CompoundOutputs.noName.dmn";
   public static final String DUPLICATE_COMPOUND_OUTPUT_NAME_DMN = "org/camunda/bpm/dmn/engine/api/CompoundOutputs.duplicateName.dmn";
+
+  public static final String MISSING_VARIABLE_DMN = "org/camunda/bpm/dmn/engine/api/MissingVariable.dmn";
+
   public static final String MISSING_REQUIRED_DECISION_REFERENCE_DMN = "org/camunda/bpm/dmn/engine/api/MissingRequiredDecisionReference.dmn";
   public static final String WRONG_REQUIRED_DECISION_REFERENCE_DMN = "org/camunda/bpm/dmn/engine/api/WrongRequiredDecisionReference.dmn";
   public static final String MISSING_REQUIRED_DECISION_ATTRIBUTE_DMN = "org/camunda/bpm/dmn/engine/api/MissingRequiredDecisionAttribute.dmn";
@@ -166,6 +169,21 @@ public class ParseDecisionTest extends DmnEngineTest {
         .hasMessageContaining("DMN-02009")
         .hasMessageContaining("has a compound output but name of output")
         .hasMessageContaining("is duplicate");
+    }
+  }
+
+  @Test
+  public void shouldFailIfVariableIsMissing() {
+    try {
+      parseDecisionsFromFile(MISSING_VARIABLE_DMN);
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    }
+    catch (DmnTransformException e) {
+      assertThat(e)
+        .hasCauseExactlyInstanceOf(DmnTransformException.class)
+        .hasMessageStartingWith("DMN-02004")
+        .hasMessageContaining("DMN-02018")
+        .hasMessageContaining("The decision 'missing-variable' must have an 'variable' element");
     }
   }
 

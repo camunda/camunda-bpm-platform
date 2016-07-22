@@ -19,6 +19,7 @@ import org.camunda.bpm.dmn.engine.impl.spi.type.DmnDataTypeTransformer;
 import org.camunda.bpm.dmn.engine.impl.spi.type.DmnTypeDefinition;
 import org.camunda.bpm.dmn.engine.impl.type.DefaultTypeDefinition;
 import org.camunda.bpm.dmn.engine.impl.type.DmnTypeDefinitionImpl;
+import org.camunda.bpm.model.dmn.instance.InformationItem;
 import org.camunda.bpm.model.dmn.instance.LiteralExpression;
 import org.camunda.bpm.model.dmn.instance.Text;
 import org.camunda.bpm.model.dmn.instance.UnaryTests;
@@ -26,7 +27,14 @@ import org.camunda.bpm.model.dmn.instance.UnaryTests;
 public class DmnExpressionTransformHelper {
 
   public static DmnTypeDefinition createTypeDefinition(DmnElementTransformContext context, LiteralExpression expression) {
-    String typeRef = expression.getTypeRef();
+    return createTypeDefinition(context, expression.getTypeRef());
+  }
+
+  public static DmnTypeDefinition createTypeDefinition(DmnElementTransformContext context, InformationItem informationItem) {
+    return createTypeDefinition(context, informationItem.getTypeRef());
+  }
+
+  protected static DmnTypeDefinition createTypeDefinition(DmnElementTransformContext context, String typeRef) {
     if (typeRef != null) {
       DmnDataTypeTransformer transformer = context.getDataTypeTransformerRegistry().getTransformer(typeRef);
       return new DmnTypeDefinitionImpl(typeRef, transformer);
@@ -35,7 +43,6 @@ public class DmnExpressionTransformHelper {
       return new DefaultTypeDefinition();
     }
   }
-
 
   public static String getExpressionLanguage(DmnElementTransformContext context, LiteralExpression expression) {
     return getExpressionLanguage(context, expression.getExpressionLanguage());

@@ -24,8 +24,8 @@ import static org.mockito.Mockito.verify;
 
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionLiteralExpressionImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableInputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableRuleImpl;
@@ -41,7 +41,8 @@ import org.junit.Test;
 
 public class ExpressionLanguageTest extends DmnEngineTest {
 
-  public static final String GROOVY_DMN = "org/camunda/bpm/dmn/engine/el/ExpressionLanguageTest.groovy.dmn";
+  public static final String GROOVY_DECISION_TABLE_DMN = "org/camunda/bpm/dmn/engine/el/ExpressionLanguageTest.groovy.decisionTable.dmn";
+  public static final String GROOVY_DECISION_LITERAL_EXPRESSION_DMN = "org/camunda/bpm/dmn/engine/el/ExpressionLanguageTest.groovy.decisionLiteralExpression.dmn";
   public static final String SCRIPT_DMN = "org/camunda/bpm/dmn/engine/el/ExpressionLanguageTest.script.dmn";
   public static final String EMPTY_EXPRESSIONS_DMN = "org/camunda/bpm/dmn/engine/el/ExpressionLanguageTest.emptyExpressions.dmn";
 
@@ -69,10 +70,9 @@ public class ExpressionLanguageTest extends DmnEngineTest {
   }
 
   @Test
-  @DecisionResource(resource = GROOVY_DMN)
-  public void testGlobalExpressionLanguage() {
-    DmnDecisionImpl decisionEntity  = (DmnDecisionImpl) decision;
-    DmnDecisionTableImpl decisionTable = decisionEntity.getRelatedDecisionTable();
+  @DecisionResource(resource = GROOVY_DECISION_TABLE_DMN)
+  public void testGlobalExpressionLanguageDecisionTable() {
+    DmnDecisionTableImpl decisionTable = (DmnDecisionTableImpl) decision.getDecisionLogic();
     for (DmnDecisionTableInputImpl dmnInput : decisionTable.getInputs()) {
       assertThat(dmnInput.getExpression().getExpressionLanguage()).isEqualTo("groovy");
     }
@@ -89,6 +89,18 @@ public class ExpressionLanguageTest extends DmnEngineTest {
     assertExample(dmnEngine, decision);
     verify(scriptEngineResolver, atLeastOnce()).getScriptEngineForLanguage("groovy");
     verify(scriptEngineResolver, never()).getScriptEngineForLanguage("juel");
+  }
+
+  @Test
+  @DecisionResource(resource = GROOVY_DECISION_LITERAL_EXPRESSION_DMN)
+  public void testGlobalExpressionLanguageDecisionLiteralExpression() {
+    DmnDecisionLiteralExpressionImpl decisionLiteralExpression = (DmnDecisionLiteralExpressionImpl) decision.getDecisionLogic();
+
+    assertThat(decisionLiteralExpression.getExpression().getExpressionLanguage()).isEqualTo("groovy");
+
+    // TODO CAM-6441 - evaluate decision and verify script engine invocation
+    // verify(scriptEngineResolver, atLeastOnce()).getScriptEngineForLanguage("groovy");
+    // verify(scriptEngineResolver, never()).getScriptEngineForLanguage("juel");
   }
 
   @Test

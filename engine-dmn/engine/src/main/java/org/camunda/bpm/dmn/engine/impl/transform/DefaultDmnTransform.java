@@ -28,6 +28,7 @@ import java.util.Set;
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionLiteralExpressionImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionRequirementsGraphImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableInputImpl;
@@ -35,6 +36,7 @@ import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableOutputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableRuleImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnExpressionImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnLogger;
+import org.camunda.bpm.dmn.engine.impl.DmnVariableImpl;
 import org.camunda.bpm.dmn.engine.impl.spi.hitpolicy.DmnHitPolicyHandlerRegistry;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformContext;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformHandler;
@@ -54,9 +56,11 @@ import org.camunda.bpm.model.dmn.instance.InformationRequirement;
 import org.camunda.bpm.model.dmn.instance.Input;
 import org.camunda.bpm.model.dmn.instance.InputEntry;
 import org.camunda.bpm.model.dmn.instance.InputExpression;
+import org.camunda.bpm.model.dmn.instance.LiteralExpression;
 import org.camunda.bpm.model.dmn.instance.Output;
 import org.camunda.bpm.model.dmn.instance.OutputEntry;
 import org.camunda.bpm.model.dmn.instance.Rule;
+import org.camunda.bpm.model.dmn.instance.Variable;
 
 public class DefaultDmnTransform implements DmnTransform, DmnElementTransformContext {
 
@@ -171,13 +175,13 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
     Map<String,DmnDecisionImpl> dmnDecisions = transformIndividualDecisions(decisions);
     buildDecisionRequirements(decisions, dmnDecisions);
     List<DmnDecision> dmnDecisionList = new ArrayList<DmnDecision>(dmnDecisions.values());
-    
+
     for(Decision decision: decisions) {
       DmnDecision dmnDecision = dmnDecisions.get(decision.getId());
       notifyTransformListeners(decision, dmnDecision);
     }
     ensureNoLoopInDecisions(dmnDecisionList);
-    
+
     return dmnDecisionList;
   }
 
@@ -192,12 +196,12 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
     }
     return dmnDecisions;
   }
-  
+
   protected void buildDecisionRequirements(Collection<Decision> decisions, Map<String, DmnDecisionImpl> dmnDecisions) {
     for(Decision decision: decisions) {
       List<DmnDecision> requiredDmnDecisions = getRequiredDmnDecisions(decision, dmnDecisions);
       DmnDecisionImpl dmnDecision = dmnDecisions.get(decision.getId());
-      
+
       if(requiredDmnDecisions.size() > 0) {
         dmnDecision.setRequiredDecision(requiredDmnDecisions);
       }
@@ -206,20 +210,20 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
 
   protected void ensureNoLoopInDecisions(List<DmnDecision> dmnDecisionList) {
     List<String> visitedDecisions = new ArrayList<String>();
-    
+
     for(DmnDecision decision: dmnDecisionList) {
       ensureNoLoopInDecision(decision, new ArrayList<String>(), visitedDecisions);
     }
   }
-  
+
   protected void ensureNoLoopInDecision(DmnDecision decision, List<String> parentDecisionList, List<String> visitedDecisions) {
-    
+
     if (visitedDecisions.contains(decision.getKey())) {
-      return;  
+      return;
     }
 
     parentDecisionList.add(decision.getKey());
-    
+
     for(DmnDecision requiredDecision : decision.getRequiredDecisions()){
 
       if (parentDecisionList.contains(requiredDecision.getKey())) {
@@ -234,7 +238,7 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
   protected List<DmnDecision> getRequiredDmnDecisions(Decision decision, Map<String, DmnDecisionImpl> dmnDecisions) {
     List<DmnDecision> requiredDecisionList = new ArrayList<DmnDecision>();
     for(InformationRequirement informationRequirement: decision.getInformationRequirements()) {
-      
+
       Decision requiredDecision = informationRequirement.getRequiredDecision();
       if(requiredDecision != null) {
         DmnDecision requiredDmnDecision = dmnDecisions.get(requiredDecision.getId());
@@ -243,7 +247,7 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
     }
     return requiredDecisionList;
   }
- 
+
   protected DmnDecisionImpl transformDecision(Decision decision) {
 
     DmnElementTransformHandler<Decision, DmnDecisionImpl> handler = handlerRegistry.getHandler(Decision.class);
@@ -262,7 +266,12 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
 
     if (expression instanceof DecisionTable) {
       DmnDecisionTableImpl dmnDecisionTable = transformDecisionTable((DecisionTable) expression);
-      dmnDecision.setRelatedDecisionTable(dmnDecisionTable);
+      dmnDecision.setDecisionLogic(dmnDecisionTable);
+
+    } else if (expression instanceof LiteralExpression) {
+      DmnDecisionLiteralExpressionImpl dmnDecisionLiteralExpression = transformDecisionLiteralExpression(decision, (LiteralExpression) expression);
+      dmnDecision.setDecisionLogic(dmnDecisionLiteralExpression);
+
     } else {
       LOG.decisionTypeNotSupported(expression, decision);
       return null;
@@ -403,6 +412,33 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
   protected DmnExpressionImpl transformOutputEntry(OutputEntry outputEntry) {
     DmnElementTransformHandler<OutputEntry, DmnExpressionImpl> handler = handlerRegistry.getHandler(OutputEntry.class);
     return handler.handleElement(this, outputEntry);
+  }
+
+  protected DmnDecisionLiteralExpressionImpl transformDecisionLiteralExpression(Decision decision, LiteralExpression literalExpression) {
+    DmnDecisionLiteralExpressionImpl dmnDecisionLiteralExpression = new DmnDecisionLiteralExpressionImpl();
+
+    Variable variable = decision.getVariable();
+    if (variable == null) {
+      throw LOG.decisionVariableIsMissing(decision.getId());
+    }
+
+    DmnVariableImpl dmnVariable = transformVariable(variable);
+    dmnDecisionLiteralExpression.setVariable(dmnVariable);
+
+    DmnExpressionImpl dmnLiteralExpression = transformLiteralExpression(literalExpression);
+    dmnDecisionLiteralExpression.setExpression(dmnLiteralExpression);
+
+    return dmnDecisionLiteralExpression;
+  }
+
+  protected DmnExpressionImpl transformLiteralExpression(LiteralExpression literalExpression) {
+    DmnElementTransformHandler<LiteralExpression, DmnExpressionImpl> handler = handlerRegistry.getHandler(LiteralExpression.class);
+    return handler.handleElement(this, literalExpression);
+  }
+
+  protected DmnVariableImpl transformVariable(Variable variable) {
+    DmnElementTransformHandler<Variable, DmnVariableImpl> handler = handlerRegistry.getHandler(Variable.class);
+    return handler.handleElement(this, variable);
   }
 
   // listeners ////////////////////////////////////////////////////////////////

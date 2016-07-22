@@ -21,7 +21,7 @@ import java.util.Map;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.hitpolicy.DefaultHitPolicyHandlerRegistry;
 import org.camunda.bpm.dmn.engine.impl.spi.hitpolicy.DmnHitPolicyHandler;
 import org.camunda.bpm.dmn.engine.impl.spi.hitpolicy.DmnHitPolicyHandlerRegistry;
@@ -262,8 +262,8 @@ public class DmnDecisionTableEvaluationListenerTest extends DmnEngineTest {
   public void setDecisionTableHitPolicy(HitPolicy hitPolicy, BuiltinAggregator aggregator) {
     DmnHitPolicyHandler handler = hitPolicyHandlerRegistry.getHandler(hitPolicy, aggregator);
     assertThat(handler).isNotNull();
-    DmnDecisionImpl DecisionEntity = (DmnDecisionImpl) this.decision;
-    DecisionEntity.getRelatedDecisionTable().setHitPolicyHandler(handler);
+    DmnDecisionTableImpl decisionTable = (DmnDecisionTableImpl) this.decision.getDecisionLogic();
+    decisionTable.setHitPolicyHandler(handler);
   }
 
   public DmnDecisionTableResult evaluateDecisionTable(Object input1, Object input2, Object input3, Object output1) {

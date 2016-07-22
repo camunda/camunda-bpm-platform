@@ -68,7 +68,7 @@ public class DefaultDmnDecisionContext {
   protected final String inputExpressionExpressionLanguage;
   protected final String inputEntryExpressionLanguage;
   protected final String outputEntryExpressionLanguage;
-  
+
   public DefaultDmnDecisionContext(DefaultDmnEngineConfiguration configuration) {
     evaluationListeners = configuration.getDecisionTableEvaluationListeners();
     decisionEvaluationListeners = configuration.getDecisionEvaluationListeners();
@@ -91,37 +91,36 @@ public class DefaultDmnDecisionContext {
 
   public DmnDecisionTableResult evaluateDecision(DmnDecision decision, VariableContext variableContext) {
 
-    if(decision.getKey() == null 
-      || ((DmnDecisionImpl)decision).getRelatedDecisionTable() == null) {
+    if(decision.getKey() == null || !decision.isDecisionTable()) {
       throw LOG.unableToFindAnyDecisionTable();
     }
     VariableMap variableMap = buildVariableMapFromVariableContext(variableContext);
-    
+
     List<DmnDecision> requiredDecisions = new ArrayList<DmnDecision>();
     buildDecisionTree(decision, requiredDecisions);
-    
+
     List<DmnDecisionTableEvaluationEvent> evaluatedEvents = new ArrayList<DmnDecisionTableEvaluationEvent>();
     DmnDecisionTableResult evaluatedResult = null;
-    
+
     for (DmnDecision evaluateDecision:requiredDecisions) {
       DmnDecisionTableEvaluationEventImpl evaluatedEvent = evaluateDecisionTable(evaluateDecision, variableMap.asVariableContext());
-      evaluatedEvents.add(evaluatedEvent);  
-      
-      evaluatedResult = generateDecisionTableResult(((DmnDecisionImpl)decision).getRelatedDecisionTable(), evaluatedEvent); 
+      evaluatedEvents.add(evaluatedEvent);
+
+      evaluatedResult = generateDecisionTableResult((DmnDecisionTableImpl) decision.getDecisionLogic(), evaluatedEvent);
       if(decision != evaluateDecision) {
         addResultToVariableContext(evaluatedResult, variableMap);
       }
     }
 
     generateDecisionEvaluationEvent(evaluatedEvents);
-    return evaluatedResult;  
-   
+    return evaluatedResult;
+
   }
-  
+
   protected DmnDecisionTableEvaluationEventImpl evaluateDecisionTable(DmnDecision decision, VariableContext variableContext) {
     DmnDecisionTableEvaluationEventImpl evaluationResult = new DmnDecisionTableEvaluationEventImpl();
     evaluationResult.setDecisionTable(decision);
-    DmnDecisionTableImpl decisionTable = ((DmnDecisionImpl)decision).getRelatedDecisionTable();
+    DmnDecisionTableImpl decisionTable = (DmnDecisionTableImpl) decision.getDecisionLogic();
     evaluationResult.setExecutedDecisionElements(calculateExecutedDecisionElements(decisionTable));
 
     int inputSize = decisionTable.getInputs().size();
@@ -144,7 +143,7 @@ public class DefaultDmnDecisionContext {
   }
 
   protected void generateDecisionEvaluationEvent(List<DmnDecisionTableEvaluationEvent> evaluatedEvents) {
-    
+
     DmnDecisionTableEvaluationEvent rootEvaluatedEvent = null;
     DmnDecisionEvaluationEventImpl decisionEvaluationEvent = new DmnDecisionEvaluationEventImpl();
     long executedDecisionElements = 0L;
@@ -153,10 +152,10 @@ public class DefaultDmnDecisionContext {
       executedDecisionElements += evaluatedEvent.getExecutedDecisionElements();
       rootEvaluatedEvent = evaluatedEvent;
     }
-    
+
     decisionEvaluationEvent.setDecisionResult(rootEvaluatedEvent);
     decisionEvaluationEvent.setExecutedDecisionElements(executedDecisionElements);
-    
+
     evaluatedEvents.remove(rootEvaluatedEvent);
     decisionEvaluationEvent.setRequiredDecisionResults(evaluatedEvents);
 
@@ -175,11 +174,11 @@ public class DefaultDmnDecisionContext {
       variableMap.putAll(evaluatedResult.getSingleResult());
     } else {
       Set<String> outputs = new HashSet<String>();
-    
+
       for (Map<String, Object> resultMap : resultList) {
         outputs.addAll(resultMap.keySet());
       }
-      
+
       for (String output : outputs) {
         List<Object> values = evaluatedResult.collectEntries(output);
         variableMap.put(output, values);
@@ -188,14 +187,14 @@ public class DefaultDmnDecisionContext {
   }
 
   protected VariableMap buildVariableMapFromVariableContext(VariableContext variableContext) {
-    
+
     VariableMap variableMap = Variables.createVariables();
 
     Set<String> variables = variableContext.keySet();
     for(String variable: variables) {
       variableMap.put(variable, variableContext.resolve(variable));
     }
-    
+
     return variableMap;
   }
 
@@ -207,7 +206,7 @@ public class DefaultDmnDecisionContext {
     for(DmnDecision dmnDecision : decision.getRequiredDecisions()){
       buildDecisionTree(dmnDecision, requiredDecisions);
     }
-    
+
     requiredDecisions.add(decision);
   }
 

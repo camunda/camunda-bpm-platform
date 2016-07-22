@@ -19,26 +19,26 @@ import static org.camunda.bpm.dmn.engine.impl.transform.DmnExpressionTransformHe
 import org.camunda.bpm.dmn.engine.impl.DmnExpressionImpl;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformContext;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformHandler;
-import org.camunda.bpm.model.dmn.instance.OutputEntry;
+import org.camunda.bpm.model.dmn.instance.LiteralExpression;
 
-public class DmnDecisionTableConclusionTransformHandler implements DmnElementTransformHandler<OutputEntry, DmnExpressionImpl> {
+public class DmnLiternalExpressionTransformHandler implements DmnElementTransformHandler<LiteralExpression, DmnExpressionImpl> {
 
-  public DmnExpressionImpl handleElement(DmnElementTransformContext context, OutputEntry outputEntry) {
-    return createFromOutputEntry(context, outputEntry);
+  public DmnExpressionImpl handleElement(DmnElementTransformContext context, LiteralExpression literalExpression) {
+    return createFromLiteralExpressionEntry(context, literalExpression);
   }
 
-  protected DmnExpressionImpl createFromOutputEntry(DmnElementTransformContext context, OutputEntry outputEntry) {
-    DmnExpressionImpl conclusion = createDmnElement(context, outputEntry);
+  protected DmnExpressionImpl createFromLiteralExpressionEntry(DmnElementTransformContext context, LiteralExpression literalExpression) {
+    DmnExpressionImpl dmnExpression = createDmnElement(context, literalExpression);
 
-    conclusion.setId(outputEntry.getId());
-    conclusion.setName(outputEntry.getLabel());
-    conclusion.setExpressionLanguage(getExpressionLanguage(context, outputEntry));
-    conclusion.setExpression(getExpression(outputEntry));
+    dmnExpression.setId(literalExpression.getId());
+    dmnExpression.setName(literalExpression.getLabel());
+    dmnExpression.setExpressionLanguage(getExpressionLanguage(context, literalExpression));
+    dmnExpression.setExpression(getExpression(literalExpression));
 
-    return conclusion;
+    return dmnExpression;
   }
 
-  protected DmnExpressionImpl createDmnElement(DmnElementTransformContext context, OutputEntry outputEntry) {
+  protected DmnExpressionImpl createDmnElement(DmnElementTransformContext context, LiteralExpression inputEntry) {
     return new DmnExpressionImpl();
   }
 

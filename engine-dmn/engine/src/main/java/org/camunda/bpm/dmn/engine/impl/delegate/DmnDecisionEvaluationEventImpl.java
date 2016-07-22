@@ -27,7 +27,7 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
   protected long executedDecisionElements;
 
   public DmnDecisionTableEvaluationEvent getDecisionResult() {
-    return decisionResult;  
+    return decisionResult;
   }
 
   public void setDecisionResult(DmnDecisionTableEvaluationEvent decisionResult) {
@@ -55,8 +55,8 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
     DmnDecisionImpl dmnDecision = ((DmnDecisionImpl)decisionResult.getDecisionTable());
     return "DmnDecisionTableEvaluationEventImpl{" +
       " key="+ dmnDecision.getKey() +
-      ", name="+ dmnDecision.getName() + 
-      ", decisionTable=" + dmnDecision.getRelatedDecisionTable() +
+      ", name="+ dmnDecision.getName() +
+      ", decisionLogic=" + dmnDecision.getDecisionLogic() +
       ", requiredDecisionResults=" + requiredDecisionResults +
       ", executedDecisionElements=" + executedDecisionElements +
       '}';

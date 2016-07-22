@@ -5,13 +5,15 @@ import java.util.Collection;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionLogic;
 
 public class DmnDecisionImpl implements DmnDecision {
 
   protected String key;
   protected String name;
-  protected DmnDecisionTableImpl decisionTable;
-  
+
+  protected DmnDecisionLogic decisionLogic;
+
   protected Collection<DmnDecision> requiredDecision = new ArrayList<DmnDecision>();
 
   public String getKey() {
@@ -30,12 +32,12 @@ public class DmnDecisionImpl implements DmnDecision {
     this.name = name;
   }
 
-  public void setRelatedDecisionTable(DmnDecisionTableImpl decisionTable) {
-    this.decisionTable = decisionTable;   
+  public void setDecisionLogic(DmnDecisionLogic decisionLogic) {
+    this.decisionLogic = decisionLogic;
   }
 
-  public DmnDecisionTableImpl getRelatedDecisionTable() {
-    return decisionTable;
+  public DmnDecisionLogic getDecisionLogic() {
+    return decisionLogic;
   }
 
   public void setRequiredDecision(List<DmnDecision> requiredDecision) {
@@ -49,7 +51,7 @@ public class DmnDecisionImpl implements DmnDecision {
 
   @Override
   public boolean isDecisionTable() {
-    return true;
+    return decisionLogic != null && decisionLogic instanceof DmnDecisionTableImpl;
   }
 
   @Override
@@ -57,8 +59,8 @@ public class DmnDecisionImpl implements DmnDecision {
     return "DmnDecisionTableImpl{" +
       " key= "+ key +
       ", name= "+ name +
-      ", decisionTable=" + decisionTable +
       ", requiredDecision=" + requiredDecision +
+      ", decisionLogic=" + decisionLogic +
       '}';
   }
 }

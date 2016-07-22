@@ -25,9 +25,11 @@ import org.camunda.bpm.model.dmn.instance.DmnModelElementInstance;
 import org.camunda.bpm.model.dmn.instance.Input;
 import org.camunda.bpm.model.dmn.instance.InputEntry;
 import org.camunda.bpm.model.dmn.instance.InputExpression;
+import org.camunda.bpm.model.dmn.instance.LiteralExpression;
 import org.camunda.bpm.model.dmn.instance.Output;
 import org.camunda.bpm.model.dmn.instance.OutputEntry;
 import org.camunda.bpm.model.dmn.instance.Rule;
+import org.camunda.bpm.model.dmn.instance.Variable;
 
 public class DefaultElementTransformHandlerRegistry implements DmnElementTransformHandlerRegistry {
 
@@ -38,13 +40,17 @@ public class DefaultElementTransformHandlerRegistry implements DmnElementTransfo
 
     handlers.put(Definitions.class, new DmnDecisionRequirementsGraphTransformHandler());
     handlers.put(Decision.class, new DmnDecisionTransformHandler());
+
     handlers.put(DecisionTable.class, new DmnDecisionTableTransformHandler());
     handlers.put(Input.class, new DmnDecisionTableInputTransformHandler());
     handlers.put(InputExpression.class, new DmnDecisionTableInputExpressionTransformHandler());
     handlers.put(Output.class, new DmnDecisionTableOutputTransformHandler());
     handlers.put(Rule.class, new DmnDecisionTableRuleTransformHandler());
     handlers.put(InputEntry.class, new DmnDecisionTableConditionTransformHandler());
-    handlers.put(OutputEntry.class, new DmnDecisionTableConclusionTransformHandler());
+    handlers.put(OutputEntry.class, new DmnLiternalExpressionTransformHandler());
+
+    handlers.put(LiteralExpression.class, new DmnLiternalExpressionTransformHandler());
+    handlers.put(Variable.class, new DmnVariableTransformHandler());
 
     return handlers;
   }

@@ -40,11 +40,18 @@ public interface DmnDecision {
   String getName();
 
   /**
-   * Check if the decision is implemented as Decision Table.
+   * Checks if the decision logic is implemented as Decision Table.
    *
-   *  @return true if the decision is implement as Decision Table, false otherwise
+   * @return true if the decision logic is implement as Decision Table, otherwise false
    */
   boolean isDecisionTable();
+
+  /**
+   * Returns the decision logic of the decision (e.g., a decision table).
+   *
+   * @return the containing decision logic
+   */
+  DmnDecisionLogic getDecisionLogic();
 
   /**
    * Returns the required decisions of this decision.
