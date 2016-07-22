@@ -59,7 +59,9 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   protected void fireUserOperationLog(final UserOperationLogContext context) {
-    context.setUserId(getAuthenticatedUserId());
+    if (context.getUserId() == null) {
+      context.setUserId(getAuthenticatedUserId());
+    }
 
     HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
       @Override
