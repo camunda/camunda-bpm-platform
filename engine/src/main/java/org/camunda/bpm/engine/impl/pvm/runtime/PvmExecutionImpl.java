@@ -1545,7 +1545,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    * @param targetScopeId - destination scope to be found in current execution tree
    * @return execution with activity id corresponding to targetScopeId
    */
-  private PvmExecutionImpl findExecutionForFlowScope(final String targetScopeId) {
+  protected PvmExecutionImpl findExecutionForFlowScope(final String targetScopeId) {
     EnsureUtil.ensureNotNull("target scope id", targetScopeId);
 
     ScopeImpl currentActivity = getActivity();
@@ -1561,7 +1561,9 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     });
 
-    EnsureUtil.ensureNotNull("no scope found with id: " + targetScopeId, "target scope", targetFlowScope);
+    if (targetFlowScope == null) {
+      throw ProcessEngineLogger.PVM_LOGGER.scopeNotFoundException(targetScopeId,this.getId());
+    }
 
     return findExecutionForFlowScope(targetFlowScope);
   }

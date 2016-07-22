@@ -75,4 +75,12 @@ public class PvmLogger extends ProcessEngineLogger {
         "010", "Create scope: parent exection {} continues as  {}", execution, propagatingExecution);
   }
 
+  public ProcessEngineException scopeNotFoundException(String activityId, String executionId) {
+    return new ProcessEngineException(exceptionMessage(
+        "011",
+        "Scope with specified activity Id {} and execution {} not found",
+        activityId,executionId
+    ));
+  }
+
 }

@@ -65,7 +65,7 @@ public class TargetVariableScopeTest {
     VariableMap variables = Variables.createVariables().putValue("orderIds", Arrays.asList(new int[]{1, 2, 3}));
     //fails due to inappropriate variable scope target
     thrown.expect(ScriptEvaluationException.class);
-    thrown.expectMessage(startsWith("Unable to evaluate script: org.camunda.bpm.engine.exception.NullValueException: no scope found with id: NOT_EXISTING"));
+    thrown.expectMessage(startsWith("Unable to evaluate script: org.camunda.bpm.engine.ProcessEngineException: ENGINE-20011 Scope with specified activity Id NOT_EXISTING and execution"));
     engineRule.getRuntimeService().startProcessInstanceByKey("Process_MultiInstanceCallAcitivity",variables);
   }
 
@@ -134,7 +134,7 @@ public class TargetVariableScopeTest {
 
     ProcessDefinition processDefinition = testHelper.deployAndGetDefinition(instance);
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage(startsWith("org.camunda.bpm.engine.exception.NullValueException: no scope found with id: SubProcess_2: target scope is null"));
+    thrown.expectMessage(startsWith("org.camunda.bpm.engine.ProcessEngineException: ENGINE-20011 Scope with specified activity Id SubProcess_2 and execution"));
     VariableMap variables = Variables.createVariables().putValue("orderIds", Arrays.asList(new int[]{1, 2, 3}));
     engineRule.getRuntimeService().startProcessInstanceById(processDefinition.getId(),variables);
   }
