@@ -1562,7 +1562,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     });
 
     if (targetFlowScope == null) {
-      throw ProcessEngineLogger.PVM_LOGGER.scopeNotFoundException(targetScopeId,this.getId());
+      throw LOG.scopeNotFoundException(targetScopeId,this.getId());
     }
 
     return findExecutionForFlowScope(targetFlowScope);
