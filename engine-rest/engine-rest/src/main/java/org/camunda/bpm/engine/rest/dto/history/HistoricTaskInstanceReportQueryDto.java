@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.rest.dto.history;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceReport;
-import org.camunda.bpm.engine.history.TaskReportResult;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
 import org.camunda.bpm.engine.rest.dto.AbstractSearchQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
@@ -74,19 +74,20 @@ public class HistoricTaskInstanceReportQueryDto extends AbstractSearchQueryDto {
     if (completedAfter != null) {
       reportQuery.completedAfter(completedAfter);
     }
-    if (groupby != null && "processDefinition".equals(groupby)) {
-      reportQuery.groupByProcessDefinitionKey();
-    }
   }
 
   protected HistoricTaskInstanceReport createNewReportQuery(ProcessEngine engine) {
     return engine.getHistoryService().createHistoricTaskInstanceReport();
   }
 
-  public List<TaskReportResult> executeReport(ProcessEngine engine) {
+  public List<HistoricTaskInstanceReportResult> executeReport(ProcessEngine engine) {
     HistoricTaskInstanceReport reportQuery = createNewReportQuery(engine);
     applyFilters(reportQuery);
 
-    return reportQuery.taskReport();
+    if("processDefinition".equals(groupby)) {
+      return reportQuery.countByProcessDefinitionKey();
+    } else {
+      return reportQuery.countByTaskDefinitionKey();
+    }
   }
 }

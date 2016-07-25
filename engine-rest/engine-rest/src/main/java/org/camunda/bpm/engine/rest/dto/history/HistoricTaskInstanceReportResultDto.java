@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import org.camunda.bpm.engine.history.TaskReportResult;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
 
 /**
  * @author Stefan Hentschel.
@@ -38,11 +38,11 @@ public class HistoricTaskInstanceReportResultDto {
     this.count = count;
   }
 
-  public static HistoricTaskInstanceReportResultDto fromHistoricTaskInstanceReportResult(TaskReportResult taskReportResult) {
+  public static HistoricTaskInstanceReportResultDto fromHistoricTaskInstanceReportResult(HistoricTaskInstanceReportResult taskReportResult) {
     HistoricTaskInstanceReportResultDto dto = new HistoricTaskInstanceReportResultDto();
 
     dto.count = taskReportResult.getCount();
-    dto.definition = taskReportResult.getDefinition();
+    dto.definition = taskReportResult.getDefinitionKey();
 
     return dto;
   }

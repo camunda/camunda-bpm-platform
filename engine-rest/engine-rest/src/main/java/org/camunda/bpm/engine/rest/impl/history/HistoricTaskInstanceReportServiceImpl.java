@@ -14,7 +14,7 @@ package org.camunda.bpm.engine.rest.impl.history;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.history.TaskReportResult;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceReportQueryDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceReportResultDto;
 import org.camunda.bpm.engine.rest.history.HistoricTaskInstanceReportService;
@@ -39,10 +39,10 @@ public class HistoricTaskInstanceReportServiceImpl implements HistoricTaskInstan
   @Override
   public List<HistoricTaskInstanceReportResultDto> getTaskReportResults(UriInfo uriInfo) {
     HistoricTaskInstanceReportQueryDto queryDto = new HistoricTaskInstanceReportQueryDto(objectMapper, uriInfo.getQueryParameters());
-    List<TaskReportResult> taskReportResults = queryDto.executeReport(engine);
+    List<HistoricTaskInstanceReportResult> taskReportResults = queryDto.executeReport(engine);
 
     List<HistoricTaskInstanceReportResultDto> dtoList = new ArrayList<HistoricTaskInstanceReportResultDto>();
-    for( TaskReportResult taskReportResult : taskReportResults ) {
+    for( HistoricTaskInstanceReportResult taskReportResult : taskReportResults ) {
       dtoList.add(HistoricTaskInstanceReportResultDto.fromHistoricTaskInstanceReportResult(taskReportResult));
     }
 

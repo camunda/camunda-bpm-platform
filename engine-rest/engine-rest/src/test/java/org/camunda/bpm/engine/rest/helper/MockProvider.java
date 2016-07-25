@@ -47,9 +47,9 @@ import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
-import org.camunda.bpm.engine.history.TaskReportResult;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
@@ -801,6 +801,7 @@ public abstract class MockProvider {
   // tasks
   public static final Long EXAMPLE_HISTORIC_TASK_REPORT_COUNT = 12L;
   public static final String EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION = "aTaskDefinition";
+  public static final String EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION = "aProcessDefinition";
   public static final String EXAMPLE_HISTORIC_TASK_START_TIME = "2016-04-12T15:29:33";
   public static final String EXAMPLE_HISTORIC_TASK_END_TIME = "2016-04-12T16:23:34";
 
@@ -924,10 +925,18 @@ public abstract class MockProvider {
     return mockList;
   }
 
-  public static List<TaskReportResult> createMockHistoricTaskInstanceReport() {
-    TaskReportResult mock = mock(TaskReportResult.class);
+  public static List<HistoricTaskInstanceReportResult> createMockHistoricTaskInstanceReport() {
+    HistoricTaskInstanceReportResult mock = mock(HistoricTaskInstanceReportResult.class);
     when(mock.getCount()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_COUNT);
-    when(mock.getDefinition()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION);
+    when(mock.getDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION);
+
+    return Collections.singletonList(mock);
+  }
+
+  public static List<HistoricTaskInstanceReportResult> createMockHistoricTaskInstanceReportWithProcDef() {
+    HistoricTaskInstanceReportResult mock = mock(HistoricTaskInstanceReportResult.class);
+    when(mock.getCount()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_COUNT);
+    when(mock.getDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION);
 
     return Collections.singletonList(mock);
   }

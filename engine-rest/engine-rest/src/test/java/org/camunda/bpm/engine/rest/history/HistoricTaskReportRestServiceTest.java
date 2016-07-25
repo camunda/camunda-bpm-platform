@@ -16,7 +16,7 @@ import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceReport;
-import org.camunda.bpm.engine.history.TaskReportResult;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Assert;
@@ -25,7 +25,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 import javax.ws.rs.core.Response.Status;
-import java.util.Date;
 import java.util.List;
 
 import static com.jayway.restassured.RestAssured.given;
@@ -35,6 +34,7 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_T
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_TASK_START_TIME;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstanceReport;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstanceReportWithProcDef;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -62,9 +62,10 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
   private HistoricTaskInstanceReport setUpMockHistoricProcessInstanceReportQuery() {
     HistoricTaskInstanceReport mockedReportQuery = mock(HistoricTaskInstanceReport.class);
 
-    List<TaskReportResult> taskReportResults = createMockHistoricTaskInstanceReport();
-    when(mockedReportQuery.groupByProcessDefinitionKey()).thenReturn(mockedReportQuery);
-    when(mockedReportQuery.taskReport()).thenReturn(taskReportResults);
+    List<HistoricTaskInstanceReportResult> taskReportResults = createMockHistoricTaskInstanceReport();
+    List<HistoricTaskInstanceReportResult> taskReportResultsWithProcDef = createMockHistoricTaskInstanceReportWithProcDef();
+    when(mockedReportQuery.countByTaskDefinitionKey()).thenReturn(taskReportResults);
+    when(mockedReportQuery.countByProcessDefinitionKey()).thenReturn(taskReportResultsWithProcDef);
 
     when(processEngine.getHistoryService().createHistoricTaskInstanceReport()).thenReturn(mockedReportQuery);
 
@@ -81,14 +82,14 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
       .when()
         .get(TASK_REPORT_URL);
 
-    verify(mockedReportQuery).taskReport();
+    verify(mockedReportQuery).countByTaskDefinitionKey();
     verifyNoMoreInteractions(mockedReportQuery);
   }
 
   @Test
   public void testMissingAuthorization() {
     String message = "not authorized";
-    when(mockedReportQuery.taskReport()).thenThrow(new AuthorizationException(message));
+    when(mockedReportQuery.countByTaskDefinitionKey()).thenThrow(new AuthorizationException(message));
 
     given()
       .then()
@@ -134,7 +135,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
       .when()
         .get(TASK_REPORT_URL);
 
-    verify(mockedReportQuery).taskReport();
+    verify(mockedReportQuery).countByTaskDefinitionKey();
     verifyNoMoreInteractions(mockedReportQuery);
   }
 
@@ -149,7 +150,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
       .when()
         .get(TASK_REPORT_URL);
 
-    verify(mockedReportQuery).taskReport();
+    verify(mockedReportQuery).countByTaskDefinitionKey();
     verifyNoMoreInteractions(mockedReportQuery);
   }
 
@@ -164,8 +165,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
       .when()
         .get(TASK_REPORT_URL);
 
-    verify(mockedReportQuery).groupByProcessDefinitionKey();
-    verify(mockedReportQuery).taskReport();
+    verify(mockedReportQuery).countByProcessDefinitionKey();
     verifyNoMoreInteractions(mockedReportQuery);
   }
 }
