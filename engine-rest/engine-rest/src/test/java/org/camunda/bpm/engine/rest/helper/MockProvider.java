@@ -805,6 +805,12 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_TASK_START_TIME = "2016-04-12T15:29:33";
   public static final String EXAMPLE_HISTORIC_TASK_END_TIME = "2016-04-12T16:23:34";
 
+  // historic task instance duration report
+  public static final long EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_AVG = 10;
+  public static final long EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_MIN = 5;
+  public static final long EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_MAX = 15;
+  public static final int EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_PERIOD = 1;
+
   public static Task createMockTask() {
     return mockTask().build();
   }
@@ -940,6 +946,20 @@ public abstract class MockProvider {
 
     return Collections.singletonList(mock);
   }
+
+  public static List<DurationReportResult> createMockHistoricTaskInstanceDurationReport(PeriodUnit periodUnit) {
+    DurationReportResult mock = mock(DurationReportResult.class);
+    when(mock.getAverage()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_AVG);
+    when(mock.getMinimum()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_MIN);
+    when(mock.getMaximum()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_MAX);
+    when(mock.getPeriod()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_PERIOD);
+    when(mock.getPeriodUnit()).thenReturn(periodUnit);
+
+    List<DurationReportResult> mockList = new ArrayList<DurationReportResult>();
+    mockList.add(mock);
+    return mockList;
+  }
+
 
   // form data
   public static StartFormData createMockStartFormData(ProcessDefinition definition) {

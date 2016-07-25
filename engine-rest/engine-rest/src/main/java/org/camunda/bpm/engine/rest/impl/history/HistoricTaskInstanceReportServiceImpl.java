@@ -14,9 +14,12 @@ package org.camunda.bpm.engine.rest.impl.history;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceReportQueryDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceReportResultDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceReportDurationQueryDto;
+import org.camunda.bpm.engine.rest.dto.history.ReportResultDto;
 import org.camunda.bpm.engine.rest.history.HistoricTaskInstanceReportService;
 
 import javax.ws.rs.core.UriInfo;
@@ -48,4 +51,20 @@ public class HistoricTaskInstanceReportServiceImpl implements HistoricTaskInstan
 
     return dtoList;
   }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<ReportResultDto> getTaskDurationReportResults(UriInfo uriInfo) {
+    HistoricTaskInstanceReportDurationQueryDto queryDto = new HistoricTaskInstanceReportDurationQueryDto(objectMapper, uriInfo.getQueryParameters());
+    List<DurationReportResult> resultDtos = (List<DurationReportResult>) queryDto.executeReport(engine);
+
+    List<ReportResultDto> dtoList = new ArrayList<ReportResultDto>();
+    for( DurationReportResult result : resultDtos ) {
+      dtoList.add(ReportResultDto.fromReportResult(result));
+    }
+
+    return dtoList;
+  }
+
+
 }
