@@ -63,10 +63,23 @@
          brand-name="Camunda Cockpit">
       <ul cam-if-logged-in
           ng-controller="camHeaderViewsCtrl">
-        <li ng-repeat="actionProvider in navbarActions"
+        <li ng-repeat="actionProvider in menuActions"
             ng-if="actionProvider.pagePath && actionProvider.accessible"
             ng-class="activeClass(actionProvider)">
           <a ng-href="{{ actionProvider.pagePath }}">{{ actionProvider.label }}</a>
+        </li>
+
+        <li class="dropdown"
+            ng-if="dropdownActions.length">
+          <a class="dropdown-toggle"
+             href>More <i class="caret"></i></a>
+          <ul class="dropdown-menu">
+            <li ng-repeat="actionProvider in dropdownActions"
+                ng-if="actionProvider.pagePath && actionProvider.accessible"
+                ng-class="activeClass(actionProvider)">
+              <a ng-href="{{ actionProvider.pagePath }}">{{ actionProvider.label }}</a>
+            </li
+          </ul>
         </li>
       </ul>
     </div>

@@ -117,6 +117,6 @@ module.exports = [
           }
         }],
 
-      priority: 0
+      priority: 100
     });
   }];

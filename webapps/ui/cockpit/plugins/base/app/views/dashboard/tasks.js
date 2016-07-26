@@ -54,6 +54,6 @@ module.exports = [
           });
         }],
 
-      priority: -3
+      priority: 50
     });
   }];
