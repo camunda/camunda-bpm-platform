@@ -74,6 +74,20 @@ public interface CommandChecker {
   void checkUpdateProcessDefinitionByKey(String processDefinitionKey);
 
   /**
+   * Checks if it is allowed to delete a process definition, which corresponds to the given id.
+   *
+   * @param processDefinitionId the id which corresponds to the process definition
+   */
+  void checkDeleteProcessDefinitionById(String processDefinitionId);
+
+  /**
+   * Checks if it is allowed to delete a process definition, which corresponds to the given key.
+   *
+   * @param processDefinitionKey the key which corresponds to the process definition
+   */
+  void checkDeleteProcessDefinitionByKey(String processDefinitionKey);
+
+  /**
    *  Checks if it is allowed to update a process instance of the given process definition key.
    */
   void checkUpdateProcessInstanceByProcessDefinitionKey(String processDefinitionKey);
@@ -95,7 +109,7 @@ public interface CommandChecker {
   void checkReadProcessInstance(String processInstanceId);
 
   /**
-   * Checks if it is allowed to read the given job. 
+   * Checks if it is allowed to read the given job.
    */
   void checkReadJob(JobEntity job);
 
@@ -178,7 +192,7 @@ public interface CommandChecker {
    * Check if it is allowed to work on a task
    */
   void checkTaskWork(TaskEntity task);
-  
+
   /**
    *  Check if it is allowed to delete a task
    */

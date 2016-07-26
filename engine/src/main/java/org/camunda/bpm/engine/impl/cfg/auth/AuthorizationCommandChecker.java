@@ -107,6 +107,21 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   @Override
+  public void checkDeleteProcessDefinitionById(String processDefinitionId) {
+    if (getAuthorizationManager().isAuthorizationEnabled()) {
+      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
+      if (processDefinition != null) {
+        checkDeleteProcessDefinitionById(processDefinition.getKey());
+      }
+    }
+  }
+
+  @Override
+  public void checkDeleteProcessDefinitionByKey(String processDefinitionKey) {
+    getAuthorizationManager().checkAuthorization(DELETE, PROCESS_DEFINITION, processDefinitionKey);
+  }
+
+  @Override
   public void checkUpdateProcessInstanceByProcessDefinitionId(String processDefinitionId) {
     if (getAuthorizationManager().isAuthorizationEnabled()) {
       ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);

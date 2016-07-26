@@ -88,6 +88,22 @@ public class TenantCommandChecker implements CommandChecker {
   }
 
   @Override
+  public void checkDeleteProcessDefinitionById(String processDefinitionId) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
+      if (processDefinition != null && !getTenantManager().isAuthenticatedTenant(processDefinition.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("delete the process definition '"+ processDefinitionId + "'");
+      }
+    }
+  }
+
+  @Override
+  public void checkDeleteProcessDefinitionByKey(String processDefinitionKey) {
+  }
+
+
+
+  @Override
   public void checkUpdateProcessInstanceByProcessDefinitionId(String processDefinitionId) {
     if (getTenantManager().isTenantCheckEnabled()) {
       ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);

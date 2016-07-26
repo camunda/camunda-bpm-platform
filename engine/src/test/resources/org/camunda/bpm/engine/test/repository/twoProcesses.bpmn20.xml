@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples2">
+
+  <process id="one" name="One" isExecutable="true">
+    <startEvent id="start" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="end" />
+    <endEvent id="end" />
+  </process>
+
+  <process id="two" name="Two" isExecutable="true">
+    <startEvent id="start2" />
+    <sequenceFlow id="flow2" sourceRef="start2" targetRef="end2" />
+    <endEvent id="end2" />
+  </process>
+
+</definitions>

@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.exception.dmn.DmnModelInstanceNotFoundException;
 import org.camunda.bpm.engine.impl.cmd.AddIdentityLinkForProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteIdentityLinkForProcessDefinitionCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeployCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeployedProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentBpmnModelInstanceCmd;
@@ -112,6 +113,21 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
 
   public void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners) {
     commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade, skipCustomListeners));
+  }
+
+  @Override
+  public void deleteProcessDefinition(String processDefinitionId) {
+    deleteProcessDefinition(processDefinitionId, false);
+  }
+
+  @Override
+  public void deleteProcessDefinition(String processDefinitionId, boolean cascade) {
+    deleteProcessDefinition(processDefinitionId, cascade, false);
+  }
+
+  @Override
+  public void deleteProcessDefinition(String processDefinitionId, boolean cascade, boolean skipCustomListeners) {
+    commandExecutor.execute(new DeleteProcessDefinitionCmd(processDefinitionId, cascade, skipCustomListeners));
   }
 
   public ProcessDefinitionQuery createProcessDefinitionQuery() {

@@ -117,6 +117,53 @@ public interface RepositoryService {
    */
   void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners);
 
+
+  /**
+   * Deletes the process definition which belongs to the given process definition id.
+   *
+   * @param processDefinitionId the id, which corresponds to the process definition
+   * @throws ProcessEngineException
+   *          If the process definition does not exist
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void deleteProcessDefinition(String processDefinitionId);
+
+  /**
+   * Deletes the process definition which belongs to the given process definition id.
+   * Cascades the deletion if the cascade is set to true.
+   *
+   * @param processDefinitionId the id, which corresponds to the process definition
+   * @param cascade true if the deletion should be cascade, false otherwise
+   * @throws ProcessEngineException
+   *          If the process definition does not exist
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void deleteProcessDefinition(String processDefinitionId, boolean cascade);
+
+
+  /**
+   * Deletes the process definition which belongs to the given process definition id.
+   * Cascades the deletion if the cascade is set to true the custom listener
+   * can be skipped if the third parameter is set to true.
+   *
+   * @param processDefinitionId the id, which corresponds to the process definition
+   * @param cascade if set to true, all process instances (including) history are deleted
+   * @param skipCustomListeners if true, only the built-in {@link ExecutionListener}s
+   *            are notified with the {@link ExecutionListener#EVENTNAME_END} event.
+   *            Is only used if cascade set to true.
+   *
+   * @throws ProcessEngineException
+   *          If the process definition does not exist
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void deleteProcessDefinition(String processDefinitionId, boolean cascade, boolean skipCustomListeners);
+
   /**
    * Retrieves a list of deployment resource names for the given deployment,
    * ordered alphabetically.

@@ -176,6 +176,16 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     definition.setSuspensionState(persistedDefinition.getSuspensionState());
   }
 
+  @Override
+  protected void handlePersistedDefinition(ProcessDefinitionEntity definition, ProcessDefinitionEntity persistedDefinition, DeploymentEntity deployment, Properties properties) {
+    //check if persisted definition is not null, since the process definition can be deleted by the user
+    //in such cases we don't want to handle them
+    //we can't do this in the parent method, since other siblings want to handle them like {@link DecisionDefinitionDeployer}
+    if (persistedDefinition != null) {
+      super.handlePersistedDefinition(definition, persistedDefinition, deployment, properties);
+    }
+  }
+
   protected void updateJobDeclarations(List<JobDeclaration<?, ?>> jobDeclarations, ProcessDefinitionEntity processDefinition, boolean isNewDeployment) {
 
     if(jobDeclarations == null || jobDeclarations.isEmpty()) {
