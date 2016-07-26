@@ -15,8 +15,8 @@ describe('Cockpit Dashboard Spec', function() {
   });
 
   it('should display all sections of the page in the header', function() {
-    dashboardPage.pluginList().count().then(function(count) {
-      expect(dashboardPage.navbarItems().count()).to.eventually.eql(count);
-    })
+    expect(dashboardPage.navbarItem(0).getText()).to.eventually.eql('Processes');
+    expect(dashboardPage.navbarItem(1).getText()).to.eventually.eql('Decisions');
+    expect(dashboardPage.navbarItem(2).getText()).to.eventually.eql('Tasks');
   });
 });

@@ -13,8 +13,11 @@ module.exports = [
   'Views',
   function($scope, $injector, $location, Views) {
     $scope.navbarVars = { read: [] };
-    $scope.navbarActions = Views.getProviders({ component: 'cockpit.dashboard.section' });
-    $scope.navbarActions.forEach(function(plugin) {
+
+    $scope.menuActions = [];
+    $scope.dropdownActions = [];
+
+    Views.getProviders({ component: 'cockpit.dashboard.section' }).forEach(function(plugin) {
       if (angular.isArray(plugin.access)) {
         var fn = $injector.invoke(plugin.access);
 
@@ -25,10 +28,12 @@ module.exports = [
         });
       }
 
-    // accessible by default in case there's no callback
+      // accessible by default in case there's no callback
       else {
         plugin.accessible = true;
       }
+
+      (plugin.priority >= 0 ? $scope.menuActions : $scope.dropdownActions).push(plugin);
     });
 
     $scope.activeClass = function(plugin) {
