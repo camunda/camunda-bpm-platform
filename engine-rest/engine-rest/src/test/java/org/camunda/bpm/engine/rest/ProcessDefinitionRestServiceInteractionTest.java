@@ -78,8 +78,7 @@ import org.mockito.Matchers;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockSerializedVariables;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.variable.Variables;
 
@@ -887,9 +886,13 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
             .statusCode(Status.OK.getStatusCode())
             .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
             .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".value",
-                    equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
+                    equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE))
             .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type",
-                    equalTo("String"))
+                    equalTo("Object"))
+            .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".valueInfo.objectTypeName",
+                    equalTo(ArrayList.class.getName()))
+            .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".valueInfo.serializationDataFormat",
+                    equalTo("application/json"))
             .when().post(START_PROCESS_INSTANCE_URL);
 
     verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
@@ -1055,11 +1058,10 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     json.put("businessKey", "aBusinessKey");
     json.put("caseInstanceId", "aCaseInstanceId");
 
-    VariableMap variables = Variables.createVariables()
+    VariableMap variables = createMockSerializedVariables()
             .putValueTyped("processVariable", Variables.stringValue("aString"))
             .putValueTyped("var", Variables.stringValue("value"))
-            .putValueTyped("varLocal", Variables.stringValue("valueLocal"))
-            .putValueTyped(EXAMPLE_VARIABLE_INSTANCE_NAME, EXAMPLE_PRIMITIVE_VARIABLE_VALUE);
+            .putValueTyped("varLocal", Variables.stringValue("valueLocal"));
 
     //mock process instance and instantiation builder
     ProcessInstanceWithVariables mockInstance = MockProvider.createMockInstanceWithVariables();
@@ -1091,9 +1093,13 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
             .statusCode(Status.OK.getStatusCode())
             .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
             .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".value",
-                    equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
+                    equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE))
             .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type",
-                    equalTo("String"))
+                    equalTo("Object"))
+            .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".valueInfo.objectTypeName",
+                    equalTo(ArrayList.class.getName()))
+            .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".valueInfo.serializationDataFormat",
+                    equalTo("application/json"))
             .body("variables.processVariable.type", equalTo("String"))
             .body("variables.processVariable.value", equalTo("aString"))
             .body("variables.var.type", equalTo("String"))

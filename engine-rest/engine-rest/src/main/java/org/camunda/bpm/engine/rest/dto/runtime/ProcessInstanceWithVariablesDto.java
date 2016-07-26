@@ -51,7 +51,7 @@ public class ProcessInstanceWithVariablesDto extends ProcessInstanceDto {
     VariableMap variables = instance.getVariables();
     Map<String, VariableValueDto> values = new HashMap<String, VariableValueDto>();
     for (String variableName : variables.keySet()) {
-      VariableValueDto valueDto = VariableValueDto.fromTypedValue(variables.getValueTyped(variableName));
+      VariableValueDto valueDto = VariableValueDto.fromTypedValue(variables.getValueTyped(variableName), true);
       values.put(variableName, valueDto);
     }
     result.variables = values;

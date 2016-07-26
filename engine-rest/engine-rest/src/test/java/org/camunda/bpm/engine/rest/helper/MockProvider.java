@@ -1022,10 +1022,10 @@ public abstract class MockProvider {
     when(mock.isSuspended()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED);
     when(mock.isEnded()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_ENDED);
     when(mock.getTenantId()).thenReturn(tenantId);
-    when(mock.getVariables()).thenReturn(MockProvider.createMockFormVariables());
-
+    when(mock.getVariables()).thenReturn(createMockSerializedVariables());
     return mock;
   }
+
 
   public static ProcessInstance createMockInstance() {
     return createMockInstance(EXAMPLE_TENANT_ID);
@@ -1067,6 +1067,15 @@ public abstract class MockProvider {
 
   public static VariableInstance createMockVariableInstance(TypedValue value) {
     return mockVariableInstance().typedValue(value).build();
+  }
+
+  public static VariableMap createMockSerializedVariables() {
+    VariableMap variables = Variables.createVariables();
+    variables.putValueTyped(EXAMPLE_VARIABLE_INSTANCE_NAME, Variables.serializedObjectValue(EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE)
+                                                          .serializationDataFormat("application/json")
+                                                          .objectTypeName(ArrayList.class.getName())
+                                                          .create());
+    return variables;
   }
 
   public static Execution createMockExecution() {
