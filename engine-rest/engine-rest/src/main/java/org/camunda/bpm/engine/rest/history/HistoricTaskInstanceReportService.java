@@ -24,7 +24,6 @@ public interface HistoricTaskInstanceReportService {
    * creates a historic task instance report
    */
   @GET
-  @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   List<HistoricTaskInstanceReportResultDto> getTaskReportResults(@Context UriInfo uriInfo);
 
@@ -33,7 +32,6 @@ public interface HistoricTaskInstanceReportService {
    */
   @GET
   @Path("/duration")
-  @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   List<ReportResultDto> getTaskDurationReportResults(@Context UriInfo uriInfo);
 }
