@@ -1,7 +1,7 @@
 <!-- # CE - camunda-cockpit-ui/client/scripts/pages/dashboard.html -->
 <div class="ctn-view dashboard container-fluid">
   <div class="sections row">
-    <section ng-repeat="plugin in dashboardPlugins"
+    <section ng-repeat="plugin in mainPlugins"
              ng-if="!plugin.noDashboardSection && plugin.accessible"
              class="col-sm-6 col-md-4 col-lg-3">
       <div class="inner">
@@ -17,6 +17,31 @@
           <view data-plugin-id="{{ plugin.id }}"
                 provider="plugin"></view>
         </div>
+      </div>
+    </section>
+
+
+    <section class="misc col-sm-6 col-md-4 col-lg-3"
+             ng-if="miscPlugins.length">
+      <div class="inner">
+        <header>
+          <h1 class="section-title">More</h1>
+        </header>
+
+        <ul class="row">
+          <li ng-repeat="plugin in miscPlugins"
+              ng-if="!plugin.noDashboardSection && plugin.accessible">
+            <h3>
+              <a ng-if="plugin.pagePath"
+                 ng-href="{{ plugin.pagePath }}">{{ plugin.label }}</a>
+
+              <span ng-if="!plugin.pagePath">{{ plugin.label }}</span>
+            </h3>
+
+            <view data-plugin-id="{{ plugin.id }}"
+                  provider="plugin"></view>
+          </li>
+        </ul>
       </div>
     </section>
   </div>

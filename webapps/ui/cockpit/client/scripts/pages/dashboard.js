@@ -13,9 +13,13 @@ var Controller = [
   page
 ) {
     var $rootScope = $scope.$root;
+    $scope.mainPlugins = [];
+    $scope.miscPlugins = [];
 
-    $scope.dashboardPlugins = Views.getProviders({
+    Views.getProviders({
       component: 'cockpit.dashboard.section'
+    }).forEach(function(plugin) {
+      (plugin.priority >= 0 ? $scope.mainPlugins : $scope.miscPlugins).push(plugin);
     });
 
   // old plugins are still shown on the dashboard
