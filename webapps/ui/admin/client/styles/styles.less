@@ -104,6 +104,11 @@ table.cam-table > tbody > tr > td.action {
     bottom: 0;
     overflow: auto;
   }
+  .no-breadcrumbs & {
+    > [ng-view] {
+      top: 0;
+    }
+  }
 }
 
 .container-fluid {
