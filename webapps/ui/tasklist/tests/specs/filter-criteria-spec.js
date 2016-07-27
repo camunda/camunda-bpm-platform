@@ -104,8 +104,8 @@ describe('Tasklist Filter Criteria Spec', function() {
     it('should validate input - unique criterion key', function() {
 
       // when
-      editModalPage.addCriterion('Process Instance', 'Id', 'the value');
-      editModalPage.addCriterion('Process Instance', 'Id', 'the other value');
+      editModalPage.addCriterion('Process Instance', 'ID', 'the value');
+      editModalPage.addCriterion('Process Instance', 'ID', 'the other value');
 
       // then
       expect(editModalPage.criterionKeyHelpText(0)).to.eventually.eql('Key must be unique');
@@ -319,9 +319,9 @@ describe('Tasklist Filter Criteria Spec', function() {
     });
 
   });
-  
+
   describe('multi tenacy', function() {
-   
+
       before(function() {
         return testHelper(setupFile.multiTenancySetup, function() {
           dashboardPage.navigateToWebapp('Tasklist');
@@ -332,11 +332,11 @@ describe('Tasklist Filter Criteria Spec', function() {
       beforeEach(function() {
         dashboardPage.taskFilters.selectFilter(0);
         dashboardPage.taskFilters.editFilter(0);
-        editModalPage.selectPanelByKey('criteria');        
+        editModalPage.selectPanelByKey('criteria');
       });
-      
+
       it('should add tenant id criterion and validate result', function() {
-        
+
         // when
         editModalPage.addCriterion('Task', 'Tenant ID In', 'tenant1');
         editModalPage.saveFilter();
@@ -354,7 +354,7 @@ describe('Tasklist Filter Criteria Spec', function() {
         // then
         expect(dashboardPage.taskList.taskList().count()).to.eventually.eql(2);
       });
-      
+
       it('should add without tenant id criterion and validate result', function() {
 
         // when
