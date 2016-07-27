@@ -211,7 +211,7 @@ public class DmnTransformTest extends DmnEngineTest {
     assertThat(variable.getId()).isEqualTo("v1");
     assertThat(variable.getName()).isEqualTo("c");
     assertThat(variable.getTypeDefinition()).isNotNull();
-    assertThat(variable.getTypeDefinition().getTypeName()).isEqualTo("string");
+    assertThat(variable.getTypeDefinition().getTypeName()).isEqualTo("integer");
 
     DmnExpressionImpl dmnExpression = dmnDecisionLiteralExpression.getExpression();
     assertThat(dmnExpression).isNotNull();

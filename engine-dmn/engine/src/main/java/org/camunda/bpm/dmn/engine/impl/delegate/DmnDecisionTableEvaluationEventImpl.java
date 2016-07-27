@@ -20,7 +20,6 @@ import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedDecisionRule;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedInput;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class DmnDecisionTableEvaluationEventImpl implements DmnDecisionTableEvaluationEvent {
@@ -33,6 +32,10 @@ public class DmnDecisionTableEvaluationEventImpl implements DmnDecisionTableEval
   protected long executedDecisionElements;
 
   public DmnDecision getDecisionTable() {
+    return getDecision();
+  }
+
+  public DmnDecision getDecision() {
     return decision;
   }
 
@@ -82,11 +85,10 @@ public class DmnDecisionTableEvaluationEventImpl implements DmnDecisionTableEval
 
   @Override
   public String toString() {
-    DmnDecisionImpl dmnDecision = ((DmnDecisionImpl)decision);
     return "DmnDecisionTableEvaluationEventImpl{" +
-      " key="+ dmnDecision.getKey() +
-      ", name="+ dmnDecision.getName() +
-      ", decisionLogic=" + dmnDecision.getDecisionLogic() +
+      " key="+ decision.getKey() +
+      ", name="+ decision.getName() +
+      ", decisionLogic=" + decision.getDecisionLogic() +
       ", inputs=" + inputs +
       ", matchingRules=" + matchingRules +
       ", collectResultName='" + collectResultName + '\'' +

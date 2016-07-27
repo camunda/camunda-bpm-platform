@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Test;
 
-public class DmnResultTest extends DmnEngineTest {
+public class DmnDecisionTableResultTest extends DmnEngineTest {
 
   public static final String NO_OUTPUT_VALUE = "noOutputValue";
   public static final String SINGLE_OUTPUT_VALUE = "singleOutputValue";
@@ -38,6 +38,7 @@ public class DmnResultTest extends DmnEngineTest {
 
   public static final String RESULT_TEST_DMN = "DmnResultTest.dmn";
   public static final String RESULT_TEST_WITH_TYPES_DMN = "DmnResultTypedTest.dmn";
+  public static final String RESULT_TEST_WITH_SINGLE_UNNAMED_OUTPUT_DMN = "DmnResultTest.testSingleOutputNoName.dmn";
 
   @Test
   @DecisionResource(resource = RESULT_TEST_DMN)
@@ -108,7 +109,7 @@ public class DmnResultTest extends DmnEngineTest {
   }
 
   @Test
-  @DecisionResource
+  @DecisionResource(resource = RESULT_TEST_WITH_SINGLE_UNNAMED_OUTPUT_DMN)
   public void testSingleOutputNoName() {
     DmnDecisionTableResult decisionResult = evaluateDecisionTable();
     assertThat(decisionResult).hasSize(1);

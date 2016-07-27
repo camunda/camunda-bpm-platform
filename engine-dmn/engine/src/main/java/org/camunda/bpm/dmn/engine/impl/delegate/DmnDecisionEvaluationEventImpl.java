@@ -16,29 +16,29 @@ package org.camunda.bpm.dmn.engine.impl.delegate;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationEvent;
-import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionLogicEvaluationEvent;
 
 public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEvent {
 
-  protected DmnDecisionTableEvaluationEvent decisionResult;
-  protected Collection<DmnDecisionTableEvaluationEvent> requiredDecisionResults = new ArrayList<DmnDecisionTableEvaluationEvent>();
+  protected DmnDecisionLogicEvaluationEvent decisionResult;
+  protected Collection<DmnDecisionLogicEvaluationEvent> requiredDecisionResults = new ArrayList<DmnDecisionLogicEvaluationEvent>();
   protected long executedDecisionElements;
 
-  public DmnDecisionTableEvaluationEvent getDecisionResult() {
+  public DmnDecisionLogicEvaluationEvent getDecisionResult() {
     return decisionResult;
   }
 
-  public void setDecisionResult(DmnDecisionTableEvaluationEvent decisionResult) {
+  public void setDecisionResult(DmnDecisionLogicEvaluationEvent decisionResult) {
     this.decisionResult = decisionResult;
   }
 
-  public Collection<DmnDecisionTableEvaluationEvent> getRequiredDecisionResults() {
+  public Collection<DmnDecisionLogicEvaluationEvent> getRequiredDecisionResults() {
     return requiredDecisionResults;
   }
 
-  public void setRequiredDecisionResults(Collection<DmnDecisionTableEvaluationEvent> requiredDecisionResults) {
+  public void setRequiredDecisionResults(Collection<DmnDecisionLogicEvaluationEvent> requiredDecisionResults) {
     this.requiredDecisionResults = requiredDecisionResults;
   }
 
@@ -52,8 +52,8 @@ public class DmnDecisionEvaluationEventImpl implements DmnDecisionEvaluationEven
 
   @Override
   public String toString() {
-    DmnDecisionImpl dmnDecision = ((DmnDecisionImpl)decisionResult.getDecisionTable());
-    return "DmnDecisionTableEvaluationEventImpl{" +
+    DmnDecision dmnDecision = decisionResult.getDecision();
+    return "DmnDecisionEvaluationEventImpl{" +
       " key="+ dmnDecision.getKey() +
       ", name="+ dmnDecision.getName() +
       ", decisionLogic=" + dmnDecision.getDecisionLogic() +

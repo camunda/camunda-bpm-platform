@@ -22,7 +22,7 @@ import org.camunda.bpm.model.dmn.HitPolicy;
 /**
  * Event which represents the evaluation of a decision table
  */
-public interface DmnDecisionTableEvaluationEvent {
+public interface DmnDecisionTableEvaluationEvent extends DmnDecisionLogicEvaluationEvent {
 
   /**
    * @return the evaluated decision table

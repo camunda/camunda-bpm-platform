@@ -4,9 +4,9 @@
              namespace="http://camunda.org/schema/1.0/dmn">
 
   <decision id="decision" name="Decision">
-    <variable id="v1" name="c" typeRef="integer" />
+    <variable id="r1" name="result" typeRef="integer" />
     <literalExpression id="e1" label="expression 1" expressionLanguage="groovy">
-      <text>a + b</text>
+      <text>bean.call(x)</text>
     </literalExpression>
   </decision>
 

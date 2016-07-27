@@ -16,11 +16,15 @@ package org.camunda.bpm.dmn.engine.impl;
 import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
 import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
@@ -105,9 +109,11 @@ public class DefaultDmnEngine implements DmnEngine {
     ensureNotNull("decision", decision);
     ensureNotNull("variableContext", variableContext);
 
-    if (decision.isDecisionTable() && decision instanceof DmnDecisionImpl) {
+    if (decision instanceof DmnDecisionImpl && decision.isDecisionTable()) {
       DefaultDmnDecisionContext decisionContext = new DefaultDmnDecisionContext(dmnEngineConfiguration);
-       return decisionContext.evaluateDecision(decision, variableContext);
+
+      DmnDecisionResult decisionResult = decisionContext.evaluateDecision(decision, variableContext);
+      return wrapDecisionTableResult(decisionResult);
     }
     else {
       throw LOG.decisionTypeNotSupported(decision);
@@ -144,6 +150,70 @@ public class DefaultDmnEngine implements DmnEngine {
       }
     }
     throw LOG.unableToFindDecisionWithKey(decisionKey);
+  }
+
+  public DmnDecisionResult evaluateDecision(DmnDecision decision, Map<String, Object> variables) {
+    ensureNotNull("decision", decision);
+    ensureNotNull("variables", variables);
+    return evaluateDecision(decision, Variables.fromMap(variables).asVariableContext());
+  }
+
+  public DmnDecisionResult evaluateDecision(DmnDecision decision, VariableContext variableContext) {
+    ensureNotNull("decision", decision);
+    ensureNotNull("variableContext", variableContext);
+
+    if (decision instanceof DmnDecisionImpl) {
+      DefaultDmnDecisionContext decisionContext = new DefaultDmnDecisionContext(dmnEngineConfiguration);
+      return decisionContext.evaluateDecision(decision, variableContext);
+    }
+    else {
+      throw LOG.decisionTypeNotSupported(decision);
+    }
+  }
+
+  public DmnDecisionResult evaluateDecision(String decisionKey, InputStream inputStream, Map<String, Object> variables) {
+    ensureNotNull("variables", variables);
+    return evaluateDecision(decisionKey, inputStream, Variables.fromMap(variables).asVariableContext());
+  }
+
+  public DmnDecisionResult evaluateDecision(String decisionKey, InputStream inputStream, VariableContext variableContext) {
+    ensureNotNull("decisionKey", decisionKey);
+    List<DmnDecision> decisions = parseDecisions(inputStream);
+    for (DmnDecision decision : decisions) {
+      if (decisionKey.equals(decision.getKey())) {
+        return evaluateDecision(decision, variableContext);
+      }
+    }
+    throw LOG.unableToFindDecisionWithKey(decisionKey);
+  }
+
+  public DmnDecisionResult evaluateDecision(String decisionKey, DmnModelInstance dmnModelInstance, Map<String, Object> variables) {
+    ensureNotNull("variables", variables);
+    return evaluateDecision(decisionKey, dmnModelInstance, Variables.fromMap(variables).asVariableContext());
+  }
+
+  public DmnDecisionResult evaluateDecision(String decisionKey, DmnModelInstance dmnModelInstance, VariableContext variableContext) {
+    ensureNotNull("decisionKey", decisionKey);
+    List<DmnDecision> decisions = parseDecisions(dmnModelInstance);
+    for (DmnDecision decision : decisions) {
+      if (decisionKey.equals(decision.getKey())) {
+        return evaluateDecision(decision, variableContext);
+      }
+    }
+    throw LOG.unableToFindDecisionWithKey(decisionKey);
+  }
+
+  protected DmnDecisionTableResult wrapDecisionTableResult(DmnDecisionResult decisionResult) {
+    List<DmnDecisionRuleResult> ruleResults = new ArrayList<DmnDecisionRuleResult>();
+
+    for (DmnDecisionResultEntries result : decisionResult) {
+      DmnDecisionRuleResultImpl ruleResult = new DmnDecisionRuleResultImpl();
+      ruleResult.putAllValues(result.getEntryMapTyped());
+
+      ruleResults.add(ruleResult);
+    }
+
+    return new DmnDecisionTableResultImpl(ruleResults);
   }
 
 }

@@ -2,7 +2,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,24 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.dmn.engine.delegate;
 
-import java.util.Map;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * A evaluated decision rule.
+ * Event which represents the evaluation of a decision with a literal expression.
  */
-public interface DmnEvaluatedDecisionRule {
+public interface DmnDecisionLiteralExpressionEvaluationEvent extends DmnDecisionLogicEvaluationEvent {
 
   /**
-   * @return the id of the decision rule or null if not set
+   * @return the output name of the evaluated expression
    */
-  String getId();
+  String getOutputName();
 
   /**
-   * @return the evaluated output entries for the decision rule
+   * @return the value of the evaluated expression
    */
-  Map<String, DmnEvaluatedOutput> getOutputEntries();
+  TypedValue getOutputValue();
 
 }

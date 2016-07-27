@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-public class DmnDecisionRuleResultImpl implements DmnDecisionRuleResult {
+public class DmnDecisionResultEntriesImpl implements DmnDecisionResultEntries {
 
   private static final long serialVersionUID = 1L;
 

@@ -14,6 +14,8 @@
 package org.camunda.bpm.dmn.engine.impl;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
@@ -82,6 +84,20 @@ public class DmnEngineLogger extends DmnLogger {
     return new DmnTransformException(exceptionMessage(
       "009",
       "Unable to find any decision table in model.")
+    );
+  }
+
+  public DmnDecisionResultException decisionOutputHasMoreThanOneValue(DmnDecisionResultEntries result) {
+    return new DmnDecisionResultException(exceptionMessage(
+      "010",
+      "Unable to get single decision result entry as it has more than one entry '{}'", result)
+    );
+  }
+
+  public DmnDecisionResultException decisionResultHasMoreThanOneOutput(DmnDecisionResult decisionResult) {
+    return new DmnDecisionResultException(exceptionMessage(
+      "011",
+      "Unable to get single decision result as it has more than one result '{}'", decisionResult)
     );
   }
 

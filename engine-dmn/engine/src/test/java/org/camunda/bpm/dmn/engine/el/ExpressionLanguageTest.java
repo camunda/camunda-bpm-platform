@@ -37,6 +37,7 @@ import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
 import org.camunda.bpm.dmn.feel.impl.FeelException;
+import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Test;
 
 public class ExpressionLanguageTest extends DmnEngineTest {
@@ -45,6 +46,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
   public static final String GROOVY_DECISION_LITERAL_EXPRESSION_DMN = "org/camunda/bpm/dmn/engine/el/ExpressionLanguageTest.groovy.decisionLiteralExpression.dmn";
   public static final String SCRIPT_DMN = "org/camunda/bpm/dmn/engine/el/ExpressionLanguageTest.script.dmn";
   public static final String EMPTY_EXPRESSIONS_DMN = "org/camunda/bpm/dmn/engine/el/ExpressionLanguageTest.emptyExpressions.dmn";
+  public static final String DECISION_WITH_LITERAL_EXPRESSION_DMN = "org/camunda/bpm/dmn/engine/el/ExpressionLanguageTest.decisionLiteralExpression.dmn";
 
   protected DefaultScriptEngineResolver scriptEngineResolver;
   protected JuelElProvider elProvider;
@@ -98,9 +100,11 @@ public class ExpressionLanguageTest extends DmnEngineTest {
 
     assertThat(decisionLiteralExpression.getExpression().getExpressionLanguage()).isEqualTo("groovy");
 
-    // TODO CAM-6441 - evaluate decision and verify script engine invocation
-    // verify(scriptEngineResolver, atLeastOnce()).getScriptEngineForLanguage("groovy");
-    // verify(scriptEngineResolver, never()).getScriptEngineForLanguage("juel");
+    dmnEngine.evaluateDecision(decision,
+        Variables.createVariables().putValue("a", 2).putValue("b", 3));
+
+    verify(scriptEngineResolver, atLeastOnce()).getScriptEngineForLanguage("groovy");
+    verify(scriptEngineResolver, never()).getScriptEngineForLanguage("juel");
   }
 
   @Test
@@ -136,6 +140,27 @@ public class ExpressionLanguageTest extends DmnEngineTest {
     assertExample(javascriptEngine, decision);
 
     verify(scriptEngineResolver, atLeastOnce()).getScriptEngineForLanguage("javascript");
+    verify(scriptEngineResolver, never()).getScriptEngineForLanguage("juel");
+  }
+
+  @Test
+  @DecisionResource(resource = DECISION_WITH_LITERAL_EXPRESSION_DMN)
+  public void testExecuteLiteralExpressionWithDefaultDmnEngineConfiguration() {
+    dmnEngine.evaluateDecision(decision,
+        Variables.createVariables().putValue("a", 1).putValue("b", 2));
+
+    verify(elProvider, atLeastOnce()).createExpression(anyString());
+  }
+
+  @Test
+  @DecisionResource(resource = DECISION_WITH_LITERAL_EXPRESSION_DMN)
+  public void testExecuteLiteralExpressionWithGroovyDmnEngineConfiguration() {
+    DmnEngine juelEngine = createEngineWithDefaultExpressionLanguage("groovy");
+
+    juelEngine.evaluateDecision(decision,
+        Variables.createVariables().putValue("a", 1).putValue("b", 2));
+
+    verify(scriptEngineResolver, atLeastOnce()).getScriptEngineForLanguage("groovy");
     verify(scriptEngineResolver, never()).getScriptEngineForLanguage("juel");
   }
 
@@ -202,6 +227,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
     configuration.setDefaultInputExpressionExpressionLanguage(expressionLanguage);
     configuration.setDefaultInputEntryExpressionLanguage(expressionLanguage);
     configuration.setDefaultOutputEntryExpressionLanguage(expressionLanguage);
+    configuration.setDefaultLiteralExpressionLanguage(expressionLanguage);
 
     return configuration.buildEngine();
   }

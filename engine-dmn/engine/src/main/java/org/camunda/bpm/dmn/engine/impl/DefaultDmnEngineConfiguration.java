@@ -24,6 +24,7 @@ import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationListener;
 import org.camunda.bpm.dmn.engine.impl.el.DefaultScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.el.JuelElProvider;
 import org.camunda.bpm.dmn.engine.impl.metrics.DefaultEngineMetricCollector;
+import org.camunda.bpm.dmn.engine.impl.metrics.DmnEngineMetricCollectorWrapper;
 import org.camunda.bpm.dmn.engine.impl.spi.el.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnTransformer;
@@ -59,9 +60,11 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
   protected String defaultInputExpressionExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
   protected String defaultInputEntryExpressionLanguage = FEEL_EXPRESSION_LANGUAGE;
   protected String defaultOutputEntryExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
+  protected String defaultLiteralExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
 
   protected DmnTransformer transformer = new DefaultDmnTransformer();
 
+  @Override
   public DmnEngine buildEngine() {
     init();
     return new DefaultDmnEngine(this);
@@ -87,7 +90,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
     if (customPreDecisionTableEvaluationListeners != null && !customPreDecisionTableEvaluationListeners.isEmpty()) {
       listeners.addAll(customPreDecisionTableEvaluationListeners);
     }
-    listeners.addAll(getDefaultDmnDecisionTableEvaluationListeners());
+
     if (customPostDecisionTableEvaluationListeners != null && !customPostDecisionTableEvaluationListeners.isEmpty()) {
       listeners.addAll(customPostDecisionTableEvaluationListeners);
     }
@@ -99,16 +102,24 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
     if (customPreDecisionEvaluationListeners != null && !customPreDecisionEvaluationListeners.isEmpty()) {
       listeners.addAll(customPreDecisionEvaluationListeners);
     }
-    
+
+    listeners.addAll(getDefaultDmnDecisionEvaluationListeners());
+
     if (customPostDecisionEvaluationListeners != null && !customPostDecisionEvaluationListeners.isEmpty()) {
       listeners.addAll(customPostDecisionEvaluationListeners);
     }
     decisionEvaluationListeners = listeners;
   }
 
-  protected Collection<? extends DmnDecisionTableEvaluationListener> getDefaultDmnDecisionTableEvaluationListeners() {
-    List<DmnDecisionTableEvaluationListener> defaultListeners = new ArrayList<DmnDecisionTableEvaluationListener>();
-    defaultListeners.add(engineMetricCollector);
+  protected Collection<? extends DmnDecisionEvaluationListener> getDefaultDmnDecisionEvaluationListeners() {
+    List<DmnDecisionEvaluationListener> defaultListeners = new ArrayList<DmnDecisionEvaluationListener>();
+
+    if (engineMetricCollector instanceof DmnDecisionEvaluationListener) {
+      defaultListeners.add((DmnDecisionEvaluationListener) engineMetricCollector);
+    } else {
+      defaultListeners.add(new DmnEngineMetricCollectorWrapper(engineMetricCollector));
+    }
+
     return defaultListeners;
   }
 
@@ -134,66 +145,81 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
     }
   }
 
+  @Override
   public DmnEngineMetricCollector getEngineMetricCollector() {
     return engineMetricCollector;
   }
 
+  @Override
   public void setEngineMetricCollector(DmnEngineMetricCollector engineMetricCollector) {
     this.engineMetricCollector = engineMetricCollector;
   }
 
+  @Override
   public DefaultDmnEngineConfiguration engineMetricCollector(DmnEngineMetricCollector engineMetricCollector) {
     setEngineMetricCollector(engineMetricCollector);
     return this;
   }
 
+  @Override
   public List<DmnDecisionTableEvaluationListener> getCustomPreDecisionTableEvaluationListeners() {
     return customPreDecisionTableEvaluationListeners;
   }
 
+  @Override
   public void setCustomPreDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners) {
     this.customPreDecisionTableEvaluationListeners = decisionTableEvaluationListeners;
   }
 
+  @Override
   public DefaultDmnEngineConfiguration customPreDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners) {
     setCustomPreDecisionTableEvaluationListeners(decisionTableEvaluationListeners);
     return this;
   }
 
+  @Override
   public List<DmnDecisionTableEvaluationListener> getCustomPostDecisionTableEvaluationListeners() {
     return customPostDecisionTableEvaluationListeners;
   }
 
+  @Override
   public void setCustomPostDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners) {
     this.customPostDecisionTableEvaluationListeners = decisionTableEvaluationListeners;
   }
 
+  @Override
   public DefaultDmnEngineConfiguration customPostDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners) {
     setCustomPostDecisionTableEvaluationListeners(decisionTableEvaluationListeners);
     return this;
   }
 
+  @Override
   public List<DmnDecisionEvaluationListener> getCustomPreDecisionEvaluationListeners() {
     return customPreDecisionEvaluationListeners;
   }
 
+  @Override
   public void setCustomPreDecisionEvaluationListeners(List<DmnDecisionEvaluationListener> decisionEvaluationListeners) {
     this.customPreDecisionEvaluationListeners = decisionEvaluationListeners;
   }
 
+  @Override
   public DefaultDmnEngineConfiguration customPreDecisionEvaluationListeners(List<DmnDecisionEvaluationListener> decisionEvaluationListeners) {
     setCustomPreDecisionEvaluationListeners(decisionEvaluationListeners);
     return this;
   }
 
+  @Override
   public List<DmnDecisionEvaluationListener> getCustomPostDecisionEvaluationListeners() {
     return customPostDecisionEvaluationListeners;
   }
 
+  @Override
   public void setCustomPostDecisionEvaluationListeners(List<DmnDecisionEvaluationListener> decisionEvaluationListeners) {
     this.customPostDecisionEvaluationListeners = decisionEvaluationListeners;
   }
 
+  @Override
   public DefaultDmnEngineConfiguration customPostDecisionEvaluationListeners(List<DmnDecisionEvaluationListener> decisionEvaluationListeners) {
     setCustomPostDecisionEvaluationListeners(decisionEvaluationListeners);
     return this;
@@ -406,6 +432,37 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
    */
   public DefaultDmnEngineConfiguration defaultOutputEntryExpressionLanguage(String expressionLanguage) {
     setDefaultOutputEntryExpressionLanguage(expressionLanguage);
+    return this;
+  }
+
+  /**
+   * @return the default expression language for literal expressions
+   */
+  public String getDefaultLiteralExpressionLanguage() {
+    return defaultLiteralExpressionLanguage;
+  }
+
+  /**
+   * Set the default expression language which is used to evaluate literal expressions.
+   * It is used for all literal expressions which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for literal expressions
+   */
+  public void setDefaultLiteralExpressionLanguage(String expressionLanguage) {
+    this.defaultLiteralExpressionLanguage = expressionLanguage;
+  }
+
+  /**
+   * Set the default expression language which is used to evaluate literal expressions.
+   * It is used for all literal expressions which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for literal expressions
+   * @return this configuration
+   */
+  public DefaultDmnEngineConfiguration defaultLiteralExpressionLanguage(String expressionLanguage) {
+    setDefaultLiteralExpressionLanguage(expressionLanguage);
     return this;
   }
 

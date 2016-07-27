@@ -23,12 +23,12 @@ public interface DmnDecisionEvaluationEvent {
   /**
    * @return the result of the evaluated decision
    */
-  DmnDecisionTableEvaluationEvent getDecisionResult();
+  DmnDecisionLogicEvaluationEvent getDecisionResult();
 
   /**
    * @return the collection of required decision results
    */
-  Collection<DmnDecisionTableEvaluationEvent> getRequiredDecisionResults();
+  Collection<DmnDecisionLogicEvaluationEvent> getRequiredDecisionResults();
 
   /**
    * @return the number of executed decision elements during the evaluation

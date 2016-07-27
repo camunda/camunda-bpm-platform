@@ -15,14 +15,20 @@ package org.camunda.bpm.dmn.engine.impl.metrics;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationEvent;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationListener;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
 import org.camunda.bpm.dmn.engine.spi.DmnEngineMetricCollector;
 
-public class DefaultEngineMetricCollector implements DmnEngineMetricCollector {
+public class DefaultEngineMetricCollector implements DmnEngineMetricCollector, DmnDecisionEvaluationListener {
 
   protected AtomicLong executedDecisionElements = new AtomicLong();
 
   public void notify(DmnDecisionTableEvaluationEvent evaluationEvent) {
+    // collector is registered as decision evaluation listener
+  }
+
+  public void notify(DmnDecisionEvaluationEvent evaluationEvent) {
     long executedDecisionElements = evaluationEvent.getExecutedDecisionElements();
     this.executedDecisionElements.getAndAdd(executedDecisionElements);
   }

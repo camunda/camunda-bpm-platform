@@ -127,7 +127,7 @@ public class DefaultDmnEngineConfigurationApiTest {
     assertThat(configuration.getCustomPreDecisionEvaluationListeners())
       .containsExactlyElementsOf(listeners);
   }
-  
+
   @Test
   public void shouldSetCustomPostDecisionTableEvaluationListeners() {
     configuration.setCustomPostDecisionTableEvaluationListeners(null);
@@ -368,6 +368,28 @@ public class DefaultDmnEngineConfigurationApiTest {
   }
 
   @Test
+  public void shouldSetDefaultLiteralExpressionLanguage() {
+    configuration.setDefaultLiteralExpressionLanguage(null);
+    assertThat(configuration.getDefaultLiteralExpressionLanguage())
+      .isNull();
+
+    configuration.setDefaultLiteralExpressionLanguage("camunda");
+    assertThat(configuration.getDefaultLiteralExpressionLanguage())
+      .isEqualTo("camunda");
+  }
+
+  @Test
+  public void shouldSetFluentDefaultLiteralExpressionLanguage() {
+    configuration.defaultLiteralExpressionLanguage(null);
+    assertThat(configuration.getDefaultLiteralExpressionLanguage())
+      .isNull();
+
+    configuration.defaultLiteralExpressionLanguage("camunda");
+    assertThat(configuration.getDefaultLiteralExpressionLanguage())
+      .isEqualTo("camunda");
+  }
+
+  @Test
   public void shouldSetTransformer() {
     configuration.setTransformer(null);
     assertThat(configuration.getTransformer())
@@ -465,7 +487,6 @@ public class DefaultDmnEngineConfigurationApiTest {
 
     ArrayList<DmnDecisionTableEvaluationListener> expectedListeners = new ArrayList<DmnDecisionTableEvaluationListener>();
     expectedListeners.addAll(preListeners);
-    expectedListeners.add(configuration.getEngineMetricCollector());
     expectedListeners.addAll(postListeners);
 
     assertThat(configuration.getDecisionTableEvaluationListeners())
@@ -486,6 +507,7 @@ public class DefaultDmnEngineConfigurationApiTest {
 
     ArrayList<DmnDecisionEvaluationListener> expectedListeners = new ArrayList<DmnDecisionEvaluationListener>();
     expectedListeners.addAll(preListeners);
+    expectedListeners.add((DefaultEngineMetricCollector) configuration.getEngineMetricCollector());
     expectedListeners.addAll(postListeners);
 
     assertThat(configuration.getDecisionEvaluationListeners())

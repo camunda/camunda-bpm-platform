@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.impl.DmnEvaluationException;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformException;
@@ -194,7 +195,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   }
 
   @Test
-  public void shouldFailEvaluatingIfInputStreamIsNull() {
+  public void shouldFailEvaluatingDecisionTableIfInputStreamIsNull() {
     try{
       dmnEngine.evaluateDecisionTable(DECISION_KEY, (InputStream) null, createVariables());
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
@@ -215,7 +216,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   }
 
   @Test
-  public void shouldFailEvaluatingIfInputStreamIsInvalid() {
+  public void shouldFailEvaluatingDecisionTableIfInputStreamIsInvalid() {
     try{
       dmnEngine.evaluateDecisionTable(DECISION_KEY, createInvalidInputStream(), createVariables());
       failBecauseExceptionWasNotThrown(DmnTransformException.class);
@@ -236,7 +237,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   }
 
   @Test
-  public void shouldFailEvaluatingIfModelInstanceIsNull() {
+  public void shouldFailEvaluatingDecisionTableIfModelInstanceIsNull() {
     try{
       dmnEngine.evaluateDecisionTable(DECISION_KEY, (DmnModelInstance) null, createVariables());
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
@@ -257,7 +258,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   }
 
   @Test
-  public void shouldFailEvaluatingIfDecisionKeyIsNull() {
+  public void shouldFailEvaluatingDecisionTableIfDecisionKeyIsNull() {
     try {
       dmnEngine.evaluateDecisionTable(null, createInputStream(), createVariables());
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
@@ -292,7 +293,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   }
 
   @Test
-  public void shouldFailEvaluatingIfDecisionKeyIsUnknown() {
+  public void shouldFailEvaluatingDecisionTableIfDecisionKeyIsUnknown() {
     try{
       dmnEngine.evaluateDecisionTable("unknown", createInputStream(), createVariables());
       failBecauseExceptionWasNotThrown(DmnTransformException.class);
@@ -335,7 +336,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   }
 
   @Test
-  public void shouldFailEvaluatingIfDecisionIsNull() {
+  public void shouldFailEvaluatingDecisionTableIfDecisionIsNull() {
     try {
       dmnEngine.evaluateDecisionTable(null, createVariables());
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
@@ -355,7 +356,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
 
   @Test
   @DecisionResource(resource = ONE_RULE_DMN)
-  public void shouldFailEvaluatingIfVariablesIsNull() {
+  public void shouldFailEvaluatingDecisionTableIfVariablesIsNull() {
     try {
       dmnEngine.evaluateDecisionTable(DECISION_KEY, createInputStream(), (Map<String, Object>) null);
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
@@ -383,7 +384,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
 
   @Test
   @DecisionResource(resource = ONE_RULE_DMN)
-  public void shouldFailEvaluatingIfVariableContextIsNull() {
+  public void shouldFailEvaluatingDecisionTableIfVariableContextIsNull() {
     try {
       dmnEngine.evaluateDecisionTable(DECISION_KEY, createInputStream(), (VariableContext) null);
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
@@ -411,7 +412,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
 
   @Test
   @DecisionResource(resource = ONE_RULE_DMN)
-  public void shouldFailEvaluatingDecisionWithEmptyVariableMap() {
+  public void shouldFailEvaluatingDecisionTableWithEmptyVariableMap() {
     try {
       dmnEngine.evaluateDecisionTable(decision, createVariables());
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
@@ -423,7 +424,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
 
   @Test
   @DecisionResource(resource = ONE_RULE_DMN)
-  public void shouldFailEvaluatingDecisionWithEmptyVariableContext() {
+  public void shouldFailEvaluatingDecisionTableWithEmptyVariableContext() {
     try {
       dmnEngine.evaluateDecisionTable(decision, emptyVariableContext());
       failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
@@ -434,8 +435,248 @@ public class DmnEngineApiTest extends DmnEngineTest {
   }
 
   @Test
+  public void shouldFailEvaluatingIfInputStreamIsNull() {
+    try{
+      dmnEngine.evaluateDecision(DECISION_KEY, (InputStream) null, createVariables());
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch (IllegalArgumentException e) {
+      assertThat(e)
+        .hasMessageContaining("UTILS-02001");
+    }
+
+    try{
+      dmnEngine.evaluateDecision(DECISION_KEY, (InputStream) null, emptyVariableContext());
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch (IllegalArgumentException e) {
+      assertThat(e)
+        .hasMessageContaining("UTILS-02001");
+    }
+  }
+
+  @Test
+  public void shouldFailEvaluatingIfInputStreamIsInvalid() {
+    try{
+      dmnEngine.evaluateDecision(DECISION_KEY, createInvalidInputStream(), createVariables());
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    }
+    catch (DmnTransformException e) {
+      assertThat(e)
+        .hasMessageContaining("DMN-02003");
+    }
+
+    try{
+      dmnEngine.evaluateDecision(DECISION_KEY, createInvalidInputStream(), emptyVariableContext());
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    }
+    catch (DmnTransformException e) {
+      assertThat(e)
+        .hasMessageContaining("DMN-02003");
+    }
+  }
+
+  @Test
+  public void shouldFailEvaluatingIfModelInstanceIsNull() {
+    try{
+      dmnEngine.evaluateDecision(DECISION_KEY, (DmnModelInstance) null, createVariables());
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch (IllegalArgumentException e) {
+      assertThat(e)
+        .hasMessageContaining("UTILS-02001");
+    }
+
+    try{
+      dmnEngine.evaluateDecision(DECISION_KEY, (DmnModelInstance) null, emptyVariableContext());
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch (IllegalArgumentException e) {
+      assertThat(e)
+        .hasMessageContaining("UTILS-02001");
+    }
+  }
+
+  @Test
+  public void shouldFailEvaluatingIfDecisionKeyIsNull() {
+    try {
+      dmnEngine.evaluateDecision(null, createInputStream(), createVariables());
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(IllegalArgumentException e) {
+      assertThat(e).hasMessageStartingWith("UTILS-02001");
+    }
+
+    try {
+      dmnEngine.evaluateDecision(null, createInputStream(), emptyVariableContext());
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(IllegalArgumentException e) {
+      assertThat(e).hasMessageStartingWith("UTILS-02001");
+    }
+
+    try {
+      dmnEngine.evaluateDecision(null, createDmnModelInstance(), createVariables());
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(IllegalArgumentException e) {
+      assertThat(e).hasMessageStartingWith("UTILS-02001");
+    }
+
+    try {
+      dmnEngine.evaluateDecision(null, createDmnModelInstance(), emptyVariableContext());
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(IllegalArgumentException e) {
+      assertThat(e).hasMessageStartingWith("UTILS-02001");
+    }
+  }
+
+  @Test
+  public void shouldFailEvaluatingIfDecisionKeyIsUnknown() {
+    try{
+      dmnEngine.evaluateDecision("unknown", createInputStream(), createVariables());
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    }
+    catch (DmnTransformException e) {
+      assertThat(e)
+        .hasMessageStartingWith("DMN-01001")
+        .hasMessageContaining("unknown");
+    }
+
+    try{
+      dmnEngine.evaluateDecision("unknown", createInputStream(), emptyVariableContext());
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    }
+    catch (DmnTransformException e) {
+      assertThat(e)
+        .hasMessageStartingWith("DMN-01001")
+        .hasMessageContaining("unknown");
+    }
+
+    try{
+      dmnEngine.evaluateDecision("unknown", createDmnModelInstance(), createVariables());
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    }
+    catch (DmnTransformException e) {
+      assertThat(e)
+        .hasMessageStartingWith("DMN-01001")
+        .hasMessageContaining("unknown");
+    }
+
+    try{
+      dmnEngine.evaluateDecision("unknown", createDmnModelInstance(), emptyVariableContext());
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    }
+    catch (DmnTransformException e) {
+      assertThat(e)
+        .hasMessageStartingWith("DMN-01001")
+        .hasMessageContaining("unknown");
+    }
+  }
+
+  @Test
+  public void shouldFailEvaluatingIfDecisionIsNull() {
+    try {
+      dmnEngine.evaluateDecision(null, createVariables());
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(IllegalArgumentException e) {
+      assertThat(e).hasMessageStartingWith("UTILS-02001");
+    }
+
+    try {
+      dmnEngine.evaluateDecision(null, emptyVariableContext());
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(IllegalArgumentException e) {
+      assertThat(e).hasMessageStartingWith("UTILS-02001");
+    }
+  }
+
+  @Test
   @DecisionResource(resource = ONE_RULE_DMN)
-  public void shouldEvaluateDecisionWithVariableMap() {
+  public void shouldFailEvaluatingIfVariablesIsNull() {
+    try {
+      dmnEngine.evaluateDecision(DECISION_KEY, createInputStream(), (Map<String, Object>) null);
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(IllegalArgumentException e) {
+      assertThat(e).hasMessageStartingWith("UTILS-02001");
+    }
+
+    try {
+      dmnEngine.evaluateDecision(DECISION_KEY, createDmnModelInstance(), (Map<String, Object>) null);
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(IllegalArgumentException e) {
+      assertThat(e).hasMessageStartingWith("UTILS-02001");
+    }
+
+    try {
+      dmnEngine.evaluateDecision(decision, (Map<String, Object>) null);
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(IllegalArgumentException e) {
+      assertThat(e).hasMessageStartingWith("UTILS-02001");
+    }
+  }
+
+  @Test
+  @DecisionResource(resource = ONE_RULE_DMN)
+  public void shouldFailEvaluatingIfVariableContextIsNull() {
+    try {
+      dmnEngine.evaluateDecision(DECISION_KEY, createInputStream(), (VariableContext) null);
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(IllegalArgumentException e) {
+      assertThat(e).hasMessageStartingWith("UTILS-02001");
+    }
+
+    try {
+      dmnEngine.evaluateDecision(DECISION_KEY, createDmnModelInstance(), (VariableContext) null);
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(IllegalArgumentException e) {
+      assertThat(e).hasMessageStartingWith("UTILS-02001");
+    }
+
+    try {
+      dmnEngine.evaluateDecision(decision, (VariableContext) null);
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(IllegalArgumentException e) {
+      assertThat(e).hasMessageStartingWith("UTILS-02001");
+    }
+  }
+
+  @Test
+  @DecisionResource(resource = ONE_RULE_DMN)
+  public void shouldFailEvaluatingDecisionWithEmptyVariableMap() {
+    try {
+      dmnEngine.evaluateDecision(decision, createVariables());
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(DmnEvaluationException e) {
+      assertThat(e).hasMessageStartingWith("DMN-01002");
+    }
+  }
+
+  @Test
+  @DecisionResource(resource = ONE_RULE_DMN)
+  public void shouldFailEvaluatingDecisionWithEmptyVariableContext() {
+    try {
+      dmnEngine.evaluateDecision(decision, emptyVariableContext());
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(DmnEvaluationException e) {
+      assertThat(e).hasMessageStartingWith("DMN-01002");
+    }
+  }
+
+  @Test
+  @DecisionResource(resource = ONE_RULE_DMN)
+  public void shouldEvaluateDecisionTableWithVariableMap() {
     DmnDecisionTableResult results = dmnEngine.evaluateDecisionTable(decision, createVariables().putValue("input", INPUT_VALUE));
     assertThat(results)
       .hasSingleResult()
@@ -444,11 +685,31 @@ public class DmnEngineApiTest extends DmnEngineTest {
 
   @Test
   @DecisionResource(resource = ONE_RULE_DMN)
-  public void shouldEvaluateDecisionWithVariableContext() {
+  public void shouldEvaluateDecisionTableWithVariableContext() {
     DmnDecisionTableResult results = dmnEngine.evaluateDecisionTable(decision, createVariables().putValue("input", INPUT_VALUE).asVariableContext());
     assertThat(results)
       .hasSingleResult()
       .hasSingleEntry(EXPECTED_OUTPUT_VALUE);
+  }
+
+  @Test
+  @DecisionResource(resource = ONE_RULE_DMN)
+  public void shouldEvaluateDecisionWithVariableMap() {
+    DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE));
+
+    assertThat(results.getSingleEntry())
+      .isNotNull()
+      .isEqualTo(EXPECTED_OUTPUT_VALUE);
+  }
+
+  @Test
+  @DecisionResource(resource = ONE_RULE_DMN)
+  public void shouldEvaluateDecisionWithVariableContext() {
+    DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE).asVariableContext());
+
+    assertThat(results.getSingleEntry())
+      .isNotNull()
+      .isEqualTo(EXPECTED_OUTPUT_VALUE);
   }
 
   @Test
