@@ -39,7 +39,7 @@
       options: [
         {
           name: 'processInstanceId',
-          label: 'Id'
+          label: 'ID'
         },
         {
           name: 'processInstanceBusinessKey',
@@ -56,7 +56,7 @@
       options: [
         {
           name: 'processDefinitionId',
-          label: 'Id'
+          label: 'ID'
         },
         {
           name: 'processDefinitionKey',
@@ -82,7 +82,7 @@
       options: [
         {
           name: 'caseInstanceId',
-          label: 'Id'
+          label: 'ID'
         },
         {
           name: 'caseInstanceBusinessKey',
@@ -99,7 +99,7 @@
       options: [
         {
           name: 'caseDefinitionId',
-          label: 'Id'
+          label: 'ID'
         },
         {
           name: 'caseDefinitionKey',

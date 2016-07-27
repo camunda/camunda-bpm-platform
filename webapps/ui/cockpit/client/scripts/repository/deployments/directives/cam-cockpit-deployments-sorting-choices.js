@@ -28,7 +28,7 @@ module.exports = [function() {
         var deploymentsSortingData = $scope.deploymentsSortingData = $scope.deploymentsData.newChild($scope);
 
         var uniqueProps = $scope.uniqueProps = {
-          id:               'Id',
+          id:               'ID',
           name:             'Name',
           deploymentTime:   'Deployment Time'
         };

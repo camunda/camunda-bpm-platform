@@ -63,7 +63,7 @@ describe('Repository Spec', function() {
         location = location.replace('deploymentsSortBy=name', 'deploymentsSortBy=id');
 
         browser.setLocation(location).then(function() {
-          expect(deploymentsPage.sortingBy()).to.eventually.eql('Id');
+          expect(deploymentsPage.sortingBy()).to.eventually.eql('ID');
         });
 
       });
@@ -71,7 +71,7 @@ describe('Repository Spec', function() {
 
     it('should preserve sorting order on unrelated URL change', function() {
       browser.setLocation('repository').then(function() {
-        expect(deploymentsPage.sortingBy()).to.eventually.eql('Id');
+        expect(deploymentsPage.sortingBy()).to.eventually.eql('ID');
       });
     });
 
