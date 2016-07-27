@@ -51,7 +51,7 @@
   }
 
   .section-title {
-    font-size: 2rem;
+    font-size: 2em;
     margin-top: 5px;
     font-weight: 100;
   }
@@ -68,7 +68,7 @@
     font-size: 2em;
     font-weight: 100;
     .animate-spin {
-      font-size: 1rem;
+      font-size: 1em;
     }
   }
 
@@ -79,6 +79,23 @@
     }
     &.nope .value {
       color: @brand-success;
+    }
+  }
+
+  .misc {
+    li {
+      border-bottom: 1px solid @custom-gray-light;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      &:last-of-type {
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 0;
+      }
+    }
+
+    h2 {
+      font-size: 1.5em;
     }
   }
 }
