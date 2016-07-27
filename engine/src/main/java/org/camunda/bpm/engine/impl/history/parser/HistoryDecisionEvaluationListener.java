@@ -48,7 +48,7 @@ public class HistoryDecisionEvaluationListener implements DmnDecisionEvaluationL
   }
 
   protected HistoryEvent createHistoryEvent(DmnDecisionEvaluationEvent evaluationEvent) {
-    DmnDecision decisionTable = evaluationEvent.getDecisionResult().getDecisionTable();
+    DmnDecision decisionTable = evaluationEvent.getDecisionResult().getDecision();
     if(isDeployedDecisionTable(decisionTable) && historyLevel.isHistoryEventProduced(HistoryEventTypes.DMN_DECISION_EVALUATE, decisionTable)) {
 
       CoreExecutionContext<? extends CoreExecution> executionContext = Context.getCoreExecutionContext();
