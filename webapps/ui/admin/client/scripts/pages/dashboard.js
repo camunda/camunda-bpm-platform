@@ -42,7 +42,7 @@ var Controller = [
     return plugin;
   });
 
-    $rootScope.showBreadcrumbs = true;
+    $rootScope.showBreadcrumbs = false;
 
     page.breadcrumbsClear();
 
