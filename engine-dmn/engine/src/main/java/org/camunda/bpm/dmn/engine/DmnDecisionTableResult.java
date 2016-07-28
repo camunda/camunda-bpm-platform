@@ -17,6 +17,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 /**
  * The result of one decision table. Which is the list of its decision rule results (see
  * {@link DmnDecisionRuleResult}). This represents the output entries of all matching
@@ -65,5 +67,37 @@ public interface DmnDecisionTableResult extends List<DmnDecisionRuleResult>, Ser
    * @see DmnDecisionRuleResult#getEntryMap()
    */
   List<Map<String, Object>> getResultList();
+
+  /**
+   * Returns the value of the single entry of the decision rule result. Asserts that
+   * only one decision rule result with a single entry exist.
+   *
+   * @param <T>
+   *          the type of the result entry
+   * @return the value of the single result entry or null if none exists
+   *
+   * @throws DmnEngineException
+   *           if more than one decision rule result or more than one result entry
+   *           exists
+   *
+   * @see #getSingleEntryTyped()
+   */
+  <T> T getSingleEntry();
+
+  /**
+   * Returns the typed value of the single entry of the decision rule result. Asserts
+   * that only one decision rule result with a single entry exist.
+   *
+   * @param <T>
+   *          the type of the result entry
+   * @return the typed value of the single result entry or null if none exists
+   *
+   * @throws DmnEngineException
+   *           if more than one decision rule result or more than one result entry
+   *           exists
+   *
+   * @see #getSingleEntry()
+   */
+  <T extends TypedValue> T getSingleEntryTyped();
 
 }

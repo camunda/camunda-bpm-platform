@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class DmnDecisionTableResultImpl implements DmnDecisionTableResult {
 
@@ -78,6 +79,26 @@ public class DmnDecisionTableResultImpl implements DmnDecisionTableResult {
     }
 
     return entryMapList;
+  }
+
+  @Override
+  public <T> T getSingleEntry() {
+    DmnDecisionRuleResult result = getSingleResult();
+    if (result != null) {
+      return result.getSingleEntry();
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public <T extends TypedValue> T getSingleEntryTyped() {
+    DmnDecisionRuleResult result = getSingleResult();
+    if (result != null) {
+      return result.getSingleEntryTyped();
+    } else {
+      return null;
+    }
   }
 
   @Override

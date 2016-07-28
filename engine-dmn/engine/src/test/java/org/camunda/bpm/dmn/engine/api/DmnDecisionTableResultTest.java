@@ -48,6 +48,9 @@ public class DmnDecisionTableResultTest extends DmnEngineTest {
     assertThat(results).isEmpty();
     assertThat(results.getFirstResult()).isNull();
     assertThat(results.getSingleResult()).isNull();
+    
+    assertThat(results.getSingleEntry()).isNull();
+    assertThat(results.getSingleEntryTyped()).isNull();
   }
 
   @Test
@@ -59,6 +62,8 @@ public class DmnDecisionTableResultTest extends DmnEngineTest {
     assertSingleOutputValue(results.get(0));
     assertSingleOutputValue(results.getFirstResult());
     assertSingleOutputValue(results.getSingleResult());
+    
+    assertThat(results.getSingleEntry()).isEqualTo("singleValue");
   }
 
   @Test
@@ -88,6 +93,18 @@ public class DmnDecisionTableResultTest extends DmnEngineTest {
         .hasMessageContaining("multipleValues1")
         .hasMessageContaining("multipleValues2");
     }
+    
+    try {
+      decisionResult.getSingleEntry();
+      failBecauseExceptionWasNotThrown(DmnDecisionResultException.class);
+    }
+    catch (DmnDecisionResultException e){
+      assertThat(e)
+        .hasMessageStartingWith("DMN-01008")
+        .hasMessageContaining("singleValue")
+        .hasMessageContaining("multipleValues1")
+        .hasMessageContaining("multipleValues2");
+    }
   }
 
   @Test
@@ -97,6 +114,8 @@ public class DmnDecisionTableResultTest extends DmnEngineTest {
     assertThat(decisionResult).hasSize(1);
 
     assertNoOutputValue(decisionResult.getFirstResult());
+    
+    assertThat(decisionResult.getSingleEntry()).isNull();
   }
 
   @Test
@@ -106,6 +125,8 @@ public class DmnDecisionTableResultTest extends DmnEngineTest {
     assertThat(decisionResult).hasSize(1);
 
     assertSingleOutputValue(decisionResult.getFirstResult());
+    
+    assertThat(decisionResult.getSingleEntry()).isEqualTo("singleValue");
   }
 
   @Test
@@ -117,6 +138,8 @@ public class DmnDecisionTableResultTest extends DmnEngineTest {
     assertThat(decisionResult.getFirstResult()).hasSize(1);
     assertThat(decisionResult.getFirstResult().getSingleEntry()).isEqualTo("outputValue");
     assertThat(decisionResult.getFirstResult().get(null)).isEqualTo("outputValue");
+    
+    assertThat(decisionResult.getSingleEntry()).isEqualTo("outputValue");
   }
 
   @Test
@@ -126,6 +149,17 @@ public class DmnDecisionTableResultTest extends DmnEngineTest {
     assertThat(decisionResult).hasSize(1);
 
     assertMultipleOutputValues(decisionResult.getFirstResult());
+    
+    try {
+      decisionResult.getSingleEntry();
+      failBecauseExceptionWasNotThrown(DmnDecisionResultException.class);
+    }
+    catch (DmnDecisionResultException e){
+      assertThat(e)
+        .hasMessageStartingWith("DMN-01007")
+        .hasMessageContaining("multipleValues1")
+        .hasMessageContaining("multipleValues2");
+    }
   }
 
   @Test
@@ -212,6 +246,24 @@ public class DmnDecisionTableResultTest extends DmnEngineTest {
     assertThat(typedValue).isEqualTo(Variables.stringValue("singleValue"));
 
     typedValue = ruleResult.getSingleEntryTyped();
+    assertThat(typedValue).isEqualTo(Variables.stringValue("singleValue"));
+  }
+  
+  @Test
+  @DecisionResource(resource = RESULT_TEST_DMN)
+  public void testSingleEntryUntypedValue() {
+    DmnDecisionTableResult decisionResult = evaluateWithMatchingRules(SINGLE_OUTPUT_VALUE);
+
+    TypedValue typedValue = decisionResult.getSingleEntryTyped();
+    assertThat(typedValue).isEqualTo(Variables.untypedValue("singleValue"));
+  }
+
+  @Test
+  @DecisionResource(resource = RESULT_TEST_WITH_TYPES_DMN)
+  public void testSingleEntryTypedValue() {
+    DmnDecisionTableResult decisionResult = evaluateWithMatchingRules(SINGLE_OUTPUT_VALUE);
+
+    TypedValue typedValue = decisionResult.getSingleEntryTyped();
     assertThat(typedValue).isEqualTo(Variables.stringValue("singleValue"));
   }
 
