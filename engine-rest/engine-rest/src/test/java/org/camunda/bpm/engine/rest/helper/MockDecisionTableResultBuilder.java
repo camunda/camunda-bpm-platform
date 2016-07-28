@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Philipp Ossler
@@ -61,6 +62,16 @@ public class MockDecisionTableResultBuilder {
 
     @Override
     public List<Map<String, Object>> getResultList() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> T getSingleEntry() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T extends TypedValue> T getSingleEntryTyped() {
       throw new UnsupportedOperationException();
     }
 
