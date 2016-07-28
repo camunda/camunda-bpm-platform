@@ -432,7 +432,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
       String sentryVariableName = sentryPart.getVariableName();
       String sentryVariableEvent = sentryPart.getVariableEvent();
       CmmnExecution execution = sentryPart.getCaseExecution();
-      if (sentryPart.getType() == VARIABLE_ON_PART && sentryVariableName.equals(variableName) 
+      if (VARIABLE_ON_PART.equals(sentryPart.getType()) && sentryVariableName.equals(variableName) 
         && sentryVariableEvent.equals(variableEvent)
         && !hasVariableWithSameNameInParent(execution, sentryVariableName)) {
 
@@ -455,7 +455,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   protected boolean hasVariableWithSameNameInParent(CmmnExecution execution, String variableName) {
     while(execution != null) {
-      if (getId() == execution.getId()) {
+      if (execution.getId().equals(getId())) {
         return false;
       }
       if (execution.getVariableLocal(variableName) != null) {
