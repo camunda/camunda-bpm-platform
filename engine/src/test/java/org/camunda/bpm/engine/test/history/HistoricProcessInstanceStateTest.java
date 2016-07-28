@@ -173,11 +173,17 @@ public class HistoricProcessInstanceStateTest {
   public void testWithCallActivity() {
     processEngineRule.getRuntimeService().startProcessInstanceByKey("Process_1");
     assertThat(processEngineRule.getRuntimeService().createProcessInstanceQuery().active().list().size(),is(0));
-    List<HistoricProcessInstance> entities = processEngineRule.getHistoryService().createHistoricProcessInstanceQuery()
-        .finishedBefore(new Date()).orderByProcessInstanceStartTime().asc().list();
-    assertThat(entities.size(),is(2));
-    assertThat(entities.get(0).getState(),is(HistoricProcessInstance.COMPLETED));
-    assertThat(entities.get(1).getState(),is(HistoricProcessInstance.INTERNALLY_TERMINATED));
+
+    HistoricProcessInstance entity1 = processEngineRule.getHistoryService().createHistoricProcessInstanceQuery()
+        .processDefinitionKey("Process_1").singleResult();
+
+    HistoricProcessInstance entity2 = processEngineRule.getHistoryService().createHistoricProcessInstanceQuery()
+        .processDefinitionKey("process2").singleResult();
+
+    assertThat(entity1,is(notNullValue()));
+    assertThat(entity2,is(notNullValue()));
+    assertThat(entity1.getState(),is(HistoricProcessInstance.COMPLETED));
+    assertThat(entity2.getState(),is(HistoricProcessInstance.INTERNALLY_TERMINATED));
   }
 
   private HistoricProcessInstance getHistoricProcessInstanceWithAssertion(ProcessDefinition processDefinition) {
