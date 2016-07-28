@@ -12,34 +12,44 @@
     <version>7.6.0-SNAPSHOT</version>
   </parent>
 
-  <properties>
-    <camunda.version.current>
-      7.6.0-SNAPSHOT
-    </camunda.version.current>
-    <camunda.version.previous>
-      7.5.0
-    </camunda.version.previous>
-  </properties>
+  <profiles>
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+    </profile>
 
-  <modules>
-    <module>previous-engine-util</module>
-    <module>previous-engine</module>
-    <module>upgrade-database</module>
-    <module>test-old-engine</module>
-  </modules>
+    <profile>
+      <id>old-engine-instances</id>
+      <properties>
+        <camunda.version.current>
+          7.6.0-SNAPSHOT
+        </camunda.version.current>
+        <camunda.version.previous>
+          7.5.0
+        </camunda.version.previous>
+      </properties>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>sql-maven-plugin</artifactId>       
-          <configuration>
-            <keepFormat>false</keepFormat>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+      <modules>
+        <module>previous-engine</module>
+        <module>upgrade-database</module>
+        <module>test-old-engine</module>
+      </modules>
 
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>sql-maven-plugin</artifactId>       
+              <configuration>
+                <keepFormat>false</keepFormat>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
 </project>

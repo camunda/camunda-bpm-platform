@@ -53,11 +53,6 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm.qa.rolling.upgrade</groupId>
-      <artifactId>camunda-qa-previous-engine-util</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
 
   <build>
@@ -73,38 +68,31 @@
         <filtering>true</filtering>
       </testResource>
     </testResources>
-  </build>
 
-  <profiles>
-    <profile>
-      <id>old-engine-instances</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <configuration>
+          <cleanupDaemonThreads>false</cleanupDaemonThreads>
+          <includeProjectDependencies>true</includeProjectDependencies>
+          <includePluginDependencies>false</includePluginDependencies>
+          <classpathScope>test</classpathScope>
+        </configuration>
+        <executions>
+          <execution>
+            <id>create-test-fixture</id>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <phase>process-test-classes</phase>
             <configuration>
-              <cleanupDaemonThreads>false</cleanupDaemonThreads>
-              <includeProjectDependencies>true</includeProjectDependencies>
-              <includePluginDependencies>false</includePluginDependencies>
-              <classpathScope>test</classpathScope>
+              <mainClass>org.camunda.bpm.qa.rolling.upgrade.TestFixture</mainClass>
+              <includePluginDependencies>true</includePluginDependencies>
             </configuration>
-            <executions>
-              <execution>
-                <id>create-test-fixture</id>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-                <phase>process-test-classes</phase>
-                <configuration>
-                  <mainClass>org.camunda.bpm.qa.rolling.upgrade.TestFixture</mainClass>
-                  <includePluginDependencies>true</includePluginDependencies>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

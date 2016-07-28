@@ -1,16 +1,24 @@
-Instance Migration Tests
+Old Engine Instances Tests
 ========================
 
-These modules test scenarios in which process instances are started before upgrading Camunda from a minor version to another minor version and completed after. The tests ensure that object instances persisted in the database tables by the engine in a previous minor version can be successfully processed by succeeding versions. The most common use case is migration of execution trees.
+The test suite belongs to the rolling upgrade tests.
+
+These modules test following scenario:
+
+ * old engine creates process instance on old database schema (`previous-engine`)
+ * upgrade of database schema to newer version (`upgrade-database`)
+ * old engine end process instance on newer database schema (`test-old-engine`)
+
 
 Executing Tests
 ---------------
 
-Run `mvn clean install -Pinstance-migration,${database-id}` where `${database-id}` is for example `h2`.
+Run `mvn clean install -Pold-engine-instances,${database-id}` where `${database-id}` is for example `h2`.
 
 Project Structure
 -----------------
 
-* `test-fixture-72`: Creates the `7.2.0` database schema
-* Any `test-fixture-7x`: Applies patch scripts for version `7.(x-1)`. Applies migration scripts from `7.(x-1)` to `7.x`. Starts process instances with engine version `7.x.0`
-* `test-migration`: Executes test cases to assure that process instances started by any of the `test-fixture` modules can be completed with the current engine version
+ * `previous-engine` creates the old database schema and creates the process instance with the old engine
+ * `upgrade-database` upgrades the old database schema to the newer one 
+ * `test-old-engine` ends the process instance and drops the schema with the new scripts
+
