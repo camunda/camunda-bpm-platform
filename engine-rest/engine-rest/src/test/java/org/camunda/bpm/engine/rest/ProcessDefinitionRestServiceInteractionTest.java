@@ -186,6 +186,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   private void setUpMockDefinitionQuery(ProcessDefinition mockDefinition) {
     processDefinitionQueryMock = mock(ProcessDefinitionQuery.class);
     when(processDefinitionQueryMock.processDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)).thenReturn(processDefinitionQueryMock);
+    when(processDefinitionQueryMock.processDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)).thenReturn(processDefinitionQueryMock);
     when(processDefinitionQueryMock.tenantIdIn(anyString())).thenReturn(processDefinitionQueryMock);
     when(processDefinitionQueryMock.withoutTenantId()).thenReturn(processDefinitionQueryMock);
     when(processDefinitionQueryMock.latestVersion()).thenReturn(processDefinitionQueryMock);
@@ -1395,6 +1396,149 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .body("message", equalTo(message))
     .when()
       .get(XML_DEFINITION_URL);
+  }
+
+  @Test
+  public void testDeleteDeployment() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_URL);
+
+    verify(repositoryServiceMock).deleteProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, false);
+  }
+
+
+  @Test
+  public void testDeleteDeploymentCascade() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("cascade", true)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_URL);
+
+    verify(repositoryServiceMock).deleteProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, true, false);
+  }
+
+  @Test
+  public void testDeleteDeploymentCascadeNonsense() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("cascade", "bla")
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_URL);
+
+    verify(repositoryServiceMock).deleteProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, false);
+  }
+
+  @Test
+  public void testDeleteDeploymentCascadeFalse() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("cascade", false)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_URL);
+
+    verify(repositoryServiceMock).deleteProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, false);
+  }
+
+  @Test
+  public void testDeleteDeploymentSkipCustomListeners() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("skipCustomListeners", true)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_URL);
+
+    verify(repositoryServiceMock).deleteProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, true);
+  }
+
+  @Test
+  public void testDeleteDeploymentSkipCustomListenersNonsense() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("skipCustomListeners", "bla")
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_URL);
+
+    verify(repositoryServiceMock).deleteProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, false);
+  }
+
+  @Test
+  public void testDeleteDeploymentSkipCustomListenersFalse() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("skipCustomListeners", false)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_URL);
+
+    verify(repositoryServiceMock).deleteProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, false);
+  }
+
+  @Test
+  public void testDeleteDeploymentSkipCustomListenersAndCascade() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("cascade", true)
+      .queryParam("skipCustomListeners", true)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_URL);
+
+    verify(repositoryServiceMock).deleteProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, true, true);
+  }
+
+  @Test
+  public void testDeleteNonExistingDeployment() {
+
+    when(processDefinitionQueryMock.processDefinitionId("NON_EXISTING_ID")).thenReturn(processDefinitionQueryMock);
+    when(processDefinitionQueryMock.singleResult()).thenReturn(null);
+
+    given()
+      .pathParam("id", "NON_EXISTING_ID")
+    .expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body(containsString("Process definition with id 'NON_EXISTING_ID' do not exist"))
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_URL);
+  }
+
+  @Test
+  public void testDeleteDeploymentThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(repositoryServiceMock).deleteProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, false);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(message))
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_URL);
   }
 
   @Test

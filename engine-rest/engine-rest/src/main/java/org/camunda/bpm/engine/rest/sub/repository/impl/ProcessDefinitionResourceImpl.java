@@ -90,6 +90,23 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
   }
 
   @Override
+  public Response deleteProcessDefinition(String processDefinitionId, boolean cascade, boolean skipCustomListeners) {
+    RepositoryService repositoryService = engine.getRepositoryService();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                                                           .processDefinitionId(processDefinitionId)
+                                                           .singleResult();
+
+    if (processDefinition == null) {
+      return Response.status(Status.NOT_FOUND)
+                      .entity("Process definition with id '" + processDefinitionId + "' do not exist")
+                      .build();
+    }
+
+    repositoryService.deleteProcessDefinition(processDefinitionId, cascade, skipCustomListeners);
+    return Response.ok().build();
+  }
+
+  @Override
   public ProcessInstanceDto startProcessInstance(UriInfo context, StartProcessInstanceDto parameters) {
     ProcessInstanceWithVariables instance = null;
     try {

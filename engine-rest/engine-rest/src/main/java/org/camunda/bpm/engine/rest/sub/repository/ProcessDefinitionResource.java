@@ -45,6 +45,11 @@ public interface ProcessDefinitionResource {
   @Path("/diagram")
   Response getProcessDefinitionDiagram();
 
+  @DELETE
+  Response deleteProcessDefinition(@PathParam("id") String processDefinitionId,
+                                   @QueryParam("cascade") boolean cascade,
+                                   @QueryParam("skipCustomListeners") boolean skipCustomListeners);
+
   @POST
   @Path("/start")
   @Consumes(MediaType.APPLICATION_JSON)
