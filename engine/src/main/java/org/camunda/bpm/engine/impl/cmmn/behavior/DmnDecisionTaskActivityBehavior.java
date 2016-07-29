@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import static org.camunda.bpm.engine.impl.util.DecisionTableUtil.evaluateDecisionTable;
+import static org.camunda.bpm.engine.impl.util.DecisionEvaluationUtil.evaluateDecision;
 
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.dmn.result.DecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
 
 /**
  * @author Roman Smirnov
@@ -24,11 +24,12 @@ import org.camunda.bpm.engine.impl.dmn.result.DecisionTableResultMapper;
  */
 public class DmnDecisionTaskActivityBehavior extends DecisionTaskActivityBehavior {
 
-  protected DecisionTableResultMapper decisionResultMapper;
+  protected DecisionResultMapper decisionResultMapper;
 
+  @Override
   protected void performStart(CmmnActivityExecution execution) {
     try {
-      evaluateDecisionTable((AbstractVariableScope) execution, callableElement, resultVariable, decisionResultMapper);
+      evaluateDecision((AbstractVariableScope) execution, callableElement, resultVariable, decisionResultMapper);
 
       if (execution.isActive()) {
         execution.complete();
@@ -40,11 +41,11 @@ public class DmnDecisionTaskActivityBehavior extends DecisionTaskActivityBehavio
     }
   }
 
-  public DecisionTableResultMapper getDecisionTableResultMapper() {
+  public DecisionResultMapper getDecisionTableResultMapper() {
     return decisionResultMapper;
   }
 
-  public void setDecisionTableResultMapper(DecisionTableResultMapper decisionResultMapper) {
+  public void setDecisionTableResultMapper(DecisionResultMapper decisionResultMapper) {
     this.decisionResultMapper = decisionResultMapper;
   }
 

@@ -18,7 +18,9 @@ import java.util.Map;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.dmn.DecisionEvaluationBuilder;
+import org.camunda.bpm.engine.dmn.DecisionsEvaluationBuilder;
 import org.camunda.bpm.engine.impl.dmn.DecisionEvaluationBuilderImpl;
+import org.camunda.bpm.engine.impl.dmn.DecisionTableEvaluationBuilderImpl;
 
 /**
  * @author Philipp Ossler
@@ -45,11 +47,19 @@ public class DecisionServiceImpl extends ServiceImpl implements DecisionService 
   }
 
   public DecisionEvaluationBuilder evaluateDecisionTableByKey(String decisionDefinitionKey) {
-    return DecisionEvaluationBuilderImpl.evaluateDecisionTableByKey(commandExecutor, decisionDefinitionKey);
+    return DecisionTableEvaluationBuilderImpl.evaluateDecisionTableByKey(commandExecutor, decisionDefinitionKey);
   }
 
   public DecisionEvaluationBuilder evaluateDecisionTableById(String decisionDefinitionId) {
-    return DecisionEvaluationBuilderImpl.evaluateDecisionTableById(commandExecutor, decisionDefinitionId);
+    return DecisionTableEvaluationBuilderImpl.evaluateDecisionTableById(commandExecutor, decisionDefinitionId);
+  }
+
+  public DecisionsEvaluationBuilder evaluateDecisionByKey(String decisionDefinitionKey) {
+    return DecisionEvaluationBuilderImpl.evaluateDecisionByKey(commandExecutor, decisionDefinitionKey);
+  }
+
+  public DecisionsEvaluationBuilder evaluateDecisionById(String decisionDefinitionId) {
+    return DecisionEvaluationBuilderImpl.evaluateDecisionById(commandExecutor, decisionDefinitionId);
   }
 
 }

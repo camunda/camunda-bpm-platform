@@ -42,9 +42,9 @@ import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement.CallableElementBinding;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
-import org.camunda.bpm.engine.impl.dmn.result.DecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
 import org.camunda.bpm.engine.impl.dmn.result.ResultListDecisionTableResultMapper;
-import org.camunda.bpm.engine.impl.dmn.result.SingleResultDecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.SingleResultDecisionResultMapper;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.instance.Body;
@@ -781,7 +781,7 @@ public class DecisionTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
     DmnDecisionTaskActivityBehavior behavior = (DmnDecisionTaskActivityBehavior) activity.getActivityBehavior();
-    DecisionTableResultMapper mapper = behavior.getDecisionTableResultMapper();
+    DecisionResultMapper mapper = behavior.getDecisionTableResultMapper();
     assertTrue(mapper instanceof ResultListDecisionTableResultMapper);
   }
 
@@ -795,8 +795,8 @@ public class DecisionTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
     DmnDecisionTaskActivityBehavior behavior = (DmnDecisionTaskActivityBehavior) activity.getActivityBehavior();
-    DecisionTableResultMapper mapper = behavior.getDecisionTableResultMapper();
-    assertTrue(mapper instanceof SingleResultDecisionTableResultMapper);
+    DecisionResultMapper mapper = behavior.getDecisionTableResultMapper();
+    assertTrue(mapper instanceof SingleResultDecisionResultMapper);
   }
 
 }

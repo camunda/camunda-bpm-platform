@@ -18,8 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.DecisionService;
@@ -40,10 +44,6 @@ import org.camunda.bpm.engine.rest.sub.repository.DecisionDefinitionResource;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -130,8 +130,12 @@ public class DecisionDefinitionResourceImpl implements DecisionDefinitionResourc
     Map<String, Object> variables = VariableValueDto.toMap(parameters.getVariables(), engine, objectMapper);
 
     try {
-      DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableById(decisionDefinitionId, variables);
-      return createDecisionTableResultDto(decisionResult);
+      DmnDecisionResult decisionResult = decisionService
+          .evaluateDecisionById(decisionDefinitionId)
+          .variables(variables)
+          .evaluate();
+
+      return createDecisionResultDto(decisionResult);
 
     }
     catch (AuthorizationException e) {
@@ -155,22 +159,22 @@ public class DecisionDefinitionResourceImpl implements DecisionDefinitionResourc
     }
   }
 
-  protected List<Map<String, VariableValueDto>> createDecisionTableResultDto(DmnDecisionTableResult decisionResult) {
+  protected List<Map<String, VariableValueDto>> createDecisionResultDto(DmnDecisionResult decisionResult) {
     List<Map<String, VariableValueDto>> dto = new ArrayList<Map<String, VariableValueDto>>();
 
-    for (DmnDecisionRuleResult ruleResult : decisionResult) {
-      Map<String, VariableValueDto> ruleResultDto = createRuleResultDto(ruleResult);
-      dto.add(ruleResultDto);
+    for (DmnDecisionResultEntries entries : decisionResult) {
+      Map<String, VariableValueDto> resultEntriesDto = createResultEntriesDto(entries);
+      dto.add(resultEntriesDto);
     }
 
     return dto;
   }
 
-  protected Map<String, VariableValueDto> createRuleResultDto(DmnDecisionRuleResult ruleResult) {
+  protected Map<String, VariableValueDto> createResultEntriesDto(DmnDecisionResultEntries entries) {
     VariableMap variableMap = Variables.createVariables();
 
-    for(String key : ruleResult.keySet()) {
-      TypedValue typedValue = ruleResult.getEntryTyped(key);
+    for(String key : entries.keySet()) {
+      TypedValue typedValue = entries.getEntryTyped(key);
       variableMap.putValueTyped(key, typedValue);
     }
 

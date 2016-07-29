@@ -12,17 +12,19 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableResultImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.dmn.invocation.DecisionTableInvocation;
+import org.camunda.bpm.engine.impl.dmn.invocation.DecisionInvocation;
 import org.camunda.bpm.engine.impl.dmn.invocation.VariableScopeContext;
-import org.camunda.bpm.engine.impl.dmn.result.CollectEntriesDecisionTableResultMapper;
-import org.camunda.bpm.engine.impl.dmn.result.DecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.CollectEntriesDecisionResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
 import org.camunda.bpm.engine.impl.dmn.result.ResultListDecisionTableResultMapper;
-import org.camunda.bpm.engine.impl.dmn.result.SingleEntryDecisionTableResultMapper;
-import org.camunda.bpm.engine.impl.dmn.result.SingleResultDecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.SingleEntryDecisionResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.SingleResultDecisionResultMapper;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.context.VariableContext;
@@ -31,21 +33,21 @@ import org.camunda.bpm.engine.variable.context.VariableContext;
  * @author Roman Smirnov
  *
  */
-public class DecisionTableUtil {
+public class DecisionEvaluationUtil {
 
   public static final String DECISION_RESULT_VARIABLE = "decisionResult";
 
-  public static DecisionTableResultMapper getDecisionTableResultMapperForName(String mapDecisionResult) {
+  public static DecisionResultMapper getDecisionResultMapperForName(String mapDecisionResult) {
     if ("singleEntry".equals(mapDecisionResult)) {
-      return new SingleEntryDecisionTableResultMapper();
+      return new SingleEntryDecisionResultMapper();
 
     }
     else if ("singleResult".equals(mapDecisionResult)) {
-      return new SingleResultDecisionTableResultMapper();
+      return new SingleResultDecisionResultMapper();
 
     }
     else if ("collectEntries".equals(mapDecisionResult)) {
-      return new CollectEntriesDecisionTableResultMapper();
+      return new CollectEntriesDecisionResultMapper();
 
     }
     else if ("resultList".equals(mapDecisionResult) || mapDecisionResult == null) {
@@ -57,47 +59,53 @@ public class DecisionTableUtil {
     }
   }
 
-  public static void evaluateDecisionTable(AbstractVariableScope execution, BaseCallableElement callableElement,
-      String resultVariable, DecisionTableResultMapper decisionTableResultMapper) throws Exception {
+  public static void evaluateDecision(AbstractVariableScope execution, BaseCallableElement callableElement,
+      String resultVariable, DecisionResultMapper decisionResultMapper) throws Exception {
 
     DecisionDefinition decisionDefinition = resolveDecisionDefinition(callableElement, execution);
-    DecisionTableInvocation invocation = createInvocation(decisionDefinition, execution);
+    DecisionInvocation invocation = createInvocation(decisionDefinition, execution);
 
     invoke(invocation);
 
-    DmnDecisionTableResult result = invocation.getInvocationResult();
+    DmnDecisionResult result = invocation.getInvocationResult();
     if (result != null) {
       execution.setVariableLocalTransient(DECISION_RESULT_VARIABLE, result);
 
-      if (resultVariable != null && decisionTableResultMapper != null) {
-        Object mappedDecisionResult = decisionTableResultMapper.mapDecisionTableResult(result);
+      if (resultVariable != null && decisionResultMapper != null) {
+        Object mappedDecisionResult = decisionResultMapper.mapDecisionResult(result);
         execution.setVariable(resultVariable, mappedDecisionResult);
       }
     }
   }
 
-  public static DmnDecisionTableResult evaluateDecisionTable(DecisionDefinition decisionDefinition, VariableMap variables) throws Exception {
-    DecisionTableInvocation invocation = createInvocation(decisionDefinition, variables);
+  public static DmnDecisionResult evaluateDecision(DecisionDefinition decisionDefinition, VariableMap variables) throws Exception {
+    DecisionInvocation invocation = createInvocation(decisionDefinition, variables);
     invoke(invocation);
     return invocation.getInvocationResult();
   }
 
-  protected static void invoke(DecisionTableInvocation invocation) throws Exception {
+  public static DmnDecisionTableResult evaluateDecisionTable(DecisionDefinition decisionDefinition, VariableMap variables) throws Exception {
+    // doesn't throw an exception if the decision definition is not implemented as decision table
+    DmnDecisionResult decisionResult = evaluateDecision(decisionDefinition, variables);
+    return DmnDecisionTableResultImpl.wrap(decisionResult);
+  }
+
+  protected static void invoke(DecisionInvocation invocation) throws Exception {
     Context.getProcessEngineConfiguration()
       .getDelegateInterceptor()
       .handleInvocation(invocation);
   }
 
-  protected static DecisionTableInvocation createInvocation(DecisionDefinition decisionDefinition, VariableMap variables) {
+  protected static DecisionInvocation createInvocation(DecisionDefinition decisionDefinition, VariableMap variables) {
     return createInvocation(decisionDefinition, variables.asVariableContext());
   }
 
-  protected static DecisionTableInvocation createInvocation(DecisionDefinition decisionDefinition, AbstractVariableScope variableScope) {
+  protected static DecisionInvocation createInvocation(DecisionDefinition decisionDefinition, AbstractVariableScope variableScope) {
     return createInvocation(decisionDefinition, VariableScopeContext.wrap(variableScope));
   }
 
-  protected static DecisionTableInvocation createInvocation(DecisionDefinition decisionDefinition, VariableContext variableContext) {
-    return new DecisionTableInvocation(decisionDefinition, variableContext);
+  protected static DecisionInvocation createInvocation(DecisionDefinition decisionDefinition, VariableContext variableContext) {
+    return new DecisionInvocation(decisionDefinition, variableContext);
   }
 
   protected static DecisionDefinition resolveDecisionDefinition(BaseCallableElement callableElement, AbstractVariableScope execution) {

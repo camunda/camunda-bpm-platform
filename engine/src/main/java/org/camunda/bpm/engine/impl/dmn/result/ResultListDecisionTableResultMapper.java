@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.engine.impl.dmn.result;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 
 /**
  * Maps the decision result to a list of pairs that contains output name and
@@ -21,11 +21,11 @@ import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
  *
  * @author Philipp Ossler
  */
-public class ResultListDecisionTableResultMapper implements DecisionTableResultMapper {
+public class ResultListDecisionTableResultMapper implements DecisionResultMapper {
 
   @Override
-  public Object mapDecisionTableResult(DmnDecisionTableResult decisionTableResult) {
-    return decisionTableResult.getResultList();
+  public Object mapDecisionResult(DmnDecisionResult decisionResult) {
+    return decisionResult.getResultList();
   }
 
 }

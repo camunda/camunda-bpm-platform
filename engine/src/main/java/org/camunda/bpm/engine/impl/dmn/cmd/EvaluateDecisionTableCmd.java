@@ -13,13 +13,13 @@
 
 package org.camunda.bpm.engine.impl.dmn.cmd;
 
-import static org.camunda.bpm.engine.impl.util.DecisionEvaluationUtil.evaluateDecision;
+import static org.camunda.bpm.engine.impl.util.DecisionEvaluationUtil.evaluateDecisionTable;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.dmn.DecisionEvaluationBuilderImpl;
+import org.camunda.bpm.engine.impl.dmn.DecisionTableEvaluationBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
@@ -28,12 +28,14 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
 /**
- * Evaluates the decision with the given key or id.
+ * Evaluates the decision table with the given key or id.
  *
  * If the decision definition key given then specify the version and tenant-id.
  * If no version is provided then the latest version is taken.
+ *
+ * @author Kristin Polenz
  */
-public class EvaluateDecisionCmd implements Command<DmnDecisionResult> {
+public class EvaluateDecisionTableCmd implements Command<DmnDecisionTableResult> {
 
   protected String decisionDefinitionKey;
   protected String decisionDefinitionId;
@@ -42,7 +44,7 @@ public class EvaluateDecisionCmd implements Command<DmnDecisionResult> {
   protected String decisionDefinitionTenantId;
   protected boolean isTenandIdSet;
 
-  public EvaluateDecisionCmd(DecisionEvaluationBuilderImpl builder) {
+  public EvaluateDecisionTableCmd(DecisionTableEvaluationBuilderImpl builder) {
     this.decisionDefinitionKey = builder.getDecisionDefinitionKey();
     this.decisionDefinitionId = builder.getDecisionDefinitionId();
     this.version = builder.getVersion();
@@ -52,7 +54,7 @@ public class EvaluateDecisionCmd implements Command<DmnDecisionResult> {
   }
 
   @Override
-  public DmnDecisionResult execute(CommandContext commandContext) {
+  public DmnDecisionTableResult execute(CommandContext commandContext) {
     ensureOnlyOneNotNull("either decision definition id or key must be set", decisionDefinitionId, decisionDefinitionKey);
 
     DecisionDefinition decisionDefinition = getDecisionDefinition(commandContext);
@@ -65,9 +67,9 @@ public class EvaluateDecisionCmd implements Command<DmnDecisionResult> {
 
   }
 
-  protected DmnDecisionResult doEvaluateDecision(DecisionDefinition decisionDefinition, VariableMap variables) {
+  protected DmnDecisionTableResult doEvaluateDecision(DecisionDefinition decisionDefinition, VariableMap variables) {
     try {
-      return evaluateDecision(decisionDefinition, variables);
+      return evaluateDecisionTable(decisionDefinition, variables);
     }
     catch (Exception e) {
       throw new ProcessEngineException("Exception while evaluating decision with key '"+decisionDefinitionKey+"'", e);

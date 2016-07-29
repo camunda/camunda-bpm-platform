@@ -40,6 +40,8 @@ public class DmnBusinessRuleTaskTest {
   public static final String DECISION_OKAY_DMN = "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionOkay.dmn11.xml";
   public static final String DECISION_NOT_OKAY_DMN = "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionNotOkay.dmn11.xml";
   public static final String DECISION_POJO_DMN = "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testPojo.dmn11.xml";
+
+  public static final String DECISION_LITERAL_EXPRESSION_DMN = "org/camunda/bpm/engine/test/dmn/deployment/DecisionWithLiteralExpression.dmn";
   public static final String DRD_DISH_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
@@ -125,6 +127,26 @@ public class DmnBusinessRuleTaskTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     assertEquals("okay", getDecisionResult(processInstance));
+  }
+
+  @Deployment( resources = DECISION_LITERAL_EXPRESSION_DMN )
+  @Test
+  public void evaluateDecisionWithLiteralExpression() {
+    testRule.deploy(Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .businessRuleTask()
+          .camundaDecisionRef("decisionLiteralExpression")
+          .camundaResultVariable("result")
+          .camundaMapDecisionResult("singleEntry")
+        .endEvent()
+          .camundaAsyncBefore()
+        .done());
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", Variables.createVariables()
+        .putValue("a", 2)
+        .putValue("b", 3));
+
+    assertEquals(5, getDecisionResult(processInstance));
   }
 
   @Deployment( resources = DRD_DISH_RESOURCE )

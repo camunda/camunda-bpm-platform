@@ -15,51 +15,51 @@ package org.camunda.bpm.engine.rest.helper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Philipp Ossler
  */
-public class MockDecisionRuleResultBuilder {
+public class MockDecisionResultEntriesBuilder {
 
-  protected final MockDecisionTableResultBuilder mockDecisionTableResultBuilder;
+  protected final MockDecisionResultBuilder mockDecisionResultBuilder;
 
   protected Map<String, TypedValue> entries = new HashMap<String, TypedValue>();
 
-  public MockDecisionRuleResultBuilder(MockDecisionTableResultBuilder mockDecisionTableResultBuilder) {
-    this.mockDecisionTableResultBuilder = mockDecisionTableResultBuilder;
+  public MockDecisionResultEntriesBuilder(MockDecisionResultBuilder mockDecisionResultBuilder) {
+    this.mockDecisionResultBuilder = mockDecisionResultBuilder;
   }
 
-  public MockDecisionRuleResultBuilder entry(String key, TypedValue value) {
+  public MockDecisionResultEntriesBuilder entry(String key, TypedValue value) {
     entries.put(key, value);
     return this;
   }
 
-  public MockDecisionTableResultBuilder endRuleResult() {
-    SimpleDecisionRuleResult ruleResult = new SimpleDecisionRuleResult(entries);
+  public MockDecisionResultBuilder endResultEntries() {
+    SimpleDecisionResultEntries resultEntires = new SimpleDecisionResultEntries(entries);
 
-    mockDecisionTableResultBuilder.addRuleResult(ruleResult);
+    mockDecisionResultBuilder.addResultEntries(resultEntires);
 
-    return mockDecisionTableResultBuilder;
+    return mockDecisionResultBuilder;
   }
 
-  public MockDecisionRuleResultBuilder ruleResult() {
-    return endRuleResult().ruleResult();
+  public MockDecisionResultEntriesBuilder resultEntries() {
+    return endResultEntries().resultEntries();
   }
 
-  public DmnDecisionTableResult build() {
-    return endRuleResult().build();
+  public DmnDecisionResult build() {
+    return endResultEntries().build();
   }
 
-  protected static class SimpleDecisionRuleResult extends HashMap<String, Object> implements DmnDecisionRuleResult {
+  protected static class SimpleDecisionResultEntries extends HashMap<String, Object> implements DmnDecisionResultEntries {
 
     private static final long serialVersionUID = 1L;
 
     protected final Map<String, TypedValue> typedEntries;
 
-    public SimpleDecisionRuleResult(Map<String, TypedValue> entries) {
+    public SimpleDecisionResultEntries(Map<String, TypedValue> entries) {
       super(asEntryMap(entries));
 
       this.typedEntries = entries;

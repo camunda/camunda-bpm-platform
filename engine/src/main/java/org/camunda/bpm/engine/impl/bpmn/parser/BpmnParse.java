@@ -90,7 +90,7 @@ import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
-import org.camunda.bpm.engine.impl.dmn.result.DecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
 import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
@@ -138,7 +138,7 @@ import org.camunda.bpm.engine.impl.task.listener.ClassDelegateTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.DelegateExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ScriptTaskListener;
-import org.camunda.bpm.engine.impl.util.DecisionTableUtil;
+import org.camunda.bpm.engine.impl.util.DecisionEvaluationUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.util.ScriptUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
@@ -2148,9 +2148,9 @@ public class BpmnParse extends Parse {
     parseTenantId(businessRuleTaskElement, activity, callableElement, "decisionRefTenantId");
 
     String resultVariable = parseResultVariable(businessRuleTaskElement);
-    DecisionTableResultMapper decisionTableResultMapper = parseDecisionResultMapper(businessRuleTaskElement);
+    DecisionResultMapper decisionResultMapper = parseDecisionResultMapper(businessRuleTaskElement);
 
-    DmnBusinessRuleTaskActivityBehavior behavior = new DmnBusinessRuleTaskActivityBehavior(callableElement, resultVariable, decisionTableResultMapper);
+    DmnBusinessRuleTaskActivityBehavior behavior = new DmnBusinessRuleTaskActivityBehavior(callableElement, resultVariable, decisionResultMapper);
     activity.setActivityBehavior(behavior);
 
     parseExecutionListenersOnScope(businessRuleTaskElement, activity);
@@ -2162,10 +2162,10 @@ public class BpmnParse extends Parse {
     return activity;
   }
 
-  protected DecisionTableResultMapper parseDecisionResultMapper(Element businessRuleTaskElement) {
+  protected DecisionResultMapper parseDecisionResultMapper(Element businessRuleTaskElement) {
     // default mapper is 'resultList'
     String decisionResultMapper = businessRuleTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "mapDecisionResult");
-    DecisionTableResultMapper mapper = DecisionTableUtil.getDecisionTableResultMapperForName(decisionResultMapper);
+    DecisionResultMapper mapper = DecisionEvaluationUtil.getDecisionResultMapperForName(decisionResultMapper);
 
     if (mapper == null) {
       addError("No decision result mapper found for name '" + decisionResultMapper

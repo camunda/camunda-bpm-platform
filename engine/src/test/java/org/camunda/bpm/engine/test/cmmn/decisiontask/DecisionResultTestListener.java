@@ -13,24 +13,24 @@
 
 package org.camunda.bpm.engine.test.cmmn.decisiontask;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
-import org.camunda.bpm.engine.impl.util.DecisionTableUtil;
+import org.camunda.bpm.engine.impl.util.DecisionEvaluationUtil;
 
 /**
  * @author Roman Smirnov
  */
 public class DecisionResultTestListener implements CaseExecutionListener {
 
-  public static DmnDecisionTableResult decisionResult = null;
+  public static DmnDecisionResult decisionResult = null;
 
   @Override
   public void notify(DelegateCaseExecution execution) throws Exception {
-    decisionResult = (DmnDecisionTableResult) execution.getVariable(DecisionTableUtil.DECISION_RESULT_VARIABLE);
+    decisionResult = (DmnDecisionResult) execution.getVariable(DecisionEvaluationUtil.DECISION_RESULT_VARIABLE);
   }
 
-  public static DmnDecisionTableResult getDecisionResult() {
+  public static DmnDecisionResult getDecisionResult() {
     return decisionResult;
   }
 

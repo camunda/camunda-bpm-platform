@@ -17,6 +17,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.RepositoryService;
@@ -40,9 +41,13 @@ import org.junit.rules.RuleChain;
  */
 public class DecisionServiceTest {
 
-  protected static final String DMN_FILE = "org/camunda/bpm/engine/test/api/dmn/Example.dmn";
-  protected static final String DMN_FILE_SECOND_VERSION = "org/camunda/bpm/engine/test/api/dmn/Example_v2.dmn";
-  protected static final String DRD_DISH_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
+  protected static final String DMN_DECISION_TABLE = "org/camunda/bpm/engine/test/api/dmn/Example.dmn";
+  protected static final String DMN_DECISION_TABLE_V2 = "org/camunda/bpm/engine/test/api/dmn/Example_v2.dmn";
+
+  protected static final String DMN_DECISION_LITERAL_EXPRESSION = "org/camunda/bpm/engine/test/api/dmn/DecisionWithLiteralExpression.dmn";
+  protected static final String DMN_DECISION_LITERAL_EXPRESSION_V2 = "org/camunda/bpm/engine/test/api/dmn/DecisionWithLiteralExpression_v2.dmn";
+
+  protected static final String DRD_DISH_DECISION_TABLE = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
 
   protected static final String DECISION_DEFINITION_KEY = "decision";
 
@@ -67,9 +72,9 @@ public class DecisionServiceTest {
     repositoryService = engineRule.getRepositoryService();
   }
 
-  @Deployment(resources = DMN_FILE)
+  @Deployment(resources = DMN_DECISION_TABLE)
   @Test
-	public void evaluateDecisionById() {
+	public void evaluateDecisionTableById() {
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
 
     DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableById(decisionDefinition.getId(), createVariables());
@@ -77,38 +82,38 @@ public class DecisionServiceTest {
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
 
-  @Deployment(resources = DMN_FILE)
+  @Deployment(resources = DMN_DECISION_TABLE)
   @Test
-	public void evaluateDecisionByKey() {
+	public void evaluateDecisionTableByKey() {
     DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, createVariables());
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
 
-  @Deployment(resources = DMN_FILE)
+  @Deployment(resources = DMN_DECISION_TABLE)
   @Test
-	public void evaluateDecisionByKeyAndLatestVersion() {
-    testRule.deploy(DMN_FILE_SECOND_VERSION);
+	public void evaluateDecisionTableByKeyAndLatestVersion() {
+    testRule.deploy(DMN_DECISION_TABLE_V2);
 
     DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, createVariables());
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_SECOND_VERSION);
   }
 
-  @Deployment(resources = DMN_FILE)
+  @Deployment(resources = DMN_DECISION_TABLE)
   @Test
-	public void evaluateDecisionByKeyAndVersion() {
-    testRule.deploy(DMN_FILE_SECOND_VERSION);
+	public void evaluateDecisionTableByKeyAndVersion() {
+    testRule.deploy(DMN_DECISION_TABLE_V2);
 
     DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKeyAndVersion(DECISION_DEFINITION_KEY, 1, createVariables());
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
 
-  @Deployment(resources = DMN_FILE)
+  @Deployment(resources = DMN_DECISION_TABLE)
   @Test
-	public void evaluateDecisionByKeyAndNullVersion() {
-    testRule.deploy(DMN_FILE_SECOND_VERSION);
+	public void evaluateDecisionTableByKeyAndNullVersion() {
+    testRule.deploy(DMN_DECISION_TABLE_V2);
 
     DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKeyAndVersion(DECISION_DEFINITION_KEY, null, createVariables());
 
@@ -116,7 +121,7 @@ public class DecisionServiceTest {
   }
 
   @Test
-	public void evaluateDecisionByNullId() {
+	public void evaluateDecisionTableByNullId() {
     thrown.expect(NotValidException.class);
     thrown.expectMessage("either decision definition id or key must be set");
 
@@ -124,7 +129,7 @@ public class DecisionServiceTest {
   }
 
   @Test
-	public void evaluateDecisionByNonExistingId() {
+	public void evaluateDecisionTableByNonExistingId() {
     thrown.expect(NotFoundException.class);
     thrown.expectMessage("no deployed decision definition found with id 'unknown'");
 
@@ -132,7 +137,7 @@ public class DecisionServiceTest {
   }
 
   @Test
-	public void evaluateDecisionByNullKey() {
+	public void evaluateDecisionTableByNullKey() {
     thrown.expect(NotValidException.class);
     thrown.expectMessage("either decision definition id or key must be set");
 
@@ -140,16 +145,16 @@ public class DecisionServiceTest {
   }
 
   @Test
-	public void evaluateDecisionByNonExistingKey() {
+	public void evaluateDecisionTableByNonExistingKey() {
     thrown.expect(NotFoundException.class);
     thrown.expectMessage("no decision definition deployed with key 'unknown'");
 
     decisionService.evaluateDecisionTableByKey("unknown", null);
   }
 
-  @Deployment(resources = DMN_FILE)
+  @Deployment(resources = DMN_DECISION_TABLE)
   @Test
-	public void evaluateDecisionByKeyWithNonExistingVersion() {
+	public void evaluateDecisionTableByKeyWithNonExistingVersion() {
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
 
     thrown.expect(NotFoundException.class);
@@ -158,7 +163,118 @@ public class DecisionServiceTest {
     decisionService.evaluateDecisionTableByKeyAndVersion(decisionDefinition.getKey(), 42, null);
   }
 
-  @Deployment( resources = DRD_DISH_RESOURCE )
+  @Deployment(resources = DMN_DECISION_LITERAL_EXPRESSION)
+  @Test
+  public void evaluateDecisionById() {
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
+
+    DmnDecisionResult decisionResult = decisionService
+        .evaluateDecisionById(decisionDefinition.getId())
+        .variables(createVariables())
+        .evaluate();
+
+    assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
+  }
+
+  @Deployment(resources = DMN_DECISION_LITERAL_EXPRESSION)
+  @Test
+  public void evaluateDecisionByKey() {
+    DmnDecisionResult decisionResult = decisionService
+        .evaluateDecisionByKey(DECISION_DEFINITION_KEY)
+        .variables(createVariables())
+        .evaluate();
+
+    assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
+  }
+
+  @Deployment(resources = DMN_DECISION_LITERAL_EXPRESSION)
+  @Test
+  public void evaluateDecisionByKeyAndLatestVersion() {
+    testRule.deploy(DMN_DECISION_LITERAL_EXPRESSION_V2);
+
+    DmnDecisionResult decisionResult = decisionService
+        .evaluateDecisionByKey(DECISION_DEFINITION_KEY)
+        .variables(createVariables())
+        .evaluate();
+
+    assertThatDecisionHasResult(decisionResult, RESULT_OF_SECOND_VERSION);
+  }
+
+  @Deployment(resources = DMN_DECISION_LITERAL_EXPRESSION)
+  @Test
+  public void evaluateDecisionByKeyAndVersion() {
+    testRule.deploy(DMN_DECISION_LITERAL_EXPRESSION_V2);
+
+    DmnDecisionResult decisionResult = decisionService
+        .evaluateDecisionByKey(DECISION_DEFINITION_KEY)
+        .version(1)
+        .variables(createVariables())
+        .evaluate();
+
+    assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
+  }
+
+  @Deployment(resources = DMN_DECISION_LITERAL_EXPRESSION)
+  @Test
+  public void evaluateDecisionByKeyAndNullVersion() {
+    testRule.deploy(DMN_DECISION_LITERAL_EXPRESSION_V2);
+
+    DmnDecisionResult decisionResult = decisionService
+        .evaluateDecisionByKey(DECISION_DEFINITION_KEY)
+        .version(null)
+        .variables(createVariables())
+        .evaluate();
+
+    assertThatDecisionHasResult(decisionResult, RESULT_OF_SECOND_VERSION);
+  }
+
+  @Test
+  public void evaluateDecisionByNullId() {
+    thrown.expect(NotValidException.class);
+    thrown.expectMessage("either decision definition id or key must be set");
+
+    decisionService.evaluateDecisionById(null).evaluate();
+  }
+
+  @Test
+  public void evaluateDecisionByNonExistingId() {
+    thrown.expect(NotFoundException.class);
+    thrown.expectMessage("no deployed decision definition found with id 'unknown'");
+
+    decisionService.evaluateDecisionById("unknown").evaluate();
+  }
+
+  @Test
+  public void evaluateDecisionByNullKey() {
+    thrown.expect(NotValidException.class);
+    thrown.expectMessage("either decision definition id or key must be set");
+
+    decisionService.evaluateDecisionByKey(null).evaluate();
+  }
+
+  @Test
+  public void evaluateDecisionByNonExistingKey() {
+    thrown.expect(NotFoundException.class);
+    thrown.expectMessage("no decision definition deployed with key 'unknown'");
+
+    decisionService.evaluateDecisionByKey("unknown").evaluate();
+  }
+
+  @Deployment(resources = DMN_DECISION_LITERAL_EXPRESSION)
+  @Test
+  public void evaluateDecisionByKeyWithNonExistingVersion() {
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
+
+    thrown.expect(NotFoundException.class);
+    thrown.expectMessage("no decision definition deployed with key = 'decision' and version = '42'");
+
+    decisionService
+      .evaluateDecisionByKey(decisionDefinition.getKey())
+      .version(42)
+      .evaluate();
+  }
+
+  @Deployment( resources = DRD_DISH_DECISION_TABLE )
   @Test
   public void evaluateDecisionWithRequiredDecisions() {
 
@@ -174,6 +290,13 @@ public class DecisionServiceTest {
   }
 
   protected void assertThatDecisionHasResult(DmnDecisionTableResult decisionResult, Object expectedValue) {
+    assertThat(decisionResult, is(notNullValue()));
+    assertThat(decisionResult.size(), is(1));
+    String value = decisionResult.getSingleResult().getFirstEntry();
+    assertThat(value, is(expectedValue));
+  }
+
+  protected void assertThatDecisionHasResult(DmnDecisionResult decisionResult, Object expectedValue) {
     assertThat(decisionResult, is(notNullValue()));
     assertThat(decisionResult.size(), is(1));
     String value = decisionResult.getSingleResult().getFirstEntry();

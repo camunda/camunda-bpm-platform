@@ -13,40 +13,40 @@
 
 package org.camunda.bpm.engine.impl.dmn.result;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.dmn.DecisionLogger;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * Maps the decision result to a single typed entry.
  *
  * @author Philipp Ossler
  */
-public class SingleEntryDecisionTableResultMapper implements DecisionTableResultMapper {
+public class SingleEntryDecisionResultMapper implements DecisionResultMapper {
 
   protected static final DecisionLogger LOG = ProcessEngineLogger.DECISION_LOGGER;
 
   @Override
-  public Object mapDecisionTableResult(DmnDecisionTableResult decisionTableResult) {
+  public Object mapDecisionResult(DmnDecisionResult decisionResult) {
     try {
-      DmnDecisionRuleResult singleResult = decisionTableResult.getSingleResult();
-      if (singleResult != null) {
-        return singleResult.getSingleEntryTyped();
+      TypedValue typedValue = decisionResult.getSingleEntryTyped();
+      if (typedValue != null) {
+        return typedValue;
       }
       else {
         return Variables.untypedNullValue();
       }
     } catch (DmnEngineException e) {
-      throw LOG.decisionResultMappingException(decisionTableResult, this, e);
+      throw LOG.decisionResultMappingException(decisionResult, this, e);
     }
   }
 
   @Override
   public String toString() {
-    return "SingleEntryDecisionTableResultMapper{}";
+    return "SingleEntryDecisionResultMapper{}";
   }
 
 }

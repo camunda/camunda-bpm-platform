@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
-import static org.camunda.bpm.engine.impl.util.DecisionTableUtil.getDecisionTableResultMapperForName;
+import static org.camunda.bpm.engine.impl.util.DecisionEvaluationUtil.getDecisionResultMapperForName;
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.DmnDecisionTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
-import org.camunda.bpm.engine.impl.dmn.result.DecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.DecisionRefExpression;
 import org.camunda.bpm.model.cmmn.instance.DecisionTask;
@@ -49,8 +49,8 @@ public class DecisionTaskItemHandler extends CallingTaskItemHandler {
     DecisionTask decisionTask = getDefinition(element);
     DmnDecisionTaskActivityBehavior behavior = getActivityBehavior(activity);
     String mapper = decisionTask.getCamundaMapDecisionResult();
-    DecisionTableResultMapper decisionTableResultMapper = getDecisionTableResultMapperForName(mapper);
-    behavior.setDecisionTableResultMapper(decisionTableResultMapper);
+    DecisionResultMapper decisionResultMapper = getDecisionResultMapperForName(mapper);
+    behavior.setDecisionTableResultMapper(decisionResultMapper);
   }
 
   protected BaseCallableElement createCallableElement() {

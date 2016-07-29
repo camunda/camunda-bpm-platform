@@ -16,42 +16,42 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Philipp Ossler
  */
-public class MockDecisionTableResultBuilder {
+public class MockDecisionResultBuilder {
 
-  protected List<DmnDecisionRuleResult> ruleResults = new ArrayList<DmnDecisionRuleResult>();
+  protected List<DmnDecisionResultEntries> entries = new ArrayList<DmnDecisionResultEntries>();
 
-  public MockDecisionRuleResultBuilder ruleResult() {
-    return new MockDecisionRuleResultBuilder(this);
+  public MockDecisionResultEntriesBuilder resultEntries() {
+    return new MockDecisionResultEntriesBuilder(this);
   }
 
-  public void addRuleResult(DmnDecisionRuleResult ruleResult) {
-    ruleResults.add(ruleResult);
+  public void addResultEntries(DmnDecisionResultEntries resultEntries) {
+    entries.add(resultEntries);
   }
 
-  public DmnDecisionTableResult build() {
-    SimpleDecisionTableResult decisionTableResult = new SimpleDecisionTableResult();
-    decisionTableResult.addAll(ruleResults);
+  public DmnDecisionResult build() {
+    SimpleDecisionResult decisionTableResult = new SimpleDecisionResult();
+    decisionTableResult.addAll(entries);
     return decisionTableResult;
   }
 
-  protected class SimpleDecisionTableResult extends ArrayList<DmnDecisionRuleResult> implements DmnDecisionTableResult {
+  protected class SimpleDecisionResult extends ArrayList<DmnDecisionResultEntries> implements DmnDecisionResult {
 
     private static final long serialVersionUID = 1L;
 
     @Override
-    public DmnDecisionRuleResult getFirstResult() {
+    public DmnDecisionResultEntries getFirstResult() {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public DmnDecisionRuleResult getSingleResult() {
+    public DmnDecisionResultEntries getSingleResult() {
       throw new UnsupportedOperationException();
     }
 

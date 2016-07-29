@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.dmn.DecisionLogger;
 
@@ -27,12 +27,12 @@ import org.camunda.bpm.engine.impl.dmn.DecisionLogger;
  *
  * @author Philipp Ossler
  */
-public class CollectEntriesDecisionTableResultMapper implements DecisionTableResultMapper {
+public class CollectEntriesDecisionResultMapper implements DecisionResultMapper {
 
   protected static final DecisionLogger LOG = ProcessEngineLogger.DECISION_LOGGER;
 
   @Override
-  public Object mapDecisionTableResult(DmnDecisionTableResult decisionResult) {
+  public Object mapDecisionResult(DmnDecisionResult decisionResult) {
     if (decisionResult.isEmpty()) {
       return Collections.emptyList();
 
@@ -49,7 +49,7 @@ public class CollectEntriesDecisionTableResultMapper implements DecisionTableRes
     }
   }
 
-  protected Set<String> collectOutputNames(DmnDecisionTableResult decisionResult) {
+  protected Set<String> collectOutputNames(DmnDecisionResult decisionResult) {
     Set<String> outputNames = new HashSet<String>();
 
     for (Map<String, Object> entryMap : decisionResult.getResultList()) {
@@ -61,7 +61,7 @@ public class CollectEntriesDecisionTableResultMapper implements DecisionTableRes
 
   @Override
   public String toString() {
-    return "CollectEntriesDecisionTableResultMapper{}";
+    return "CollectEntriesDecisionResultMapper{}";
   }
 
 }

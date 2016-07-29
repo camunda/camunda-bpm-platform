@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.history.producer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationEvent;
@@ -188,19 +189,26 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
       event.setDecisionRequirementsDefinitionKey(decision.getDecisionRequirementsDefinitionKey());
     }
 
-    // TODO CAM-6442 - support decisions with literal expressions
-    DmnDecisionTableEvaluationEvent evalEvent = (DmnDecisionTableEvaluationEvent) evaluationEvent;
+    if (evaluationEvent instanceof DmnDecisionTableEvaluationEvent) {
 
-    if (evalEvent.getCollectResultValue() != null) {
-      Double collectResultValue = getCollectResultValue(evalEvent.getCollectResultValue());
-      event.setCollectResultValue(collectResultValue);
+      DmnDecisionTableEvaluationEvent evalEvent = (DmnDecisionTableEvaluationEvent) evaluationEvent;
+
+      if (evalEvent.getCollectResultValue() != null) {
+        Double collectResultValue = getCollectResultValue(evalEvent.getCollectResultValue());
+        event.setCollectResultValue(collectResultValue);
+      }
+
+      List<HistoricDecisionInputInstance> historicDecisionInputInstances = createHistoricDecisionInputInstances(evalEvent);
+      event.setInputs(historicDecisionInputInstances);
+
+      List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = createHistoricDecisionOutputInstances(evalEvent);
+      event.setOutputs(historicDecisionOutputInstances);
+    } else {
+      // TODO CAM-6442 - support decisions with literal expressions
+
+      event.setInputs(Collections.<HistoricDecisionInputInstance> emptyList());
+      event.setOutputs(Collections.<HistoricDecisionOutputInstance> emptyList());
     }
-
-    List<HistoricDecisionInputInstance> historicDecisionInputInstances = createHistoricDecisionInputInstances(evalEvent);
-    event.setInputs(historicDecisionInputInstances);
-
-    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = createHistoricDecisionOutputInstances(evalEvent);
-    event.setOutputs(historicDecisionOutputInstances);
   }
 
   protected Double getCollectResultValue(TypedValue collectResultValue) {

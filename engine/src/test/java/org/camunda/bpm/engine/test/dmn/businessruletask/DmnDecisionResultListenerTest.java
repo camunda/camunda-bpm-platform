@@ -15,8 +15,8 @@ package org.camunda.bpm.engine.test.dmn.businessruletask;
 
 import java.util.Collections;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -34,7 +34,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
   protected static final String TEST_DECISION_COLLECT_SUM = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultCollectSumHitPolicyTest.dmn11.xml";
   protected static final String TEST_DECISION_COLLECT_COUNT = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultCollectCountHitPolicyTest.dmn11.xml";
 
-  protected DmnDecisionTableResult results;
+  protected DmnDecisionResult results;
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
   public void testNoOutput() {
@@ -49,7 +49,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
 
     assertFalse("The decision result 'ruleResult' should not be empty", results.isEmpty());
 
-    DmnDecisionRuleResult decisionOutput = results.get(0);
+    DmnDecisionResultEntries decisionOutput = results.get(0);
     assertNull(decisionOutput.getFirstEntry());
   }
 
@@ -59,7 +59,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
 
     assertEquals(2, results.size());
 
-    for (DmnDecisionRuleResult output : results) {
+    for (DmnDecisionResultEntries output : results) {
       assertTrue("The decision output should be empty", output.isEmpty());
     }
   }
@@ -68,7 +68,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
   public void testSingleEntry() {
     startTestProcess("single entry");
 
-    DmnDecisionRuleResult firstOutput = results.get(0);
+    DmnDecisionResultEntries firstOutput = results.get(0);
     assertEquals("foo", firstOutput.getFirstEntry());
     assertEquals(Variables.stringValue("foo"), firstOutput.getFirstEntryTyped());
   }
@@ -77,7 +77,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
   public void testMultipleEntries() {
     startTestProcess("multiple entries");
 
-    DmnDecisionRuleResult firstOutput = results.get(0);
+    DmnDecisionResultEntries firstOutput = results.get(0);
     assertEquals("foo", firstOutput.get("result1"));
     assertEquals("bar", firstOutput.get("result2"));
 
@@ -91,7 +91,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
 
     assertEquals(2, results.size());
 
-    for (DmnDecisionRuleResult output : results) {
+    for (DmnDecisionResultEntries output : results) {
       assertEquals("foo", output.getFirstEntry());
       assertEquals(Variables.stringValue("foo"), output.getFirstEntryTyped());
     }
@@ -103,7 +103,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
 
     assertEquals(2, results.size());
 
-    for (DmnDecisionRuleResult output : results) {
+    for (DmnDecisionResultEntries output : results) {
       assertEquals(2, output.size());
       assertEquals("foo", output.get("result1"));
       assertEquals("bar", output.get("result2"));
@@ -118,7 +118,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
     startTestProcess("no output");
 
     assertEquals(1, results.size());
-    DmnDecisionRuleResult firstOutput = results.get(0);
+    DmnDecisionResultEntries firstOutput = results.get(0);
 
     assertEquals(0, firstOutput.getFirstEntry());
     assertEquals(Variables.integerValue(0), firstOutput.getFirstEntryTyped());
@@ -136,7 +136,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
     startTestProcess("single entry");
 
     assertEquals(1, results.size());
-    DmnDecisionRuleResult firstOutput = results.get(0);
+    DmnDecisionResultEntries firstOutput = results.get(0);
 
     assertEquals(12, firstOutput.getFirstEntry());
     assertEquals(Variables.integerValue(12), firstOutput.getFirstEntryTyped());
@@ -147,7 +147,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
     startTestProcess("single entry list");
 
     assertEquals(1, results.size());
-    DmnDecisionRuleResult firstOutput = results.get(0);
+    DmnDecisionResultEntries firstOutput = results.get(0);
 
     assertEquals(33, firstOutput.getFirstEntry());
     assertEquals(Variables.integerValue(33), firstOutput.getFirstEntryTyped());

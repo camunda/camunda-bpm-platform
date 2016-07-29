@@ -13,14 +13,14 @@
 
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import static org.camunda.bpm.engine.impl.util.DecisionTableUtil.evaluateDecisionTable;
+import static org.camunda.bpm.engine.impl.util.DecisionEvaluationUtil.evaluateDecision;
 
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.dmn.result.DecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
@@ -37,12 +37,12 @@ public class DmnBusinessRuleTaskActivityBehavior extends AbstractBpmnActivityBeh
 
   protected final BaseCallableElement callableElement;
   protected final String resultVariable;
-  protected final DecisionTableResultMapper decisionTableResultMapper;
+  protected final DecisionResultMapper decisionResultMapper;
 
-  public DmnBusinessRuleTaskActivityBehavior(BaseCallableElement callableElement, String resultVariableName, DecisionTableResultMapper decisionTableResultMapper) {
+  public DmnBusinessRuleTaskActivityBehavior(BaseCallableElement callableElement, String resultVariableName, DecisionResultMapper decisionResultMapper) {
     this.callableElement = callableElement;
     this.resultVariable = resultVariableName;
-    this.decisionTableResultMapper = decisionTableResultMapper;
+    this.decisionResultMapper = decisionResultMapper;
   }
 
   @Override
@@ -50,7 +50,7 @@ public class DmnBusinessRuleTaskActivityBehavior extends AbstractBpmnActivityBeh
     executeWithErrorPropagation(execution, new Callable<Void>() {
 
       public Void call() throws Exception {
-        evaluateDecisionTable((AbstractVariableScope) execution, callableElement, resultVariable, decisionTableResultMapper);
+        evaluateDecision((AbstractVariableScope) execution, callableElement, resultVariable, decisionResultMapper);
         leave(execution);
         return null;
       }
