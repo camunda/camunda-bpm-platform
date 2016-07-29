@@ -16,15 +16,12 @@ package org.camunda.bpm.dmn.engine.impl;
 import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
 import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
@@ -113,10 +110,10 @@ public class DefaultDmnEngine implements DmnEngine {
       DefaultDmnDecisionContext decisionContext = new DefaultDmnDecisionContext(dmnEngineConfiguration);
 
       DmnDecisionResult decisionResult = decisionContext.evaluateDecision(decision, variableContext);
-      return wrapDecisionTableResult(decisionResult);
+      return DmnDecisionTableResultImpl.wrap(decisionResult);
     }
     else {
-      throw LOG.decisionTypeNotSupported(decision);
+      throw LOG.decisionIsNotADecisionTable(decision);
     }
   }
 
@@ -201,19 +198,6 @@ public class DefaultDmnEngine implements DmnEngine {
       }
     }
     throw LOG.unableToFindDecisionWithKey(decisionKey);
-  }
-
-  protected DmnDecisionTableResult wrapDecisionTableResult(DmnDecisionResult decisionResult) {
-    List<DmnDecisionRuleResult> ruleResults = new ArrayList<DmnDecisionRuleResult>();
-
-    for (DmnDecisionResultEntries result : decisionResult) {
-      DmnDecisionRuleResultImpl ruleResult = new DmnDecisionRuleResultImpl();
-      ruleResult.putAllValues(result.getEntryMapTyped());
-
-      ruleResults.add(ruleResult);
-    }
-
-    return new DmnDecisionTableResultImpl(ruleResults);
   }
 
 }

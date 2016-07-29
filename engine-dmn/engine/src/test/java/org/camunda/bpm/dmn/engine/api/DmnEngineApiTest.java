@@ -17,13 +17,18 @@ import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.camunda.bpm.dmn.engine.test.asserts.DmnEngineTestAssertions.assertThat;
 import static org.camunda.bpm.engine.variable.Variables.createVariables;
 import static org.camunda.bpm.engine.variable.Variables.emptyVariableContext;
+import static org.mockito.Mockito.mock;
 
 import java.io.InputStream;
 import java.util.Map;
 
+import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionLogic;
 import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnEngineException;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnEvaluationException;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformException;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
@@ -45,6 +50,7 @@ public class DmnEngineApiTest extends DmnEngineTest {
   public static final String ONE_RULE_DMN = "org/camunda/bpm/dmn/engine/api/OneRule.dmn";
   public static final String NOT_A_DMN_FILE = "org/camunda/bpm/dmn/engine/api/NotADmnFile.bpmn";
   public static final String INVOCATION_DMN = "org/camunda/bpm/dmn/engine/api/InvocationDecision.dmn";
+  public static final String DECISION_LITERAL_EXPRESSION_DMN = "org/camunda/bpm/dmn/engine/api/DecisionWithLiteralExpression.dmn";
 
   public static final String INPUT_VALUE = "ok";
   public static final String EXPECTED_OUTPUT_VALUE = "ok";
@@ -675,6 +681,55 @@ public class DmnEngineApiTest extends DmnEngineTest {
   }
 
   @Test
+  @DecisionResource(resource = DECISION_LITERAL_EXPRESSION_DMN)
+  public void shouldFailEvaluatingDecisionTableIfDecisionIsNotATable() {
+    try {
+      dmnEngine.evaluateDecisionTable(decision, variables);
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(DmnEngineException e) {
+      assertThat(e).hasMessageStartingWith("DMN-01013");
+    }
+  }
+
+  @Test
+  public void shouldFailEvaluatingDecisionTableIfDecisionTypeIsNotSupported() {
+    try {
+      dmnEngine.evaluateDecisionTable(mock(DmnDecision.class), variables);
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(DmnEngineException e) {
+      assertThat(e).hasMessageStartingWith("DMN-01013");
+    }
+  }
+
+  @Test
+  public void shouldFailEvaluatingDecisionIfDecisionTypeIsNotSupported() {
+    try {
+      dmnEngine.evaluateDecision(mock(DmnDecision.class), variables);
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(DmnEngineException e) {
+      assertThat(e).hasMessageStartingWith("DMN-01004");
+    }
+  }
+
+  @Test
+  public void shouldFailEvaluatingDecisionIfDecisionLogicIsNotSupported() {
+    DmnDecisionImpl decision = new DmnDecisionImpl();
+    decision.setKey("decision");
+    decision.setDecisionLogic(mock(DmnDecisionLogic.class));
+
+    try {
+      dmnEngine.evaluateDecision(decision, variables);
+      failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
+    }
+    catch(DmnEngineException e) {
+      assertThat(e).hasMessageStartingWith("DMN-01012");
+    }
+  }
+
+  @Test
   @DecisionResource(resource = ONE_RULE_DMN)
   public void shouldEvaluateDecisionTableWithVariableMap() {
     DmnDecisionTableResult results = dmnEngine.evaluateDecisionTable(decision, createVariables().putValue("input", INPUT_VALUE));
@@ -706,6 +761,16 @@ public class DmnEngineApiTest extends DmnEngineTest {
   @DecisionResource(resource = ONE_RULE_DMN)
   public void shouldEvaluateDecisionWithVariableContext() {
     DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE).asVariableContext());
+
+    assertThat(results.getSingleEntry())
+      .isNotNull()
+      .isEqualTo(EXPECTED_OUTPUT_VALUE);
+  }
+
+  @Test
+  @DecisionResource(resource = DECISION_LITERAL_EXPRESSION_DMN)
+  public void shouldEvaluateDecisionLiteralExpression() {
+    DmnDecisionResult results = dmnEngine.evaluateDecision(decision, createVariables().putValue("input", INPUT_VALUE));
 
     assertThat(results.getSingleEntry())
       .isNotNull()

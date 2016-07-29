@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
 import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -223,6 +225,19 @@ public class DmnDecisionTableResultImpl implements DmnDecisionTableResult {
 
   protected List<DmnDecisionRuleResult> asUnmodifiableList() {
     return Collections.unmodifiableList(ruleResults);
+  }
+
+  public static DmnDecisionTableResultImpl wrap(DmnDecisionResult decisionResult) {
+    List<DmnDecisionRuleResult> ruleResults = new ArrayList<DmnDecisionRuleResult>();
+
+    for (DmnDecisionResultEntries result : decisionResult) {
+      DmnDecisionRuleResultImpl ruleResult = new DmnDecisionRuleResultImpl();
+      ruleResult.putAllValues(result.getEntryMapTyped());
+
+      ruleResults.add(ruleResult);
+    }
+
+    return new DmnDecisionTableResultImpl(ruleResults);
   }
 
 }

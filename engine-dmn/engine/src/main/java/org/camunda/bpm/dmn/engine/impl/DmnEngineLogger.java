@@ -14,8 +14,9 @@
 package org.camunda.bpm.dmn.engine.impl;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
+import org.camunda.bpm.dmn.engine.DmnDecisionLogic;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries;
 import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
@@ -98,6 +99,20 @@ public class DmnEngineLogger extends DmnLogger {
     return new DmnDecisionResultException(exceptionMessage(
       "011",
       "Unable to get single decision result as it has more than one result '{}'", decisionResult)
+    );
+  }
+
+  public DmnEngineException decisionLogicTypeNotSupported(DmnDecisionLogic decisionLogic) {
+    return new DmnEngineException(exceptionMessage(
+      "012",
+      "Decision logic type '{}' not supported by DMN engine.", decisionLogic.getClass())
+    );
+  }
+
+  public DmnEngineException decisionIsNotADecisionTable(DmnDecision decision) {
+    return new DmnEngineException(exceptionMessage(
+      "013",
+      "The decision '{}' is not implemented as decision table.", decision)
     );
   }
 

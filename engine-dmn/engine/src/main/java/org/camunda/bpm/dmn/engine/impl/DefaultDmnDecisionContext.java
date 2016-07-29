@@ -117,7 +117,7 @@ public class DefaultDmnDecisionContext {
     if (evaluationHandlers.containsKey(key)) {
       return evaluationHandlers.get(key);
     } else {
-      throw LOG.decisionTypeNotSupported(decision);
+      throw LOG.decisionLogicTypeNotSupported(decision.getDecisionLogic());
     }
   }
 
