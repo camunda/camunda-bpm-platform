@@ -1,10 +1,12 @@
 package org.camunda.bpm.engine.test.history;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -26,6 +28,7 @@ import static org.junit.Assert.assertThat;
 /**
  * @author Askar Akhmerov
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class HistoricProcessInstanceStateTest {
 
   public static final String TERMINATION = "termination";
