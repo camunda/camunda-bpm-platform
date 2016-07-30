@@ -119,9 +119,9 @@ public class DeleteProcessDefinitionTest {
     try {
       repositoryService.deleteProcessDefinition(processDefinition.getId());
       fail("Should fail, since there exists a process instance");
-    } catch (Exception ex) {
-      //then the deletion should fail since there exist a process instance
-      assert (ex.getMessage().contains("Referential integrity constraint violation"));
+    } catch (RuntimeException ae) {
+      // then Exception is expected, the deletion should fail since there exist a process instance
+      // and the cascade flag is per default false
     }
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
   }
