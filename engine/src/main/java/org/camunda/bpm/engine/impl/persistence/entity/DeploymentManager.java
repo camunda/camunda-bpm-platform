@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 /**
  * @author Tom Baeyens
  * @author Deivarayan Azhagappan
+ * @author Christopher Zell
  */
 public class DeploymentManager extends AbstractManager {
 

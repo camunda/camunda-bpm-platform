@@ -119,8 +119,9 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     try {
       repositoryService.deleteDeployment(processDefinition.getDeploymentId());
       fail("Exception expected");
-    } catch (RuntimeException ae) {
+    } catch (ProcessEngineException pee) {
       // Exception expected when deleting deployment with running process
+      assert(pee.getMessage().contains("Deletion of process definition without cascading failed."));
     }
   }
 
@@ -505,7 +506,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
       assertTextPresent("decisionRequirementsDefinitionId is null", e.getMessage());
     }
   }
-  
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/repository/one.dmn" })
   public void testGetDecisionModel() throws Exception {
     DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
@@ -573,7 +574,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/repository/drg.dmn", 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/repository/drg.dmn",
                            "org/camunda/bpm/engine/test/repository/drg.png" })
   public void testGetDecisionRequirementsDiagram() throws Exception {
 
@@ -593,7 +594,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
       assertTextPresent("no deployed decision requirements definition found with id 'invalid'", e.getMessage());
     }
-    
+
     try {
       repositoryService.getDecisionRequirementsDiagram(null);
     } catch (ProcessEngineException e) {

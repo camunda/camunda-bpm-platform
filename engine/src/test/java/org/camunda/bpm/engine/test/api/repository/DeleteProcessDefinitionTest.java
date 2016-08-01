@@ -33,6 +33,7 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -120,9 +121,10 @@ public class DeleteProcessDefinitionTest {
     try {
       repositoryService.deleteProcessDefinition(processDefinition.getId());
       fail("Should fail, since there exists a process instance");
-    } catch (RuntimeException ae) {
+    } catch (ProcessEngineException pee) {
       // then Exception is expected, the deletion should fail since there exist a process instance
       // and the cascade flag is per default false
+      assert(pee.getMessage().contains("Deletion of process definition without cascading failed."));
     }
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
   }

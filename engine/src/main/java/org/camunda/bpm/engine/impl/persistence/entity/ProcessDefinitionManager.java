@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -38,6 +39,7 @@ import org.camunda.bpm.engine.runtime.Job;
  * @author Tom Baeyens
  * @author Falko Menge
  * @author Saeid Mirzaei
+ * @author Christopher Zell
  */
 public class ProcessDefinitionManager extends AbstractManager {
 
@@ -288,6 +290,12 @@ public class ProcessDefinitionManager extends AbstractManager {
 
     if (cascade) {
       cascadeDeleteProcessDefinition(processDefinitionId, instances, skipCustomListeners);
+    } else {
+      ProcessInstanceQueryImpl procInstQuery = new ProcessInstanceQueryImpl().processDefinitionId(processDefinitionId);
+      long processInstanceCount = getProcessInstanceManager().findProcessInstanceCountByQueryCriteria(procInstQuery);
+      if (processInstanceCount != 0) {
+        throw LOG.deleteProcessDefinitionWithProcessInstancesException(processDefinitionId, processInstanceCount);
+      }
     }
 
     // remove related authorization parameters in IdentityLink table
