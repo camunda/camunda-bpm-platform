@@ -92,6 +92,8 @@ import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.variable.listener.CaseVariableListenerInvocation;
 import org.camunda.bpm.engine.impl.variable.listener.DelegateCaseVariableInstanceImpl;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.variable.impl.value.NullValueImpl;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Roman Smirnov
@@ -334,61 +336,26 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   }
 
   public void handleVariableTransition(String variableName, String transition) {
-    // Step 1: Collect all sentries in the execution tree
     Map<String,List<CmmnSentryPart>> sentries = new HashMap<String, List<CmmnSentryPart>>();
     collectAllSentries(sentries);
     List<CmmnSentryPart> sentryParts = collectSentryParts(sentries);
     
-    // Step 2: Collect all affected sentries with variable on parts
     List<String> affectedSentries = collectAffectedSentriesWithVariableOnParts(variableName, transition, sentryParts);
 
-    // Step 3: fire force update on all case sentry part
-    // contained by a affected sentry to provoke an
-    // OptimisticLockingException
     List<CmmnSentryPart> affectedSentryParts = getAffectedSentryParts(sentries,affectedSentries);
     forceUpdateOnCaseSentryParts(affectedSentryParts);
 
-    // Step 4: check each affected sentry whether it is satisfied.
-    // the returned list contains all satisfied sentries
-    List<String> satisfiedSentries = getSatisfiedSentriesInExecutionTree(affectedSentries, sentries);
+    List<String> allSentries = new ArrayList<String>(sentries.keySet());
+    
+    List<String> satisfiedSentries = getSatisfiedSentriesInExecutionTree(allSentries, sentries);
 
-    // Step 5: reset sentries -> satisfied == false
     List<CmmnSentryPart> satisfiedSentryParts = getAffectedSentryParts(sentries, satisfiedSentries);
     resetSentryParts(satisfiedSentryParts);
 
-    // Step 6: fire satisfied sentries
     fireSentries(satisfiedSentries);
 
-    // Step 7: Check and fire not affected sentries
-    checkAndFireNotAffectedSentries(affectedSentries, sentries);
   }
 
-  protected void checkAndFireNotAffectedSentries(List<String> affectedSentries, Map<String, List<CmmnSentryPart>> sentries) {
-
-    // This covers the scenario where a variable changes and ifPart has to be evaluated
-    // because IfParts does not have any specific event trigger.
-
-    // Step 7: get all not affected sentries to avoid that a
-    // sentry will be checked twice;
-    List<String> notAffectedSentries = new ArrayList<String>();
-    for (String sentryId : sentries.keySet()) {
-      // but only those ones which has an ifPart defined and its respective execution is active
-      if (!affectedSentries.contains(sentryId) && containsIfPartAndExecutionActive(sentryId, sentries)) {
-        notAffectedSentries.add(sentryId);
-      }
-    }
-    
-    // Step 8: check each not affected sentry whether it is satisfied
-    List<String> satisfiedSentries = getSatisfiedSentriesInExecutionTree(notAffectedSentries, sentries);
-    
-    // Step 9: reset sentries -> satisfied == false
-    List<CmmnSentryPart> satisfiedSentryParts = getAffectedSentryParts(sentries, satisfiedSentries);
-    resetSentryParts(satisfiedSentryParts);
-    
-    // Step 10: fire satisfied sentries
-    fireSentries(satisfiedSentries);
-  }
-  
   protected List<String> collectAffectedSentries(CmmnExecution child, String transition) {
     List<? extends CmmnSentryPart> sentryParts = getCaseSentryParts();
 
@@ -458,7 +425,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
       if (execution.getId().equals(getId())) {
         return false;
       }
-      if (execution.getVariableLocal(variableName) != null) {
+      TypedValue variableTypedValue = execution.getVariableLocalTyped(variableName);
+      if (variableTypedValue != null) {
         return true;
       }
       execution = execution.getParent();
