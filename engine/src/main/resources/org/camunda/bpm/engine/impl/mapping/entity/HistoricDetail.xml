@@ -197,10 +197,10 @@
 
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       LEFT JOIN (
-        SELECT
+        SELECT DISTINCT
             SELF.PROC_DEF_KEY_ AS KEY_
         FROM
-            (SELECT DISTINCT DKEYS.PROC_DEF_KEY_ from ${prefix}ACT_HI_DETAIL DKEYS) SELF
+            ${prefix}ACT_HI_DETAIL SELF
         WHERE
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
       ) AUTH
