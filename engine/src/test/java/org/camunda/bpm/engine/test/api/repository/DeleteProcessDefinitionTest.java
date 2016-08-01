@@ -33,6 +33,7 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -137,7 +138,9 @@ public class DeleteProcessDefinitionTest {
     ProcessInstanceWithVariables procInst = runtimeService.createProcessInstanceByKey("process").executeWithVariablesInReturn();
     assertNotNull(procInst);
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
-    assertEquals(2, engineRule.getHistoryService().createHistoricActivityInstanceQuery().count());
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
+      assertEquals(2, engineRule.getHistoryService().createHistoricActivityInstanceQuery().count());
+    }
 
     //when the corresponding process definition is cascading deleted from the deployment
     repositoryService.deleteProcessDefinition(processDefinition.getId(), true);
@@ -145,7 +148,9 @@ public class DeleteProcessDefinitionTest {
     //then exist no process instance and no definition
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     assertEquals(0, repositoryService.createProcessDefinitionQuery().count());
-    assertEquals(0, engineRule.getHistoryService().createHistoricActivityInstanceQuery().count());
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
+      assertEquals(0, engineRule.getHistoryService().createHistoricActivityInstanceQuery().count());
+    }
   }
 
   @Test
