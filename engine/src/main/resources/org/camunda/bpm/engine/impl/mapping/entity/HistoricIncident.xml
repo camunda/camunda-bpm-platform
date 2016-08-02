@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?> 
 
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity">
 
@@ -50,7 +50,7 @@
     update
       ${prefix}ACT_HI_INCIDENT
     set
-      <!-- MySQL requires timestamps to always be part of the
+      <!-- MySQL requires timestamps to always be part of the 
       UPDATE statement or else it is going to update them to the current time -->
       CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
       END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
@@ -125,10 +125,10 @@
 
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       LEFT JOIN (
-        SELECT DISTINCT
+        SELECT
             SELF.PROC_DEF_KEY_ AS KEY_
         FROM
-          ${prefix}ACT_HI_INCIDENT SELF
+            (SELECT DISTINCT DKEYS.PROC_DEF_KEY_ from ${prefix}ACT_HI_INCIDENT DKEYS) SELF
         WHERE
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
       ) AUTH

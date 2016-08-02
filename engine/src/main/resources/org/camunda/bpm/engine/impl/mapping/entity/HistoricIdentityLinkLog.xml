@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogEntity">
 
   <!-- INSERT HISTORIC IDENTITY LINK -->
-
+  
   <insert id="insertHistoricIdentityLinkLogEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEntity">
     insert into ${prefix}ACT_HI_IDENTITYLINK (
     		ID_,
     		TIMESTAMP_,
     		TYPE_,
-    		USER_ID_,
-    		GROUP_ID_,
-    		TASK_ID_,
-    		PROC_DEF_ID_,
+    		USER_ID_, 
+    		GROUP_ID_, 
+    		TASK_ID_, 
+    		PROC_DEF_ID_, 
     		OPERATION_TYPE_,
             ASSIGNER_ID_,
             PROC_DEF_KEY_,
             TENANT_ID_)
     values (#{id, jdbcType=VARCHAR},
-            #{time, jdbcType=TIMESTAMP},
+            #{time, jdbcType=TIMESTAMP},  
             #{type, jdbcType=VARCHAR},
             #{userId, jdbcType=VARCHAR},
             #{groupId, jdbcType=VARCHAR},
@@ -32,7 +32,7 @@
             #{tenantId, jdbcType=VARCHAR}
            )
   </insert>
-
+  
   <!-- HISTORIC IDENTITY LINK DELETE -->
 
   <delete id="deleteHistoricIdentityLink" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogEntity">
@@ -42,11 +42,11 @@
   <delete id="deleteHistoricIdentityLinksByProcessDefinitionId">
     delete from ${prefix}ACT_HI_IDENTITYLINK where PROC_DEF_ID_ = #{processDefinitionId}
   </delete>
-
+  
   <delete id="deleteHistoricIdentityLinksByTaskId">
     delete from ${prefix}ACT_HI_IDENTITYLINK where TASK_ID_ = #{taskId}
   </delete>
-
+  
   <!-- HISTORIC IDENTITY LINK RESULTMAP -->
 
   <resultMap id="historicIdentityLinkResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogEntity">
@@ -62,7 +62,7 @@
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
-
+  
   <select id="selectHistoricIdentityLinkByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIdentityLinkLogQueryImpl" resultMap="historicIdentityLinkResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
@@ -80,19 +80,19 @@
 
   <sql id="selectHistoricIdentityLinkByQueryCriteriaSql">
     from ${prefix}ACT_HI_IDENTITYLINK RES
-
+    
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       LEFT JOIN (
-        SELECT DISTINCT
+        SELECT
             SELF.PROC_DEF_KEY_ AS KEY_
         FROM
-          ${prefix}ACT_HI_IDENTITYLINK SELF
+            (SELECT DISTINCT DKEYS.PROC_DEF_KEY_ from ${prefix}ACT_HI_IDENTITYLINK DKEYS) SELF
         WHERE
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
       ) AUTH
       ON AUTH.KEY_ = RES.PROC_DEF_KEY_
     </if>
-
+    
     <where>
       <if test="type != null">
         and RES.TYPE_ = #{type}
@@ -134,9 +134,9 @@
       <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
         and ((RES.PROC_DEF_KEY_ is not null and AUTH.KEY_ is not null) or RES.PROC_DEF_KEY_ is null)
       </if>
-
+      
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
-
+      
     </where>
   </sql>
 </mapper>

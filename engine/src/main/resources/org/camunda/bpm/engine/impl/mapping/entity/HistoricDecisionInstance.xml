@@ -122,7 +122,7 @@
   
   <select id="selectHistoricDecisionInstancesByNativeQuery_mssql_or_db2" parameterType="java.util.Map" resultMap="historicDecisionInstanceResultMap">
     <if test="resultType == 'LIST_PAGE'">
-      ${limitBeforeNativeQuery}
+        ${limitBeforeNativeQuery}
     </if>
     ${sql}
     <if test="resultType == 'LIST_PAGE'">
@@ -137,10 +137,10 @@
 
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       INNER JOIN (
-        SELECT DISTINCT
+        SELECT
             SELF.DEC_DEF_KEY_ AS KEY_
         FROM
-            ${prefix}ACT_HI_DECINST SELF
+            (SELECT DISTINCT DKEYS.DEC_DEF_KEY_ from ${prefix}ACT_HI_DECINST DKEYS) SELF
         WHERE
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
       ) AUTH
