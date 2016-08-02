@@ -26,7 +26,7 @@ create table ACT_HI_DECINST (
 create table ACT_HI_DEC_IN (
     ID_ nvarchar(64) NOT NULL,
     DEC_INST_ID_ nvarchar(64) NOT NULL,
-    CLAUSE_ID_ nvarchar(64) NOT NULL,
+    CLAUSE_ID_ nvarchar(64),
     CLAUSE_NAME_ nvarchar(255),
     VAR_TYPE_ nvarchar(100),
     BYTEARRAY_ID_ nvarchar(64),
@@ -42,9 +42,9 @@ create table ACT_HI_DEC_IN (
 create table ACT_HI_DEC_OUT (
     ID_ nvarchar(64) NOT NULL,
     DEC_INST_ID_ nvarchar(64) NOT NULL,
-    CLAUSE_ID_ nvarchar(64) NOT NULL,
+    CLAUSE_ID_ nvarchar(64),
     CLAUSE_NAME_ nvarchar(255),
-    RULE_ID_ nvarchar(64) NOT NULL,
+    RULE_ID_ nvarchar(64),
     RULE_ORDER_ int,
     VAR_NAME_ nvarchar(255),
     VAR_TYPE_ nvarchar(100),

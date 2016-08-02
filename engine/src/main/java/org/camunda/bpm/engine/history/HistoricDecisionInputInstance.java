@@ -28,10 +28,12 @@ public interface HistoricDecisionInputInstance {
   /** The unique identifier of the historic decision instance. */
   String getDecisionInstanceId();
 
-  /** The unique identifier of the clause that the value is assigned for. */
+  /** The unique identifier of the clause that the value is assigned for.
+   * Can be <code>null</code> if the decision is not implemented as decision table. */
   String getClauseId();
 
-  /** The name of the clause that the value is assigned for. */
+  /** The name of the clause that the value is assigned for.
+   * Can be <code>null</code> if the decision is not implemented as decision table. */
   String getClauseName();
 
   /**

@@ -28,16 +28,20 @@ public interface HistoricDecisionOutputInstance {
   /** The unique identifier of the historic decision instance. */
   String getDecisionInstanceId();
 
-  /** The unique identifier of the clause that the value is assigned for. */
+  /** The unique identifier of the clause that the value is assigned for.
+   * Can be <code>null</code> if the decision is not implemented as decision table. */
   String getClauseId();
 
-  /** The name of the clause that the value is assigned for. */
+  /** The name of the clause that the value is assigned for.
+   * Can be <code>null</code> if the decision is not implemented as decision table. */
   String getClauseName();
 
-  /** The unique identifier of the rule that is matched. */
+  /** The unique identifier of the rule that is matched.
+   * Can be <code>null</code> if the decision is not implemented as decision table. */
   String getRuleId();
 
-  /** The order of the rule that is matched. */
+  /** The order of the rule that is matched.
+   * Can be <code>null</code> if the decision is not implemented as decision table. */
   Integer getRuleOrder();
 
   /** The name of the output variable. */

@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationEvent;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionLiteralExpressionEvaluationEvent;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionLogicEvaluationEvent;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedDecisionRule;
@@ -190,25 +191,28 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     }
 
     if (evaluationEvent instanceof DmnDecisionTableEvaluationEvent) {
+      initDecisionInstanceEventForDecisionTable(event, (DmnDecisionTableEvaluationEvent) evaluationEvent);
 
-      DmnDecisionTableEvaluationEvent evalEvent = (DmnDecisionTableEvaluationEvent) evaluationEvent;
+    } else if (evaluationEvent instanceof DmnDecisionLiteralExpressionEvaluationEvent) {
+      initDecisionInstanceEventForDecisionLiteralExpression(event, (DmnDecisionLiteralExpressionEvaluationEvent) evaluationEvent);
 
-      if (evalEvent.getCollectResultValue() != null) {
-        Double collectResultValue = getCollectResultValue(evalEvent.getCollectResultValue());
-        event.setCollectResultValue(collectResultValue);
-      }
-
-      List<HistoricDecisionInputInstance> historicDecisionInputInstances = createHistoricDecisionInputInstances(evalEvent);
-      event.setInputs(historicDecisionInputInstances);
-
-      List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = createHistoricDecisionOutputInstances(evalEvent);
-      event.setOutputs(historicDecisionOutputInstances);
     } else {
-      // TODO CAM-6442 - support decisions with literal expressions
-
       event.setInputs(Collections.<HistoricDecisionInputInstance> emptyList());
       event.setOutputs(Collections.<HistoricDecisionOutputInstance> emptyList());
     }
+  }
+
+  protected void initDecisionInstanceEventForDecisionTable(HistoricDecisionInstanceEntity event, DmnDecisionTableEvaluationEvent evaluationEvent) {
+    if (evaluationEvent.getCollectResultValue() != null) {
+      Double collectResultValue = getCollectResultValue(evaluationEvent.getCollectResultValue());
+      event.setCollectResultValue(collectResultValue);
+    }
+
+    List<HistoricDecisionInputInstance> historicDecisionInputInstances = createHistoricDecisionInputInstances(evaluationEvent);
+    event.setInputs(historicDecisionInputInstances);
+
+    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = createHistoricDecisionOutputInstances(evaluationEvent);
+    event.setOutputs(historicDecisionOutputInstances);
   }
 
   protected Double getCollectResultValue(TypedValue collectResultValue) {
@@ -266,15 +270,24 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
         outputInstance.setRuleOrder(ruleOrder);
 
         outputInstance.setVariableName(outputClause.getOutputName());
-
-        TypedValue typedValue = Variables.untypedValue(outputClause.getValue());
-        outputInstance.setValue(typedValue);
+        outputInstance.setValue(outputClause.getValue());
 
         outputInstances.add(outputInstance);
       }
     }
 
     return outputInstances;
+  }
+
+  protected void initDecisionInstanceEventForDecisionLiteralExpression(HistoricDecisionInstanceEntity event, DmnDecisionLiteralExpressionEvaluationEvent evaluationEvent) {
+    // no inputs for expression
+    event.setInputs(Collections.<HistoricDecisionInputInstance> emptyList());
+
+    HistoricDecisionOutputInstanceEntity outputInstance = new HistoricDecisionOutputInstanceEntity();
+    outputInstance.setVariableName(evaluationEvent.getOutputName());
+    outputInstance.setValue(evaluationEvent.getOutputValue());
+
+    event.setOutputs(Collections.<HistoricDecisionOutputInstance> singletonList(outputInstance));
   }
 
   protected void setReferenceToProcessInstance(HistoricDecisionInstanceEntity event, ExecutionEntity execution) {

@@ -14,7 +14,7 @@
   
       <startEvent id="start"/>
       
-      <sequenceFlow sourceRef="start" targetRef="task">
+      <sequenceFlow id="flow"  sourceRef="start" targetRef="task">
         <extensionElements>
           <camunda:executionListener class="org.camunda.bpm.engine.test.history.DecisionServiceDelegate" event="take" />
         </extensionElements>

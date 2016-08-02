@@ -55,6 +55,14 @@ create index ACT_IDX_HI_DEC_INST_ROOT_ID on ACT_HI_DECINST(ROOT_DEC_INST_ID_);
 create index ACT_IDX_HI_DEC_INST_REQ_ID on ACT_HI_DECINST(DEC_REQ_ID_);
 create index ACT_IDX_HI_DEC_INST_REQ_KEY on ACT_HI_DECINST(DEC_REQ_KEY_);
 
+-- remove not null from ACT_HI_DEC tables --
+alter table ACT_HI_DEC_OUT
+  alter column CLAUSE_ID_ drop not null
+  alter column RULE_ID_ drop not null;
+
+alter table ACT_HI_DEC_IN
+  alter column CLAUSE_ID_ drop not null;
+  
 -- CAM-5914
 create index ACT_IDX_JOB_EXECUTION_ID on ACT_RU_JOB(EXECUTION_ID_);
 create index ACT_IDX_JOB_HANDLER on ACT_RU_JOB(HANDLER_TYPE_,HANDLER_CFG_);

@@ -237,8 +237,6 @@ public abstract class TestHelper {
       method = getMethod(testClass, methodName);
       annotation = method.getAnnotation(annotationClass);
     } catch (Exception e) {
-      LOG.debug("Cannot determine RequiredHistoryLevel annotation on test method '" + methodName
-          + "' of class " + testClass.getName(), e);
       // - ignore if we cannot access the method
       // - just try again with the class
       // => can for example be the case for parameterized tests where methodName does not correspond to the actual method name

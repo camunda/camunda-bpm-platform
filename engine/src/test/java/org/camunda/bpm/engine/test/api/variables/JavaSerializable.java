@@ -61,5 +61,10 @@ public class JavaSerializable implements Serializable {
     return true;
   }
 
+  @Override
+  public String toString() {
+    return "JavaSerializable [property=" + property + "]";
+  }
+
 
 }
