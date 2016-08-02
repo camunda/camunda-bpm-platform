@@ -117,6 +117,26 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testTerminateInvalidCaseExeuction() {
+    try {
+      caseService
+        .withCaseExecution("invalid")
+        .terminate();
+      fail("The case execution should not be found.");
+    } catch (NotFoundException e) {
+
+    }
+
+    try {
+      caseService
+        .withCaseExecution(null)
+        .terminate();
+      fail("The case execution should not be found.");
+    } catch (NotValidException e) {
+
+    }
+  }
+
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testExecuteSetVariable() {
     // given:

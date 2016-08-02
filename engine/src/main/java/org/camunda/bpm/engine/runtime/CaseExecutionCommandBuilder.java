@@ -329,6 +329,20 @@ public interface CaseExecutionCommandBuilder {
   void complete();
 
   /**
+   * <p>Additionally to {@link #execute()} the associated case execution will
+   * be terminated. Therefore there happens a transition to state <code>TERMINATED</code>.</p>
+   *
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the
+   *      given case execution id
+   * @throws NotAllowedException when the transition is not allowed to be done or
+   *      when the case execution is a case instance
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
+   */
+  void terminate();
+  
+  /**
    * <p>Additionally to {@link #execute()} the associated case instance will
    * be closed, so that no further work or modifications is allowed for the
    * associated case instance. Therefore there happens a transition from the

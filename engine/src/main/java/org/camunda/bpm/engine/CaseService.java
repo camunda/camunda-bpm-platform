@@ -444,6 +444,22 @@ public interface CaseService {
    */
   void closeCaseInstance(String caseExecutionId);
 
+  /**
+   * <p>Terminates the case execution identified by the given id.
+   * Performs the transition to state <code>TERMINATED</code>.</p>
+   *
+   * @param caseExecutionId the id of the case execution to be terminated
+   *
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the
+   *      given case execution id
+   * @throws NotAllowedException when the transition is not allowed to be done or
+   *      when the case execution is a case instance
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
+   */
+  void terminateCaseExecution(String caseExecutionId);
+
   // fluent API ////////////////////////////////////////////////////////////
 
   /**

@@ -301,6 +301,44 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
   }
 
   @Test
+  public void terminateCaseInstanceNoAuthenticatedTenants() {
+    
+    identityService.setAuthentication("user", null, null);
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot update the case execution");
+
+    caseService.terminateCaseExecution(caseInstanceId);
+  }
+
+  @Test
+  public void terminateCaseExecutionWithAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    caseService.terminateCaseExecution(caseInstanceId);
+
+    HistoricCaseInstance historicCaseInstance = getHistoricCaseInstance();
+
+    assertThat(historicCaseInstance, notNullValue());
+    assertThat(historicCaseInstance.isTerminated(), is(true));
+
+  }
+
+  @Test
+  public void terminateCaseExecutionDisabledTenantCheck() {
+    
+    identityService.setAuthentication("user", null, null);
+    processEngineConfiguration.setTenantCheckEnabled(false);
+
+    caseService.terminateCaseExecution(caseInstanceId);
+    
+    HistoricCaseInstance historicCaseInstance = getHistoricCaseInstance();
+
+    assertThat(historicCaseInstance, notNullValue());
+    assertThat(historicCaseInstance.isTerminated(), is(true));
+  }
+  
+  @Test
   public void getVariablesNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 

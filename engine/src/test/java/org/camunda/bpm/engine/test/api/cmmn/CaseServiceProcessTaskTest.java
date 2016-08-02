@@ -604,6 +604,68 @@ public class CaseServiceProcessTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
+      })
+  public void testTerminate() {
+    // given
+    createCaseInstance(DEFINITION_KEY);
+    CaseExecution processTask = queryCaseExecutionByActivityId(PROCESS_TASK_KEY);
+    assertTrue(processTask.isEnabled());
+    
+    caseService.manuallyStartCaseExecution(processTask.getId());
+    // when
+    caseService
+      .withCaseExecution(processTask.getId())
+      .terminate();
+    
+    processTask = queryCaseExecutionByActivityId(PROCESS_TASK_KEY);
+    assertNull(processTask);
+
+  }
+
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
+      })
+  public void testTerminateNonFluent() {
+    // given
+    createCaseInstance(DEFINITION_KEY);
+    CaseExecution processTask = queryCaseExecutionByActivityId(PROCESS_TASK_KEY);
+    assertTrue(processTask.isEnabled());
+    
+    caseService.manuallyStartCaseExecution(processTask.getId());
+
+    // when
+    caseService
+      .terminateCaseExecution(processTask.getId());
+    
+    processTask = queryCaseExecutionByActivityId(PROCESS_TASK_KEY);
+    assertNull(processTask);
+
+  }
+
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
+      })
+  public void testTerminateNonActiveProcessTask() {
+    // given
+    createCaseInstance(DEFINITION_KEY);
+    CaseExecution processTask = queryCaseExecutionByActivityId(PROCESS_TASK_KEY);
+    assertTrue(processTask.isEnabled());
+    
+    try {
+      // when
+      caseService.terminateCaseExecution(processTask.getId());
+      fail("It should not be possible to terminate a task.");
+    } catch (NotAllowedException e) {
+      boolean result = e.getMessage().contains("The case execution must be in state 'active' to terminate");
+      assertTrue(result);
+    }
+  }
+
   protected CaseInstance createCaseInstance(String caseDefinitionKey) {
     return caseService
         .withCaseDefinitionByKey(caseDefinitionKey)

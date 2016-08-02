@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.cmmn.cmd.CompleteCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.DisableCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.ManualStartCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.ReenableCaseExecutionCmd;
+import org.camunda.bpm.engine.impl.cmmn.cmd.TerminateCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -215,6 +216,11 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
 
   public void close() {
     CloseCaseInstanceCmd command = new CloseCaseInstanceCmd(this);
+    executeCommand(command);
+  }
+
+  public void terminate() {
+    TerminateCaseExecutionCmd command = new TerminateCaseExecutionCmd(this);
     executeCommand(command);
   }
 

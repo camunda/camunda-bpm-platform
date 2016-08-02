@@ -100,6 +100,39 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn"
+      })
+  public void testTerminate() {
+    // given
+    createCaseInstance(DEFINITION_KEY).getId();
+   
+    String caseTaskId = queryCaseExecutionByActivityId(MILESTONE_KEY).getId();
+
+    caseService
+     .withCaseExecution(caseTaskId)
+     .terminate();
+
+    CaseExecution caseMilestone = queryCaseExecutionByActivityId(MILESTONE_KEY);
+    assertNull(caseMilestone);
+  }
+
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn"
+      })
+  public void testTerminateNonFluent() {
+    // given
+    createCaseInstance(DEFINITION_KEY).getId();
+    CaseExecution caseMilestone = queryCaseExecutionByActivityId(MILESTONE_KEY);
+    assertNotNull(caseMilestone);
+
+    caseService.terminateCaseExecution(caseMilestone.getId());
+
+    caseMilestone = queryCaseExecutionByActivityId(MILESTONE_KEY);
+    assertNull(caseMilestone);
+
+  }
+
   protected CaseInstance createCaseInstance(String caseDefinitionKey) {
     return caseService
         .withCaseDefinitionByKey(caseDefinitionKey)

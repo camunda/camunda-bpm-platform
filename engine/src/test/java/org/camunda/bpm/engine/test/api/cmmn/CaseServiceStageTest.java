@@ -1004,4 +1004,106 @@ public class CaseServiceStageTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  public void testTerminate() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+      .createCaseDefinitionQuery()
+      .singleResult()
+      .getId();
+
+    caseService
+      .withCaseDefinition(caseDefinitionId)
+      .create()
+      .getId();
+
+    CaseExecution stageExecution = queryCaseExecutionByActivityId("PI_Stage_1");
+
+    // when
+    caseService
+      .manuallyStartCaseExecution(stageExecution.getId());
+ 
+    CaseExecution humanTaskExecution1 = queryCaseExecutionByActivityId("PI_HumanTask_1");
+    assertTrue(humanTaskExecution1.isEnabled());
+    
+    CaseExecution humanTaskExecution2 = queryCaseExecutionByActivityId("PI_HumanTask_2");
+    assertTrue(humanTaskExecution2.isEnabled());
+    
+    caseService.withCaseExecution(stageExecution.getId())
+      .terminate();
+    
+    // then
+    stageExecution = queryCaseExecutionByActivityId("PI_Stage_1");
+    assertNull(stageExecution);
+
+    humanTaskExecution1 = queryCaseExecutionByActivityId("PI_HumanTask_1");
+    assertNull(humanTaskExecution1);
+
+    humanTaskExecution2 = queryCaseExecutionByActivityId("PI_HumanTask_2");
+    assertNull(humanTaskExecution2);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  public void testTerminateNonFluent() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+      .createCaseDefinitionQuery()
+      .singleResult()
+      .getId();
+
+    caseService
+      .withCaseDefinition(caseDefinitionId)
+      .create()
+      .getId();
+
+    CaseExecution stageExecution = queryCaseExecutionByActivityId("PI_Stage_1");
+
+    // when
+    caseService
+      .manuallyStartCaseExecution(stageExecution.getId());
+ 
+    caseService.terminateCaseExecution(stageExecution.getId());
+      
+    // then
+    stageExecution = queryCaseExecutionByActivityId("PI_Stage_1");
+    assertNull(stageExecution);
+    
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneStageCase.cmmn"})
+  public void testTerminateWithNonActiveState() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+      .createCaseDefinitionQuery()
+      .singleResult()
+      .getId();
+
+    caseService
+      .withCaseDefinition(caseDefinitionId)
+      .create()
+      .getId();
+
+    CaseExecution stageExecution = queryCaseExecutionByActivityId("PI_Stage_1");
+
+    // when
+    try {
+      // when
+      caseService.terminateCaseExecution(stageExecution.getId());
+      fail("It should not be possible to terminate a task.");
+    } catch (NotAllowedException e) {
+      boolean result = e.getMessage().contains("The case execution must be in state 'active' to terminate");
+      assertTrue(result);
+    }
+    
+  }
+
+  protected CaseExecution queryCaseExecutionByActivityId(String activityId) {
+    return caseService
+      .createCaseExecutionQuery()
+      .activityId(activityId)
+      .singleResult();
+  }
 }
