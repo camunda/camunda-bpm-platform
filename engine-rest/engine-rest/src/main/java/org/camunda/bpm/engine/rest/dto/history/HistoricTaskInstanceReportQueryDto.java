@@ -29,6 +29,8 @@ import java.util.List;
  */
 public class HistoricTaskInstanceReportQueryDto extends AbstractSearchQueryDto {
 
+  public static final String PROCESS_DEFINITION = "processDefinition";
+
   protected Date completedBefore;
   protected Date completedAfter;
   protected String groupby;
@@ -84,7 +86,7 @@ public class HistoricTaskInstanceReportQueryDto extends AbstractSearchQueryDto {
     HistoricTaskInstanceReport reportQuery = createNewReportQuery(engine);
     applyFilters(reportQuery);
 
-    if("processDefinition".equals(groupby)) {
+    if(PROCESS_DEFINITION.equals(groupby)) {
       return reportQuery.countByProcessDefinitionKey();
     } else {
       return reportQuery.countByTaskDefinitionKey();
