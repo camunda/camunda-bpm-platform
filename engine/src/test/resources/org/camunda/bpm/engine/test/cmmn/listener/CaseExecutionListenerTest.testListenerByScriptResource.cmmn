@@ -25,6 +25,11 @@
           </camunda:caseExecutionListener>
 
         </extensionElements>
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
       </humanTask>
 
       <humanTask id="HumanTask_2" name="Another HumanTask" />

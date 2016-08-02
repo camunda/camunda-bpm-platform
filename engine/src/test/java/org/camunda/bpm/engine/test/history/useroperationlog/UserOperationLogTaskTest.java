@@ -255,10 +255,6 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     caseService
       .withCaseExecution(humanTaskId)

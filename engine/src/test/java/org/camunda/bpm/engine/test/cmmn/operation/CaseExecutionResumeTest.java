@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.cmmn.operation;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
+import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CaseDefinitionBuilder;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
@@ -37,9 +38,11 @@ public class CaseExecutionResumeTest extends PvmTestCase {
         .behavior(new StageActivityBehavior())
         .createActivity("A")
           .behavior(new TaskWaitState())
+          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
         .endActivity()
         .createActivity("B")
           .behavior(new TaskWaitState())
+          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
         .endActivity()
       .endActivity()
       .buildCaseDefinition();
@@ -51,7 +54,6 @@ public class CaseExecutionResumeTest extends PvmTestCase {
     // a case execution associated with Stage X
     CmmnActivityExecution stageX = caseInstance.findCaseExecution("X");
 
-    stageX.manualStart();
     stageX.suspend();
 
     // a case execution associated with Task A
@@ -86,6 +88,7 @@ public class CaseExecutionResumeTest extends PvmTestCase {
         .endActivity()
         .createActivity("B")
           .behavior(new TaskWaitState())
+          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
         .endActivity()
       .endActivity()
       .buildCaseDefinition();
@@ -97,11 +100,8 @@ public class CaseExecutionResumeTest extends PvmTestCase {
     // a case execution associated with Stage X
     CmmnActivityExecution stageX = caseInstance.findCaseExecution("X");
 
-    stageX.manualStart();
-
     // a case execution associated with Task A
     CmmnActivityExecution taskA = caseInstance.findCaseExecution("A");
-    taskA.manualStart();
     taskA.suspend();
 
     // a case execution associated with Task B

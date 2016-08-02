@@ -167,7 +167,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     secondHumanTask = queryCaseExecutionByActivityId("HumanTask_2");
     // Sentry1 would not be satisfied as the value has to be > 100
     // But, Sentry 2 would be satisfied and enables HumanTask2
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(secondHumanTask.isEnabled());
 
   }
 
@@ -178,8 +178,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
     
     String firstHumanTaskId = queryCaseExecutionByActivityId("HumanTask_1").getId();
-    
-    manualStart(firstHumanTaskId);
+
     complete(firstHumanTaskId);
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("HumanTask_2");
@@ -233,7 +232,6 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     assertFalse(caseModelHumanTask.isEnabled());
 
     String stageExecutionId = queryCaseExecutionByActivityId("Stage_1").getId();
-    manualStart(stageExecutionId);
     // set the variable in the scope of stage such that sentry in the scope of case model does not gets evaluated.
     caseService.setVariableLocal(stageExecutionId, "variable_1", "aVariable");
     
@@ -256,12 +254,6 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   public void testStagesScope() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
-    String stageExecutionId = queryCaseExecutionByActivityId("Stage_1").getId();
-    manualStart(stageExecutionId);
-    
-    CaseExecution stageExecution2 = queryCaseExecutionByActivityId("Stage_2");
-    manualStart(stageExecution2.getId());
-
     caseService.setVariable(caseInstanceId, "variable_1", "aVariable");
 
     CaseExecution humanTask1 = queryCaseExecutionByActivityId("HumanTask_1");
@@ -279,10 +271,8 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     caseService.createCaseInstanceByKey("Case_1").getId();
 
     String stageExecution1_Id = queryCaseExecutionByActivityId("Stage_1").getId();
-    manualStart(stageExecution1_Id);
     
     String stageExecution2_Id = queryCaseExecutionByActivityId("Stage_2").getId();
-    manualStart(stageExecution2_Id);
 
     // variable set to stage 1 scope, so that sentries in stage 2 and in case model should not be triggered
     caseService.setVariableLocal(stageExecution1_Id, "variable_1", "aVariable");
@@ -308,9 +298,6 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testMultipleOnPartsInStage.cmmn"})
   public void testMultipleOnPartsInStages() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
-
-    String stageExecutionId = queryCaseExecutionByActivityId("Stage_1").getId();
-    manualStart(stageExecutionId);
     
     caseService.setVariable(caseInstanceId, "variable_1", 101);
 
@@ -362,7 +349,6 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
     CaseExecution stageExecution = queryCaseExecutionByActivityId("Stage_1");
-    manualStart(stageExecution.getId());
 
     CaseExecution humanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
     assertTrue(humanTask2.isAvailable());
@@ -391,7 +377,6 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     caseService.createCaseInstanceByKey("Case_1").getId();
 
     String stageExecutionId = queryCaseExecutionByActivityId("Stage_1").getId();
-    manualStart(stageExecutionId);
 
     CaseExecution humanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
     assertTrue(humanTask2.isAvailable());
@@ -412,10 +397,8 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     caseService.createCaseInstanceByKey("Case_1").getId();
 
     String stageExecution1_Id = queryCaseExecutionByActivityId("Stage_1").getId();
-    manualStart(stageExecution1_Id);
 
     CaseExecution stageExecution2 = queryCaseExecutionByActivityId("Stage_2");
-    manualStart(stageExecution2.getId());
 
     caseService.setVariable(stageExecution1_Id, "value", 99);
 
@@ -442,11 +425,9 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
     String stageExecution1_Id = queryCaseExecutionByActivityId("Stage_1").getId();
-    manualStart(stageExecution1_Id);
 
     // inner stage
     String stageExecution2_Id = queryCaseExecutionByActivityId("Stage_2").getId();
-    manualStart(stageExecution2_Id);
     
     // set the same variable 'value' in the scope of case model
     caseService.setVariable(caseInstanceId, "value", 102);
@@ -479,11 +460,9 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
     String stageExecution1_Id = queryCaseExecutionByActivityId("Stage_1").getId();
-    manualStart(stageExecution1_Id);
 
     // inner stage
     String stageExecution2_Id = queryCaseExecutionByActivityId("Stage_2").getId();
-    manualStart(stageExecution2_Id);
     
     // set the variable 'value' in the scope of the case model
     caseService.setVariable(stageExecution1_Id, "value", 99);
@@ -509,11 +488,9 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
     String stageExecution1_Id = queryCaseExecutionByActivityId("Stage_1").getId();
-    manualStart(stageExecution1_Id);
 
     // inner stage
     String stageExecution2_Id = queryCaseExecutionByActivityId("Stage_2").getId();
-    manualStart(stageExecution2_Id);
     
     // set the variable 'value' in the scope of the case model
     caseService.setVariable(caseInstanceId, "value", 99);
@@ -543,11 +520,9 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
     String stageExecution1_Id = queryCaseExecutionByActivityId("Stage_1").getId();
-    manualStart(stageExecution1_Id);
 
     // inner stage
     String stageExecution2_Id = queryCaseExecutionByActivityId("Stage_2").getId();
-    manualStart(stageExecution2_Id);
     
     // set the variable 'value_1' in the scope of the case model
     caseService.setVariable(caseInstanceId, "value_1", 99);
@@ -582,7 +557,6 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     caseService.createCaseInstanceByKey("Case_1").getId();
 
     CaseExecution stageExecution = queryCaseExecutionByActivityId("Stage_1");
-    manualStart(stageExecution.getId());
 
     caseService.setVariable(stageExecution.getId(), "value", 99);
 

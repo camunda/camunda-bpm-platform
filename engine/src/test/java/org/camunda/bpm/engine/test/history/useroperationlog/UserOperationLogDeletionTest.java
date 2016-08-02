@@ -79,7 +79,6 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-    caseService.manuallyStartCaseExecution(caseExecutionId);
 
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.setAssignee(taskId, "demo");
@@ -133,7 +132,6 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-    caseService.manuallyStartCaseExecution(caseExecutionId);
 
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.complete(taskId);

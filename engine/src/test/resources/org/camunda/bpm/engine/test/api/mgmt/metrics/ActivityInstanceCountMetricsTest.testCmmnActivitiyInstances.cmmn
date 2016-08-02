@@ -20,7 +20,13 @@
         </planItemOnPart>
       </sentry>
 
-      <humanTask id="HumanTask_1" name="A HumanTask" />
+      <humanTask id="HumanTask_1" name="A HumanTask" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
 
       <stage id="Stage_1" autoComplete="true">
         <planItem id="PI_HumanTask_2" definitionRef="HumanTask_1" />

@@ -12,6 +12,12 @@
         <extensionElements>
           <camunda:in variables="all" local="true" />
         </extensionElements>
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+
       </processTask>
     </casePlanModel>
   </case>

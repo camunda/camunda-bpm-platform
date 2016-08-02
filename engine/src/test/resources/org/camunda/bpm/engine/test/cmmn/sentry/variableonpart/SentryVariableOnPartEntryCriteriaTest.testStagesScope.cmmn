@@ -25,7 +25,13 @@
             </camunda:variableOnPart>
            </cmmn:extensionElements>
        </cmmn:sentry>
-        <cmmn:humanTask id="HumanTask_09vk714" name="HumanTask_1" />
+        <cmmn:humanTask id="HumanTask_09vk714" name="HumanTask_1" >
+          <cmmn:defaultControl>
+            <cmmn:manualActivationRule>
+              <cmmn:condition>${true}</cmmn:condition>
+            </cmmn:manualActivationRule>
+          </cmmn:defaultControl>
+        </cmmn:humanTask>
       </cmmn:stage>
       <cmmn:stage id="Stage_02yiwni" name="Stage_2">
         <cmmn:planItem id="HumanTask_2" name="HumanTask2" definitionRef="HumanTask_0orrrv3">
@@ -38,9 +44,21 @@
             </camunda:variableOnPart>
           </cmmn:extensionElements>
         </cmmn:sentry>
-        <cmmn:humanTask id="HumanTask_0orrrv3" />
+        <cmmn:humanTask id="HumanTask_0orrrv3" >
+          <cmmn:defaultControl>
+            <cmmn:manualActivationRule>
+              <cmmn:condition>${true}</cmmn:condition>
+            </cmmn:manualActivationRule>
+          </cmmn:defaultControl>
+        </cmmn:humanTask>
       </cmmn:stage>
-      <cmmn:humanTask id="HumanTask_0x597zk" name="HumanTask3" />
+      <cmmn:humanTask id="HumanTask_0x597zk" name="HumanTask3" >
+        <cmmn:defaultControl>
+          <cmmn:manualActivationRule>
+            <cmmn:condition>${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:defaultControl>
+      </cmmn:humanTask>
     </cmmn:casePlanModel>
   </cmmn:case>
   <cmmndi:CMMNDI>

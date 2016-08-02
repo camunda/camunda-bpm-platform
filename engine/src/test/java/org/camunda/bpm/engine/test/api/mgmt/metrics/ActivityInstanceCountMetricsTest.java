@@ -105,7 +105,7 @@ public class ActivityInstanceCountMetricsTest extends AbstractMetricsTest {
 
     caseService.createCaseInstanceByKey("case");
 
-    assertEquals(0l, managementService.createMetricsQuery()
+    assertEquals(1l, managementService.createMetricsQuery()
         .name(Metrics.ACTIVTY_INSTANCE_START)
         .sum());
 

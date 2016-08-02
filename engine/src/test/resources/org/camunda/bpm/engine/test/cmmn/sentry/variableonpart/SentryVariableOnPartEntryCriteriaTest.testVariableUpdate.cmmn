@@ -18,7 +18,13 @@
           </camunda:variableOnPart>
         </cmmn:extensionElements>
       </cmmn:sentry>  
-      <cmmn:humanTask id="HumanTask_1m45ynk" name="HumanTask_1" />
+      <cmmn:humanTask id="HumanTask_1m45ynk" name="HumanTask_1" >
+        <cmmn:defaultControl>
+          <cmmn:manualActivationRule>
+            <cmmn:condition>${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:defaultControl>
+      </cmmn:humanTask>
     </cmmn:casePlanModel>
   </cmmn:case>
   <cmmndi:CMMNDI>

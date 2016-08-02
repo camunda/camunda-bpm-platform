@@ -24,6 +24,11 @@ import org.camunda.bpm.engine.test.cmmn.tasklistener.util.MySpecialTaskListener;
 import org.camunda.bpm.engine.test.cmmn.tasklistener.util.MyTaskListener;
 import org.camunda.bpm.engine.test.cmmn.tasklistener.util.NotTaskListener;
 import org.camunda.bpm.engine.test.cmmn.tasklistener.util.TaskDeleteListener;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * @author Roman Smirnov
@@ -44,11 +49,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // then
     VariableInstanceQuery query = runtimeService
@@ -71,17 +71,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
       .setVariable("myTaskListener", new MyTaskListener())
       .create()
       .getId();
-
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // then
     VariableInstanceQuery query = runtimeService
@@ -112,9 +101,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .getId();
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // then
     VariableInstanceQuery query = runtimeService
@@ -136,17 +122,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
       .withCaseDefinitionByKey("case")
       .create()
       .getId();
-
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // then
     VariableInstanceQuery query = runtimeService
@@ -173,10 +148,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     caseService
@@ -211,10 +182,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     caseService
       .withCaseExecution(humanTaskId)
@@ -248,10 +215,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     caseService
       .withCaseExecution(humanTaskId)
@@ -284,10 +247,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     caseService
       .withCaseExecution(humanTaskId)
@@ -318,10 +277,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     terminate(humanTaskId);
@@ -354,10 +309,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     terminate(humanTaskId);
 
@@ -389,10 +340,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     terminate(humanTaskId);
 
@@ -422,10 +369,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     terminate(humanTaskId);
@@ -457,10 +400,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     processEngineConfiguration
@@ -495,10 +434,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     String taskId = taskService
         .createTaskQuery()
@@ -537,10 +472,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     String taskId = taskService
         .createTaskQuery()
         .caseExecutionId(humanTaskId)
@@ -578,10 +509,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     String taskId = taskService
         .createTaskQuery()
         .caseExecutionId(humanTaskId)
@@ -618,10 +545,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     String taskId = taskService
         .createTaskQuery()
         .caseExecutionId(humanTaskId)
@@ -657,11 +580,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // then
     VariableInstanceQuery query = runtimeService
         .createVariableInstanceQuery()
@@ -690,10 +608,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .getId();
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     String taskId = taskService
         .createTaskQuery()
         .caseExecutionId(humanTaskId)
@@ -741,9 +655,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .getId();
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     String taskId = taskService
         .createTaskQuery()
@@ -791,9 +702,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .getId();
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     String taskId = taskService
         .createTaskQuery()
@@ -843,9 +751,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .getId();
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     String taskId = taskService
         .createTaskQuery()
@@ -893,9 +798,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .getId();
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     String taskId = taskService
         .createTaskQuery()
@@ -945,10 +847,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .getId();
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     String taskId = taskService
         .createTaskQuery()
         .caseExecutionId(humanTaskId)
@@ -993,11 +891,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
+    //when
     String taskId = taskService
         .createTaskQuery()
         .caseExecutionId(humanTaskId)
@@ -1045,9 +939,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .getId();
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     String taskId = taskService
         .createTaskQuery()
@@ -1093,11 +984,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // then
     VariableInstanceQuery query = runtimeService
         .createVariableInstanceQuery()
@@ -1126,11 +1012,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // then
     VariableInstanceQuery query = runtimeService
@@ -1164,10 +1045,6 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
         .getId();
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     String taskId = taskService
         .createTaskQuery()
         .caseExecutionId(humanTaskId)
@@ -1201,23 +1078,12 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDoesNotImplementTaskListenerInterfaceByClass.cmmn"})
   public void testDoesNotImplementTaskListenerInterfaceByClass() {
-    // given
-    caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
-
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    // when
     try {
       caseService
-        .withCaseExecution(humanTaskId)
-        .manualStart();
+          .withCaseDefinitionByKey("case")
+          .create()
+          .getId();
+      fail("exception expected");
     } catch (Exception e) {
       // then
       Throwable cause = e.getCause();
@@ -1229,24 +1095,13 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDoesNotImplementTaskListenerInterfaceByDelegateExpression.cmmn"})
   public void testDoesNotImplementTaskListenerInterfaceByDelegateExpression() {
-    // given
-    caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myTaskListener", new NotTaskListener())
-      .create()
-      .getId();
-
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    // when
     try {
       caseService
-        .withCaseExecution(humanTaskId)
-        .manualStart();
+          .withCaseDefinitionByKey("case")
+          .setVariable("myTaskListener", new NotTaskListener())
+          .create()
+          .getId();
+      fail("exception expected");
     } catch (Exception e) {
       // then
       Throwable cause = e.getCause();
@@ -1258,23 +1113,13 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testTaskListenerDoesNotExist.cmmn"})
   public void testTaskListenerDoesNotExist() {
-    // given
-    caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    // when
     try {
       caseService
-        .withCaseExecution(humanTaskId)
-        .manualStart();
+          .withCaseDefinitionByKey("case")
+          .create()
+          .getId();
+      fail("exception expected");
     } catch (Exception e) {
       // then
       Throwable cause = e.getCause();

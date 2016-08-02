@@ -25,6 +25,9 @@
           <repetitionRule camunda:repeatOnStandardEvent="disable">
             <condition>${true}</condition>
           </repetitionRule>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
         </defaultControl>
       </humanTask>
 

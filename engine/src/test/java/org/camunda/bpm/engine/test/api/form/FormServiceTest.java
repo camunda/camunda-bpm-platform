@@ -514,9 +514,6 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
   public void testSubmitTaskFormForCmmnHumanTask() {
     caseService.createCaseInstanceByKey("oneTaskCase");
 
-    CaseExecution caseExecution = caseService.createCaseExecutionQuery().enabled().singleResult();
-    caseService.withCaseExecution(caseExecution.getId()).manualStart();
-
     Task task = taskService.createTaskQuery().singleResult();
 
     String stringValue = "some string";

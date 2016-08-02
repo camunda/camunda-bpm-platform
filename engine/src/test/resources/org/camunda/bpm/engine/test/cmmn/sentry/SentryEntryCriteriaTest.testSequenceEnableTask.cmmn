@@ -25,6 +25,11 @@
         <extensionElements>
           <camunda:caseExecutionListener event="enable" class="org.camunda.bpm.engine.test.cmmn.sentry.SentryTriggerListener" />
         </extensionElements>
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
       </humanTask>
 
     </casePlanModel>

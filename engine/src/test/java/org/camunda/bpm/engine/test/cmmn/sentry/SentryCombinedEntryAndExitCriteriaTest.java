@@ -238,7 +238,7 @@ public class SentryCombinedEntryAndExitCriteriaTest extends CmmnProcessEngineTes
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
 
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     String secondHumanTaskId = secondHumanTask.getId();
@@ -246,7 +246,6 @@ public class SentryCombinedEntryAndExitCriteriaTest extends CmmnProcessEngineTes
     assertTrue(secondHumanTask.isAvailable());
 
     // when
-    manualStart(firstHumanTaskId);
     complete(firstHumanTaskId);
 
     // then

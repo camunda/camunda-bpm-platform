@@ -337,7 +337,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     query.enabled();
 
-    verifyQueryResults(query, 6);
+    verifyQueryResults(query, 2);
 
   }
 
@@ -346,7 +346,7 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     query.active();
 
-    verifyQueryResults(query, 5);
+    verifyQueryResults(query, 9);
 
   }
 

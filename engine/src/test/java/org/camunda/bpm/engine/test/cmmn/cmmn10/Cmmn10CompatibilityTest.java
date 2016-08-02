@@ -63,7 +63,6 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
     String secondHumanTaskId = queryCaseExecutionByActivityId("PI_HumanTask_2").getId();
 
     // when
-    manualStart(secondHumanTaskId);
     complete(secondHumanTaskId);
 
     // then
@@ -72,7 +71,6 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1");
     assertEquals(2, query.count());
     assertEquals(1, query.available().count());
-    assertEquals(1, query.enabled().count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testRepetitionRuleWithoutEntryCriteria.cmmn")
@@ -83,7 +81,6 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
     String firstHumanTaskId = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
 
     // when
-    manualStart(firstHumanTaskId);
     complete(firstHumanTaskId);
 
     // then
@@ -91,7 +88,7 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_1");
     assertEquals(1, query.count());
-    assertEquals(1, query.enabled().count());
+    assertEquals(1, query.active().count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testRepetitionRuleCustomStandardEvent.cmmn")
@@ -120,11 +117,10 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
     String humanTask = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
 
     // when
-    manualStart(humanTask);
     complete(humanTask);
 
     // then
-    assertTrue(queryCaseExecutionByActivityId("PI_HumanTask_2").isEnabled());
+    assertTrue(queryCaseExecutionByActivityId("PI_HumanTask_2").isActive());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testPlanItemExitCriterion.cmmn")
@@ -132,12 +128,9 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
     // given
     createCaseInstanceByKey("case");
 
-    assertTrue(queryCaseExecutionByActivityId("PI_HumanTask_2").isEnabled());
-
     String humanTask = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
 
     // when
-    manualStart(humanTask);
     complete(humanTask);
 
     // then
@@ -152,7 +145,6 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
     String humanTask = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
 
     // when
-    manualStart(humanTask);
     complete(humanTask);
 
     // then
@@ -186,7 +178,6 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
 
     // when
     String humanTask = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
-    manualStart(humanTask);
 
     // then
     Task task = taskService.createTaskQuery().singleResult();

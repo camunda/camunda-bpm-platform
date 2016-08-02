@@ -20,6 +20,12 @@
       <humanTask name="Decide About Loan Application" id="HumanTask_6"/>
 
       <stage name="Obtain Customer Data" id="Stage_1">
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+
         <planItem definitionRef="HumanTask_1" id="PI_HumanTask_1"/>
         <planItem definitionRef="HumanTask_2" id="PI_HumanTask_2"/>
         <planItem definitionRef="HumanTask_3" id="PI_HumanTask_3"/>

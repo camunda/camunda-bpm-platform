@@ -18,7 +18,13 @@
             <cmmn:condition id="Expression_187cws3"><![CDATA[${value > 100}]]></cmmn:condition>
           </cmmn:ifPart>
         </cmmn:sentry>
-        <cmmn:humanTask id="HumanTask_021vofs" name="HumanTask 1" />
+        <cmmn:humanTask id="HumanTask_021vofs" name="HumanTask 1" >
+          <cmmn:defaultControl>
+            <cmmn:manualActivationRule>
+              <cmmn:condition>${true}</cmmn:condition>
+            </cmmn:manualActivationRule>
+          </cmmn:defaultControl>
+        </cmmn:humanTask>
       </cmmn:stage>
       <cmmn:stage id="Stage_0moifuq">
         <cmmn:planItem id="HumanTask_2" name="HumanTask2" definitionRef="HumanTask_14512zu">
@@ -34,7 +40,13 @@
             <cmmn:condition id="Expression_1oqkh2r"><![CDATA[${value > 100}]]></cmmn:condition>
           </cmmn:ifPart>
         </cmmn:sentry>
-        <cmmn:humanTask id="HumanTask_14512zu" />
+        <cmmn:humanTask id="HumanTask_14512zu" >
+          <cmmn:defaultControl>
+            <cmmn:manualActivationRule>
+              <cmmn:condition>${true}</cmmn:condition>
+            </cmmn:manualActivationRule>
+          </cmmn:defaultControl>
+        </cmmn:humanTask>
       </cmmn:stage>
     </cmmn:casePlanModel>
   </cmmn:case>

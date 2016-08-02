@@ -439,7 +439,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
 
     VariableMap variables = Variables.createVariables().putValue("var", "test");
     CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
-    caseService.manuallyStartCaseExecution(caseExecution.getId(), variables);
+    caseService.setVariables(caseExecution.getId(), variables);
 
     VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
     assertThat(variableInstance, is(notNullValue()));

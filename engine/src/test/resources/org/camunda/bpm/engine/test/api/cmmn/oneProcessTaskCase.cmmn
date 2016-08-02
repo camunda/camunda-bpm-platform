@@ -8,7 +8,7 @@
   
     <casePlanModel id="CasePlanModel_1">
       <planItem id="PI_ProcessTask_1" definitionRef="ProcessTask_1" />
-      <processTask id="ProcessTask_1" name="A Process Task" processRef="oneTaskProcess" />
+      <processTask id="ProcessTask_1" name="A Process Task" processRef="oneTaskProcess"/>
     </casePlanModel>
   </case>
   

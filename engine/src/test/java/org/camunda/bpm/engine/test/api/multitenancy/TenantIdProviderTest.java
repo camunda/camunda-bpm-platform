@@ -69,8 +69,10 @@ public class TenantIdProviderTest {
   protected static final String DMN_FILE = "org/camunda/bpm/engine/test/api/multitenancy/simpleDecisionTable.dmn";
 
   protected static final String CMMN_FILE = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithCaseTask.cmmn";
+  protected static final String CMMN_FILE_WITH_MANUAL_ACTIVATION = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithCaseTaskWithManualActivation.cmmn";
   protected static final String CMMN_VARIABLE_FILE = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithCaseTaskVariables.cmmn";
   protected static final String CMMN_SUBPROCESS_FILE = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
+  protected static final String CMMN_SUBPROCESS_FILE_WITH_MANUAL_ACTIVATION = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn";
 
   protected static final String TENANT_ID = "tenant1";
 
@@ -449,7 +451,7 @@ public class TenantIdProviderTest {
     // if the case is started
     engineRule.getCaseService().createCaseInstanceByKey("testCase");
     CaseExecution caseExecution = engineRule.getCaseService().createCaseExecutionQuery().activityId("PI_ProcessTask_1").singleResult();
-    engineRule.getCaseService().manuallyStartCaseExecution(caseExecution.getId());
+
 
     // then the tenant id provider is invoked once for the process instance
     assertThat(tenantIdProvider.parameters.size(), is(1));
@@ -468,7 +470,6 @@ public class TenantIdProviderTest {
     // if the case is started
     engineRule.getCaseService().createCaseInstanceByKey("testCase");
     CaseExecution caseExecution = engineRule.getCaseService().createCaseExecutionQuery().activityId("PI_ProcessTask_1").singleResult();
-    engineRule.getCaseService().manuallyStartCaseExecution(caseExecution.getId());
 
     // then the tenant id provider is not invoked
     assertThat(tenantIdProvider.parameters.size(), is(0));
@@ -487,7 +488,6 @@ public class TenantIdProviderTest {
     // if the case is started
     engineRule.getCaseService().createCaseInstanceByKey("testCase", Variables.createVariables().putValue("varName", true));
     CaseExecution caseExecution = engineRule.getCaseService().createCaseExecutionQuery().activityId("PI_ProcessTask_1").singleResult();
-    engineRule.getCaseService().manuallyStartCaseExecution(caseExecution.getId());
 
     // then the tenant id provider is passed in the variable
     assertThat(tenantIdProvider.parameters.size(), is(1));
@@ -510,7 +510,6 @@ public class TenantIdProviderTest {
     // if the case is started
     engineRule.getCaseService().createCaseInstanceByKey("testCase");
     CaseExecution caseExecution = engineRule.getCaseService().createCaseExecutionQuery().activityId("PI_ProcessTask_1").singleResult();
-    engineRule.getCaseService().manuallyStartCaseExecution(caseExecution.getId());
 
     // then the tenant id provider is passed in the process definition
     assertThat(tenantIdProvider.parameters.size(), is(1));
@@ -530,7 +529,6 @@ public class TenantIdProviderTest {
     // if the case is started
     engineRule.getCaseService().createCaseInstanceByKey("testCase");
     CaseExecution caseExecution = engineRule.getCaseService().createCaseExecutionQuery().activityId("PI_ProcessTask_1").singleResult();
-    engineRule.getCaseService().manuallyStartCaseExecution(caseExecution.getId());
 
     // then the tenant id provider is handed in the super case execution
     assertThat(tenantIdProvider.parameters.size(), is(1));
@@ -759,7 +757,7 @@ public class TenantIdProviderTest {
     TestTenantIdProvider.delegate = tenantIdProvider;
 
     // given a deployment without tenant id
-    testRule.deploy(CMMN_FILE);
+    testRule.deploy(CMMN_FILE_WITH_MANUAL_ACTIVATION);
 
     // if a case instance is created
     engineRule.getCaseService().withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
@@ -775,7 +773,7 @@ public class TenantIdProviderTest {
     TestTenantIdProvider.delegate = tenantIdProvider;
 
     // given a deployment with a tenant id
-    testRule.deployForTenant(TENANT_ID, CMMN_FILE);
+    testRule.deployForTenant(TENANT_ID, CMMN_FILE_WITH_MANUAL_ACTIVATION);
 
     // if a case instance is created
     engineRule.getCaseService().withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
@@ -790,7 +788,7 @@ public class TenantIdProviderTest {
     ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
     TestTenantIdProvider.delegate = tenantIdProvider;
 
-    testRule.deploy(CMMN_FILE);
+    testRule.deploy(CMMN_FILE_WITH_MANUAL_ACTIVATION);
 
     // if a case instance is created
     engineRule.getCaseService().withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariables(Variables.createVariables().putValue("varName", true)).create();
@@ -806,7 +804,7 @@ public class TenantIdProviderTest {
     ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
     TestTenantIdProvider.delegate = tenantIdProvider;
 
-    testRule.deploy(CMMN_FILE);
+    testRule.deploy(CMMN_FILE_WITH_MANUAL_ACTIVATION);
     CaseDefinition deployedCaseDefinition = engineRule.getRepositoryService().createCaseDefinitionQuery().singleResult();
 
     // if a case instance is created
@@ -825,7 +823,7 @@ public class TenantIdProviderTest {
     StaticTenantIdTestProvider tenantIdProvider = new StaticTenantIdTestProvider(tenantId);
     TestTenantIdProvider.delegate = tenantIdProvider;
 
-    testRule.deploy(CMMN_FILE);
+    testRule.deploy(CMMN_FILE_WITH_MANUAL_ACTIVATION);
 
     // if a case instance is created
     engineRule.getCaseService().withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
@@ -842,7 +840,7 @@ public class TenantIdProviderTest {
     StaticTenantIdTestProvider tenantIdProvider = new StaticTenantIdTestProvider(tenantId);
     TestTenantIdProvider.delegate = tenantIdProvider;
 
-    testRule.deploy(CMMN_FILE);
+    testRule.deploy(CMMN_FILE_WITH_MANUAL_ACTIVATION);
 
     // if a case instance is created
     engineRule.getCaseService().withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
@@ -865,7 +863,6 @@ public class TenantIdProviderTest {
 
     // if a case instance is created
     engineRule.getCaseService().withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
-    startCaseTask();
 
     // then the tenant id provider is invoked twice
     assertThat(tenantIdProvider.caseParameters.size(), is(2));
@@ -882,7 +879,6 @@ public class TenantIdProviderTest {
 
     // if a case instance is created
     engineRule.getCaseService().withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
-    startCaseTask();
 
     // then the tenant id provider is not invoked
     assertThat(tenantIdProvider.caseParameters.size(), is(0));
@@ -898,7 +894,6 @@ public class TenantIdProviderTest {
 
     // if a case instance is created
     engineRule.getCaseService().withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariables(Variables.createVariables().putValue("varName", true)).create();
-    startCaseTask();
 
     // then the tenant id provider is passed in the variable
     assertThat(tenantIdProvider.caseParameters.get(1).getVariables().size(), is(1));
@@ -916,7 +911,6 @@ public class TenantIdProviderTest {
 
     // if a case instance is created
     engineRule.getCaseService().withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
-    startCaseTask();
 
     // then the tenant id provider is passed in the case definition
     CaseDefinition passedCaseDefinition = tenantIdProvider.caseParameters.get(1).getCaseDefinition();
@@ -930,7 +924,7 @@ public class TenantIdProviderTest {
     ContextLoggingTenantIdProvider tenantIdProvider = new ContextLoggingTenantIdProvider();
     TestTenantIdProvider.delegate = tenantIdProvider;
 
-    testRule.deploy(CMMN_SUBPROCESS_FILE, CMMN_FILE);
+    testRule.deploy(CMMN_SUBPROCESS_FILE, CMMN_FILE_WITH_MANUAL_ACTIVATION);
     CaseDefinition superCaseDefinition = engineRule.getRepositoryService().createCaseDefinitionQuery().caseDefinitionKey(CASE_DEFINITION_KEY).singleResult();
 
 
@@ -955,7 +949,6 @@ public class TenantIdProviderTest {
 
     // if a case instance is created
     engineRule.getCaseService().withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
-    startCaseTask();
 
     // then the tenant id provider can set the tenant id to a value
     CaseInstance subCaseInstance = engineRule.getCaseService().createCaseInstanceQuery().caseDefinitionKey("oneTaskCase").singleResult();
@@ -977,7 +970,6 @@ public class TenantIdProviderTest {
 
     // if a case instance is created
     engineRule.getCaseService().withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
-    startCaseTask();
 
     // then the tenant id provider can set the tenant id to null
     CaseInstance caseInstance = engineRule.getCaseService().createCaseInstanceQuery().caseDefinitionKey("oneTaskCase").singleResult();
@@ -995,7 +987,6 @@ public class TenantIdProviderTest {
 
     // if a case instance is created
     engineRule.getCaseService().withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
-    startCaseTask();
 
     // then the tenant id is inherited to the sub case instance even tough it is not set by the provider
     CaseInstance caseInstance = engineRule.getCaseService().createCaseInstanceQuery().caseDefinitionKey("oneTaskCase").singleResult();
@@ -1012,7 +1003,6 @@ public class TenantIdProviderTest {
 
     // if the case is started
     engineRule.getCaseService().withCaseDefinitionByKey(CASE_DEFINITION_KEY).create();
-    startCaseTask();
 
     // then the tenant id provider is handed in the super case execution
     assertThat(tenantIdProvider.caseParameters.size(), is(2));

@@ -14,6 +14,11 @@
         <extensionElements>
           <camunda:caseExecutionListener event="disable" delegateExpression="${myListener}" />
         </extensionElements>
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
       </humanTask>
 
     </casePlanModel>

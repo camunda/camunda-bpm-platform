@@ -14,7 +14,7 @@
       <stage id="Stage_1">
         <defaultControl>
           <repetitionRule>
-            <condition>${true}</condition>
+            <condition>${repeating}</condition>
           </repetitionRule>
         </defaultControl>
         <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />

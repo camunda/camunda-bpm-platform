@@ -15,6 +15,11 @@
         <extensionElements>
           <camunda:caseExecutionListener event="reenable" class="org.camunda.bpm.engine.test.cmmn.listener.MySpecialCaseExecutionListener" />
         </extensionElements>
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
       </humanTask>
 
       <humanTask id="HumanTask_2" name="Another HumanTask" />

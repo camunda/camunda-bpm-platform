@@ -23,7 +23,13 @@
         <planItem id="PI_HumanTask_3" definitionRef="HumanTask_1" />
       </stage>
 
-      <humanTask id="HumanTask_1" />
+      <humanTask id="HumanTask_1" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
 
     </casePlanModel>
   </case>

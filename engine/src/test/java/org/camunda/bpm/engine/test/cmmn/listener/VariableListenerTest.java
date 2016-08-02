@@ -403,8 +403,6 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
         caseService.createCaseExecutionQuery().activityId("PI_Stage_1").singleResult();
     assertNotNull(stageExecution);
 
-    caseService.withCaseExecution(stageExecution.getId()).manualStart();
-
     CaseExecution taskExecution =
         caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
     assertNotNull(taskExecution);

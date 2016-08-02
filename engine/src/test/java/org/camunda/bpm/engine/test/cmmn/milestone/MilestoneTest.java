@@ -67,11 +67,6 @@ public class MilestoneTest extends PluggableProcessEngineTestCase {
 
     assertTrue(milestone.isAvailable());
 
-    // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // then
     assertNull(caseService.getVariable(caseInstanceId, "occur"));
 
@@ -128,11 +123,6 @@ public class MilestoneTest extends PluggableProcessEngineTestCase {
         .getId();
 
     assertTrue(milestone.isAvailable());
-
-    // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // then
     assertNull(caseService.getVariable(caseInstanceId, "occur"));

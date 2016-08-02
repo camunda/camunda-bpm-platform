@@ -19,7 +19,13 @@
         </planItemOnPart>
       </sentry>
 
-      <humanTask id="HumanTask_1" />
+      <humanTask id="HumanTask_1" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
       <stage id="Stage_1">
         <defaultControl>
           <repetitionRule>

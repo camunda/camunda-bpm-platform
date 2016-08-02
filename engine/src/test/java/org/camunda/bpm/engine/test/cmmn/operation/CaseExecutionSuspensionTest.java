@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.cmmn.operation;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
+import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CaseDefinitionBuilder;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
@@ -50,8 +51,6 @@ public class CaseExecutionSuspensionTest extends PvmTestCase {
 
     // a case execution associated with Stage X
     CmmnActivityExecution stageX = caseInstance.findCaseExecution("X");
-
-    stageX.manualStart();
 
     // a case execution associated with Task A
     CmmnActivityExecution taskA = caseInstance.findCaseExecution("A");
@@ -95,8 +94,6 @@ public class CaseExecutionSuspensionTest extends PvmTestCase {
     // a case execution associated with Stage X
     CmmnActivityExecution stageX = caseInstance.findCaseExecution("X");
 
-    stageX.manualStart();
-
     // a case execution associated with Task A
     CmmnActivityExecution taskA = caseInstance.findCaseExecution("A");
 
@@ -128,6 +125,7 @@ public class CaseExecutionSuspensionTest extends PvmTestCase {
         .endActivity()
         .createActivity("B")
           .behavior(new TaskWaitState())
+          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
         .endActivity()
       .endActivity()
       .buildCaseDefinition();
@@ -139,11 +137,8 @@ public class CaseExecutionSuspensionTest extends PvmTestCase {
     // a case execution associated with Stage X
     CmmnActivityExecution stageX = caseInstance.findCaseExecution("X");
 
-    stageX.manualStart();
-
     // a case execution associated with Task A
     CmmnActivityExecution taskA = caseInstance.findCaseExecution("A");
-    taskA.manualStart();
 
     // a case execution associated with Task B
     CmmnActivityExecution taskB = caseInstance.findCaseExecution("B");

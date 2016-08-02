@@ -37,20 +37,17 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     String secondHumanTaskId = secondHumanTask.getId();
     assertTrue(secondHumanTask.isAvailable());
 
-    // (1) when
-    manualStart(firstHumanTaskId);
-
     // (1) then
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
     assertTrue(secondHumanTask.isAvailable());
 
-    assertNull(caseService.getVariable(caseInstanceId, "enable"));
+    assertNull(caseService.getVariable(caseInstanceId, "start"));
 
     // (2) when
     complete(firstHumanTaskId);
@@ -71,14 +68,11 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     String secondHumanTaskId = secondHumanTask.getId();
     assertTrue(secondHumanTask.isAvailable());
-
-    // (1) when
-    manualStart(firstHumanTaskId);
 
     // (1) then
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
@@ -107,14 +101,11 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution stage = queryCaseExecutionByActivityId("PI_Stage_1");
     String stageId = stage.getId();
     assertTrue(stage.isAvailable());
-
-    // (1) when
-    manualStart(firstHumanTaskId);
 
     // (1) then
     stage = queryCaseExecutionById(stageId);
@@ -142,14 +133,11 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution stage = queryCaseExecutionByActivityId("PI_Stage_1");
     String stageId = stage.getId();
     assertTrue(stage.isAvailable());
-
-    // (1) when
-    manualStart(firstHumanTaskId);
 
     // (1) then
     stage = queryCaseExecutionById(stageId);
@@ -189,14 +177,11 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution milestone = queryCaseExecutionByActivityId("PI_Milestone_1");
     String milestoneId = milestone.getId();
     assertTrue(milestone.isAvailable());
-
-    // (1) when
-    manualStart(firstHumanTaskId);
 
     // (1) then
     milestone = queryCaseExecutionById(milestoneId);
@@ -224,7 +209,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     String secondHumanTaskId = secondHumanTask.getId();
@@ -234,9 +219,6 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     String thirdHumanTaskId = thirdHumanTask.getId();
     assertTrue(thirdHumanTask.isAvailable());
 
-    // (1) when (start first human task) /////////////////////////////////////////////////
-    manualStart(firstHumanTaskId);
-
     // (1) then
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
     assertTrue(secondHumanTask.isAvailable());
@@ -244,45 +226,42 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
     assertTrue(thirdHumanTask.isAvailable());
 
-    assertNull(caseService.getVariable(caseInstanceId, "enable"));
+    assertNull(caseService.getVariable(caseInstanceId, "start"));
 
     // (2) when (complete first human task) /////////////////////////////////////////////
     complete(firstHumanTaskId);
 
     // (2) then
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
-    assertTrue(secondHumanTask.isEnabled());
+    assertTrue(secondHumanTask.isActive());
 
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
     assertTrue(thirdHumanTask.isAvailable());
 
-    Object enableVariable = caseService.getVariable(caseInstanceId, "enable");
+    Object enableVariable = caseService.getVariable(caseInstanceId, "start");
     assertNotNull(enableVariable);
     assertTrue((Boolean) enableVariable);
 
     // reset variable
     caseService
       .withCaseExecution(caseInstanceId)
-      .removeVariable("enable")
+      .removeVariable("start")
       .execute();
-
-    // (3) when (start second human task) /////////////////////////////////////////////
-    manualStart(secondHumanTaskId);
 
     // (3) then
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
     assertTrue(thirdHumanTask.isAvailable());
 
-    assertNull(caseService.getVariable(caseInstanceId, "enable"));
+    assertNull(caseService.getVariable(caseInstanceId, "start"));
 
     // (4) when (complete second human task) //////////////////////////////////////////
     complete(secondHumanTaskId);
 
     // (4) then
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
-    assertTrue(thirdHumanTask.isEnabled());
+    assertTrue(thirdHumanTask.isActive());
 
-    enableVariable = caseService.getVariable(caseInstanceId, "enable");
+    enableVariable = caseService.getVariable(caseInstanceId, "start");
     assertNotNull(enableVariable);
     assertTrue((Boolean) enableVariable);
   }
@@ -294,14 +273,13 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     String secondHumanTaskId = secondHumanTask.getId();
     assertTrue(secondHumanTask.isAvailable());
 
     // when
-    manualStart(firstHumanTaskId);
     caseService
       .withCaseExecution(firstHumanTaskId)
       .setVariable("value", 99)
@@ -323,14 +301,13 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     String secondHumanTaskId = secondHumanTask.getId();
     assertTrue(secondHumanTask.isAvailable());
 
     // when
-    manualStart(firstHumanTaskId);
     caseService
       .withCaseExecution(firstHumanTaskId)
       .setVariable("value", 100)
@@ -341,7 +318,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     assertNull(firstHumanTask);
 
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
-    assertTrue(secondHumanTask.isEnabled());
+    assertTrue(secondHumanTask.isActive());
 
   }
 
@@ -352,7 +329,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     String secondHumanTaskId = secondHumanTask.getId();
@@ -367,15 +344,14 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     assertFalse(part.isSatisfied());
 
     // when
-    manualStart(firstHumanTaskId);
     complete(firstHumanTaskId);
 
     // then
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
-    assertTrue(secondHumanTask.isEnabled());
+    assertTrue(secondHumanTask.isActive());
 
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
-    assertTrue(thirdHumanTask.isEnabled());
+    assertTrue(thirdHumanTask.isActive());
 
     part = query.singleResult();
     assertNotNull(part);
@@ -389,37 +365,35 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     String secondHumanTaskId = secondHumanTask.getId();
-    assertTrue(secondHumanTask.isEnabled());
+    assertTrue(secondHumanTask.isActive());
 
     CaseExecution thirdHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_3");
     String thirdHumanTaskId = thirdHumanTask.getId();
     assertTrue(thirdHumanTask.isAvailable());
 
     // (1) when
-    manualStart(firstHumanTaskId);
     complete(firstHumanTaskId);
 
     // (1) then
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
     assertTrue(thirdHumanTask.isAvailable());
 
-    assertNull(caseService.getVariable(caseInstanceId, "enable"));
+    assertNull(caseService.getVariable(caseInstanceId, "start"));
 
     // (2) when
-    manualStart(secondHumanTaskId);
     complete(secondHumanTaskId);
 
     // (2) then
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
-    assertTrue(thirdHumanTask.isEnabled());
+    assertTrue(thirdHumanTask.isActive());
 
-    Object enableVariable = caseService.getVariable(caseInstanceId, "enable");
-    assertNotNull(enableVariable);
-    assertTrue((Boolean) enableVariable);
+    Object startVariable = caseService.getVariable(caseInstanceId, "start");
+    assertNotNull(startVariable);
+    assertTrue((Boolean) startVariable);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testSequenceCombinedWithAndJoin.cmmn"})
@@ -429,7 +403,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     String secondHumanTaskId = secondHumanTask.getId();
@@ -440,23 +414,21 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     assertTrue(thirdHumanTask.isAvailable());
 
     // (1) when
-    manualStart(firstHumanTaskId);
     complete(firstHumanTaskId);
 
     // (1) then
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
-    assertTrue(secondHumanTask.isEnabled());
+    assertTrue(secondHumanTask.isActive());
 
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
     assertTrue(thirdHumanTask.isAvailable()); // still available
 
     // (2) when
-    manualStart(secondHumanTaskId);
     complete(secondHumanTaskId);
 
     // (2) then
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
-    assertTrue(thirdHumanTask.isEnabled());
+    assertTrue(thirdHumanTask.isActive());
 
   }
 
@@ -467,7 +439,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     String secondHumanTaskId = secondHumanTask.getId();
@@ -478,7 +450,6 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     assertTrue(thirdHumanTask.isAvailable());
 
     // when
-    manualStart(firstHumanTaskId);
     caseService
       .withCaseExecution(firstHumanTaskId)
       .setVariable("value", 80)
@@ -489,7 +460,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     assertTrue(secondHumanTask.isAvailable());
 
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
-    assertTrue(thirdHumanTask.isEnabled());
+    assertTrue(thirdHumanTask.isActive());
 
   }
 
@@ -500,35 +471,33 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     String secondHumanTaskId = secondHumanTask.getId();
-    assertTrue(secondHumanTask.isEnabled());
+    assertTrue(secondHumanTask.isActive());
 
     CaseExecution thirdHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_3");
     String thirdHumanTaskId = thirdHumanTask.getId();
     assertTrue(thirdHumanTask.isAvailable());
 
     // (1) when
-    manualStart(firstHumanTaskId);
     complete(firstHumanTaskId);
 
     // (1) then
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
-    assertTrue(thirdHumanTask.isEnabled());
+    assertTrue(thirdHumanTask.isActive());
 
-    Object enableVariable = caseService.getVariable(caseInstanceId, "enable");
-    assertNotNull(enableVariable);
-    assertTrue((Boolean) enableVariable);
+    Object startVariable = caseService.getVariable(caseInstanceId, "start");
+    assertNotNull(startVariable);
+    assertTrue((Boolean) startVariable);
 
     // (2) when
-    manualStart(secondHumanTaskId);
     complete(secondHumanTaskId);
 
     // (2) then
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
-    assertTrue(thirdHumanTask.isEnabled()); // is still enabled
+    assertTrue(thirdHumanTask.isActive()); // is still active
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testCycle.cmmn"})
@@ -577,10 +546,10 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     // then
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
-    assertTrue(secondHumanTask.isEnabled());
+    assertTrue(secondHumanTask.isActive());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testEnableOnParentSuspendInsideStage.cmmn"})
@@ -730,7 +699,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
 
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     String secondHumanTaskId = secondHumanTask.getId();
@@ -748,7 +717,6 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
       .execute();
 
     // (1) when
-    manualStart(firstHumanTaskId);
     complete(firstHumanTaskId);
 
     // (1) then
@@ -766,7 +734,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     // (2) then
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
-    assertTrue(secondHumanTask.isEnabled());
+    assertTrue(secondHumanTask.isActive());
 
     milestone = queryCaseExecutionById(milestoneId);
     // milestone occurs when the sentry was evaluated successfully after value is set to 101
@@ -796,7 +764,6 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     // then
     // .. completing the stage should be successful; evaluating Sentry_1 should not fail
-    caseService.manuallyStartCaseExecution(task1Execution.getId());
     caseService.completeCaseExecution(task1Execution.getId());
     stageExecution = caseService.createCaseExecutionQuery().activityId("PI_Stage_1").singleResult();
     assertNull(stageExecution);
@@ -817,7 +784,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     CaseExecution humanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
 
     // sentry has been ignored
-    assertTrue(humanTask.isEnabled());
+    assertTrue(humanTask.isActive());
   }
 
   @Deployment
@@ -831,7 +798,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     List<CaseExecution> humanTasks = caseService
       .createCaseExecutionQuery()
       .activityId("PI_HumanTask_1")
-      .enabled()
+      .active()
       .list();
     assertEquals(2, humanTasks.size());
 
@@ -844,21 +811,20 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     }
 
     // when
-    manualStart(humanTaskInsideFirstStageId);
     complete(humanTaskInsideFirstStageId);
 
     // then
     CaseExecution secondHumanTaskInsideFirstStage = caseService
       .createCaseExecutionQuery()
       .activityId("PI_HumanTask_2")
-      .enabled()
+      .active()
       .singleResult();
     assertEquals(firstStageId, ((CaseExecutionEntity) secondHumanTaskInsideFirstStage).getParentId());
 
     // PI_HumanTask_1 in PI_Stage_2 is enabled
     CaseExecution firstHumanTaskInsideSecondStage = queryCaseExecutionByActivityId("PI_HumanTask_1");
     assertNotNull(firstHumanTaskInsideSecondStage);
-    assertTrue(firstHumanTaskInsideSecondStage.isEnabled());
+    assertTrue(firstHumanTaskInsideSecondStage.isActive());
     assertEquals(secondStageId, ((CaseExecutionEntity) firstHumanTaskInsideSecondStage).getParentId());
 
     // PI_HumanTask_2 in PI_Stage_2 is available

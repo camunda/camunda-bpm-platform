@@ -8,7 +8,8 @@
 
     <casePlanModel id="CasePlanModel_1">
 
-      <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
+      <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" >
+      </planItem>
 
       <humanTask id="HumanTask_1">
         <defaultControl>
@@ -17,6 +18,11 @@
               <body>${repetition}</body>
             </condition>
           </repetitionRule>
+          <manualActivationRule>
+            <condition>
+              <body>${true}</body>
+            </condition>
+          </manualActivationRule>
         </defaultControl>
       </humanTask>
 

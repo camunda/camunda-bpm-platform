@@ -10,6 +10,11 @@
       <planItem id="PI_ProcessTask_1" definitionRef="ProcessTask_1" />
 
       <processTask id="ProcessTask_1" name="A Process Task" processRef="testProcess" camunda:processBinding="deployment">
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
       </processTask>
     </casePlanModel>
   </case>

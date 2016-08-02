@@ -13,6 +13,11 @@
           <camunda:in variables="all" />
           <camunda:in sourceExpression="${1000}" target="anotherVariable" />
         </extensionElements>
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
       </processTask>
     </casePlanModel>
   </case>

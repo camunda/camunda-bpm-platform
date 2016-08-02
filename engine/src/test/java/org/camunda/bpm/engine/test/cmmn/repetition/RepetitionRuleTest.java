@@ -26,6 +26,8 @@ import org.camunda.bpm.engine.variable.Variables;
  */
 public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
 
+  private static final String CASE_ID = "case";
+
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testVariableBasedRule.cmmn")
   public void testVariableBasedRepetitionRuleEvaluatesToTrue() {
     // given
@@ -35,7 +37,6 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     String humanTask1 = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
 
     // when
-    manualStart(humanTask1);
     complete(humanTask1);
 
     // then
@@ -45,7 +46,7 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
 
     assertEquals(2, query.count());
     assertEquals(1, query.available().count());
-    assertEquals(1, query.enabled().count());
+    assertEquals(1, query.active().count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testVariableBasedRule.cmmn")
@@ -57,7 +58,6 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     String humanTask1 = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
 
     // when
-    manualStart(humanTask1);
     complete(humanTask1);
 
     // then
@@ -65,7 +65,7 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_2");
     assertEquals(1, query.count());
-    assertEquals(1, query.enabled().count());
+    assertEquals(1, query.active().count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testDefaultVariableBasedRule.cmmn")
@@ -77,7 +77,6 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     String humanTask1 = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
 
     // when
-    manualStart(humanTask1);
     complete(humanTask1);
 
     // then
@@ -87,7 +86,7 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
 
     assertEquals(2, query.count());
     assertEquals(1, query.available().count());
-    assertEquals(1, query.enabled().count());
+    assertEquals(1, query.active().count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testDefaultVariableBasedRule.cmmn")
@@ -99,7 +98,6 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     String humanTask1 = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
 
     // when
-    manualStart(humanTask1);
     complete(humanTask1);
 
     // then
@@ -107,7 +105,7 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_2");
     assertEquals(1, query.count());
-    assertEquals(1, query.enabled().count());
+    assertEquals(1, query.active().count());
   }
 
   @Deployment
@@ -118,7 +116,6 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     String firstHumanTaskId = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
 
     // when
-    manualStart(firstHumanTaskId);
     complete(firstHumanTaskId);
 
     // then
@@ -128,7 +125,7 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
 
     assertEquals(2, query.count());
 
-    CaseExecution originInstance = query.enabled().singleResult();
+    CaseExecution originInstance = query.active().singleResult();
     assertNotNull(originInstance);
 
     CaseExecution repetitionInstance = query.available().singleResult();
@@ -143,7 +140,6 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     String firstHumanTaskId = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
 
     // when
-    manualStart(firstHumanTaskId);
     complete(firstHumanTaskId);
 
     // then
@@ -153,7 +149,7 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
 
     assertEquals(2, query.count());
 
-    CaseExecution originInstance = query.enabled().singleResult();
+    CaseExecution originInstance = query.active().singleResult();
     assertNotNull(originInstance);
 
     CaseExecution repetitionInstance = query.available().singleResult();
@@ -169,7 +165,6 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     String milestoneId = queryCaseExecutionByActivityId("PI_Milestone_1").getId();
 
     // when
-    manualStart(firstHumanTaskId);
     complete(firstHumanTaskId);
 
     // then
@@ -199,7 +194,7 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
 
     assertEquals(2, query.count());
 
-    CaseExecution originInstance = query.enabled().singleResult();
+    CaseExecution originInstance = query.active().singleResult();
     assertNotNull(originInstance);
 
     CaseExecution repetitionInstance = query.available().singleResult();
@@ -216,8 +211,8 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
 
     assertEquals(3, query.count());
 
-    // enabled instances
-    assertEquals(2, query.enabled().count());
+    // active instances
+    assertEquals(2, query.active().count());
 
     // available instances
     assertEquals(1,  query.available().count());
@@ -240,7 +235,7 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
 
     assertEquals(2, query.count());
 
-    CaseExecution originInstance = query.enabled().singleResult();
+    CaseExecution originInstance = query.active().singleResult();
     assertNotNull(originInstance);
 
     CaseExecution repetitionInstance = query.available().singleResult();
@@ -258,7 +253,7 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     assertEquals(3, query.count());
 
     // enabled instances
-    assertEquals(2, query.enabled().count());
+    assertEquals(2, query.active().count());
 
     // available instances
     assertEquals(1,  query.available().count());
@@ -301,38 +296,31 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatTaskWithoutEntryCriteria.cmmn")
   public void testRepeatTaskWithoutEntryCriteriaWhenCompleting() {
     // given
-    String caseInstanceId = createCaseInstance().getId();
+    String caseInstanceId = createCaseInstanceByKey(CASE_ID,Variables.createVariables().putValue("repeating", true)).getId();
 
     CaseExecutionQuery query = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1");
     assertEquals(1, query.count());
 
-    CaseExecution enabledCaseExecution = query.enabled().singleResult();
-    assertNotNull(enabledCaseExecution);
+    CaseExecution activeCaseExecution = query.active().singleResult();
+    assertNotNull(activeCaseExecution);
 
     // when (1)
-    manualStart(enabledCaseExecution.getId());
-    complete(enabledCaseExecution.getId());
+    complete(activeCaseExecution.getId());
 
     // then (1)
     query = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1");
     assertEquals(1, query.count());
 
-    enabledCaseExecution = query.enabled().singleResult();
-    assertNotNull(enabledCaseExecution);
+    activeCaseExecution = query.active().singleResult();
+    assertNotNull(activeCaseExecution);
 
     // when (2)
-    manualStart(enabledCaseExecution.getId());
-    complete(enabledCaseExecution.getId());
+    caseService.setVariable(caseInstanceId,"repeating",false);
+    complete(activeCaseExecution.getId());
 
     // then (2)
     query = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1");
-    assertEquals(1, query.count());
-
-    enabledCaseExecution = query.enabled().singleResult();
-    assertNotNull(enabledCaseExecution);
-
-    // when (3)
-    complete(caseInstanceId);
+    assertEquals(0, query.count());
 
     // then (3)
     query = caseService.createCaseExecutionQuery();
@@ -343,50 +331,33 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatStageWithoutEntryCriteria.cmmn")
   public void testRepeatStageWithoutEntryCriteriaWhenCompleting() {
     // given
-    String caseInstanceId = createCaseInstance().getId();
+    String caseInstanceId = createCaseInstanceByKey(CASE_ID,Variables.createVariables().putValue("repeating",true)).getId();
 
     CaseExecutionQuery stageQuery = caseService
         .createCaseExecutionQuery()
         .activityId("PI_Stage_1");
     assertEquals(1, stageQuery.count());
 
-    CaseExecution enabledStageCaseExecution = stageQuery.enabled().singleResult();
-    assertNotNull(enabledStageCaseExecution);
-
-    // start enabled stage
-    manualStart(enabledStageCaseExecution.getId());
+    CaseExecution activeStageCaseExecution = stageQuery.active().singleResult();
+    assertNotNull(activeStageCaseExecution);
 
     CaseExecution humanTaskCaseExecution = queryCaseExecutionByActivityId("PI_HumanTask_1");
 
     // when (1)
-    manualStart(humanTaskCaseExecution.getId());
     complete(humanTaskCaseExecution.getId());
 
     // then (1)
     stageQuery = caseService.createCaseExecutionQuery().activityId("PI_Stage_1");
     assertEquals(1, stageQuery.count());
 
-    enabledStageCaseExecution = stageQuery.enabled().singleResult();
-    assertNotNull(enabledStageCaseExecution);
-
-    // start enabled stage
-    manualStart(enabledStageCaseExecution.getId());
+    activeStageCaseExecution = stageQuery.active().singleResult();
+    assertNotNull(activeStageCaseExecution);
 
     humanTaskCaseExecution = queryCaseExecutionByActivityId("PI_HumanTask_1");
 
     // when (2)
-    manualStart(humanTaskCaseExecution.getId());
+    caseService.setVariable(caseInstanceId,"repeating",false);
     complete(humanTaskCaseExecution.getId());
-
-    // then (2)
-    stageQuery = caseService.createCaseExecutionQuery().activityId("PI_Stage_1");
-    assertEquals(1, stageQuery.count());
-
-    enabledStageCaseExecution = stageQuery.enabled().singleResult();
-    assertNotNull(enabledStageCaseExecution);
-
-    // when (3)
-    complete(caseInstanceId);
 
     // then (3)
     CaseExecutionQuery query = caseService.createCaseExecutionQuery();
@@ -397,40 +368,29 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatTaskWithoutEntryCriteria.cmmn")
   public void testRepeatTaskWithoutEntryCriteriaWhenTerminating() {
     // given
-    String caseInstanceId = createCaseInstance().getId();
+    String caseInstanceId = createCaseInstanceByKey(CASE_ID,Variables.createVariables().putValue("repeating",true)).getId();
 
     CaseExecutionQuery query = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1");
     assertEquals(1, query.count());
 
-    CaseExecution enabledCaseExecution = query.enabled().singleResult();
-    assertNotNull(enabledCaseExecution);
+    CaseExecution activeCaseExecution = query.active().singleResult();
+    assertNotNull(activeCaseExecution);
 
     // when (1)
-    manualStart(enabledCaseExecution.getId());
-    terminate(enabledCaseExecution.getId());
+    terminate(activeCaseExecution.getId());
 
     // then (1)
     query = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1");
     assertEquals(1, query.count());
 
-    enabledCaseExecution = query.enabled().singleResult();
-    assertNotNull(enabledCaseExecution);
+    activeCaseExecution = query.active().singleResult();
+    assertNotNull(activeCaseExecution);
 
     // when (2)
-    manualStart(enabledCaseExecution.getId());
-    terminate(enabledCaseExecution.getId());
+    caseService.setVariable(caseInstanceId,"repeating",false);
+    terminate(activeCaseExecution.getId());
 
     // then (2)
-    query = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1");
-    assertEquals(1, query.count());
-
-    enabledCaseExecution = query.enabled().singleResult();
-    assertNotNull(enabledCaseExecution);
-
-    // when (3)
-    complete(caseInstanceId);
-
-    // then (3)
     query = caseService.createCaseExecutionQuery();
     assertEquals(1, query.count());
     assertEquals(caseInstanceId, query.singleResult().getId());
@@ -439,52 +399,35 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatStageWithoutEntryCriteria.cmmn")
   public void testRepeatStageWithoutEntryCriteriaWhenTerminating() {
     // given
-    String caseInstanceId = createCaseInstance().getId();
+    String caseInstanceId = createCaseInstanceByKey(CASE_ID,Variables.createVariables().putValue("repeating",true)).getId();
 
     CaseExecutionQuery stageQuery = caseService
         .createCaseExecutionQuery()
         .activityId("PI_Stage_1");
     assertEquals(1, stageQuery.count());
 
-    CaseExecution enabledStageCaseExecution = stageQuery.enabled().singleResult();
-    assertNotNull(enabledStageCaseExecution);
-
-    // start enabled stage
-    manualStart(enabledStageCaseExecution.getId());
+    CaseExecution activeStageCaseExecution = stageQuery.active().singleResult();
+    assertNotNull(activeStageCaseExecution);
 
     CaseExecution humanTaskCaseExecution = queryCaseExecutionByActivityId("PI_HumanTask_1");
 
     // when (1)
-    manualStart(humanTaskCaseExecution.getId());
     terminate(humanTaskCaseExecution.getId());
 
     // then (1)
     stageQuery = caseService.createCaseExecutionQuery().activityId("PI_Stage_1");
     assertEquals(1, stageQuery.count());
 
-    enabledStageCaseExecution = stageQuery.enabled().singleResult();
-    assertNotNull(enabledStageCaseExecution);
-
-    // start enabled stage
-    manualStart(enabledStageCaseExecution.getId());
+    activeStageCaseExecution = stageQuery.active().singleResult();
+    assertNotNull(activeStageCaseExecution);
 
     humanTaskCaseExecution = queryCaseExecutionByActivityId("PI_HumanTask_1");
 
     // when (2)
-    manualStart(humanTaskCaseExecution.getId());
+    caseService.setVariable(caseInstanceId,"repeating",false);
     terminate(humanTaskCaseExecution.getId());
 
     // then (2)
-    stageQuery = caseService.createCaseExecutionQuery().activityId("PI_Stage_1");
-    assertEquals(1, stageQuery.count());
-
-    enabledStageCaseExecution = stageQuery.enabled().singleResult();
-    assertNotNull(enabledStageCaseExecution);
-
-    // when (3)
-    complete(caseInstanceId);
-
-    // then (3)
     CaseExecutionQuery query = caseService.createCaseExecutionQuery();
     assertEquals(1, query.count());
     assertEquals(caseInstanceId, query.singleResult().getId());
@@ -593,7 +536,7 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     CaseExecutionQuery enabledQuery = caseService
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_1")
-        .enabled();
+        .active();
 
     String enabledTaskId = enabledQuery
         .listPage(0, 1)
@@ -605,14 +548,13 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     assertTrue(secondHumanTask.isAvailable());
 
     // when
-    manualStart(enabledTaskId);
     complete(enabledTaskId);
 
     // then
     // there is only one instance of PI_HumanTask_2
     secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     assertNotNull(secondHumanTask);
-    assertTrue(secondHumanTask.isEnabled());
+    assertTrue(secondHumanTask.isActive());
   }
 
   @Deployment
@@ -633,43 +575,41 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     fireEntryCriteria(availableQuery.singleResult().getId());
 
     // get any enabled task
-    CaseExecutionQuery enabledQuery = caseService
+    CaseExecutionQuery activeQuery = caseService
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_1")
-        .enabled();
+        .active();
 
-    String enabledTaskId = enabledQuery
+    String activeTaskId = activeQuery
         .listPage(0, 1)
         .get(0)
         .getId();
 
     // when (1)
-    manualStart(enabledTaskId);
-    complete(enabledTaskId);
+    complete(activeTaskId);
 
     // then (1)
     CaseExecutionQuery query = caseService
       .createCaseExecutionQuery()
       .activityId("PI_HumanTask_2");
     assertEquals(2, query.count());
-    assertEquals(1, query.enabled().count());
+    assertEquals(1, query.active().count());
     assertEquals(1, query.available().count());
 
     // when (2)
     // get another enabled task
-    enabledTaskId = enabledQuery
+    activeTaskId = activeQuery
         .listPage(0, 1)
         .get(0)
         .getId();
-    manualStart(enabledTaskId);
-    complete(enabledTaskId);
+    complete(activeTaskId);
 
     // then (2)
     query = caseService
       .createCaseExecutionQuery()
       .activityId("PI_HumanTask_2");
     assertEquals(3, query.count());
-    assertEquals(2, query.enabled().count());
+    assertEquals(2, query.active().count());
     assertEquals(1, query.available().count());
   }
 
@@ -692,60 +632,57 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     fireEntryCriteria(availableQuery.singleResult().getId());
 
     // get any enabled task
-    CaseExecutionQuery enabledQuery = caseService
+    CaseExecutionQuery activeQuery = caseService
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_1")
-        .enabled();
+        .active();
 
-    String enabledTaskId = enabledQuery
+    String activeTaskId = activeQuery
         .listPage(0, 1)
         .get(0)
         .getId();
 
     // when (1)
-    manualStart(enabledTaskId);
-    complete(enabledTaskId);
+    complete(activeTaskId);
 
     // then (1)
     CaseExecutionQuery query = caseService
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_2");
     assertEquals(2, query.count());
-    assertEquals(1, query.enabled().count());
+    assertEquals(1, query.active().count());
     assertEquals(1, query.available().count());
 
     // when (2)
-    enabledTaskId = enabledQuery
+    activeTaskId = activeQuery
         .listPage(0, 1)
         .get(0)
         .getId();
 
-    manualStart(enabledTaskId);
-    complete(enabledTaskId);
+    complete(activeTaskId);
 
     // then (2)
     query = caseService
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_2");
     assertEquals(3, query.count());
-    assertEquals(2, query.enabled().count());
+    assertEquals(2, query.active().count());
     assertEquals(1, query.available().count());
 
     // when (3)
-    enabledTaskId = enabledQuery
+    activeTaskId = activeQuery
         .listPage(0, 1)
         .get(0)
         .getId();
 
-    manualStart(enabledTaskId);
-    complete(enabledTaskId);
+    complete(activeTaskId);
 
     // then (3)
     query = caseService
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_2");
     assertEquals(3, query.count());
-    assertEquals(3, query.enabled().count());
+    assertEquals(3, query.active().count());
     assertEquals(0, query.available().count());
   }
 
@@ -755,14 +692,13 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     VariableMap variables = Variables.createVariables().putValue("repetition", 0);
     createCaseInstanceByKey("case", variables);
 
-    CaseExecutionQuery enabledQuery = caseService
+    CaseExecutionQuery activeQuery = caseService
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_1")
-        .enabled();
-    String enabledCaseExecutionId = enabledQuery.singleResult().getId();
+        .active();
+    String enabledCaseExecutionId = activeQuery.singleResult().getId();
 
     // when (1)
-    manualStart(enabledCaseExecutionId);
     complete(enabledCaseExecutionId);
 
     // then (1)
@@ -770,11 +706,10 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_1");
     assertEquals(1, query.count());
-    assertEquals(1, query.enabled().count());
+    assertEquals(1, query.active().count());
 
     // when (2)
-    enabledCaseExecutionId = enabledQuery.singleResult().getId();
-    manualStart(enabledCaseExecutionId);
+    enabledCaseExecutionId = activeQuery.singleResult().getId();
     complete(enabledCaseExecutionId);
 
     // then (2)
@@ -782,11 +717,10 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_1");
     assertEquals(1, query.count());
-    assertEquals(1, query.enabled().count());
+    assertEquals(1, query.active().count());
 
     // when (3)
-    enabledCaseExecutionId = enabledQuery.singleResult().getId();
-    manualStart(enabledCaseExecutionId);
+    enabledCaseExecutionId = activeQuery.singleResult().getId();
     complete(enabledCaseExecutionId);
 
     // then (3)
@@ -813,7 +747,6 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     // when (2)
     // complete any task
     String caseExecutionId = query.listPage(0, 1).get(0).getId();
-    manualStart(caseExecutionId);
     complete(caseExecutionId);
 
     // then (2)
@@ -844,11 +777,6 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     VariableMap variables = Variables.createVariables().putValue("manualActivation", false);
     String caseInstanceId = createCaseInstanceByKey("case", variables).getId();
 
-    String stageId = queryCaseExecutionByActivityId("PI_Stage_1").getId();
-
-    // when (1)
-    manualStart(stageId);
-
     // then (1)
     CaseExecutionQuery query = caseService
         .createCaseExecutionQuery()
@@ -877,9 +805,6 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     String caseInstanceId = createCaseInstance().getId();
 
     String stageId = queryCaseExecutionByActivityId("PI_Stage_1").getId();
-
-    // when (1)
-    manualStart(stageId);
 
     // then (1)
     CaseExecutionQuery query = caseService
@@ -915,30 +840,24 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     // given
     String caseInstanceId = createCaseInstance().getId();
 
-    String stageId = queryCaseExecutionByActivityId("PI_Stage_1").getId();
-
-    // when (1)
-    manualStart(stageId);
-
     // then (1)
     CaseExecutionQuery query = caseService
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_1");
     assertEquals(1, query.count());
 
-    assertEquals(1, query.enabled().count());
-    String enabledTaskId = query.singleResult().getId();
+    assertEquals(1, query.active().count());
+    String activeTaskId = query.singleResult().getId();
 
     // when (2)
-    manualStart(enabledTaskId);
-    complete(enabledTaskId);
+    complete(activeTaskId);
 
     // then (2)
     query = caseService
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_1");
     assertEquals(1, query.count());
-    assertEquals(1, query.enabled().count());
+    assertEquals(1, query.active().count());
 
     CaseExecution stage = queryCaseExecutionByActivityId("PI_Stage_1");
     assertNotNull(stage);
@@ -955,7 +874,6 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     String humanTask1 = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
 
     // when (1)
-    manualStart(humanTask1);
     complete(humanTask1);
 
     // then (1)
@@ -964,11 +882,10 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_2");
     assertEquals(2, query.count());
     assertEquals(1, query.available().count());
-    assertEquals(1, query.enabled().count());
+    assertEquals(1, query.active().count());
 
     // when (2)
-    String humanTask2 = query.enabled().singleResult().getId();
-    manualStart(humanTask2);
+    String humanTask2 = query.active().singleResult().getId();
     complete(humanTask2);
 
     // then (2)
@@ -985,7 +902,6 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     createCaseInstance();
 
     String humanTask1 = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
-    manualStart(humanTask1);
     complete(humanTask1);
 
     CaseExecutionQuery query = caseService

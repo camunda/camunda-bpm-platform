@@ -18,7 +18,13 @@
         </itemControl>
       </planItem>
 
-      <humanTask id="HumanTask_1" />
+      <humanTask id="HumanTask_1" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
 
     </casePlanModel>
   </case>

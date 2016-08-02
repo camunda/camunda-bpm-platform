@@ -27,6 +27,11 @@
           <camunda:caseExecutionListener event="enable" class="org.camunda.bpm.engine.test.cmmn.sentry.SentryTriggerListener" />
           <camunda:caseExecutionListener event="start" class="org.camunda.bpm.engine.test.cmmn.sentry.SentryTriggerListener" />
         </extensionElements>
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
 
         <planItem id="PI_HumanTask_2" definitionRef="HumanTask_1" />
         <planItem id="PI_HumanTask_3" definitionRef="HumanTask_1" />

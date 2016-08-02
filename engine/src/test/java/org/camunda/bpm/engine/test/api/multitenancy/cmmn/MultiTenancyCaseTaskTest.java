@@ -29,6 +29,7 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
   protected static final String TENANT_TWO = "tenant2";
 
   protected static final String CMMN_LATEST = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithCaseTask.cmmn";
+  protected static final String CMMN_LATEST_WITH_MANUAL_ACTIVATION = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithCaseTaskWithManualActivation.cmmn";
   protected static final String CMMN_DEPLOYMENT = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithCaseTaskDeploymentBinding.cmmn";
   protected static final String CMMN_VERSION = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithCaseTaskVersionBinding.cmmn";
   protected static final String CMMN_VERSION_2 = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithCaseTaskVersionBinding_v2.cmmn";
@@ -55,8 +56,8 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
 
   public void testStartCaseInstanceWithLatestBindingSameVersion() {
 
-    deploymentForTenant(TENANT_ONE, CMMN_LATEST, CMMN_CASE);
-    deploymentForTenant(TENANT_TWO, CMMN_LATEST, CMMN_CASE);
+    deploymentForTenant(TENANT_ONE, CMMN_LATEST_WITH_MANUAL_ACTIVATION, CMMN_CASE);
+    deploymentForTenant(TENANT_TWO, CMMN_LATEST_WITH_MANUAL_ACTIVATION, CMMN_CASE);
 
     createCaseInstance("caseTaskCase", TENANT_ONE);
     createCaseInstance("caseTaskCase", TENANT_TWO);
@@ -68,9 +69,9 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
 
   public void testStartCaseInstanceWithLatestBindingDifferentVersion() {
 
-    deploymentForTenant(TENANT_ONE, CMMN_LATEST, CMMN_CASE);
+    deploymentForTenant(TENANT_ONE, CMMN_LATEST_WITH_MANUAL_ACTIVATION, CMMN_CASE);
 
-    deploymentForTenant(TENANT_TWO, CMMN_LATEST, CMMN_CASE);
+    deploymentForTenant(TENANT_TWO, CMMN_LATEST_WITH_MANUAL_ACTIVATION, CMMN_CASE);
     deploymentForTenant(TENANT_TWO, CMMN_CASE);
 
     createCaseInstance("caseTaskCase", TENANT_ONE);
@@ -148,9 +149,6 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
 
     caseService.withCaseDefinitionByKey("caseTaskCase").create();
 
-    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(CASE_TASK_ID).singleResult();
-    caseService.withCaseExecution(caseExecution.getId()).manualStart();
-
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
@@ -160,9 +158,6 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
     deploymentForTenant(TENANT_ONE, CMMN_CASE);
 
     caseService.withCaseDefinitionByKey("caseTaskCase").create();
-
-    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(CASE_TASK_ID).singleResult();
-    caseService.withCaseExecution(caseExecution.getId()).manualStart();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));

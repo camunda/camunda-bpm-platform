@@ -127,10 +127,6 @@ public class MigrationCallActivityTest {
         .activityId("PI_HumanTask_1")
         .singleResult();
 
-    rule.getCaseService()
-      .withCaseExecution(caseExecution.getId())
-      .manualStart();
-
     testHelper.completeTask("PI_HumanTask_1");
     // and the calling process instance
     testHelper.completeTask("userTask");
@@ -288,10 +284,6 @@ public class MigrationCallActivityTest {
       .activityId("PI_HumanTask_1")
       .singleResult();
 
-    rule.getCaseService()
-      .withCaseExecution(caseExecution.getId())
-      .manualStart();
-
     testHelper.completeTask("PI_HumanTask_1");
 
     // and the calling process instance
@@ -403,10 +395,6 @@ public class MigrationCallActivityTest {
       .activityId("PI_HumanTask_1")
       .singleResult();
 
-    rule.getCaseService()
-      .withCaseExecution(caseExecution.getId())
-      .manualStart();
-
     testHelper.completeTask("PI_HumanTask_1");
 
     // and the calling process instance
@@ -517,10 +505,6 @@ public class MigrationCallActivityTest {
       .createCaseExecutionQuery()
       .activityId("PI_HumanTask_1")
       .singleResult();
-
-    rule.getCaseService()
-      .withCaseExecution(caseExecution.getId())
-      .manualStart();
 
     testHelper.completeTask("PI_HumanTask_1");
 

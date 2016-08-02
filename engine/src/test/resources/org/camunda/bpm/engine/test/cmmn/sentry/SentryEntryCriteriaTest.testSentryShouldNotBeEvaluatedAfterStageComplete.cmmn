@@ -10,6 +10,11 @@
       <planItem id="PI_Stage_1" definitionRef="Stage_1" />
 
       <stage id="Stage_1">
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
         <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
         <planItem id="PI_HumanTask_2" definitionRef="HumanTask_1">
           <entryCriterion sentryRef="Sentry_1" />

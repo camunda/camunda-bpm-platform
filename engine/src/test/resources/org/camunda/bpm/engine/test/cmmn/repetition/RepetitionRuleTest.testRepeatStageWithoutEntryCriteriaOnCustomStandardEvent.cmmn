@@ -16,6 +16,9 @@
           <repetitionRule camunda:repeatOnStandardEvent="disable">
             <condition>${true}</condition>
           </repetitionRule>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
         </defaultControl>
         <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
       </stage>

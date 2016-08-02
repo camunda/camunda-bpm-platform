@@ -845,10 +845,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     caseService
       .withCaseExecution(humanTaskId)
@@ -883,10 +879,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     caseService
@@ -923,10 +915,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     caseService
       .withCaseExecution(humanTaskId)
@@ -960,10 +948,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     caseService
@@ -999,10 +983,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     terminate(humanTaskId);
 
@@ -1035,10 +1015,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     terminate(humanTaskId);
@@ -1073,10 +1049,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     terminate(humanTaskId);
 
@@ -1108,10 +1080,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     terminate(humanTaskId);
@@ -1242,10 +1210,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     exit(humanTaskId);
@@ -1409,10 +1373,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     suspend(humanTaskId);
 
@@ -1445,10 +1405,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     suspend(humanTaskId);
@@ -1483,10 +1439,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     suspend(humanTaskId);
 
@@ -1518,10 +1470,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // when
     suspend(humanTaskId);
@@ -1653,10 +1601,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // when
     parentSuspend(humanTaskId);
 
@@ -1688,10 +1632,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     suspend(humanTaskId);
 
@@ -1728,10 +1668,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     suspend(humanTaskId);
 
     // when
@@ -1767,10 +1703,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     suspend(humanTaskId);
 
     // when
@@ -1805,10 +1737,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     suspend(humanTaskId);
 
     // when
@@ -1842,10 +1770,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     suspend(humanTaskId);
 
@@ -1882,10 +1806,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     suspend(humanTaskId);
 
     // when
@@ -1921,10 +1841,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     suspend(humanTaskId);
 
     // when
@@ -1958,10 +1874,6 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     suspend(humanTaskId);
 

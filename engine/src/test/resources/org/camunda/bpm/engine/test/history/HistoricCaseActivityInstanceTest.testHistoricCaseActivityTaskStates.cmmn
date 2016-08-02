@@ -29,8 +29,20 @@
         </planItemOnPart>
       </sentry>
 
-      <humanTask id="HumanTask_1" />
-      <humanTask id="HumanTask_2" />
+      <humanTask id="HumanTask_1" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
+      <humanTask id="HumanTask_2" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
       <humanTask id="HumanTask_3">
         <defaultControl>
           <manualActivationRule>

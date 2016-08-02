@@ -224,7 +224,7 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
       return rule.evaluate(execution);
     }
 
-    return true;
+    return false;
   }
 
   // helper ///////////////////////////////////////////////////////////

@@ -38,6 +38,11 @@
             </camunda:script>
           </camunda:caseExecutionListener>
         </extensionElements>
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
       </humanTask>
 
     </casePlanModel>

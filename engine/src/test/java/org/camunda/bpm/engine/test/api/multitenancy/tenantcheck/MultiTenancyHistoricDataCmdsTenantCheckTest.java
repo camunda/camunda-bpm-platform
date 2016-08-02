@@ -79,7 +79,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
       .endEvent()
       .done();
 
-  protected static final String CMMN_PROCESS = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
+  protected static final String CMMN_PROCESS_WITH_MANUAL_ACTIVATION = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn";
 
   protected static final String DMN = "org/camunda/bpm/engine/test/api/multitenancy/simpleDecisionTable.dmn";
 
@@ -187,7 +187,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
   @Test
   public void failToDeleteHistoricCaseInstanceNoAuthenticatedTenants() {
-    testRule.deployForTenant(TENANT_ONE, CMMN_PROCESS);
+    testRule.deployForTenant(TENANT_ONE, CMMN_PROCESS_WITH_MANUAL_ACTIVATION);
     String caseInstanceId = createAndCloseCaseInstance(null);
 
     identityService.setAuthentication("user", null, null);
@@ -200,7 +200,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
   @Test
   public void deleteHistoricCaseInstanceWithAuthenticatedTenant() {
-    testRule.deployForTenant(TENANT_ONE, CMMN_PROCESS);
+    testRule.deployForTenant(TENANT_ONE, CMMN_PROCESS_WITH_MANUAL_ACTIVATION);
     String caseInstanceId = createAndCloseCaseInstance(null);
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
@@ -216,8 +216,8 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
   @Test
   public void deleteHistoricCaseInstanceWithDisabledTenantCheck() {
-    testRule.deployForTenant(TENANT_ONE, CMMN_PROCESS);
-    testRule.deployForTenant(TENANT_TWO, CMMN_PROCESS);
+    testRule.deployForTenant(TENANT_ONE, CMMN_PROCESS_WITH_MANUAL_ACTIVATION);
+    testRule.deployForTenant(TENANT_TWO, CMMN_PROCESS_WITH_MANUAL_ACTIVATION);
 
     String caseInstanceIdOne = createAndCloseCaseInstance(TENANT_ONE);
     String caseInstanceIdTwo = createAndCloseCaseInstance(TENANT_TWO);

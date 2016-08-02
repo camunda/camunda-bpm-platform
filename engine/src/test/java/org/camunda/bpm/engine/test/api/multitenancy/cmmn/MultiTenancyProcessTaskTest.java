@@ -1,3 +1,4 @@
+
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +32,7 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
   protected static final String TENANT_TWO = "tenant2";
 
   protected static final String CMMN_LATEST = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithProcessTask.cmmn";
+  protected static final String CMMN_LATEST_WITH_MANUAL_ACTIVATION = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithProcessTaskWithManualActivation.cmmn";
   protected static final String CMMN_DEPLOYMENT = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithProcessTaskDeploymentBinding.cmmn";
   protected static final String CMMN_VERSION = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithProcessTaskVersionBinding.cmmn";
   protected static final String CMMN_VERSION_2 = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithProcessTaskVersionBinding_v2.cmmn";
@@ -61,8 +63,8 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
 
   public void testStartProcessInstanceWithLatestBindingSameVersion() {
 
-    deploymentForTenant(TENANT_ONE, CMMN_LATEST, PROCESS);
-    deploymentForTenant(TENANT_TWO, CMMN_LATEST, PROCESS);
+    deploymentForTenant(TENANT_ONE, CMMN_LATEST_WITH_MANUAL_ACTIVATION, PROCESS);
+    deploymentForTenant(TENANT_TWO, CMMN_LATEST_WITH_MANUAL_ACTIVATION, PROCESS);
 
     createCaseInstance("testCase", TENANT_ONE);
     createCaseInstance("testCase", TENANT_TWO);
@@ -74,9 +76,9 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
 
   public void testStartProcessInstanceWithLatestBindingDifferentVersion() {
 
-    deploymentForTenant(TENANT_ONE, CMMN_LATEST, PROCESS);
+    deploymentForTenant(TENANT_ONE, CMMN_LATEST_WITH_MANUAL_ACTIVATION, PROCESS);
 
-    deploymentForTenant(TENANT_TWO, CMMN_LATEST, PROCESS);
+    deploymentForTenant(TENANT_TWO, CMMN_LATEST_WITH_MANUAL_ACTIVATION, PROCESS);
     deploymentForTenant(TENANT_TWO, PROCESS);
 
     createCaseInstance("testCase", TENANT_ONE);
@@ -152,9 +154,6 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
     deploymentForTenant(TENANT_ONE, PROCESS);
 
     caseService.withCaseDefinitionByKey("testCase").create();
-
-    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(PROCESS_TASK_ID).singleResult();
-    caseService.withCaseExecution(caseExecution.getId()).manualStart();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));

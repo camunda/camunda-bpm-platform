@@ -4,6 +4,12 @@
     <cmmn:casePlanModel id="CasePlanModel_1" name="A CasePlanModel">
       <cmmn:planItem id="Stage_1" name="Stage1" definitionRef="Stage_0irdgqu" />
       <cmmn:stage id="Stage_0irdgqu" name="Stage">
+        <cmmn:defaultControl>
+          <cmmn:manualActivationRule>
+            <cmmn:condition>${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:defaultControl>
+
         <cmmn:planItem id="HumanTask_1" name="HumanTask 1" definitionRef="HumanTask_10dbxwv">
           <cmmn:entryCriterion id="Sentry_1" sentryRef="Sentry1" />
         </cmmn:planItem>
@@ -14,7 +20,13 @@
              </camunda:variableOnPart>
           </cmmn:extensionElements>
         </cmmn:sentry>
-        <cmmn:humanTask id="HumanTask_10dbxwv" name="HumanTask1" />
+        <cmmn:humanTask id="HumanTask_10dbxwv" name="HumanTask1" >
+          <cmmn:defaultControl>
+            <cmmn:manualActivationRule>
+              <cmmn:condition>${true}</cmmn:condition>
+            </cmmn:manualActivationRule>
+          </cmmn:defaultControl>
+        </cmmn:humanTask>
       </cmmn:stage>
     </cmmn:casePlanModel>
   </cmmn:case>

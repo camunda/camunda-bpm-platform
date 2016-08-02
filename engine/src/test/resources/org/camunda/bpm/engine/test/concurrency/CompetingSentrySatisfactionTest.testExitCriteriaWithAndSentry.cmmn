@@ -22,7 +22,13 @@
         </planItemOnPart>
       </sentry>
 
-      <humanTask id="HumanTask_1" />
+      <humanTask id="HumanTask_1" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
 
       <humanTask id="HumanTask_2">
         <defaultControl>
@@ -32,7 +38,13 @@
         </defaultControl>
       </humanTask>
 
-      <humanTask id="HumanTask_3" />
+      <humanTask id="HumanTask_3" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
 
     </casePlanModel>
   </case>

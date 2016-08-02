@@ -36,11 +36,6 @@ public class HumanTaskFollowUpDateTest extends CmmnProcessEngineTestCase {
     variables.put("dateVariable", date);
 
     String caseInstanceId = caseService.createCaseInstanceByKey("case", variables).getId();
-    String humanTaskId = caseService.createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-    caseService.manuallyStartCaseExecution(humanTaskId);
 
     Task task = taskService.createTaskQuery().caseInstanceId(caseInstanceId).singleResult();
 
@@ -55,11 +50,6 @@ public class HumanTaskFollowUpDateTest extends CmmnProcessEngineTestCase {
     variables.put("dateVariable", "2015-01-01T12:10:00");
 
     String caseInstanceId = caseService.createCaseInstanceByKey("case", variables).getId();
-    String humanTaskId = caseService.createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-    caseService.manuallyStartCaseExecution(humanTaskId);
 
     Task task = taskService.createTaskQuery().caseInstanceId(caseInstanceId).singleResult();
 
@@ -74,11 +64,6 @@ public class HumanTaskFollowUpDateTest extends CmmnProcessEngineTestCase {
     variables.put("dateVariable", "P2DT2H30M");
 
     String caseInstanceId = caseService.createCaseInstanceByKey("case", variables).getId();
-    String humanTaskId = caseService.createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-    caseService.manuallyStartCaseExecution(humanTaskId);
 
     Task task = taskService.createTaskQuery().caseInstanceId(caseInstanceId).singleResult();
 

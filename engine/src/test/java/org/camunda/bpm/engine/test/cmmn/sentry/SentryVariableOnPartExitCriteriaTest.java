@@ -30,14 +30,13 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     String secondHumanTaskId = secondHumanTask.getId();
-    assertTrue(secondHumanTask.isEnabled());
+    assertTrue(secondHumanTask.isActive());
 
     // when
-    manualStart(firstHumanTaskId);
     caseService
       .withCaseExecution(firstHumanTaskId)
       .setVariable("variable_1", 100)
@@ -58,14 +57,13 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isEnabled());
+    assertTrue(firstHumanTask.isActive());
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     String secondHumanTaskId = secondHumanTask.getId();
-    assertTrue(secondHumanTask.isEnabled());
+    assertTrue(secondHumanTask.isActive());
 
     // when
-    manualStart(firstHumanTaskId);
     caseService
       .withCaseExecution(firstHumanTaskId)
       .setVariable("variable", 100)
@@ -76,7 +74,7 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
     assertNull(firstHumanTask);
 
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
-    assertTrue(secondHumanTask.isEnabled());
+    assertTrue(secondHumanTask.isActive());
 
   }
 
@@ -85,16 +83,14 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
     // given
     createCaseInstance();
 
-    CaseExecution stageExecution = queryCaseExecutionByActivityId("Stage_1");
-    manualStart(stageExecution.getId());
+    CaseExecution stageExecution;
 
     CaseExecution humanTask1 = queryCaseExecutionByActivityId("HumanTask_1");
-    assertTrue(humanTask1.isEnabled());
+    assertTrue(humanTask1.isActive());
     
     CaseExecution humanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
-    assertTrue(humanTask2.isEnabled());
+    assertTrue(humanTask2.isActive());
 
-    manualStart(humanTask1.getId());
     complete(humanTask1.getId());
 
     stageExecution = queryCaseExecutionByActivityId("Stage_1");
@@ -118,10 +114,8 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
     createCaseInstance();
 
     CaseExecution stageExecution1 = queryCaseExecutionByActivityId("Stage_1");
-    manualStart(stageExecution1.getId());
 
-    CaseExecution stageExecution2 = queryCaseExecutionByActivityId("Stage_2");
-    manualStart(stageExecution2.getId());
+    CaseExecution stageExecution2;
 
     caseService.setVariable(stageExecution1.getId(), "value", 101);
 

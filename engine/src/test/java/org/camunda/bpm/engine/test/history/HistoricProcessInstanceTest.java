@@ -469,17 +469,6 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
         .create()
         .getId();
 
-    String processTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_ProcessTask_1")
-        .singleResult()
-        .getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
-
     // then
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
@@ -527,17 +516,6 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
         .withCaseDefinitionByKey("case")
         .create()
         .getId();
-
-    String processTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_ProcessTask_1")
-        .singleResult()
-        .getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     // then
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
@@ -598,17 +576,6 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
       .businessKey(businessKey)
       .create()
       .getId();
-
-    String processTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_ProcessTask_1")
-        .singleResult()
-        .getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     // then
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
@@ -770,14 +737,6 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
   public void testQueryBySuperCaseInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneProcessTaskCase").getId();
 
-    String processTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_ProcessTask_1")
-        .singleResult()
-        .getId();
-
-    caseService.manuallyStartCaseExecution(processTaskId);
-
     HistoricProcessInstanceQuery query = historyService
         .createHistoricProcessInstanceQuery()
         .superCaseInstanceId(superCaseInstanceId);
@@ -857,8 +816,6 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
         .activityId("PI_ProcessTask_1")
         .singleResult()
         .getId();
-
-    caseService.manuallyStartCaseExecution(processTaskId);
 
     HistoricProcessInstance instance = historyService
         .createHistoricProcessInstanceQuery()

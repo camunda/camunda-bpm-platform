@@ -8,8 +8,20 @@
     <casePlanModel id="CasePlanModel_1">
       <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
       <planItem id="PI_HumanTask_2" definitionRef="HumanTask_2" />
-      <humanTask id="HumanTask_1" name="A HumanTask" />
-      <humanTask id="HumanTask_2" name="Another HumanTask" />
+      <humanTask id="HumanTask_1" name="A HumanTask" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
+      <humanTask id="HumanTask_2" name="Another HumanTask" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
     </casePlanModel>
   </case>
   

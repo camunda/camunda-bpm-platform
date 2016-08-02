@@ -13,7 +13,13 @@
           </camunda:variableOnPart>
         </cmmn:extensionElements>
       </cmmn:sentry>  
-      <cmmn:task id="Task_1" />
+      <cmmn:task id="Task_1" >
+        <cmmn:defaultControl>
+          <cmmn:manualActivationRule>
+            <cmmn:condition>${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:defaultControl>
+      </cmmn:task>
       <cmmn:stage id="Stage_0jv94fp">
         <cmmn:planItem id="HumanTask_2" name="HumanTask2" definitionRef="Task_0c96edy">
           <cmmn:entryCriterion id="Stage_Sentry_1" sentryRef="Sentry_2" />
@@ -31,8 +37,20 @@
             <cmmn:condition id="Expression_1emjyjf"><![CDATA[${variable_1 > 100}]]></cmmn:condition>
           </cmmn:ifPart>
         </cmmn:sentry>
-        <cmmn:task id="Task_0c96edy" name="HumanTask 2" />
-        <cmmn:humanTask id="HumanTask_1ag04vg" name="HumanTask1" />
+        <cmmn:task id="Task_0c96edy" name="HumanTask 2" >
+          <cmmn:defaultControl>
+            <cmmn:manualActivationRule>
+              <cmmn:condition>${true}</cmmn:condition>
+            </cmmn:manualActivationRule>
+          </cmmn:defaultControl>
+        </cmmn:task>
+        <cmmn:humanTask id="HumanTask_1ag04vg" name="HumanTask1" >
+          <cmmn:defaultControl>
+            <cmmn:manualActivationRule>
+              <cmmn:condition>${true}</cmmn:condition>
+            </cmmn:manualActivationRule>
+          </cmmn:defaultControl>
+        </cmmn:humanTask>
       </cmmn:stage>
     </cmmn:casePlanModel>
   </cmmn:case>

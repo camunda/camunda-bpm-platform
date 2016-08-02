@@ -42,7 +42,13 @@
 
       <humanTask id="HumanTask_1" />
       <humanTask id="HumanTask_2" />
-      <humanTask id="HumanTask_3" />
+      <humanTask id="HumanTask_3" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
 
       <milestone id="Milestone" />
 

@@ -14,6 +14,11 @@
         <extensionElements>
           <camunda:caseExecutionListener event="enable" class="org.camunda.bpm.engine.test.cmmn.listener.MySpecialCaseExecutionListener" />
         </extensionElements>
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
       </humanTask>
 
     </casePlanModel>

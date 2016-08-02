@@ -58,7 +58,7 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertEquals(caseInstance.getCaseDefinitionId(), historicInstance.getCaseDefinitionId());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageWithManualActivationCase.cmmn"})
   public void testCaseInstanceStates() {
     String caseInstanceId = createCaseInstance().getId();
 
@@ -105,7 +105,7 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertCount(0, historicQuery().notClosed());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageWithManualActivationCase.cmmn"})
   public void testHistoricCaseInstanceDates() {
     // create test dates
     long duration = 72 * 3600 * 1000;
@@ -180,8 +180,6 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
   public void testSuperCaseInstance() {
     String caseInstanceId  = createCaseInstanceByKey("oneCaseTaskCase").getId();
     String caseTaskId = queryCaseExecutionByActivityId("PI_CaseTask_1").getId();
-
-    manualStart(caseTaskId);
 
     HistoricCaseInstance historicCaseInstance = historicQuery()
       .superCaseInstanceId(caseInstanceId)
@@ -549,7 +547,7 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertEquals(2, historyService.createNativeHistoricCaseInstanceQuery().sql("SELECT * FROM " + tableName).listPage(2, 2).size());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageWithManualActivationCase.cmmn"})
   public void testDeleteHistoricCaseInstance() {
     CaseInstance caseInstance = createCaseInstance();
 
@@ -614,14 +612,6 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
   public void testQueryBySubProcessInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneProcessTaskCase").getId();
 
-    String processTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_ProcessTask_1")
-        .singleResult()
-        .getId();
-
-    caseService.manuallyStartCaseExecution(processTaskId);
-
     String subProcessInstanceId = runtimeService
         .createProcessInstanceQuery()
         .superCaseInstanceId(superCaseInstanceId)
@@ -663,14 +653,6 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
   public void testQueryBySuperCaseInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneCaseTaskCase").getId();
 
-    String caseTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_CaseTask_1")
-        .singleResult()
-        .getId();
-
-    caseService.manuallyStartCaseExecution(caseTaskId);
-
     HistoricCaseInstanceQuery query = historyService
         .createHistoricCaseInstanceQuery()
         .superCaseInstanceId(superCaseInstanceId);
@@ -704,14 +686,6 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
       })
   public void testQueryBySubCaseInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneCaseTaskCase").getId();
-
-    String caseTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_CaseTask_1")
-        .singleResult()
-        .getId();
-
-    caseService.manuallyStartCaseExecution(caseTaskId);
 
     String subCaseInstanceId = caseService
         .createCaseInstanceQuery()

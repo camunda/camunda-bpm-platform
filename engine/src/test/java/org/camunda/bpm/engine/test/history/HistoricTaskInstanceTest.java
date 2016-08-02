@@ -547,11 +547,6 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // then
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
@@ -608,11 +603,6 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // then
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
@@ -667,11 +657,6 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // then
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
@@ -729,11 +714,6 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // then
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
@@ -770,11 +750,6 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
         .activityId("PI_ProcessTask_1")
         .singleResult()
         .getId();
-
-    // when
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     // then
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
@@ -843,11 +818,6 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     // then
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
@@ -935,12 +905,6 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     // given
     String key = "oneTaskCase";
     String caseInstanceId = caseService.createCaseInstanceByKey(key).getId();
-    String humanTask = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-    caseService.manuallyStartCaseExecution(humanTask);
 
     // when
     HistoricTaskInstance task = historyService

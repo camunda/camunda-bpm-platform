@@ -8,9 +8,21 @@
     <casePlanModel id="CasePlanModel_1">
       <planItem id="PI_Stage_1" definitionRef="Stage_1" />
 
-      <humanTask id="HumanTask_1" />
+      <humanTask id="HumanTask_1" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
 
-      <humanTask id="HumanTask_2" />
+      <humanTask id="HumanTask_2" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
 
       <stage id="Stage_1">
 

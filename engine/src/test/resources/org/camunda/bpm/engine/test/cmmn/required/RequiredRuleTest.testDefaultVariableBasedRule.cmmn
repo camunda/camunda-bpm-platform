@@ -15,6 +15,9 @@
           <requiredRule>
             <condition>${required}</condition>
           </requiredRule>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
         </defaultControl>
       </humanTask>
     </casePlanModel>

@@ -1404,7 +1404,6 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-    caseService.manuallyStartCaseExecution(humanTask);
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
     caseService.setVariable(caseInstanceId, "aVariable", "aValue");

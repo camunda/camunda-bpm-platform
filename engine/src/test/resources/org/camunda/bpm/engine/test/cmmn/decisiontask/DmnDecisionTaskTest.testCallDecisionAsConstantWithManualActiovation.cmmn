@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<definitions id="_7f0c94c0-2a22-445d-b4b7-4fd181e08248"
+                  xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+                  xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  targetNamespace="Examples">
+  <case id="case">
+  
+    <casePlanModel id="CasePlanModel_1">
+      <planItem id="PI_DecisionTask_1" definitionRef="DecisionTask_1" />
+      <decisionTask id="DecisionTask_1" isBlocking="false"
+                    decisionRef="testDecision"
+                    camunda:resultVariable="result"
+                    camunda:mapDecisionResult="singleEntry" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </decisionTask>
+    </casePlanModel>
+  </case>
+  
+</definitions>

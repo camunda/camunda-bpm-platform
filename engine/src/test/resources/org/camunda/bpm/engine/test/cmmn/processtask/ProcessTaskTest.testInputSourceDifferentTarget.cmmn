@@ -13,6 +13,11 @@
           <camunda:in source="aVariable" target="myVariable" />
           <camunda:in source="anotherVariable" target="myAnotherVariable" />
         </extensionElements>
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
       </processTask>
     </casePlanModel>
   </case>

@@ -663,10 +663,6 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
-
     Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
 
@@ -1418,10 +1414,6 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
-
     Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
 
@@ -1859,10 +1851,6 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
         .singleResult()
         .getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
     String variableName = "aVariable";
@@ -1888,10 +1876,6 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     String variableName = "aVariable";
     String variableValue = "aValue";
@@ -1944,10 +1928,6 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
 
     String variableName = "aVariable";
     String variableValue = "aValue";

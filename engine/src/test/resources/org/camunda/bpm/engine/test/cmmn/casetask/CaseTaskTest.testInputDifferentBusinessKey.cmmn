@@ -12,6 +12,11 @@
         <extensionElements>
           <camunda:in businessKey="${myOwnBusinessKey}" />
         </extensionElements>
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
       </caseTask>
     </casePlanModel>
   </case>

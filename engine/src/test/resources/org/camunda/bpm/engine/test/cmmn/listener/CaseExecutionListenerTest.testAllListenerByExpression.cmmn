@@ -15,6 +15,11 @@
         <extensionElements>
           <camunda:caseExecutionListener expression="${myListener.notify(caseExecution, caseExecution.eventName)}" />
         </extensionElements>
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
       </humanTask>
       <humanTask id="HumanTask_2" name="Another HumanTask" />
 

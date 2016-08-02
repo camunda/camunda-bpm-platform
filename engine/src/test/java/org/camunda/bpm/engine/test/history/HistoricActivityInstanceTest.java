@@ -968,7 +968,6 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
         .singleResult()
         .getId();
 
-    caseService.manuallyStartCaseExecution(humanTaskId);
     caseService.completeCaseExecution(humanTaskId);
 
     historicCallActivity = historyService

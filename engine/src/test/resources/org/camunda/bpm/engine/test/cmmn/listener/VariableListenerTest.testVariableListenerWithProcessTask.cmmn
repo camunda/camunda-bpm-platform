@@ -17,6 +17,11 @@
         <extensionElements>
           <camunda:out variables="all" />
         </extensionElements>
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
       </processTask>
 
     </casePlanModel>

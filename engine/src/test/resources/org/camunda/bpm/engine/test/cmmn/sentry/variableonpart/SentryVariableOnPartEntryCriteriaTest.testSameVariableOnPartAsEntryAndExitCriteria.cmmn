@@ -25,7 +25,13 @@
             <cmmn:condition id="Expression_1tkqxip"><![CDATA[${value > 100}]]></cmmn:condition>
           </cmmn:ifPart>
         </cmmn:sentry>  
-        <cmmn:humanTask id="HumanTask_0gwum1g" name="Human Task 1" />
+        <cmmn:humanTask id="HumanTask_0gwum1g" name="Human Task 1" >
+          <cmmn:defaultControl>
+            <cmmn:manualActivationRule>
+              <cmmn:condition>${true}</cmmn:condition>
+            </cmmn:manualActivationRule>
+          </cmmn:defaultControl>
+        </cmmn:humanTask>
       </cmmn:stage>
     </cmmn:casePlanModel>
   </cmmn:case>

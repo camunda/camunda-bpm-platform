@@ -13,7 +13,7 @@
       <humanTask id="HumanTask_1">
         <defaultControl>
           <repetitionRule>
-            <condition>${true}</condition>
+            <condition>${repeating}</condition>
           </repetitionRule>
         </defaultControl>
       </humanTask>

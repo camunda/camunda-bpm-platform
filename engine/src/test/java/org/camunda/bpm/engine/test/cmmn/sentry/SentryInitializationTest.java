@@ -238,7 +238,7 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     // then
     CaseSentryPartQueryImpl query = createCaseSentryPartQuery();
 
-    assertEquals(0, query.count());
+    assertEquals(2, query.count());
 
     // when
     String stageId = caseService
@@ -246,10 +246,6 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
         .activityId("PI_Stage_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(stageId)
-      .manualStart();
 
     // then
     assertEquals(2, query.count());

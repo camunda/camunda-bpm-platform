@@ -9,7 +9,13 @@
     <casePlanModel id="CasePlanModel_1">
       <planItem id="PI_CaseTask_1" definitionRef="CaseTask_1" />
 
-      <caseTask id="CaseTask_1" name="A Case Task" caseRef="oneTaskCase" camunda:caseBinding="deployment"/>
+      <caseTask id="CaseTask_1" name="A Case Task" caseRef="oneTaskCase" camunda:caseBinding="deployment">
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </caseTask>
     </casePlanModel>
   </case>
 

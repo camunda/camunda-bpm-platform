@@ -1441,16 +1441,6 @@ public class ProcessInstanceQueryTest {
       .create()
       .getId();
 
-    String processTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_ProcessTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
-
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
 
     query.caseInstanceId(caseInstanceId);
@@ -1491,16 +1481,6 @@ public class ProcessInstanceQueryTest {
       .businessKey("aBusinessKey")
       .create()
       .getId();
-
-    String processTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_ProcessTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(processTaskId)
-      .manualStart();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
 
@@ -1605,14 +1585,6 @@ public class ProcessInstanceQueryTest {
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn"})
   public void testQueryBySuperCaseInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneProcessTaskCase").getId();
-
-    String processTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_ProcessTask_1")
-        .singleResult()
-        .getId();
-
-    caseService.manuallyStartCaseExecution(processTaskId);
 
     ProcessInstanceQuery query = runtimeService
         .createProcessInstanceQuery()

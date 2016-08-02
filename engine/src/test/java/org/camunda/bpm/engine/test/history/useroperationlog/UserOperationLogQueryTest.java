@@ -889,16 +889,6 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
        .withCaseDefinition(caseDefinitionId)
        .create();
 
-    String caseExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
-
     Task task = taskService.createTaskQuery().singleResult();
 
     assertNotNull(task);
@@ -929,16 +919,6 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
        .withCaseDefinition(caseDefinitionId)
        .create()
        .getId();
-
-    String caseExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
 
     Task task = taskService.createTaskQuery().singleResult();
 
@@ -975,10 +955,6 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
         .activityId("PI_HumanTask_1")
         .singleResult()
         .getId();
-
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
 
     Task task = taskService.createTaskQuery().singleResult();
 

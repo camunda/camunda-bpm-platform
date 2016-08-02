@@ -32,7 +32,7 @@
 
       <humanTask id="HumanTask_2">
         <extensionElements>
-          <camunda:caseExecutionListener event="enable" class="org.camunda.bpm.engine.test.cmmn.sentry.SentryTriggerListener" />
+          <camunda:caseExecutionListener event="start" class="org.camunda.bpm.engine.test.cmmn.sentry.SentryTriggerListener" />
         </extensionElements>
       </humanTask>
 

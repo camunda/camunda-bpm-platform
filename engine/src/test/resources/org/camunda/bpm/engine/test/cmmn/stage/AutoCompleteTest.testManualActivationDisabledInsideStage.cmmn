@@ -20,7 +20,13 @@
           </itemControl>
         </planItem>
 
-        <planItem id="PI_HumanTask_3" definitionRef="HumanTask_1" />
+        <planItem id="PI_HumanTask_3" definitionRef="HumanTask_1" >
+          <itemControl>
+            <manualActivationRule>
+              <condition>${true}</condition>
+            </manualActivationRule>
+          </itemControl>
+        </planItem>
       </stage>
 
       <humanTask id="HumanTask_1" />

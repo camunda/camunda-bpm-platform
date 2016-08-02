@@ -29,7 +29,7 @@ public class MultiTenancyDelegateCaseExecutionTest extends PluggableProcessEngin
 
   protected static final String HUMAN_TASK_CMMN_FILE = "org/camunda/bpm/engine/test/api/multitenancy/HumanTaskCaseExecutionListener.cmmn";
   protected static final String CASE_TASK_CMMN_FILE = "org/camunda/bpm/engine/test/api/multitenancy/CaseTaskCaseExecutionListener.cmmn";
-  protected static final String CMMN_FILE = "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn";
+  protected static final String CMMN_FILE = "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn";
 
   protected static final String TENANT_ID = "tenant1";
 
@@ -38,7 +38,7 @@ public class MultiTenancyDelegateCaseExecutionTest extends PluggableProcessEngin
 
     AssertingCaseExecutionListener.addAsserts(hasTenantId("tenant1"));
 
-    startCaseInstance("case");
+    createCaseInstance("case");
   }
 
   public void testCallCaseTask() {
@@ -47,10 +47,10 @@ public class MultiTenancyDelegateCaseExecutionTest extends PluggableProcessEngin
 
     AssertingCaseExecutionListener.addAsserts(hasTenantId("tenant1"));
 
-    startCaseInstance("oneCaseTaskCase");
+    createCaseInstance("oneCaseTaskCase");
   }
 
-  protected void startCaseInstance(String caseDefinitionKey) {
+  protected void createCaseInstance(String caseDefinitionKey) {
     CaseDefinition caseDefinition = repositoryService
         .createCaseDefinitionQuery()
         .caseDefinitionKey(caseDefinitionKey)

@@ -28,7 +28,13 @@
         </defaultControl>
       </humanTask>
 
-      <humanTask id="HumanTask_2" />
+      <humanTask id="HumanTask_2" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
 
     </casePlanModel>
   </case>

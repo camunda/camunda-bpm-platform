@@ -10,7 +10,13 @@
       <planItem id="PI_DecisionTask_1" definitionRef="DecisionTask_1" />
 
       <decisionTask id="DecisionTask_1" name="A Decision Task" decisionRef="decision" camunda:decisionBinding="deployment"
-        camunda:mapDecisionResult="singleEntry" camunda:resultVariable="decisionVar"/>
+        camunda:mapDecisionResult="singleEntry" camunda:resultVariable="decisionVar">
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </decisionTask>
     </casePlanModel>
   </case>
 

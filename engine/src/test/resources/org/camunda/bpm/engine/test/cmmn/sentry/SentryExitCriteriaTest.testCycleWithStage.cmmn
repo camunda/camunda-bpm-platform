@@ -36,6 +36,11 @@
       </humanTask>
 
       <stage id="Stage_1">
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
         <planItem id="PI_Inner_HumanTask_1" definitionRef="Inner_HumanTask_1" />
         <planItem id="PI_Inner_HumanTask_2" definitionRef="Inner_HumanTask_1">
           <exitCriterion sentryRef="Inner_Sentry_1" />

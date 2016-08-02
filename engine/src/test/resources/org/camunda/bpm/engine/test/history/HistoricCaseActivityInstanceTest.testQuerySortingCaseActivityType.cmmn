@@ -23,7 +23,13 @@
 
       <milestone id="Milestone_1" />
       <humanTask id="HumanTask_1" />
-      <processTask id="ProcessTask_1" />
+      <processTask id="ProcessTask_1" >
+        <defaultControl>
+          <manualActivationRule>
+            <condition>${true}</condition>
+          </manualActivationRule>
+        </defaultControl>
+      </processTask>
 
     </casePlanModel>
 

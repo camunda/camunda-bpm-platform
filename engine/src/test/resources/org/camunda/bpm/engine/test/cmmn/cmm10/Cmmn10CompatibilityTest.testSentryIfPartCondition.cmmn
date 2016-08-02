@@ -17,7 +17,15 @@
         </ifPart>
       </sentry>
 
-      <humanTask id="HumanTask_1" />
+      <humanTask id="HumanTask_1">
+        <defaultControl>
+          <manualActivationRule>
+            <condition>
+              <body>${true}</body>
+            </condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
 
     </casePlanModel>
   </case>
