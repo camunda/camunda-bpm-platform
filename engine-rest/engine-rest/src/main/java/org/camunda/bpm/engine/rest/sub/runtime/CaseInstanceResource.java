@@ -40,6 +40,11 @@ public interface CaseInstanceResource {
   @Consumes(MediaType.APPLICATION_JSON)
   void close(CaseExecutionTriggerDto triggerDto);
 
+  @POST
+  @Path("/terminate")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void terminate(CaseExecutionTriggerDto triggerDto);
+  
   @Path("/variables")
   VariableResource getVariablesResource();
 

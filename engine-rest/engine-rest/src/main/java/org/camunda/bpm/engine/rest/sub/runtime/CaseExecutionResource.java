@@ -51,6 +51,11 @@ public interface CaseExecutionResource {
   @Consumes(MediaType.APPLICATION_JSON)
   void complete(CaseExecutionTriggerDto triggerDto);
 
+  @POST
+  @Path("/terminate")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void terminate(CaseExecutionTriggerDto triggerDto);
+
   @Path("/localVariables")
   VariableResource getVariablesLocal();
 

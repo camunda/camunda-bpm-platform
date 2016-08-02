@@ -116,6 +116,30 @@ public class CaseInstanceResourceImpl implements CaseInstanceResource {
 
   }
 
+  public void terminate(CaseExecutionTriggerDto triggerDto) {
+    try {
+      CaseService caseService = engine.getCaseService();
+      CaseExecutionCommandBuilder commandBuilder = caseService.withCaseExecution(caseInstanceId);
+
+      initializeCommand(commandBuilder, triggerDto, "terminate");
+
+      commandBuilder.terminate();
+
+    } catch (NotFoundException e) {
+      throw createInvalidRequestException("terminate", Status.NOT_FOUND, e);
+
+    } catch (NotValidException e) {
+      throw createInvalidRequestException("terminate", Status.BAD_REQUEST, e);
+
+    } catch (NotAllowedException e) {
+      throw createInvalidRequestException("terminate", Status.FORBIDDEN, e);
+
+    } catch (ProcessEngineException e) {
+      throw createRestException("terminate", Status.INTERNAL_SERVER_ERROR, e);
+
+    }
+  }
+
   protected InvalidRequestException createInvalidRequestException(String transition, Status status, ProcessEngineException cause) {
     String errorMessage = String.format("Cannot %s case instance %s: %s", transition, caseInstanceId, cause.getMessage());
     return new InvalidRequestException(status, cause, errorMessage);
