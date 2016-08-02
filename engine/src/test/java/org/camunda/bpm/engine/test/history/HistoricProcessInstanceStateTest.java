@@ -18,9 +18,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
-import java.util.Date;
 import java.util.List;
 
+import static junit.framework.TestCase.fail;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -45,9 +45,7 @@ public class HistoricProcessInstanceStateTest {
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
-  /**
-   *
-   */
+
   @Test
   public void testTerminatedInternalWithGateway () {
     BpmnModelInstance instance = Bpmn.createExecutableProcess(PROCESS_ID)
@@ -61,7 +59,7 @@ public class HistoricProcessInstanceStateTest {
     ProcessDefinition processDefinition = processEngineTestRule.deployAndGetDefinition(instance);
     processEngineRule.getRuntimeService().startProcessInstanceById(processDefinition.getId());
     HistoricProcessInstance entity = getHistoricProcessInstanceWithAssertion(processDefinition);
-    assertThat(entity.getState(),is(HistoricProcessInstance.COMPLETED));
+    assertThat(entity.getState(),is(HistoricProcessInstance.STATE_COMPLETED));
   }
 
   @Test
@@ -73,12 +71,12 @@ public class HistoricProcessInstanceStateTest {
     ProcessDefinition processDefinition = processEngineTestRule.deployAndGetDefinition(instance);
     processEngineRule.getRuntimeService().startProcessInstanceById(processDefinition.getId());
     HistoricProcessInstance entity = getHistoricProcessInstanceWithAssertion(processDefinition);
-    assertThat(entity.getState(),is(HistoricProcessInstance.COMPLETED));
+    assertThat(entity.getState(),is(HistoricProcessInstance.STATE_COMPLETED));
   }
 
 
   @Test
-  public void testHappyPathWithSuspension () {
+  public void testCompletionWithSuspension () {
     BpmnModelInstance instance = Bpmn.createExecutableProcess(PROCESS_ID)
         .startEvent()
         .userTask()
@@ -88,21 +86,21 @@ public class HistoricProcessInstanceStateTest {
     ProcessInstance processInstance = processEngineRule.getRuntimeService()
         .startProcessInstanceById(processDefinition.getId());
     HistoricProcessInstance entity = getHistoricProcessInstanceWithAssertion(processDefinition);
-    assertThat(entity.getState(),is(HistoricProcessInstance.ACTIVE));
+    assertThat(entity.getState(),is(HistoricProcessInstance.STATE_ACTIVE));
 
     //suspend
     processEngineRule.getRuntimeService().updateProcessInstanceSuspensionState()
         .byProcessInstanceId(processInstance.getId()).suspend();
 
     entity = getHistoricProcessInstanceWithAssertion(processDefinition);
-    assertThat(entity.getState(),is(HistoricProcessInstance.SUSPENDED));
+    assertThat(entity.getState(),is(HistoricProcessInstance.STATE_SUSPENDED));
 
     //activate
     processEngineRule.getRuntimeService().updateProcessInstanceSuspensionState()
         .byProcessInstanceId(processInstance.getId()).activate();
 
     entity = getHistoricProcessInstanceWithAssertion(processDefinition);
-    assertThat(entity.getState(),is(HistoricProcessInstance.ACTIVE));
+    assertThat(entity.getState(),is(HistoricProcessInstance.STATE_ACTIVE));
 
     //complete task
     processEngineRule.getTaskService().complete(
@@ -110,7 +108,48 @@ public class HistoricProcessInstanceStateTest {
 
     //make sure happy path ended
     entity = getHistoricProcessInstanceWithAssertion(processDefinition);
-    assertThat(entity.getState(),is(HistoricProcessInstance.COMPLETED));
+    assertThat(entity.getState(),is(HistoricProcessInstance.STATE_COMPLETED));
+  }
+
+  @Test
+  public void testSuspensionByProcessDefinition () {
+    BpmnModelInstance instance = Bpmn.createExecutableProcess(PROCESS_ID)
+        .startEvent()
+        .userTask()
+        .endEvent()
+        .done();
+    ProcessDefinition processDefinition = processEngineTestRule.deployAndGetDefinition(instance);
+    ProcessInstance processInstance1 = processEngineRule.getRuntimeService()
+        .startProcessInstanceById(processDefinition.getId());
+
+    ProcessInstance processInstance2 = processEngineRule.getRuntimeService()
+        .startProcessInstanceById(processDefinition.getId());
+
+    //suspend all
+    processEngineRule.getRuntimeService().updateProcessInstanceSuspensionState()
+        .byProcessDefinitionId(processDefinition.getId()).suspend();
+
+    HistoricProcessInstance hpi1 = processEngineRule.getHistoryService().createHistoricProcessInstanceQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
+
+    HistoricProcessInstance hpi2 = processEngineRule.getHistoryService().createHistoricProcessInstanceQuery()
+        .processInstanceId(processInstance2.getId()).singleResult();
+
+    assertThat(hpi1.getState(),is(HistoricProcessInstance.STATE_SUSPENDED));
+    assertThat(hpi2.getState(),is(HistoricProcessInstance.STATE_SUSPENDED));
+
+    //activate all
+    processEngineRule.getRuntimeService().updateProcessInstanceSuspensionState()
+        .byProcessDefinitionKey(processDefinition.getKey()).activate();
+
+    hpi1 = processEngineRule.getHistoryService().createHistoricProcessInstanceQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
+
+    hpi2 = processEngineRule.getHistoryService().createHistoricProcessInstanceQuery()
+        .processInstanceId(processInstance2.getId()).singleResult();
+
+    assertThat(hpi1.getState(),is(HistoricProcessInstance.STATE_ACTIVE));
+    assertThat(hpi2.getState(),is(HistoricProcessInstance.STATE_ACTIVE));
   }
 
   @Test
@@ -124,12 +163,12 @@ public class HistoricProcessInstanceStateTest {
     ProcessInstance processInstance = processEngineRule.getRuntimeService()
         .startProcessInstanceById(processDefinition.getId());
     HistoricProcessInstance entity = getHistoricProcessInstanceWithAssertion(processDefinition);
-    assertThat(entity.getState(),is(HistoricProcessInstance.ACTIVE));
+    assertThat(entity.getState(),is(HistoricProcessInstance.STATE_ACTIVE));
 
     //same call as in ProcessInstanceResourceImpl
     processEngineRule.getRuntimeService().deleteProcessInstance(processInstance.getId(), REASON,false,true);
     entity = getHistoricProcessInstanceWithAssertion(processDefinition);
-    assertThat(entity.getState(),is(HistoricProcessInstance.EXTERNALLY_TERMINATED));
+    assertThat(entity.getState(),is(HistoricProcessInstance.STATE_EXTERNALLY_TERMINATED));
   }
 
   @Test
@@ -145,16 +184,20 @@ public class HistoricProcessInstanceStateTest {
         .done();
     ProcessDefinition processDefinition = processEngineTestRule.deployAndGetDefinition(instance);
 
+
     try {
-      processEngineRule.getRuntimeService()
+      ProcessInstance pi = processEngineRule.getRuntimeService()
           .startProcessInstanceById(processDefinition.getId());
+      processEngineRule.getManagementService().executeJob(
+          processEngineRule.getManagementService().createJobQuery().executable().singleResult().getId());
+      fail("exception expected");
     } catch (Exception e) {
       //expected
     }
 
     assertThat(processEngineRule.getRuntimeService().createProcessInstanceQuery().active().list().size(),is(1));
     HistoricProcessInstance entity = getHistoricProcessInstanceWithAssertion(processDefinition);
-    assertThat(entity.getState(),is(HistoricProcessInstance.ACTIVE));
+    assertThat(entity.getState(),is(HistoricProcessInstance.STATE_ACTIVE));
   }
 
   @Test
@@ -168,25 +211,25 @@ public class HistoricProcessInstanceStateTest {
     ProcessDefinition processDefinition = processEngineTestRule.deployAndGetDefinition(process1);
     processEngineRule.getRuntimeService().startProcessInstanceById(processDefinition.getId());
     HistoricProcessInstance entity = getHistoricProcessInstanceWithAssertion(processDefinition);
-    assertThat(entity.getState(),is(HistoricProcessInstance.COMPLETED));
+    assertThat(entity.getState(),is(HistoricProcessInstance.STATE_COMPLETED));
   }
 
   @Test
   @Deployment (resources = {"org/camunda/bpm/engine/test/history/HistoricProcessInstanceStateTest.testWithCallActivity.bpmn"})
   public void testWithCallActivity() {
-    processEngineRule.getRuntimeService().startProcessInstanceByKey("Process_1");
+    processEngineRule.getRuntimeService().startProcessInstanceByKey("Main_Process");
     assertThat(processEngineRule.getRuntimeService().createProcessInstanceQuery().active().list().size(),is(0));
 
     HistoricProcessInstance entity1 = processEngineRule.getHistoryService().createHistoricProcessInstanceQuery()
-        .processDefinitionKey("Process_1").singleResult();
+        .processDefinitionKey("Main_Process").singleResult();
 
     HistoricProcessInstance entity2 = processEngineRule.getHistoryService().createHistoricProcessInstanceQuery()
-        .processDefinitionKey("process2").singleResult();
+        .processDefinitionKey("Sub_Process").singleResult();
 
     assertThat(entity1,is(notNullValue()));
     assertThat(entity2,is(notNullValue()));
-    assertThat(entity1.getState(),is(HistoricProcessInstance.COMPLETED));
-    assertThat(entity2.getState(),is(HistoricProcessInstance.INTERNALLY_TERMINATED));
+    assertThat(entity1.getState(),is(HistoricProcessInstance.STATE_COMPLETED));
+    assertThat(entity2.getState(),is(HistoricProcessInstance.STATE_INTERNALLY_TERMINATED));
   }
 
   private HistoricProcessInstance getHistoricProcessInstanceWithAssertion(ProcessDefinition processDefinition) {
@@ -197,7 +240,7 @@ public class HistoricProcessInstanceStateTest {
     return entities.get(0);
   }
 
-  public static void initEndEvent(BpmnModelInstance modelInstance, String endEventId) {
+  protected static void initEndEvent(BpmnModelInstance modelInstance, String endEventId) {
     EndEvent endEvent = modelInstance.getModelElementById(endEventId);
     TerminateEventDefinition terminateDefinition = modelInstance.newInstance(TerminateEventDefinition.class);
     endEvent.addChildElement(terminateDefinition);

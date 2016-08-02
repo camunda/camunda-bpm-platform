@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.3.0-dev">
   <bpmn:collaboration id="Collaboration_0mz4ai6">
-    <bpmn:participant id="Participant_067hwpl" processRef="Process_1" />
-    <bpmn:participant id="Participant_1tnsm90" processRef="process2" />
+    <bpmn:participant id="Participant_067hwpl" processRef="Main_Process" />
+    <bpmn:participant id="Participant_1tnsm90" processRef="Sub_Process" />
   </bpmn:collaboration>
-  <bpmn:process id="Process_1" isExecutable="true">
+  <bpmn:process id="Main_Process" isExecutable="true">
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>SequenceFlow_1w1d9kb</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:callActivity id="Task_0bl0qve" calledElement="process2">
+    <bpmn:callActivity id="Task_0bl0qve" calledElement="Sub_Process">
       <bpmn:incoming>SequenceFlow_1w1d9kb</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_15ju6zr</bpmn:outgoing>
     </bpmn:callActivity>
@@ -26,7 +26,7 @@
       <bpmn:errorEventDefinition />
     </bpmn:boundaryEvent>
   </bpmn:process>
-  <bpmn:process id="process2" isExecutable="true">
+  <bpmn:process id="Sub_Process" isExecutable="true">
     <bpmn:startEvent id="StartEvent_0mh2zei">
       <bpmn:outgoing>SequenceFlow_08hbkd2</bpmn:outgoing>
     </bpmn:startEvent>

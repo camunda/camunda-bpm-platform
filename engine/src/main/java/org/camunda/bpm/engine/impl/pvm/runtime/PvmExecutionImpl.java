@@ -99,7 +99,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   protected boolean deleteRoot;
   protected String deleteReason;
-  protected transient boolean externallyTerminated;
+  protected boolean externallyTerminated;
 
   //state/type of execution //////////////////////////////////////////////////
 

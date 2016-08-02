@@ -130,7 +130,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
       return true;
     }
 
-    // verify there are no ACTIVE children
+    // verify there are no STATE_ACTIVE children
     for (CmmnExecution child : children) {
       if (child.isActive()) {
 
@@ -143,7 +143,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
     }
 
     if (autoComplete) {
-      // ensure that all required children are DISABLED, COMPLETED and/or TERMINATED
+      // ensure that all required children are DISABLED, STATE_COMPLETED and/or TERMINATED
       // available in the case execution tree.
 
       for (CmmnExecution child : children) {
@@ -158,7 +158,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
       }
 
     } else { /* autoComplete == false && manualCompletion == false */
-      // ensure that ALL children are DISABLED, COMPLETED and/or TERMINATED
+      // ensure that ALL children are DISABLED, STATE_COMPLETED and/or TERMINATED
 
       for (CmmnExecution child : children) {
         if (!child.isDisabled() && !child.isCompleted() && !child.isTerminated()) {

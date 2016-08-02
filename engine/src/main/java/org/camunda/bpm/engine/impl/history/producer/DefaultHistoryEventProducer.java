@@ -44,7 +44,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
@@ -453,7 +452,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
 
     //state
-    evt.setState(HistoricProcessInstance.ACTIVE);
+    evt.setState(HistoricProcessInstance.STATE_ACTIVE);
 
     // set start user Id
     evt.setStartUserId(Context.getCommandContext().getAuthenticatedUserId());
@@ -471,9 +470,9 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     initProcessInstanceEvent(evt, executionEntity, HistoryEventTypes.PROCESS_INSTANCE_UPDATE);
 
     if (executionEntity.isSuspended()) {
-      evt.setState(HistoricProcessInstance.SUSPENDED);
+      evt.setState(HistoricProcessInstance.STATE_SUSPENDED);
     } else {
-      evt.setState(HistoricProcessInstance.ACTIVE);
+      evt.setState(HistoricProcessInstance.STATE_ACTIVE);
     }
 
     return evt;
@@ -519,14 +518,14 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return evt;
   }
 
-  private void determineEndState(ExecutionEntity executionEntity, HistoricProcessInstanceEventEntity evt) {
+  protected void determineEndState(ExecutionEntity executionEntity, HistoricProcessInstanceEventEntity evt) {
     //determine state
     if (executionEntity.getActivity() != null) {
-      evt.setState(HistoricProcessInstance.COMPLETED);
+      evt.setState(HistoricProcessInstance.STATE_COMPLETED);
     } else if (executionEntity.getActivity() == null && executionEntity.isExternallyTerminated()) {
-      evt.setState(HistoricProcessInstance.EXTERNALLY_TERMINATED);
+      evt.setState(HistoricProcessInstance.STATE_EXTERNALLY_TERMINATED);
     } else if (executionEntity.getActivity() == null && !executionEntity.isExternallyTerminated()) {
-      evt.setState(HistoricProcessInstance.INTERNALLY_TERMINATED);
+      evt.setState(HistoricProcessInstance.STATE_INTERNALLY_TERMINATED);
     }
   }
 

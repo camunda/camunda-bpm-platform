@@ -64,6 +64,12 @@ public class ExecutionManager extends AbstractManager {
     }
   }
 
+  public List<ExecutionEntity> findExecutionsByParametersForSuspension (
+      Map<String, Object> parameters) {
+    return getDbEntityManager()
+         .selectList("selectExecutionsByParametersForSuspension", configureParameterizedQuery(parameters));
+  }
+
   public void deleteProcessInstance(String processInstanceId, String deleteReason) {
     deleteProcessInstance(processInstanceId, deleteReason, false, false);
   }

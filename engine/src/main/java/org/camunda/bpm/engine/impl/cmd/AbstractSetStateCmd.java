@@ -68,12 +68,10 @@ public abstract class AbstractSetStateCmd implements Command<Void> {
         }
       }
 
-    }
-    else {
+      triggerHistoryEvent(commandContext);
+    } else {
       scheduleSuspensionStateUpdate(commandContext);
     }
-
-    triggerHistoryEvent(commandContext);
 
     if (!isLogUserOperationDisabled()) {
       logUserOperation(commandContext);
@@ -82,7 +80,9 @@ public abstract class AbstractSetStateCmd implements Command<Void> {
     return null;
   }
 
-  protected abstract void triggerHistoryEvent(CommandContext commandContext);
+  protected void triggerHistoryEvent(CommandContext commandContext) {
+
+  }
 
   public void disableLogUserOperation() {
     this.isLogUserOperationDisabled = true;

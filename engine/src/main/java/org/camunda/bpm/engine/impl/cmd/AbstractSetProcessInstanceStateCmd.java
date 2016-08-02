@@ -12,11 +12,16 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.Collections;
+import java.util.*;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
+import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
@@ -25,6 +30,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.*;
 import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * @author Daniel Meyer
@@ -106,19 +112,47 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
   @Override
   protected void triggerHistoryEvent(CommandContext commandContext){
     HistoryLevel historyLevel = commandContext.getProcessEngineConfiguration().getHistoryLevel();
-    final ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+    List<ExecutionEntity> updatedProcessInstances = obtainProcessInstances(commandContext);
     //suspension state is not updated synchronously
-    if (getNewSuspensionState() != null && processInstance != null) {
-      processInstance.setSuspensionState(getNewSuspensionState().getStateCode());
-      if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_UPDATE, processInstance)) {
-        HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
-          @Override
-          public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
-            return producer.createProcessInstanceUpdateEvt(processInstance);
-          }
-        });
+    if (getNewSuspensionState() != null && updatedProcessInstances != null) {
+      for (final ExecutionEntity processInstance: updatedProcessInstances) {
+
+        if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_UPDATE, processInstance)) {
+          HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+            @Override
+            public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+              HistoricProcessInstanceEventEntity processInstanceUpdateEvt = (HistoricProcessInstanceEventEntity)
+                  producer.createProcessInstanceUpdateEvt(processInstance);
+              if (SuspensionState.SUSPENDED.getStateCode() == getNewSuspensionState().getStateCode()) {
+                processInstanceUpdateEvt.setState(HistoricProcessInstance.STATE_SUSPENDED);
+              } else {
+                processInstanceUpdateEvt.setState(HistoricProcessInstance.STATE_ACTIVE);
+              }
+              return processInstanceUpdateEvt;
+            }
+          });
+        }
       }
     }
+  }
+
+  protected List<ExecutionEntity> obtainProcessInstances(CommandContext commandContext) {
+    List<ExecutionEntity> result = new ArrayList<ExecutionEntity>();
+    Map<String, Object> params = new HashMap<String,Object>();
+    if (processInstanceId != null) {
+      params.put("processInstanceId",processInstanceId);
+    } else if (processDefinitionId != null) {
+      params.put("processDefinitionId",processDefinitionId);
+    } else if (isProcessDefinitionTenantIdSet) {
+      params.put("isTenantIdSet",isProcessDefinitionTenantIdSet);
+      params.put("processDefinitionTenantId",processDefinitionTenantId);
+      params.put("processDefinitionKey",processDefinitionKey);
+    } else {
+      params.put("processDefinitionKey",processDefinitionKey);
+      params.put("isTenantIdSet",isProcessDefinitionTenantIdSet);
+    }
+    result.addAll(commandContext.getExecutionManager().findExecutionsByParametersForSuspension(params));
+    return result;
   }
 
   @Override

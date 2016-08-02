@@ -94,7 +94,7 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
       hpi.setProcessInstanceId(id);
       hpi.setProcessDefinitionId("someProcDefId");
       hpi.setStartTime(new Date());
-      hpi.setState(HistoricProcessInstance.ACTIVE);
+      hpi.setState(HistoricProcessInstance.STATE_ACTIVE);
 
       newEntityManager.insert(hpi);
       newEntityManager.flush();

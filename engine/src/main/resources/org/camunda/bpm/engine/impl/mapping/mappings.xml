@@ -5,7 +5,6 @@
 <configuration>
 	<settings>
 		<setting name="lazyLoadingEnabled" value="false" />
-    <setting name="jdbcTypeForNull" value="NULL" />
 	</settings>
 	<mappers>
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Commons.xml" />

@@ -71,26 +71,12 @@ public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
       .getExecutionManager()
       .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners,externallyTerminated);
 
-    handleHistory(commandContext, execution);
-
     // create user operation log
     commandContext.getOperationLogManager()
       .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, processInstanceId,
           null, null, Collections.singletonList(PropertyChange.EMPTY_CHANGE));
 
     return null;
-  }
-
-  private void handleHistory(CommandContext commandContext, final ExecutionEntity execution) {
-    HistoryLevel historyLevel = commandContext.getProcessEngineConfiguration().getHistoryLevel();
-    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_END, execution)) {
-      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
-        @Override
-        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
-          return producer.createProcessInstanceEndEvt(execution);
-        }
-      });
-    }
   }
 
   protected void checkDeleteProcessInstance(ExecutionEntity execution, CommandContext commandContext) {

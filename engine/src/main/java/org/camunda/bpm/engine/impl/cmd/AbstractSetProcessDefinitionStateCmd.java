@@ -192,8 +192,4 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
 
   protected abstract AbstractSetProcessInstanceStateCmd getNextCommand(UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceCommandBuilder);
 
-  @Override
-  protected void triggerHistoryEvent(CommandContext commandContext){
-
-  }
 }

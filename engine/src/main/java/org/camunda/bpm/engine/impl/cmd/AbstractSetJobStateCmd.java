@@ -148,9 +148,4 @@ public abstract class AbstractSetJobStateCmd extends AbstractSetStateCmd {
     commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), jobId, jobDefinitionId,
       processInstanceId, processDefinitionId, processDefinitionKey, propertyChange);
   }
-
-  @Override
-  protected void triggerHistoryEvent(CommandContext commandContext){
-
-  };
 }
