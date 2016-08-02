@@ -8,5 +8,10 @@ module.exports = Base.extend({
 
   pluginList: function () {
     return element.all(by.css('.dashboard > .sections > section'));
+  },
+
+  plugin: function(idx) {
+    return this.pluginList().get(idx);
   }
+
 });
