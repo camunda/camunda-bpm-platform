@@ -155,9 +155,9 @@ public class VariableValueDto {
     return dto;
   }
 
-  public static VariableValueDto fromTypedValue(TypedValue typedValue, boolean serializedValues) {
+  public static VariableValueDto fromTypedValue(TypedValue typedValue, boolean preferSerializedValue) {
     VariableValueDto dto = new VariableValueDto();
-    fromTypedValue(dto, typedValue, serializedValues);
+    fromTypedValue(dto, typedValue, preferSerializedValue);
     return dto;
   }
 
@@ -165,7 +165,7 @@ public class VariableValueDto {
     fromTypedValue(dto, typedValue, false);
   }
 
-  public static void fromTypedValue(VariableValueDto dto, TypedValue typedValue, boolean serializedValues) {
+  public static void fromTypedValue(VariableValueDto dto, TypedValue typedValue, boolean preferSerializedValue) {
 
     ValueType type = typedValue.getType();
     if (type != null) {
@@ -177,7 +177,7 @@ public class VariableValueDto {
     if(typedValue instanceof SerializableValue) {
       SerializableValue serializableValue = (SerializableValue) typedValue;
 
-      if(serializableValue.isDeserialized() && !serializedValues) {
+      if(serializableValue.isDeserialized() && !preferSerializedValue) {
         dto.setValue(serializableValue.getValue());
       }
       else {
