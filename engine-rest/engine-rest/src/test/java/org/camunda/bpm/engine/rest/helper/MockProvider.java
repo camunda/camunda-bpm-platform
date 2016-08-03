@@ -109,6 +109,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskCountByCandidateGroupResult;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.value.ObjectValueImpl;
 import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
@@ -123,6 +124,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  *
  */
 public abstract class MockProvider {
+
+  public static final String FORMAT_APPLICATION_JSON = "application/json";
 
   // general non existing Id
   public static final String NON_EXISTING_ID = "nonExistingId";
@@ -208,6 +211,7 @@ public abstract class MockProvider {
   public static final String SPIN_VARIABLE_INSTANCE_ID = "spinVariableInstanceId";
 
   public static final String EXAMPLE_VARIABLE_INSTANCE_NAME = "aVariableInstanceName";
+  public static final String EXAMPLE_DESERIALIZED_VARIABLE_INSTANCE_NAME = "aDeserializedVariableInstanceName";
 
   public static final StringValue EXAMPLE_PRIMITIVE_VARIABLE_VALUE = Variables.stringValue("aVariableInstanceValue");
   public static final String EXAMPLE_VARIABLE_INSTANCE_PROC_DEF_KEY = "aVariableInstanceProcDefKey";
@@ -224,6 +228,7 @@ public abstract class MockProvider {
 
   public static final String EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE = "aSerializedValue";
   public static final byte[] EXAMPLE_VARIABLE_INSTANCE_BYTE = "aSerializedValue".getBytes();
+  public static final String EXAMPLE_VARIABLE_INSTANCE_DESERIALIZED_VALUE = "aDeserializedValue";
 
   public static final String EXAMPLE_SPIN_DATA_FORMAT = "aDataFormatId";
   public static final String EXAMPLE_SPIN_ROOT_TYPE = "path.to.a.RootType";
@@ -1072,10 +1077,16 @@ public abstract class MockProvider {
 
   public static VariableMap createMockSerializedVariables() {
     VariableMap variables = Variables.createVariables();
-    variables.putValueTyped(EXAMPLE_VARIABLE_INSTANCE_NAME, Variables.serializedObjectValue(EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE)
-                                                          .serializationDataFormat("application/json")
-                                                          .objectTypeName(ArrayList.class.getName())
-                                                          .create());
+    ObjectValue serializedVar = Variables.serializedObjectValue(EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE)
+            .serializationDataFormat(FORMAT_APPLICATION_JSON)
+            .objectTypeName(ArrayList.class.getName())
+            .create();
+
+    ObjectValue deserializedVar = new ObjectValueImpl(EXAMPLE_VARIABLE_INSTANCE_DESERIALIZED_VALUE,
+                                                      EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE,
+                                                      FORMAT_APPLICATION_JSON, Object.class.getName(), true);
+    variables.putValueTyped(EXAMPLE_VARIABLE_INSTANCE_NAME, serializedVar);
+    variables.putValueTyped(EXAMPLE_DESERIALIZED_VARIABLE_INSTANCE_NAME, deserializedVar);
     return variables;
   }
 

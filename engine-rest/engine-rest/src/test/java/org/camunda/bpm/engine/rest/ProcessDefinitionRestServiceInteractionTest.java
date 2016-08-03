@@ -880,12 +880,13 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("withVariablesInReturn", true);
 
-    //when request then return process instance with variables
-    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    //when request then return process instance with serialized variables
+    Response response = given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
             .contentType(POST_JSON_CONTENT_TYPE).body(json)
             .then().expect()
             .statusCode(Status.OK.getStatusCode())
             .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+            //serialized variable
             .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".value",
                     equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE))
             .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type",
@@ -893,7 +894,16 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
             .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".valueInfo.objectTypeName",
                     equalTo(ArrayList.class.getName()))
             .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".valueInfo.serializationDataFormat",
-                    equalTo("application/json"))
+                    equalTo(MockProvider.FORMAT_APPLICATION_JSON))
+            //deserialized variable should also returned as serialized variable
+            .body("variables." + MockProvider.EXAMPLE_DESERIALIZED_VARIABLE_INSTANCE_NAME + ".value",
+                    equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE))
+            .body("variables." + MockProvider.EXAMPLE_DESERIALIZED_VARIABLE_INSTANCE_NAME + ".type",
+                    equalTo("Object"))
+            .body("variables." + MockProvider.EXAMPLE_DESERIALIZED_VARIABLE_INSTANCE_NAME + ".valueInfo.objectTypeName",
+                    equalTo(Object.class.getName()))
+            .body("variables." + MockProvider.EXAMPLE_DESERIALIZED_VARIABLE_INSTANCE_NAME + ".valueInfo.serializationDataFormat",
+                    equalTo(MockProvider.FORMAT_APPLICATION_JSON))
             .when().post(START_PROCESS_INSTANCE_URL);
 
     verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
@@ -1087,11 +1097,12 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     json.put("startInstructions", startInstructions);
     json.put("withVariablesInReturn", true);
 
-    //request which should contain variables of process instance
+    //request which response should contain serialized variables of process instance
     given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
             .contentType(POST_JSON_CONTENT_TYPE).body(json)
             .then().expect()
             .statusCode(Status.OK.getStatusCode())
+            //serialized variable
             .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
             .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".value",
                     equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE))
@@ -1100,7 +1111,16 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
             .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".valueInfo.objectTypeName",
                     equalTo(ArrayList.class.getName()))
             .body("variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".valueInfo.serializationDataFormat",
-                    equalTo("application/json"))
+                    equalTo(MockProvider.FORMAT_APPLICATION_JSON))
+            //deserialized variable should also returned as serialized variable
+            .body("variables." + MockProvider.EXAMPLE_DESERIALIZED_VARIABLE_INSTANCE_NAME + ".value",
+                    equalTo(MockProvider.EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE))
+            .body("variables." + MockProvider.EXAMPLE_DESERIALIZED_VARIABLE_INSTANCE_NAME + ".type",
+                    equalTo("Object"))
+            .body("variables." + MockProvider.EXAMPLE_DESERIALIZED_VARIABLE_INSTANCE_NAME + ".valueInfo.objectTypeName",
+                    equalTo(Object.class.getName()))
+            .body("variables." + MockProvider.EXAMPLE_DESERIALIZED_VARIABLE_INSTANCE_NAME + ".valueInfo.serializationDataFormat",
+                    equalTo(MockProvider.FORMAT_APPLICATION_JSON))
             .body("variables.processVariable.type", equalTo("String"))
             .body("variables.processVariable.value", equalTo("aString"))
             .body("variables.var.type", equalTo("String"))
