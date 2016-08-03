@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.rest.dto.history;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceReport;
-import org.camunda.bpm.engine.rest.dto.AbstractReportDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
@@ -26,12 +25,13 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.camunda.bpm.engine.rest.dto.AbstractDurationReportDto;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class HistoricProcessInstanceReportDto extends AbstractReportDto<HistoricProcessInstanceReport> {
+public class HistoricProcessInstanceReportDto extends AbstractDurationReportDto<HistoricProcessInstanceReport> {
 
   protected String[] processDefinitionIdIn;
   protected String[] processDefinitionKeyIn;
@@ -83,10 +83,12 @@ public class HistoricProcessInstanceReportDto extends AbstractReportDto<Historic
     this.reportType = reportType;
   }
 
+  @Override
   protected HistoricProcessInstanceReport createNewReportQuery(ProcessEngine engine) {
     return engine.getHistoryService().createHistoricProcessInstanceReport();
   }
 
+  @Override
   protected void applyFilters(HistoricProcessInstanceReport reportQuery) {
     if (processDefinitionIdIn != null && processDefinitionIdIn.length > 0) {
       reportQuery.processDefinitionIdIn(processDefinitionIdIn);

@@ -15,17 +15,17 @@ package org.camunda.bpm.engine.rest.dto.history;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceReport;
-import org.camunda.bpm.engine.rest.dto.AbstractReportDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.Date;
+import org.camunda.bpm.engine.rest.dto.AbstractDurationReportDto;
 
 /**
  * @author Stefan Hentschel.
  */
-public class HistoricTaskInstanceReportDurationQueryDto extends AbstractReportDto<HistoricTaskInstanceReport> {
+public class HistoricTaskInstanceReportDurationQueryDto extends AbstractDurationReportDto<HistoricTaskInstanceReport> {
 
   protected Date completedBefore;
   protected Date completedAfter;
@@ -54,6 +54,8 @@ public class HistoricTaskInstanceReportDurationQueryDto extends AbstractReportDt
     this.completedBefore = completedBefore;
   }
 
+
+  @Override
   protected void applyFilters(HistoricTaskInstanceReport reportQuery) {
     if (completedBefore != null) {
       reportQuery.completedBefore(completedBefore);
@@ -63,6 +65,7 @@ public class HistoricTaskInstanceReportDurationQueryDto extends AbstractReportDt
     }
   }
 
+  @Override
   protected HistoricTaskInstanceReport createNewReportQuery(ProcessEngine engine) {
     return engine.getHistoryService().createHistoricTaskInstanceReport();
   }

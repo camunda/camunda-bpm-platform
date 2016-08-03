@@ -12,15 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.ReportResult;
 import org.camunda.bpm.engine.query.Report;
-import org.camunda.bpm.engine.query.PeriodUnit;
-import org.camunda.bpm.engine.rest.dto.converter.PeriodUnitConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -30,11 +27,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Roman Smirnov
+ * @param <T> 
  *
  */
 public abstract class AbstractReportDto<T extends Report> extends AbstractSearchQueryDto {
-
-  protected PeriodUnit periodUnit;
 
   // required for populating via jackson
   public AbstractReportDto() {
@@ -44,22 +40,18 @@ public abstract class AbstractReportDto<T extends Report> extends AbstractSearch
     super(objectMapper, queryParameters);
   }
 
-  @CamundaQueryParam(value = "periodUnit", converter = PeriodUnitConverter.class)
-  public void setPeriodUnit(PeriodUnit periodUnit) {
-    this.periodUnit = periodUnit;
-  }
-
   public List<? extends ReportResult> executeReport(ProcessEngine engine) {
     T reportQuery = createNewReportQuery(engine);
     applyFilters(reportQuery);
 
     try {
-      return reportQuery.duration(periodUnit);
-
+      return executeReportQuery(reportQuery);
     } catch (NotValidException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, e.getMessage());
     }
   }
+
+  protected abstract List< ? extends ReportResult> executeReportQuery(T report);
 
   protected abstract T createNewReportQuery(ProcessEngine engine);
 
