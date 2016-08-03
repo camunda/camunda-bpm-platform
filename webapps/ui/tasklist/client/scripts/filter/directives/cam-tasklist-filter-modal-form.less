@@ -10,4 +10,19 @@
   .global-access {
     margin: 0 0 (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5);
   }
+
+  .user-read-permissions .btn-link {
+    max-width: 100%;
+    overflow: hidden;
+    > span {
+      display: inline-block;
+      max-width: ~"calc(100% - 1.3em)";
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      &.glyphicon {
+        top: -2px;
+      }
+    }
+  }
 }
