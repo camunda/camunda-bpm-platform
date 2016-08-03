@@ -175,22 +175,11 @@ module.exports = [
 
           $scope.openDatepicker = function(evt) {
             if(evt.keyCode === 13 && evt.target === evt.currentTarget) {
-            // we can not trigger events in an event handler, because 'apply is already in progress' ;)
+              // we can not trigger events in an event handler, because 'apply is already in progress' ;)
               $timeout(function() {
 
-              // activate the inline edit field
+                // activate the inline edit field
                 evt.target.firstChild.click();
-
-              // wait for angular to open the date picker
-                $timeout(function() {
-
-                // wait for the update of the inline edit field, otherwise it will steal out focus
-                  $timeout(function() {
-
-                  // set the focus to the date picker
-                    document.querySelector('.cam-widget-inline-field.field-control > .datepicker > table').focus();
-                  });
-                });
               });
             }
           };
