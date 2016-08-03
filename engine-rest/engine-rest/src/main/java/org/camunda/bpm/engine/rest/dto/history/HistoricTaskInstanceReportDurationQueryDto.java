@@ -34,7 +34,6 @@ public class HistoricTaskInstanceReportDurationQueryDto extends AbstractReportDt
 
   public HistoricTaskInstanceReportDurationQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
-    this.reportType = REPORT_TYPE_DURATION;
   }
 
   public Date getCompletedBefore() {

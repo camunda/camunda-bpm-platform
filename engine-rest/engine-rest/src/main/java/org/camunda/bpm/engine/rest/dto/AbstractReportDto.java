@@ -34,15 +34,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public abstract class AbstractReportDto<T extends Report> extends AbstractSearchQueryDto {
 
-  public static final String REPORT_TYPE_DURATION = "duration";
-
-  public static final List<String> VALID_REPORT_TYPE_VALUES;
-  static {
-    VALID_REPORT_TYPE_VALUES = new ArrayList<String>();
-    VALID_REPORT_TYPE_VALUES.add(REPORT_TYPE_DURATION);
-  }
-
-  protected String reportType;
   protected PeriodUnit periodUnit;
 
   // required for populating via jackson
@@ -51,14 +42,6 @@ public abstract class AbstractReportDto<T extends Report> extends AbstractSearch
 
   public AbstractReportDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
-  }
-
-  @CamundaQueryParam("reportType")
-  public void setReportType(String reportType) {
-    if (!VALID_REPORT_TYPE_VALUES.contains(reportType)) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "reportType parameter has invalid value: " + reportType);
-    }
-    this.reportType = reportType;
   }
 
   @CamundaQueryParam(value = "periodUnit", converter = PeriodUnitConverter.class)
@@ -70,18 +53,12 @@ public abstract class AbstractReportDto<T extends Report> extends AbstractSearch
     T reportQuery = createNewReportQuery(engine);
     applyFilters(reportQuery);
 
-    if (REPORT_TYPE_DURATION.equals(reportType)) {
-      try {
-        return reportQuery.duration(periodUnit);
-      }
-      catch (NotValidException e) {
-        throw new InvalidRequestException(Status.BAD_REQUEST, e, e.getMessage());
-      }
-    }
-    else {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Unknown report type " + reportType);
-    }
+    try {
+      return reportQuery.duration(periodUnit);
 
+    } catch (NotValidException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, e.getMessage());
+    }
   }
 
   protected abstract T createNewReportQuery(ProcessEngine engine);

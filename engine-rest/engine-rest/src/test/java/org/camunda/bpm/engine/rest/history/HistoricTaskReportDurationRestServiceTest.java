@@ -137,20 +137,6 @@ public class HistoricTaskReportDurationRestServiceTest extends AbstractRestServi
   }
 
   @Test
-  public void testInvalidReportType() {
-    given()
-      .queryParam("reportType", "abc")
-    .then()
-      .expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .contentType(ContentType.JSON)
-        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", containsString("Cannot set query parameter 'reportType' to value 'abc'"))
-    .when()
-      .get(TASK_DURATION_REPORT_URL);
-  }
-
-  @Test
   public void testInvalidPeriodUnit() {
     given()
       .queryParam("periodUnit", "abc")
@@ -167,7 +153,6 @@ public class HistoricTaskReportDurationRestServiceTest extends AbstractRestServi
   @Test
   public void testMissingPeriodUnit() {
     given()
-      .queryParam("reportType", "duration")
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
@@ -184,7 +169,6 @@ public class HistoricTaskReportDurationRestServiceTest extends AbstractRestServi
     when(mockedReportQuery.duration(MONTH)).thenThrow(new AuthorizationException(message));
 
     given()
-      .queryParam("reportType", "duration")
       .queryParam("periodUnit", "month")
     .then()
       .expect()
