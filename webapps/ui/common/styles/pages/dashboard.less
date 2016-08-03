@@ -48,6 +48,9 @@
     list-style: none;
     padding: 0;
     margin: 0 0 (@grid-gutter-width * 0.5) 0;
+    &:last-of-type {
+      margin-bottom: 0;
+    }
   }
 
   .section-title {
@@ -82,16 +85,24 @@
     }
   }
 
+  .misc li,
+  li.link {
+    border-top: 1px solid @custom-gray-light;
+  }
+  li.link {
+    padding-top: 15px;
+  }
+
   .misc {
     li {
-      border-bottom: 1px solid @custom-gray-light;
-      padding-bottom: 10px;
-      margin-bottom: 10px;
-      &:last-of-type {
-        border-bottom: none;
-        padding-bottom: 0;
-        margin-bottom: 0;
+      padding-top: 5px;
+      &:first-of-type {
+        border-top: none;
       }
+    }
+
+    h3 {
+      margin-top: 10px;
     }
 
     h2 {
