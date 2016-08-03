@@ -78,6 +78,7 @@ import org.mockito.Matchers;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockSerializedVariables;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.variable.Variables;
@@ -1534,14 +1535,15 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   @Test
   public void testDeleteNonExistingDeployment() {
 
-    when(processDefinitionQueryMock.processDefinitionId("NON_EXISTING_ID")).thenReturn(processDefinitionQueryMock);
-    when(processDefinitionQueryMock.singleResult()).thenReturn(null);
+    doThrow(new NotFoundException("No process definition found with id 'NON_EXISTING_ID'"))
+            .when(repositoryServiceMock)
+            .deleteProcessDefinition("NON_EXISTING_ID", false, false);
 
     given()
       .pathParam("id", "NON_EXISTING_ID")
     .expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
-      .body(containsString("Process definition with id 'NON_EXISTING_ID' do not exist"))
+      .body(containsString("No process definition found with id 'NON_EXISTING_ID'"))
     .when()
       .delete(SINGLE_PROCESS_DEFINITION_URL);
   }
