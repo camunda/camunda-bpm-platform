@@ -125,12 +125,12 @@
         },
         {
           name: 'activityInstanceIdIn',
-          label: 'Activity Instance Id In',
+          label: 'Activity Instance ID In',
           help: commaSeparatedValues
         },
         {
           name: 'executionId',
-          label: 'Execution Id'
+          label: 'Execution ID'
         }
       ]
     },

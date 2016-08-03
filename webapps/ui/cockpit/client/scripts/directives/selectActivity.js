@@ -12,7 +12,7 @@
         }
 
         if (!selectedActivityQuery) {
-          throw new Error('No activity id query given in @cam-select-activity');
+          throw new Error('No activity ID query given in @cam-select-activity');
         }
 
         element.on('click', function(event) {

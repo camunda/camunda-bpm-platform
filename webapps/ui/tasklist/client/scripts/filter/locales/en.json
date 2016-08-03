@@ -88,9 +88,9 @@
   "FILTER_FORM_PERMISSIONS_SAVE_ERROR":
                         "Something went wrong while saving the permissions",
   "FILTER_FORM_PERMISSIONS_USER_ID":
-                        "User Id",
+                        "User ID",
   "FILTER_FORM_PERMISSIONS_GROUP_ID":
-                        "Group Id",
+                        "Group ID",
   "FILTER_FORM_PERMISSIONS_DUPLICATE_USER":
                         "Given user has already read permissions",
   "FILTER_FORM_PERMISSIONS_DUPLICATE_GROUP":
