@@ -10,7 +10,7 @@ VALUES
 
 ALTER TABLE ACT_RE_DECISION_DEF
   ADD DEC_REQ_ID_ varchar(64);
-  
+
 ALTER TABLE ACT_RE_DECISION_DEF
   ADD DEC_REQ_KEY_ varchar(255);
 
@@ -19,7 +19,7 @@ ALTER TABLE ACT_RU_CASE_SENTRY_PART
 
 ALTER TABLE ACT_RU_CASE_SENTRY_PART
   ADD VARIABLE_NAME_ varchar(255);
-  
+
 create table ACT_RE_DECISION_REQ_DEF (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
@@ -44,13 +44,13 @@ create index ACT_IDX_DEC_REQ_DEF_TENANT_ID on ACT_RE_DECISION_REQ_DEF(TENANT_ID_
 
 ALTER TABLE ACT_HI_DECINST
   ADD ROOT_DEC_INST_ID_ varchar(64);
-  
+
 ALTER TABLE ACT_HI_DECINST
   ADD DEC_REQ_ID_ varchar(64);
-  
+
 ALTER TABLE ACT_HI_DECINST
   ADD DEC_REQ_KEY_ varchar(255);
-  
+
 create index ACT_IDX_HI_DEC_INST_ROOT_ID on ACT_HI_DECINST(ROOT_DEC_INST_ID_);
 create index ACT_IDX_HI_DEC_INST_REQ_ID on ACT_HI_DECINST(DEC_REQ_ID_);
 create index ACT_IDX_HI_DEC_INST_REQ_KEY on ACT_HI_DECINST(DEC_REQ_KEY_);
@@ -58,9 +58,9 @@ create index ACT_IDX_HI_DEC_INST_REQ_KEY on ACT_HI_DECINST(DEC_REQ_KEY_);
 -- remove not null from ACT_HI_DEC tables --
 alter table ACT_HI_DEC_OUT
   alter column CLAUSE_ID_ set null;
-alter table ACT_HI_DEC_OUT  
+alter table ACT_HI_DEC_OUT
   alter column RULE_ID_ set null;
-  
+
 alter table ACT_HI_DEC_IN
   alter column CLAUSE_ID_ set null;
 
