@@ -56,7 +56,7 @@
   "ADD_GROUPS":
         "Add groups",
   "USE_ADD_GROUP":
-        "You can add a group by typing a group id into the input field and afterwards clicking the button with the plus sign.",
+        "You can add a group by typing a group ID into the input field and afterwards clicking the button with the plus sign.",
   "DUPLICATE_GROUP":
         "Task is already in this group.",
   "OWNER":
@@ -224,5 +224,5 @@
   "priority":
         "Priority",
   "caseInstanceId":
-        "Case instance id"
+        "Case instance ID"
 }
