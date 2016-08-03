@@ -90,6 +90,21 @@ public class HistoricTaskReportDurationRestServiceTest extends AbstractRestServi
   }
 
   @Test
+  public void testWithoutDurationParam() {
+    given()
+      .queryParam("periodUnit", "month")
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+    .when()
+      .get(TASK_DURATION_REPORT_URL);
+
+    verify(mockedReportQuery).duration(MONTH);
+    verifyNoMoreInteractions(mockedReportQuery);
+  }
+
+  @Test
   public void testEmptyReportByMonth() {
     given()
       .queryParam("reportType", "duration")
@@ -150,19 +165,6 @@ public class HistoricTaskReportDurationRestServiceTest extends AbstractRestServi
   }
 
   @Test
-  public void testMissingReportType() {
-    given()
-    .then()
-      .expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .contentType(ContentType.JSON)
-        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", containsString("Unknown report type null"))
-    .when()
-      .get(TASK_DURATION_REPORT_URL);
-  }
-
-  @Test
   public void testMissingPeriodUnit() {
     given()
       .queryParam("reportType", "duration")
@@ -203,6 +205,11 @@ public class HistoricTaskReportDurationRestServiceTest extends AbstractRestServi
       .expect()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
+        .body("[0].average", equalTo((int) EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_AVG))
+        .body("[0].maximum", equalTo((int) EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_MAX))
+        .body("[0].minimum", equalTo((int) EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_MIN))
+        .body("[0].period", equalTo(EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_PERIOD))
+        .body("[0].periodUnit", equalTo(MONTH.toString()))
     .when()
       .get(TASK_DURATION_REPORT_URL);
 
@@ -210,18 +217,6 @@ public class HistoricTaskReportDurationRestServiceTest extends AbstractRestServi
     List<String> reports = from(content).getList("");
     Assert.assertEquals("There should be one report returned.", 1, reports.size());
     Assert.assertNotNull("The returned report should not be null.", reports.get(0));
-
-    long returnedAvg = from(content).getLong("[0].average");
-    long returnedMax = from(content).getLong("[0].maximum");
-    long returnedMin = from(content).getLong("[0].minimum");
-    int returnedPeriod = from(content).getInt("[0].period");
-    String returnedPeriodUnit = from(content).getString("[0].periodUnit");
-
-    Assert.assertEquals(EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_AVG, returnedAvg);
-    Assert.assertEquals(EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_MAX, returnedMax);
-    Assert.assertEquals(EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_MIN, returnedMin);
-    Assert.assertEquals(EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_PERIOD, returnedPeriod);
-    Assert.assertEquals(MONTH.toString(), returnedPeriodUnit);
   }
 
   @Test
@@ -233,6 +228,11 @@ public class HistoricTaskReportDurationRestServiceTest extends AbstractRestServi
       .expect()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
+        .body("[0].average", equalTo((int) EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_AVG))
+        .body("[0].maximum", equalTo((int) EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_MAX))
+        .body("[0].minimum", equalTo((int) EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_MIN))
+        .body("[0].period", equalTo(EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_PERIOD))
+        .body("[0].periodUnit", equalTo(QUARTER.toString()))
     .when()
       .get(TASK_DURATION_REPORT_URL);
 
@@ -240,22 +240,10 @@ public class HistoricTaskReportDurationRestServiceTest extends AbstractRestServi
     List<String> reports = from(content).getList("");
     Assert.assertEquals("There should be one report returned.", 1, reports.size());
     Assert.assertNotNull("The returned report should not be null.", reports.get(0));
-
-    long returnedAvg = from(content).getLong("[0].average");
-    long returnedMax = from(content).getLong("[0].maximum");
-    long returnedMin = from(content).getLong("[0].minimum");
-    int returnedPeriod = from(content).getInt("[0].period");
-    String returnedPeriodUnit = from(content).getString("[0].periodUnit");
-
-    Assert.assertEquals(EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_AVG, returnedAvg);
-    Assert.assertEquals(EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_MAX, returnedMax);
-    Assert.assertEquals(EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_MIN, returnedMin);
-    Assert.assertEquals(EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_PERIOD, returnedPeriod);
-    Assert.assertEquals(QUARTER.toString(), returnedPeriodUnit);
   }
 
   @Test
-  public void testHistoricBeforeAndAfterStartTimeQuery() {
+  public void testHistoricBeforeAndAfterEndTimeQuery() {
     given()
       .queryParam("periodUnit", "month")
       .queryParam("reportType", "duration")
@@ -269,6 +257,38 @@ public class HistoricTaskReportDurationRestServiceTest extends AbstractRestServi
       .get(TASK_DURATION_REPORT_URL);
 
     verifyStringStartParameterQueryInvocations();
+  }
+
+  @Test
+  public void testHistoricBeforeQuery() {
+    given()
+      .queryParam("periodUnit", "month")
+      .queryParam("reportType", "duration")
+      .queryParam("completedBefore", EXAMPLE_HISTORIC_TASK_INST_START_TIME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+    .when()
+      .get(TASK_DURATION_REPORT_URL);
+
+    verify(mockedReportQuery).completedBefore(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_START_TIME));
+  }
+
+  @Test
+  public void testHistoricAfterQuery() {
+    given()
+      .queryParam("periodUnit", "month")
+      .queryParam("reportType", "duration")
+      .queryParam("completedAfter", EXAMPLE_HISTORIC_TASK_INST_START_TIME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+    .when()
+      .get(TASK_DURATION_REPORT_URL);
+
+    verify(mockedReportQuery).completedAfter(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_END_TIME));
   }
 
   private Map<String, String> getCompleteStartDateAsStringQueryParameters() {
