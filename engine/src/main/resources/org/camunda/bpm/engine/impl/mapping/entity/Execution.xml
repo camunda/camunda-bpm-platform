@@ -152,35 +152,6 @@
     where PROC_INST_ID_ = #{parameter}
   </select>
 
-  <select id="selectExecutionsByParametersForSuspension" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
-    select * from ${prefix}ACT_RU_EXECUTION
-    <where>
-      <if test="parameter.processInstanceId != null">
-        PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR}
-      </if>
-      <if test="parameter.processDefinitionId != null">
-        and PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=VARCHAR}
-      </if>
-      <if test="parameter.processDefinitionKey != null">
-        and PROC_DEF_ID_ IN (
-        SELECT ID_
-        FROM ${prefix}ACT_RE_PROCDEF PD
-        WHERE PD.KEY_ = #{parameter.processDefinitionKey, jdbcType=VARCHAR}
-        <if test="parameter.isTenantIdSet">
-          <if test="parameter.tenantId != null">
-            and PD.TENANT_ID_ = #{parameter.tenantId, jdbcType=VARCHAR}
-          </if>
-          <if test="parameter.tenantId == null">
-            and PD.TENANT_ID_ is null
-          </if>
-        </if>
-        )
-        <bind name="columnPrefix" value="''"/>
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
-      </if>
-    </where>
-  </select>
-
   <select id="selectProcessInstanceIdsByProcessDefinitionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
     select ID_
     from ${prefix}ACT_RU_EXECUTION
