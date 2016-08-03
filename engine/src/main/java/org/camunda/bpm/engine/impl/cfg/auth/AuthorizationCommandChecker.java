@@ -111,7 +111,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     if (getAuthorizationManager().isAuthorizationEnabled()) {
       ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
       if (processDefinition != null) {
-        checkDeleteProcessDefinitionById(processDefinition.getKey());
+        checkDeleteProcessDefinitionByKey(processDefinition.getKey());
       }
     }
   }

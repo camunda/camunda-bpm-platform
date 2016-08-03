@@ -187,24 +187,24 @@ public class ProcessDefinitionManager extends AbstractManager {
 
   // delete  ///////////////////////////////////////////////////////////
 
-  public void deleteProcessDefinitionsByDeploymentId(String deploymentId) {
-    getDbEntityManager().delete(ProcessDefinitionEntity.class, "deleteProcessDefinitionsByDeploymentId", deploymentId);
+  /**
+   * Cascades the deletion of the process definition to the process instances.
+   * Skips the custom listeners if the flag was set to true.
+   *
+   * @param processDefinitionId the process definition id
+   * @param skipCustomListeners true if the custom listeners should be skipped at process instance deletion
+   */
+  protected void cascadeDeleteProcessInstancesForProcessDefinition(String processDefinitionId, boolean skipCustomListeners) {
+    getProcessInstanceManager()
+            .deleteProcessInstancesByProcessDefinition(processDefinitionId, "deleted process definition", true, skipCustomListeners);
   }
 
   /**
-   * Cascades the deletion of the process definition.
-   * Deletes the history and the process instances if the flag was set to true.
+   * Cascades the deletion of a process definition to the history, deletes the history.
    *
    * @param processDefinitionId the process definition id
-   * @param instances true if also the process instances should be deleted
-   * @param skipCustomListeners true if the custom listeners should be skipped at process instance deletion
    */
-  protected void cascadeDeleteProcessDefinition(String processDefinitionId, boolean instances, boolean skipCustomListeners) {
-    if (instances) {
-      getProcessInstanceManager()
-        .deleteProcessInstancesByProcessDefinition(processDefinitionId, "deleted process definition", true, skipCustomListeners);
-    }
-
+  protected void cascadeDeleteHistoryForProcessDefinition(String processDefinitionId) {
      // remove historic incidents which are not referenced to a process instance
     getHistoricIncidentManager().deleteHistoricIncidentsByProcessDefinitionId(processDefinitionId);
 
@@ -258,13 +258,13 @@ public class ProcessDefinitionManager extends AbstractManager {
 
  /**
   * Deletes the given process definition from the database and cache.
-  * If cascade is set to true it deletes also the history and the process instances
-  * if the instances flag is set as well to true.
+  * If cascadeToHistory and cascadeToInstances is set to true it deletes
+  * the history and the process instances.
   *
   * *Note*: If more than one process definition, from one deployment, is deleted in
-  * a single transaction and the cascade and instances flag was set to true it
+  * a single transaction and the cascadeToHistory and cascadeToInstances flag was set to true it
   * can cause a dirty deployment cache. The process instances of ALL process definitions must be deleted,
-  * before every process definition can be deleted! In such cases the instances flag
+  * before every process definition can be deleted! In such cases the cascadeToInstances flag
   * have to set to false!
   *
   * On deletion of all process instances, the task listeners will be deleted as well.
@@ -282,14 +282,17 @@ public class ProcessDefinitionManager extends AbstractManager {
   *
   * @param processDefinition the process definition which should be deleted
   * @param processDefinitionId the id of the process definition
-  * @param cascade if true all instances and the history will deleted as well
-  * @param instances if false only the history will be deleted if cascade is set to true
+  * @param cascadeToHistory if true the history will deleted as well
+  * @param cascadeToInstances if true the process instances are deleted as well
   * @param skipCustomListeners if true skips the custom listeners on deletion of instances
   */
-  public void deleteProcessDefinition(ProcessDefinition processDefinition, String processDefinitionId, boolean cascade, boolean instances, boolean skipCustomListeners) {
+  public void deleteProcessDefinition(ProcessDefinition processDefinition, String processDefinitionId, boolean cascadeToHistory, boolean cascadeToInstances, boolean skipCustomListeners) {
 
-    if (cascade) {
-      cascadeDeleteProcessDefinition(processDefinitionId, instances, skipCustomListeners);
+    if (cascadeToHistory) {
+      cascadeDeleteHistoryForProcessDefinition(processDefinitionId);
+      if (cascadeToInstances) {
+        cascadeDeleteProcessInstancesForProcessDefinition(processDefinitionId, skipCustomListeners);
+      }
     } else {
       ProcessInstanceQueryImpl procInstQuery = new ProcessInstanceQueryImpl().processDefinitionId(processDefinitionId);
       long processInstanceCount = getProcessInstanceManager().findProcessInstanceCountByQueryCriteria(procInstQuery);

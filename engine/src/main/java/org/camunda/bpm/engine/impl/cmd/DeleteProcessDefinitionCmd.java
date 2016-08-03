@@ -16,11 +16,12 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * Command to delete a process definition form a deployment.
@@ -45,7 +46,7 @@ public class DeleteProcessDefinitionCmd implements Command<Void>, Serializable {
 
     ProcessDefinition processDefinition = commandContext.getProcessDefinitionManager()
                                                 .findLatestProcessDefinitionById(processDefinitionId);
-    ensureNotNull("No process definition found with id '" + processDefinitionId + "'", "processDefinition", processDefinition);
+    ensureNotNull(NotFoundException.class, "No process definition found with id '" + processDefinitionId + "'", "processDefinition", processDefinition);
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkDeleteProcessDefinitionById(processDefinitionId);

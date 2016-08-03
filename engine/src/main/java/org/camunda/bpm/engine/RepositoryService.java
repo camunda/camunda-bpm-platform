@@ -120,6 +120,9 @@ public interface RepositoryService {
 
   /**
    * Deletes the process definition which belongs to the given process definition id.
+   * Same behavior as {@link RepositoryService#deleteProcessDefinition(java.lang.String, boolean, boolean)}
+   * Both boolean parameters of this method are per default false. The deletion is
+   * in this case not cascading.
    *
    * @param processDefinitionId the id, which corresponds to the process definition
    * @throws ProcessEngineException
@@ -127,20 +130,25 @@ public interface RepositoryService {
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @see RepositoryService#deleteProcessDefinition(java.lang.String, boolean, boolean)
    */
   void deleteProcessDefinition(String processDefinitionId);
 
   /**
    * Deletes the process definition which belongs to the given process definition id.
    * Cascades the deletion if the cascade is set to true.
+   * Same behavior as {@link RepositoryService#deleteProcessDefinition(java.lang.String, boolean, boolean)}
+   * The skipCustomListeners parameter is per default false. The custom listeners are called
+   * if the cascading flag is set to false and the process instances are deleted.
    *
    * @param processDefinitionId the id, which corresponds to the process definition
-   * @param cascade true if the deletion should be cascade, false otherwise
+   * @param cascade if set to true, all process instances (including) history are deleted
    * @throws ProcessEngineException
    *          If the process definition does not exist
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @see RepositoryService#deleteProcessDefinition(java.lang.String, boolean, boolean)
    */
   void deleteProcessDefinition(String processDefinitionId, boolean cascade);
 

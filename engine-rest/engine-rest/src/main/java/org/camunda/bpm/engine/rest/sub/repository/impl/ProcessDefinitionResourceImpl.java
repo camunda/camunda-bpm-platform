@@ -56,6 +56,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceWithVariablesDto;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 
@@ -90,19 +91,14 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
   }
 
   @Override
-  public Response deleteProcessDefinition(String processDefinitionId, boolean cascade, boolean skipCustomListeners) {
+  public Response deleteProcessDefinition(boolean cascade, boolean skipCustomListeners) {
     RepositoryService repositoryService = engine.getRepositoryService();
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                                                           .processDefinitionId(processDefinitionId)
-                                                           .singleResult();
 
-    if (processDefinition == null) {
-      return Response.status(Status.NOT_FOUND)
-                      .entity("Process definition with id '" + processDefinitionId + "' do not exist")
-                      .build();
+    try {
+      repositoryService.deleteProcessDefinition(processDefinitionId, cascade, skipCustomListeners);
+    } catch (NotFoundException nfe) {
+      throw new InvalidRequestException(Status.NOT_FOUND, nfe, nfe.getMessage());
     }
-
-    repositoryService.deleteProcessDefinition(processDefinitionId, cascade, skipCustomListeners);
     return Response.ok().build();
   }
 

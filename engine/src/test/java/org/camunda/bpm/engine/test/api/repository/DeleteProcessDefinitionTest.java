@@ -34,12 +34,15 @@ import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
+import org.junit.rules.ExpectedException;
 
 /**
  *
@@ -49,6 +52,9 @@ public class DeleteProcessDefinitionTest {
 
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
 
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
@@ -72,22 +78,20 @@ public class DeleteProcessDefinitionTest {
 
   @Test
   public void testDeleteProcessDefinitionNullId() {
-    try {
-      repositoryService.deleteProcessDefinition(null);
-      fail("Should fail, since process definition Id is null!");
-    } catch (Exception ex) {
-      assert (ex.getMessage().contains("processDefinitionId is null"));
-    }
+    // declare expected exception
+    thrown.expect(NullValueException.class);
+    thrown.expectMessage("processDefinitionId is null");
+
+    repositoryService.deleteProcessDefinition(null);
   }
 
   @Test
   public void testDeleteNonExistingProcessDefinition() {
-    try {
-      repositoryService.deleteProcessDefinition("notexist");
-      fail("Should fail, to delete non existing process definition!");
-    } catch (Exception ex) {
-      assert (ex.getMessage().contains("No process definition found"));
-    }
+    // declare expected exception
+    thrown.expect(NotFoundException.class);
+    thrown.expectMessage("No process definition found with id 'notexist': processDefinition is null");
+
+    repositoryService.deleteProcessDefinition("notexist");
   }
 
   @Test
@@ -124,7 +128,7 @@ public class DeleteProcessDefinitionTest {
     } catch (ProcessEngineException pee) {
       // then Exception is expected, the deletion should fail since there exist a process instance
       // and the cascade flag is per default false
-      assert(pee.getMessage().contains("Deletion of process definition without cascading failed."));
+      assertTrue(pee.getMessage().contains("Deletion of process definition without cascading failed."));
     }
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
   }
@@ -198,7 +202,7 @@ public class DeleteProcessDefinitionTest {
     //then creating process instance from the existing process definition
     ProcessInstanceWithVariables procInst = runtimeService.createProcessInstanceByKey("two").executeWithVariablesInReturn();
     assertNotNull(procInst);
-    assert (procInst.getProcessDefinitionId().contains("two"));
+    assertTrue(procInst.getProcessDefinitionId().contains("two"));
 
     //should refill the cache
     assertEquals(1, processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache().size());
