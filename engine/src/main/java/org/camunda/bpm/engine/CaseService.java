@@ -446,19 +446,42 @@ public interface CaseService {
 
   /**
    * <p>Terminates the case execution identified by the given id.
-   * Performs the transition to state <code>TERMINATED</code>.</p>
+   * Performs the transition from <code>ACTIVE</code> to state <code>TERMINATED</code>
+   * if the case execution belongs to a case model or a task or a stage.
+   * Performs the transition from <code>AVAILABLE</code> to state <code>TERMINATED</code> if the case
+   * execution belongs to a milestone.</p>
    *
    * @param caseExecutionId the id of the case execution to be terminated
    *
    * @throws NotValidException when the given case execution id is null
    * @throws NotFoundException when no case execution is found for the
    *      given case execution id
-   * @throws NotAllowedException when the transition is not allowed to be done or
-   *      when the case execution is a case instance
+   * @throws NotAllowedException when the transition is not allowed to be done
    * @throws ProcessEngineException when an internal exception happens during the execution
    *     of the command.
    */
   void terminateCaseExecution(String caseExecutionId);
+
+  /**
+  *
+  * <p>Terminates the case execution identified by the given id.
+  * Performs the transition from <code>ACTIVE</code> to state <code>TERMINATED</code>
+  * if the case execution belongs to either a case model or a task or a stage.
+  * Performs the transition from <code>AVAILABLE</code> to state <code>TERMINATED</code> if the case
+  * execution belongs to a milestone.</p>
+  *
+  *
+  * @param caseExecutionId the id of the case execution to terminate
+  * @param variables variables to be set on the case execution
+  *
+   * @throws NotValidException when the given case execution id is null
+   * @throws NotFoundException when no case execution is found for the
+   *      given case execution id
+   * @throws NotAllowedException when the transition is not allowed to be done
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
+   */
+  void terminateCaseExecution(String caseExecutionId, Map<String, Object> variables);
 
   // fluent API ////////////////////////////////////////////////////////////
 

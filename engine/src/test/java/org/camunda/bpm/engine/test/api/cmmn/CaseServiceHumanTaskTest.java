@@ -1371,6 +1371,68 @@ public class CaseServiceHumanTaskTest extends PluggableProcessEngineTestCase {
     
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"})
+  public void testTerminateWithVariablesNonFluent() {
+    // given:
+    // a deployed case definition
+    String caseDefinitionId = repositoryService
+        .createCaseDefinitionQuery()
+        .singleResult()
+        .getId();
+
+    // an active case instance
+    String caseInstanceId = caseService
+       .withCaseDefinition(caseDefinitionId)
+       .create()
+       .getId();
+
+    String humanTaskExecutionId = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService
+      .withCaseExecution(humanTaskExecutionId)
+      .manualStart();
+
+    Task task = taskService
+        .createTaskQuery()
+        .singleResult();
+
+    assertNotNull(task);
+
+    // when
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariable", "aValue");
+
+    caseService.terminateCaseExecution(humanTaskExecutionId, variables);
+
+    // then
+
+    // the task has been terminated
+    assertNull(taskService.createTaskQuery().singleResult());
+
+    // the corresponding case execution has been also
+    // deleted
+    CaseExecution humanTaskExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult();
+
+    assertNull(humanTaskExecution);
+
+    // there is a variable set on the case instance
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
+
+    assertNotNull(variable);
+    assertEquals(caseInstanceId, variable.getCaseExecutionId());
+    assertEquals(caseInstanceId, variable.getCaseInstanceId());
+    assertEquals("aVariable", variable.getName());
+    assertEquals("aValue", variable.getValue());
+
+  }
+
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testTerminateNonActiveHumanTask() {
     // given:
