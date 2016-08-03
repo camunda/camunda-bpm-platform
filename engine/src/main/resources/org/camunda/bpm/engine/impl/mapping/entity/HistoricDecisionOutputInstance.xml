@@ -28,7 +28,7 @@
           #{clauseId, jdbcType=VARCHAR},
           #{clauseName, jdbcType=VARCHAR},
           #{ruleId, jdbcType=VARCHAR},
-          #{ruleOrder, jdbcType=VARCHAR},
+          #{ruleOrder, jdbcType=INTEGER},
           #{variableName, jdbcType=VARCHAR},
           #{serializerName, jdbcType=VARCHAR},
           #{byteArrayValueId, jdbcType=VARCHAR},

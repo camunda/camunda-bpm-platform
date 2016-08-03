@@ -63,9 +63,7 @@ alter table ACT_HI_DEC_OUT
   );
 
 alter table ACT_HI_DEC_IN
-  modify (
-      CLAUSE_ID_ null
-  );  
+  modify ( CLAUSE_ID_ null ); 
   
 -- CAM-5914
 create index ACT_IDX_JOB_EXECUTION_ID on ACT_RU_JOB(EXECUTION_ID_);
