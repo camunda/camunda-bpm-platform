@@ -40,7 +40,6 @@ public class TransactionIsolationLevelTest extends AbstractFoxPlatformIntegratio
         .openSession();
     try {
       int transactionIsolation = sqlSession.getConnection().getTransactionIsolation();
-      System.out.println("Current transaction isolation: " + transactionIsolation);
       assertEquals("TransactionIsolationLevel for connection is " + transactionIsolation + " instead of " + Connection.TRANSACTION_READ_COMMITTED,
           Connection.TRANSACTION_READ_COMMITTED, transactionIsolation);
     } catch (SQLException e) {

@@ -10,6 +10,7 @@
 		<datasource jndi-name="java:jboss/datasources/ProcessEngine" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="ProcessEngine">
 			<connection-url>${database.url}</connection-url>
 			<driver>h2</driver>
+			<transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
 			<security>
 				<user-name>${database.username}</user-name>
 				<password>${database.password}</password>
