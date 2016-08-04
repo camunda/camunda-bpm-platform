@@ -330,6 +330,12 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
         .singleResult()
         .getId();
 
+    CaseExecution humanTask2 = executionQuery
+      .activityId("PI_HumanTask_2")
+      .singleResult();
+
+    manualStart(humanTask2.getId());
+ 
     // when
     complete(humanTask1Id);
 

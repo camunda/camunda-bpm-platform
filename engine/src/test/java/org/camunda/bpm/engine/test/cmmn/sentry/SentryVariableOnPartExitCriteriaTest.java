@@ -115,14 +115,12 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
 
     CaseExecution stageExecution1 = queryCaseExecutionByActivityId("Stage_1");
 
-    CaseExecution stageExecution2;
-
     caseService.setVariable(stageExecution1.getId(), "value", 101);
 
     stageExecution1 = queryCaseExecutionByActivityId("Stage_1");
     assertNull(stageExecution1);
 
-    stageExecution2 = queryCaseExecutionByActivityId("Stage_2");
+    CaseExecution stageExecution2 = queryCaseExecutionByActivityId("Stage_2");
     assertNull(stageExecution2);
     
   }

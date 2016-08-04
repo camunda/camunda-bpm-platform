@@ -578,7 +578,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   }
   
   protected void checkAndFireExitCriteria(List<String> satisfiedSentries) {
-    if (!isCompleted() && !isTerminated()) {
+    if (isActive()) {
       CmmnActivity activity = getActivity();
       ensureNotNull(PvmException.class, "Case execution '"+getId()+"': has no current activity.", "activity", activity);
 

@@ -25,6 +25,9 @@
         <planItemOnPart sourceRef="PI_HumanTask_1">
           <standardEvent>exit</standardEvent>
         </planItemOnPart>
+        <ifPart id="IfPart_1doc4is">
+          <condition id="Expression_0z741x7"><![CDATA[${value > 100}]]></condition>
+        </ifPart>
       </sentry>
 
       <humanTask id="HumanTask_1" />

@@ -166,6 +166,7 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertHistoricState(humanTaskId3, ACTIVE);
     assertStateQuery(COMPLETED, ENABLED, ACTIVE);
 
+    manualStart(taskInstanceId2);
     // when human task 3 is terminated
     terminate(taskInstanceId3);
 

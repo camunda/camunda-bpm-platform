@@ -233,7 +233,7 @@ public class SentryCombinedEntryAndExitCriteriaTest extends CmmnProcessEngineTes
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryCombinedEntryAndExitCriteriaTest.testFireFirstExitCriteria.cmmn"})
   public void testFireFirstExitCriteria() {
     // given
-    String caseInstanceId = createCaseInstance().getId();
+    createCaseInstance();
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
     String firstHumanTaskId = firstHumanTask.getId();
@@ -253,11 +253,7 @@ public class SentryCombinedEntryAndExitCriteriaTest extends CmmnProcessEngineTes
     assertNull(firstHumanTask);
 
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
-    assertNull(secondHumanTask);
-
-    assertNull(caseService.getVariable(caseInstanceId, "enable"));
-    assertTrue((Boolean) caseService.getVariable(caseInstanceId, "exit"));
-
+    assertTrue(secondHumanTask.isActive());
   }
 
 }

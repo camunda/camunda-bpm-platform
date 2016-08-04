@@ -35,7 +35,13 @@ public class SentryExitCriteriaTest extends CmmnProcessEngineTestCase {
 
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
     String secondHumanTaskId = secondHumanTask.getId();
+
     assertTrue(secondHumanTask.isActive());
+
+    // (2) then
+    secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
+    assertTrue(secondHumanTask.isActive());
+
     assertNull(caseService.getVariable(caseInstanceId, "exit"));
 
     // (2) when
@@ -121,7 +127,6 @@ public class SentryExitCriteriaTest extends CmmnProcessEngineTestCase {
     String thirdHumanTaskId = thirdHumanTask.getId();
     assertTrue(thirdHumanTask.isActive());
 
-    // (1) when
     complete(firstHumanTaskId);
 
     // (1) then
@@ -296,9 +301,13 @@ public class SentryExitCriteriaTest extends CmmnProcessEngineTestCase {
     String innerThirdHumanTaskId = innerThirdHumanTask.getId();
     assertTrue(innerThirdHumanTask.isActive());
 
+    caseService.setVariable(stageId, "value", 99);
     // when
     suspend(stageId);
+    resume(stageId);
 
+    caseService.setVariable(stageId, "value", 101);
+ 
     // then
     stage = queryCaseExecutionById(stageId);
     assertNull(stage);
@@ -374,21 +383,6 @@ public class SentryExitCriteriaTest extends CmmnProcessEngineTestCase {
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
     assertTrue(secondHumanTask.isActive());
 
-  }
-
-
-
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testExitTaskByInstanceCreation.cmmn"})
-  public void testExitTaskByInstanceCreation() {
-    // given + when
-    createCaseInstance();
-
-    // then
-    CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
-    assertTrue(firstHumanTask.isActive());
-
-    CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
-    assertNull(secondHumanTask);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testExitCriteriaOnCasePlanModel.cmmn"})
@@ -491,101 +485,7 @@ public class SentryExitCriteriaTest extends CmmnProcessEngineTestCase {
     assertNull(secondHumanTask);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testExitDisabledTask.cmmn"})
-  public void testExitDisabledTask() {
-    // given
-    createCaseInstance();
-
-    CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
-    String firstHumanTaskId = firstHumanTask.getId();
-
-    assertTrue(firstHumanTask.isEnabled());
-
-    CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
-    String secondHumanTaskId = secondHumanTask.getId();
-
-    assertTrue(secondHumanTask.isEnabled());
-
-    disable(secondHumanTaskId);
-
-    // when
-    manualStart(firstHumanTaskId);
-
-    // then
-    firstHumanTask = queryCaseExecutionById(firstHumanTaskId);
-    assertTrue(firstHumanTask.isActive());
-
-    secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
-    assertNull(secondHumanTask);
-
-  }
-
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testExitDisabledTask.cmmn"})
-  public void testExitSuspendedTask() {
-    // given
-    createCaseInstance();
-
-    CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
-    String firstHumanTaskId = firstHumanTask.getId();
-
-    assertTrue(firstHumanTask.isEnabled());
-
-    CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
-    String secondHumanTaskId = secondHumanTask.getId();
-
-    assertTrue(secondHumanTask.isEnabled());
-
-    manualStart(secondHumanTaskId);
-    suspend(secondHumanTaskId);
-
-    // when
-    manualStart(firstHumanTaskId);
-
-    // then
-    firstHumanTask = queryCaseExecutionById(firstHumanTaskId);
-    assertTrue(firstHumanTask.isActive());
-
-    secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
-    assertNull(secondHumanTask);
-
-  }
-
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testExitAvailableTask.cmmn"})
-  public void testExitAvailableTask() {
-    // given
-    createCaseInstance();
-
-    CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
-    String firstHumanTaskId = firstHumanTask.getId();
-
-    assertTrue(firstHumanTask.isEnabled());
-
-    CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
-    String secondHumanTaskId = secondHumanTask.getId();
-
-    assertTrue(secondHumanTask.isAvailable());
-
-    CaseExecution thirdHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_3");
-    String thirdHumanTaskId = thirdHumanTask.getId();
-
-    assertTrue(thirdHumanTask.isEnabled());
-
-    // when
-    manualStart(firstHumanTaskId);
-
-    // then
-    firstHumanTask = queryCaseExecutionById(firstHumanTaskId);
-    assertTrue(firstHumanTask.isActive());
-
-    secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
-    assertNull(secondHumanTask);
-
-    thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
-    assertTrue(thirdHumanTask.isEnabled());
-
-  }
-
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testExitDisabledTask.cmmn"})
+  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testExitActiveTask.cmmn"})
   public void testExitActiveTask() {
     // given
     createCaseInstance();

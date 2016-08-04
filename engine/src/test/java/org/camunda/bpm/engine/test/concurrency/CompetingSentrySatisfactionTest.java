@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.impl.cmmn.cmd.CompleteCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.ManualStartCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.StateTransitionCaseExecutionCmd;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.test.Deployment;
 import org.slf4j.Logger;
 
@@ -203,7 +204,8 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertTextPresent("was updated by another transaction concurrently", message);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.testExitCriteriaWithOrSentry.cmmn"})
+  @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.testExitCriteriaWithOrSentry.cmmn",
+      "org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.oneTaskProcess.bpmn20.xml"})
   public void testExitCriteriaWithOrSentry() {
     String caseInstanceId = caseService
         .withCaseDefinitionByKey("case")
@@ -224,6 +226,13 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
         .singleResult()
         .getId();
 
+    CaseExecution thirdTask = caseService
+      .createCaseExecutionQuery()
+      .caseInstanceId(caseInstanceId)
+      .activityId("ProcessTask_3")
+      .singleResult();
+    caseService.manuallyStartCaseExecution(thirdTask.getId());
+    
     LOG.debug("test thread starts thread one");
     SingleThread threadOne = new ManualStartSingleThread(firstHumanTaskId);
     threadOne.startAndWaitUntilControlIsReturned();
