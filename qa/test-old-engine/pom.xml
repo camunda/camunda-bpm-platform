@@ -13,7 +13,7 @@
     </camunda.version.current>
   </properties>
 
-  <artifactId>camunda-new-schema-old-engine</artifactId>
+  <artifactId>camunda-qa-old-engine</artifactId>
   <packaging>jar</packaging>
   <name>camunda BPM - QA - test new schema with old engine</name>
 
@@ -56,43 +56,111 @@
 
     <profile>
       <id>old-engine</id>
+
       <dependencyManagement>
-        <dependencies>
+        <dependencies>     
           <dependency>
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-bom</artifactId>
-            <version>7.5.3-ee</version>
+            <version>7.5.0</version>
             <scope>import</scope>
             <type>pom</type>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-engine</artifactId>
-            <version>7.5.3-ee</version>
+            <version>7.5.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-xml-model</artifactId>
-            <version>7.5.3-ee</version>
+            <version>7.5.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-bpmn-model</artifactId>
-            <version>7.5.3-ee</version>
+            <version>7.5.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-cmmn-model</artifactId>
-            <version>7.5.3-ee</version>
+            <version>7.5.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-dmn-model</artifactId>
-            <version>7.5.3-ee</version>
+            <version>7.5.0</version>
           </dependency>
-        </dependencies>
+         </dependencies>
       </dependencyManagement>
+
       <dependencies>
+       <dependency>
+          <groupId>com.fasterxml.uuid</groupId>
+          <artifactId>java-uuid-generator</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest-library</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-test</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.apache.openjpa</groupId>
+          <artifactId>openjpa</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.subethamail</groupId>
+          <artifactId>subethasmtp-wiser</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy-all</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.python</groupId>
+          <artifactId>jython</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.jruby</groupId>
+          <artifactId>jruby-complete</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+
+
         <dependency>
           <groupId>org.camunda.bpm.distro</groupId>
           <artifactId>camunda-sql-scripts</artifactId>
@@ -103,7 +171,7 @@
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine</artifactId>
-          <version>7.5.3-ee</version>
+          <version>7.5.0</version>
           <scope>test</scope>
         </dependency>
         <dependency>
@@ -112,8 +180,10 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
+
       <build>
         <plugins>
+
           <!-- parse version properties from qa/pom.xml -->
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -136,55 +206,19 @@
                 </goals>
                 <configuration>
                   <propertyPrefix>camunda.old</propertyPrefix>
-                  <versionString>7.5.3-ee</versionString>
+                  <versionString>7.5.0</versionString>
                 </configuration>
               </execution>
             </executions>
           </plugin>
 
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>create-sql-script-stubs</id>
-                <phase>generate-test-sources</phase>
-                <configuration>
-                  <target>
-
-                    <!-- create the SQL scripts so that the files exist even if they do not exist in the distribution.
-                    (this can be the case if there are no db upgrades (yet) for a particular release ) -->
-
-                    <mkdir dir="${project.build.directory}/scripts-current/sql/upgrade/" />
-
-                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
-                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
-
-                    <!-- patches for last minor version -->
-                    <!-- only add patch scripts which are after the camunda.version.old -->
-                    <!-- example:
-                      <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch_${camunda.old.majorVersion}.${camunda.old.minorVersion}.X_to_${camunda.old.majorVersion}.${camunda.old.minorVersion}.Y.sql" />
-                    -->
-
-                    <!-- patches for current minor version if any -->
-                    <!-- example:
-                      <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch_${camunda.current.majorVersion}.${camunda.current.minorVersion}.0_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.1.sql" />
-                    -->
-
-                  </target>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
+          <!--UNPACKING-->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
 
             <executions>
+              <!--UNPACK OLD TEST SUITE-->
               <execution>
                 <id>unpack-engine-tests</id>
                 <phase>generate-test-sources</phase>
@@ -200,9 +234,11 @@
                       <type>test-jar</type>
                       <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
                     </artifactItem>
-                  </artifactItems>
+                  </artifactItems>//
                 </configuration>
               </execution>
+
+              <!--UNPACK NEW SQL SCRIPTS-->
               <execution>
                 <id>unpack-old-scripts</id>
                 <phase>generate-test-sources</phase>
@@ -211,13 +247,6 @@
                 </goals>
                 <configuration>
                   <artifactItems>
-                    <artifactItem>
-                      <groupId>org.camunda.bpm.distro</groupId>
-                      <artifactId>camunda-sql-scripts</artifactId>
-                      <version>7.5.3-ee</version>
-                      <outputDirectory>${project.build.directory}/scripts-old</outputDirectory>
-                      <overWrite>true</overWrite>
-                    </artifactItem>
                     <artifactItem>
                       <groupId>org.camunda.bpm.distro</groupId>
                       <artifactId>camunda-sql-scripts</artifactId>
@@ -230,13 +259,16 @@
                 </configuration>
               </execution>
             </executions>
+
           </plugin>
 
-
+          <!--SQL EXECUTION-->
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
             <executions>
+
+              <!--DROP DB IF PRESENT-->
               <execution>
                 <id>drop-db-if-present</id>
                 <phase>generate-test-resources</phase>
@@ -245,7 +277,6 @@
                 </goals>
                 <configuration>
                   <srcFiles>
-                    <!-- first: try dropping the DB -->
                     <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${camunda.version.current}.sql</srcFile>
                     <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${camunda.version.current}.sql</srcFile>
                   </srcFiles>
@@ -253,67 +284,23 @@
                   <onError>continue</onError>
                 </configuration>
               </execution>
+
+              <!--CREATE NEW SCHEMA-->
               <execution>
-                <id>create-old-schema</id>
+                <id>create-new-schema</id>
                 <phase>generate-test-resources</phase>
                 <goals>
                   <goal>execute</goal>
                 </goals>
                 <configuration>
                   <srcFiles>
-                    <!-- now create old version of the schema -->
-                    <srcFile>${project.build.directory}/scripts-old/sql/create/${database.type}_engine_7.5.3-ee.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-old/sql/create/${database.type}_identity_7.5.3-ee.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/create/${database.type}_engine_${camunda.version.current}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/create/${database.type}_identity_${camunda.version.current}.sql</srcFile>
                   </srcFiles>
                 </configuration>
               </execution>
-              <execution>
-                <id>patch-old-schema</id>
-                <phase>generate-test-resources</phase>
-                <goals>
-                  <goal>execute</goal>
-                </goals>
-                <configuration>
-                  <srcFiles>
-                    <!-- now patch old version of the schema -->
-                    <!-- only add patch scripts which are after the camunda.version.old -->
-                    <!-- example:
-                      <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch_${camunda.old.majorVersion}.${camunda.old.minorVersion}.X_to_${camunda.old.majorVersion}.${camunda.old.minorVersion}.Y.sql</srcFile>
-                    -->
-                  </srcFiles>
-                </configuration>
-              </execution>
-              <execution>
-                <id>upgrade-db</id>
-                <phase>generate-test-resources</phase>
-                <goals>
-                  <goal>execute</goal>
-                </goals>
-                <configuration>
-                  <srcFiles>
-                    <!-- now perform the schema migrations -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
-                    <!-- clear authorization table when upgrading from 7.4 to 7.5 -->
-                    <srcFile>${project.basedir}/clear.authorization.table.sql</srcFile>
-                  </srcFiles>
-                </configuration>
-              </execution>
-              <execution>
-                <id>patch-new-schema</id>
-                <phase>generate-test-resources</phase>
-                <goals>
-                  <goal>execute</goal>
-                </goals>
-                <configuration>
-                  <srcFiles>
-                    <!-- now patch new version of the schema, apply any patches explicitly -->
-                    <!-- example:
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch_${camunda.current.majorVersion}.${camunda.current.minorVersion}.0_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.1.sql</srcFile>
-                    -->
-                  </srcFiles>
-                </configuration>
-              </execution>
+
+              <!--DROP DB AFTER TEST-->
               <execution>
                 <id>drop-db</id>
                 <phase>post-integration-test</phase>
@@ -322,12 +309,12 @@
                 </goals>
                 <configuration>
                   <srcFiles>
-                    <!-- finally drop db -->
                     <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${camunda.version.current}.sql</srcFile>
                     <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${camunda.version.current}.sql</srcFile>
                   </srcFiles>
                 </configuration>
               </execution>
+
             </executions>
           </plugin>
 
@@ -345,7 +332,9 @@
                 <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
-
+                <!--Exclude test class, because 4 tests fail and are removed on later patch versions -->
+                <exclude>**/MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest.java</exclude>
+                
                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
               </excludes>
               <testFailureIgnore>false</testFailureIgnore>
@@ -357,74 +346,4 @@
       </build>
     </profile>
   </profiles>
-
-  <dependencies>
-
-    <dependency>
-      <groupId>com.fasterxml.uuid</groupId>
-      <artifactId>java-uuid-generator</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.openjpa</groupId>
-      <artifactId>openjpa</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.subethamail</groupId>
-      <artifactId>subethasmtp-wiser</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.python</groupId>
-      <artifactId>jython</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jruby</groupId>
-      <artifactId>jruby-complete</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-
-  </dependencies>
-
 </project>
