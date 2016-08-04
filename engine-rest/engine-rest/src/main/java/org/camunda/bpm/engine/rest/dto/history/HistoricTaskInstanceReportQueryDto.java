@@ -16,18 +16,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceReport;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
-import org.camunda.bpm.engine.rest.dto.AbstractSearchQueryDto;
+import org.camunda.bpm.engine.rest.dto.AbstractReportDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import java.util.Date;
 import java.util.List;
 
 /**
  * @author Stefan Hentschel.
  */
-public class HistoricTaskInstanceReportQueryDto extends AbstractSearchQueryDto {
+public class HistoricTaskInstanceReportQueryDto extends AbstractReportDto<HistoricTaskInstanceReport> {
 
   public static final String PROCESS_DEFINITION = "processDefinition";
 
@@ -76,13 +78,20 @@ public class HistoricTaskInstanceReportQueryDto extends AbstractSearchQueryDto {
     if (completedAfter != null) {
       reportQuery.completedAfter(completedAfter);
     }
+
+    if(REPORT_TYPE_DURATION.equals(reportType)) {
+      if(periodUnit == null) {
+        throw new InvalidRequestException(Response.Status.BAD_REQUEST, "periodUnit is null");
+      }
+    }
+
   }
 
   protected HistoricTaskInstanceReport createNewReportQuery(ProcessEngine engine) {
     return engine.getHistoryService().createHistoricTaskInstanceReport();
   }
 
-  public List<HistoricTaskInstanceReportResult> executeReport(ProcessEngine engine) {
+  public List<HistoricTaskInstanceReportResult> executeCompletedReport(ProcessEngine engine) {
     HistoricTaskInstanceReport reportQuery = createNewReportQuery(engine);
     applyFilters(reportQuery);
 

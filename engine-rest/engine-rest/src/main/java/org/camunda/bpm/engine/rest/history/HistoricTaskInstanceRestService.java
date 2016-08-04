@@ -25,6 +25,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
@@ -78,6 +79,8 @@ public interface HistoricTaskInstanceRestService {
   /**
    * Provides a report sub module
    */
-  @Path( HistoricTaskInstanceReportService.PATH)
-  HistoricTaskInstanceReportService getHistoricTaskInstanceReportResource();
+  @GET
+  @Path("report")
+  @Produces(MediaType.APPLICATION_JSON)
+  Response getHistoricTaskInstanceReport(@Context UriInfo uriInfo);
 }

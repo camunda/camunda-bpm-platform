@@ -16,12 +16,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
+import org.camunda.bpm.engine.history.ReportResult;
+import org.camunda.bpm.engine.rest.dto.AbstractReportDto;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceQueryDto;
-import org.camunda.bpm.engine.rest.history.HistoricTaskInstanceReportService;
+import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceReportQueryDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricTaskInstanceReportResultDto;
+import org.camunda.bpm.engine.rest.dto.history.ReportResultDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.history.HistoricTaskInstanceRestService;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,8 +102,41 @@ public class HistoricTaskInstanceRestServiceImpl implements HistoricTaskInstance
   }
 
   @Override
-  public HistoricTaskInstanceReportService getHistoricTaskInstanceReportResource() {
-    return new HistoricTaskInstanceReportServiceImpl(processEngine, objectMapper);
+  public Response getHistoricTaskInstanceReport(UriInfo uriInfo) {
+    HistoricTaskInstanceReportQueryDto queryDto = new HistoricTaskInstanceReportQueryDto(objectMapper, uriInfo.getQueryParameters());
+    Response response;
+
+    if (AbstractReportDto.REPORT_TYPE_DURATION.equals(queryDto.getReportType())) {
+      List<? extends ReportResult> reportResults = queryDto.executeReport(processEngine);
+      response = Response.ok(generateDurationDto(reportResults)).build();
+    } else if (AbstractReportDto.REPORT_TYPE_COUNT.equals(queryDto.getReportType())) {
+      List<HistoricTaskInstanceReportResult> reportResults = queryDto.executeCompletedReport(processEngine);
+      response = Response.ok(generateCountDto(reportResults)).build();
+    } else {
+      throw new InvalidRequestException(Response.Status.BAD_REQUEST, "Parameter reportType is not set.");
+    }
+
+    return response;
+  }
+
+  protected List<HistoricTaskInstanceReportResultDto> generateCountDto(List<HistoricTaskInstanceReportResult> results) {
+    List<HistoricTaskInstanceReportResultDto> dtoList = new ArrayList<HistoricTaskInstanceReportResultDto>();
+
+    for( HistoricTaskInstanceReportResult result : results ) {
+      dtoList.add(HistoricTaskInstanceReportResultDto.fromHistoricTaskInstanceReportResult(result));
+    }
+
+    return dtoList;
+  }
+
+  protected List<ReportResultDto> generateDurationDto(List<? extends ReportResult> results) {
+    List<ReportResultDto> dtoList = new ArrayList<ReportResultDto>();
+
+    for( ReportResult result : results ) {
+      dtoList.add(ReportResultDto.fromReportResult(result));
+    }
+
+    return dtoList;
   }
 
 }

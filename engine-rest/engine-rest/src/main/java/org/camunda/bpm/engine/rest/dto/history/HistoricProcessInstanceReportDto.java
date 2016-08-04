@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.dto.history;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceReport;
+import org.camunda.bpm.engine.rest.dto.AbstractReportDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
@@ -25,20 +26,17 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.camunda.bpm.engine.rest.dto.AbstractDurationReportDto;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class HistoricProcessInstanceReportDto extends AbstractDurationReportDto<HistoricProcessInstanceReport> {
+public class HistoricProcessInstanceReportDto extends AbstractReportDto<HistoricProcessInstanceReport> {
 
   protected String[] processDefinitionIdIn;
   protected String[] processDefinitionKeyIn;
   protected Date startedAfter;
   protected Date startedBefore;
-
-  protected String reportType;
 
   public static final String REPORT_TYPE_DURATION = "duration";
 
@@ -73,14 +71,6 @@ public class HistoricProcessInstanceReportDto extends AbstractDurationReportDto<
   @CamundaQueryParam(value = "startedBefore", converter = DateConverter.class)
   public void setStartedBefore(Date startedBefore) {
     this.startedBefore = startedBefore;
-  }
-
-  @CamundaQueryParam("reportType")
-  public void setReportType(String reportType) {
-    if (!VALID_REPORT_TYPE_VALUES.contains(reportType)) {
-      throw new InvalidRequestException(Response.Status.BAD_REQUEST, "reportType parameter has invalid value: " + reportType);
-    }
-    this.reportType = reportType;
   }
 
   @Override

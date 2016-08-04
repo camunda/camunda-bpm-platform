@@ -12,15 +12,19 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.ReportResult;
+import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.query.Report;
+import org.camunda.bpm.engine.rest.dto.converter.PeriodUnitConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,12 +36,50 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public abstract class AbstractReportDto<T extends Report> extends AbstractSearchQueryDto {
 
+  protected PeriodUnit periodUnit;
+  protected String reportType;
+
+  public static final String REPORT_TYPE_DURATION = "duration";
+  public static final String REPORT_TYPE_COUNT = "count";
+
+  public static final List<String> VALID_REPORT_TYPE_VALUES;
+  static {
+    VALID_REPORT_TYPE_VALUES = new ArrayList<String>();
+    VALID_REPORT_TYPE_VALUES.add(REPORT_TYPE_DURATION);
+    VALID_REPORT_TYPE_VALUES.add(REPORT_TYPE_COUNT);
+  }
+
   // required for populating via jackson
   public AbstractReportDto() {
   }
 
   public AbstractReportDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
+  }
+
+  protected PeriodUnit getPeriodUnit() {
+    return periodUnit;
+  }
+
+  public String getReportType() {
+    return reportType;
+  }
+
+  @CamundaQueryParam("reportType")
+  public void setReportType(String reportType) {
+    if (!VALID_REPORT_TYPE_VALUES.contains(reportType)) {
+      throw new InvalidRequestException(Response.Status.BAD_REQUEST, "reportType parameter has invalid value: " + reportType);
+    }
+    this.reportType = reportType;
+  }
+
+  @CamundaQueryParam(value = "periodUnit", converter = PeriodUnitConverter.class)
+  public void setPeriodUnit(PeriodUnit periodUnit) {
+    this.periodUnit = periodUnit;
+  }
+
+  protected List<? extends ReportResult> executeReportQuery(T report) {
+    return report.duration(periodUnit);
   }
 
   public List<? extends ReportResult> executeReport(ProcessEngine engine) {
@@ -50,8 +92,6 @@ public abstract class AbstractReportDto<T extends Report> extends AbstractSearch
       throw new InvalidRequestException(Status.BAD_REQUEST, e, e.getMessage());
     }
   }
-
-  protected abstract List< ? extends ReportResult> executeReportQuery(T report);
 
   protected abstract T createNewReportQuery(ProcessEngine engine);
 
