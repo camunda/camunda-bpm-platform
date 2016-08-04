@@ -74,11 +74,6 @@ public class RedeployCaseClassloadingTest extends AbstractFoxPlatformIntegration
         .singleResult()
         .getId();
 
-    // the listener should execute successfully
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     // then (1)
     VariableInstanceQuery query = runtimeService
         .createVariableInstanceQuery()

@@ -70,11 +70,9 @@ public class CdiBeanCaseTaskResolutionTest extends AbstractFoxPlatformIntegratio
 
     CaseExecution caseTaskInstance = caseService.createCaseExecutionQuery().activityId("PI_CaseTask_1")
         .singleResult();
-    caseService.withCaseExecution(caseTaskInstance.getId()).manualStart();
 
     CaseExecution calledCaseHumanTaskInstance = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
         .singleResult();
-    caseService.withCaseExecution(calledCaseHumanTaskInstance.getId()).manualStart();
 
     Task calledCaseTask = taskService.createTaskQuery().singleResult();
 

@@ -12,7 +12,7 @@
 
       <humanTask id="HumanTask_1" name="A HumanTask">
         <extensionElements>
-          <camunda:caseExecutionListener event="manualStart" class="org.camunda.bpm.integrationtest.functional.classloading.beans.ExampleCaseExecutionListener" />
+          <camunda:caseExecutionListener event="start" class="org.camunda.bpm.integrationtest.functional.classloading.beans.ExampleCaseExecutionListener" />
           <camunda:caseExecutionListener event="complete" delegateExpression="${caseExecutionListener}" />
         </extensionElements>
       </humanTask>

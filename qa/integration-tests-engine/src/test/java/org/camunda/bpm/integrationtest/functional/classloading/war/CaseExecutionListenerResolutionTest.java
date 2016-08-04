@@ -72,11 +72,6 @@ public class CaseExecutionListenerResolutionTest extends AbstractFoxPlatformInte
         .singleResult()
         .getId();
 
-    // the listener should execute successfully
-    caseService
-      .withCaseExecution(humanTaskId)
-      .manualStart();
-
     VariableInstanceQuery query = runtimeService
         .createVariableInstanceQuery()
         .variableName("listener")
