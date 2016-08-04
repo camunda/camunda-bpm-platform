@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.jayway.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.query.PeriodUnit.MONTH;
 import static org.camunda.bpm.engine.query.PeriodUnit.QUARTER;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_TASK_END_TIME;
@@ -51,11 +50,12 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoric
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstanceReportWithProcDef;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static com.jayway.restassured.RestAssured.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Stefan Hentschel.
@@ -72,10 +72,10 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
 
   @Before
   public void setUpRuntimeData() {
-    mockedReportQuery = setUpMockHistoricProcessInstanceReportQuery();
+    mockedReportQuery = setUpMockReportQuery();
   }
 
-  private HistoricTaskInstanceReport setUpMockHistoricProcessInstanceReportQuery() {
+  private HistoricTaskInstanceReport setUpMockReportQuery() {
     HistoricTaskInstanceReport mockedReportQuery = mock(HistoricTaskInstanceReport.class);
 
     List<HistoricTaskInstanceReportResult> taskReportResults = createMockHistoricTaskInstanceReport();
@@ -83,7 +83,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
 
     when(mockedReportQuery.completedAfter(any(Date.class))).thenReturn(mockedReportQuery);
     when(mockedReportQuery.completedBefore(any(Date.class))).thenReturn(mockedReportQuery);
-    
+
     when(mockedReportQuery.countByTaskDefinitionKey()).thenReturn(taskReportResults);
     when(mockedReportQuery.countByProcessDefinitionKey()).thenReturn(taskReportResultsWithProcDef);
 
@@ -99,7 +99,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testMissingAuthorization() {
+  public void testTaskCountMissingAuthorization() {
     String message = "not authorized";
     when(mockedReportQuery.countByTaskDefinitionKey()).thenThrow(new AuthorizationException(message));
 
@@ -115,6 +115,24 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
       .get(TASK_REPORT_URL);
   }
 
+
+  @Test
+  public void testTaskCountByProcDefMissingAuthorization() {
+    String message = "not authorized";
+    when(mockedReportQuery.countByProcessDefinitionKey()).thenThrow(new AuthorizationException(message));
+
+    given()
+      .queryParam("reportType", "count")
+      .queryParam("groupBy", "processDefinition")
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo(message))
+    .when()
+      .get(TASK_REPORT_URL);
+  }
 
   @Test
   public void testTaskCountReport() {
@@ -164,6 +182,42 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
 
     verify(mockedReportQuery).completedAfter(any(Date.class));
     verify(mockedReportQuery).countByTaskDefinitionKey();
+    verifyNoMoreInteractions(mockedReportQuery);
+  }
+
+  @Test
+  public void testTaskCountByProcDefReportWithCompletedBefore() {
+    given()
+      .queryParam("reportType", "count")
+      .queryParam("completedBefore", EXAMPLE_HISTORIC_TASK_END_TIME)
+      .queryParam("groupBy", "processDefinition")
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+    .when()
+      .get(TASK_REPORT_URL);
+
+    verify(mockedReportQuery).completedBefore(any(Date.class));
+    verify(mockedReportQuery).countByProcessDefinitionKey();
+    verifyNoMoreInteractions(mockedReportQuery);
+  }
+
+  @Test
+  public void testTaskCountByProcDefReportWithCompletedAfter() {
+    given()
+      .queryParam("reportType", "count")
+      .queryParam("completedAfter", EXAMPLE_HISTORIC_TASK_START_TIME)
+      .queryParam("groupBy", "processDefinition")
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+    .when()
+      .get(TASK_REPORT_URL);
+
+    verify(mockedReportQuery).completedAfter(any(Date.class));
+    verify(mockedReportQuery).countByProcessDefinitionKey();
     verifyNoMoreInteractions(mockedReportQuery);
   }
 
@@ -221,8 +275,8 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
     given()
       .queryParam("reportType", "count")
       .queryParam("groupBy", "processDefinition")
-      .queryParam("completedBefore", EXAMPLE_HISTORIC_TASK_END_TIME)
-      .queryParam("completedAfter", EXAMPLE_HISTORIC_TASK_START_TIME)
+      .queryParam("completedBefore", EXAMPLE_HISTORIC_TASK_INST_END_TIME)
+      .queryParam("completedAfter", EXAMPLE_HISTORIC_TASK_INST_START_TIME)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -232,19 +286,100 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
     .when()
       .get(TASK_REPORT_URL);
 
-    verify(mockedReportQuery).completedAfter(any(Date.class));
-    verify(mockedReportQuery).completedBefore(any(Date.class));
+    verifyStringStartParameterQueryInvocations();
     verify(mockedReportQuery).countByProcessDefinitionKey();
     verifyNoMoreInteractions(mockedReportQuery);
 
   }
 
+  @Test
+  public void testTaskCountWithAllParametersGroupByTask() {
+    given()
+      .queryParam("reportType", "count")
+      .queryParam("completedBefore", EXAMPLE_HISTORIC_TASK_INST_END_TIME)
+      .queryParam("completedAfter", EXAMPLE_HISTORIC_TASK_INST_START_TIME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("[0].definition", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION))
+        .body("[0].count", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_COUNT.intValue()))
+    .when()
+      .get(TASK_REPORT_URL);
+
+    verifyStringStartParameterQueryInvocations();
+    verify(mockedReportQuery).countByTaskDefinitionKey();
+    verifyNoMoreInteractions(mockedReportQuery);
+
+  }
+
   // TASK DURATION REPORT ///////////////////////////////////////////////////////
+  @Test
+  public void testTaskDurationMonthMissingAuthorization() {
+    String message = "not authorized";
+    when(mockedReportQuery.duration(MONTH)).thenThrow(new AuthorizationException(message));
+
+    given()
+      .queryParam("reportType", "duration")
+      .queryParam("periodUnit", "month")
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo(message))
+    .when()
+      .get(TASK_REPORT_URL);
+  }
+
+  @Test
+  public void testTaskDurationQuarterMissingAuthorization() {
+    String message = "not authorized";
+    when(mockedReportQuery.duration(QUARTER)).thenThrow(new AuthorizationException(message));
+
+    given()
+      .queryParam("reportType", "duration")
+      .queryParam("periodUnit", "quarter")
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo(message))
+    .when()
+      .get(TASK_REPORT_URL);
+  }
+
+   @Test
+  public void testWrongReportType() {
+    given()
+      .queryParam("reportType", "abc")
+      .then()
+      .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot set query parameter 'reportType' to value 'abc'"))
+      .when()
+      .get(TASK_REPORT_URL);
+  }
 
   @Test
   public void testTaskDurationReportWithoutDurationParam() {
     given()
       .queryParam("periodUnit", "month")
+      .then()
+      .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Parameter reportType is not set."))
+      .when()
+      .get(TASK_REPORT_URL);
+  }
+
+  @Test
+  public void testTaskDurationQuarterReportWithoutDurationParam() {
+    given()
+      .queryParam("periodUnit", "quarter")
       .then()
       .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
@@ -362,7 +497,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testHistoricAfterQuery() {
+  public void testTaskDurationReportWithCompletedAfter() {
     given()
       .queryParam("periodUnit", "month")
       .queryParam("reportType", "duration")
@@ -378,6 +513,63 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
     verify(mockedReportQuery).duration(PeriodUnit.MONTH);
     verifyNoMoreInteractions(mockedReportQuery);
   }
+
+
+  @Test
+  public void testTaskDurationQuarterReportWithCompletedBeforeAndCompletedAfter() {
+    given()
+      .queryParam("periodUnit", "quarter")
+      .queryParam("reportType", "duration")
+      .queryParam("completedBefore", EXAMPLE_HISTORIC_TASK_INST_START_TIME)
+      .queryParam("completedAfter", EXAMPLE_HISTORIC_TASK_INST_END_TIME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+    .when()
+      .get(TASK_REPORT_URL);
+
+    verifyStringStartParameterQueryInvocations();
+    verify(mockedReportQuery).duration(PeriodUnit.QUARTER);
+    verifyNoMoreInteractions(mockedReportQuery);
+  }
+
+  @Test
+  public void testTaskDurationQuarterReportWithCompletedBefore() {
+    given()
+      .queryParam("periodUnit", "quarter")
+      .queryParam("reportType", "duration")
+      .queryParam("completedBefore", EXAMPLE_HISTORIC_TASK_END_TIME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+    .when()
+      .get(TASK_REPORT_URL);
+
+    verify(mockedReportQuery).completedBefore(any(Date.class));
+    verify(mockedReportQuery).duration(PeriodUnit.QUARTER);
+    verifyNoMoreInteractions(mockedReportQuery);
+  }
+
+  @Test
+  public void testTaskDurationQuarterReportWithCompletedAfter() {
+    given()
+      .queryParam("periodUnit", "quarter")
+      .queryParam("reportType", "duration")
+      .queryParam("completedAfter", EXAMPLE_HISTORIC_TASK_START_TIME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+    .when()
+      .get(TASK_REPORT_URL);
+
+    verify(mockedReportQuery).completedAfter(any(Date.class));
+    verify(mockedReportQuery).duration(PeriodUnit.QUARTER);
+    verifyNoMoreInteractions(mockedReportQuery);
+  }
+
 
   private Map<String, String> getCompleteStartDateAsStringQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
