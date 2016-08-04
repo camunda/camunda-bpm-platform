@@ -67,7 +67,7 @@
         <module>test-db-upgrade</module>
         <module>test-db-instance-migration</module>
         <module>test-old-engine-instances</module>
-        <module>test-schema-with-old-engine</module>
+        <module>test-old-engine</module>
       </modules>
     </profile>
 
@@ -158,7 +158,7 @@
     <profile>
       <id>old-engine</id>
       <modules>
-        <module>test-schema-with-old-engine</module>
+        <module>test-old-engine</module>
       </modules>
     </profile>
   </profiles>
