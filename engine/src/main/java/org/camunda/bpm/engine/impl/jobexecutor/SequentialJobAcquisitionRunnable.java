@@ -76,6 +76,10 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
       waitTime = Math.max(0, (acquisitionContext.getAcquisitionTime() + waitTime) - System.currentTimeMillis());
 
       suspendAcquisition(waitTime);
+      if (isJobAdded) {
+        acquisitionContext.setJobAdded(isJobAdded);
+        acquisitionStrategy.reconfigure(acquisitionContext);
+      }
     }
 
     LOG.stoppedJobAcquisition(jobExecutor.getName());
