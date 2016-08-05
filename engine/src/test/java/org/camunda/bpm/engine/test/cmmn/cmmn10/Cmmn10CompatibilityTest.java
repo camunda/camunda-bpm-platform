@@ -55,6 +55,16 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
     assertTrue(taskExecution.isActive());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testManualActivationRuleWithoutCondition.cmmn")
+  public void testManualActivationRuleWithoutCondition() {
+    createCaseInstanceByKey("case", Variables.createVariables().putValue("manual", false));
+
+    CaseExecution taskExecution = queryCaseExecutionByActivityId("PI_HumanTask_1");
+
+    assertNotNull(taskExecution);
+    assertTrue(taskExecution.isEnabled());
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testRepetitionRule.cmmn")
   public void testRepetitionRule() {
     // given

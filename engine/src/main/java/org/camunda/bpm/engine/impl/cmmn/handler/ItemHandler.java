@@ -315,14 +315,15 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
 
     if (manualActivationRule != null) {
       ConditionExpression condition = manualActivationRule.getCondition();
+      Expression manualActivationExpression = null;
       if (condition != null) {
         String rule = condition.getText();
         if (rule != null) {
-          Expression manualActivationExpression = expressionManager.createExpression(rule);
-          CaseControlRule caseRule = new CaseControlRuleImpl(manualActivationExpression);
-          activity.setProperty(PROPERTY_MANUAL_ACTIVATION_RULE, caseRule);
+          manualActivationExpression = expressionManager.createExpression(rule);
         }
       }
+      CaseControlRule caseRule = new CaseControlRuleImpl(manualActivationExpression);
+      activity.setProperty(PROPERTY_MANUAL_ACTIVATION_RULE, caseRule);
     }
 
   }

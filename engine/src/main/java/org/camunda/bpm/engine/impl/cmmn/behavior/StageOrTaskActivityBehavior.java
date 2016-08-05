@@ -216,15 +216,18 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
   // manual activation rule //////////////////////////////////////////////
 
   protected boolean evaluateManualActivationRule(CmmnActivityExecution execution) {
+    boolean manualActivation = false;
     CmmnActivity activity = execution.getActivity();
-
     Object manualActivationRule = activity.getProperty(PROPERTY_MANUAL_ACTIVATION_RULE);
     if (manualActivationRule != null) {
       CaseControlRule rule = (CaseControlRule) manualActivationRule;
-      return rule.evaluate(execution);
+      if (!rule.isEmpty()) {
+        manualActivation = rule.evaluate(execution);
+      } else {
+        manualActivation = true;
+      }
     }
-
-    return false;
+    return manualActivation;
   }
 
   // helper ///////////////////////////////////////////////////////////
