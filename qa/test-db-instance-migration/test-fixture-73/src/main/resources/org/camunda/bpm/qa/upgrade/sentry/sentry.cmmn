@@ -27,7 +27,9 @@
       <humanTask id="HumanTask_1" >
         <defaultControl>
           <manualActivationRule>
-            <condition>${true}</condition>
+            <condition>
+              <body>${true}</body>
+            </condition>
           </manualActivationRule>
         </defaultControl>
       </humanTask>
