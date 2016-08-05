@@ -32,14 +32,17 @@ import org.junit.Test;
  */
 public class CompleteProcessInstanceTest {
 
+  public static final String PROCESS_DEF_KEY = "rollingProcess";
+  
   @Rule
   public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.cfg.xml");
+
 
   @Test
   public void testDeployProcessWithoutIsExecutableAttribute() {
     //given an already started process instance
     RuntimeService runtimeService = engineRule.getRuntimeService();
-    ProcessInstance oldInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    ProcessInstance oldInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEF_KEY).singleResult();
     Assert.assertNotNull(oldInstance);
 
     //which waits on an user task
@@ -52,7 +55,7 @@ public class CompleteProcessInstanceTest {
 
     //then there exists no more tasks
     //and the process instance is also completed
-    Assert.assertEquals(0, taskService.createTaskQuery().count());
-    Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+    Assert.assertEquals(0, taskService.createTaskQuery().processDefinitionKey(PROCESS_DEF_KEY).count());
+    Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEF_KEY).count());
   }
 }

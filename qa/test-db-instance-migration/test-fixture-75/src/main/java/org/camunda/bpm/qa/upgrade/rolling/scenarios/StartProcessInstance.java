@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.qa.rolling.upgrade.scenarios;
+package org.camunda.bpm.qa.upgrade.rolling.scenarios;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.test.Deployment;
@@ -23,14 +23,16 @@ import org.camunda.bpm.qa.upgrade.Times;
 
 /**
  * Starts the process instance on the old engine.
- * 
+ *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public class StartProcessInstance {
 
+  public static final String PROCESS_DEF_KEY = "rollingProcess";
+
   @Deployment
   public static String deploy() {
-    return "org/camunda/bpm/qa/rolling/upgrade/deployment/process.bpmn20.xml";
+    return "org/camunda/bpm/qa/upgrade/rolling/rollingProcess.bpmn20.xml";
   }
 
   @DescribesScenario("init")
@@ -38,7 +40,7 @@ public class StartProcessInstance {
   public static ScenarioSetup startProcess() {
     return new ScenarioSetup() {
       public void execute(ProcessEngine engine, String scenarioName) {
-        engine.getRuntimeService().startProcessInstanceByKey("process", scenarioName);
+        engine.getRuntimeService().startProcessInstanceByKey(PROCESS_DEF_KEY, scenarioName);
       }
     };
   }

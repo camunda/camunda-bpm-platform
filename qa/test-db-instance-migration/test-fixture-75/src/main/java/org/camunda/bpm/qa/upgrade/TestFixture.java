@@ -16,12 +16,14 @@ package org.camunda.bpm.qa.upgrade;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.qa.upgrade.rolling.scenarios.StartProcessInstance;
 import org.camunda.bpm.qa.upgrade.scenarios.deployment.DeployProcessWithoutIsExecutableAttributeScenario;
 
 /**
  * Sets up scenarios for migration from 7.5.0
  *
  * @author Thorben Lindhauer
+ * @author Christopher Zell
  */
 public class TestFixture {
 
@@ -39,6 +41,8 @@ public class TestFixture {
     ScenarioRunner runner = new ScenarioRunner(processEngine, ENGINE_VERSION);
     // compensation
     runner.setupScenarios(DeployProcessWithoutIsExecutableAttributeScenario.class);
+    //rolling upgrade start instances
+    runner.setupScenarios(StartProcessInstance.class);
 
     processEngine.close();
   }
