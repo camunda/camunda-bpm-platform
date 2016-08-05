@@ -34,7 +34,15 @@
         </defaultControl>
       </humanTask>
       <stage id="Stage_1">
-      
+
+        <defaultControl>
+          <manualActivationRule>
+            <condition>
+              <body>${true}</body>
+            </condition>
+          </manualActivationRule>
+        </defaultControl>
+
         <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
         <planItem id="PI_HumanTask_2" definitionRef="HumanTask_1" entryCriteriaRefs="Sentry_2" />
         
