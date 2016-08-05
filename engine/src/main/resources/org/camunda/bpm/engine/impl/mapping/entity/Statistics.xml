@@ -116,6 +116,8 @@
 
                 where
                     E.PARENT_ID_ IS NULL
+                   <bind name="columnPrefix" value="'E.'"/>
+                   <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
                 group by
                     E.PROC_DEF_ID_
               ) INSTANCE
@@ -134,6 +136,8 @@
                     ${prefix}ACT_RU_JOB J
                 where
                     J.RETRIES_ = 0
+                    <bind name="columnPrefix" value="'J.'"/>
+                    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
                 group by
                     J.PROCESS_DEF_ID_
               ) JOB
@@ -158,7 +162,8 @@
                   <if test="includeIncidentsForType != null">
                       I.INCIDENT_TYPE_ = #{includeIncidentsForType}
                   </if>
-
+                  <bind name="columnPrefix" value="'I.'"/>
+                  <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
                 </where>
                 group by
                     I.PROC_DEF_ID_, I.INCIDENT_TYPE_
