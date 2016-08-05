@@ -1,9 +1,11 @@
 package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -18,6 +20,7 @@ import static org.junit.Assert.assertThat;
 /**
  * @author Askar Akhmerov
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class MultiTenancyHistoricProcessInstanceStateTest {
   public static final String PROCESS_ID = "process1";
   protected static final String TENANT_ONE = "tenant1";
