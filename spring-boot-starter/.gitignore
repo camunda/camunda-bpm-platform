@@ -1,4 +1,6 @@
+#
 # IDE
+#
 .classpath
 .project
 .settings
@@ -6,6 +8,9 @@
 .factorypath
 .idea/
 *.iml
+#
 # MAVEN
-target
+#
+target/
+pom.xml.versionsBackup
 github-pages/
