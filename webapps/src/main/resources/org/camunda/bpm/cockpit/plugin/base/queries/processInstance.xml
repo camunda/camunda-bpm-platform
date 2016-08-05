@@ -44,7 +44,7 @@
       (
         <!-- This statement selects all process instances to an assigned process definition id (by using pagination!).-->
         ${limitBefore}
-        select RES.* ${limitBetween},
+        select ${distinct} RES.* ${limitBetween},
         <if test="historyEnabled">
         HISTORY.START_TIME_
         </if>

@@ -40,6 +40,7 @@ public class ProcessInstanceRestServiceAuthorizationTest extends AuthorizationTe
 
   protected ProcessInstanceRestService resource;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     super.setUp();
@@ -51,6 +52,7 @@ public class ProcessInstanceRestServiceAuthorizationTest extends AuthorizationTe
     resource = new ProcessInstanceRestService(engineName);
   }
 
+  @Override
   @After
   public void tearDown() {
     deleteDeployment(deploymentId);
@@ -115,6 +117,30 @@ public class ProcessInstanceRestServiceAuthorizationTest extends AuthorizationTe
     // then
     assertThat(instances).isNotEmpty();
     assertThat(instances).hasSize(3);
+  }
+
+  @Test
+  public void testQueryPaginationWithOverlappingPermissions() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, USER_TASK_PROCESS_KEY, userId, READ_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+
+    // when
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, 0, 3);
+
+    // then
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(3);
+
+    result = resource.queryProcessInstances(queryParameter, 0, 2);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(2);
+
+    result = resource.queryProcessInstances(queryParameter, 2, 2);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(1);
   }
 
 }
