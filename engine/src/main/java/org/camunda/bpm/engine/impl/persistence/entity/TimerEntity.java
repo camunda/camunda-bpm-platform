@@ -58,8 +58,10 @@ public class TimerEntity extends JobEntity {
     deploymentId = te.deploymentId;
     processDefinitionId = te.processDefinitionId;
     processDefinitionKey = te.processDefinitionKey;
+    tenantId = te.tenantId;
   }
 
+  @Override
   protected void preExecute(CommandContext commandContext) {
     if (getJobHandler() instanceof TimerEventJobHandler) {
       TimerJobConfiguration configuration = (TimerJobConfiguration) getJobHandlerConfiguration();
@@ -118,6 +120,7 @@ public class TimerEntity extends JobEntity {
     this.repeat = repeat;
   }
 
+  @Override
   public String getType() {
     return TYPE;
   }

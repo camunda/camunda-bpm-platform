@@ -13,6 +13,13 @@
 
 package org.camunda.bpm.engine.test.api.multitenancy;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
+import java.util.List;
+
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -20,6 +27,7 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -29,13 +37,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 public class MultiTenancyTimerStartEventTest {
 
@@ -161,6 +162,31 @@ public class MultiTenancyTimerStartEventTest {
 
     assertThat(jobTenantOne.getRetries(), is(4));
     assertThat(jobTenantTwo.getRetries(), is(3));
+  }
+
+  @Test
+  public void timerStartEventWithTimerCycle() {
+
+    testRule.deployForTenant(TENANT_ONE, Bpmn.createExecutableProcess()
+        .startEvent()
+          .timerWithCycle("R2/PT1M")
+        .userTask()
+        .endEvent()
+        .done());
+
+    // execute first timer cycle
+    Job job = managementService.createJobQuery().singleResult();
+    assertThat(job.getTenantId(), is(TENANT_ONE));
+    managementService.executeJob(job.getId());
+
+    // execute second timer cycle
+    job = managementService.createJobQuery().singleResult();
+    assertThat(job.getTenantId(), is(TENANT_ONE));
+    managementService.executeJob(job.getId());
+
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
+    assertThat(query.withoutTenantId().count(), is(0L));
   }
 
   protected void executeFailingJobs(List<Job> jobs) {
