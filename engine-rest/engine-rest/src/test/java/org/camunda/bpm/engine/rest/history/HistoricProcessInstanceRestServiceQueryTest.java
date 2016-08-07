@@ -772,6 +772,58 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
   }
 
   @Test
+  public void testQueryWithIncidentStatusOpen() {
+    given()
+      .queryParam("incidentStatus", "open")
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    InOrder inOrder = inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).incidentStatus("open");
+    inOrder.verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testQueryWithIncidentStatusOpenAsPost() {
+    Map<String, String> body = new HashMap<String, String>();
+    body.put("incidentStatus", "open");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(body)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    InOrder inOrder = inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).incidentStatus("open");
+    inOrder.verify(mockedQuery).list();
+  }
+  
+  @Test
+  public void testQueryCountIncidentStatusOpenForPost() {
+    Map<String,String> body = new HashMap<String, String>();
+    body.put("incidentStatus", "open");
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(body)
+    .then()
+      .expect()
+        .body("count", equalTo(1))
+      .when()
+        .post(HISTORIC_PROCESS_INSTANCE_COUNT_RESOURCE_URL);
+
+    verify(mockedQuery).count();
+    verify(mockedQuery).incidentStatus("open");
+  }
+
+
+  @Test
   public void testQueryIncidentMessage() {
     given()
       .queryParam("incidentMessage", MockProvider.EXAMPLE_INCIDENT_MESSAGE)
