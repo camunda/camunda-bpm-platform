@@ -46,6 +46,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected boolean finished = false;
   protected boolean unfinished = false;
   protected boolean withIncidents = false;
+  protected String incidentStatus;
   protected String incidentMessage;
   protected String incidentMessageLike;
   protected String startedBy;
@@ -125,6 +126,12 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public HistoricProcessInstanceQuery withIncidents() {
     this.withIncidents = true;
 
+    return this;
+  }
+
+  @Override
+  public HistoricProcessInstanceQuery incidentStatus(String status) {
+    this.incidentStatus = status;
     return this;
   }
 

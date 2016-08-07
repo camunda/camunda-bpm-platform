@@ -18,7 +18,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -31,6 +33,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEnt
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -259,6 +262,63 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
 
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown message").count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown message").list().size());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldDeleteIncidentAfterJobWasSuccessfully.bpmn"})
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testHistoricProcessInstanceQueryIncidentStatusOpen() {
+    //given a processes instance, which will fail
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("fail", true);
+    runtimeService.startProcessInstanceByKey("failingProcessWithUserTask", parameters);
+
+    //when jobs are executed till retry count is zero
+    executeAvailableJobs();
+
+    //then query for historic process instance with open incidents will return one
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentStatus("open").count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldDeleteIncidentAfterJobWasSuccessfully.bpmn"})
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testHistoricProcessInstanceQueryIncidentStatusResolved() {
+    //given a incident processes instance
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("fail", true);
+    ProcessInstance pi1 = runtimeService.startProcessInstanceByKey("failingProcessWithUserTask", parameters);
+    executeAvailableJobs();
+
+    //when `fail` variable is set to true and job retry count is set to one and executed again
+    runtimeService.setVariable(pi1.getId(), "fail", false);
+    Job jobToResolve = managementService.createJobQuery().processInstanceId(pi1.getId()).singleResult();
+    managementService.setJobRetries(jobToResolve.getId(), 1);
+    executeAvailableJobs();
+
+    //then query for historic process instance with resolved incidents will return one
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentStatus("resolved").count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldDeleteIncidentAfterJobWasSuccessfully.bpmn"})
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testHistoricProcessInstanceQueryIncidentStatusOpenWithTwoProcesses() {
+    //given two processes, which will fail, are started
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("fail", true);
+    ProcessInstance pi1 = runtimeService.startProcessInstanceByKey("failingProcessWithUserTask", parameters);
+    runtimeService.startProcessInstanceByKey("failingProcessWithUserTask", parameters);
+    executeAvailableJobs();
+    assertEquals(2, historyService.createHistoricProcessInstanceQuery().incidentStatus("open").count());
+
+    //when 'fail' variable is set to false, job retry count is set to one
+    //and available jobs are executed
+    runtimeService.setVariable(pi1.getId(), "fail", false);
+    Job jobToResolve = managementService.createJobQuery().processInstanceId(pi1.getId()).singleResult();
+    managementService.setJobRetries(jobToResolve.getId(), 1);
+    executeAvailableJobs();
+
+    //then query with open and with resolved incidents returns one
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentStatus("open").count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentStatus("resolved").count());
   }
 
   public void testHistoricProcessInstanceQueryWithIncidentMessageNull() {

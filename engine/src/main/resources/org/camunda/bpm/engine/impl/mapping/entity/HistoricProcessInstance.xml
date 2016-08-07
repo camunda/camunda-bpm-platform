@@ -159,7 +159,7 @@
       inner join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
     </if>
 
-    <if test="withIncidents || incidentMessage != null || incidentMessageLike != null">
+    <if test="withIncidents || incidentStatus != null || incidentMessage != null || incidentMessageLike != null">
       inner join ${prefix}ACT_HI_INCIDENT INC on RES.PROC_INST_ID_ = INC.PROC_INST_ID_
     </if>
     <where>
@@ -244,6 +244,14 @@
 
       <if test="incidentMessageLike != null">
         and INC.INCIDENT_MSG_ like #{incidentMessageLike}
+      </if>
+      
+      <if test="incidentStatus == 'open'">
+        and INC.END_TIME_ is null
+      </if>
+      
+      <if test="incidentStatus == 'resolved'">
+        and INC.END_TIME_ is not null
       </if>
 
       <if test="startedBy != null">
