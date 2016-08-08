@@ -7,9 +7,9 @@
     <version>7.6.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>camunda-qa-test-old-engine</artifactId>
+  <artifactId>camunda-qa-test-old-engine-migration</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - test old engine</name>
+  <name>camunda BPM - QA - upgrade - instance migration - test old engine</name>
 
   <dependencyManagement>
     <dependencies>
