@@ -2,6 +2,7 @@ package org.camunda.bpm.cockpit.plugin.base.tenantcheck;
 
 import static org.fest.assertions.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -70,9 +71,7 @@ public class ProcessDefinitionResourceTenantCheckTest extends AbstractCockpitPlu
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(1);
 
-    ProcessDefinitionDto dto = result.get(0);
-    String calledFrom = dto.getCalledFromActivityIds().get(0);
-    assertThat(calledFrom).isEqualTo("CallActivity_Tenant1");
+    assertThat(getCalledFromActivityIds(result)).containsOnly("CallActivity_Tenant1");
   }
 
   @Test
@@ -85,13 +84,7 @@ public class ProcessDefinitionResourceTenantCheckTest extends AbstractCockpitPlu
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(2);
 
-    ProcessDefinitionDto dto = result.get(0);
-    String calledFrom = dto.getCalledFromActivityIds().get(0);
-    assertThat(calledFrom).isEqualTo("CallActivity_Tenant1");
-
-    dto = result.get(1);
-    calledFrom = dto.getCalledFromActivityIds().get(0);
-    assertThat(calledFrom).isEqualTo("CallActivity_Tenant2");
+    assertThat(getCalledFromActivityIds(result)).contains("CallActivity_Tenant1", "CallActivity_Tenant2");
   }
 
   @Test
@@ -103,13 +96,18 @@ public class ProcessDefinitionResourceTenantCheckTest extends AbstractCockpitPlu
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(2);
 
-    ProcessDefinitionDto dto = result.get(0);
-    String calledFrom = dto.getCalledFromActivityIds().get(0);
-    assertThat(calledFrom).isEqualTo("CallActivity_Tenant1");
-
-    dto = result.get(1);
-    calledFrom = dto.getCalledFromActivityIds().get(0);
-    assertThat(calledFrom).isEqualTo("CallActivity_Tenant2");
+    assertThat(getCalledFromActivityIds(result)).contains("CallActivity_Tenant1", "CallActivity_Tenant2");
   }
+
+  protected List<String> getCalledFromActivityIds(List<ProcessDefinitionDto> processDefinitions) {
+    List<String> activityIds = new ArrayList<String>();
+
+    for (ProcessDefinitionDto processDefinition : processDefinitions) {
+      activityIds.addAll(processDefinition.getCalledFromActivityIds());
+    }
+
+    return activityIds;
+  }
+
 
 }
