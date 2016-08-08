@@ -16,7 +16,8 @@ package org.camunda.bpm.engine.test.bpmn.event.timer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -31,41 +32,6 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Joram Barrez
  */
 public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
-
-  @Deployment
-  public void failingShortTimerOnUserTaskWithExpression() throws Exception {
-    JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
-    jobExecutor.start();
-    //sleep 2 mins so executor suspends to the max time
-    Thread.sleep(1000 * 60 * 2);
-    // Set the clock fixed
-    Date startTime = new Date();
-
-    // After process start, there should be 1 timer created
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("timer-example");
-    Task task1 = taskService.createTaskQuery().singleResult();
-    assertEquals("Timer Task", task1.getName());
-
-    JobQuery jobQuery = managementService.createJobQuery().processInstanceId(pi.getId());
-    Job job = jobQuery.singleResult();
-    assertNotNull(job);
-
-    // After setting the clock to time 5 seconds after start, the first timer should fire
-    ClockUtil.setCurrentTime(new Date(startTime.getTime() + 5000));
-    //for 5 sec we test every sec if job is available
-    waitForJobExecutorToProcessAllJobs(5000L);
-
-    // we have no timer to fire
-    assertEquals(0, jobQuery.count());
-
-    // and we are in the second state
-    assertEquals(1L, taskService.createTaskQuery().count());
-    Task task = taskService.createTaskQuery().orderByTaskName().desc().singleResult();
-    assertEquals("Next Task", task.getName());
-
-    // complete the task and end the execution
-    taskService.complete(task.getId());
-  }
 
   /*
    * Test for when multiple boundary timer events are defined on the same user

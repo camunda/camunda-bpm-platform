@@ -19,7 +19,6 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobAcquisitionStrategy;
 import org.camunda.bpm.engine.impl.jobexecutor.JobAcquisitionContext;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.SequentialJobAcquisitionRunnable;
 
 /**
@@ -31,13 +30,19 @@ public class RecordingAcquireJobsRunnable extends SequentialJobAcquisitionRunnab
   protected List<RecordedWaitEvent> waitEvents = new ArrayList<RecordedWaitEvent>();
   protected List<RecordedAcquisitionEvent> acquisitionEvents = new ArrayList<RecordedAcquisitionEvent>();
 
-  public RecordingAcquireJobsRunnable(JobExecutor jobExecutor) {
+  public RecordingAcquireJobsRunnable(ControllableJobExecutor jobExecutor) {
     super(jobExecutor);
   }
 
   @Override
   protected void suspendAcquisition(long millis) {
-    // don't actually wait
+    LOG.debugJobAcquisitionThreadSleeping(millis);
+    if (jobExecutor instanceof ControllableJobExecutor) {
+      ControllableJobExecutor controllableExecutor = (ControllableJobExecutor) jobExecutor;
+      if (controllableExecutor.isSyncAsSuspendEnabled()) {
+        controllableExecutor.getAcquisitionThreadControl().sync();
+      }
+    }
   }
 
   @Override

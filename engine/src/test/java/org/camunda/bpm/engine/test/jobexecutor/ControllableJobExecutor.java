@@ -38,6 +38,7 @@ public class ControllableJobExecutor extends JobExecutor {
   protected ThreadControl executionThreadControl;
 
   protected boolean syncOnShutdown = true;
+  boolean syncAsSuspendEnabled;
 
   public ControllableJobExecutor() {
     acquireJobsRunnable = new RecordingAcquireJobsRunnable(this);
@@ -61,6 +62,15 @@ public class ControllableJobExecutor extends JobExecutor {
   public ControllableJobExecutor(ProcessEngineImpl processEngine) {
     this();
     processEngines.add(processEngine);
+  }
+
+  public ControllableJobExecutor(boolean syncAsSuspendEnabled) {
+    this();
+    this.syncAsSuspendEnabled = syncAsSuspendEnabled;
+  }
+
+  public boolean isSyncAsSuspendEnabled() {
+    return syncAsSuspendEnabled;
   }
 
   /**
