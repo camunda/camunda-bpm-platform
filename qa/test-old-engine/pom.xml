@@ -7,12 +7,6 @@
     <version>7.6.0-SNAPSHOT</version>
   </parent>
 
-  <properties>
-    <camunda.version.current>
-      7.6.0-SNAPSHOT
-    </camunda.version.current>
-  </properties>
-
   <artifactId>camunda-qa-old-engine</artifactId>
   <packaging>jar</packaging>
   <name>camunda BPM - QA - test new schema with old engine</name>
@@ -164,7 +158,7 @@
         <dependency>
           <groupId>org.camunda.bpm.distro</groupId>
           <artifactId>camunda-sql-scripts</artifactId>
-          <version>${camunda.version.current}</version>
+          <version>${project.version}</version>
           <type>test-jar</type>
         </dependency>
 
@@ -183,34 +177,6 @@
 
       <build>
         <plugins>
-
-          <!-- parse version properties from qa/pom.xml -->
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>parse-current-version</id>
-                <goals>
-                  <goal>parse-version</goal>
-                </goals>
-                <configuration>
-                  <propertyPrefix>camunda.current</propertyPrefix>
-                  <versionString>${camunda.version.current}</versionString>
-                </configuration>
-              </execution>
-              <execution>
-                <id>parse-old-version</id>
-                <goals>
-                  <goal>parse-version</goal>
-                </goals>
-                <configuration>
-                  <propertyPrefix>camunda.old</propertyPrefix>
-                  <versionString>7.5.0</versionString>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
 
           <!--UNPACKING-->
           <plugin>
@@ -240,7 +206,7 @@
 
               <!--UNPACK NEW SQL SCRIPTS-->
               <execution>
-                <id>unpack-old-scripts</id>
+                <id>unpack-new-scripts</id>
                 <phase>generate-test-sources</phase>
                 <goals>
                   <goal>unpack</goal>
@@ -250,7 +216,7 @@
                     <artifactItem>
                       <groupId>org.camunda.bpm.distro</groupId>
                       <artifactId>camunda-sql-scripts</artifactId>
-                      <version>${camunda.version.current}</version>
+                      <version>${project.version}</version>
                       <type>test-jar</type>
                       <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                       <overWrite>true</overWrite>
@@ -277,8 +243,8 @@
                 </goals>
                 <configuration>
                   <srcFiles>
-                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${camunda.version.current}.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${camunda.version.current}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${project.version}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${project.version}.sql</srcFile>
                   </srcFiles>
                   <autocommit>true</autocommit>
                   <onError>continue</onError>
@@ -294,8 +260,8 @@
                 </goals>
                 <configuration>
                   <srcFiles>
-                    <srcFile>${project.build.directory}/scripts-current/sql/create/${database.type}_engine_${camunda.version.current}.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/create/${database.type}_identity_${camunda.version.current}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/create/${database.type}_engine_${project.version}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/create/${database.type}_identity_${project.version}.sql</srcFile>
                   </srcFiles>
                 </configuration>
               </execution>
@@ -309,8 +275,8 @@
                 </goals>
                 <configuration>
                   <srcFiles>
-                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${camunda.version.current}.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${camunda.version.current}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${project.version}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${project.version}.sql</srcFile>
                   </srcFiles>
                 </configuration>
               </execution>
