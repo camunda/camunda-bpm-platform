@@ -251,7 +251,8 @@
                         </foreach>
                         ) = 1
                     </if>
-
+                    <bind name="columnPrefix" value="'EXECUTION.'"/>
+                    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
                   group by
                       PROCDEF.DEPLOYMENT_ID_
                 ) INSTANCE
@@ -284,7 +285,8 @@
                         </foreach>
                         ) = 1
                     </if>
-
+                    <bind name="columnPrefix" value="'JOB.'"/>
+                    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />  
                   group by
                       DEPLOYMENT_ID_
                 ) JOB
@@ -323,7 +325,8 @@
                         </foreach>
                         ) = 1
                     </if>
-
+                    <bind name="columnPrefix" value="'INC.'"/>
+                    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />    
                   group by
                       PROCDEF.DEPLOYMENT_ID_, INC.INCIDENT_TYPE_
                 ) INC
