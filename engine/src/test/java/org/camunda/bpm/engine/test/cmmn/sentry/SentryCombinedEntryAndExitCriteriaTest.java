@@ -17,11 +17,13 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Ignore;
 
 /**
  * @author Roman Smirnov
  *
  */
+@Ignore
 public class SentryCombinedEntryAndExitCriteriaTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryCombinedEntryAndExitCriteriaTest.testParentResumeInsideStage.cmmn"})
@@ -229,31 +231,4 @@ public class SentryCombinedEntryAndExitCriteriaTest extends CmmnProcessEngineTes
     assertEquals(CaseExecutionState.ENABLED, ((CaseExecutionEntity) thirdHumanTask).getPreviousState());
 
   }
-
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryCombinedEntryAndExitCriteriaTest.testFireFirstExitCriteria.cmmn"})
-  public void testFireFirstExitCriteria() {
-    // given
-    createCaseInstance();
-
-    CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
-    String firstHumanTaskId = firstHumanTask.getId();
-
-    assertTrue(firstHumanTask.isActive());
-
-    CaseExecution secondHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_2");
-    String secondHumanTaskId = secondHumanTask.getId();
-
-    assertTrue(secondHumanTask.isAvailable());
-
-    // when
-    complete(firstHumanTaskId);
-
-    // then
-    firstHumanTask = queryCaseExecutionById(firstHumanTaskId);
-    assertNull(firstHumanTask);
-
-    secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
-    assertTrue(secondHumanTask.isActive());
-  }
-
 }

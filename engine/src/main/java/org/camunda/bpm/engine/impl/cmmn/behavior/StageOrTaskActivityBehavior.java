@@ -41,10 +41,7 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
   }
 
   public void created(CmmnActivityExecution execution) {
-    if (!execution.isCompleted() && !execution.isTerminated() && isAtLeastOneExitCriterionSatisfied(execution)) {
-      fireExitCriteria(execution);
-
-    } else if (execution.isAvailable() && isAtLeastOneEntryCriterionSatisfied(execution)) {
+    if (execution.isAvailable() && isAtLeastOneEntryCriterionSatisfied(execution)) {
       fireEntryCriteria(execution);
     }
   }

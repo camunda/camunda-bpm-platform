@@ -92,7 +92,6 @@ import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.variable.listener.CaseVariableListenerInvocation;
 import org.camunda.bpm.engine.impl.variable.listener.DelegateCaseVariableInstanceImpl;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.variable.impl.value.NullValueImpl;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
@@ -128,13 +127,6 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
    * to note that an entry criterion is satisfied.
    */
   protected boolean entryCriterionSatisfied = false;
-
-  /**
-   * This property will be used if <code>this</code>
-   * {@link CmmnExecution} is in state {@link CaseExecutionState#NEW}
-   * to note that an entry criterion is satisfied.
-   */
-  protected boolean exitCriterionSatisfied = false;
 
   public CmmnExecution() {
   }
@@ -587,12 +579,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
       for (CmmnSentryDeclaration sentryDeclaration : exitCriteria) {
 
         if (sentryDeclaration != null && satisfiedSentries.contains(sentryDeclaration.getId())) {
-          if (!isNew()) {
-            fireExitCriteria();
-          }
-          else {
-            exitCriterionSatisfied = true;
-          }
+          fireExitCriteria();
           break;
         }
       }
@@ -722,10 +709,6 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   public boolean isEntryCriterionSatisfied() {
     return entryCriterionSatisfied;
-  }
-
-  public boolean isExitCriterionSatisfied() {
-    return exitCriterionSatisfied;
   }
 
   // business key ////////////////////////////////////////////////////////////

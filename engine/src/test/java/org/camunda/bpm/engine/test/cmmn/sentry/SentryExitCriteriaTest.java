@@ -38,13 +38,9 @@ public class SentryExitCriteriaTest extends CmmnProcessEngineTestCase {
 
     assertTrue(secondHumanTask.isActive());
 
-    // (2) then
-    secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
-    assertTrue(secondHumanTask.isActive());
-
     assertNull(caseService.getVariable(caseInstanceId, "exit"));
 
-    // (2) when
+    // (1) when
     complete(firstHumanTaskId);
 
     // (2) then
@@ -127,6 +123,7 @@ public class SentryExitCriteriaTest extends CmmnProcessEngineTestCase {
     String thirdHumanTaskId = thirdHumanTask.getId();
     assertTrue(thirdHumanTask.isActive());
 
+    // (1) when
     complete(firstHumanTaskId);
 
     // (1) then
@@ -273,60 +270,6 @@ public class SentryExitCriteriaTest extends CmmnProcessEngineTestCase {
 
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
     assertNull(thirdHumanTask);
-  }
-
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testCycleWithStage.cmmn"})
-  public void testCycleWithStage() {
-    // given
-    String caseInstanceId = createCaseInstance().getId();
-
-    CaseExecution stage = queryCaseExecutionByActivityId("PI_Stage_1");
-    String stageId = stage.getId();
-
-    manualStart(stageId);
-
-    CaseExecution firstHumanTask = queryCaseExecutionByActivityId("PI_HumanTask_1");
-    String firstHumanTaskId = firstHumanTask.getId();
-    assertTrue(firstHumanTask.isActive());
-
-    CaseExecution innerFirstHumanTask = queryCaseExecutionByActivityId("PI_Inner_HumanTask_1");
-    String innerFirstHumanTaskId = innerFirstHumanTask.getId();
-    assertTrue(innerFirstHumanTask.isActive());
-
-    CaseExecution innerSecondHumanTask = queryCaseExecutionByActivityId("PI_Inner_HumanTask_2");
-    String innerSecondHumanTaskId = innerSecondHumanTask.getId();
-    assertTrue(innerSecondHumanTask.isActive());
-
-    CaseExecution innerThirdHumanTask = queryCaseExecutionByActivityId("PI_Inner_HumanTask_3");
-    String innerThirdHumanTaskId = innerThirdHumanTask.getId();
-    assertTrue(innerThirdHumanTask.isActive());
-
-    caseService.setVariable(stageId, "value", 99);
-    // when
-    suspend(stageId);
-    resume(stageId);
-
-    caseService.setVariable(stageId, "value", 101);
- 
-    // then
-    stage = queryCaseExecutionById(stageId);
-    assertNull(stage);
-
-    firstHumanTask = queryCaseExecutionById(firstHumanTaskId);
-    assertNull(firstHumanTask);
-
-    innerFirstHumanTask = queryCaseExecutionById(innerFirstHumanTaskId);
-    assertNull(innerFirstHumanTask);
-
-    innerSecondHumanTask = queryCaseExecutionById(innerSecondHumanTaskId);
-    assertNull(innerSecondHumanTask);
-
-    innerThirdHumanTask = queryCaseExecutionById(innerThirdHumanTaskId);
-    assertNull(innerThirdHumanTask);
-
-    Object variable = caseService.getVariable(caseInstanceId, "parentSuspend");
-    assertNotNull(variable);
-    assertTrue(Boolean.valueOf((Boolean) variable));
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryExitCriteriaTest.testExitTaskWithIfPart.cmmn"})

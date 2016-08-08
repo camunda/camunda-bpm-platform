@@ -59,10 +59,6 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
     return !(criteria != null && !criteria.isEmpty());
   }
 
-  protected boolean isAtLeastOneExitCriterionSatisfied(CmmnActivityExecution execution) {
-    return execution.isExitCriterionSatisfied();
-  }
-
   // rules (required and repetition rule) /////////////////////////////////////////
 
   protected void evaluateRequiredRule(CmmnActivityExecution execution) {
