@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.test.api.multitenancy.query;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,14 +23,10 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
-import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderCaseInstanceContext;
-import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderHistoricDecisionInstanceContext;
-import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInstanceContext;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.multitenancy.StaticTenantIdTestProvider;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -55,13 +50,15 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
 
   protected static final String ONE_TASK_PROCESS_DEFINITION_KEY = "oneTaskProcess";
   protected static final String FAILED_JOBS_PROCESS_DEFINITION_KEY = "ExampleProcess";
-  
+
+  protected static StaticTenantIdTestProvider tenantIdProvider;
+
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
 
-      TenantIdTestProvider tenantIdProvider = new TenantIdTestProvider(TENANT_ONE);
+      tenantIdProvider = new StaticTenantIdTestProvider(TENANT_ONE);
       configuration.setTenantIdProvider(tenantIdProvider);
 
       return configuration;
@@ -78,24 +75,33 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
 
   protected IdentityService identityService;
 
-  protected BpmnModelInstance oneTaskProcess;
-  
+  protected ProcessEngineConfiguration processEngineConfiguration;
+
+  protected static final BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess(ONE_TASK_PROCESS_DEFINITION_KEY)
+    .startEvent()
+    .userTask()
+    .done();
+
+  protected static final BpmnModelInstance failingProcess = Bpmn.createExecutableProcess(FAILED_JOBS_PROCESS_DEFINITION_KEY)
+    .startEvent()
+    .serviceTask()
+      .camundaClass("org.camunda.bpm.engine.test.api.multitenancy.FailingDelegate")
+      .camundaAsyncBefore()
+    .done();
+
   @Rule
   public RuleChain tenantRuleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Before
   public void setUp() {
-    oneTaskProcess = Bpmn.createExecutableProcess(ONE_TASK_PROCESS_DEFINITION_KEY)
-      .startEvent().userTask().done();
-  
     runtimeService = engineRule.getRuntimeService();
     identityService = engineRule.getIdentityService();
     managementService = engineRule.getManagementService();
-    
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
   }
   
   @Test
-  public void activeProcessInstancesCountWithUserBelongsToNoTenant() {
+  public void activeProcessInstancesCountWithNoAuthenticatedTenant() {
 
     testRule.deploy(oneTaskProcess);
 
@@ -115,7 +121,7 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
   }
 
   @Test
-  public void activeProcessInstancesCountWithUserBelongsToTenant() {
+  public void activeProcessInstancesCountWithAuthenticatedTenant() {
 
     testRule.deploy(oneTaskProcess);
     
@@ -135,7 +141,26 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
   }
 
   @Test
-  public void activeProcessInstancesCountWithUserBelongsToMultipleTenant() {
+  public void activeProcessInstancesCountWithDisabledTenantCheck() {
+
+    testRule.deploy(oneTaskProcess);
+    
+    startProcessInstances(ONE_TASK_PROCESS_DEFINITION_KEY);
+    
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+    
+    List<ProcessDefinitionStatistics> processDefinitionsStatistics = managementService
+      .createProcessDefinitionStatisticsQuery()
+      .list();
+ 
+    // then
+    assertEquals(1, processDefinitionsStatistics.size());
+    assertEquals(3, processDefinitionsStatistics.get(0).getInstances());
+  }
+
+  @Test
+  public void activeProcessInstancesCountWithMultipleAuthenticatedTenants() {
 
     testRule.deploy(oneTaskProcess);
 
@@ -155,13 +180,13 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
   }
 
   @Test
-  public void failedJobsCountWithUserBelongsToNoTenant() {
+  public void failedJobsCountWithWithNoAuthenticatedTenant() {
 
-    testRule.deploy("org/camunda/bpm/engine/test/api/multitenancy/statisticsQueryWithFailedJobs.bpmn20.xml");
+    testRule.deploy(failingProcess);
     
     startProcessInstances(FAILED_JOBS_PROCESS_DEFINITION_KEY);
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     identityService.setAuthentication("user", null, null);
 
@@ -178,13 +203,37 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
   }
 
   @Test
-  public void failedJobsCountWithUserBelongsToTenant() {
+  public void failedJobsCountWithWithDisabledTenantCheck() {
 
-    testRule.deploy("org/camunda/bpm/engine/test/api/multitenancy/statisticsQueryWithFailedJobs.bpmn20.xml");
+    testRule.deploy(failingProcess);
+    
+    startProcessInstances(FAILED_JOBS_PROCESS_DEFINITION_KEY);
+
+    testRule.executeAvailableJobs();
+
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    List<ProcessDefinitionStatistics> processDefinitionsStatistics =
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeFailedJobs()
+        .list();
+
+    // then
+    assertEquals(1, processDefinitionsStatistics.size());
+    assertEquals(3, processDefinitionsStatistics.get(0).getFailedJobs());
+    
+  }
+
+  @Test
+  public void failedJobsCountWithAuthenticatedTenant() {
+
+    testRule.deploy(failingProcess);
 
     startProcessInstances(FAILED_JOBS_PROCESS_DEFINITION_KEY);
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
@@ -200,13 +249,13 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
   }
 
   @Test
-  public void failedJobsCountWithUserBelongsToNultipleTenant() {
+  public void failedJobsCountWithMultipleAuthenticatedTenants() {
 
-    testRule.deploy("org/camunda/bpm/engine/test/api/multitenancy/statisticsQueryWithFailedJobs.bpmn20.xml");
+    testRule.deploy(failingProcess);
 
     startProcessInstances(FAILED_JOBS_PROCESS_DEFINITION_KEY);
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
@@ -222,13 +271,13 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
   }
 
   @Test
-  public void incidentsCountWithUserBelongsToNoTenant() {
+  public void incidentsCountWithNoAuthenticatedTenant() {
 
-    testRule.deploy("org/camunda/bpm/engine/test/api/multitenancy/statisticsQueryWithFailedJobs.bpmn20.xml");
+    testRule.deploy(failingProcess);
 
     startProcessInstances(FAILED_JOBS_PROCESS_DEFINITION_KEY);
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     identityService.setAuthentication("user", null, null);
 
@@ -247,13 +296,39 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
   }
 
   @Test
-  public void incidentsCountWithUserBelongsToTenant() {
+  public void incidentsCountWithDisabledTenantCheck() {
 
-    testRule.deploy("org/camunda/bpm/engine/test/api/multitenancy/statisticsQueryWithFailedJobs.bpmn20.xml");
+    testRule.deploy(failingProcess);
 
     startProcessInstances(FAILED_JOBS_PROCESS_DEFINITION_KEY);
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
+
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    List<ProcessDefinitionStatistics> processDefinitionsStatistics =
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeIncidents()
+        .list();
+
+    // then
+    assertEquals(1, processDefinitionsStatistics.size());
+    
+    List<IncidentStatistics> incidentStatistics = processDefinitionsStatistics.get(0).getIncidentStatistics();
+    assertEquals(1, incidentStatistics.size());
+    assertEquals(3, incidentStatistics.get(0).getIncidentCount());
+  }
+
+  @Test
+  public void incidentsCountWithAuthenticatedTenant() {
+
+    testRule.deploy(failingProcess);
+
+    startProcessInstances(FAILED_JOBS_PROCESS_DEFINITION_KEY);
+
+    testRule.executeAvailableJobs();
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
@@ -272,13 +347,13 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
   }
 
   @Test
-  public void incidentsCountWithUserBelongsToMultipleTenant() {
+  public void incidentsCountWithMultipleAuthenticatedTenants() {
 
-    testRule.deploy("org/camunda/bpm/engine/test/api/multitenancy/statisticsQueryWithFailedJobs.bpmn20.xml");
+    testRule.deploy(failingProcess);
 
     startProcessInstances(FAILED_JOBS_PROCESS_DEFINITION_KEY);
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
@@ -296,13 +371,13 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
   }
 
   @Test
-  public void incidentsCountWithIncidentTypeAndUserBelongsToTenant() {
+  public void incidentsCountWithIncidentTypeAndAuthenticatedTenant() {
 
-    testRule.deploy("org/camunda/bpm/engine/test/api/multitenancy/statisticsQueryWithFailedJobs.bpmn20.xml");
+    testRule.deploy(failingProcess);
 
     startProcessInstances(FAILED_JOBS_PROCESS_DEFINITION_KEY);
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
@@ -321,13 +396,13 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
   }
 
   @Test
-  public void incidentsFailedJobsAndIncidentsCountWithUserBelongsToTenant() {
+  public void instancesFailedJobsAndIncidentsCountWithAuthenticatedTenant() {
 
-    testRule.deploy("org/camunda/bpm/engine/test/api/multitenancy/statisticsQueryWithFailedJobs.bpmn20.xml");
+    testRule.deploy(failingProcess);
 
     startProcessInstances(FAILED_JOBS_PROCESS_DEFINITION_KEY);
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
@@ -361,61 +436,6 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
   }
 
   protected void setTenantIdProvider(String tenantId) {
-    TenantIdTestProvider tenantIdProvider = (TenantIdTestProvider)(engineRule.getProcessEngineConfiguration().getTenantIdProvider());
-    tenantIdProvider.setTenantIdProviderForProcessInstance(tenantId);
-  }
-
-  protected void executeAvailableJobs(){
-    executeAvailableJobs(0, Integer.MAX_VALUE, true);
-  }
-  
-  protected void executeAvailableJobs(int jobsExecuted, int expectedExecutions, boolean ignoreLessExecutions) {
-    List<Job> jobs = managementService.createJobQuery().withRetriesLeft().list();
-
-    if (jobs.isEmpty()) {
-      assertTrue("executed less jobs than expected. expected <" + expectedExecutions + "> actual <" + jobsExecuted + ">",
-          jobsExecuted == expectedExecutions || ignoreLessExecutions);
-      return;
-    }
-
-    for (Job job : jobs) {
-      try {
-        managementService.executeJob(job.getId());
-        jobsExecuted += 1;
-      } catch (Exception e) {}
-    }
-
-    assertTrue("executed more jobs than expected. expected <" + expectedExecutions + "> actual <" + jobsExecuted + ">",
-        jobsExecuted <= expectedExecutions);
-
-    executeAvailableJobs(jobsExecuted, expectedExecutions, ignoreLessExecutions);
-  }
-
-  public static class TenantIdTestProvider implements TenantIdProvider {
-
-    public String tenantId;
-
-    public TenantIdTestProvider(String tenantId) {
-      this.tenantId = tenantId;
-    }
-
-    public void setTenantIdProviderForProcessInstance(String tenantId) {
-      this.tenantId = tenantId;
-    }
-    
-    @Override
-    public String provideTenantIdForProcessInstance(TenantIdProviderProcessInstanceContext ctx) {
-      return tenantId;
-    }
-
-    @Override
-    public String provideTenantIdForHistoricDecisionInstance(TenantIdProviderHistoricDecisionInstanceContext ctx) {
-      return null;
-    }
-
-    @Override
-    public String provideTenantIdForCaseInstance(TenantIdProviderCaseInstanceContext ctx) {
-      return null;
-    }
+    tenantIdProvider.setTenantIdProvider(tenantId);
   }
 }

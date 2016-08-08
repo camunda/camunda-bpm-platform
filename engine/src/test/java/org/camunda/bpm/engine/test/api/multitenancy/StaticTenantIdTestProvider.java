@@ -23,9 +23,13 @@ import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInsta
  */
 public class StaticTenantIdTestProvider implements TenantIdProvider {
 
-  protected final String tenantId;
+  protected String tenantId;
 
   public StaticTenantIdTestProvider(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
+  public void setTenantIdProvider(String tenantId) {
     this.tenantId = tenantId;
   }
 
