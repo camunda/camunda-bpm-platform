@@ -318,7 +318,7 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
       Expression manualActivationExpression = null;
       if (condition != null) {
         String rule = condition.getText();
-        if (rule != null) {
+        if (rule != null && !rule.isEmpty()) {
           manualActivationExpression = expressionManager.createExpression(rule);
         }
       }

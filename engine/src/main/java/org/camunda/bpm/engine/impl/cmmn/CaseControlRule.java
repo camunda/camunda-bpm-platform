@@ -22,6 +22,4 @@ public interface CaseControlRule {
 
   boolean evaluate(CmmnActivityExecution execution);
 
-  boolean isEmpty();
-
 }

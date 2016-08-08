@@ -76,8 +76,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
 
     // clear lists
-    expectedStateTransitions.clear();
-    stateTransitionCollector.stateTransitions.clear();
+    emptyCollector(stateTransitionCollector, expectedStateTransitions);
 
     // case instance is active
     assertTrue(caseInstance.isActive());
@@ -162,36 +161,14 @@ public class CaseInstanceTest extends PvmTestCase {
     // ()        --create(Case1)--> active
     // ()        --create(X)-->     available
     // available --enable(X)-->     enabled
-    List<String> expectedStateTransitions = new ArrayList<String>();
-    expectedStateTransitions.add("() --create(Case1)--> active");
-    expectedStateTransitions.add("() --create(X)--> available");
-    expectedStateTransitions.add("available --enable(X)--> enabled");
-
-    assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
+    List<String> expectedStateTransitions = initAndAssertExpectedTransitions(stateTransitionCollector);
 
     // clear lists
-    expectedStateTransitions.clear();
-    stateTransitionCollector.stateTransitions.clear();
+    emptyCollector(stateTransitionCollector, expectedStateTransitions);
 
-    // case instance is active
-    assertTrue(caseInstance.isActive());
+    CaseExecutionImpl planItemX = assertCaseXState(caseInstance);
+    List<CaseExecutionImpl> childPlanItems;
 
-    CaseExecutionImpl instance = (CaseExecutionImpl) caseInstance;
-
-    // case instance has one child plan item
-    List<CaseExecutionImpl> childPlanItems = instance.getCaseExecutions();
-    assertEquals(1, childPlanItems.size());
-
-    CaseExecutionImpl planItemX = childPlanItems.get(0);
-
-    // the case instance should be the parent of X
-    assertEquals(caseInstance, planItemX.getParent());
-
-    // X should be enabled
-    assertTrue(planItemX.isEnabled());
-
-    // before activation (ie. manual start) X should not have any children
-    assertTrue(planItemX.getCaseExecutions().isEmpty());
 
     // manual start of x
     planItemX.manualStart();
@@ -214,8 +191,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
 
     // clear lists
-    expectedStateTransitions.clear();
-    stateTransitionCollector.stateTransitions.clear();
+    emptyCollector(stateTransitionCollector, expectedStateTransitions);
 
     // X should have two chil plan items
     childPlanItems = planItemX.getCaseExecutions();
@@ -243,6 +219,116 @@ public class CaseInstanceTest extends PvmTestCase {
 
     assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
 
+  }
+
+  protected CaseExecutionImpl assertCaseXState(CmmnCaseInstance caseInstance) {
+
+    // case instance is active
+    assertTrue(caseInstance.isActive());
+
+    CaseExecutionImpl instance = (CaseExecutionImpl) caseInstance;
+
+    // case instance has one child plan item
+    List<CaseExecutionImpl> childPlanItems = instance.getCaseExecutions();
+    assertEquals(1, childPlanItems.size());
+
+    CaseExecutionImpl planItemX = childPlanItems.get(0);
+
+    // the case instance should be the parent of X
+    assertEquals(caseInstance, planItemX.getParent());
+
+    // X should be enabled
+    assertTrue(planItemX.isEnabled());
+
+    // before activation (ie. manual start) X should not have any children
+    assertTrue(planItemX.getCaseExecutions().isEmpty());
+    return planItemX;
+  }
+
+  @Test
+  public void testCaseInstanceWithOneStateWithoutManualStartOfChildren() {
+    CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
+
+    CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
+        .listener("create", stateTransitionCollector)
+          .createActivity("X")
+            .listener("create", stateTransitionCollector)
+            .listener("enable", stateTransitionCollector)
+            .listener("manualStart", stateTransitionCollector)
+            .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+            .behavior(new StageActivityBehavior())
+          .createActivity("A")
+            .listener("create", stateTransitionCollector)
+            .listener("start", stateTransitionCollector)
+            .behavior(new TaskWaitState())
+          .endActivity()
+          .createActivity("B")
+            .listener("create", stateTransitionCollector)
+            .listener("start", stateTransitionCollector)
+            .behavior(new TaskWaitState())
+          .endActivity()
+        .endActivity()
+        .buildCaseDefinition();
+
+    CmmnCaseInstance caseInstance = caseDefinition.createCaseInstance();
+    caseInstance.create();
+    List<String> expectedStateTransitions = initAndAssertExpectedTransitions(stateTransitionCollector);
+    emptyCollector(stateTransitionCollector, expectedStateTransitions);
+
+
+    // clear lists
+    CaseExecutionImpl planItemX = assertCaseXState(caseInstance);
+
+    // manual start of x
+    planItemX.manualStart();
+
+    // X should be active
+    assertTrue(planItemX.isActive());
+
+    // expected state transitions after a manual start of X:
+    expectedStateTransitions.add("enabled --manualStart(X)--> active");
+    expectedStateTransitions.add("() --create(A)--> available");
+    expectedStateTransitions.add("available --start(A)--> active");
+    expectedStateTransitions.add("() --create(B)--> available");
+    expectedStateTransitions.add("available --start(B)--> active");
+
+    assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
+
+    // clear lists
+    emptyCollector(stateTransitionCollector, expectedStateTransitions);
+
+    // X should have two chil plan items
+    List<CaseExecutionImpl> childPlanItems;
+    childPlanItems = planItemX.getCaseExecutions();
+    assertEquals(2, childPlanItems.size());
+
+    for (CmmnExecution childPlanItem : childPlanItems) {
+      // both children should be active
+      assertTrue(childPlanItem.isActive());
+
+      // X should be the parent of both children
+      assertEquals(planItemX, childPlanItem.getParent());
+    }
+  }
+
+  protected void emptyCollector(CaseExecutionStateTransitionCollector stateTransitionCollector, List<String> expectedStateTransitions) {
+    // clear lists
+    expectedStateTransitions.clear();
+    stateTransitionCollector.stateTransitions.clear();
+  }
+
+  protected List<String> initAndAssertExpectedTransitions(CaseExecutionStateTransitionCollector stateTransitionCollector) {
+    // expected state transitions after the creation of a case instance:
+    // ()        --create(Case1)--> active
+    // ()        --create(X)-->     available
+    // available --enable(X)-->     enabled
+    List<String> expectedStateTransitions = new ArrayList<String>();
+    expectedStateTransitions.add("() --create(Case1)--> active");
+    expectedStateTransitions.add("() --create(X)--> available");
+    expectedStateTransitions.add("available --enable(X)--> enabled");
+
+    assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
+    return expectedStateTransitions;
   }
 
 
@@ -378,8 +464,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
 
     // clear lists
-    expectedStateTransitions.clear();
-    stateTransitionCollector.stateTransitions.clear();
+    emptyCollector(stateTransitionCollector, expectedStateTransitions);
 
     CaseExecutionImpl instance = (CaseExecutionImpl) caseInstance;
 
@@ -413,8 +498,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
 
     // clear lists
-    expectedStateTransitions.clear();
-    stateTransitionCollector.stateTransitions.clear();
+    emptyCollector(stateTransitionCollector, expectedStateTransitions);
 
     // handle plan item X1 ///////////////////////////////////////////////////
 
@@ -451,8 +535,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
 
     // clear lists
-    expectedStateTransitions.clear();
-    stateTransitionCollector.stateTransitions.clear();
+    emptyCollector(stateTransitionCollector, expectedStateTransitions);
 
     // handle plan item A2 ////////////////////////////////////////////////
 
@@ -477,8 +560,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
 
     // clear lists
-    expectedStateTransitions.clear();
-    stateTransitionCollector.stateTransitions.clear();
+    emptyCollector(stateTransitionCollector, expectedStateTransitions);
 
     // handle plan item B1 /////////////////////////////////////////////////
 
@@ -503,8 +585,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
 
     // clear lists
-    expectedStateTransitions.clear();
-    stateTransitionCollector.stateTransitions.clear();
+    emptyCollector(stateTransitionCollector, expectedStateTransitions);
 
     // handle plan item Y ////////////////////////////////////////////////
 
@@ -541,8 +622,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
 
     // clear lists
-    expectedStateTransitions.clear();
-    stateTransitionCollector.stateTransitions.clear();
+    emptyCollector(stateTransitionCollector, expectedStateTransitions);
 
     // handle plan item C //////////////////////////////////////////////////
 
@@ -567,8 +647,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
 
     // clear lists
-    expectedStateTransitions.clear();
-    stateTransitionCollector.stateTransitions.clear();
+    emptyCollector(stateTransitionCollector, expectedStateTransitions);
 
     // handle plan item X2 ///////////////////////////////////////////
 
@@ -605,8 +684,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
 
     // clear lists
-    expectedStateTransitions.clear();
-    stateTransitionCollector.stateTransitions.clear();
+    emptyCollector(stateTransitionCollector, expectedStateTransitions);
 
     // handle plan item A3 //////////////////////////////////////////////
 
@@ -631,8 +709,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
 
     // clear lists
-    expectedStateTransitions.clear();
-    stateTransitionCollector.stateTransitions.clear();
+    emptyCollector(stateTransitionCollector, expectedStateTransitions);
 
     // handle plan item B2 /////////////////////////////////////////////////
 
@@ -657,8 +734,7 @@ public class CaseInstanceTest extends PvmTestCase {
     assertEquals(expectedStateTransitions, stateTransitionCollector.stateTransitions);
 
     // clear lists
-    expectedStateTransitions.clear();
-    stateTransitionCollector.stateTransitions.clear();
+    emptyCollector(stateTransitionCollector, expectedStateTransitions);
 
   }
 

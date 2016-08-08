@@ -12,12 +12,7 @@
  */
 package org.camunda.bpm.engine.test.cmmn.operation;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
-import org.camunda.bpm.engine.impl.cmmn.behavior.CaseControlRuleImpl;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
@@ -25,24 +20,10 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
 import org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CaseDefinitionBuilder;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
-import org.camunda.bpm.engine.impl.el.FixedValue;
-import org.camunda.bpm.engine.impl.el.JuelExpression;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
-import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpressionImpl;
-import org.camunda.bpm.model.cmmn.impl.instance.ManualActivationRuleImpl;
-import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
-import org.camunda.bpm.model.cmmn.instance.ManualActivationRule;
-import org.camunda.bpm.model.xml.impl.ModelBuilderImpl;
-import org.camunda.bpm.model.xml.impl.instance.DomElementImpl;
-import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
-import org.camunda.bpm.model.xml.instance.DomElement;
-import org.python.apache.xerces.impl.xs.opti.DefaultElement;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;

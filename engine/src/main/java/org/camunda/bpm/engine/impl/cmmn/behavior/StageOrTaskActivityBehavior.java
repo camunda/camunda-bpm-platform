@@ -218,11 +218,7 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
     Object manualActivationRule = activity.getProperty(PROPERTY_MANUAL_ACTIVATION_RULE);
     if (manualActivationRule != null) {
       CaseControlRule rule = (CaseControlRule) manualActivationRule;
-      if (!rule.isEmpty()) {
-        manualActivation = rule.evaluate(execution);
-      } else {
-        manualActivation = true;
-      }
+      manualActivation = rule.evaluate(execution);
     }
     return manualActivation;
   }

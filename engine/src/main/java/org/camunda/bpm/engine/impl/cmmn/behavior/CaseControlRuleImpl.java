@@ -35,7 +35,7 @@ public class CaseControlRuleImpl implements CaseControlRule {
 
   public boolean evaluate(CmmnActivityExecution execution) {
     if (expression == null) {
-      return false;
+      return true;
     }
 
     Object result = expression.getValue(execution);
@@ -46,15 +46,6 @@ public class CaseControlRuleImpl implements CaseControlRule {
     }
 
     return (Boolean) result;
-  }
-
-  @Override
-  public boolean isEmpty() {
-    boolean result = true;
-    if (expression != null && expression.getExpressionText() != null) {
-      return expression.getExpressionText().isEmpty();
-    }
-    return result;
   }
 
 }
