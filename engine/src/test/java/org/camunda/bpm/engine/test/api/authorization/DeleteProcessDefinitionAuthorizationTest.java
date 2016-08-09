@@ -17,7 +17,6 @@ package org.camunda.bpm.engine.test.api.authorization;
 
 import java.util.Collection;
 import java.util.List;
-import static junit.framework.TestCase.assertNotNull;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -25,7 +24,6 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
@@ -51,6 +49,7 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class DeleteProcessDefinitionAuthorizationTest {
 
+  public static final String PROCESS_DEFINITION_KEY = "one";
 
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
@@ -71,10 +70,10 @@ public class DeleteProcessDefinitionAuthorizationTest {
       scenario()
         .withoutAuthorizations()
         .failsDueToRequired(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionId", "userId", Permissions.DELETE)),
+          grant(Resources.PROCESS_DEFINITION, PROCESS_DEFINITION_KEY, "userId", Permissions.DELETE)),
       scenario()
         .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionId", "userId", Permissions.DELETE))
+          grant(Resources.PROCESS_DEFINITION, PROCESS_DEFINITION_KEY, "userId", Permissions.DELETE))
         .succeeds(),
       scenario()
         .withAuthorizations(
@@ -103,38 +102,44 @@ public class DeleteProcessDefinitionAuthorizationTest {
   public void testDeleteProcessDefinition() {
     testHelper.deploy("org/camunda/bpm/engine/test/repository/twoProcesses.bpmn20.xml");
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
-    assertEquals(2, processDefinitions.size());
+
+    authRule.init(scenario)
+      .withUser("userId")
+      .start();
 
     //when a process definition is been deleted
     repositoryService.deleteProcessDefinition(processDefinitions.get(0).getId());
 
     //then only one process definition should remain
-    assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
+    if (authRule.assertScenario(scenario)) {
+      assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
+    }
   }
 
 
   @Test
   public void testDeleteProcessDefinitionCascade() {
     // given process definition and a process instance
-    BpmnModelInstance bpmnModel = Bpmn.createExecutableProcess("process").startEvent().userTask().endEvent().done();
+    BpmnModelInstance bpmnModel = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().userTask().endEvent().done();
     testHelper.deploy(bpmnModel);
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process").singleResult();
-    ProcessInstanceWithVariables procInst = runtimeService.createProcessInstanceByKey("process").executeWithVariablesInReturn();
-    assertNotNull(procInst);
-    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
-    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
-      assertEquals(2, engineRule.getHistoryService().createHistoricActivityInstanceQuery().count());
-    }
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).singleResult();
+    runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).executeWithVariablesInReturn();
+
+    authRule.init(scenario)
+      .withUser("userId")
+      .start();
 
     //when the corresponding process definition is cascading deleted from the deployment
     repositoryService.deleteProcessDefinition(processDefinition.getId(), true);
 
     //then exist no process instance and no definition
-    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-    assertEquals(0, repositoryService.createProcessDefinitionQuery().count());
-    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
-      assertEquals(0, engineRule.getHistoryService().createHistoricActivityInstanceQuery().count());
+    if (authRule.assertScenario(scenario)) {
+      assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+      assertEquals(0, repositoryService.createProcessDefinitionQuery().count());
+      if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
+        assertEquals(0, engineRule.getHistoryService().createHistoricActivityInstanceQuery().count());
+      }
     }
   }
 }

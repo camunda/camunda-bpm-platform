@@ -139,7 +139,7 @@ public interface RepositoryService {
    * Cascades the deletion if the cascade is set to true.
    * Same behavior as {@link RepositoryService#deleteProcessDefinition(java.lang.String, boolean, boolean)}
    * The skipCustomListeners parameter is per default false. The custom listeners are called
-   * if the cascading flag is set to false and the process instances are deleted.
+   * if the cascading flag is set to true and the process instances are deleted.
    *
    * @param processDefinitionId the id, which corresponds to the process definition
    * @param cascade if set to true, all process instances (including) history are deleted

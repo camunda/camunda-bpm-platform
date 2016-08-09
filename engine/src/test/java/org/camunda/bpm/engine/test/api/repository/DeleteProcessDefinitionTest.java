@@ -101,7 +101,6 @@ public class DeleteProcessDefinitionTest {
             .addClasspathResource("org/camunda/bpm/engine/test/repository/twoProcesses.bpmn20.xml")
             .deploy();
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
-    assertEquals(2, processDefinitions.size());
 
     //when a process definition is been deleted
     repositoryService.deleteProcessDefinition(processDefinitions.get(0).getId());
@@ -118,8 +117,7 @@ public class DeleteProcessDefinitionTest {
                                   .addModelInstance("process.bpmn", bpmnModel)
                                   .deploy();
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process").singleResult();
-    ProcessInstanceWithVariables procInst = runtimeService.createProcessInstanceByKey("process").executeWithVariablesInReturn();
-    assertNotNull(procInst);
+    runtimeService.createProcessInstanceByKey("process").executeWithVariablesInReturn();
 
     //when the corresponding process definition is deleted from the deployment
     try {
@@ -141,12 +139,7 @@ public class DeleteProcessDefinitionTest {
                                   .addModelInstance("process.bpmn", bpmnModel)
                                   .deploy();
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process").singleResult();
-    ProcessInstanceWithVariables procInst = runtimeService.createProcessInstanceByKey("process").executeWithVariablesInReturn();
-    assertNotNull(procInst);
-    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
-    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
-      assertEquals(2, engineRule.getHistoryService().createHistoricActivityInstanceQuery().count());
-    }
+    runtimeService.createProcessInstanceByKey("process").executeWithVariablesInReturn();
 
     //when the corresponding process definition is cascading deleted from the deployment
     repositoryService.deleteProcessDefinition(processDefinition.getId(), true);
@@ -161,7 +154,6 @@ public class DeleteProcessDefinitionTest {
 
   @Test
   public void testDeleteProcessDefinitionClearsCache() {
-
     // given process definition and a process instance
     BpmnModelInstance bpmnModel = Bpmn.createExecutableProcess("process").startEvent().userTask().endEvent().done();
     deployment = repositoryService.createDeployment()
@@ -197,7 +189,6 @@ public class DeleteProcessDefinitionTest {
 
     //when clearing the deployment cache
     processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
-    assertEquals(0, processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache().size());
 
     //then creating process instance from the existing process definition
     ProcessInstanceWithVariables procInst = runtimeService.createProcessInstanceByKey("two").executeWithVariablesInReturn();
@@ -218,10 +209,8 @@ public class DeleteProcessDefinitionTest {
             .addClasspathResource("org/camunda/bpm/engine/test/repository/twoProcesses.bpmn20.xml")
             .deploy();
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
-    assertEquals(2, processDefinitions.size());
     //one is deleted from the deployment
     repositoryService.deleteProcessDefinition(processDefinitions.get(0).getId());
-    assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
 
     //when the process definition is redeployed
     Deployment deployment2 = repositoryService.createDeployment()
