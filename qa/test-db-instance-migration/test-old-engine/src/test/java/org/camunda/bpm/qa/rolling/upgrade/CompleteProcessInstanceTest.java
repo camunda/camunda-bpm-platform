@@ -36,8 +36,6 @@ import org.junit.Test;
 @Origin("7.5.0")
 public class CompleteProcessInstanceTest {
 
-  public static final String PROCESS_DEF_KEY = "rollingProcess";
-
   @Rule
   public UpgradeTestRule rule = new UpgradeTestRule();
 
@@ -45,8 +43,7 @@ public class CompleteProcessInstanceTest {
   @ScenarioUnderTest("init.1")
   public void testDeployProcessWithoutIsExecutableAttribute() {
     //given an already started process instance
-    RuntimeService runtimeService = rule.getRuntimeService();
-    ProcessInstance oldInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEF_KEY).singleResult();
+    ProcessInstance oldInstance = rule.processInstance();
     Assert.assertNotNull(oldInstance);
 
     //which waits on an user task
@@ -59,7 +56,8 @@ public class CompleteProcessInstanceTest {
 
     //then there exists no more tasks
     //and the process instance is also completed
-    Assert.assertEquals(0, taskService.createTaskQuery().processDefinitionKey(PROCESS_DEF_KEY).count());
-    Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEF_KEY).count());
+    Assert.assertEquals(0, rule.taskQuery().count());
+    rule.assertScenarioEnded();
   }
+
 }
