@@ -205,6 +205,10 @@ public class JobAcquisitionBackoffIdleTest {
         acquisitionThread.makeContinueAndWaitForSync();
         //assert max idle time and clear events
         assertJobExecutorWaitEvent(MAX_IDLE_WAIT_TIME);
+
+        //trigger continue and assert that new acquisition cycle was triggered right after the hint
+        triggerReconfigurationAndNextCycle();
+        assertJobExecutorWaitEvent(0);
         return procInstance;
       }
     });

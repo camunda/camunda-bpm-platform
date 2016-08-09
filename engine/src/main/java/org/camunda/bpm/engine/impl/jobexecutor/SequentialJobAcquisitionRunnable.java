@@ -45,8 +45,7 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
     while (!isInterrupted) {
       acquisitionContext.reset();
       acquisitionContext.setAcquisitionTime(System.currentTimeMillis());
-      // we are in a new acquisition cycle; discard any previous notification
-      clearJobAddedNotification();
+
 
       Iterator<ProcessEngineImpl> engineIterator = jobExecutor.engineIterator();
 
@@ -69,6 +68,11 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
 
       acquisitionContext.setJobAdded(isJobAdded);
       configureNextAcquisitionCycle(acquisitionContext, acquisitionStrategy);
+      //The clear had to be done after the configuration, since a hint can be
+      //appear in the suspend and the flag shouldn't be cleaned in this case.
+      //The loop will restart after suspend with the isJobAdded flag and
+      //reconfigure with this flag
+      clearJobAddedNotification();
 
       long waitTime = acquisitionStrategy.getWaitTime();
       // wait the requested wait time minus the time that acquisition itself took
@@ -76,10 +80,6 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
       waitTime = Math.max(0, (acquisitionContext.getAcquisitionTime() + waitTime) - System.currentTimeMillis());
 
       suspendAcquisition(waitTime);
-      if (isJobAdded) {
-        acquisitionContext.setJobAdded(isJobAdded);
-        acquisitionStrategy.reconfigure(acquisitionContext);
-      }
     }
 
     LOG.stoppedJobAcquisition(jobExecutor.getName());
