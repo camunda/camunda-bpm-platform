@@ -19,7 +19,9 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.qa.upgrade.Origin;
+import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
+import org.camunda.bpm.qa.upgrade.UpgradeTestRule;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,23 +32,25 @@ import org.junit.Test;
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
+@ScenarioUnderTest("StartProcessInstance")
+@Origin("7.5.0")
 public class CompleteProcessInstanceTest {
 
   public static final String PROCESS_DEF_KEY = "rollingProcess";
-  
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.cfg.xml");
 
+  @Rule
+  public UpgradeTestRule rule = new UpgradeTestRule();
 
   @Test
+  @ScenarioUnderTest("init.1")
   public void testDeployProcessWithoutIsExecutableAttribute() {
     //given an already started process instance
-    RuntimeService runtimeService = engineRule.getRuntimeService();
+    RuntimeService runtimeService = rule.getRuntimeService();
     ProcessInstance oldInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEF_KEY).singleResult();
     Assert.assertNotNull(oldInstance);
 
     //which waits on an user task
-    TaskService taskService = engineRule.getTaskService();
+    TaskService taskService = rule.getTaskService();
     Task userTask = taskService.createTaskQuery().processInstanceId(oldInstance.getId()).singleResult();
     Assert.assertNotNull(userTask);
 

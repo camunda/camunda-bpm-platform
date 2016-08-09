@@ -16,7 +16,7 @@ package org.camunda.bpm.qa.upgrade;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.qa.upgrade.rolling.scenarios.StartProcessInstance;
+import org.camunda.bpm.qa.upgrade.scenarios.rolling.StartProcessInstance;
 import org.camunda.bpm.qa.upgrade.scenarios.deployment.DeployProcessWithoutIsExecutableAttributeScenario;
 
 /**
