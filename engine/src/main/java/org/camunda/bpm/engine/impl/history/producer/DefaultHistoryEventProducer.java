@@ -71,10 +71,9 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String parentActivityInstanceId = null;
     ExecutionEntity parentExecution = execution.getParent();
 
-    if (parentExecution != null && CompensationBehavior.isCompensationThrowing(parentExecution)) {
+    if (parentExecution != null && CompensationBehavior.isCompensationThrowing(parentExecution) && execution.getActivity() != null) {
       parentActivityInstanceId = CompensationBehavior.getParentActivityInstanceId(execution);
-    }
-    else {
+    } else {
       parentActivityInstanceId = execution.getParentActivityInstanceId();
     }
 

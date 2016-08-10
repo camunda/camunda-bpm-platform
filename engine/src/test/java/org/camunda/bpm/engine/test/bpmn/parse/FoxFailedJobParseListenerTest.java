@@ -1,13 +1,14 @@
 package org.camunda.bpm.engine.test.bpmn.parse;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
-import org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+
+import static org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION;
 
 public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTestCase {
 
@@ -134,14 +135,14 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTestCas
   protected void checkFoxFailedJobConfig(ActivityImpl activity) {
     assertNotNull(activity);
 
-    assertTrue(activity.getProperties().contains(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION));
+    assertTrue(activity.getProperties().contains(FOX_FAILED_JOB_CONFIGURATION));
 
-    Object value = activity.getProperties().get(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION);
+    Object value = activity.getProperties().get(FOX_FAILED_JOB_CONFIGURATION);
     assertEquals("R5/PT5M", value);
   }
 
   protected void checkNotContainingFoxFailedJobConfig(ActivityImpl activity) {
-    assertFalse(activity.getProperties().contains(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION));
+    assertFalse(activity.getProperties().contains(FOX_FAILED_JOB_CONFIGURATION));
   }
 
 }

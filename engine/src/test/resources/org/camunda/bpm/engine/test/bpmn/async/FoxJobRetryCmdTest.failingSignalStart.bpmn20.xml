@@ -15,7 +15,7 @@
       
     <sequenceFlow sourceRef="signalStart" targetRef="failingServiceTask" />
   
-    <serviceTask id="failingServiceTask" camunda:class="org.camunda.bpm.engine.test.cmd.FailingDelegate"/>
+    <serviceTask id="failingServiceTask" camunda:class="org.camunda.bpm.engine.test.bpmn.async.FailingDelegate"/>
     
     <sequenceFlow sourceRef="failingServiceTask" targetRef="end" /> 
        
