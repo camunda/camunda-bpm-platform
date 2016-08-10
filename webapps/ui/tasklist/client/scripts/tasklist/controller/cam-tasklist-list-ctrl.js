@@ -10,5 +10,5 @@
 
       $scope.tasklistVars = { read: [ 'tasklistData' ] };
       $scope.tasklistPlugins = Views.getProviders({ component: 'tasklist.list' });
-
+      $scope.tasklistHeaderPlugins = Views.getProviders({ component: 'tasklist.header' });
     }];
