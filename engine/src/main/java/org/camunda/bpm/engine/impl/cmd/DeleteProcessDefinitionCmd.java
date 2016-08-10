@@ -17,9 +17,12 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -51,6 +54,12 @@ public class DeleteProcessDefinitionCmd implements Command<Void>, Serializable {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkDeleteProcessDefinitionById(processDefinitionId);
     }
+
+    UserOperationLogManager logManager = commandContext.getOperationLogManager();
+    logManager.logProcessDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE,
+                                             processDefinitionId,
+                                             processDefinition.getKey(),
+                                             new PropertyChange("cascade", null, cascade));
 
     commandContext.getProcessDefinitionManager().deleteProcessDefinition(processDefinition, processDefinitionId, cascade, cascade, skipCustomListeners);
     return null;
