@@ -12,7 +12,7 @@ module.exports = [
   ) {
     ViewsProvider.registerDefaultView('cockpit.dashboard.section', {
       id: 'tasks',
-      label: 'Tasks',
+      label: 'User Tasks',
       template: template,
       pagePath: '#/tasks',
       checkActive: function(path) {
@@ -54,6 +54,6 @@ module.exports = [
           });
         }],
 
-      priority: 50
+      priority: 20
     });
   }];
