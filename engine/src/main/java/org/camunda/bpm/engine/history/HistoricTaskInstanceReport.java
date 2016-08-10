@@ -56,5 +56,5 @@ public interface HistoricTaskInstanceReport extends Report {
    *
    * @return a list of {@link HistoricTaskInstanceReportResult}s
    */
-  List<HistoricTaskInstanceReportResult> countByTaskDefinitionKey();
+  List<HistoricTaskInstanceReportResult> countByTaskName();
 }

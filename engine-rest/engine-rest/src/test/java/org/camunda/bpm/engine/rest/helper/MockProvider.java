@@ -810,6 +810,9 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION = "aProcessDefinition";
   public static final String EXAMPLE_HISTORIC_TASK_START_TIME = "2016-04-12T15:29:33";
   public static final String EXAMPLE_HISTORIC_TASK_END_TIME = "2016-04-12T16:23:34";
+  public static final String EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID = "aProcessDefinitionId:1:1";
+  public static final String EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME = "aProcessDefinitionName";
+  public static final String EXAMPLE_HISTORIC_TASK_REPORT_TASK_NAME = "aTaskName";
 
   // historic task instance duration report
   public static final long EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_AVG = 10;
@@ -941,6 +944,10 @@ public abstract class MockProvider {
     HistoricTaskInstanceReportResult mock = mock(HistoricTaskInstanceReportResult.class);
     when(mock.getCount()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_COUNT);
     when(mock.getDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION);
+    when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID);
+    when(mock.getProcessDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION);
+    when(mock.getProcessDefinitionName()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME);
+    when(mock.getTaskName()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_TASK_NAME);
 
     return Collections.singletonList(mock);
   }
@@ -949,6 +956,10 @@ public abstract class MockProvider {
     HistoricTaskInstanceReportResult mock = mock(HistoricTaskInstanceReportResult.class);
     when(mock.getCount()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_COUNT);
     when(mock.getDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION);
+    when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID);
+    when(mock.getProcessDefinitionKey()).thenReturn(null);
+    when(mock.getProcessDefinitionName()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME);
+    when(mock.getTaskName()).thenReturn(null);
 
     return Collections.singletonList(mock);
   }

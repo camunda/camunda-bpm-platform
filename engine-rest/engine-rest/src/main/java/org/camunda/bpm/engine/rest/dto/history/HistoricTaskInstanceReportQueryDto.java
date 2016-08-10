@@ -98,7 +98,7 @@ public class HistoricTaskInstanceReportQueryDto extends AbstractReportDto<Histor
     if(PROCESS_DEFINITION.equals(groupby)) {
       return reportQuery.countByProcessDefinitionKey();
     } else {
-      return reportQuery.countByTaskDefinitionKey();
+      return reportQuery.countByTaskName();
     }
   }
 }

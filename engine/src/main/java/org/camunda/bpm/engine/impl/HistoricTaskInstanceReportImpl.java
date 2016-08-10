@@ -73,7 +73,7 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
   }
 
   @Override
-  public List<HistoricTaskInstanceReportResult> countByTaskDefinitionKey() {
+  public List<HistoricTaskInstanceReportResult> countByTaskName() {
     CommandContext commandContext = Context.getCommandContext();
 
     if(commandContext == null) {
@@ -81,20 +81,20 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
 
         @Override
         public List<HistoricTaskInstanceReportResult> execute(CommandContext commandContext) {
-          return executeCountByTaskDefinitionKey(commandContext);
+          return executeCountByTaskName(commandContext);
         }
 
       });
     }
     else {
-      return executeCountByTaskDefinitionKey(commandContext);
+      return executeCountByTaskName(commandContext);
     }
   }
 
-  protected List<HistoricTaskInstanceReportResult> executeCountByTaskDefinitionKey(CommandContext commandContext) {
+  protected List<HistoricTaskInstanceReportResult> executeCountByTaskName(CommandContext commandContext) {
     doAuthCheck(commandContext);
     return commandContext.getTaskReportManager()
-      .selectHistoricTaskInstanceCountByTaskDefKeyReport(this);
+      .selectHistoricTaskInstanceCountByTaskNameReport(this);
   }
 
   @Override

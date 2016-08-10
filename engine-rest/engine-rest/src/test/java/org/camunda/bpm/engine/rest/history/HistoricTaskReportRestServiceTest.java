@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.jayway.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.query.PeriodUnit.MONTH;
 import static org.camunda.bpm.engine.query.PeriodUnit.QUARTER;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_TASK_END_TIME;
@@ -44,18 +45,20 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_T
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_TASK_REPORT_COUNT;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_TASK_REPORT_TASK_NAME;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_TASK_START_TIME;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstanceDurationReport;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstanceReport;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstanceReportWithProcDef;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static com.jayway.restassured.RestAssured.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Stefan Hentschel.
@@ -84,7 +87,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
     when(mockedReportQuery.completedAfter(any(Date.class))).thenReturn(mockedReportQuery);
     when(mockedReportQuery.completedBefore(any(Date.class))).thenReturn(mockedReportQuery);
 
-    when(mockedReportQuery.countByTaskDefinitionKey()).thenReturn(taskReportResults);
+    when(mockedReportQuery.countByTaskName()).thenReturn(taskReportResults);
     when(mockedReportQuery.countByProcessDefinitionKey()).thenReturn(taskReportResultsWithProcDef);
 
     List<DurationReportResult> durationReportByMonth = createMockHistoricTaskInstanceDurationReport(MONTH);
@@ -101,7 +104,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
   @Test
   public void testTaskCountMissingAuthorization() {
     String message = "not authorized";
-    when(mockedReportQuery.countByTaskDefinitionKey()).thenThrow(new AuthorizationException(message));
+    when(mockedReportQuery.countByTaskName()).thenThrow(new AuthorizationException(message));
 
     given()
       .queryParam("reportType", "count")
@@ -147,7 +150,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
     .when()
       .get(TASK_REPORT_URL);
 
-    verify(mockedReportQuery).countByTaskDefinitionKey();
+    verify(mockedReportQuery).countByTaskName();
     verifyNoMoreInteractions(mockedReportQuery);
   }
 
@@ -164,7 +167,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
       .get(TASK_REPORT_URL);
 
     verify(mockedReportQuery).completedBefore(any(Date.class));
-    verify(mockedReportQuery).countByTaskDefinitionKey();
+    verify(mockedReportQuery).countByTaskName();
     verifyNoMoreInteractions(mockedReportQuery);
   }
 
@@ -181,7 +184,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
       .get(TASK_REPORT_URL);
 
     verify(mockedReportQuery).completedAfter(any(Date.class));
-    verify(mockedReportQuery).countByTaskDefinitionKey();
+    verify(mockedReportQuery).countByTaskName();
     verifyNoMoreInteractions(mockedReportQuery);
   }
 
@@ -249,7 +252,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
     .when()
       .get(TASK_REPORT_URL);
 
-    verify(mockedReportQuery).countByTaskDefinitionKey();
+    verify(mockedReportQuery).countByTaskName();
     verifyNoMoreInteractions(mockedReportQuery);
   }
 
@@ -266,7 +269,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
     .when()
       .get(TASK_REPORT_URL);
 
-    verify(mockedReportQuery).countByTaskDefinitionKey();
+    verify(mockedReportQuery).countByTaskName();
     verifyNoMoreInteractions(mockedReportQuery);
   }
 
@@ -283,6 +286,10 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
         .contentType(ContentType.JSON)
         .body("[0].definition", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION))
         .body("[0].count", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_COUNT.intValue()))
+        .body("[0].processDefinitionId", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID))
+        .body("[0].processDefinitionName", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME))
+        .body("[0].processDefinitionKey", equalTo(null))
+        .body("[0].taskName", equalTo(null))
     .when()
       .get(TASK_REPORT_URL);
 
@@ -304,11 +311,15 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
         .contentType(ContentType.JSON)
         .body("[0].definition", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION))
         .body("[0].count", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_COUNT.intValue()))
+        .body("[0].processDefinitionId", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID))
+        .body("[0].processDefinitionName", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME))
+        .body("[0].processDefinitionKey", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION))
+        .body("[0].taskName", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_TASK_NAME))
     .when()
       .get(TASK_REPORT_URL);
 
     verifyStringStartParameterQueryInvocations();
-    verify(mockedReportQuery).countByTaskDefinitionKey();
+    verify(mockedReportQuery).countByTaskName();
     verifyNoMoreInteractions(mockedReportQuery);
 
   }

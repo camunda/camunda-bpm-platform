@@ -37,9 +37,9 @@ public class TaskReportManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricTaskInstanceReportResult> selectHistoricTaskInstanceCountByTaskDefKeyReport(HistoricTaskInstanceReportImpl query) {
+  public List<HistoricTaskInstanceReportResult> selectHistoricTaskInstanceCountByTaskNameReport(HistoricTaskInstanceReportImpl query) {
     configureQuery(query);
-    return getDbEntityManager().selectListWithRawParameter("selectHistoricTaskInstanceCountByTaskDefKeyReport", query, 0, Integer.MAX_VALUE);
+    return getDbEntityManager().selectListWithRawParameter("selectHistoricTaskInstanceCountByTaskNameReport", query, 0, Integer.MAX_VALUE);
   }
 
   @SuppressWarnings("unchecked")

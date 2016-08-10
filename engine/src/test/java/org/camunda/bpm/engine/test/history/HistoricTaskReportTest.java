@@ -33,9 +33,9 @@ import org.junit.rules.RuleChain;
 
 import java.util.Calendar;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -89,11 +89,18 @@ public class HistoricTaskReportTest {
     startAndCompleteProcessInstance(PROCESS_DEFINITION_KEY, 2016, 7, 14, 12, 1);
 
     // when
-    List<HistoricTaskInstanceReportResult> historicTaskInstanceReportResults = historyService.createHistoricTaskInstanceReport().countByTaskDefinitionKey();
+    List<HistoricTaskInstanceReportResult> historicTaskInstanceReportResults = historyService
+      .createHistoricTaskInstanceReport()
+      .countByTaskName();
 
     // then
     assertEquals(3, historicTaskInstanceReportResults.size());
     assertEquals(2, historicTaskInstanceReportResults.get(0).getCount(), 0);
+    assertEquals(ANOTHER_PROCESS_DEFINITION_KEY, historicTaskInstanceReportResults.get(0).getProcessDefinitionKey());
+    assertEquals("name_" + ANOTHER_PROCESS_DEFINITION_KEY, historicTaskInstanceReportResults.get(0).getProcessDefinitionName());
+    assertEquals(ANOTHER_PROCESS_DEFINITION_KEY + " Task 1", historicTaskInstanceReportResults.get(0).getTaskName());
+
+    assertTrue(historicTaskInstanceReportResults.get(2).getProcessDefinitionId().contains(":2:"));
   }
 
   @Test
@@ -114,6 +121,10 @@ public class HistoricTaskReportTest {
 
     // then
     assertEquals(2, historicTaskInstanceReportResults.size());
+    assertTrue(historicTaskInstanceReportResults.get(0).getProcessDefinitionId().contains(":1:"));
+    assertEquals("name_" + ANOTHER_PROCESS_DEFINITION_KEY, historicTaskInstanceReportResults.get(0).getProcessDefinitionName());
+
+    assertNull(historicTaskInstanceReportResults.get(0).getProcessDefinitionKey());
   }
 
   @Test
@@ -189,6 +200,7 @@ public class HistoricTaskReportTest {
   protected BpmnModelInstance createProcessWithUserTask(String key) {
     double random = Math.random();
     return Bpmn.createExecutableProcess(key)
+      .name("name_" + key)
       .startEvent()
         .userTask(key + "_" + random + "_task1")
           .name(key + " Task 1")

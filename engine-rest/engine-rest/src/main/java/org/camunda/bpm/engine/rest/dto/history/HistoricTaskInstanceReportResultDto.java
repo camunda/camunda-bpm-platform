@@ -21,6 +21,10 @@ public class HistoricTaskInstanceReportResultDto {
 
   protected String definition;
   protected Long count;
+  protected String processDefinitionKey;
+  protected String processDefinitionId;
+  protected String processDefinitionName;
+  protected String taskName;
 
   public String getDefinition() {
     return definition;
@@ -38,11 +42,47 @@ public class HistoricTaskInstanceReportResultDto {
     this.count = count;
   }
 
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
+  }
+
+  public String getProcessDefinitionName() {
+    return processDefinitionName;
+  }
+
+  public void setProcessDefinitionName(String processDefinitionName) {
+    this.processDefinitionName = processDefinitionName;
+  }
+
+  public String getTaskName() {
+    return taskName;
+  }
+
+  public void setTaskName(String taskName) {
+    this.taskName = taskName;
+  }
+
   public static HistoricTaskInstanceReportResultDto fromHistoricTaskInstanceReportResult(HistoricTaskInstanceReportResult taskReportResult) {
     HistoricTaskInstanceReportResultDto dto = new HistoricTaskInstanceReportResultDto();
 
     dto.count = taskReportResult.getCount();
     dto.definition = taskReportResult.getDefinitionKey();
+    dto.processDefinitionKey = taskReportResult.getProcessDefinitionKey();
+    dto.processDefinitionId = taskReportResult.getProcessDefinitionId();
+    dto.processDefinitionName = taskReportResult.getProcessDefinitionName();
+    dto.taskName = taskReportResult.getTaskName();
 
     return dto;
   }

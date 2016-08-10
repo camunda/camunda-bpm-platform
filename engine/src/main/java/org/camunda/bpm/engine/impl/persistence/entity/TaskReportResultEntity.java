@@ -19,29 +19,71 @@ import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
  */
 public class TaskReportResultEntity implements HistoricTaskInstanceReportResult {
 
-  protected String definition;
+  protected String definitionKey;
   protected Long count;
+  protected String processDefinitionKey;
+  protected String processDefinitionId;
+  protected String processDefinitionName;
+  protected String taskName;
 
   public String getDefinitionKey() {
-    return definition;
+    return definitionKey;
   }
 
   public Long getCount() {
     return count;
   }
 
-  public void setDefinition(String definition) {
-    this.definition = definition;
+  public void setDefinitionKey(String definitionKey) {
+    this.definitionKey = definitionKey;
   }
 
   public void setCount(Long count) {
     this.count = count;
   }
 
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
+  }
+
+  public String getProcessDefinitionName() {
+    return processDefinitionName;
+  }
+
+  public void setProcessDefinitionName(String processDefinitionName) {
+    this.processDefinitionName = processDefinitionName;
+  }
+
+  public String getTaskName() {
+    return taskName;
+  }
+
+  public void setTaskName(String taskName) {
+    this.taskName = taskName;
+  }
+
+  @Override
   public String toString() {
     return this.getClass().getSimpleName()
-      + "[definition=" + definition
-      + ", count=" + count
-      + "]";
+    + "[" +
+      "definitionKey='" + definitionKey + '\'' +
+      ", count=" + count +
+      ", processDefinitionKey='" + processDefinitionKey + '\'' +
+      ", processDefinitionId='" + processDefinitionId + '\'' +
+      ", processDefinitionName='" + processDefinitionName + '\'' +
+      ", taskName='" + taskName + '\'' +
+      ']';
   }
 }

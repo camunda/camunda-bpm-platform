@@ -19,19 +19,27 @@
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.TaskReportResultEntity">
 
   <resultMap id="historicTaskReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.TaskReportResultEntity">
-    <result property="definition" column="DEF_" jdbcType="VARCHAR" />
+    <result property="definitionKey" column="DEF_KEY_" jdbcType="VARCHAR" />
     <result property="count" column="COUNT_" jdbcType="BIGINT" />
+    <result property="taskName" column="TASK_NAME_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionName" column="PROC_DEF_NAME_" jdbcType="VARCHAR" />
   </resultMap>
 
-  <select id="selectHistoricTaskInstanceCountByTaskDefKeyReport" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceReportImpl" resultMap="historicTaskReportResultMap">
+  <select id="selectHistoricTaskInstanceCountByTaskNameReport" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceReportImpl" resultMap="historicTaskReportResultMap">
     SELECT
       COUNT(DISTINCT(HTI.ID_)) AS COUNT_,
-     HTI.TASK_DEF_KEY_ AS DEF_
+      HTI.NAME_ AS TASK_NAME_,
+      HTI.TASK_DEF_KEY_ AS DEF_KEY_,
+      HTI.PROC_DEF_KEY_ AS PROC_DEF_KEY_,
+      MAX(PD.PROC_DEF_ID_) AS PROC_DEF_ID_,
+      MAX(PD.PROC_DEF_NAME_) AS PROC_DEF_NAME_
 
     <include refid="selectHistoricTaskInstancesForReportByCriteria" />
 
     GROUP BY
-      HTI.TASK_DEF_KEY_
+      HTI.NAME_, HTI.TASK_DEF_KEY_, HTI.PROC_DEF_KEY_
     ORDER BY
       HTI.TASK_DEF_KEY_ ASC
   </select>
@@ -39,7 +47,9 @@
   <select id="selectHistoricTaskInstanceCountByProcDefKeyReport" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceReportImpl" resultMap="historicTaskReportResultMap">
     SELECT
       COUNT(DISTINCT(HTI.ID_)) AS COUNT_,
-     HTI.PROC_DEF_KEY_ AS DEF_
+      HTI.PROC_DEF_KEY_ AS DEF_KEY_,
+      MAX(PD.PROC_DEF_ID_) AS PROC_DEF_ID_,
+      MAX(PD.PROC_DEF_NAME_) AS PROC_DEF_NAME_
 
     <include refid="selectHistoricTaskInstancesForReportByCriteria" />
 
@@ -51,7 +61,21 @@
 
   <sql id="selectHistoricTaskInstancesForReportByCriteria">
     FROM
-    ${prefix}ACT_HI_TASKINST HTI
+      ${prefix}ACT_HI_TASKINST HTI
+    INNER JOIN (
+      SELECT
+        MAX(PROC.ID_) AS PROC_DEF_ID_,
+        MAX(PROC.NAME_) AS PROC_DEF_NAME_,
+        PROC.KEY_ AS JOIN_KEY_
+      FROM
+        ACT_RE_PROCDEF PROC
+      GROUP BY
+        PROC.KEY_, PROC.VERSION_
+      ORDER BY
+        PROC.VERSION_ DESC
+    ) PD
+    ON
+      PD.JOIN_KEY_ = HTI.PROC_DEF_KEY_
     <where>
       HTI.END_TIME_ IS NOT NULL
 
