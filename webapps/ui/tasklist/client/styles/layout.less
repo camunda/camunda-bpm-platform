@@ -182,13 +182,15 @@ button {
 
 
 .column.tasks-list {
-  .content {
-    padding-top: 0;
-  }
   view {
     display: block;
-    overflow: visible;
-    padding: (@grid-gutter-width * 0.5) 0;
+  }
+  .content {
+    padding-top: 0;
+    view {
+      overflow: visible;
+      padding: (@grid-gutter-width * 0.5) 0;
+    }
   }
   [cam-widget-search] {
     margin: 0 (@grid-gutter-width * 0.5);
@@ -341,11 +343,17 @@ body.task-column-close [cam-widget-search].multiline-pills [cam-widget-search-pi
 
   .tasks-list {
     > .cell.top {
-      > div {
-        width: 100%;
+      > div,
+      > view {
+        width: ~"calc(100% - 35px)";
         margin-left: 0;
-        margin-right: -20px;
-        padding: 0 20px 0 0;
+        margin-right: 0;
+        padding: 0;
+      }
+      > view {
+        position: absolute;
+        overflow: visible;
+        display: block;
       }
     }
 

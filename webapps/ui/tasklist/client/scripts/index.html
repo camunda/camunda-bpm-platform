@@ -35,8 +35,9 @@
   <section class="column column-center tasks-list"
            ng-controller="camListCtrl">
     <header class="cell top">
-      <div cam-sorting-choices
-           tasklist-data="tasklistData"></div>
+      <view ng-repeat="tasklistHeaderPlugin in tasklistHeaderPlugins"
+            provider="tasklistHeaderPlugin"
+            vars="tasklistVars"></view>
 
       <button ng-click="toggleRegion($event)"
               data-region="list"

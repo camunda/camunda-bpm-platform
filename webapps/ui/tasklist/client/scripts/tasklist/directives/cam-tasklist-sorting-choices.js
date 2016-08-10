@@ -69,21 +69,22 @@ module.exports = [
 
           plannedRefresh = $timeout(function() {
             var columns = $(element).parents('.columns');
+            var viewElement = $(element).parents('view');
             var headers = columns.find('.cell.top');
             var bodies = columns.find('.cell.content');
             var shown = $bdy.hasClass('list-column-close');
-
-            element.css('height', 'auto');
+            var minHeight;
+            viewElement.css('height', 'auto');
 
             if (shown) {
-              var minHeight = parseInt(headers.css('min-height'), 10);
+              minHeight = parseInt(headers.css('min-height'), 10);
               headers.css('height', minHeight);
               bodies.css('top', minHeight);
               return;
             }
 
-            var height = $(element).height();
-            var columnTop = element.parent();
+            var height = viewElement.height();
+            var columnTop = viewElement.parent();
             $(columnTop).height(height);
             var columnTopHeight = height;
 
