@@ -6,9 +6,6 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     camTasklistListCtrl = require('./controller/cam-tasklist-list-ctrl'),
 
   /* directives */
-    camTasklistSortingChoices = require('./directives/cam-tasklist-sorting-choices'),
-    camTasklistSortingDropdown = require('./directives/cam-tasklist-sorting-dropdown'),
-    camTasklistSortingInputs = require('./directives/cam-tasklist-sorting-inputs'),
     camTasklistTasks = require('./directives/cam-tasklist-tasks'),
 
   /* filters */
@@ -25,9 +22,6 @@ var ngModule = angular.module('cam.tasklist.tasklist', [
 ngModule.controller('camListCtrl', camTasklistListCtrl);
 
   /* directives */
-ngModule.directive('camSortingChoices', camTasklistSortingChoices);
-ngModule.directive('camSortingDropdown', camTasklistSortingDropdown);
-ngModule.directive('camSortingInputs', camTasklistSortingInputs);
 ngModule.directive('camTasks', camTasklistTasks);
 
   /* filters */
