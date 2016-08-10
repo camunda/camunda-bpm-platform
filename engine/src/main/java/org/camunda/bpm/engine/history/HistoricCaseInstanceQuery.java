@@ -107,6 +107,9 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
   /** Only select historic case instances with one of the given tenant ids. */
   HistoricCaseInstanceQuery tenantIdIn(String... tenantIds);
 
+  /** Only selects historic case instances which have no tenant id. */
+  HistoricCaseInstanceQuery withoutTenantId();
+
   /** Only select historic case instances which are active */
   HistoricCaseInstanceQuery active();
 

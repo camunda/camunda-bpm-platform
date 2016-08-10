@@ -37,9 +37,11 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
 
   @Override
   protected void setUp() {
+    deployment(CMMN_FILE);
     deploymentForTenant(TENANT_ONE, CMMN_FILE);
     deploymentForTenant(TENANT_TWO, CMMN_FILE);
 
+    caseService.withCaseDefinitionByKey("oneTaskCase").caseDefinitionWithoutTenantId().create();
     createCaseInstance(TENANT_ONE);
     createCaseInstance(TENANT_TWO);
   }
@@ -48,7 +50,7 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
     HistoricCaseInstanceQuery query = historyService
         .createHistoricCaseInstanceQuery();
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count(), is(3L));
   }
 
   public void testQueryByTenantId() {
@@ -71,6 +73,14 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(2L));
+  }
+
+  public void testQueryByInstancesWithoutTenantId() {
+    HistoricCaseInstanceQuery query = historyService
+        .createHistoricCaseInstanceQuery()
+        .withoutTenantId();
+
+    assertThat(query.count(), is(1L));
   }
 
   public void testQueryByNonExistingTenantId() {
@@ -121,7 +131,7 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
     identityService.setAuthentication("user", null, null);
 
     HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery();
-    assertThat(query.count(), is(0L));
+    assertThat(query.count(), is(1L));
   }
 
   public void testQueryAuthenticatedTenant() {
@@ -129,7 +139,7 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
 
     HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery();
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count(), is(2L));
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
     assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count(), is(1L));
@@ -140,9 +150,10 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
 
     HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery();
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count(), is(3L));
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.withoutTenantId().count(), is(1L));
   }
 
   public void testQueryDisabledTenantCheck() {
@@ -150,7 +161,7 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
     identityService.setAuthentication("user", null, null);
 
     HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery();
-    assertThat(query.count(), is(2L));
+    assertThat(query.count(), is(3L));
   }
 
   protected void createCaseInstance(String tenantId) {

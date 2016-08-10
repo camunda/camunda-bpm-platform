@@ -912,6 +912,54 @@ public class HistoricCaseInstanceRestServiceQueryTest extends AbstractRestServic
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
   }
 
+  @Test
+  public void testWithoutTenantIdParameter() {
+    mockedQuery = setUpMockHistoricCaseInstanceQuery(Arrays.asList(MockProvider.createMockHistoricCaseInstance(null)));
+
+    Response response = given()
+      .queryParam("withoutTenantId", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_CASE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId1).isEqualTo(null);
+  }
+
+  @Test
+  public void testWithoutTenantIdPostParameter() {
+    mockedQuery = setUpMockHistoricCaseInstanceQuery(Arrays.asList(MockProvider.createMockHistoricCaseInstance(null)));
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("withoutTenantId", true);
+
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_CASE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).withoutTenantId();
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(1);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    assertThat(returnedTenantId1).isEqualTo(null);
+  }
+
   private List<HistoricCaseInstance> createMockHistoricCaseInstancesTwoTenants() {
     return Arrays.asList(
         MockProvider.createMockHistoricCaseInstance(MockProvider.EXAMPLE_TENANT_ID),

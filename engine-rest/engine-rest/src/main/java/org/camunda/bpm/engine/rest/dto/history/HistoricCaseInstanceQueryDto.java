@@ -12,14 +12,13 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import static java.lang.Boolean.TRUE;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
@@ -32,6 +31,9 @@ import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringSetConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -71,6 +73,7 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
   private String superProcessInstanceId;
   private String subProcessInstanceId;
   private List<String> tenantIds;
+  private Boolean withoutTenantId;
   public String createdBy;
 
   public Date createdBefore;
@@ -160,6 +163,11 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
   @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
   public void setTenantIdIn(List<String> tenantIds) {
     this.tenantIds = tenantIds;
+  }
+
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
   }
 
   @CamundaQueryParam("createdBy")
@@ -271,6 +279,9 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
+    if (TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
     }
     if (createdBy != null) {
       query.createdBy(createdBy);
