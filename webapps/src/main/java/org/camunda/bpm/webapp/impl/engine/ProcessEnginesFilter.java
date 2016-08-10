@@ -37,6 +37,8 @@ import org.camunda.bpm.webapp.impl.filter.AbstractTemplateFilter;
 import org.camunda.bpm.webapp.impl.security.SecurityActions;
 import org.camunda.bpm.webapp.impl.security.SecurityActions.SecurityAction;
 import org.camunda.bpm.webapp.plugin.spi.AppPlugin;
+import org.camunda.bpm.welcome.Welcome;
+import org.camunda.bpm.welcome.WelcomeRuntimeDelegate;
 
 /**
  *
@@ -51,8 +53,9 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
   protected static final String COCKPIT_APP_NAME = "cockpit";
   protected static final String ADMIN_APP_NAME = "admin";
   protected static final String TASKLIST_APP_NAME = "tasklist";
+  protected static final String WELCOME_APP_NAME = "welcome";
 
-  protected static final String DEFAULT_APP = TASKLIST_APP_NAME;
+  protected static final String DEFAULT_APP = WELCOME_APP_NAME;
   protected static final String INDEX_PAGE = "index.html";
 
   protected static final String SETUP_PAGE = "setup/";
@@ -68,6 +71,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
   protected final CockpitRuntimeDelegate cockpitRuntimeDelegate;
   protected final AdminRuntimeDelegate adminRuntimeDelegate;
   protected final TasklistRuntimeDelegate tasklistRuntimeDelegate;
+  protected final WelcomeRuntimeDelegate welcomeRuntimeDelegate;
 
   // accepts two times the plugin name
   protected final String pluginPackageFormat;
@@ -79,6 +83,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
     this.cockpitRuntimeDelegate = Cockpit.getRuntimeDelegate();
     this.adminRuntimeDelegate = Admin.getRuntimeDelegate();
     this.tasklistRuntimeDelegate = Tasklist.getRuntimeDelegate();
+    this.welcomeRuntimeDelegate = Welcome.getRuntimeDelegate();
     this.pluginPackageFormat = "{ name: '%s-plugin-%s', location: '%s/api/%s/plugin/%s/static/app', main: 'plugin.js' }";
     this.pluginDependencyFormat = "{ ngModuleName: '%s.plugin.%s', requirePackageName: '%s-plugin-%s' }";
   }
@@ -287,6 +292,9 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
 
     } else if (TASKLIST_APP_NAME.equals(appName)) {
         return (List<T>) tasklistRuntimeDelegate.getAppPluginRegistry().getPlugins();
+
+    } else if (WELCOME_APP_NAME.equals(appName)) {
+      return (List<T>) welcomeRuntimeDelegate.getAppPluginRegistry().getPlugins();
 
     } else {
       return Collections.emptyList();

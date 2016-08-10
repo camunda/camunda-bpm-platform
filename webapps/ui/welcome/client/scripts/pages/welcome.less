@@ -1,0 +1,40 @@
+.app-label-wrapper {
+  display: block;
+  position: relative;
+  margin: 0 auto;
+  max-width: 220px;
+  max-height: 220px;
+  overflow: hidden;
+
+  &:before {
+    content: '';
+    display: block;
+    padding-top: 100%;
+    background-position: center;
+    background-size: cover;
+  }
+}
+
+.app-name {
+  text-align: center;
+}
+
+.cockpit-app .app-label-wrapper:before {
+  background-image: url('../assets/images/cockpit.svg');
+}
+.tasklist-app .app-label-wrapper:before {
+  background-image: url('../assets/images/tasklist.svg');
+}
+.admin-app .app-label-wrapper:before {
+  background-image: url('../assets/images/admin.svg');
+}
+
+.app-user-docs {
+  margin-top: 5px;
+}
+
+.app-link {
+  overflow: hidden;
+  display: block;
+  margin-bottom: @grid-gutter-width * 0.5;
+}

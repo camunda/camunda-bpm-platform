@@ -1,0 +1,135 @@
+<div class="user-profile">
+  <div class="user-profile-display"
+       ng-if="!visibleForm">
+    <h3 class="section-title">
+      Your profile
+    </h3>
+
+    <ul class="action-links list-inline small pull-right">
+      <li><a ng-click="showForm('profile')">Edit profile</a></li>
+      <li><a ng-click="showForm('password')">Change password</a></li>
+    </ul>
+
+
+    <div class="user-profile-info">
+      <div class="user-profile-username">{{ user.id }}</div>
+      <div class="h3 user-profile-name">{{ user.firstName }} {{ user.lastName }}</div>
+      <div class="user-profile-email">{{ user.email }}</div>
+    </div>
+
+    <hr class="narrow"
+        ng-if="user.groups.length">
+
+    <div ng-if="user.groups.length">
+      <h4>Groups</h4>
+      <ul class="user-profile-groups">
+        <li ng-repeat="group in user.groups"
+            ng-class="'group-' + group.id + ' type-' + group.type.toLowerCase()">{{ group.name }}</li>
+      </ul>
+    </div>
+  </div>
+
+  <form name="userProfile"
+        class="user-profile"
+        ng-submit="submitProfile()"
+        ng-show="visibleForm === 'profile'">
+    <h3 class="section-title">Edit your profile</h3>
+
+    <div class="form-group">
+      <label for="user-profile-firstname">First name</label>
+      <input class="form-control"
+             id="user-profile-firstname"
+             type="text"
+             name="firstName"
+             required
+             ng-model="user.firstName"
+             placeholder="Jonny" />
+    </div>
+
+    <div class="form-group">
+      <label for="user-profile-lastname">Last name</label>
+      <input class="form-control"
+             id="user-profile-lastname"
+             type="text"
+             name="lastName"
+             required
+             ng-model="user.lastName"
+             placeholder="Prosciutto" />
+    </div>
+
+    <div class="form-group">
+      <label for="user-profile-email">Email</label>
+      <input class="form-control"
+             id="user-profile-email"
+             type="text"
+             name="email"
+             ng-model="user.email"
+             placeholder="j.prosciutto@acme.org" />
+    </div>
+
+    <div class="form-group actions row">
+      <div class="col-xs-6">
+        <button type="button"
+                class="btn btn-link"
+                ng-click="showForm()">Cancel</button>
+      </div>
+      <div class="col-xs-6 text-right">
+        <button type="submit"
+                ng-disabled="userProfile.$invalid || userProfile.$pristine || processing"
+                class="btn btn-primary">Update</button>
+      </div>
+    </div>
+  </form>
+
+
+
+  <form name="changePassword"
+        class="change-password"
+        ng-submit="submitPassword()"
+        ng-show="visibleForm === 'password'">
+    <h3 class="section-title">Change your password</h3>
+
+    <div class="form-group">
+      <label for="user-password-current">Current password</label>
+      <input class="form-control"
+             id="user-password-current"
+             type="password"
+             name="current"
+             required
+             ng-model="password.current" />
+    </div>
+
+    <div class="form-group">
+      <label for="user-password-new">New password</label>
+      <input class="form-control"
+             id="user-password-new"
+             type="password"
+             name="new"
+             required
+             ng-model="password.new" />
+    </div>
+
+    <div class="form-group">
+      <label for="user-password-confirmation">Confirm new password</label>
+      <input class="form-control"
+             id="user-password-confirmation"
+             type="password"
+             name="confirmation"
+             required
+             ng-model="password.confirmation" />
+    </div>
+
+    <div class="form-group actions row">
+      <div class="col-xs-6">
+        <button type="button"
+                class="btn btn-link"
+                ng-click="showForm()">Cancel</button>
+      </div>
+      <div class="col-xs-6 text-right">
+        <button type="submit"
+                ng-disabled="changePassword.$invalid || changePassword.$pristine || processing || password.new !== password.confirmation"
+                class="btn btn-primary">Change password</button>
+      </div>
+    </div>
+  </form>
+</div>

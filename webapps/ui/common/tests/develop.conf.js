@@ -7,7 +7,7 @@ global.expect   = chai.expect;
 
 var bail = typeof process.env.TEST_BAIL !== 'undefined';
 var tested = process.env.TESTED || '*';
-var testedApp = process.env.TESTED_APP || 'admin,tasklist,cockpit';
+var testedApp = process.env.TESTED_APP || 'admin,tasklist,cockpit,hub';
 testedApp = testedApp.indexOf(',') > -1 ? ('{' + testedApp + '}') : testedApp;
 
 var specsPath = '../../'+ testedApp +'/tests/specs/' + tested + '-spec.js';

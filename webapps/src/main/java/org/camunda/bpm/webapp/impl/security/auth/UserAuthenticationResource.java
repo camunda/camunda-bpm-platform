@@ -51,7 +51,7 @@ public class UserAuthenticationResource {
 
   public static final String PATH = "/auth/user";
 
-  private static final String[] APPS = new String[] { "cockpit", "tasklist" };
+  private static final String[] APPS = new String[] { "cockpit", "tasklist", "admin"};
 
   @Context
   protected HttpServletRequest request;
@@ -105,7 +105,7 @@ public class UserAuthenticationResource {
       AuthorizationService authorizationService = processEngine.getAuthorizationService();
 
       HashSet<String> authorizedApps = new HashSet<String>();
-      authorizedApps.add("admin");
+      authorizedApps.add("welcome");
 
       if (processEngine.getProcessEngineConfiguration().isAuthorizationEnabled()) {
         for (String application: APPS) {
