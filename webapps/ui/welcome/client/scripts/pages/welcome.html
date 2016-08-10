@@ -1,0 +1,68 @@
+<div class="row welcome-page">
+  <div class="col-sm-8 col-xs-12">
+    <section ng-init="authorized = $root.authentication.authorizedApps"
+             class="webapps">
+      <div class="inner"
+           ng-init="cols = columnWidth()">
+        <div class="row">
+          <div class="col-xs-12">
+            <h3 class="section-title">Your apps</h3>
+          </div>
+        </div>
+
+
+
+
+        <div class="row">
+          <div ng-if="canAccessApp('cockpit')"
+               ng-class="'col-xs-' + cols"
+               class="cockpit-app">
+            <a class="app-label-wrapper"
+               href="./../../cockpit/default/#">
+            </a>
+            <h3 class="app-name">
+              <a href="./../../cockpit/default/#">Cockpit</a>
+            </h3>
+          </div>
+
+
+          <div ng-if="canAccessApp('tasklist')"
+               ng-class="'col-xs-' + cols"
+               class="tasklist-app">
+            <a class="app-label-wrapper"
+               href="./../../tasklist/default/#">
+            </a>
+            <h3 class="app-name">
+              <a href="./../../tasklist/default/#">Tasklist</a>
+            </h3>
+          </div>
+
+
+          <div ng-if="canAccessApp('admin')"
+               ng-class="'col-xs-' + cols"
+               class="admin-app">
+            <a class="app-label-wrapper"
+               href="./../../admin/default/#">
+            </a>
+            <h3 class="app-name">
+              <a href="./../../admin/default/#">Admin</a>
+            </h3>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="inner" custom-links></div>
+    </section>
+  </div>
+
+
+  <section class="col-sm-4 col-xs-12"
+           id="user-profile">
+    <div class="inner">
+      <div user-profile
+           username="$root.authentication.name"></div>
+    </div>
+  </section>
+</div>

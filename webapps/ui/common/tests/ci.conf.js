@@ -30,7 +30,7 @@ exports.config = {
   // Spec patterns are relative to the location of the spec file. They may
   // include glob patterns.
   specs: [
-    '../../{admin,tasklist,cockpit}/tests/specs/' + tested + '-spec.js'
+    '../../{admin,tasklist,cockpit,hub}/tests/specs/' + tested + '-spec.js'
   ],
 
   // A base URL for your application under test. Calls to protractor.get()

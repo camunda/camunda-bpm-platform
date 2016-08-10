@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.admin.impl.web.SetupResource;
@@ -44,14 +45,25 @@ public class DevProcessApplication extends ServletProcessApplication {
   private final static Logger LOGGER = Logger.getLogger(DevProcessApplication.class.getName());
 
   @PostDeploy
-  public void startProcesses(ProcessEngine engine) throws Exception {
+  public void startProcesses(final ProcessEngine engine) throws Exception {
     createAdminDemoData(engine);
     createTasklistDemoData(engine);
-    createReportDemoData(engine);
-    createCockpitDemoData(engine);
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          createReportDemoData(engine);
+          createCockpitDemoData(engine);
+          LOGGER.info("Done generating demo data.");
+        }
+        catch(Exception e) {
+          LOGGER.log(Level.WARNING, "Exception while generating demo data", e);
+        }
+      }
+    }.start();
   }
 
-  private void createCockpitDemoData(final ProcessEngine engine) throws Exception {
+  protected void createCockpitDemoData(final ProcessEngine engine) throws Exception {
     RuntimeService runtimeService = engine.getRuntimeService();
 
     Map<String, Object> vars1 = new HashMap<String, Object>();

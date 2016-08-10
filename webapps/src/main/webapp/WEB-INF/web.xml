@@ -19,6 +19,11 @@
     <listener-class>org.camunda.bpm.tasklist.impl.web.bootstrap.TasklistContainerBootstrap</listener-class>
   </listener>
 
+  <!-- welcome bootstrap listener -->
+  <listener>
+    <listener-class>org.camunda.bpm.welcome.impl.web.bootstrap.WelcomeContainerBootstrap</listener-class>
+  </listener>
+
   <!-- Authentication filter -->
   <filter>
     <filter-name>Authentication Filter</filter-name>

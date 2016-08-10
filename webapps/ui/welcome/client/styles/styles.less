@@ -1,0 +1,57 @@
+@import "./_app-variables";
+@import "./../../../common/styles/cam-webapps-common.less";
+
+
+/* ---------------------------------------------------------------- */
+
+.page-header{
+  margin: 0 (@grid-gutter-width * 0.5);
+  border: none;
+}
+
+/* ---------------------------------------------------------------- */
+/*
+form .form-control,
+form .form-control-static,
+form .btn {
+  font-size: 18px;
+}
+*/
+/* ---------------------------------------------------------------- */
+
+.welcome-page {
+  background-color: @custom-gray-light;
+  position: absolute;
+  min-height: ~"calc(100% - (@{header-height} + @{footer-height}))";
+  width: 100%;
+  // padding-top: @grid-gutter-width;
+  // padding-bottom: @grid-gutter-width;
+  // padding: (@grid-gutter-width * 0.5) @grid-gutter-width;
+
+  section {
+    padding-top: @grid-gutter-width * 0.5;
+    padding-bottom: @grid-gutter-width * 0.5;
+    > .inner {
+      background-color: @body-bg;
+      padding: @grid-gutter-width * 0.5;
+    }
+  }
+  .section-title {
+    font-size: 2em;
+    margin-top: 5px;
+    padding-bottom: 10px;
+    font-weight: 100;
+    margin-bottom: @grid-gutter-width * 0.5;
+    border-bottom: 1px solid @custom-gray-light;
+  }
+}
+
+
+/* ---------------------------------------------------------------- */
+
+@import "./../scripts/pages/welcome";
+
+/* ---------------------------------------------------------------- */
+
+@import "./../scripts/directives/user-profile";
+@import "./../scripts/directives/custom-links";

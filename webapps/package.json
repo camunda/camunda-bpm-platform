@@ -5,6 +5,8 @@
   "gruntConfig": {
     "connectPort": 8020,
     "livereloadPort": 8021,
+    "welcomeBuildTarget": "target/webapp/app/welcome",
+    "welcomeSourceDir": "ui/welcome/client",
     "adminBuildTarget": "target/webapp/app/admin",
     "adminSourceDir": "ui/admin/client",
     "cockpitBuildTarget": "target/webapp/app/cockpit",
