@@ -8,8 +8,8 @@
       <span class="value">{{ count.unfinished | abbreviateNumber }}</span>
     </li>
     <li>
-      <a href="#/tasks" ng-if="count.finished == 0 || count.finished > 1">Completed tasks</a>
-      <a href="#/tasks" ng-if="count.finished == 1">Completed task</a>
+      <a href="#/tasks?searchQuery={{ finishedSearchQuery() }}" ng-if="count.finished == 0 || count.finished > 1">Completed tasks</a>
+      <a href="#/tasks?searchQuery={{ finishedSearchQuery() }}" ng-if="count.finished == 1">Completed task</a>
       <span class="value">{{ count.finished | abbreviateNumber }}</span>
     </li>
   </ul>

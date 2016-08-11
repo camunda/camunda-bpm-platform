@@ -32,6 +32,17 @@ module.exports = [
 
           var HistoryResource = camAPI.resource('history');
 
+          $scope.finishedSearchQuery = function() {
+            var searchObject = [{
+              type: 'TAfinished',
+              operator: 'eq',
+              value: '',
+              name: ''
+            }];
+
+            return encodeURI(JSON.stringify(searchObject));
+          };
+
           series({
             unfinished: function(cb) {
               HistoryResource.taskCount({ unfinished: true }, function(err, data) {
