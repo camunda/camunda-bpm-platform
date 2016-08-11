@@ -19,8 +19,8 @@
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.TaskReportResultEntity">
 
   <resultMap id="historicTaskReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.TaskReportResultEntity">
-    <result property="definitionKey" column="DEF_KEY_" jdbcType="VARCHAR" />
     <result property="count" column="COUNT_" jdbcType="BIGINT" />
+    <result property="taskDefinitionKey" column="TASK_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="taskName" column="TASK_NAME_" jdbcType="VARCHAR" />
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
@@ -31,7 +31,7 @@
     SELECT
       COUNT(DISTINCT(HTI.ID_)) AS COUNT_,
       HTI.NAME_ AS TASK_NAME_,
-      HTI.TASK_DEF_KEY_ AS DEF_KEY_,
+      HTI.TASK_DEF_KEY_ AS TASK_DEF_KEY_,
       HTI.PROC_DEF_KEY_ AS PROC_DEF_KEY_,
       MAX(PD.PROC_DEF_ID_) AS PROC_DEF_ID_,
       MAX(PD.PROC_DEF_NAME_) AS PROC_DEF_NAME_
@@ -47,7 +47,7 @@
   <select id="selectHistoricTaskInstanceCountByProcDefKeyReport" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceReportImpl" resultMap="historicTaskReportResultMap">
     SELECT
       COUNT(DISTINCT(HTI.ID_)) AS COUNT_,
-      HTI.PROC_DEF_KEY_ AS DEF_KEY_,
+      HTI.PROC_DEF_KEY_ AS PROC_DEF_KEY_,
       MAX(PD.PROC_DEF_ID_) AS PROC_DEF_ID_,
       MAX(PD.PROC_DEF_NAME_) AS PROC_DEF_NAME_
 

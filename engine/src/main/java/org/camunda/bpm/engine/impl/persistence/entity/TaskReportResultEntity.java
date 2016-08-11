@@ -19,23 +19,23 @@ import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
  */
 public class TaskReportResultEntity implements HistoricTaskInstanceReportResult {
 
-  protected String definitionKey;
+  protected String taskDefinitionKey;
   protected Long count;
   protected String processDefinitionKey;
   protected String processDefinitionId;
   protected String processDefinitionName;
   protected String taskName;
 
-  public String getDefinitionKey() {
-    return definitionKey;
+  public String getTaskDefinitionKey() {
+    return taskDefinitionKey;
+  }
+
+  public void setTaskDefinitionKey(String taskDefinitionKey) {
+    this.taskDefinitionKey = taskDefinitionKey;
   }
 
   public Long getCount() {
     return count;
-  }
-
-  public void setDefinitionKey(String definitionKey) {
-    this.definitionKey = definitionKey;
   }
 
   public void setCount(Long count) {
@@ -78,7 +78,7 @@ public class TaskReportResultEntity implements HistoricTaskInstanceReportResult 
   public String toString() {
     return this.getClass().getSimpleName()
     + "[" +
-      "definitionKey='" + definitionKey + '\'' +
+      "taskDefinitionKey='" + taskDefinitionKey + '\'' +
       ", count=" + count +
       ", processDefinitionKey='" + processDefinitionKey + '\'' +
       ", processDefinitionId='" + processDefinitionId + '\'' +

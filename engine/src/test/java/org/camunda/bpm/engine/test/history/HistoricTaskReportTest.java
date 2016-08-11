@@ -124,7 +124,8 @@ public class HistoricTaskReportTest {
     assertTrue(historicTaskInstanceReportResults.get(0).getProcessDefinitionId().contains(":1:"));
     assertEquals("name_" + ANOTHER_PROCESS_DEFINITION_KEY, historicTaskInstanceReportResults.get(0).getProcessDefinitionName());
 
-    assertNull(historicTaskInstanceReportResults.get(0).getProcessDefinitionKey());
+    assertNull(historicTaskInstanceReportResults.get(0).getTaskDefinitionKey());
+    assertEquals(ANOTHER_PROCESS_DEFINITION_KEY, historicTaskInstanceReportResults.get(0).getProcessDefinitionKey());
   }
 
   @Test

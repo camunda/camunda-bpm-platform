@@ -32,6 +32,7 @@ import java.util.List;
 public class HistoricTaskInstanceReportQueryDto extends AbstractReportDto<HistoricTaskInstanceReport> {
 
   public static final String PROCESS_DEFINITION = "processDefinition";
+  public static final String TASK_NAME = "taskName";
 
   protected Date completedBefore;
   protected Date completedAfter;
@@ -97,8 +98,10 @@ public class HistoricTaskInstanceReportQueryDto extends AbstractReportDto<Histor
 
     if(PROCESS_DEFINITION.equals(groupby)) {
       return reportQuery.countByProcessDefinitionKey();
-    } else {
+    } else if( TASK_NAME.equals(groupby) ){
       return reportQuery.countByTaskName();
+    } else {
+      throw new InvalidRequestException(Response.Status.BAD_REQUEST, "groupBy parameter has invalid value: " + groupby);
     }
   }
 }

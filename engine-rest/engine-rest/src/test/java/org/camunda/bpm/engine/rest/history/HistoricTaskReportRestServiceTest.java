@@ -108,6 +108,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
 
     given()
       .queryParam("reportType", "count")
+      .queryParam("groupBy", "taskName")
     .then()
       .expect()
         .statusCode(Status.FORBIDDEN.getStatusCode())
@@ -141,11 +142,12 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
   public void testTaskCountReport() {
     given()
       .queryParam("reportType", "count")
+      .queryParam("groupBy", "taskName")
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
-        .body("[0].definition", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION))
+        .body("[0].taskDefinitionKey", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION))
         .body("[0].count", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_COUNT.intValue()))
     .when()
       .get(TASK_REPORT_URL);
@@ -158,6 +160,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
   public void testTaskCountReportWithCompletedBefore() {
     given()
       .queryParam("reportType", "count")
+      .queryParam("groupBy", "taskName")
       .queryParam("completedBefore", EXAMPLE_HISTORIC_TASK_END_TIME)
     .then()
       .expect()
@@ -175,6 +178,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
   public void testTaskCountReportWithCompletedAfter() {
     given()
       .queryParam("reportType", "count")
+      .queryParam("groupBy", "taskName")
       .queryParam("completedAfter", EXAMPLE_HISTORIC_TASK_START_TIME)
     .then()
       .expect()
@@ -244,7 +248,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
   public void testTaskCountReportWithGroupByTaskDef() {
     given()
       .queryParam("reportType", "count")
-      .queryParam("groupBy", "taskDefinition")
+      .queryParam("groupBy", "taskName")
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -258,19 +262,16 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
 
   @Test
   public void testTaskCountReportWithGroupByAnyDef() {
-    // should return same definitions as task definition
     given()
       .queryParam("reportType", "count")
       .queryParam("groupBy", "anotherDefinition")
     .then()
       .expect()
-        .statusCode(Status.OK.getStatusCode())
-        .contentType(ContentType.JSON)
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("groupBy parameter has invalid value: anotherDefinition"))
     .when()
       .get(TASK_REPORT_URL);
-
-    verify(mockedReportQuery).countByTaskName();
-    verifyNoMoreInteractions(mockedReportQuery);
   }
 
   @Test
@@ -284,11 +285,11 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
-        .body("[0].definition", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION))
         .body("[0].count", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_COUNT.intValue()))
+        .body("[0].taskDefinitionKey", equalTo(null))
         .body("[0].processDefinitionId", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID))
         .body("[0].processDefinitionName", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME))
-        .body("[0].processDefinitionKey", equalTo(null))
+        .body("[0].processDefinitionKey", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION))
         .body("[0].taskName", equalTo(null))
     .when()
       .get(TASK_REPORT_URL);
@@ -303,13 +304,14 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
   public void testTaskCountWithAllParametersGroupByTask() {
     given()
       .queryParam("reportType", "count")
+      .queryParam("groupBy", "taskName")
       .queryParam("completedBefore", EXAMPLE_HISTORIC_TASK_INST_END_TIME)
       .queryParam("completedAfter", EXAMPLE_HISTORIC_TASK_INST_START_TIME)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
-        .body("[0].definition", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION))
+        .body("[0].taskDefinitionKey", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION))
         .body("[0].count", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_COUNT.intValue()))
         .body("[0].processDefinitionId", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID))
         .body("[0].processDefinitionName", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME))
@@ -365,12 +367,12 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
   public void testWrongReportType() {
     given()
       .queryParam("reportType", "abc")
-      .then()
+    .then()
       .expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("Cannot set query parameter 'reportType' to value 'abc'"))
-      .when()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Cannot set query parameter 'reportType' to value 'abc'"))
+    .when()
       .get(TASK_REPORT_URL);
   }
 

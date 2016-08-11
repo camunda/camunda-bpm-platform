@@ -943,7 +943,7 @@ public abstract class MockProvider {
   public static List<HistoricTaskInstanceReportResult> createMockHistoricTaskInstanceReport() {
     HistoricTaskInstanceReportResult mock = mock(HistoricTaskInstanceReportResult.class);
     when(mock.getCount()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_COUNT);
-    when(mock.getDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION);
+    when(mock.getTaskDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION);
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID);
     when(mock.getProcessDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION);
     when(mock.getProcessDefinitionName()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME);
@@ -955,9 +955,9 @@ public abstract class MockProvider {
   public static List<HistoricTaskInstanceReportResult> createMockHistoricTaskInstanceReportWithProcDef() {
     HistoricTaskInstanceReportResult mock = mock(HistoricTaskInstanceReportResult.class);
     when(mock.getCount()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_COUNT);
-    when(mock.getDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION);
+    when(mock.getTaskDefinitionKey()).thenReturn(null);
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID);
-    when(mock.getProcessDefinitionKey()).thenReturn(null);
+    when(mock.getProcessDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION);
     when(mock.getProcessDefinitionName()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME);
     when(mock.getTaskName()).thenReturn(null);
 

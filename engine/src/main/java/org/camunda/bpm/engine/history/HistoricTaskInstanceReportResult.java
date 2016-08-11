@@ -8,11 +8,9 @@ public interface HistoricTaskInstanceReportResult {
   /**
    * <p>Returns the selected definition key.</p>
    *
-   * @return A task definition key or a process definition key. The result depends how the query was triggered.
-   *         When the query is triggered with a 'countByProcessDefinitionKey' then the returned value will be a
-   *         process definition key. Else the return value is a task definition key
+   * @return A task definition key when the query is triggered with a 'countByTaskName'. Else the return value is null.
    */
-  String getDefinitionKey();
+  String getTaskDefinitionKey();
 
   /**
    * <p>Returns the count of the grouped items.</p>
@@ -21,9 +19,6 @@ public interface HistoricTaskInstanceReportResult {
 
   /**
    * <p>Returns the process definition key for the selected definition key.</p>
-   *
-   * @return A process definition key when the query is triggered with a 'countByTaskName'. Else the return
-   * value is null.
    */
   String getProcessDefinitionKey();
 
