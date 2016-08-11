@@ -1342,10 +1342,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       }
       String parentId = execution.getParentId();
       ExecutionEntity parent = executionsMap.get(parentId);
-      if (parent == null) {
-        throw LOG.resolveParentOfExecutionFailedException(execution.getId(), parentId);
-      }
-
       if (!execution.isProcessInstanceExecution()) {
         execution.processInstance = this;
         execution.parent = parent;

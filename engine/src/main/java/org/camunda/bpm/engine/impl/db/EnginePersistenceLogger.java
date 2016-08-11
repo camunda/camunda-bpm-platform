@@ -603,14 +603,4 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         ));
   }
 
-  public ProcessEngineException resolveParentOfExecutionFailedException(String parentId, String executionId) {
-    return new ProcessEngineException(exceptionMessage(
-        "077",
-        "Cannot resolve parent with id '{}' of execution '{}', perhaps it was deleted in the meantime",
-        parentId,
-        executionId
-        ));
-  }
-
-
 }
