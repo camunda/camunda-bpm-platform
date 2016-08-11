@@ -38,7 +38,7 @@ module.exports = Page.extend({
   },
 
   cmmnDiagramFormElement: function() {
-    return element(by.css('.cmmn-resource'));
+    return element(by.css('[cam-widget-cmmn-viewer]'));
   },
 
   imageFormElement: function() {
