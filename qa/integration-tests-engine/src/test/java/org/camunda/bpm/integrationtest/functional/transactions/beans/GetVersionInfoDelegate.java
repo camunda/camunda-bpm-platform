@@ -1,4 +1,4 @@
-package org.camunda.bpm.integrationtest.functional.transactions;
+package org.camunda.bpm.integrationtest.functional.transactions.beans;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;

@@ -10,30 +10,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.management.Metrics;
+import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
 
-/**
- * @author Thorben Lindhauer
- *
- */
-public class SuccessfulJobListener implements Command<Void> {
+public class JobFailureCollector implements CommandContextListener {
 
-  public Void execute(CommandContext commandContext) {
-    logJobSuccess(commandContext);
+  protected Throwable failure;
 
-    return null;
+  public void setFailure(Throwable failure) {
+    // log failure if not already present
+    if (this.failure == null) {
+      this.failure = failure;
+    }
   }
 
-  protected void logJobSuccess(CommandContext commandContext) {
-    if (commandContext.getProcessEngineConfiguration().isMetricsEnabled()) {
-      commandContext.getProcessEngineConfiguration()
-        .getMetricsRegistry()
-        .markOccurrence(Metrics.JOB_SUCCESSFUL);
-    }
+  public Throwable getFailure() {
+    return failure;
+  }
+
+  @Override
+  public void onCommandFailed(CommandContext commandContext, Throwable t) {
+    setFailure(t);
+  }
+
+  @Override
+  public void onCommandContextClose(CommandContext commandContext) {
+    // ignore
   }
 
 }
