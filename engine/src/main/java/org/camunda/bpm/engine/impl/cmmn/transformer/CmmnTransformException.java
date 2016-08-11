@@ -13,12 +13,12 @@
 
 package org.camunda.bpm.engine.impl.cmmn.transformer;
 
-import org.camunda.bpm.dmn.engine.DmnEngineException;
+import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * Exception throw for errors during the transformation of a cmmn model.
  */
-public class CmmnTransformException extends DmnEngineException {
+public class CmmnTransformException extends ProcessEngineException {
 
   private static final long serialVersionUID = 1L;
 
