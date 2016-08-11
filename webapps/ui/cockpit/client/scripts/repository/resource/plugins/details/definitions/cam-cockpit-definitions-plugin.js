@@ -1,5 +1,7 @@
 'use strict';
 
+var angular = require('camunda-commons-ui/vendor/angular');
+
 var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-cockpit-definitions-plugin.html', 'utf8');
@@ -26,6 +28,14 @@ var Controller = [
     var CaseInstance = camAPI.resource('case-instance');
 
     var resource;
+
+    $scope.hasCasePlugin = false;
+    try {
+      $scope.hasCasePlugin = !!angular.module('cockpit.plugin.case');
+    }
+    catch (e) {
+      // do nothing
+    }
 
     // observe //////////////////////////////////////////////////////
 
@@ -107,6 +117,9 @@ var Controller = [
         }
         else if (isDmnResource(resource)) {
           path = 'decision-definition';
+        }
+        else if (isCmmnResource(resource)) {
+          path = 'case-definition';
         }
 
         return '#/' + path + '/' + definition.id;
