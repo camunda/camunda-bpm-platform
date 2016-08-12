@@ -147,8 +147,11 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
-        .body("[0].taskDefinitionKey", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION))
         .body("[0].count", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_COUNT.intValue()))
+        .body("[0].processDefinitionId", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID))
+        .body("[0].processDefinitionName", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME))
+        .body("[0].processDefinitionKey", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION))
+        .body("[0].taskName", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_TASK_NAME))
     .when()
       .get(TASK_REPORT_URL);
 
@@ -286,7 +289,6 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
         .body("[0].count", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_COUNT.intValue()))
-        .body("[0].taskDefinitionKey", equalTo(null))
         .body("[0].processDefinitionId", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID))
         .body("[0].processDefinitionName", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME))
         .body("[0].processDefinitionKey", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION))
@@ -311,7 +313,6 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
-        .body("[0].taskDefinitionKey", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION))
         .body("[0].count", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_COUNT.intValue()))
         .body("[0].processDefinitionId", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID))
         .body("[0].processDefinitionName", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME))

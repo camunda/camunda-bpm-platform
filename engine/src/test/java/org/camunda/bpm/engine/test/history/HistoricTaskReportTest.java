@@ -94,13 +94,13 @@ public class HistoricTaskReportTest {
       .countByTaskName();
 
     // then
-    assertEquals(3, historicTaskInstanceReportResults.size());
+    assertEquals(2, historicTaskInstanceReportResults.size());
     assertEquals(2, historicTaskInstanceReportResults.get(0).getCount(), 0);
     assertEquals(ANOTHER_PROCESS_DEFINITION_KEY, historicTaskInstanceReportResults.get(0).getProcessDefinitionKey());
     assertEquals("name_" + ANOTHER_PROCESS_DEFINITION_KEY, historicTaskInstanceReportResults.get(0).getProcessDefinitionName());
     assertEquals(ANOTHER_PROCESS_DEFINITION_KEY + " Task 1", historicTaskInstanceReportResults.get(0).getTaskName());
 
-    assertTrue(historicTaskInstanceReportResults.get(2).getProcessDefinitionId().contains(":2:"));
+    assertTrue(historicTaskInstanceReportResults.get(1).getProcessDefinitionId().contains(":2:"));
   }
 
   @Test
@@ -124,7 +124,6 @@ public class HistoricTaskReportTest {
     assertTrue(historicTaskInstanceReportResults.get(0).getProcessDefinitionId().contains(":1:"));
     assertEquals("name_" + ANOTHER_PROCESS_DEFINITION_KEY, historicTaskInstanceReportResults.get(0).getProcessDefinitionName());
 
-    assertNull(historicTaskInstanceReportResults.get(0).getTaskDefinitionKey());
     assertEquals(ANOTHER_PROCESS_DEFINITION_KEY, historicTaskInstanceReportResults.get(0).getProcessDefinitionKey());
   }
 

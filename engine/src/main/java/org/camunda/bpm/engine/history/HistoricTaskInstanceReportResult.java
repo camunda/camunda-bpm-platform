@@ -6,13 +6,6 @@ package org.camunda.bpm.engine.history;
 public interface HistoricTaskInstanceReportResult {
 
   /**
-   * <p>Returns the selected definition key.</p>
-   *
-   * @return A task definition key when the query is triggered with a 'countByTaskName'. Else the return value is null.
-   */
-  String getTaskDefinitionKey();
-
-  /**
    * <p>Returns the count of the grouped items.</p>
    */
   Long getCount();
