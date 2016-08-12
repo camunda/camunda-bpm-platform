@@ -17,12 +17,8 @@ import org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener;
 import org.camunda.bpm.engine.impl.calendar.DurationHelper;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.*;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -115,6 +111,11 @@ public class FoxJobRetryCmd extends JobRetryCmd {
       if (processDefinition != null) {
         activity = processDefinition.getInitial();
       }
+
+    } else if (TimerStartEventSubprocessJobHandler.TYPE.equals(type)) {
+      DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
+      ProcessDefinitionEntity processDefinitionEntity = deploymentCache.getProcessDefinitionCache().get(job.getProcessDefinitionId());
+      activity = processDefinitionEntity.findActivity(job.getActivityId());
 
     } else if (AsyncContinuationJobHandler.TYPE.equals(type)) {
       ExecutionEntity execution = fetchExecutionEntity(job.getExecutionId());

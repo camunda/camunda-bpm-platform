@@ -188,7 +188,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void FAILING_testRetryOnTimerStartEventInEventSubProcess() {
+  public void testRetryOnTimerStartEventInEventSubProcess() {
     runtimeService.startProcessInstanceByKey("process").getId();
 
     Job job = managementService.createJobQuery().singleResult();
