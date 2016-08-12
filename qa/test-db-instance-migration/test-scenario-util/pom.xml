@@ -11,6 +11,26 @@
   <packaging>jar</packaging>
   <name>camunda BPM - QA - upgrade - instance migration - scenario util</name>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.camunda.bpm.model</groupId>
+        <artifactId>camunda-bpmn-model</artifactId>
+        <version>7.2.0</version>
+    </dependency>    
+    <dependency>
+      <groupId>org.camunda.bpm.model</groupId>
+      <artifactId>camunda-cmmn-model</artifactId>
+      <version>7.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm.model</groupId>
+      <artifactId>camunda-xml-model</artifactId>
+      <version>7.2.0</version>
+    </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
 
     <dependency>
