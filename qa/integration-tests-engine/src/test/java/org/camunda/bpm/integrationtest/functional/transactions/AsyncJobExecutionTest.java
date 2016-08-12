@@ -2,7 +2,6 @@ package org.camunda.bpm.integrationtest.functional.transactions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
@@ -70,11 +69,8 @@ public class AsyncJobExecutionTest extends AbstractFoxPlatformIntegrationTest {
 
     assertNotNull(job);
     assertEquals(0, job.getRetries());
-    assertEquals("Unable to commit transaction", job.getExceptionMessage());
-
-    String stacktrace = managementService.getJobExceptionStacktrace(job.getId());
-    assertNotNull(stacktrace);
-    assertTrue("unexpected stacktrace, was <" + stacktrace + ">", stacktrace.contains("Caused by: java.lang.Throwable: setRollbackOnly"));
+    assertNotNull(job.getExceptionMessage());
+    assertNotNull(managementService.getJobExceptionStacktrace(job.getId()));
   }
 
   @Test
@@ -82,17 +78,14 @@ public class AsyncJobExecutionTest extends AbstractFoxPlatformIntegrationTest {
 
     runtimeService.startProcessInstanceByKey("txRollbackServiceTaskWithCustomRetryCycle");
 
-    waitForJobExecutorToProcessAllJobs(10000);
+    waitForJobExecutorToProcessAllJobs(20000);
 
     Job job = managementService.createJobQuery().singleResult();
 
     assertNotNull(job);
     assertEquals(0, job.getRetries());
-    assertEquals("Unable to commit transaction", job.getExceptionMessage());
-
-    String stacktrace = managementService.getJobExceptionStacktrace(job.getId());
-    assertNotNull(stacktrace);
-    assertTrue("unexpected stacktrace, was <" + stacktrace + ">", stacktrace.contains("Caused by: java.lang.Throwable: setRollbackOnly"));
+    assertNotNull(job.getExceptionMessage());
+    assertNotNull(managementService.getJobExceptionStacktrace(job.getId()));
   }
 
   @Test
@@ -106,11 +99,8 @@ public class AsyncJobExecutionTest extends AbstractFoxPlatformIntegrationTest {
 
     assertNotNull(job);
     assertEquals(0, job.getRetries());
-    assertEquals("Unable to commit transaction", job.getExceptionMessage());
-
-    String stacktrace = managementService.getJobExceptionStacktrace(job.getId());
-    assertNotNull(stacktrace);
-    assertTrue("unexpected stacktrace, was <" + stacktrace + ">", stacktrace.contains("Caused by: java.lang.RuntimeException: exception in transaction listener"));
+    assertNotNull(job.getExceptionMessage());
+    assertNotNull(managementService.getJobExceptionStacktrace(job.getId()));
   }
 
 }
