@@ -72,7 +72,7 @@ public class DbSqlSessionFactory implements SessionFactory {
 
   static {
 
-    String defaultOrderBy = " order by ${orderBy} ";
+    String defaultOrderBy = " order by ${orderByColumns} ";
 
     // h2
     databaseSpecificLimitBeforeStatements.put(H2, "");
@@ -229,10 +229,10 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBeforeStatements.put(DB2, "SELECT SUB.* FROM (");
     databaseSpecificInnerLimitAfterStatements.put(DB2, ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
     databaseSpecificLimitAfterStatements.put(DB2, databaseSpecificInnerLimitAfterStatements.get(DB2) + " ORDER BY SUB.rnk");
-    databaseSpecificLimitBetweenStatements.put(DB2, ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select distinct RES.* ");
-    databaseSpecificLimitBetweenFilterStatements.put(DB2, ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select distinct RES.ID_, RES.REV_, RES.RESOURCE_TYPE_, RES.NAME_, RES.OWNER_ ");
+    databaseSpecificLimitBetweenStatements.put(DB2, ", row_number() over (ORDER BY ${orderByColumns}) rnk FROM ( select distinct RES.* ");
+    databaseSpecificLimitBetweenFilterStatements.put(DB2, ", row_number() over (ORDER BY ${orderByColumns}) rnk FROM ( select distinct RES.ID_, RES.REV_, RES.RESOURCE_TYPE_, RES.NAME_, RES.OWNER_ ");
     databaseSpecificOrderByStatements.put(DB2, "");
-    databaseSpecificLimitBeforeNativeQueryStatements.put(DB2, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
+    databaseSpecificLimitBeforeNativeQueryStatements.put(DB2, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderByColumns}) rnk FROM (");
     databaseSpecificDistinct.put(DB2, "");
 
     databaseSpecificBitAnd1.put(DB2, "BITAND(");
@@ -267,10 +267,10 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBeforeStatements.put(MSSQL, "SELECT SUB.* FROM (");
     databaseSpecificInnerLimitAfterStatements.put(MSSQL, ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
     databaseSpecificLimitAfterStatements.put(MSSQL, databaseSpecificInnerLimitAfterStatements.get(MSSQL) + " ORDER BY SUB.rnk");
-    databaseSpecificLimitBetweenStatements.put(MSSQL, ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select distinct RES.* ");
+    databaseSpecificLimitBetweenStatements.put(MSSQL, ", row_number() over (ORDER BY ${orderByColumns}) rnk FROM ( select distinct RES.* ");
     databaseSpecificLimitBetweenFilterStatements.put(MSSQL, "");
     databaseSpecificOrderByStatements.put(MSSQL, "");
-    databaseSpecificLimitBeforeNativeQueryStatements.put(MSSQL, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
+    databaseSpecificLimitBeforeNativeQueryStatements.put(MSSQL, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderByColumns}) rnk FROM (");
     databaseSpecificDistinct.put(MSSQL, "");
 
     databaseSpecificBitAnd1.put(MSSQL, "");
