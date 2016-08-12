@@ -127,6 +127,9 @@
     <if test="caseKeyNotIn != null || caseDefinitionKey != null || caseDefinitionName != null || caseDefinitionNameLike != null">
       inner join ${prefix}ACT_RE_CASE_DEF DEF on RES.CASE_DEF_ID_ = DEF.ID_
     </if>
+    <if test="caseActivityIds != null &amp;&amp; caseActivityIds.length > 0">
+      inner join ${prefix}ACT_HI_CASEACTINST HCA on RES.CASE_INST_ID_ = HCA.CASE_INST_ID_
+    </if>
     <where>
       <if test="caseInstanceId != null">
         RES.CASE_INST_ID_ = #{caseInstanceId}
@@ -207,6 +210,13 @@
         <if test="tenantIds == null">
           and RES.TENANT_ID_ is null
         </if>
+      </if>
+      <if test="caseActivityIds != null &amp;&amp; caseActivityIds.length > 0">
+        and HCA.CASE_ACT_ID_ in
+        <foreach item="caseActivityId" index="index" collection="caseActivityIds"
+                 open="(" separator="," close=")">
+          #{caseActivityId}
+        </foreach>
       </if>
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
         and EXISTS (

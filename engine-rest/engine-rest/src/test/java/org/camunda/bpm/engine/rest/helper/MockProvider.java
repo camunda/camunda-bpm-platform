@@ -137,6 +137,11 @@ public abstract class MockProvider {
 
   public static final String EXAMPLE_TENANT_NAME = "aTenantName";
 
+  // case activity ids
+  public static final String EXAMPLE_CASE_ACTIVITY_ID = "aCaseActivityId";
+  public static final String ANOTHER_EXAMPLE_CASE_ACTIVITY_ID = "anotherCaseActivityId";
+  public static final String EXAMPLE_CASE_ACTIVITY_ID_LIST = EXAMPLE_CASE_ACTIVITY_ID + "," + ANOTHER_EXAMPLE_CASE_ACTIVITY_ID;
+
   // version tag
   public static final String EXAMPLE_VERSION_TAG = "aVersionTag";
   public static final String ANOTHER_EXAMPLE_VERSION_TAG = "anotherVersionTag";

@@ -966,6 +966,45 @@ public class HistoricCaseInstanceRestServiceQueryTest extends AbstractRestServic
         MockProvider.createMockHistoricCaseInstance(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
   }
 
+  @Test
+  public void testCaseActivityIdListParameter() {
+
+    Response response = given()
+      .queryParam("caseActivityIdIn", MockProvider.EXAMPLE_CASE_ACTIVITY_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_CASE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseActivityIdIn(MockProvider.EXAMPLE_CASE_ACTIVITY_ID, MockProvider.ANOTHER_EXAMPLE_CASE_ACTIVITY_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> historicCaseInstances = from(content).getList("");
+    assertThat(historicCaseInstances).hasSize(1);
+  }
+
+  @Test
+  public void testCaseActivityIdListPostParameter() {
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("caseActivityIdIn", MockProvider.EXAMPLE_CASE_ACTIVITY_ID_LIST.split(","));
+
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_CASE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseActivityIdIn(MockProvider.EXAMPLE_CASE_ACTIVITY_ID, MockProvider.ANOTHER_EXAMPLE_CASE_ACTIVITY_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> historicCaseInstances = from(content).getList("");
+    assertThat(historicCaseInstances).hasSize(1);
+  }
 
   protected void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
     given()

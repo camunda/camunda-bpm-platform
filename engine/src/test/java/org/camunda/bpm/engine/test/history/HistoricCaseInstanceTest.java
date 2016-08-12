@@ -720,6 +720,76 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertEquals(0, query.list().size());
   }
 
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+  })
+  public void testQueryByCaseActivityId() {
+
+    // given
+    createCaseInstanceByKey("oneTaskCase");
+
+    // when
+    HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery()
+      .caseActivityIdIn("PI_HumanTask_1");
+
+    // then
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+  })
+  public void testQueryByCaseActivityIds() {
+
+    // given
+    createCaseInstanceByKey("oneCaseTaskCase");
+
+    // when
+    HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery()
+      .caseActivityIdIn("PI_HumanTask_1", "PI_CaseTask_1");
+
+    // then
+    assertEquals(2, query.list().size());
+    assertEquals(2, query.count());
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"
+  })
+  public void testDistinctQueryByCaseActivityIds() {
+
+    // given
+    createCaseInstanceByKey("twoTaskCase");
+
+    // when
+    HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery()
+      .caseActivityIdIn("PI_HumanTask_1", "PI_HumanTask_2");
+
+    // then
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+  }
+
+  public void testQueryByNonExistingCaseActivityId() {
+    HistoricCaseInstanceQuery query = historyService
+        .createHistoricCaseInstanceQuery()
+        .caseActivityIdIn("nonExisting");
+
+    assertEquals(0, query.count());
+  }
+
+  public void testFailQueryByCaseActivityIdNull() {
+    try {
+      historyService.createHistoricCaseInstanceQuery()
+        .caseActivityIdIn((String) null);
+
+      fail("expected exception");
+    } catch (NullValueException e) {
+    }
+  }
+
   protected HistoricCaseInstance queryHistoricCaseInstance(String caseInstanceId) {
     HistoricCaseInstance historicCaseInstance = historicQuery()
       .caseInstanceId(caseInstanceId)

@@ -67,6 +67,12 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
    */
   HistoricCaseInstanceQuery caseInstanceBusinessKeyLike(String caseInstanceBusinessKeyLike);
 
+  /**
+   * <p>Only selects historic case instances with historic case activity instances
+   * in at least one of the given case activity ids.</p>
+   */
+  HistoricCaseInstanceQuery caseActivityIdIn(String... caseActivityIds);
+
   /** Only select historic case instances that were created before the given date. */
   HistoricCaseInstanceQuery createdBefore(Date date);
 

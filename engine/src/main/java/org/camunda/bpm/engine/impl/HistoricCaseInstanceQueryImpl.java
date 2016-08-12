@@ -57,6 +57,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   protected Date closedBefore;
   protected Date closedAfter;
   protected String caseDefinitionKey;
+  protected String[] caseActivityIds;
 
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
@@ -118,6 +119,12 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     ensureNotContainsNull("caseDefinitionKeys", caseDefinitionKeys);
     ensureNotContainsEmptyString("caseDefinitionKeys", caseDefinitionKeys);
     this.caseKeyNotIn = caseDefinitionKeys;
+    return this;
+  }
+
+  public HistoricCaseInstanceQuery caseActivityIdIn(String... caseActivityIds) {
+    ensureNotNull("caseActivityIds", (Object[]) caseActivityIds);
+    this.caseActivityIds = caseActivityIds;
     return this;
   }
 

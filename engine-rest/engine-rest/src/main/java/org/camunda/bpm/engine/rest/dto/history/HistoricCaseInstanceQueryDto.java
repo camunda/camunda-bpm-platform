@@ -75,6 +75,7 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
   private List<String> tenantIds;
   private Boolean withoutTenantId;
   public String createdBy;
+  public List<String> caseActivityIdIn;
 
   public Date createdBefore;
   public Date createdAfter;
@@ -225,6 +226,11 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
     this.variables = variables;
   }
 
+  @CamundaQueryParam(value = "caseActivityIdIn", converter = StringListConverter.class)
+  public void setCaseActivityIdIn(List<String> caseActivityIdIn) {
+    this.caseActivityIdIn = caseActivityIdIn;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -312,6 +318,9 @@ public class HistoricCaseInstanceQueryDto extends AbstractQueryDto<HistoricCaseI
     }
     if (notClosed != null && notClosed) {
       query.notClosed();
+    }
+    if (caseActivityIdIn != null && !caseActivityIdIn.isEmpty()) {
+      query.caseActivityIdIn(caseActivityIdIn.toArray(new String[caseActivityIdIn.size()]));
     }
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {
