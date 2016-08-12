@@ -18,6 +18,7 @@ import javax.transaction.UserTransaction;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 @Named
 public class TransactionRollbackDelegate implements JavaDelegate {
@@ -27,6 +28,8 @@ public class TransactionRollbackDelegate implements JavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
+    EnsureUtil.ensureNotNull("user transaction", utx);
+
     // simulate a failure that triggers the transaction rollback
     utx.setRollbackOnly();
   }
