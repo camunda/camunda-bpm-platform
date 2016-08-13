@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
 
 import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
@@ -73,7 +74,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MeterLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
@@ -107,8 +107,6 @@ public class CommandContext {
   protected List<Session> sessionList = new ArrayList<Session>();
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected FailedJobCommandFactory failedJobCommandFactory;
-
-  protected JobEntity currentJob = null;
 
   protected List<CommandContextListener> commandContextListeners = new LinkedList<CommandContextListener>();
 
@@ -190,6 +188,7 @@ public class CommandContext {
             // fire command failed (must not fail itself)
             fireCommandFailed(commandInvocationContext.getThrowable());
 
+            Level loggingLevel = Level.SEVERE;
             if (shouldLogInfo(commandInvocationContext.getThrowable())) {
               LOG.infoException(commandInvocationContext.getThrowable());
             }
@@ -582,14 +581,6 @@ public class CommandContext {
 
   public boolean isTenantCheckEnabled() {
     return tenantCheckEnabled;
-  }
-
-  public JobEntity getCurrentJob() {
-    return currentJob;
-  }
-
-  public void setCurrentJob(JobEntity currentJob) {
-    this.currentJob = currentJob;
   }
 
 }

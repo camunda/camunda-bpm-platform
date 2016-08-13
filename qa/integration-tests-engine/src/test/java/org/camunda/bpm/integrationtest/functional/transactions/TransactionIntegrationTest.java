@@ -16,7 +16,6 @@
 package org.camunda.bpm.integrationtest.functional.transactions;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.integrationtest.functional.transactions.beans.FailingDelegate;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;

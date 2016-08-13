@@ -12,11 +12,11 @@
     <endEvent id="endevent2" name="End">
       <incoming>flow5</incoming>
     </endEvent>
-    <serviceTask id="scripttask1" camunda:async="true" camunda:class="org.camunda.bpm.integrationtest.functional.transactions.beans.UpdateRouterConfiguration" name="Update router configuration">
+    <serviceTask id="scripttask1" camunda:async="true" camunda:class="org.camunda.bpm.integrationtest.functional.transactions.UpdateRouterConfiguration" name="Update router configuration">
       <incoming>flow6</incoming>
       <outgoing>flow5</outgoing>
     </serviceTask>
-    <serviceTask id="scripttask2" camunda:async="true" camunda:class="org.camunda.bpm.integrationtest.functional.transactions.beans.GetVersionInfoDelegate" name="Get version info">
+    <serviceTask id="scripttask2" camunda:async="true" camunda:class="org.camunda.bpm.integrationtest.functional.transactions.GetVersionInfoDelegate" name="Get version info">
       <incoming>flow1</incoming>
       <outgoing>flow6</outgoing>
     </serviceTask>

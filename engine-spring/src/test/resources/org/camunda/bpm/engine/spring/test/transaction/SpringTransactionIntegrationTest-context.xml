@@ -26,17 +26,7 @@
     <property name="jobExecutorActivate" value="false" />
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
-    
-    <property name="customPostBPMNParseListeners">
-      <list>
-        <bean class="org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener" />
-      </list>
-    </property>
-
-    <property name="failedJobCommandFactory" ref="foxFailedJobCommandFactory" />    
   </bean>
-  
-  <bean id="foxFailedJobCommandFactory" class="org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory" />
   
   <bean id="processEngine" class="org.camunda.bpm.engine.spring.ProcessEngineFactoryBean">
     <property name="processEngineConfiguration" ref="processEngineConfiguration" />
@@ -62,12 +52,6 @@
   
   <bean id="serviceTaskBean" class="org.camunda.bpm.engine.spring.test.transaction.ServiceTaskBean">
   	<property name="beanWithException" ref="beanWithException" />
-  </bean>
-  
-  <bean id="failingTransactionListenerDelegate" class="org.camunda.bpm.engine.spring.test.transaction.FailingTransactionListenerDelegate" />
-  
-  <bean id="transactionRollbackDelegate" class="org.camunda.bpm.engine.spring.test.transaction.TransactionRollbackDelegate">
-    <property name="transactionManager" ref="transactionManager" />
   </bean>
 
 </beans>
