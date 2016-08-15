@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.qa.upgrade;
 
-import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;

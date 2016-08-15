@@ -13,26 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.qa.upgrade.scenarios.rolling;
+package org.camunda.bpm.qa.upgrade.scenarios.rolling.mulltiInstance;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioSetup;
 import org.camunda.bpm.qa.upgrade.Times;
 
 /**
- * Starts the process instance on the old engine.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class StartProcessInstance {
+public class ProcessWithMultiInstanceCallActivityScenario {
 
-  public static final String PROCESS_DEF_KEY = "rollingProcess";
+  public static final String PROCESS_DEF_KEY = "processWithMultiInstanceCallActivity";
 
   @Deployment
   public static String deploy() {
-    return "org/camunda/bpm/qa/upgrade/rolling/rollingProcess.bpmn20.xml";
+    return "org/camunda/bpm/qa/upgrade/rolling/processWithMultiInstanceCallActivity.bpmn20.xml";
+  }
+
+  @Deployment
+  public static String deploySubProcess() {
+    return "org/camunda/bpm/qa/upgrade/rolling/simpleSubProcess.bpmn20.xml";
   }
 
   @DescribesScenario("init")
@@ -44,4 +50,18 @@ public class StartProcessInstance {
       }
     };
   }
+
+  @DescribesScenario("init.complete.one")
+  @Times(1)
+  public static ScenarioSetup startProcessAndCompleteFirstTask() {
+    return new ScenarioSetup() {
+      public void execute(ProcessEngine engine, String scenarioName) {
+        ProcessInstance procInst = engine.getRuntimeService().startProcessInstanceByKey(PROCESS_DEF_KEY, scenarioName);
+        Task task = engine.getTaskService().createTaskQuery().processInstanceId(procInst.getId()).singleResult();
+        engine.getTaskService().complete(task.getId());
+      }
+    };
+  }
+
+
 }

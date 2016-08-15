@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class DeployProcessWithoutIsExecutableAttributeScenario {
 
   @Deployment
-  public static String deployMessageBoundary() {
+  public static String deployNonExecutableProcess() {
     return "org/camunda/bpm/qa/upgrade/deployment/processWithoutIsExecutableAttribute.bpmn20.xml";
   }
 }

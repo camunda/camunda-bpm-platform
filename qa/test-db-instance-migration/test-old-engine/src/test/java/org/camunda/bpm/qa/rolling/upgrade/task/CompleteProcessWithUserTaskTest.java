@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.qa.rolling.upgrade;
+package org.camunda.bpm.qa.rolling.upgrade.task;
 
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -28,20 +27,20 @@ import org.junit.Test;
 
 /**
  * This test ensures that the old engine can complete an
- * existing process instance on the new schema.
+ * existing process with user task on the new schema.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-@ScenarioUnderTest("StartProcessInstance")
+@ScenarioUnderTest("ProcessWithUserTaskScenario")
 @Origin("7.5.0")
-public class CompleteProcessInstanceTest {
+public class CompleteProcessWithUserTaskTest {
 
   @Rule
   public UpgradeTestRule rule = new UpgradeTestRule();
 
   @Test
   @ScenarioUnderTest("init.1")
-  public void testDeployProcessWithoutIsExecutableAttribute() {
+  public void testCompleteProcessWithUserTask() {
     //given an already started process instance
     ProcessInstance oldInstance = rule.processInstance();
     Assert.assertNotNull(oldInstance);
