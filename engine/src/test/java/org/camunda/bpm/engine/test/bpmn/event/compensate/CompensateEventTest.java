@@ -48,6 +48,28 @@ import org.junit.Assert;
  */
 public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
+  public void testCompensateOrder() {
+    //given two process models, only differ in order of the activities
+    final String PROCESS_MODEL_WITH_REF_BEFORE = "org/camunda/bpm/engine/test/bpmn/event/compensate/compensation_reference-before.bpmn";
+    final String PROCESS_MODEL_WITH_REF_AFTER = "org/camunda/bpm/engine/test/bpmn/event/compensate/compensation_reference-after.bpmn";
+
+    //when model with ref before is deployed
+    org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment()
+            .addClasspathResource(PROCESS_MODEL_WITH_REF_BEFORE)
+            .deploy();
+    //then no problem will occure
+
+    //when model with ref after is deployed
+    org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment()
+            .addClasspathResource(PROCESS_MODEL_WITH_REF_AFTER)
+            .deploy();
+    //then also no problem should occure
+
+    //clean up
+    repositoryService.deleteDeployment(deployment1.getId());
+    repositoryService.deleteDeployment(deployment2.getId());
+  }
+
   @Deployment
   public void testCompensateSubprocess() {
 

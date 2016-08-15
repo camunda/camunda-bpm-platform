@@ -675,6 +675,12 @@ public class BpmnParse extends Parse {
     parseAssociations(scopeElement, parentScope, compensationHandlers);
     parseCompensationHandlers(parentScope, compensationHandlers);
 
+    if (!parentScope.isBacklogEmpty()) {
+      for (ScopeImpl.BacklogErrorCallback callback : parentScope.getBacklogErrorCallbacks()) {
+        callback.callback();
+      }
+    }
+
     if (parentScope instanceof ProcessDefinition) {
       parseProcessDefinitionCustomExtensions(scopeElement, (ProcessDefinition) parentScope);
     }
@@ -1530,8 +1536,8 @@ public class BpmnParse extends Parse {
     return nestedActivityImpl;
   }
 
-  protected CompensateEventDefinition parseThrowCompensateEventDefinition(Element compensateEventDefinitionElement, ScopeImpl scopeElement) {
-    String activityRef = compensateEventDefinitionElement.attribute("activityRef");
+  protected CompensateEventDefinition parseThrowCompensateEventDefinition(final Element compensateEventDefinitionElement, ScopeImpl scopeElement) {
+    final String activityRef = compensateEventDefinitionElement.attribute("activityRef");
     boolean waitForCompletion = "true".equals(compensateEventDefinitionElement.attribute("waitForCompletion", "true"));
 
     if (activityRef != null) {
@@ -1542,8 +1548,15 @@ public class BpmnParse extends Parse {
           scopeElement = scopeElement.getFlowScope();
         }
         if (scopeElement.findActivityAtLevelOfSubprocess(activityRef) == null) {
-          addError("Invalid attribute value for 'activityRef': no activity with id '" + activityRef + "' in scope '" + scopeElement.getId() + "'",
+          final String scopeId = scopeElement.getId();
+          scopeElement.addToBacklog(activityRef, new ScopeImpl.BacklogErrorCallback() {
+
+            @Override
+            public void callback() {
+              addError("Invalid attribute value for 'activityRef': no activity with id '" + activityRef + "' in scope '" + scopeId + "'",
               compensateEventDefinitionElement);
+            }
+          });
         }
       }
     }

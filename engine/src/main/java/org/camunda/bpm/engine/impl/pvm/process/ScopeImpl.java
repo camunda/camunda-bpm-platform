@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.pvm.process;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -98,11 +99,62 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
     return namedFlowActivities.get(activityId);
   }
 
+
+  /**
+   * Represents the backlog error callback interface.
+   * Contains a callback method, which is called if the activity in the backlog
+   * is not read till the end of parsing.
+   */
+  public interface BacklogErrorCallback {
+    /**
+     * In error case the callback will called.
+     */
+    public void callback();
+  }
+
+  /**
+   * The key identifies the activity which is referenced but not read yet.
+   * The value is the error callback, which is called if the activity is not
+   * read till the end of parsing.
+   */
+  protected final Map<String, BacklogErrorCallback> BACKLOG = new HashMap<String, BacklogErrorCallback>();
+
+  /**
+   * Returns the backlog error callback's.
+   *
+   * @return the callback's
+   */
+  public Collection<BacklogErrorCallback> getBacklogErrorCallbacks() {
+    return BACKLOG.values();
+  }
+
+  /**
+   * Returns true if the backlog is empty.
+   *
+   * @return true if empty, false otherwise
+   */
+  public boolean isBacklogEmpty() {
+    return BACKLOG.isEmpty();
+  }
+
+  /**
+   * Add's the given activity reference and the error callback to the backlog.
+   *
+   * @param activityRef the activity reference which is not read until now
+   * @param callback the error callback which should called if activity will not be read
+   */
+  public void addToBacklog(String activityRef, BacklogErrorCallback callback) {
+    BACKLOG.put(activityRef, callback);
+  }
+
   public ActivityImpl createActivity(String activityId) {
     ActivityImpl activity = new ActivityImpl(activityId, processDefinition);
     if (activityId!=null) {
       if (processDefinition.findActivity(activityId) != null) {
         throw new PvmException("duplicate activity id '" + activityId + "'");
+      }
+      if (BACKLOG.containsKey(activityId)) {
+        BACKLOG.remove(activityId);
       }
       namedFlowActivities.put(activityId, activity);
     }
