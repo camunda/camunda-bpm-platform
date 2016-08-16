@@ -222,6 +222,7 @@ public class BpmnParse extends Parse {
   public static final Namespace BPMN_DI_NS = new Namespace(BpmnParser.BPMN_DI_NS);
   public static final Namespace OMG_DI_NS = new Namespace(BpmnParser.OMG_DI_NS);
   public static final Namespace BPMN_DC_NS = new Namespace(BpmnParser.BPMN_DC_NS);
+  public static final String ALL = "all";
 
   /** The deployment to which the parsed process definitions will be added. */
   protected DeploymentEntity deployment;
@@ -3624,7 +3625,7 @@ public class BpmnParse extends Parse {
 
     String variables = parameterElement.attribute("variables");
 
-    if ("all".equals(variables)) {
+    if (ALL.equals(variables)) {
       parameter.setAllVariables(true);
     }
     else {

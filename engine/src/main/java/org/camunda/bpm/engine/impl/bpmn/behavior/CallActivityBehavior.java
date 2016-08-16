@@ -14,8 +14,6 @@
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import org.camunda.bpm.engine.delegate.Expression;
-import static org.camunda.bpm.engine.impl.util.CallableElementUtil.getProcessDefinitionToCall;
-
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingCalledProcessInstance;
 import org.camunda.bpm.engine.impl.migration.instance.parser.MigratingInstanceParseContext;
@@ -26,6 +24,8 @@ import org.camunda.bpm.engine.impl.pvm.delegate.MigrationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.variable.VariableMap;
+
+import static org.camunda.bpm.engine.impl.util.CallableElementUtil.getProcessDefinitionToCall;
 
 
 /**

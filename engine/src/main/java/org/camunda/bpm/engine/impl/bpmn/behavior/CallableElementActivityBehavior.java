@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import java.util.Map;
 import java.util.concurrent.Callable;
 import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
@@ -19,7 +20,11 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateVariableMapping;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
-import static org.camunda.bpm.engine.impl.bpmn.behavior.ClassDelegateActivityBehavior.LOG;
+
+import static org.camunda.bpm.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior.NUMBER_OF_ACTIVE_INSTANCES;
+import static org.camunda.bpm.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior.NUMBER_OF_COMPLETED_INSTANCES;
+import static org.camunda.bpm.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior.NUMBER_OF_INSTANCES;
+
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement.CallableElementBinding;
@@ -36,6 +41,8 @@ import org.camunda.bpm.engine.variable.VariableMap;
  *
  */
 public abstract class CallableElementActivityBehavior extends AbstractBpmnActivityBehavior implements SubProcessActivityBehavior {
+
+  protected String[] variablesFilter = {NUMBER_OF_INSTANCES,NUMBER_OF_ACTIVE_INSTANCES,NUMBER_OF_COMPLETED_INSTANCES};
 
   protected CallableElement callableElement;
 
@@ -122,7 +129,7 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
   @Override
   public void passOutputVariables(final ActivityExecution execution, final VariableScope subInstance) {
     // only data. no control flow available on this execution.
-    VariableMap variables = getOutputVariables(subInstance);
+    Map<String, Object> variables = filterMIScopeVariables(getOutputVariables(subInstance));
     VariableMap localVariables = getOutputVariablesLocal(subInstance);
 
     execution.setVariables(variables);
@@ -145,6 +152,15 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
     } catch (Exception ex) {
       throw new ProcessEngineException(ex);
     }
+  }
+
+  protected Map<String, Object> filterMIScopeVariables(VariableMap variables) {
+    if (variables != null) {
+      for (String key : variablesFilter) {
+        variables.remove(key);
+      }
+    }
+    return variables;
   }
 
   @Override
