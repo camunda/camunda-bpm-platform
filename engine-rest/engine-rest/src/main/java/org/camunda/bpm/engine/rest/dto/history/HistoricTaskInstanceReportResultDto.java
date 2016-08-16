@@ -24,6 +24,7 @@ public class HistoricTaskInstanceReportResultDto {
   protected String processDefinitionId;
   protected String processDefinitionName;
   protected String taskName;
+  protected String tenantId;
 
   public Long getCount() {
     return count;
@@ -65,6 +66,14 @@ public class HistoricTaskInstanceReportResultDto {
     this.taskName = taskName;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   public static HistoricTaskInstanceReportResultDto fromHistoricTaskInstanceReportResult(HistoricTaskInstanceReportResult taskReportResult) {
     HistoricTaskInstanceReportResultDto dto = new HistoricTaskInstanceReportResultDto();
 
@@ -73,6 +82,7 @@ public class HistoricTaskInstanceReportResultDto {
     dto.processDefinitionId = taskReportResult.getProcessDefinitionId();
     dto.processDefinitionName = taskReportResult.getProcessDefinitionName();
     dto.taskName = taskReportResult.getTaskName();
+    dto.tenantId = taskReportResult.getTenantId();
 
     return dto;
   }

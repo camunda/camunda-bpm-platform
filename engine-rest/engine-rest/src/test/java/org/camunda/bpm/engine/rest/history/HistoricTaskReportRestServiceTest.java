@@ -49,6 +49,7 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_T
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_TASK_REPORT_TASK_NAME;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_HISTORIC_TASK_START_TIME;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TENANT_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstanceDurationReport;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstanceReport;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstanceReportWithProcDef;
@@ -152,6 +153,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
         .body("[0].processDefinitionName", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME))
         .body("[0].processDefinitionKey", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION))
         .body("[0].taskName", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_TASK_NAME))
+        .body("[0].tenantId", equalTo(EXAMPLE_TENANT_ID))
     .when()
       .get(TASK_REPORT_URL);
 
@@ -293,6 +295,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
         .body("[0].processDefinitionName", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME))
         .body("[0].processDefinitionKey", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION))
         .body("[0].taskName", equalTo(null))
+        .body("[0].tenantId", equalTo(EXAMPLE_TENANT_ID))
     .when()
       .get(TASK_REPORT_URL);
 
@@ -318,6 +321,7 @@ public class HistoricTaskReportRestServiceTest extends AbstractRestServiceTest {
         .body("[0].processDefinitionName", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME))
         .body("[0].processDefinitionKey", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION))
         .body("[0].taskName", equalTo(EXAMPLE_HISTORIC_TASK_REPORT_TASK_NAME))
+        .body("[0].tenantId", equalTo(EXAMPLE_TENANT_ID))
     .when()
       .get(TASK_REPORT_URL);
 

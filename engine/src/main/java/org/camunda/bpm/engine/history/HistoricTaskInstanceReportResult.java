@@ -32,4 +32,9 @@ public interface HistoricTaskInstanceReportResult {
    * value is null.
    */
   String getTaskName();
+
+  /**
+   * <p>Returns the id of the tenant task</p>
+   */
+  String getTenantId();
 }

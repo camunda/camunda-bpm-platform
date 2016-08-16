@@ -24,6 +24,7 @@ public class TaskReportResultEntity implements HistoricTaskInstanceReportResult 
   protected String processDefinitionId;
   protected String processDefinitionName;
   protected String taskName;
+  protected String tenantId;
 
   public Long getCount() {
     return count;
@@ -65,6 +66,14 @@ public class TaskReportResultEntity implements HistoricTaskInstanceReportResult 
     this.taskName = taskName;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -74,6 +83,7 @@ public class TaskReportResultEntity implements HistoricTaskInstanceReportResult 
       ", processDefinitionId='" + processDefinitionId + '\'' +
       ", processDefinitionName='" + processDefinitionName + '\'' +
       ", taskName='" + taskName + '\'' +
+      ", tenantId='" + tenantId + '\'' +
       ']';
   }
 }

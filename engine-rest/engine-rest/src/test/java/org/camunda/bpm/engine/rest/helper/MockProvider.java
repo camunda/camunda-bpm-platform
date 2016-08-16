@@ -951,6 +951,7 @@ public abstract class MockProvider {
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID);
     when(mock.getProcessDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION);
     when(mock.getProcessDefinitionName()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME);
+    when(mock.getTenantId()).thenReturn(EXAMPLE_TENANT_ID);
     when(mock.getTaskName()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_TASK_NAME);
 
     return Collections.singletonList(mock);
@@ -962,6 +963,7 @@ public abstract class MockProvider {
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID);
     when(mock.getProcessDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION);
     when(mock.getProcessDefinitionName()).thenReturn(EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME);
+    when(mock.getTenantId()).thenReturn(EXAMPLE_TENANT_ID);
     when(mock.getTaskName()).thenReturn(null);
 
     return Collections.singletonList(mock);
