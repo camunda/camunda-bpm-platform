@@ -6,7 +6,7 @@ var setupFile = require('./task-setup');
 var tasksPage = require('../pages/tasks');
 
 
-describeco('Cockpit Tasks Dashboard Spec', function() {
+describe('Cockpit Tasks Dashboard Spec', function() {
 
   describe('dashboard page navigation', function() {
 
