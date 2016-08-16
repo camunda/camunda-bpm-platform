@@ -20,6 +20,8 @@
     <java.resources.override>src/main/runtime/default/resources</java.resources.override>
     <properties.override>src/main/runtime/default/config.properties</properties.override>
 
+    <history.level>full</history.level>
+
     <frontend.app.path>${project.build.directory}/webapp/</frontend.app.path>
 
     <frontend.development.cockpit.path>${frontend.app.path}</frontend.development.cockpit.path>
@@ -987,6 +989,30 @@
       <id>cfgAuthorizationCheckRevokesAlways</id>
       <properties>
         <authorizationCheckRevokes>always</authorizationCheckRevokes>
+      </properties>
+    </profile>
+
+    <!--  check history audit -->
+    <profile>
+      <id>cfghistoryaudit</id>
+      <properties>
+        <history.level>audit</history.level>
+      </properties>
+    </profile>
+
+    <!--  check history activity -->
+    <profile>
+      <id>cfghistoryactivity</id>
+      <properties>
+        <history.level>activity</history.level>
+      </properties>
+    </profile>
+
+    <!--  check history none -->
+    <profile>
+      <id>cfghistorynone</id>
+      <properties>
+        <history.level>none</history.level>
       </properties>
     </profile>
 
