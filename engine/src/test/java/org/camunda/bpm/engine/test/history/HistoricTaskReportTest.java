@@ -196,6 +196,63 @@ public class HistoricTaskReportTest {
     }
   }
 
+  @Test
+  public void testReportWithNullTaskName() {
+    // given
+    startAndCompleteProcessInstance(PROCESS_DEFINITION_KEY, 2016, 7, 14, 12, 1);
+
+    // when
+    BpmnModelInstance instance = Bpmn.createExecutableProcess(ANOTHER_PROCESS_DEFINITION_KEY)
+      .name("name_" + ANOTHER_PROCESS_DEFINITION_KEY)
+      .startEvent()
+        .userTask("task1_" + ANOTHER_PROCESS_DEFINITION_KEY)
+        .endEvent()
+      .done();
+
+    processEngineTestRule.deploy(instance);
+    startAndCompleteProcessInstance(ANOTHER_PROCESS_DEFINITION_KEY, 2016, 7, 14, 12, 1);
+
+    Calendar calendar = Calendar.getInstance();
+    calendar.set(2016, 11, 14, 12, 5);
+
+    List<HistoricTaskInstanceReportResult> historicTaskInstanceReportResults = historyService
+      .createHistoricTaskInstanceReport()
+      .completedBefore(calendar.getTime())
+      .countByTaskName();
+
+    assertEquals(1, historicTaskInstanceReportResults.size());
+    assertEquals(1, historicTaskInstanceReportResults.get(0).getCount(), 0);
+  }
+
+  @Test
+  public void testReportWithEmptyTaskName() {
+    // given
+    startAndCompleteProcessInstance(PROCESS_DEFINITION_KEY, 2016, 7, 14, 12, 1);
+
+    // when
+    BpmnModelInstance instance = Bpmn.createExecutableProcess(ANOTHER_PROCESS_DEFINITION_KEY)
+      .name("name_" + ANOTHER_PROCESS_DEFINITION_KEY)
+      .startEvent()
+        .userTask("task1_" + ANOTHER_PROCESS_DEFINITION_KEY)
+        .name("")
+      .endEvent()
+      .done();
+
+    processEngineTestRule.deploy(instance);
+    startAndCompleteProcessInstance(ANOTHER_PROCESS_DEFINITION_KEY, 2016, 7, 14, 12, 1);
+
+    Calendar calendar = Calendar.getInstance();
+    calendar.set(2016, 11, 14, 12, 5);
+
+    List<HistoricTaskInstanceReportResult> historicTaskInstanceReportResults = historyService
+      .createHistoricTaskInstanceReport()
+      .completedBefore(calendar.getTime())
+      .countByTaskName();
+
+    assertEquals(1, historicTaskInstanceReportResults.size());
+    assertEquals(1, historicTaskInstanceReportResults.get(0).getCount(), 0);
+  }
+
   protected BpmnModelInstance createProcessWithUserTask(String key) {
     double random = Math.random();
     return Bpmn.createExecutableProcess(key)
