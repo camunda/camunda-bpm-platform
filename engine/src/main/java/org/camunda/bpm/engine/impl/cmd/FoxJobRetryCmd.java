@@ -114,7 +114,7 @@ public class FoxJobRetryCmd extends JobRetryCmd {
 
     } else if (TimerStartEventSubprocessJobHandler.TYPE.equals(type)) {
       DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
-      ProcessDefinitionEntity processDefinitionEntity = deploymentCache.getProcessDefinitionCache().get(job.getProcessDefinitionId());
+      ProcessDefinitionEntity processDefinitionEntity = deploymentCache.findDeployedProcessDefinitionById(job.getProcessDefinitionId());
       activity = processDefinitionEntity.findActivity(job.getActivityId());
 
     } else if (AsyncContinuationJobHandler.TYPE.equals(type)) {
