@@ -676,10 +676,8 @@ public class BpmnParse extends Parse {
     parseAssociations(scopeElement, parentScope, compensationHandlers);
     parseCompensationHandlers(parentScope, compensationHandlers);
 
-    if (!parentScope.isBacklogEmpty()) {
-      for (ScopeImpl.BacklogErrorCallback callback : parentScope.getBacklogErrorCallbacks()) {
-        callback.callback();
-      }
+    for (ScopeImpl.BacklogErrorCallback callback : parentScope.getBacklogErrorCallbacks()) {
+      callback.callback();
     }
 
     if (parentScope instanceof ProcessDefinition) {
