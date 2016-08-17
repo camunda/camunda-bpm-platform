@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  */
 public class FormFieldImpl implements FormField {
 
+  protected boolean businessKey;
   protected String id;
   protected String label;
   protected FormType type;
@@ -99,4 +100,12 @@ public class FormFieldImpl implements FormField {
     this.validationConstraints = validationConstraints;
   }
 
+  @Override
+  public boolean isBusinessKey() {
+    return businessKey;
+  }
+
+  public void setBusinessKey(boolean businessKey) {
+    this.businessKey = businessKey;
+  }
 }

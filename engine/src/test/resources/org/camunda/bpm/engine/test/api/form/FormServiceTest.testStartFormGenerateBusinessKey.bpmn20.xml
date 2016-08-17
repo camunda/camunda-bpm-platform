@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+    xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+    xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+    typeLanguage="http://www.w3.org/2001/XMLSchema" 
+    expressionLanguage="http://www.w3.org/1999/XPath"
+    targetNamespace="test">
+
+  <process id="testProcess" isExecutable="true">
+
+    <startEvent id="start" >
+      <extensionElements>
+        <camunda:formData businessKey="customField">
+          <camunda:formField id="customField" label="Custom Field" type="string"/>
+        </camunda:formData>
+      </extensionElements>
+    </startEvent>
+
+    <sequenceFlow sourceRef="start" targetRef="usertask" />
+
+    <userTask id="usertask" name="Task" camunda:candidateGroups="dummy" />
+
+    <sequenceFlow sourceRef="usertask" targetRef="task2" />
+
+    <userTask id="task2" />
+
+  </process>
+
+</definitions>

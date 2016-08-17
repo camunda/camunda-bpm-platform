@@ -70,4 +70,13 @@ public interface FormField {
    */
   public Map<String, String> getProperties();
 
+  /**
+   * @return true if field is defined as businessKey, false otherwise
+   */
+  boolean isBusinessKey();
+
+  /**
+   * @param businessKey - set flag indicating if this field identifies business key
+   */
+  void setBusinessKey(boolean businessKey);
 }

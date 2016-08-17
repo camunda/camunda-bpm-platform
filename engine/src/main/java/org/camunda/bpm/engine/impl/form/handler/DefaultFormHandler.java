@@ -55,8 +55,10 @@ public class DefaultFormHandler implements FormHandler {
 
   public static final String FORM_FIELD_ELEMENT = "formField";
   public static final String FORM_PROPERTY_ELEMENT = "formProperty";
+  private static final String BUSINESS_KEY_ATTRIBUTE = "businessKey";
 
   protected String deploymentId;
+  protected String businessKeyFieldId;
 
   protected List<FormPropertyHandler> formPropertyHandlers = new ArrayList<FormPropertyHandler>();
 
@@ -84,6 +86,8 @@ public class DefaultFormHandler implements FormHandler {
     Element formData = extensionElement.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formData");
     if(formData != null) {
       parseFormFields(formData, bpmnParse, expressionManager);
+
+      this.businessKeyFieldId = formData.attribute(BUSINESS_KEY_ATTRIBUTE);
     }
   }
 
@@ -267,7 +271,11 @@ public class DefaultFormHandler implements FormHandler {
     // add form fields
     final List<FormField> formFields = taskFormData.getFormFields();
     for (FormFieldHandler formFieldHandler : formFieldHandlers) {
-      formFields.add(formFieldHandler.createFormField(execution));
+      FormField formField = formFieldHandler.createFormField(execution);
+      if (this.businessKeyFieldId != null && formField.getId().equals(this.businessKeyFieldId)) {
+        formField.setBusinessKey(true);
+      }
+      formFields.add(formField);
     }
   }
 
@@ -354,5 +362,13 @@ public class DefaultFormHandler implements FormHandler {
 
   public void setFormPropertyHandlers(List<FormPropertyHandler> formPropertyHandlers) {
     this.formPropertyHandlers = formPropertyHandlers;
+  }
+
+  public String getBusinessKeyFieldId() {
+    return businessKeyFieldId;
+  }
+
+  public void setBusinessKeyFieldId(String businessKeyFieldId) {
+    this.businessKeyFieldId = businessKeyFieldId;
   }
 }

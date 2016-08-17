@@ -13,23 +13,7 @@
 
 package org.camunda.bpm.engine.test.api.form;
 
-import static org.camunda.bpm.engine.variable.Variables.booleanValue;
-import static org.camunda.bpm.engine.variable.Variables.createVariables;
-import static org.camunda.bpm.engine.variable.Variables.objectValue;
-import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
-import static org.camunda.bpm.engine.variable.Variables.stringValue;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import org.apache.commons.io.IOUtils;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormProperty;
@@ -42,7 +26,6 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -50,6 +33,13 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+
+import java.util.*;
+import java.util.Map.Entry;
+
+import static org.camunda.bpm.engine.variable.Variables.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 /**
  * @author Joram Barrez
@@ -633,6 +623,26 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
     assertEquals("test", formService.getTaskFormData(task.getId()).getFormKey());
+  }
+
+  @Deployment
+  public void testStartFormGenerateBusinessKey() throws Exception {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    String expectedForm = IOUtils.toString(this.getClass().getClassLoader()
+        .getResourceAsStream("org/camunda/bpm/engine/test/api/form/FormServiceTest.testStartFormGenerateBusinessKey.html"));
+    assertThat(formService.getRenderedStartForm(processDefinition.getId()).toString().replaceAll("\\s+",""),is(expectedForm.replaceAll("\\s+","")));
+  }
+
+
+  @Deployment
+  public void testTaskFormDoesntGenerateBusinessKey() throws Exception {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    runtimeService.startProcessInstanceById(processDefinition.getId());
+    Task task = taskService.createTaskQuery().processDefinitionId(processDefinition.getId()).singleResult();
+    String expectedForm = IOUtils.toString(this.getClass().getClassLoader()
+        .getResourceAsStream("org/camunda/bpm/engine/test/api/form/FormServiceTest.testTaskFormDoesntGenerateBusinessKey.html"));
+    assertThat(formService.getRenderedTaskForm(task.getId()).toString().replaceAll("\\s+",""),is(expectedForm.replaceAll("\\s+","")));
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/form/FormServiceTest.startFormFields.bpmn20.xml"})
