@@ -45,19 +45,6 @@ public class RetryCmdDeployment {
     return modelInstance;
   }
 
-
-  public static BpmnModelInstance prepareSignalFailure() {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID_2)
-        .startEvent()
-            .signal(MESSAGE)
-          .serviceTask()
-            .camundaClass(FailingDelegate.class.getName())
-        .endEvent()
-        .done();
-    return modelInstance;
-  }
-
-
   public static BpmnModelInstance prepareMessageEventProcess() {
     return Bpmn.createExecutableProcess(PROCESS_ID)
         .startEvent()
@@ -67,20 +54,7 @@ public class RetryCmdDeployment {
               .message(MESSAGE)
             .serviceTask()
               .camundaClass(FailingDelegate.class.getName())
-            .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, SendMessageDelegate.class.getName())
-        .endEvent()
         .done();
-  }
-
-  public static BpmnModelInstance prepareMessageFailure() {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID_2)
-        .startEvent()
-          .message(MESSAGE)
-          .serviceTask()
-            .camundaClass(FailingDelegate.class.getName())
-        .endEvent()
-        .done();
-    return modelInstance;
   }
 
   public static BpmnModelInstance prepareEscalationEventProcess() {
@@ -137,14 +111,5 @@ public class RetryCmdDeployment {
 
   public void setBpmnModelInstances(BpmnModelInstance[] bpmnModelInstances) {
     this.bpmnModelInstances = bpmnModelInstances;
-  }
-
-  public static class SendMessageDelegate implements JavaDelegate {
-
-    @Override
-    public void execute(DelegateExecution execution) throws Exception {
-      RuntimeService runtimeService = execution.getProcessEngineServices().getRuntimeService();
-      runtimeService.correlateMessage(MESSAGE);
-    }
   }
 }

@@ -1,8 +1,18 @@
 package org.camunda.bpm.engine.test.bpmn.async;
 
+import static org.camunda.bpm.engine.test.bpmn.async.RetryCmdDeployment.deployment;
+import static org.camunda.bpm.engine.test.bpmn.async.RetryCmdDeployment.prepareCompensationEventProcess;
+import static org.camunda.bpm.engine.test.bpmn.async.RetryCmdDeployment.prepareEscalationEventProcess;
+import static org.camunda.bpm.engine.test.bpmn.async.RetryCmdDeployment.prepareMessageEventProcess;
+import static org.camunda.bpm.engine.test.bpmn.async.RetryCmdDeployment.prepareSignalEventProcess;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
+
+import java.util.Collection;
+
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -14,13 +24,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.util.Collection;
-
-import static org.camunda.bpm.engine.test.bpmn.async.RetryCmdDeployment.*;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Askar Akhmerov
@@ -77,22 +80,13 @@ public class FoxJobRetryCmdEventsTest {
 
     Job job = fetchJob(pi.getProcessInstanceId());
 
-    JobQuery jobQuery = engineRule.getManagementService().createJobQuery();
-
-    String jobId = job.getId();
-    if (jobId != null) {
-      jobQuery.jobId(jobId);
-    }
-
-    job = jobQuery.singleResult();
-
     try {
       engineRule.getManagementService().executeJob(job.getId());
     } catch (Exception e) {
     }
 
     // update job
-    job = jobQuery.singleResult();
+    job = fetchJob(pi.getProcessInstanceId());
     assertThat(job.getRetries(),is(4));
   }
 
