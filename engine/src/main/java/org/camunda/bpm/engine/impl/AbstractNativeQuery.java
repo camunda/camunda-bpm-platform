@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.query.NativeQuery;
 
 /**
  * Abstract superclass for all native query types.
- * 
+ *
  * @author Bernd Ruecker (camunda)
  */
 public abstract class AbstractNativeQuery<T extends NativeQuery< ? , ? >, U> implements Command<Object>, NativeQuery<T, U>,
@@ -101,7 +101,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery< ? , ? >, U> imp
     }
     return executeList(Context.getCommandContext(), getParameterMap(), firstResult, maxResults);
   }
-  
+
   public long count() {
     this.resultType = ResultType.COUNT;
     if (commandExecutor != null) {
@@ -119,14 +119,15 @@ public abstract class AbstractNativeQuery<T extends NativeQuery< ? , ? >, U> imp
       parameterMap.put("firstResult", firstResult);
       parameterMap.put("maxResults", maxResults);
       parameterMap.put("orderBy", "RES.ID_ asc");
-      
+
       int firstRow = firstResult + 1;
       parameterMap.put("firstRow", firstRow);
       int lastRow = 0;
       if(maxResults == Integer.MAX_VALUE) {
         lastRow = maxResults;
+      } else {
+       lastRow = firstResult + maxResults + 1;
       }
-      lastRow = firstResult + maxResults + 1;
       parameterMap.put("lastRow", lastRow);
       return executeList(commandContext, parameterMap, firstResult, maxResults);
     } else if (resultType == ResultType.SINGLE_RESULT) {
@@ -140,9 +141,9 @@ public abstract class AbstractNativeQuery<T extends NativeQuery< ? , ? >, U> imp
 
   /**
    * Executes the actual query to retrieve the list of results.
-   * @param maxResults 
-   * @param firstResult 
-   * 
+   * @param maxResults
+   * @param firstResult
+   *
    * @param page
    *          used if the results must be paged. If null, no paging will be
    *          applied.

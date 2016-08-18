@@ -36,7 +36,7 @@
   <delete id="deleteAllMeterLogEntries">
     delete from ${prefix}ACT_RU_METER_LOG
   </delete>
-  
+
   <delete id="deleteMeterLogEntriesByTimestampAndReporter" parameterType="java.util.Map">
     delete from ${prefix}ACT_RU_METER_LOG
     <where>
@@ -46,10 +46,10 @@
       <if test="timestamp != null">
         and TIMESTAMP_ &lt;= #{timestamp, jdbcType=TIMESTAMP}
       </if>
-        
+
     </where>
   </delete>
-  
+
 
   <!-- Meter RESULTMAP -->
 
@@ -60,6 +60,8 @@
     <result property="value" column="VALUE_" jdbcType="BIGINT" />
     <result property="timestamp" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
   </resultMap>
+
+
 
   <!-- SELECT -->
 
@@ -85,5 +87,51 @@
       </if>
     </where>
   </sql>
+
+
+  <resultMap id="meterResultIntervallMap" type="org.camunda.bpm.engine.impl.persistence.entity.MetricIntervalEntity">
+    <constructor>
+      <idArg column="INTERVAL_" jdbcType="TIMESTAMP"/>
+      <idArg column="NAME_" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <idArg column="REPORTER_" javaType="java.lang.String" jdbcType="VARCHAR"/>
+   </constructor>
+    <result property="value" column="VALUE_" jdbcType="BIGINT" />
+  </resultMap>
+
+  <select id="selectMeterLogAggregatedByTimeInterval_db2_or_mssql"  parameterType="org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl" resultMap="meterResultIntervallMap">
+    SELECT NAME_, REPORTER_, VALUE_, INTERVAL_
+    FROM (
+      SELECT row_number() OVER ( ORDER BY INTERVAL_ DESC, NAME_ DESC, REPORTER_ DESC) AS rid, RES.*
+      FROM (
+        <include refid="selectMeterLogAggregatedByTimeIntervalQuery"/>
+      ) RES
+    ) RES
+    WHERE RES.rid BETWEEN #{firstRow} AND #{lastRow}-1
+    ORDER BY INTERVAL_ DESC
+  </select>
+
+  <sql id="selectMeterLogAggregatedByTimeIntervalQuery" >
+    SELECT NAME_, REPORTER_, SUM(VALUE_) as VALUE_, INTERVAL_
+    FROM
+    (
+      SELECT
+        NAME_,
+        REPORTER_,
+        VALUE_,
+        ${fromTimestamp1} FLOOR( ${toTimestamp1} TIMESTAMP_ ${toTimestamp2} / #{interval} ) * #{interval} ${fromTimestamp2} as INTERVAL_
+      <include refid="selectMeterLogsByQueryCriteriaSql"/>
+    ) RES
+    GROUP BY
+      NAME_,
+      REPORTER_,
+      INTERVAL_
+  </sql>
+
+  <select id="selectMeterLogAggregatedByTimeInterval"  parameterType="org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl" resultMap="meterResultIntervallMap">
+    ${limitBefore}
+    <include refid="selectMeterLogAggregatedByTimeIntervalQuery"/>
+    ORDER BY INTERVAL_ DESC
+    ${limitAfter}
+  </select>
 
 </mapper>

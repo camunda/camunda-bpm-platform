@@ -1056,6 +1056,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       properties.put("datepart2" , DbSqlSessionFactory.databaseSpecificDatepart2.get(databaseType));
       properties.put("datepart3" , DbSqlSessionFactory.databaseSpecificDatepart3.get(databaseType));
 
+      properties.put("fromTimestamp1", DbSqlSessionFactory.databaseSpecificFromTimestamp1.get(databaseType));
+      properties.put("fromTimestamp2", DbSqlSessionFactory.databaseSpecificFromTimestamp2.get(databaseType));
+
+      properties.put("toTimestamp1", DbSqlSessionFactory.databaseSpecificToTimestamp1.get(databaseType));
+      properties.put("toTimestamp2", DbSqlSessionFactory.databaseSpecificToTimestamp2.get(databaseType));
+
       properties.put("trueConstant", DbSqlSessionFactory.databaseSpecificTrueConstant.get(databaseType));
       properties.put("falseConstant", DbSqlSessionFactory.databaseSpecificFalseConstant.get(databaseType));
 

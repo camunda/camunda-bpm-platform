@@ -13,25 +13,63 @@
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
 import java.util.Date;
-import java.util.TimeZone;
+import static junit.framework.TestCase.assertEquals;
+import org.camunda.bpm.engine.ManagementService;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.Metrics;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.RuleChain;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class MetricsTest extends AbstractMetricsTest {
+public class MetricsTest {
 
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  @Rule
+  public final ExpectedException exception = ExpectedException.none();
+
+  protected RuntimeService runtimeService;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected ManagementService managementService;
+
+  @Before
+  public void init() {
+    runtimeService = engineRule.getRuntimeService();
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    managementService = engineRule.getManagementService();
+  }
+
+  @After
+  public void cleanUp() {
+    managementService.deleteMetrics(null);
+  }
+
+  @Test
   public void testDeleteMetrics() {
-    deployment(Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .manualTask()
-      .endEvent()
-    .done());
+    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+            .startEvent()
+            .manualTask()
+            .endEvent()
+            .done());
 
     // given
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -39,7 +77,7 @@ public class MetricsTest extends AbstractMetricsTest {
 
     // a count of three
     assertEquals(3l, managementService.createMetricsQuery()
-        .sum());
+            .sum());
 
     // if
     // we delete with timestamp "null"
@@ -48,16 +86,17 @@ public class MetricsTest extends AbstractMetricsTest {
     // then
     // all entries are deleted
     assertEquals(0l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_START)
-        .sum());
+            .name(Metrics.ACTIVTY_INSTANCE_START)
+            .sum());
   }
 
+  @Test
   public void testDeleteMetricsWithTimestamp() {
-    deployment(Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .manualTask()
-      .endEvent()
-    .done());
+    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+            .startEvent()
+            .manualTask()
+            .endEvent()
+            .done());
 
     // given
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -65,7 +104,7 @@ public class MetricsTest extends AbstractMetricsTest {
 
     // a count of three
     assertEquals(3l, managementService.createMetricsQuery()
-        .sum());
+            .sum());
 
     // if
     // we delete with timestamp older or equal to the timestamp of the log entry
@@ -74,16 +113,17 @@ public class MetricsTest extends AbstractMetricsTest {
     // then
     // all entries are deleted
     assertEquals(0l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_START)
-        .sum());
+            .name(Metrics.ACTIVTY_INSTANCE_START)
+            .sum());
   }
 
+  @Test
   public void testDeleteMetricsWithTimestampBefore() {
-    deployment(Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .manualTask()
-      .endEvent()
-    .done());
+    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+            .startEvent()
+            .manualTask()
+            .endEvent()
+            .done());
 
     // given
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -91,7 +131,7 @@ public class MetricsTest extends AbstractMetricsTest {
 
     // a count of three
     assertEquals(3l, managementService.createMetricsQuery()
-        .sum());
+            .sum());
 
     // if
     // we delete with timestamp before the timestamp of the log entry
@@ -100,20 +140,21 @@ public class MetricsTest extends AbstractMetricsTest {
     // then
     // the entires are NOT deleted
     assertEquals(3l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_START)
-        .sum());
+            .name(Metrics.ACTIVTY_INSTANCE_START)
+            .sum());
   }
 
+  @Test
   public void testDeleteMetricsWithReporterId() {
     // indicate that db metrics reporter is active (although it is not)
     processEngineConfiguration.setDbMetricsReporterActivate(true);
 
     // given
-    deployment(Bpmn.createExecutableProcess("testProcess")
-        .startEvent()
-        .manualTask()
-        .endEvent()
-      .done());
+    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+            .startEvent()
+            .manualTask()
+            .endEvent()
+            .done());
 
     processEngineConfiguration.getDbMetricsReporter().setReporterId("reporter1");
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -124,32 +165,33 @@ public class MetricsTest extends AbstractMetricsTest {
     managementService.reportDbMetricsNow();
 
     assertEquals(3l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).reporter("reporter1")
-        .sum());
+            .sum());
 
     // when the metrics for reporter1 are deleted
     managementService.deleteMetrics(null, "reporter1");
 
     // then
     assertEquals(0l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).reporter("reporter1")
-        .sum());
+            .sum());
     assertEquals(3l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).reporter("reporter2")
-        .sum());
+            .sum());
 
     // cleanup
     processEngineConfiguration.setDbMetricsReporterActivate(false);
     processEngineConfiguration.getDbMetricsReporter().setReporterId(null);
   }
 
+  @Test
   public void testReportNow() {
     // indicate that db metrics reporter is active (although it is not)
     processEngineConfiguration.setDbMetricsReporterActivate(true);
 
     // given
-    deployment(Bpmn.createExecutableProcess("testProcess")
-        .startEvent()
-        .manualTask()
-        .endEvent()
-      .done());
+    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+            .startEvent()
+            .manualTask()
+            .endEvent()
+            .done());
     runtimeService.startProcessInstanceByKey("testProcess");
 
     // when
@@ -157,33 +199,28 @@ public class MetricsTest extends AbstractMetricsTest {
 
     // then the metrics have been reported
     assertEquals(3l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START)
-        .sum());
+            .sum());
 
     // cleanup
     processEngineConfiguration.setDbMetricsReporterActivate(false);
   }
 
+  @Test
   public void testReportNowIfMetricsIsDisabled() {
     boolean defaultIsMetricsEnabled = processEngineConfiguration.isMetricsEnabled();
 
     // given
     processEngineConfiguration.setMetricsEnabled(false);
 
-    try {
-      // when
-      managementService.reportDbMetricsNow();
-      fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
-      // then an exception is thrown
-      assertTextPresent("Metrics reporting is disabled", e.getMessage());
-    }
-    finally {
-      // reset metrics setting
-      processEngineConfiguration.setMetricsEnabled(defaultIsMetricsEnabled);
-    }
+    // when
+    exception.expect(ProcessEngineException.class);
+    exception.expectMessage("Metrics reporting is disabled");
+    managementService.reportDbMetricsNow();
+    // reset metrics setting
+    processEngineConfiguration.setMetricsEnabled(defaultIsMetricsEnabled);
   }
 
+  @Test
   public void testReportNowIfReporterIsNotActive() {
     boolean defaultIsMetricsEnabled = processEngineConfiguration.isMetricsEnabled();
     boolean defaultIsMetricsReporterActivate = processEngineConfiguration.isDbMetricsReporterActivate();
@@ -192,27 +229,22 @@ public class MetricsTest extends AbstractMetricsTest {
     processEngineConfiguration.setMetricsEnabled(true);
     processEngineConfiguration.setDbMetricsReporterActivate(false);
 
-    try {
-      // when
-      managementService.reportDbMetricsNow();
-      fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
-      // then an exception is thrown
-      assertTextPresent("Metrics reporting to database is disabled", e.getMessage());
-    }
-    finally {
-      processEngineConfiguration.setMetricsEnabled(defaultIsMetricsEnabled);
-      processEngineConfiguration.setDbMetricsReporterActivate(defaultIsMetricsReporterActivate);
-    }
+    // when
+    exception.expect(ProcessEngineException.class);
+    exception.expectMessage("Metrics reporting to database is disabled");
+    managementService.reportDbMetricsNow();
+    // then an exception is thrown
+    processEngineConfiguration.setMetricsEnabled(defaultIsMetricsEnabled);
+    processEngineConfiguration.setDbMetricsReporterActivate(defaultIsMetricsReporterActivate);
   }
 
+  @Test
   public void testQuery() {
-    deployment(Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .manualTask()
-      .endEvent()
-    .done());
+    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+            .startEvent()
+            .manualTask()
+            .endEvent()
+            .done());
 
     // given
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -225,7 +257,7 @@ public class MetricsTest extends AbstractMetricsTest {
     assertEquals(3l, managementService.createMetricsQuery().sum());
     assertEquals(3l, managementService.createMetricsQuery().startDate(new Date(1000)).sum());
     assertEquals(3l, managementService.createMetricsQuery().startDate(new Date(1000))
-        .endDate(new Date(ClockUtil.getCurrentTime().getTime() + 2000l)).sum()); // + 2000 for milliseconds imprecision on some databases (MySQL)
+            .endDate(new Date(ClockUtil.getCurrentTime().getTime() + 2000l)).sum()); // + 2000 for milliseconds imprecision on some databases (MySQL)
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).sum());
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).endDate(ClockUtil.getCurrentTime()).sum());
 
@@ -241,13 +273,13 @@ public class MetricsTest extends AbstractMetricsTest {
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).endDate(ClockUtil.getCurrentTime()).sum());
   }
 
+  @Test
   public void testQueryEndDateExclusive() {
-    deployment(Bpmn.createExecutableProcess("testProcess")
-        .startEvent()
-        .manualTask()
-        .endEvent()
-      .done());
-
+    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+            .startEvent()
+            .manualTask()
+            .endEvent()
+            .done());
     // given
     // note: dates should be exact seconds due to missing milliseconds precision on
     // older mysql versions
@@ -272,16 +304,17 @@ public class MetricsTest extends AbstractMetricsTest {
 
   }
 
+  @Test
   public void testReportWithReporterId() {
     // indicate that db metrics reporter is active (although it is not)
     processEngineConfiguration.setDbMetricsReporterActivate(true);
 
     // given
-    deployment(Bpmn.createExecutableProcess("testProcess")
-        .startEvent()
-        .manualTask()
-        .endEvent()
-      .done());
+    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+            .startEvent()
+            .manualTask()
+            .endEvent()
+            .done());
 
     // when
     processEngineConfiguration.getDbMetricsReporter().setReporterId("reporter1");
@@ -295,15 +328,15 @@ public class MetricsTest extends AbstractMetricsTest {
 
     // then the metrics have been reported
     assertEquals(6l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START)
-        .sum());
+            .sum());
 
     // and are grouped by reporter
     assertEquals(3l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).reporter("reporter1")
-        .sum());
+            .sum());
     assertEquals(3l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).reporter("reporter2")
-        .sum());
+            .sum());
     assertEquals(0l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).reporter("aNonExistingReporter")
-        .sum());
+            .sum());
 
     // cleanup
     processEngineConfiguration.setDbMetricsReporterActivate(false);

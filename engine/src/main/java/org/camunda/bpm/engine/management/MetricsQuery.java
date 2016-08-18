@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.management;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Daniel Meyer
@@ -41,6 +42,49 @@ public interface MetricsQuery {
    * Restrict to data collected before the given date (exclusive)
    */
   MetricsQuery endDate(Date endTime);
+
+
+  /**
+   * Sets the offset of the returned results.
+   *
+   * @param offset indicates after which row the result begins
+   * @return the adjusted MetricsQuery
+   */
+  MetricsQuery offset(int offset);
+
+  /**
+   * Sets the limit row count of the result.
+   * Can't be set larger than 200, since it is the maximum row count which should be returned.
+   *
+   * @param maxResults the new row limit of the result
+   * @return the adjusted MetricsQuery
+   */
+  MetricsQuery limit(int maxResults);
+
+  /**
+   * Returns the metrics summed up and aggregated on a time interval.
+   * Default interval is 900 (15 minutes). The list size has a maximum of 200
+   * the maximum can be decreased with the MetricsQuery#limit method. Paging
+   * is enabled with the help of the offset.
+   *
+   * @return the aggregated metrics
+   */
+  List<Metric> interval();
+
+
+
+  /**
+   * Returns the metrics summed up and aggregated on a time interval.
+   * The size of the interval is given via parameter.
+   * The time unit is seconds! The list size has a maximum of 200
+   * the maximum can be decreased with the MetricsQuery#limit method. Paging
+   * is enabled with the help of the offset.
+   *
+   * @param interval The time interval on which the metrics should be aggregated.
+   *                  The time unit is seconds.
+   * @return the aggregated metrics
+   */
+  List<Metric> interval(long interval);
 
   /**
    * @return the aggregated sum

@@ -59,6 +59,12 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final Map<String, String> databaseSpecificDatepart2 = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificDatepart3 = new HashMap<String, String>();
 
+  public static final Map<String, String> databaseSpecificToTimestamp1 = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificToTimestamp2 = new HashMap<String, String>();
+
+  public static final Map<String, String> databaseSpecificFromTimestamp1 = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificFromTimestamp2 = new HashMap<String, String>();
+
   public static final Map<String, String> databaseSpecificDummyTable = new HashMap<String, String>();
 
   public static final Map<String, String> databaseSpecificIfNull = new HashMap<String, String>();
@@ -90,6 +96,10 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDatepart1.put(H2, "");
     databaseSpecificDatepart2.put(H2, "(");
     databaseSpecificDatepart3.put(H2, ")");
+    databaseSpecificFromTimestamp1.put(H2, "DATEADD('s', ");
+    databaseSpecificFromTimestamp2.put(H2, ", DATE '1970-01-01')");
+    databaseSpecificToTimestamp1.put(H2, "DATEDIFF('s', '1970-01-01', ");
+    databaseSpecificToTimestamp2.put(H2, ")");
     databaseSpecificDummyTable.put(H2, "");
     databaseSpecificTrueConstant.put(H2, "1");
     databaseSpecificFalseConstant.put(H2, "0");
@@ -123,6 +133,10 @@ public class DbSqlSessionFactory implements SessionFactory {
       databaseSpecificDatepart1.put(mysqlLikeDatabase, "");
       databaseSpecificDatepart2.put(mysqlLikeDatabase, "(");
       databaseSpecificDatepart3.put(mysqlLikeDatabase, ")");
+      databaseSpecificFromTimestamp1.put(mysqlLikeDatabase, "FROM_UNIXTIME(");
+      databaseSpecificFromTimestamp2.put(mysqlLikeDatabase, ")");
+      databaseSpecificToTimestamp1.put(mysqlLikeDatabase, "UNIX_TIMESTAMP(");
+      databaseSpecificToTimestamp2.put(mysqlLikeDatabase, ")");
       databaseSpecificDummyTable.put(mysqlLikeDatabase, "");
       databaseSpecificTrueConstant.put(mysqlLikeDatabase, "1");
       databaseSpecificFalseConstant.put(mysqlLikeDatabase, "0");
@@ -158,6 +172,10 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDatepart1.put(POSTGRES, "extract(");
     databaseSpecificDatepart2.put(POSTGRES, " from ");
     databaseSpecificDatepart3.put(POSTGRES, ")");
+    databaseSpecificFromTimestamp1.put(POSTGRES, "TO_TIMESTAMP(");
+    databaseSpecificFromTimestamp2.put(POSTGRES, ") AT TIME ZONE 'UTC'");
+    databaseSpecificToTimestamp1.put(POSTGRES, "EXTRACT(epoch FROM ");
+    databaseSpecificToTimestamp2.put(POSTGRES, ")");
     databaseSpecificDummyTable.put(POSTGRES, "");
     databaseSpecificTrueConstant.put(POSTGRES, "true");
     databaseSpecificFalseConstant.put(POSTGRES, "false");
@@ -212,6 +230,10 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDatepart1.put(ORACLE, "to_number(to_char(");
     databaseSpecificDatepart2.put(ORACLE, ",");
     databaseSpecificDatepart3.put(ORACLE, "))");
+    databaseSpecificFromTimestamp1.put(ORACLE, "TO_DATE('1970-01-01','YYYY-MM-DD') + (");
+    databaseSpecificFromTimestamp2.put(ORACLE, "/ (24 * 60 * 60)) ");
+    databaseSpecificToTimestamp1.put(ORACLE, "((CAST(");
+    databaseSpecificToTimestamp2.put(ORACLE, " as date)-TO_DATE('01.01.1970','dd.mm.yyyy')) * 24 * 60 * 60)");
     databaseSpecificTrueConstant.put(ORACLE, "1");
     databaseSpecificFalseConstant.put(ORACLE, "0");
     databaseSpecificIfNull.put(ORACLE, "NVL");
@@ -246,10 +268,15 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDatepart1.put(DB2, "");
     databaseSpecificDatepart2.put(DB2, "(");
     databaseSpecificDatepart3.put(DB2, ")");
+    databaseSpecificFromTimestamp1.put(DB2, "timestamp('1970-01-01') + (");
+    databaseSpecificFromTimestamp2.put(DB2, ") SECONDS");
+    databaseSpecificToTimestamp1.put(DB2, "CAST (DAYS(");
+    databaseSpecificToTimestamp2.put(DB2, ") - DAYS('1970-01-01') AS INTEGER) * 86400 + MIDNIGHT_SECONDS(TIMESTAMP_)");
     databaseSpecificDummyTable.put(DB2, "FROM SYSIBM.SYSDUMMY1");
     databaseSpecificTrueConstant.put(DB2, "1");
     databaseSpecificFalseConstant.put(DB2, "0");
     databaseSpecificIfNull.put(DB2, "NVL");
+    addDatabaseSpecificStatement(DB2, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(DB2, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricCaseActivityInstanceByNativeQuery", "selectHistoricCaseActivityInstanceByNativeQuery_mssql_or_db2");
@@ -285,10 +312,15 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDatepart1.put(MSSQL, "datepart(");
     databaseSpecificDatepart2.put(MSSQL, ",");
     databaseSpecificDatepart3.put(MSSQL, ")");
+    databaseSpecificFromTimestamp1.put(MSSQL, "DATEADD(S, ");
+    databaseSpecificFromTimestamp2.put(MSSQL, ", '1970-01-01')");
+    databaseSpecificToTimestamp1.put(MSSQL, "DATEDIFF(SECOND,{d '1970-01-01'}, ");
+    databaseSpecificToTimestamp2.put(MSSQL, ")");
     databaseSpecificDummyTable.put(MSSQL, "");
     databaseSpecificTrueConstant.put(MSSQL, "1");
     databaseSpecificFalseConstant.put(MSSQL, "0");
     databaseSpecificIfNull.put(MSSQL, "ISNULL");
+    addDatabaseSpecificStatement(MSSQL, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricCaseActivityInstanceByNativeQuery", "selectHistoricCaseActivityInstanceByNativeQuery_mssql_or_db2");
