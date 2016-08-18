@@ -19,21 +19,28 @@ import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.ReadLocalVariableListener.VariableEvent;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.BookFlightService;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.CancelFlightService;
@@ -41,6 +48,8 @@ import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.GetVariablesDele
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.SetVariablesDelegate;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
 
 /**
@@ -1077,6 +1086,62 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     VariableEvent event = readListener.getVariableEvents().get(0);
     Assert.assertEquals("foo", event.getVariableName());
     Assert.assertEquals("bar", event.getVariableValue());
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  public void FAILING_testDeleteInstanceWithEventScopeExecution()
+  {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo")
+    .startEvent("start")
+    .subProcess("subProcess")
+      .embeddedSubProcess()
+        .startEvent("subProcessStart")
+        .endEvent("subProcessEnd")
+    .subProcessDone()
+    .userTask("userTask")
+    .done();
+
+    modelInstance = ModifiableBpmnModelInstance.modify(modelInstance)
+      .addSubProcessTo("subProcess")
+      .id("eventSubProcess")
+        .triggerByEvent()
+        .embeddedSubProcess()
+          .startEvent()
+            .compensateEventDefinition()
+            .compensateEventDefinitionDone()
+          .endEvent()
+      .done();
+
+    deployment(modelInstance);
+
+    long dayInMillis = 1000 * 60 * 60 * 24;
+    Date date1 = new Date(10 * dayInMillis);
+    ClockUtil.setCurrentTime(date1);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("foo");
+
+    // when
+    Date date2 = new Date(date1.getTime() + dayInMillis);
+    ClockUtil.setCurrentTime(date2);
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // then
+    List<HistoricActivityInstance> historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
+        .orderByActivityId().asc().list();
+    assertEquals(5, historicActivityInstance.size());
+
+    assertEquals("start", historicActivityInstance.get(0).getActivityId());
+    assertEquals(date1, historicActivityInstance.get(0).getEndTime());
+    assertEquals("subProcess", historicActivityInstance.get(1).getActivityId());
+    assertEquals(date1, historicActivityInstance.get(1).getEndTime());
+    assertEquals("subProcessEnd", historicActivityInstance.get(2).getActivityId());
+    assertEquals(date1, historicActivityInstance.get(2).getEndTime());
+    assertEquals("subProcessStart", historicActivityInstance.get(3).getActivityId());
+    assertEquals(date1, historicActivityInstance.get(3).getEndTime());
+    assertEquals("userTask", historicActivityInstance.get(4).getActivityId());
+    assertEquals(date2, historicActivityInstance.get(4).getEndTime());
+
+
   }
 
   private void completeTask(String taskName) {
