@@ -22,12 +22,14 @@ import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricCaseActivityStatisticsQuery;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
@@ -73,6 +75,11 @@ public interface HistoryService {
    * Query for the number of historic activity instances aggregated by activities of a single process definition.
    */
   HistoricActivityStatisticsQuery createHistoricActivityStatisticsQuery(String processDefinitionId);
+
+  /**
+   * Query for the number of historic case activity instances aggregated by case activities of a single case definition.
+   */
+  HistoricCaseActivityStatisticsQuery createHistoricCaseActivityStatisticsQuery(String caseDefinitionId);
 
   /** Creates a new programmatic query to search for {@link HistoricTaskInstance}s. */
   HistoricTaskInstanceQuery createHistoricTaskInstanceQuery();

@@ -14,6 +14,16 @@
     <result property="completeScope" column="COMPLETE_SCOPE_COUNT_" jdbcType="INTEGER" />
   </resultMap>
 
+  <resultMap id="historicCaseActivityStatisticsResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityStatisticsImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="available" column="AVAILABLE_" jdbcType="INTEGER" />
+    <result property="enabled" column="ENABLED_" jdbcType="INTEGER" />
+    <result property="disabled" column="DISABLED_" jdbcType="INTEGER" />
+    <result property="active" column="ACTIVE_" jdbcType="INTEGER" />
+    <result property="terminated" column="TERMINATED_" jdbcType="INTEGER" />
+    <result property="completed" column="COMPLETED_" jdbcType="INTEGER" />
+  </resultMap>
+
   <!-- HistoricActivity statistics -->
 
   <select id ="selectHistoricActivityStatistics" resultMap="historicActivityStatisticsResultMap" 
@@ -118,6 +128,43 @@
         </if>
 
       ) RES
+  </sql>
+
+  <!-- HistoricCaseActivity statistics -->
+
+  <select id ="selectHistoricCaseActivityStatistics" resultMap="historicCaseActivityStatisticsResultMap" 
+    parameterType="org.camunda.bpm.engine.impl.HistoricCaseActivityStatisticsQueryImpl">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select RES.*
+    ${limitBetween}
+    <include refid="selectHistoricCaseActivityStatisticsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id ="selectHistoricCaseActivityStatisticsCount" resultType="long" 
+    parameterType="org.camunda.bpm.engine.impl.HistoricCaseActivityStatisticsQueryImpl">
+    select count(distinct RES.ID_)
+    <include refid="selectHistoricCaseActivityStatisticsByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectHistoricCaseActivityStatisticsByQueryCriteriaSql">
+    from (
+      select
+        HCAI.CASE_ACT_ID_ as ID_
+      , count( CASE WHEN HCAI.STATE_ = 1 THEN 1 ELSE null END ${dbSpecificDummyTable} ) as AVAILABLE_
+      , count( CASE WHEN HCAI.STATE_ = 2 THEN 1 ELSE null END ${dbSpecificDummyTable} ) as ENABLED_
+      , count( CASE WHEN HCAI.STATE_ = 3 THEN 1 ELSE null END ${dbSpecificDummyTable} ) as DISABLED_
+      , count( CASE WHEN HCAI.STATE_ = 4 THEN 1 ELSE null END ${dbSpecificDummyTable} ) as ACTIVE_
+      , count( CASE WHEN HCAI.STATE_ = 6 THEN 1 ELSE null END ${dbSpecificDummyTable} ) as TERMINATED_
+      , count( CASE WHEN HCAI.STATE_ = 7 THEN 1 ELSE null END ${dbSpecificDummyTable} ) as COMPLETED_
+      from
+        ${prefix}ACT_HI_CASEACTINST HCAI
+      where
+        HCAI.CASE_DEF_ID_ = #{caseDefinitionId}
+      group by HCAI.CASE_ACT_ID_
+    ) RES
   </sql>
 
 </mapper>

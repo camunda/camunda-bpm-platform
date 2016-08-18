@@ -12,20 +12,11 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
-import java.util.List;
-
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-
-import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
-import org.camunda.bpm.engine.rest.dto.batch.BatchQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricActivityStatisticsRestService;
 import org.camunda.bpm.engine.rest.history.HistoricBatchRestService;
 import org.camunda.bpm.engine.rest.history.HistoricCaseActivityInstanceRestService;
+import org.camunda.bpm.engine.rest.history.HistoricCaseActivityStatisticsRestService;
 import org.camunda.bpm.engine.rest.history.HistoricCaseInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricDecisionInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricDetailRestService;
@@ -38,7 +29,6 @@ import org.camunda.bpm.engine.rest.history.HistoricVariableInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoryRestService;
 import org.camunda.bpm.engine.rest.history.UserOperationLogRestService;
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
-import org.camunda.bpm.engine.rest.sub.batch.BatchResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -70,6 +60,10 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
 
   public HistoricActivityStatisticsRestService getActivityStatisticsService() {
     return new HistoricActivityStatisticsRestServiceImpl(getProcessEngine());
+  }
+
+  public HistoricCaseActivityStatisticsRestService getCaseActivityStatisticsService() {
+    return new HistoricCaseActivityStatisticsRestServiceImpl(getProcessEngine());
   }
 
   public UserOperationLogRestService getUserOperationLogRestService() {

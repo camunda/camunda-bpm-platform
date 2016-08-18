@@ -19,7 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
+import org.camunda.bpm.engine.history.HistoricCaseActivityStatistics;
 import org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricCaseActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
@@ -48,6 +50,15 @@ public class HistoricStatisticsManager extends AbstractManager {
     else {
       return 0;
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<HistoricCaseActivityStatistics> getHistoricStatisticsGroupedByCaseActivity(HistoricCaseActivityStatisticsQueryImpl query, Page page) {
+    return getDbEntityManager().selectList("selectHistoricCaseActivityStatistics", query, page);
+  }
+
+  public long getHistoricStatisticsCountGroupedByCaseActivity(HistoricCaseActivityStatisticsQueryImpl query) {
+    return (Long) getDbEntityManager().selectOne("selectHistoricCaseActivityStatisticsCount", query);
   }
 
   protected boolean ensureHistoryReadOnProcessDefinition(HistoricActivityStatisticsQueryImpl query) {

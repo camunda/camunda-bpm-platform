@@ -53,6 +53,7 @@ import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
+import org.camunda.bpm.engine.history.HistoricCaseActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
@@ -380,6 +381,20 @@ public abstract class MockProvider {
   public static final long ANOTHER_EXAMPLE_FINISHED_LONG = 128;
   public static final long ANOTHER_EXAMPLE_CANCELED_LONG = 129;
   public static final long ANOTHER_EXAMPLE_COMPLETE_SCOPE_LONG = 130;
+
+  public static final long EXAMPLE_AVAILABLE_LONG = 123;
+  public static final long EXAMPLE_ACTIVE_LONG = 124;
+  public static final long EXAMPLE_COMPLETED_LONG = 125;
+  public static final long EXAMPLE_DISABLED_LONG = 126;
+  public static final long EXAMPLE_ENABLED_LONG = 127;
+  public static final long EXAMPLE_TERMINATED_LONG = 128;
+
+  public static final long ANOTHER_EXAMPLE_AVAILABLE_LONG = 129;
+  public static final long ANOTHER_EXAMPLE_ACTIVE_LONG = 130;
+  public static final long ANOTHER_EXAMPLE_COMPLETED_LONG = 131;
+  public static final long ANOTHER_EXAMPLE_DISABLED_LONG = 132;
+  public static final long ANOTHER_EXAMPLE_ENABLED_LONG = 133;
+  public static final long ANOTHER_EXAMPLE_TERMINATED_LONG = 134;
 
   public static final int ANOTHER_EXAMPLE_FAILED_JOBS = 43;
   public static final int ANOTHER_EXAMPLE_INSTANCES = 124;
@@ -1822,6 +1837,34 @@ public abstract class MockProvider {
     when(anotherStatistics.getCompleteScope()).thenReturn(ANOTHER_EXAMPLE_COMPLETE_SCOPE_LONG);
 
     List<HistoricActivityStatistics> activityResults = new ArrayList<HistoricActivityStatistics>();
+    activityResults.add(statistics);
+    activityResults.add(anotherStatistics);
+
+    return activityResults;
+  }
+
+  public static List<HistoricCaseActivityStatistics> createMockHistoricCaseActivityStatistics() {
+    HistoricCaseActivityStatistics statistics = mock(HistoricCaseActivityStatistics.class);
+
+    when(statistics.getId()).thenReturn(EXAMPLE_ACTIVITY_ID);
+    when(statistics.getActive()).thenReturn(EXAMPLE_ACTIVE_LONG);
+    when(statistics.getAvailable()).thenReturn(EXAMPLE_AVAILABLE_LONG);
+    when(statistics.getCompleted()).thenReturn(EXAMPLE_COMPLETED_LONG);
+    when(statistics.getDisabled()).thenReturn(EXAMPLE_DISABLED_LONG);
+    when(statistics.getEnabled()).thenReturn(EXAMPLE_ENABLED_LONG);
+    when(statistics.getTerminated()).thenReturn(EXAMPLE_TERMINATED_LONG);
+
+    HistoricCaseActivityStatistics anotherStatistics = mock(HistoricCaseActivityStatistics.class);
+
+    when(anotherStatistics.getId()).thenReturn(ANOTHER_EXAMPLE_ACTIVITY_ID);
+    when(anotherStatistics.getActive()).thenReturn(ANOTHER_EXAMPLE_ACTIVE_LONG);
+    when(anotherStatistics.getAvailable()).thenReturn(ANOTHER_EXAMPLE_AVAILABLE_LONG);
+    when(anotherStatistics.getCompleted()).thenReturn(ANOTHER_EXAMPLE_COMPLETED_LONG);
+    when(anotherStatistics.getDisabled()).thenReturn(ANOTHER_EXAMPLE_DISABLED_LONG);
+    when(anotherStatistics.getEnabled()).thenReturn(ANOTHER_EXAMPLE_ENABLED_LONG);
+    when(anotherStatistics.getTerminated()).thenReturn(ANOTHER_EXAMPLE_TERMINATED_LONG);
+
+    List<HistoricCaseActivityStatistics> activityResults = new ArrayList<HistoricCaseActivityStatistics>();
     activityResults.add(statistics);
     activityResults.add(anotherStatistics);
 
