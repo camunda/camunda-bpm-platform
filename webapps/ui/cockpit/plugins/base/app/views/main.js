@@ -39,7 +39,8 @@ var angular = require('angular'),
     addVariableDialog = require('./processInstance/addVariableDialog'),
     updateSuspensionStateActionPI = require('./processInstance/updateSuspensionStateAction'),
     updateSuspensionStateDialogPI = require('./processInstance/updateSuspensionStateDialog'),
-    activityInstanceStatisticsOverlayPI = require('./processInstance/activityInstanceStatisticsOverlay');
+    activityInstanceStatisticsOverlayPI = require('./processInstance/activityInstanceStatisticsOverlay'),
+    incidentJobRetryAction = require('./processInstance/incidentJobRetryAction');
 
 var ngModule = angular.module('cockpit.plugin.base.views', []);
 
@@ -74,5 +75,6 @@ ngModule.controller('AddVariableController', addVariableDialog);
 ngModule.config(updateSuspensionStateActionPI);
 ngModule.controller('UpdateProcessInstanceSuspensionStateController', updateSuspensionStateDialogPI);
 ngModule.config(activityInstanceStatisticsOverlayPI);
+ngModule.config(incidentJobRetryAction);
 
 module.exports = ngModule;

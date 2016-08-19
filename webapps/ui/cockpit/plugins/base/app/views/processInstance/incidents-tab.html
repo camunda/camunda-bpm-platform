@@ -91,13 +91,10 @@
         </td>
 
         <td class="action">
-          <a class="btn btn-default action-button"
-             ng-click="openJobRetryDialog(incident)"
-             ng-show="incident.incidentType === 'failedJob' && incident.configuration"
-             tooltip="Increment Number of Retries of Failed Job"
-             tooltip-placement="left">
-            <span class="glyphicon glyphicon-repeat"></span>
-          </a>
+          <span ng-repeat="actionProvider in incidentActions">
+            <view provider="actionProvider"
+              vars="incidentVars" />
+          </span>
         </td>
       </tr>
     </tbody>

@@ -1,0 +1,9 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/incident-job-retry-action.html -->
+<a class="btn btn-default action-button"
+   ng-click="openJobRetryDialog(incident)"
+   ng-show="incident.incidentType === 'failedJob' && incident.configuration"
+   tooltip="Increment Number of Retries of Failed Job"
+   tooltip-placement="left">
+  <span class="glyphicon glyphicon-repeat"></span>
+</a>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/incident-job-retry-action.html -->
