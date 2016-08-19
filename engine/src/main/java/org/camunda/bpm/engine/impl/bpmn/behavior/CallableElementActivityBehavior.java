@@ -129,7 +129,7 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
   @Override
   public void passOutputVariables(final ActivityExecution execution, final VariableScope subInstance) {
     // only data. no control flow available on this execution.
-    Map<String, Object> variables = filterMIScopeVariables(getOutputVariables(subInstance));
+    VariableMap variables = filterMIScopeVariables(getOutputVariables(subInstance));
     VariableMap localVariables = getOutputVariablesLocal(subInstance);
 
     execution.setVariables(variables);
@@ -154,7 +154,7 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
     }
   }
 
-  protected Map<String, Object> filterMIScopeVariables(VariableMap variables) {
+  protected VariableMap filterMIScopeVariables(VariableMap variables) {
     if (variables != null) {
       for (String key : variablesFilter) {
         variables.remove(key);

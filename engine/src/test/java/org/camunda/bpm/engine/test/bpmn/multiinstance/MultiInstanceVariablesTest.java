@@ -30,14 +30,8 @@ public class MultiInstanceVariablesTest {
   public static final String PROCESS_ID = "process";
   public static final String CALL_ACTIVITY = "callActivity";
 
+  @Rule
   public ProcessEngineRule engineRule = new ProcessEngineRule(true);
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
-
-  @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-  private Deployment deployment;
 
   @Test
   public void testMultiInstanceWithAllInOutMapping() {
@@ -73,46 +67,6 @@ public class MultiInstanceVariablesTest {
     CamundaIn camundaIn = modelInstance.newInstance(CamundaIn.class);
     camundaIn.setCamundaVariables(ALL);
     callActivityBuilder.addExtensionElement(camundaIn);
-  }
-
-  @Test
-  public void testMultiInstanceWithAllOutMapping() {
-    BpmnModelInstance modelInstance = getBpmnModelInstance();
-
-    CallActivityBuilder callActivityBuilder = ((CallActivity) modelInstance.getModelElementById(CALL_ACTIVITY)).builder();
-
-    addAllOut(modelInstance, callActivityBuilder);
-
-    BpmnModelInstance testProcess = getBpmnSubProcessModelInstance();
-
-    deployAndStartProcess(modelInstance, testProcess);
-    assertThat(engineRule.getRuntimeService().createExecutionQuery().processDefinitionKey(SUB_PROCESS_ID).list().size(),is(2));
-    List<Task> tasks = engineRule.getTaskService().createTaskQuery().active().list();
-    for (Task task : tasks) {
-      engineRule.getTaskService().complete(task.getId());
-    }
-    assertThat(engineRule.getRuntimeService().createExecutionQuery().processDefinitionKey(SUB_PROCESS_ID).list().size(),is(0));
-    assertThat(engineRule.getRuntimeService().createExecutionQuery().activityId(CALL_ACTIVITY).list().size(),is(0));
-  }
-
-  @Test
-  public void testMultiInstanceWithAllInMapping() {
-    BpmnModelInstance modelInstance = getBpmnModelInstance();
-
-    CallActivityBuilder callActivityBuilder = ((CallActivity) modelInstance.getModelElementById(CALL_ACTIVITY)).builder();
-
-    addAllIn(modelInstance, callActivityBuilder);
-
-    BpmnModelInstance testProcess = getBpmnSubProcessModelInstance();
-
-    deployAndStartProcess(modelInstance, testProcess);
-    assertThat(engineRule.getRuntimeService().createExecutionQuery().processDefinitionKey(SUB_PROCESS_ID).list().size(),is(2));
-    List<Task> tasks = engineRule.getTaskService().createTaskQuery().active().list();
-    for (Task task : tasks) {
-      engineRule.getTaskService().complete(task.getId());
-    }
-    assertThat(engineRule.getRuntimeService().createExecutionQuery().processDefinitionKey(SUB_PROCESS_ID).list().size(),is(0));
-    assertThat(engineRule.getRuntimeService().createExecutionQuery().activityId(CALL_ACTIVITY).list().size(),is(0));
   }
 
   protected void deployAndStartProcess(BpmnModelInstance modelInstance, BpmnModelInstance testProcess) {
