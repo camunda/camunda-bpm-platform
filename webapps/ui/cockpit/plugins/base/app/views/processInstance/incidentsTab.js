@@ -4,7 +4,6 @@ var fs = require('fs');
 
 var angular = require('angular');
 var incidentsTemplate = fs.readFileSync(__dirname + '/incidents-tab.html', 'utf8');
-var retryTemplate = fs.readFileSync(__dirname + '/job-retry-dialog.html', 'utf8');
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
