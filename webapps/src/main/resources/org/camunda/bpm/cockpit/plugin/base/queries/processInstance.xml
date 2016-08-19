@@ -49,7 +49,7 @@
         HISTORY.START_TIME_
         </if>
         <if test="!historyEnabled">
-        null START_TIME_
+        ${constant.null.startTime}
         </if>
         <include refid="selectProcessInstances"/>
         ${orderBy}
@@ -95,7 +95,7 @@
       RES.PROC_DEF_ID_ = P.ID_
 
       <if test="!authCheck.revokeAuthorizationCheckEnabled">
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
         AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_INST_ID_, P.KEY_, '*'))
       </if>
 
@@ -171,7 +171,7 @@
           and NAME_= #{queryVariableValue.name}
 
         <if test="queryVariableValue.valueConditions != null">
-          and 
+          and
           <if test="queryVariableValue.operatorName.equals('NOT_EQUALS')">NOT</if><!-- NOT_EQUALS uses the same conditions as EQUALS -->
           (
           <foreach collection="queryVariableValue.valueConditions" item="valueCondition" separator="or">
@@ -253,7 +253,7 @@
     </if>
 
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
       AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_INST_ID_, EXEC1.PROC_INST_ID_, PROCDEF.KEY_, '*'))
     </if>
 
