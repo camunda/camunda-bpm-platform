@@ -101,6 +101,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.for.update", "for update");
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
+    constants.put("constant.null.startTime", "null START_TIME_");
     dbSpecificConstants.put(H2, constants);
 
     // mysql specific
@@ -137,6 +138,7 @@ public class DbSqlSessionFactory implements SessionFactory {
       constants.put("constant.for.update", "for update");
       constants.put("constant.datepart.quarter", "QUARTER");
       constants.put("constant.datepart.month", "MONTH");
+      constants.put("constant.null.startTime", "null START_TIME_");
       dbSpecificConstants.put(mysqlLikeDatabase, constants);
     }
 
@@ -190,6 +192,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.for.update", "for update");
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
+    constants.put("constant.null.startTime", "null START_TIME_");
     dbSpecificConstants.put(POSTGRES, constants);
 
     // oracle
@@ -224,6 +227,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.for.update", "for update");
     constants.put("constant.datepart.quarter", "'Q'");
     constants.put("constant.datepart.month", "'MM'");
+    constants.put("constant.null.startTime", "null START_TIME_");
     dbSpecificConstants.put(ORACLE, constants);
 
     // db2
@@ -262,6 +266,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.for.update", "for read only with rs use and keep update locks");
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
+    constants.put("constant.null.startTime", "CAST(NULL as timestamp) as START_TIME_");
     dbSpecificConstants.put(DB2, constants);
 
     // mssql
@@ -301,6 +306,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.op_message", "NEW_VALUE_ + '_|_' + PROPERTY_");
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
+    constants.put("constant.null.startTime", "null START_TIME_");
     dbSpecificConstants.put(MSSQL, constants);
   }
 
