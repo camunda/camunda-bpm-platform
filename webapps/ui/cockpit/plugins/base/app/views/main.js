@@ -33,6 +33,7 @@ var angular = require('angular'),
     jobRetryBulkAction = require('./processInstance/jobRetryBulkAction'),
     jobRetryBulkDialog = require('./processInstance/jobRetryBulkDialog'),
     jobRetryDialog = require('./processInstance/jobRetryDialog'),
+    externalTaskRetryDialog = require('./processInstance/externalTaskRetryDialog'),
     cancelProcessInstanceAction = require('./processInstance/cancelProcessInstanceAction'),
     cancelProcessInstanceDialog = require('./processInstance/cancelProcessInstanceDialog'),
     addVariableAction = require('./processInstance/addVariableAction'),
@@ -40,7 +41,8 @@ var angular = require('angular'),
     updateSuspensionStateActionPI = require('./processInstance/updateSuspensionStateAction'),
     updateSuspensionStateDialogPI = require('./processInstance/updateSuspensionStateDialog'),
     activityInstanceStatisticsOverlayPI = require('./processInstance/activityInstanceStatisticsOverlay'),
-    incidentJobRetryAction = require('./processInstance/incidentJobRetryAction');
+    incidentJobRetryAction = require('./processInstance/incidentJobRetryAction'),
+    incidentExternalTaskRetryAction = require('./processInstance/incident-externalTask-retry-action');
 
 var ngModule = angular.module('cockpit.plugin.base.views', []);
 
@@ -68,6 +70,7 @@ userTasksTable(ngModule);
 jobRetryBulkAction(ngModule);
 ngModule.controller('JobRetriesController', jobRetryBulkDialog);
 ngModule.controller('JobRetryController', jobRetryDialog);
+ngModule.controller('ExternalTaskRetryController', externalTaskRetryDialog);
 cancelProcessInstanceAction(ngModule);
 ngModule.controller('CancelProcessInstanceController', cancelProcessInstanceDialog);
 ngModule.config(addVariableAction);
@@ -76,5 +79,6 @@ ngModule.config(updateSuspensionStateActionPI);
 ngModule.controller('UpdateProcessInstanceSuspensionStateController', updateSuspensionStateDialogPI);
 ngModule.config(activityInstanceStatisticsOverlayPI);
 ngModule.config(incidentJobRetryAction);
+ngModule.config(incidentExternalTaskRetryAction);
 
 module.exports = ngModule;

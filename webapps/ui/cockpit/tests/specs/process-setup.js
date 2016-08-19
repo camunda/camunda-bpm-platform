@@ -125,6 +125,21 @@ module.exports = {
       }])
     ),
 
+
+  setup4: combine(
+    operation('deployment', 'create', [{
+      deploymentName: 'failed-external-task',
+      files: [{
+        name: 'failed-external-task.bpmn',
+        content: readResource('failed-external-task.bpmn')
+      }]
+    }]),
+
+    operation('process-definition', 'start', [{
+      key: 'failed-external-task'
+    }])
+  ),
+
     multiTenancySetup:
 
         combine(

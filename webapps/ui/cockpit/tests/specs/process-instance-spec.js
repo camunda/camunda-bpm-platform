@@ -3,6 +3,7 @@
 
 var testHelper = require('../../../common/tests/test-helper');
 var setupFile = require('./process-setup');
+var CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk');
 
 var dashboardPage = require('../pages/dashboard');
 var processesPage = require('../pages/processes');
@@ -386,6 +387,63 @@ describe('Cockpit Process Instance Spec', function() {
       });
     });
 
+  });
+
+  // CAM-5846
+  describe('Retry external task incident', function() {
+    before(function(done) {
+      return testHelper(setupFile.setup4, function() {
+        var camClient = new CamSDK.Client({
+          mock: false,
+          apiUri: 'http://localhost:8080/engine-rest'
+        });
+
+        var ExternalTask = camClient.resource('external-task');
+        ExternalTask.fetchAndLock({
+          workerId: 'myWorker',
+          maxTasks: 1,
+          topics: [{
+            topicName: 'must-have-topic',
+            lockDuration: 10000,
+            variables: []
+          }]
+        }, function(err, res) {
+          if(err) {
+            return done(err);
+          }
+
+          if (res.length > 0) {
+            var extTask = res[0].id;
+
+            ExternalTask.failure({
+              id: extTask,
+              workerId: 'myWorker',
+              errorMessage : 'must-have-error-message.',
+              retries : 0,
+              retriesTimeout : 10
+            }, function(err) {
+              if(err) {
+                return done(err);
+              }
+
+              done();
+            });
+          }
+        });
+
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.goToSection('Processes');
+        processesPage.deployedProcessesList.selectProcessByName("Failed external task");
+        element(by.css('.ctn-content-bottom .instance-id [ng-transclude] a')).click();
+        instancePage.incidentsTab.selectTab();
+      });
+    });
+
+    it('should have a retry button', function() {
+      var retriesButton = instancePage.incidentsTab.incidentRetryAction(0);
+      expect(retriesButton.isDisplayed()).to.eventually.eql(true);
+    });
   });
 
 
