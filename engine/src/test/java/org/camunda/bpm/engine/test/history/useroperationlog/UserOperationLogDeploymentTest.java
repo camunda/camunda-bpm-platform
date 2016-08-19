@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
@@ -317,6 +318,145 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertNull(log.getProcessInstanceId());
     assertNull(log.getProcessDefinitionId());
     assertNull(log.getProcessDefinitionKey());
+    assertNull(log.getCaseInstanceId());
+    assertNull(log.getCaseDefinitionId());
+  }
+
+
+  public void testDeleteProcessDefinitionCascadingShouldKeepCreateUserOperationLog() {
+    // given
+    Deployment deployment = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY))
+        .deploy();
+
+    ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery()
+                                                 .deploymentId(deployment.getId())
+                                                 .singleResult();
+
+    UserOperationLogQuery query = historyService
+        .createUserOperationLogQuery()
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE);
+
+    assertEquals(1, query.count());
+
+    // when
+    repositoryService.deleteProcessDefinition(procDef.getId(), true);
+
+    // then
+    assertEquals(1, query.count());
+  }
+
+  public void testDeleteProcessDefinitiontWithoutCascadingShouldKeepCreateUserOperationLog() {
+    // given
+    Deployment deployment = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY))
+        .deploy();
+
+    ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery()
+                                                 .deploymentId(deployment.getId())
+                                                 .singleResult();
+
+    UserOperationLogQuery query = historyService
+        .createUserOperationLogQuery()
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE);
+
+    assertEquals(1, query.count());
+
+    // when
+    repositoryService.deleteProcessDefinition(procDef.getId(), true);
+
+    // then
+    assertEquals(1, query.count());
+  }
+
+  public void testDeleteProcessDefinition() {
+    // given
+    Deployment deployment = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY))
+        .deploy();
+
+    ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery()
+                                                 .deploymentId(deployment.getId())
+                                                 .singleResult();
+
+    UserOperationLogQuery query = historyService
+        .createUserOperationLogQuery()
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE);
+
+    // when
+    repositoryService.deleteProcessDefinition(procDef.getId(), false);
+
+    // then
+    assertEquals(1, query.count());
+
+    UserOperationLogEntry log = query.singleResult();
+    assertNotNull(log);
+
+    assertEquals(EntityTypes.PROCESS_DEFINITION, log.getEntityType());
+    assertEquals(procDef.getId(), log.getProcessDefinitionId());
+    assertEquals(procDef.getKey(), log.getProcessDefinitionKey());
+    assertEquals(deployment.getId(), log.getDeploymentId());
+
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_DELETE, log.getOperationType());
+
+    assertEquals("cascade", log.getProperty());
+    assertNull(log.getOrgValue());
+    assertFalse(Boolean.valueOf(log.getNewValue()));
+
+    assertEquals(USER_ID, log.getUserId());
+
+    assertNull(log.getJobDefinitionId());
+    assertNull(log.getProcessInstanceId());
+    assertNull(log.getCaseInstanceId());
+    assertNull(log.getCaseDefinitionId());
+  }
+
+  public void testDeleteProcessDefinitionCascading() {
+    // given
+    Deployment deployment = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY))
+        .deploy();
+
+    ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery()
+                                                 .deploymentId(deployment.getId())
+                                                 .singleResult();
+
+    UserOperationLogQuery query = historyService
+        .createUserOperationLogQuery()
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE);
+
+    // when
+    repositoryService.deleteProcessDefinition(procDef.getId(), true);
+
+    // then
+    assertEquals(1, query.count());
+
+    UserOperationLogEntry log = query.singleResult();
+    assertNotNull(log);
+
+    assertEquals(EntityTypes.PROCESS_DEFINITION, log.getEntityType());
+    assertEquals(procDef.getId(), log.getProcessDefinitionId());
+    assertEquals(procDef.getKey(), log.getProcessDefinitionKey());
+    assertEquals(deployment.getId(), log.getDeploymentId());
+
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_DELETE, log.getOperationType());
+
+    assertEquals("cascade", log.getProperty());
+    assertNull(log.getOrgValue());
+    assertTrue(Boolean.valueOf(log.getNewValue()));
+
+    assertEquals(USER_ID, log.getUserId());
+
+    assertNull(log.getJobDefinitionId());
+    assertNull(log.getProcessInstanceId());
     assertNull(log.getCaseInstanceId());
     assertNull(log.getCaseDefinitionId());
   }
