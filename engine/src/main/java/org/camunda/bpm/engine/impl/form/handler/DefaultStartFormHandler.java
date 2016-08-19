@@ -58,9 +58,6 @@ public class DefaultStartFormHandler extends DefaultFormHandler implements Start
     if (formKey != null) {
       startFormData.setFormKey(formKey.getExpressionText());
     }
-    if (this.businessKeyFieldId != null) {
-      startFormData.setBusinessKeyFieldId(this.businessKeyFieldId);
-    }
     startFormData.setDeploymentId(deploymentId);
     startFormData.setProcessDefinition(processDefinition);
     initializeFormProperties(startFormData, null);

@@ -79,11 +79,6 @@ public class FormPropertyAdapter implements FormField {
     return false;
   }
 
-  @Override
-  public void setBusinessKey(boolean businessKey) {
-
-  }
-
   public TypedValue getDefaultValueTyped() {
     return getValue();
   }

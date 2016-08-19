@@ -85,9 +85,8 @@ public class DefaultFormHandler implements FormHandler {
   protected void parseFormData(BpmnParse bpmnParse, ExpressionManager expressionManager, Element extensionElement) {
     Element formData = extensionElement.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formData");
     if(formData != null) {
-      parseFormFields(formData, bpmnParse, expressionManager);
-
       this.businessKeyFieldId = formData.attribute(BUSINESS_KEY_ATTRIBUTE);
+      parseFormFields(formData, bpmnParse, expressionManager);
     }
   }
 
@@ -109,6 +108,10 @@ public class DefaultFormHandler implements FormHandler {
       bpmnParse.addError("attribute id must be set for FormFieldGroup and must have a non-empty value", formField);
     } else {
       formFieldHandler.setId(id);
+    }
+
+    if (id.equals(businessKeyFieldId)) {
+      formFieldHandler.setBusinessKey(true);
     }
 
     // parse name
@@ -271,11 +274,7 @@ public class DefaultFormHandler implements FormHandler {
     // add form fields
     final List<FormField> formFields = taskFormData.getFormFields();
     for (FormFieldHandler formFieldHandler : formFieldHandlers) {
-      FormField formField = formFieldHandler.createFormField(execution);
-      if (this.businessKeyFieldId != null && formField.getId().equals(this.businessKeyFieldId)) {
-        formField.setBusinessKey(true);
-      }
-      formFields.add(formField);
+      formFields.add(formFieldHandler.createFormField(execution));
     }
   }
 

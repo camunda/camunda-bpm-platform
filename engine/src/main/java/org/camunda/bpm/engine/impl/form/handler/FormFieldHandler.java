@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormFieldValidationConstraint;
 import org.camunda.bpm.engine.form.FormType;
 import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
+import org.camunda.bpm.engine.impl.form.FormDataImpl;
 import org.camunda.bpm.engine.impl.form.FormFieldImpl;
 import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -42,6 +43,7 @@ public class FormFieldHandler {
   protected Expression defaultValueExpression;
   protected Map<String, String> properties = new HashMap<String, String>();
   protected List<FormFieldValidationConstraintHandler> validationHandlers = new ArrayList<FormFieldValidationConstraintHandler>();
+  protected boolean businessKey;
 
   public FormField createFormField(ExecutionEntity executionEntity) {
     FormFieldImpl formField = new FormFieldImpl();
@@ -57,6 +59,8 @@ public class FormFieldHandler {
         formField.setLabel(labelValueObject.toString());
       }
     }
+
+    formField.setBusinessKey(businessKey);
 
     // set type
     formField.setType(type);
@@ -193,4 +197,11 @@ public class FormFieldHandler {
     this.validationHandlers = validationHandlers;
   }
 
+  public void setBusinessKey(boolean businessKey) {
+    this.businessKey = businessKey;
+  }
+
+  public boolean isBusinessKey() {
+    return businessKey;
+  }
 }

@@ -30,7 +30,6 @@ public abstract class FormDataImpl implements FormData, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  protected String businessKeyFieldId;
   protected String formKey;
   protected String deploymentId;
   protected List<FormProperty> formProperties = new ArrayList<FormProperty>();
@@ -66,13 +65,5 @@ public abstract class FormDataImpl implements FormData, Serializable {
   }
   public void setFormFields(List<FormField> formFields) {
     this.formFields = formFields;
-  }
-
-  public String getBusinessKeyFieldId() {
-    return businessKeyFieldId;
-  }
-
-  public void setBusinessKeyFieldId(String businessKeyFieldId) {
-    this.businessKeyFieldId = businessKeyFieldId;
   }
 }

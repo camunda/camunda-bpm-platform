@@ -634,17 +634,6 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     assertThat(formService.getRenderedStartForm(processDefinition.getId()).toString().replaceAll("\\s+",""),is(expectedForm.replaceAll("\\s+","")));
   }
 
-
-  @Deployment
-  public void testTaskFormDoesntGenerateBusinessKey() throws Exception {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    runtimeService.startProcessInstanceById(processDefinition.getId());
-    Task task = taskService.createTaskQuery().processDefinitionId(processDefinition.getId()).singleResult();
-    String expectedForm = IOUtils.toString(this.getClass().getClassLoader()
-        .getResourceAsStream("org/camunda/bpm/engine/test/api/form/FormServiceTest.testTaskFormDoesntGenerateBusinessKey.html"));
-    assertThat(formService.getRenderedTaskForm(task.getId()).toString().replaceAll("\\s+",""),is(expectedForm.replaceAll("\\s+","")));
-  }
-
   @Deployment(resources={"org/camunda/bpm/engine/test/api/form/FormServiceTest.startFormFields.bpmn20.xml"})
   public void testGetStartFormVariables() {
 
