@@ -34,6 +34,7 @@ import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDt
 import org.camunda.bpm.cockpit.impl.plugin.resources.ProcessInstanceRestService;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -43,6 +44,7 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -53,6 +55,7 @@ import org.junit.experimental.categories.Category;
  * @author roman.smirnov
  * @author nico.rehwaldt
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
   private ProcessEngine processEngine;
