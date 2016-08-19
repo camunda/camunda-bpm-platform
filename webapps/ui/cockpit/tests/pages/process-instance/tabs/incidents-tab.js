@@ -15,6 +15,14 @@ module.exports = Table.extend({
 
   incidentActivity: function(item) {
     return this.tableItem(item, '.activity');
+  },
+
+  incidentAction: function(item) {
+    return this.tableItem(item, '.action')
+  },
+
+  incidentRetryAction: function(item) {
+    return this.incidentAction(item).element(by.css('.action-button[tooltip~="Retries"][tooltip$="Tasks"]'));
   }
 
 });
