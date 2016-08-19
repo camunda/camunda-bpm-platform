@@ -153,12 +153,12 @@
     from (
       select
         HCAI.CASE_ACT_ID_ as ID_
-      , count( CASE WHEN HCAI.STATE_ = 1 THEN 1 ELSE null END ${dbSpecificDummyTable} ) as AVAILABLE_
-      , count( CASE WHEN HCAI.STATE_ = 2 THEN 1 ELSE null END ${dbSpecificDummyTable} ) as ENABLED_
-      , count( CASE WHEN HCAI.STATE_ = 3 THEN 1 ELSE null END ${dbSpecificDummyTable} ) as DISABLED_
-      , count( CASE WHEN HCAI.STATE_ = 4 THEN 1 ELSE null END ${dbSpecificDummyTable} ) as ACTIVE_
-      , count( CASE WHEN HCAI.STATE_ = 6 THEN 1 ELSE null END ${dbSpecificDummyTable} ) as TERMINATED_
-      , count( CASE WHEN HCAI.STATE_ = 7 THEN 1 ELSE null END ${dbSpecificDummyTable} ) as COMPLETED_
+      , count( CASE WHEN HCAI.STATE_ = 1 THEN 1 ELSE null END ) as AVAILABLE_
+      , count( CASE WHEN HCAI.STATE_ = 2 THEN 1 ELSE null END ) as ENABLED_
+      , count( CASE WHEN HCAI.STATE_ = 3 THEN 1 ELSE null END ) as DISABLED_
+      , count( CASE WHEN HCAI.STATE_ = 4 THEN 1 ELSE null END ) as ACTIVE_
+      , count( CASE WHEN HCAI.STATE_ = 6 THEN 1 ELSE null END ) as TERMINATED_
+      , count( CASE WHEN HCAI.STATE_ = 7 THEN 1 ELSE null END ) as COMPLETED_
       from
         ${prefix}ACT_HI_CASEACTINST HCAI
       where
