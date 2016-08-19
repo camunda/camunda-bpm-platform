@@ -12,8 +12,8 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
     label: 'Incidents',
     template: incidentsTemplate,
     controller: [
-      '$scope', '$http', '$modal', 'search', 'Uri',
-      function($scope,   $http,   $modal,   search,   Uri) {
+      '$scope', '$http', '$modal', 'search', 'Uri', 'Views',
+      function($scope,   $http,   $modal,   search,   Uri, Views) {
 
         // input: processInstance, processData
 
@@ -100,23 +100,8 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
           return Uri.appUri('engine://engine/:engine/job/' + incident.rootCauseIncidentConfiguration + '/stacktrace');
         };
 
-        $scope.openJobRetryDialog = function(incident) {
-          var dialog = $modal.open({
-            resolve: {
-              incident: function() { return incident; }
-            },
-            controller: 'JobRetryController',
-            template: retryTemplate
-          });
-
-          dialog.result.then(function(result) {
-            if (result === 'finished') {
-              // refresh filter and all views
-              $scope.processData.set('filter', angular.extend({}, $scope.filter));
-            }
-          });
-
-        };
+        $scope.incidentVars = { read: ['incident', 'processData', 'filter']};
+        $scope.incidentActions = Views.getProviders({ component: 'cockpit.incident.action' });
       }],
     priority: 15
   });
