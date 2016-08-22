@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import java.util.Map;
 import java.util.concurrent.Callable;
 import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
@@ -42,7 +41,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
  */
 public abstract class CallableElementActivityBehavior extends AbstractBpmnActivityBehavior implements SubProcessActivityBehavior {
 
-  protected String[] variablesFilter = {NUMBER_OF_INSTANCES,NUMBER_OF_ACTIVE_INSTANCES,NUMBER_OF_COMPLETED_INSTANCES};
+  protected String[] variablesFilter = { NUMBER_OF_INSTANCES, NUMBER_OF_ACTIVE_INSTANCES, NUMBER_OF_COMPLETED_INSTANCES };
 
   protected CallableElement callableElement;
 
@@ -129,7 +128,7 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
   @Override
   public void passOutputVariables(final ActivityExecution execution, final VariableScope subInstance) {
     // only data. no control flow available on this execution.
-    VariableMap variables = filterMIScopeVariables(getOutputVariables(subInstance));
+    VariableMap variables = filterVariables(getOutputVariables(subInstance));
     VariableMap localVariables = getOutputVariablesLocal(subInstance);
 
     execution.setVariables(variables);
@@ -154,7 +153,7 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
     }
   }
 
-  protected VariableMap filterMIScopeVariables(VariableMap variables) {
+  protected VariableMap filterVariables(VariableMap variables) {
     if (variables != null) {
       for (String key : variablesFilter) {
         variables.remove(key);
