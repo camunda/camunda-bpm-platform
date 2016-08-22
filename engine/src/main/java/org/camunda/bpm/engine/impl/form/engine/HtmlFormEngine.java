@@ -459,9 +459,13 @@ public class HtmlFormEngine implements FormEngine {
 
     formControl
         .attribute(CLASS_ATTRIBUTE, FORM_CONTROL_CLASS)
-        .attribute(NAME_ATTRIBUTE, formFieldId)
-        .attribute(CAM_VARIABLE_TYPE_ATTRIBUTE, typeName)
-        .attribute(CAM_VARIABLE_NAME_ATTRIBUTE, formFieldId);
+        .attribute(NAME_ATTRIBUTE, formFieldId);
+
+    if (!formField.isBusinessKey()) {
+      formControl
+          .attribute(CAM_VARIABLE_TYPE_ATTRIBUTE, typeName)
+          .attribute(CAM_VARIABLE_NAME_ATTRIBUTE, formFieldId);
+    }
 
     // add validation constraints
     for (FormFieldValidationConstraint constraint : formField.getValidationConstraints()) {
