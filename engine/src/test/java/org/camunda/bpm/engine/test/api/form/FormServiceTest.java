@@ -13,7 +13,23 @@
 
 package org.camunda.bpm.engine.test.api.form;
 
-import org.apache.commons.io.IOUtils;
+import static org.camunda.bpm.engine.variable.Variables.booleanValue;
+import static org.camunda.bpm.engine.variable.Variables.createVariables;
+import static org.camunda.bpm.engine.variable.Variables.objectValue;
+import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
+import static org.camunda.bpm.engine.variable.Variables.stringValue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormProperty;
@@ -33,13 +49,6 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
-
-import java.util.*;
-import java.util.Map.Entry;
-
-import static org.camunda.bpm.engine.variable.Variables.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 
 /**
  * @author Joram Barrez
@@ -625,15 +634,6 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("test", formService.getTaskFormData(task.getId()).getFormKey());
   }
 
-  @Deployment
-  public void testStartFormGenerateBusinessKey() throws Exception {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-
-    String expectedForm = IOUtils.toString(this.getClass().getClassLoader()
-        .getResourceAsStream("org/camunda/bpm/engine/test/api/form/FormServiceTest.testStartFormGenerateBusinessKey.html"));
-    assertThat(formService.getRenderedStartForm(processDefinition.getId()).toString().replaceAll("\\s+",""),is(expectedForm.replaceAll("\\s+","")));
-  }
-
   @Deployment(resources={"org/camunda/bpm/engine/test/api/form/FormServiceTest.startFormFields.bpmn20.xml"})
   public void testGetStartFormVariables() {
 
@@ -967,47 +967,61 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/form/util/VacationRequest_deprecated_forms.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/form/util/approve.form",
-      "org/camunda/bpm/engine/test/api/form/util/request.form",
-      "org/camunda/bpm/engine/test/api/form/util/adjustRequest.form" })
-    public void testTaskFormsWithVacationRequestProcess() {
+    "org/camunda/bpm/engine/test/api/form/util/VacationRequest_deprecated_forms.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/form/util/approve.form",
+    "org/camunda/bpm/engine/test/api/form/util/request.form",
+    "org/camunda/bpm/engine/test/api/form/util/adjustRequest.form" })
+  public void testTaskFormsWithVacationRequestProcess() {
 
-      // Get start form
-      String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
-      Object startForm = formService.getRenderedStartForm(procDefId, "juel");
-      assertNotNull(startForm);
+    // Get start form
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+    Object startForm = formService.getRenderedStartForm(procDefId, "juel");
+    assertNotNull(startForm);
 
-      ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-      String processDefinitionId = processDefinition.getId();
-      assertEquals("org/camunda/bpm/engine/test/api/form/util/request.form", formService.getStartFormData(processDefinitionId).getFormKey());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    String processDefinitionId = processDefinition.getId();
+    assertEquals("org/camunda/bpm/engine/test/api/form/util/request.form", formService.getStartFormData(processDefinitionId).getFormKey());
 
-      // Define variables that would be filled in through the form
-      Map<String, String> formProperties = new HashMap<String, String>();
-      formProperties.put("employeeName", "kermit");
-      formProperties.put("numberOfDays", "4");
-      formProperties.put("vacationMotivation", "I'm tired");
-      formService.submitStartFormData(procDefId, formProperties);
+    // Define variables that would be filled in through the form
+    Map<String, String> formProperties = new HashMap<String, String>();
+    formProperties.put("employeeName", "kermit");
+    formProperties.put("numberOfDays", "4");
+    formProperties.put("vacationMotivation", "I'm tired");
+    formService.submitStartFormData(procDefId, formProperties);
 
-      // Management should now have a task assigned to them
-      Task task = taskService.createTaskQuery().taskCandidateGroup("management").singleResult();
-      assertEquals("Vacation request by kermit", task.getDescription());
-      Object taskForm = formService.getRenderedTaskForm(task.getId(), "juel");
-      assertNotNull(taskForm);
+    // Management should now have a task assigned to them
+    Task task = taskService.createTaskQuery().taskCandidateGroup("management").singleResult();
+    assertEquals("Vacation request by kermit", task.getDescription());
+    Object taskForm = formService.getRenderedTaskForm(task.getId(), "juel");
+    assertNotNull(taskForm);
 
-      // Rejecting the task should put the process back to first task
-      taskService.complete(task.getId(), CollectionUtil.singletonMap("vacationApproved", "false"));
-      task = taskService.createTaskQuery().singleResult();
-      assertEquals("Adjust vacation request", task.getName());
-    }
+    // Rejecting the task should put the process back to first task
+    taskService.complete(task.getId(), CollectionUtil.singletonMap("vacationApproved", "false"));
+    task = taskService.createTaskQuery().singleResult();
+    assertEquals("Adjust vacation request", task.getName());
+  }
 
-    @Deployment
-    public void testTaskFormUnavailable() {
-      String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
-      assertNull(formService.getRenderedStartForm(procDefId));
+  @Deployment
+  public void testTaskFormUnavailable() {
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+    assertNull(formService.getRenderedStartForm(procDefId));
 
-      runtimeService.startProcessInstanceByKey("noStartOrTaskForm");
-      Task task = taskService.createTaskQuery().singleResult();
-      assertNull(formService.getRenderedTaskForm(task.getId()));
-    }
+    runtimeService.startProcessInstanceByKey("noStartOrTaskForm");
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNull(formService.getRenderedTaskForm(task.getId()));
+  }
+
+  @Deployment
+  public void testBusinessKey() {
+    // given
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    // when
+    StartFormData startFormData = formService.getStartFormData(procDefId);
+
+    // then
+    FormField formField = startFormData.getFormFields().get(0);
+    assertTrue(formField.isBusinessKey());
+  }
+
 }

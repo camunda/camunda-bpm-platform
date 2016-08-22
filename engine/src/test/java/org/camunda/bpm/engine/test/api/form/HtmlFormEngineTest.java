@@ -224,6 +224,19 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment
+  public void testBusinessKey() {
+
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    String renderedForm = (String) formService.getRenderedStartForm(processDefinition.getId());
+
+    String expectedForm = IoUtil.readFileAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testBusinessKey.html");
+
+    assertHtmlEquals(expectedForm, renderedForm);
+
+  }
+
   public void assertHtmlEquals(String expected, String actual) {
     assertEquals(filterWhitespace(expected), filterWhitespace(actual));
   }

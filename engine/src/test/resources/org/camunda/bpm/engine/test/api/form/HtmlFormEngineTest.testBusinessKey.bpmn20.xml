@@ -11,17 +11,17 @@
 
   <process id="testProcess" isExecutable="true">
 
-    <startEvent id="start" />
-
-    <sequenceFlow sourceRef="start" targetRef="usertask" />
-
-    <userTask id="usertask" name="Task" camunda:candidateGroups="dummy" >
+    <startEvent id="start" >
       <extensionElements>
         <camunda:formData businessKey="customField">
           <camunda:formField id="customField" label="Custom Field" type="string"/>
         </camunda:formData>
       </extensionElements>
-    </userTask>
+    </startEvent>
+
+    <sequenceFlow sourceRef="start" targetRef="usertask" />
+
+    <userTask id="usertask" name="Task" camunda:candidateGroups="dummy" />
 
     <sequenceFlow sourceRef="usertask" targetRef="task2" />
 
