@@ -920,6 +920,40 @@ public class RepetitionRuleTest extends CmmnProcessEngineTestCase {
     assertEquals(2, query.count());
   }
 
+  @Deployment
+  public void testDefaultValueWithoutCondition() {
+    createCaseInstanceByKey("case");
+    String humanTask1 = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
+
+    // when
+    complete(humanTask1);
+
+    CaseExecutionQuery query = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_2");
+
+    assertEquals(2, query.count());
+    assertEquals(1, query.available().count());
+    assertEquals(1, query.active().count());
+  }
+
+  @Deployment
+  public void testDefaultValueWithEmptyCondition() {
+    createCaseInstanceByKey("case");
+    String humanTask1 = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
+
+    // when
+    complete(humanTask1);
+
+    CaseExecutionQuery query = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_2");
+
+    assertEquals(2, query.count());
+    assertEquals(1, query.available().count());
+    assertEquals(1, query.active().count());
+  }
+
   // helper ////////////////////////////////////////////////////////
 
   protected void fireEntryCriteria(final String caseExecutionId) {
