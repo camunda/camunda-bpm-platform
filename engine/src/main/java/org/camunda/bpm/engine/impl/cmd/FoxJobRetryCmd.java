@@ -18,18 +18,27 @@ import org.camunda.bpm.engine.impl.calendar.DurationHelper;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.*;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author Roman Smirnov
  */
 public class FoxJobRetryCmd extends JobRetryCmd {
 
+  public static final List<String> SUPPORTED_TYPES = Arrays.asList(
+      TimerExecuteNestedActivityJobHandler.TYPE,
+      TimerCatchIntermediateEventJobHandler.TYPE,
+      TimerStartEventJobHandler.TYPE,
+      TimerStartEventSubprocessJobHandler.TYPE,
+      AsyncContinuationJobHandler.TYPE
+  );
   private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   public FoxJobRetryCmd(String jobId, Throwable exception) {
@@ -92,36 +101,11 @@ public class FoxJobRetryCmd extends JobRetryCmd {
     String type = job.getJobHandlerType();
     ActivityImpl activity = null;
 
-    if (TimerExecuteNestedActivityJobHandler.TYPE.equals(type)
-        || TimerCatchIntermediateEventJobHandler.TYPE.equals(type)) {
-      ExecutionEntity execution = fetchExecutionEntity(job.getExecutionId());
-      if (execution != null) {
-        TimerJobConfiguration configuration = (TimerJobConfiguration) job.getJobHandlerConfiguration();
-
-        String acitivtyId = configuration.getTimerElementKey();
-        activity = execution.getProcessDefinition().findActivity(acitivtyId);
-      }
-
-    } else if (TimerStartEventJobHandler.TYPE.equals(type)) {
-      TimerJobConfiguration configuration = (TimerJobConfiguration) job.getJobHandlerConfiguration();
-
+    if (SUPPORTED_TYPES.contains(type)) {
       DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
-      String definitionKey = configuration.getTimerElementKey();
-      ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(definitionKey, job.getTenantId());
-      if (processDefinition != null) {
-        activity = processDefinition.getInitial();
-      }
-
-    } else if (TimerStartEventSubprocessJobHandler.TYPE.equals(type)) {
-      DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
-      ProcessDefinitionEntity processDefinitionEntity = deploymentCache.findDeployedProcessDefinitionById(job.getProcessDefinitionId());
+      ProcessDefinitionEntity processDefinitionEntity =
+          deploymentCache.findDeployedProcessDefinitionById(job.getProcessDefinitionId());
       activity = processDefinitionEntity.findActivity(job.getActivityId());
-
-    } else if (AsyncContinuationJobHandler.TYPE.equals(type)) {
-      ExecutionEntity execution = fetchExecutionEntity(job.getExecutionId());
-      if (execution != null) {
-        activity = execution.getActivity();
-      }
 
     } else {
       // noop, because activity type is not supported
