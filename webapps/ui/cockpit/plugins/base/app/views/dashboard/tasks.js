@@ -12,7 +12,7 @@ module.exports = [
   ) {
     ViewsProvider.registerDefaultView('cockpit.dashboard.section', {
       id: 'tasks',
-      label: 'User Tasks',
+      label: 'Human Tasks',
       template: template,
       pagePath: '#/tasks',
       checkActive: function(path) {

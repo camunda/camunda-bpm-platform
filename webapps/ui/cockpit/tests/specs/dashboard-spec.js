@@ -17,6 +17,6 @@ describe('Cockpit Dashboard Spec', function() {
   it('should display all sections of the page in the header', function() {
     expect(dashboardPage.navbarItem(0).getText()).to.eventually.eql('Processes');
     expect(dashboardPage.navbarItem(1).getText()).to.eventually.eql('Decisions');
-    expect(dashboardPage.navbarItem(2).getText()).to.eventually.eql('User Tasks');
+    expect(dashboardPage.navbarItem(2).getText()).to.eventually.eql('Human Tasks');
   });
 });

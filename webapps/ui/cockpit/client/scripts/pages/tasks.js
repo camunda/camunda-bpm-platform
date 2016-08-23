@@ -13,10 +13,10 @@ var Controller = [
 
     page.breadcrumbsClear();
     page.breadcrumbsAdd({
-      label : 'Tasks'
+      label : 'Human Tasks'
     });
 
-    page.titleSet('Tasks');
+    page.titleSet('Human Tasks');
 
     // INITIALIZE PLUGINS
     $scope.plugins = Views.getProviders({ component : 'cockpit.tasks.dashboard' });
