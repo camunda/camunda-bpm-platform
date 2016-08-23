@@ -60,6 +60,7 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
   }
 
   protected String caseActivityInstanceId;
+  protected List<String> caseActivityInstanceIds;
   protected String caseInstanceId;
   protected String caseDefinitionId;
   protected String caseExecutionId;
@@ -91,6 +92,11 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
   @CamundaQueryParam("caseActivityInstanceId")
   public void setCaseActivityInstanceId(String caseActivityInstanceId) {
     this.caseActivityInstanceId = caseActivityInstanceId;
+  }
+
+  @CamundaQueryParam(value = "caseActivityInstanceIdIn", converter = StringListConverter.class)
+  public void setCaseActivityInstanceIdIn(List<String> caseActivityInstanceIds) {
+    this.caseActivityInstanceIds = caseActivityInstanceIds;
   }
 
   @CamundaQueryParam("caseInstanceId")
@@ -207,6 +213,9 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
   protected void applyFilters(HistoricCaseActivityInstanceQuery query) {
     if (caseActivityInstanceId != null) {
       query.caseActivityInstanceId(caseActivityInstanceId);
+    }
+    if (caseActivityInstanceIds != null && !caseActivityInstanceIds.isEmpty()) {
+      query.caseActivityInstanceIdIn(caseActivityInstanceIds.toArray(new String[caseActivityInstanceIds.size()]));
     }
     if (caseInstanceId != null) {
       query.caseInstanceId(caseInstanceId);

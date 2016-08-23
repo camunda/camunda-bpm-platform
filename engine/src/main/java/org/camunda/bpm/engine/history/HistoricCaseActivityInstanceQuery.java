@@ -28,6 +28,9 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
   /** Only select historic case activity instances with the given id (primary key within history tables). */
   HistoricCaseActivityInstanceQuery caseActivityInstanceId(String caseActivityInstanceId);
 
+  /** Only select historic case activity instances with one of the given case activity instance ids. */
+  HistoricCaseActivityInstanceQuery caseActivityInstanceIdIn(String... caseActivityInstanceIds);
+
   /** Only select historic case activity instances for the given case execution */
   HistoricCaseActivityInstanceQuery caseExecutionId(String caseExecutionId);
 

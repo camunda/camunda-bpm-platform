@@ -35,6 +35,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
@@ -788,7 +789,7 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
   public void testAutoCompleteStageWithRepeatableTaskWithoutEntryCriteria() {
     // given
     createCaseInstanceByKey("case", Variables.createVariables().putValue("manualActivation", false));
-    String stage = queryCaseExecutionByActivityId("PI_Stage_1").getId();
+    queryCaseExecutionByActivityId("PI_Stage_1");
 
     // when
     String humanTask = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
@@ -814,6 +815,67 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
 
     assertNotNull(decisionTask);
     assertEquals("decisionTask", decisionTask.getCaseActivityType());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseInstanceId() {
+    // given
+    createCaseInstance();
+
+    String taskInstanceId = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
+
+    // when
+    HistoricCaseActivityInstanceQuery query = historicQuery().caseActivityInstanceIdIn(taskInstanceId);
+
+    // then
+    assertCount(1, query);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByCaseInstanceIds() {
+    // given
+    CaseInstance instance1 = createCaseInstance();
+    CaseInstance instance2 = createCaseInstance();
+
+    String taskInstanceId1 = caseService
+        .createCaseExecutionQuery()
+        .caseInstanceId(instance1.getId())
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    String taskInstanceId2 = caseService
+        .createCaseExecutionQuery()
+        .caseInstanceId(instance2.getId())
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    // when
+    HistoricCaseActivityInstanceQuery query = historicQuery()
+        .caseActivityInstanceIdIn(taskInstanceId1, taskInstanceId2);
+
+    // then
+    assertCount(2, query);
+  }
+
+  public void testQueryByInvalidCaseInstanceId() {
+
+    // when
+    HistoricCaseActivityInstanceQuery query = historicQuery().caseActivityInstanceIdIn("invalid");
+
+    // then
+    assertCount(0, query);
+
+    try {
+      historicQuery().caseActivityInstanceIdIn((String[])null);
+      fail("A NotValidException was expected.");
+    } catch (NotValidException e) {}
+
+    try {
+      historicQuery().caseActivityInstanceIdIn((String)null);
+      fail("A NotValidException was expected.");
+    } catch (NotValidException e) {}
   }
 
   protected HistoricCaseActivityInstanceQuery historicQuery() {
