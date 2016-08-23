@@ -121,7 +121,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setExecutionId(execution.getId());
     evt.setTenantId(execution.getTenantId());
 
-    ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    ProcessDefinitionEntity definition = execution.getProcessDefinition();
     if (definition != null) {
       evt.setProcessDefinitionKey(definition.getKey());
     }
@@ -153,7 +153,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String caseInstanceId = execution.getCaseInstanceId();
     String tenantId = execution.getTenantId();
 
-    ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    ProcessDefinitionEntity definition = execution.getProcessDefinition();
     String processDefinitionKey = null;
     if (definition != null) {
       processDefinitionKey = definition.getKey();
@@ -250,7 +250,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     ExecutionEntity execution = variableInstance.getExecution();
     if (execution != null) {
-      ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+      ProcessDefinitionEntity definition = execution.getProcessDefinition();
       if (definition != null) {
         evt.setProcessDefinitionId(definition.getId());
         evt.setProcessDefinitionKey(definition.getKey());
@@ -355,8 +355,12 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
         scopeActivityInstanceId = scopeExecution.getActivityInstanceId();
       }
     }
+    else if (variableInstance.getCaseExecutionId() != null) {
+      scopeActivityInstanceId = variableInstance.getCaseExecutionId();
+    }
 
     ExecutionEntity sourceExecution = null;
+    CaseExecutionEntity sourceCaseExecution = null;
     if (sourceVariableScope instanceof ExecutionEntity) {
       sourceExecution = (ExecutionEntity) sourceVariableScope;
       sourceActivityInstanceId = sourceExecution.getActivityInstanceId();
@@ -366,6 +370,16 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       if (sourceExecution != null) {
         sourceActivityInstanceId = sourceExecution.getActivityInstanceId();
       }
+      else {
+        sourceCaseExecution = ((TaskEntity) sourceVariableScope).getCaseExecution();
+        if (sourceCaseExecution != null) {
+          sourceActivityInstanceId = sourceCaseExecution.getId();
+        }
+      }
+    }
+    else if (sourceVariableScope instanceof CaseExecutionEntity) {
+      sourceCaseExecution = (CaseExecutionEntity) sourceVariableScope;
+      sourceActivityInstanceId = sourceCaseExecution.getId();
     }
 
     // create event
@@ -715,7 +729,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     historicFormPropertyEntity.setTaskId(taskId);
     historicFormPropertyEntity.setTenantId(execution.getTenantId());
 
-    ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    ProcessDefinitionEntity definition = execution.getProcessDefinition();
     if (definition != null) {
       historicFormPropertyEntity.setProcessDefinitionKey(definition.getKey());
     }
