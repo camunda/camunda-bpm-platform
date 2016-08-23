@@ -316,8 +316,6 @@ public class HtmlFormEngine implements FormEngine {
       inputField.attribute(VALUE_ATTRIBUTE, defaultValue.toString());
     }
 
-    //add business key if needed
-    addBusinessKeyAttribute(inputField,formField);
     // <input ... />
     documentBuilder.startElement(inputField).endElement();
   }
@@ -466,6 +464,9 @@ public class HtmlFormEngine implements FormEngine {
           .attribute(CAM_VARIABLE_TYPE_ATTRIBUTE, typeName)
           .attribute(CAM_VARIABLE_NAME_ATTRIBUTE, formFieldId);
     }
+    else {
+      formControl.attribute(CAM_BUSINESS_KEY_ATTRIBUTE, null);
+    }
 
     // add validation constraints
     for (FormFieldValidationConstraint constraint : formField.getValidationConstraints()) {
@@ -476,11 +477,6 @@ public class HtmlFormEngine implements FormEngine {
   }
 
   // helper /////////////////////////////////////////////////////////////////////////////////////
-  protected void addBusinessKeyAttribute(HtmlElementWriter elementWriter, FormField formField) {
-    if (formField.isBusinessKey()) {
-      elementWriter.attribute(CAM_BUSINESS_KEY_ATTRIBUTE, null);
-    }
-  }
 
   protected boolean isEnum(FormField formField) {
     return EnumFormType.TYPE_NAME.equals(formField.getTypeName());
