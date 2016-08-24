@@ -82,7 +82,6 @@ import org.camunda.bpm.model.xml.ModelParseException;
 import org.camunda.bpm.model.xml.ModelValidationException;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.util.IoUtil;
-import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 
 /**
  * <p>Provides access to the camunda BPMN model api.</p>
@@ -317,6 +316,7 @@ public class Bpmn {
     DataStateImpl.registerType(bpmnModelBuilder);
     DataObjectImpl.registerType(bpmnModelBuilder);
     DataObjectReferenceImpl.registerType(bpmnModelBuilder);
+    DataStoreImpl.registerType(bpmnModelBuilder);
     DefinitionsImpl.registerType(bpmnModelBuilder);
     DocumentationImpl.registerType(bpmnModelBuilder);
     EndEventImpl.registerType(bpmnModelBuilder);

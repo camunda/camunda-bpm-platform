@@ -16,6 +16,7 @@ package org.camunda.bpm.model.bpmn.impl;
  * Constants used in the BPMN 2.0 Language (DI + Semantic)
  *
  * @author Daniel Meyer
+ * @author Falko Menge
  *
  */
 public final class BpmnModelConstants {
@@ -91,6 +92,7 @@ public final class BpmnModelConstants {
   public static final String BPMN_ELEMENT_ITEM_AWARE_ELEMENT = "itemAwareElement";
   public static final String BPMN_ELEMENT_DATA_OBJECT = "dataObject";
   public static final String BPMN_ELEMENT_DATA_OBJECT_REFERENCE = "dataObjectReference";
+  public static final String BPMN_ELEMENT_DATA_STORE = "dataStore";
   public static final String BPMN_ELEMENT_DATA_INPUT = "dataInput";
   public static final String BPMN_ELEMENT_FORMAL_EXPRESSION = "formalExpression";
   public static final String BPMN_ELEMENT_DATA_ASSOCIATION = "dataAssociation";
@@ -364,6 +366,8 @@ public final class BpmnModelConstants {
   public static final String BPMN_ATTRIBUTE_EVENT_GATEWAY_TYPE = "eventGatewayType";
   public static final String BPMN_ATTRIBUTE_DATA_OBJECT_REF = "dataObjectRef";
   public static final String BPMN_ATTRIBUTE_METHOD = "method";
+  public static final String BPMN_ATTRIBUTE_CAPACITY = "capacity";
+  public static final String BPMN_ATTRIBUTE_IS_UNLIMITED = "isUnlimited";
 
   /** DC */
 
