@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Roman Smirnov
@@ -809,31 +810,44 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   public void testSentryShouldNotBeEvaluatedAfterStageComplete() {
     // given
     String caseInstanceId = createCaseInstance().getId();
-    
+
     // when
     CaseExecution stageExecution = caseService.createCaseExecutionQuery().activityId("PI_Stage_1").singleResult();
     assertNotNull(stageExecution);
-    
+
     // .. there is a local stage variable
     caseService.setVariableLocal(stageExecution.getId(), "value", 99);
-    
+
     // .. and the stage is activated (such that the tasks are instantiated)
     caseService.manuallyStartCaseExecution(stageExecution.getId());
-    
+
     CaseExecution task1Execution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
     assertNotNull(task1Execution);
-    
+
     // then
     // .. completing the stage should be successful; evaluating Sentry_1 should not fail
     caseService.completeCaseExecution(task1Execution.getId());
     stageExecution = caseService.createCaseExecutionQuery().activityId("PI_Stage_1").singleResult();
     assertNull(stageExecution);
-    
+
     // .. and the case plan model should have completed
     CaseExecution casePlanModelExecution = caseService.createCaseExecutionQuery().caseExecutionId(caseInstanceId).singleResult();
     assertNotNull(casePlanModelExecution);
     assertFalse(casePlanModelExecution.isActive());
-    
+
     caseService.closeCaseInstance(caseInstanceId);
   }
+
+  @Deployment
+  public void FAILING_testIfPartOnCaseInstanceCreate() {
+
+    // when
+    createCaseInstanceByKey("case", Variables.putValue("value", 101));
+
+    // then
+    CaseExecution caseExecution = queryCaseExecutionByActivityId("PI_HumanTask_1");
+    assertTrue(caseExecution.isActive());
+
+  }
+
 }
