@@ -635,6 +635,20 @@ public class HistoricCaseActivityInstanceRestServiceQueryTest extends AbstractRe
     verify(mockedQuery).list();
   }
 
+  @Test
+  public void testCaseActivityIdListParameter() {
+
+    given()
+      .queryParam("caseActivityIdIn", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_ID + "," + MockProvider.EXAMPLE_HISTORIC_ANOTHER_CASE_ACTIVITY_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_CASE_ACTIVITY_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseActivityIdIn(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_ID, MockProvider.EXAMPLE_HISTORIC_ANOTHER_CASE_ACTIVITY_ID);
+    verify(mockedQuery).list();
+  }
+
   private List<HistoricCaseActivityInstance> createMockHistoricCaseActivityInstancesTwoTenants() {
     return Arrays.asList(
         MockProvider.createMockHistoricCaseActivityInstance(MockProvider.EXAMPLE_TENANT_ID),

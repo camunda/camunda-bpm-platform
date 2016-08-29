@@ -41,9 +41,10 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   private static final long serialVersionUID = 1L;
 
   protected String[] caseActivityInstanceIds;
+  protected String[] caseActivityIds;
+
   protected String caseInstanceId;
   protected String caseDefinitionId;
-  protected String caseActivityId;
   protected String caseActivityName;
   protected String caseActivityType;
   protected Date createdBefore;
@@ -106,7 +107,12 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
 
   public HistoricCaseActivityInstanceQuery caseActivityId(String caseActivityId) {
     ensureNotNull(NotValidException.class, "caseActivityId", caseActivityId);
-    this.caseActivityId = caseActivityId;
+    return caseActivityIdIn(caseActivityId);
+  }
+
+  public HistoricCaseActivityInstanceQuery caseActivityIdIn(String... caseActivityIds) {
+    ensureNotNull(NotValidException.class, "caseActivityIds", (Object[]) caseActivityIds);
+    this.caseActivityIds = caseActivityIds;
     return this;
   }
 
@@ -286,8 +292,8 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
     return caseDefinitionId;
   }
 
-  public String getCaseActivityId() {
-    return caseActivityId;
+  public String[] getCaseActivityIds() {
+    return caseActivityIds;
   }
 
   public String getCaseActivityName() {

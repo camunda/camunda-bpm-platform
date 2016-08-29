@@ -878,6 +878,42 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     } catch (NotValidException e) {}
   }
 
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"
+  })
+  public void testQueryByCaseActivityIds() {
+    // given
+    createCaseInstanceByKey("oneTaskCase");
+    createCaseInstanceByKey("twoTaskCase");
+
+    // when
+    HistoricCaseActivityInstanceQuery query = historicQuery()
+        .caseActivityIdIn("PI_HumanTask_1", "PI_HumanTask_2");
+
+    // then
+    assertCount(3, query);
+  }
+
+  public void testQueryByInvalidCaseActivityId() {
+
+    // when
+    HistoricCaseActivityInstanceQuery query = historicQuery().caseActivityIdIn("invalid");
+
+    // then
+    assertCount(0, query);
+
+    try {
+      historicQuery().caseActivityIdIn((String[])null);
+      fail("A NotValidException was expected.");
+    } catch (NotValidException e) {}
+
+    try {
+      historicQuery().caseActivityIdIn((String)null);
+      fail("A NotValidException was expected.");
+    } catch (NotValidException e) {}
+  }
+
   protected HistoricCaseActivityInstanceQuery historicQuery() {
     return historyService.createHistoricCaseActivityInstanceQuery();
   }

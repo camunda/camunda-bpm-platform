@@ -150,8 +150,12 @@
       <if test="caseDefinitionId != null">
         and RES.CASE_DEF_ID_ = #{caseDefinitionId}
       </if>
-      <if test="caseActivityId != null">
-        and RES.CASE_ACT_ID_ = #{caseActivityId}
+      <if test="caseActivityIds != null &amp;&amp; caseActivityIds.length > 0">
+        and RES.CASE_ACT_ID_ in
+        <foreach item="caseActivityId" index="index" collection="caseActivityIds"
+                 open="(" separator="," close=")">
+          #{caseActivityId}
+        </foreach>
       </if>
       <if test="caseActivityName != null">
         and RES.CASE_ACT_NAME_ = #{caseActivityName}
