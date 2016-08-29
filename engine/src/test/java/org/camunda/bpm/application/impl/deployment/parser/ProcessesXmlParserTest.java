@@ -254,6 +254,22 @@ public class ProcessesXmlParserTest extends TestCase {
 
   }
 
+  public void FAILING_testParseProcessesXmlClassLineBreak() {
+
+    ProcessesXml processesXml = parser.createParse()
+        .sourceUrl(getStreamUrl("process_xml_one_archive_with_line_break.xml"))
+        .execute()
+        .getProcessesXml();
+
+    assertNotNull(processesXml);
+
+    ProcessArchiveXml archiveXml1 = processesXml.getProcessArchives().get(0);
+    List<String> resourceNames = archiveXml1.getProcessResourceNames();
+    assertEquals(2, resourceNames.size());
+    assertEquals("process1.bpmn", resourceNames.get(0));
+
+  }
+
   public void testParseProcessesXmlNsPrefix() {
 
     ProcessesXml processesXml = parser.createParse()

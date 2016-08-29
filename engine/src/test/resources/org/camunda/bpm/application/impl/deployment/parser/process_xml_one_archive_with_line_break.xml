@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-application
+  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
+  
+  <process-archive name="pa1">
+    <process-engine>default</process-engine>
+    <resource>
+      process1.bpmn
+    </resource>
+    <resource>process2.bpmn</resource>
+    <properties>
+        <property name="prop1">value1</property>
+        <property name="prop2">value2</property>
+    </properties>
+  </process-archive>
+  
+</process-application>
