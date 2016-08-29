@@ -192,6 +192,11 @@
       ON AUTH.KEY_ = RES.PROC_DEF_KEY_
     </if>
 
+    <if test="caseActivityIds != null &amp;&amp; caseActivityIds.length > 0">
+      INNER JOIN ${prefix}ACT_HI_CASEACTINST HCAI
+      ON RES.ACT_INST_ID_ = HCAI.ID_
+    </if>
+
     <where>
       <if test="variableId != null">
         RES.ID_ = #{variableId}
@@ -242,6 +247,15 @@
         <foreach item="item" index="index" collection="caseExecutionIds"
                  open="(" separator="," close=")">
           #{item}
+        </foreach>
+      </if>
+
+      <!-- caseActivityIds -->
+      <if test="caseActivityIds != null &amp;&amp; caseActivityIds.length > 0">
+        and HCAI.CASE_ACT_ID_ in
+        <foreach item="caseActivityId" index="index" collection="caseActivityIds"
+                 open="(" separator="," close=")">
+          #{caseActivityId}
         </foreach>
       </if>
 

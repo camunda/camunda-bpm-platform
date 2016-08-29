@@ -52,6 +52,7 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   protected String[] taskIdIn;
   protected String[] activityInstanceIdIn;
   protected String[] caseExecutionIdIn;
+  protected String[] caseActivityIdIn;
   protected String[] processInstanceIdIn;
   protected List<String> tenantIds;
 
@@ -112,6 +113,11 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     this.caseExecutionIdIn = caseExecutionIdIn;
   }
 
+  @CamundaQueryParam(value="caseActivityIdIn", converter = StringArrayConverter.class)
+  public void setCaseActivityIdIn(String[] caseActivityIdIn) {
+    this.caseActivityIdIn = caseActivityIdIn;
+  }
+
   @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
   public void setTenantIdIn(List<String> tenantIds) {
     this.tenantIds = tenantIds;
@@ -163,6 +169,9 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     }
     if (caseExecutionIdIn != null && caseExecutionIdIn.length > 0) {
       query.caseExecutionIdIn(caseExecutionIdIn);
+    }
+    if (caseActivityIdIn != null && caseActivityIdIn.length > 0) {
+      query.caseActivityIdIn(caseActivityIdIn);
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));

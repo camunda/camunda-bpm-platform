@@ -715,6 +715,37 @@ public class HistoricVariableInstanceRestServiceQueryTest extends AbstractRestSe
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
   }
 
+  @Test
+  public void testHistoricVariableQueryByCaseActivityIds() {
+
+    String caseExecutionIds = MockProvider.EXAMPLE_CASE_ACTIVITY_ID + "," + MockProvider.ANOTHER_EXAMPLE_CASE_ACTIVITY_ID;
+
+    given()
+      .queryParam("caseActivityIdIn", caseExecutionIds)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseActivityIdIn(MockProvider.EXAMPLE_CASE_ACTIVITY_ID, MockProvider.ANOTHER_EXAMPLE_CASE_ACTIVITY_ID);
+  }
+
+  @Test
+  public void testHistoricVariableQueryByCaseActivityIdsAsPost() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("caseActivityIdIn", Arrays.asList(MockProvider.EXAMPLE_CASE_ACTIVITY_ID, MockProvider.ANOTHER_EXAMPLE_CASE_ACTIVITY_ID));
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).caseActivityIdIn(MockProvider.EXAMPLE_CASE_ACTIVITY_ID, MockProvider.ANOTHER_EXAMPLE_CASE_ACTIVITY_ID);
+  }
+
   private List<HistoricVariableInstance> createMockHistoricVariableInstancesTwoTenants() {
     return Arrays.asList(
         MockProvider.mockHistoricVariableInstance(MockProvider.EXAMPLE_TENANT_ID).build(),

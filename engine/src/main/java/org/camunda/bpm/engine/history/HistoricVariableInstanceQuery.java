@@ -61,6 +61,9 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
   /** Only select historic variable instances which have one of the case executions ids. **/
   HistoricVariableInstanceQuery caseExecutionIdIn(String... caseExecutionIds);
 
+  /** Only select historic variable instances with one of the given case activity ids. **/
+  HistoricVariableInstanceQuery caseActivityIdIn(String... caseActivityIds);
+
   /** Only select historic variable instances which have one of the activity instance ids. **/
   HistoricVariableInstanceQuery activityInstanceIdIn(String... activityInstanceIds);
 
