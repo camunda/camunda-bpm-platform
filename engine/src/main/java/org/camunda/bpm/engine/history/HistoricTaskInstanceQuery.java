@@ -110,6 +110,12 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
    */
   HistoricTaskInstanceQuery taskDefinitionKey(String taskDefinitionKey);
 
+  /**
+   * Only select historic task instances with one of the given task definition keys.
+   * @see Task#getTaskDefinitionKey()
+   */
+  HistoricTaskInstanceQuery taskDefinitionKeyIn(String... taskDefinitionKeys);
+
   /** Only select historic task instances with the given task delete reason. */
   HistoricTaskInstanceQuery taskDeleteReason(String taskDeleteReason);
 
@@ -178,7 +184,7 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   /**
    * Only select historic task instances which have mapping
    * with Historic identity links based on user id
-   * 
+   *
    * @since 7.5
    */
   HistoricTaskInstanceQuery taskInvolvedUser(String involvedUser);
@@ -186,7 +192,7 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   /**
    * Only select historic task instances which have mapping
    * with Historic identity links based on group id
-   * 
+   *
    * @since 7.5
    */
   HistoricTaskInstanceQuery taskInvolvedGroup(String involvedGroup);
@@ -194,7 +200,7 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   /**
    * Only select historic task instances which have mapping
    * with Historic identity links with the condition of user being a candidate
-   * 
+   *
    * @since 7.5
    */
   HistoricTaskInstanceQuery taskHadCandidateUser(String candidateUser);
@@ -202,7 +208,7 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   /**
    * Only select historic task instances which have mapping
    * with Historic identity links with the condition of group being a candidate
-   * 
+   *
    * @since 7.5
    */
   HistoricTaskInstanceQuery taskHadCandidateGroup(String candidateGroup);

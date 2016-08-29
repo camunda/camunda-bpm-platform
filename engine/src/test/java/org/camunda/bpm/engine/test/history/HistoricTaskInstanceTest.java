@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
@@ -745,7 +746,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
         .create()
         .getId();
 
-    String processTaskId = caseService
+    caseService
         .createCaseExecutionQuery()
         .activityId("PI_ProcessTask_1")
         .singleResult()
@@ -920,4 +921,64 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertNull(task.getProcessDefinitionKey());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testQueryByTaskDefinitionKey() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    HistoricTaskInstanceQuery query1 = historyService
+        .createHistoricTaskInstanceQuery()
+        .taskDefinitionKey("theTask");
+
+    HistoricTaskInstanceQuery query2 = historyService
+        .createHistoricTaskInstanceQuery()
+        .taskDefinitionKeyIn("theTask");
+
+    // then
+    assertEquals(1, query1.count());
+    assertEquals(1, query2.count());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+  })
+  public void testQueryByTaskDefinitionKeys() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    caseService.createCaseInstanceByKey("oneTaskCase");
+
+    // when
+    HistoricTaskInstanceQuery query = historyService
+        .createHistoricTaskInstanceQuery()
+        .taskDefinitionKeyIn("theTask", "PI_HumanTask_1");
+
+    // then
+    assertEquals(2, query.count());
+  }
+
+  public void testQueryByInvalidTaskDefinitionKeys() {
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    query.taskDefinitionKeyIn("invalid");
+    assertEquals(0, query.count());
+
+    try {
+      query.taskDefinitionKeyIn(null);
+      fail("A ProcessEngineExcpetion was expected.");
+    } catch (NotValidException e) {}
+
+    try {
+      query.taskDefinitionKeyIn((String)null);
+      fail("A ProcessEngineExcpetion was expected.");
+    } catch (NotValidException e) {}
+
+    try {
+      String[] values = { "a", null, "b" };
+      query.taskDefinitionKeyIn(values);
+      fail("A ProcessEngineExcpetion was expected.");
+    } catch (NotValidException e) {}
+
+  }
 }

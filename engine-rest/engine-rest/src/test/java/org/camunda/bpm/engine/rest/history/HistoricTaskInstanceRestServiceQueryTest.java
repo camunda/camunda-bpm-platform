@@ -1989,6 +1989,50 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
 
     verify(mockedQuery).taskHadCandidateGroup(taskHadCandidateGroup);
   }
+
+  @Test
+  public void testQueryByTaskDefinitionKeyIn() {
+
+    String taskDefinitionKey1 = "aTaskDefinitionKey";
+    String taskDefinitionKey2 = "anotherTaskDefinitionKey";
+
+    given()
+      .queryParam("taskDefinitionKeyIn", taskDefinitionKey1 + "," + taskDefinitionKey2)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).taskDefinitionKeyIn(taskDefinitionKey1, taskDefinitionKey2);
+    verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testQueryByTaskDefinitionKeyInAsPost() {
+
+    String taskDefinitionKey1 = "aTaskDefinitionKey";
+    String taskDefinitionKey2 = "anotherTaskDefinitionKey";
+
+    List<String> taskDefinitionKeys = new ArrayList<String>();
+    taskDefinitionKeys.add(taskDefinitionKey1);
+    taskDefinitionKeys.add(taskDefinitionKey2);
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("taskDefinitionKeyIn", taskDefinitionKeys);
+
+    given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).taskDefinitionKeyIn(taskDefinitionKey1, taskDefinitionKey2);
+    verify(mockedQuery).list();
+  }
+
+
   private List<HistoricTaskInstance> createMockHistoricTaskInstancesTwoTenants() {
     return Arrays.asList(
         MockProvider.createMockHistoricTaskInstance(MockProvider.EXAMPLE_TENANT_ID),

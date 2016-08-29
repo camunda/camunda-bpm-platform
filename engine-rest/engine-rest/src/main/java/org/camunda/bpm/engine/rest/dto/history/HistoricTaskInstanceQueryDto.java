@@ -103,6 +103,7 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected String taskDescription;
   protected String taskDescriptionLike;
   protected String taskDefinitionKey;
+  protected String[] taskDefinitionKeyIn;
   protected String taskDeleteReason;
   protected String taskDeleteReasonLike;
   protected Boolean assigned;
@@ -209,6 +210,11 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     this.taskDefinitionKey = taskDefinitionKey;
   }
 
+  @CamundaQueryParam(value="taskDefinitionKeyIn", converter=StringArrayConverter.class)
+  public void setTaskDefinitionKeyIn(String[] taskDefinitionKeyIn) {
+    this.taskDefinitionKeyIn = taskDefinitionKeyIn;
+  }
+
   @CamundaQueryParam("taskDeleteReason")
   public void setTaskDeleteReason(String taskDeleteReason) {
     this.taskDeleteReason = taskDeleteReason;
@@ -228,7 +234,7 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   public void setUnassigned(Boolean unassigned) {
     this.unassigned = unassigned;
   }
-  
+
   @CamundaQueryParam("taskAssignee")
   public void setTaskAssignee(String taskAssignee) {
     this.taskAssignee = taskAssignee;
@@ -424,6 +430,9 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     }
     if (taskDefinitionKey != null) {
       query.taskDefinitionKey(taskDefinitionKey);
+    }
+    if (taskDefinitionKeyIn != null && taskDefinitionKeyIn.length > 0) {
+      query.taskDefinitionKeyIn(taskDefinitionKeyIn);
     }
     if (taskDeleteReason != null) {
       query.taskDeleteReason(taskDeleteReason);

@@ -257,8 +257,12 @@
       <if test="processInstanceId != null">
         and RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
-      <if test="taskDefinitionKey != null">
-        and RES.TASK_DEF_KEY_ = #{taskDefinitionKey}
+      <if test="taskDefinitionKeys != null &amp;&amp; taskDefinitionKeys.length > 0">
+        and RES.TASK_DEF_KEY_ in
+        <foreach item="taskDefinitionKey" index="index" collection="taskDefinitionKeys"
+                 open="(" separator="," close=")">
+          #{taskDefinitionKey}
+        </foreach>
       </if>
       <if test="executionId != null">
         and RES.EXECUTION_ID_ = #{executionId}

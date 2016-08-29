@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -54,7 +55,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected Boolean unassigned;
   protected String taskAssignee;
   protected String taskAssigneeLike;
-  protected String taskDefinitionKey;
+  protected String[] taskDefinitionKeys;
   protected String taskInvolvedUser;
   protected String taskInvolvedGroup;
   protected String taskHadCandidateUser;
@@ -118,7 +119,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   public HistoricTaskInstanceQuery activityInstanceIdIn(String... activityInstanceIds) {
-    ensureNotNull("activityInstanceIds", activityInstanceIds);
+    ensureNotNull("activityInstanceIds", (Object[]) activityInstanceIds);
     this.activityInstanceIds = activityInstanceIds;
     return this;
   }
@@ -253,7 +254,12 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   public HistoricTaskInstanceQuery taskDefinitionKey(String taskDefinitionKey) {
-    this.taskDefinitionKey = taskDefinitionKey;
+    return taskDefinitionKeyIn(taskDefinitionKey);
+  }
+
+  public HistoricTaskInstanceQuery taskDefinitionKeyIn(String... taskDefinitionKeys) {
+    ensureNotNull(NotValidException.class, "taskDefinitionKeys", (Object[]) taskDefinitionKeys);
+    this.taskDefinitionKeys = taskDefinitionKeys;
     return this;
   }
 
@@ -538,8 +544,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return taskId;
   }
 
-  public String getTaskDefinitionKey() {
-    return taskDefinitionKey;
+  public String[] getTaskDefinitionKeys() {
+    return taskDefinitionKeys;
   }
 
   public List<TaskQueryVariableValue> getVariables() {
