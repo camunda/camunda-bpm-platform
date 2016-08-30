@@ -114,8 +114,8 @@ public class RequiredRuleTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult();
 
-    assertThat(taskExecution,is(notNullValue()));
-    assertThat(taskExecution.isRequired(),is(true));
+    assertThat(taskExecution, is(notNullValue()));
+    assertThat(taskExecution.isRequired(), is(true));
   }
 
   @Deployment
@@ -127,7 +127,7 @@ public class RequiredRuleTest extends CmmnProcessEngineTestCase {
         .activityId("PI_HumanTask_1")
         .singleResult();
 
-    assertThat(taskExecution,is(notNullValue()));
-    assertThat(taskExecution.isRequired(),is(true));
+    assertThat(taskExecution, is(notNullValue()));
+    assertThat(taskExecution.isRequired(), is(true));
   }
 }
