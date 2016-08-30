@@ -46,6 +46,7 @@ public class MetricsIntervalTest {
 
   protected static final ProcessEngineRule ENGINE_RULE = new ProvidedProcessEngineRule();
   protected static final ProcessEngineTestRule TEST_RULE = new ProcessEngineTestRule(ENGINE_RULE);
+  protected static final String REPORTER_ID = "REPORTER_ID";
 
   @ClassRule
   public static RuleChain RULE_CHAIN = RuleChain.outerRule(ENGINE_RULE).around(TEST_RULE);
@@ -80,11 +81,14 @@ public class MetricsIntervalTest {
     runtimeService = ENGINE_RULE.getRuntimeService();
     processEngineConfiguration = ENGINE_RULE.getProcessEngineConfiguration();
     managementService = ENGINE_RULE.getManagementService();
+    processEngineConfiguration.setDbMetricsReporterActivate(true);
+    processEngineConfiguration.getDbMetricsReporter().setReporterId(REPORTER_ID);
     generateMeterData(3, 15 * 60 * 1000, 5);
   }
 
   @AfterClass
   public static void cleanUp() {
+    processEngineConfiguration.setDbMetricsReporterActivate(false);
     managementService.deleteMetrics(null);
   }
 
@@ -206,7 +210,7 @@ public class MetricsIntervalTest {
     //given metric data
 
     //when query metric interval data with reporter in where clause
-    List<Metric> metrics = managementService.createMetricsQuery().reporter("127.0.0.1$default").interval();
+    List<Metric> metrics = managementService.createMetricsQuery().reporter(REPORTER_ID).interval();
 
     //then result contains only metrics from given reporter, since it is the default it contains all
     assertEquals(36, metrics.size());
@@ -240,7 +244,7 @@ public class MetricsIntervalTest {
     //given metric data
 
     //when query metric interval data with custom interval and reporter in where clause
-    List<Metric> metrics = managementService.createMetricsQuery().reporter("127.0.0.1$default").interval(300);
+    List<Metric> metrics = managementService.createMetricsQuery().reporter(REPORTER_ID).interval(300);
 
     //then result contains only metrics from given reporter, since it is the default it contains all
     //36 * (15/5) = 108
