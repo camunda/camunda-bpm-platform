@@ -57,6 +57,7 @@ public class MetricsIntervalTest {
   protected static RuntimeService runtimeService;
   protected static ProcessEngineConfigurationImpl processEngineConfiguration;
   protected static ManagementService managementService;
+  protected static String lastReporterId;
 
   private static void generateMeterData(long dataCount, long intervall, long dataPerIntervall) {
     TEST_RULE.deploy(Bpmn.createExecutableProcess("testProcess")
@@ -82,6 +83,7 @@ public class MetricsIntervalTest {
     processEngineConfiguration = ENGINE_RULE.getProcessEngineConfiguration();
     managementService = ENGINE_RULE.getManagementService();
     processEngineConfiguration.setDbMetricsReporterActivate(true);
+    lastReporterId = processEngineConfiguration.getDbMetricsReporter().getMetricsCollectionTask().getReporter();
     processEngineConfiguration.getDbMetricsReporter().setReporterId(REPORTER_ID);
     generateMeterData(3, 15 * 60 * 1000, 5);
   }
@@ -89,6 +91,7 @@ public class MetricsIntervalTest {
   @AfterClass
   public static void cleanUp() {
     processEngineConfiguration.setDbMetricsReporterActivate(false);
+    processEngineConfiguration.getDbMetricsReporter().setReporterId(lastReporterId);
     managementService.deleteMetrics(null);
   }
 
