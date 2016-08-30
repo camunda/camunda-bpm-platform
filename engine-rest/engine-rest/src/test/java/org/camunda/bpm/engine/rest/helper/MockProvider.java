@@ -75,10 +75,12 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.identity.Authentication;
+import org.camunda.bpm.engine.impl.persistence.entity.MetricIntervalEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.management.Metric;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.query.PeriodUnit;
@@ -799,6 +801,8 @@ public abstract class MockProvider {
   // metrics
   public static final String EXAMPLE_METRICS_START_DATE = "2015-01-01T00:00:00";
   public static final String EXAMPLE_METRICS_END_DATE = "2015-02-01T00:00:00";
+  public static final String EXAMPLE_METRICS_REPORTER = "REPORTER";
+  public static final String EXAMPLE_METRICS_NAME = "metricName";
 
   // external task
   public static final String EXTERNAL_TASK_ID = "anExternalTaskId";
@@ -2519,11 +2523,33 @@ public abstract class MockProvider {
     MetricsQuery query = mock(MetricsQuery.class);
 
     when(query.name(anyString())).thenReturn(query);
+    when(query.reporter(any(String.class))).thenReturn(query);
+    when(query.limit(any(Integer.class))).thenReturn(query);
+    when(query.offset(any(Integer.class))).thenReturn(query);
     when(query.startDate(any(Date.class))).thenReturn(query);
     when(query.endDate(any(Date.class))).thenReturn(query);
 
     return query;
 
+  }
+
+  public static List<Metric> createMockMetricIntervalResult() {
+    List<Metric> metrics = new ArrayList<Metric>();
+
+    MetricIntervalEntity entity1 = new MetricIntervalEntity(new Date(15 * 60 * 1000 * 1), EXAMPLE_METRICS_NAME, EXAMPLE_METRICS_REPORTER);
+    entity1.setValue(21);
+
+    MetricIntervalEntity entity2 = new MetricIntervalEntity(new Date(15 * 60 * 1000 * 2), EXAMPLE_METRICS_NAME, EXAMPLE_METRICS_REPORTER);
+    entity2.setValue(22);
+
+    MetricIntervalEntity entity3 = new MetricIntervalEntity(new Date(15 * 60 * 1000 * 3), EXAMPLE_METRICS_NAME, EXAMPLE_METRICS_REPORTER);
+    entity3.setValue(23);
+
+    metrics.add(entity3);
+    metrics.add(entity2);
+    metrics.add(entity1);
+
+    return metrics;
   }
 
   // decision definition

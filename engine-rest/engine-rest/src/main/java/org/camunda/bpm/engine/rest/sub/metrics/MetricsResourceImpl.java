@@ -18,7 +18,6 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.rest.dto.metrics.MetricsResultDto;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Daniel Meyer
@@ -28,12 +27,10 @@ public class MetricsResourceImpl implements MetricsResource {
 
   protected String metricsName;
   protected ProcessEngine processEngine;
-  protected ObjectMapper objectMapper;
 
-  public MetricsResourceImpl(String metricsName, ProcessEngine processEngine, ObjectMapper objectMapper) {
+  public MetricsResourceImpl(String metricsName, ProcessEngine processEngine) {
     this.metricsName = metricsName;
     this.processEngine = processEngine;
-    this.objectMapper = objectMapper;
   }
 
   @Override
