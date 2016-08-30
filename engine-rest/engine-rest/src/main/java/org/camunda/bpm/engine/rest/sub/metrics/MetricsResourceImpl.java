@@ -12,14 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.sub.metrics;
 
-import java.util.Date;
-
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
+import org.camunda.bpm.engine.rest.util.DateParam;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.management.MetricsQuery;
-import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.metrics.MetricsResultDto;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,31 +36,20 @@ public class MetricsResourceImpl implements MetricsResource {
     this.objectMapper = objectMapper;
   }
 
-  public MetricsResultDto sum(UriInfo uriInfo) {
+  @Override
+  public MetricsResultDto sum(DateParam startDate, DateParam endDate) {
     MetricsQuery query = processEngine.getManagementService()
       .createMetricsQuery()
       .name(metricsName);
 
-    applyQueryParams(query, uriInfo);
+    if (startDate != null) {
+      query.startDate(startDate.getDate());
+    }
+
+    if (endDate != null) {
+      query.endDate(endDate.getDate());
+    }
 
     return new MetricsResultDto(query.sum());
   }
-
-  protected void applyQueryParams(MetricsQuery query, UriInfo uriInfo) {
-    MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
-
-    DateConverter dateConverter = new DateConverter();
-    dateConverter.setObjectMapper(objectMapper);
-
-    if(queryParameters.getFirst("startDate") != null) {
-      Date startDate = dateConverter.convertQueryParameterToType(queryParameters.getFirst("startDate"));
-      query.startDate(startDate);
-    }
-
-    if(queryParameters.getFirst("endDate") != null) {
-      Date endDate = dateConverter.convertQueryParameterToType(queryParameters.getFirst("endDate"));
-      query.endDate(endDate);
-    }
-  }
-
 }

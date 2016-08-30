@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.sub.metrics;
 
+import org.camunda.bpm.engine.rest.util.DateParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.metrics.MetricsResultDto;
 
@@ -30,6 +30,6 @@ public interface MetricsResource {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/sum")
-  MetricsResultDto sum(@Context UriInfo uriInfo);
-
+  MetricsResultDto sum(@QueryParam(value = "startDate") DateParam startDate,
+                       @QueryParam(value = "endDate") DateParam endDate);
 }
