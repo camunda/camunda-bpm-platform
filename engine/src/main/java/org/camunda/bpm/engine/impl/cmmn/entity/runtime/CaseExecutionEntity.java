@@ -716,6 +716,7 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
         (VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE,
         (VariableInstanceLifecycleListener) VariableInstanceHistoryListener.INSTANCE,
         (VariableInstanceLifecycleListener) VariableListenerInvocationListener.INSTANCE,
+        //TODO: change to instantiate in same manner as other listeners
         (VariableInstanceLifecycleListener) new VariableOnPartListener(this)
       );
   }

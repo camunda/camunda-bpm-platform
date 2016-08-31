@@ -788,4 +788,9 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
    * the next transition because the entry criterion has been already satisfied.</p>
    */
   boolean isEntryCriterionSatisfied();
+
+  /**
+   * Fire sentries that consist only out of ifPart, are not satisfied yet, but do satisfy condition.
+   */
+  void fireIfOnlySentryParts();
 }

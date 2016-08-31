@@ -318,7 +318,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     // Step 3: check each affected sentry whether it is satisfied.
     // the returned list contains all satisfied sentries
     List<String> satisfiedSentries = getSatisfiedSentries(affectedSentries);
- 
+
     // Step 4: reset sentries -> satisfied == false
     resetSentries(satisfiedSentries);
 
@@ -327,9 +327,31 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   }
 
+  public void fireIfOnlySentryParts() {
+    // the following steps are a workaround, because setVariable()
+    // does not check nor fire a sentry!!!
+    List<String> affectedSentries = new ArrayList<String>();
+    List<CmmnSentryPart> sentryParts = collectSentryParts(getSentries());
+    for (CmmnSentryPart sentryPart : sentryParts) {
+      if (isNotSatisfiedIfPartOnly(sentryPart, getSentries()) &&
+          !affectedSentries.contains(sentryPart.getSentryId())) {
+        affectedSentries.add(sentryPart.getSentryId());
+      }
+    }
+
+    // Step 7: check each not affected sentry whether it is satisfied
+    List<String> satisfiedSentries = getSatisfiedSentries(affectedSentries);
+
+    // Step 8: reset sentries -> satisfied == false
+    resetSentries(satisfiedSentries,getSentries());
+
+    // Step 9: fire satisfied sentries
+    fireSentries(satisfiedSentries);
+  }
+
   public void handleVariableTransition(String variableName, String transition) {
-    Map<String,List<CmmnSentryPart>> sentries = new HashMap<String, List<CmmnSentryPart>>();
-    collectAllSentries(sentries);
+    Map<String,List<CmmnSentryPart>> sentries = collectAllSentries();
+
     List<CmmnSentryPart> sentryParts = collectSentryParts(sentries);
     
     List<String> affectedSentries = collectAffectedSentriesWithVariableOnParts(variableName, transition, sentryParts);
@@ -361,25 +383,33 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
       if (child.getActivityId().equals(sourceRef) || child.getId().equals(sourceCaseExecutionId)) {
 
         String standardEvent = sentryPart.getStandardEvent();
-
         if (transition.equals(standardEvent)) {
-
-          if (!sentryPart.isSatisfied()) {
-            // if it is not already satisfied, then set the
-            // current case sentry part to satisfied (=true).
-            String sentryId = sentryPart.getSentryId();
-            sentryPart.setSatisfied(true);
-
-            // collect the id of affected sentry.
-            if (!affectedSentries.contains(sentryId)) {
-              affectedSentries.add(sentryId);
-            }
-          }
+          addIdIfNotSatisfied(affectedSentries, sentryPart);
         }
       }
     }
 
     return affectedSentries;
+  }
+
+  private boolean isNotSatisfiedIfPartOnly(CmmnSentryPart sentryPart, Map<String, List<CmmnSentryPart>> sentries) {
+    return IF_PART.equals(sentryPart.getType())
+        && sentries.get(sentryPart.getSentryId()).size() == 1
+        && !sentryPart.isSatisfied();
+  }
+
+  private void addIdIfNotSatisfied(List<String> affectedSentries, CmmnSentryPart sentryPart) {
+    if (!sentryPart.isSatisfied()) {
+      // if it is not already satisfied, then set the
+      // current case sentry part to satisfied (=true).
+      String sentryId = sentryPart.getSentryId();
+      sentryPart.setSatisfied(true);
+
+      // collect the id of affected sentry.
+      if (!affectedSentries.contains(sentryId)) {
+        affectedSentries.add(sentryId);
+      }
+    }
   }
 
   protected List<String> collectAffectedSentriesWithVariableOnParts(String variableName, String variableEvent, List<CmmnSentryPart> sentryParts) {
@@ -395,17 +425,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
         && sentryVariableEvent.equals(variableEvent)
         && !hasVariableWithSameNameInParent(execution, sentryVariableName)) {
 
-        if (!sentryPart.isSatisfied()) {
-            // if it is not already satisfied, then set the
-            // current case sentry part to satisfied (=true).
-            String sentryId = sentryPart.getSentryId();
-            sentryPart.setSatisfied(true);
-
-            // collect the affected sentries.
-            if (!affectedSentries.contains(sentryId)) {
-              affectedSentries.add(sentryId);
-            }
-        }
+        addIdIfNotSatisfied(affectedSentries, sentryPart);
       }
     }
 
@@ -426,12 +446,14 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     return false;
   }
 
-  protected void collectAllSentries(Map<String,List<CmmnSentryPart>> sentries) {
+  protected Map<String,List<CmmnSentryPart>> collectAllSentries() {
+    Map<String,List<CmmnSentryPart>> sentries = new HashMap<String, List<CmmnSentryPart>>();
     List<? extends CmmnExecution> caseExecutions = getCaseExecutions();
     for(CmmnExecution caseExecution: caseExecutions) {
-      caseExecution.collectAllSentries(sentries);
+      sentries.putAll(caseExecution.collectAllSentries());
     }
     sentries.putAll(getSentries());
+    return sentries;
   }
 
   protected List<CmmnSentryPart> getAffectedSentryParts(Map<String,List<CmmnSentryPart>> allSentries, List<String> affectedSentries) {
@@ -517,14 +539,17 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     }
   }
 
-  protected void resetSentries(List<String> sentries) {
+  protected void resetSentries(List<String> sentries, Map<String, List<CmmnSentryPart>> allSentries) {
     for (String sentry : sentries) {
-      List<CmmnSentryPart> parts = getSentries().get(sentry);
-
+      List<CmmnSentryPart> parts = allSentries.get(sentry);
       for (CmmnSentryPart part : parts) {
         part.setSatisfied(false);
       }
     }
+  }
+
+  protected void resetSentries(List<String> sentries) {
+    this.resetSentries(sentries,getSentries());
   }
 
   protected void resetSentryParts(List<CmmnSentryPart> parts) {

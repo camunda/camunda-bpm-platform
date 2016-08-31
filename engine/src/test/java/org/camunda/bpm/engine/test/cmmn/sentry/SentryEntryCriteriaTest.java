@@ -839,7 +839,7 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment
-  public void FAILING_testIfPartOnCaseInstanceCreate() {
+  public void testIfPartOnCaseInstanceCreate() {
 
     // when
     createCaseInstanceByKey("case", Variables.putValue("value", 101));

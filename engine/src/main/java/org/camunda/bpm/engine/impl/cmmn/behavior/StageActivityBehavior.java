@@ -53,7 +53,9 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
       execution.createSentryParts();
       execution.triggerChildExecutionsLifecycle(children);
 
+
       if (execution.isActive()) {
+        execution.fireIfOnlySentryParts();
         // if "autoComplete == true" and there are no
         // required nor active child activities,
         // then the stage will be completed.

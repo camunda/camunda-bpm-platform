@@ -12,8 +12,8 @@
         <entryCriterion sentryRef="Sentry_1" />
       </planItem>
 
-      <sentry id="Sentry_1">
-        <ifPart>
+      <sentry id="Sentry_1" >
+        <ifPart >
           <condition>${value >= 100}</condition>
         </ifPart>
       </sentry>
