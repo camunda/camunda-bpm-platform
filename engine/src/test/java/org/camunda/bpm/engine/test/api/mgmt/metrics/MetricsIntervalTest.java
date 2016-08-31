@@ -31,14 +31,14 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 import static junit.framework.TestCase.assertEquals;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 /**
  *
@@ -79,11 +79,24 @@ public class MetricsIntervalTest {
     }
   }
 
+  protected static void clearMetrics() {
+    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
+    for (Meter meter : meters) {
+      meter.getAndClear();
+    }
+    managementService.deleteMetrics(null);
+  }
+
   @BeforeClass
   public static void initMetrics() {
     runtimeService = ENGINE_RULE.getRuntimeService();
     processEngineConfiguration = ENGINE_RULE.getProcessEngineConfiguration();
     managementService = ENGINE_RULE.getManagementService();
+
+    //clean up before start
+    clearMetrics();
+
+    //init metrics
     processEngineConfiguration.setDbMetricsReporterActivate(true);
     lastReporterId = processEngineConfiguration.getDbMetricsReporter().getMetricsCollectionTask().getReporter();
     processEngineConfiguration.getDbMetricsReporter().setReporterId(REPORTER_ID);
@@ -94,11 +107,7 @@ public class MetricsIntervalTest {
   public static void cleanUp() {
     processEngineConfiguration.setDbMetricsReporterActivate(false);
     processEngineConfiguration.getDbMetricsReporter().setReporterId(lastReporterId);
-    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
-    for (Meter meter : meters) {
-      meter.getAndClear();
-    }
-    managementService.deleteMetrics(null);
+    clearMetrics();
   }
 
   //====================================================================================
@@ -133,13 +142,10 @@ public class MetricsIntervalTest {
   public void testMeterQueryIncreaseLimit() {
     //given metric data
 
-    //when query metric interval data with max results set to 1000
+      //when query metric interval data with max results set to 1000
     exception.expect(ProcessEngineException.class);
     exception.expectMessage("Metrics interval query row limit can't be set larger than 200.");
-    List<Metric> metrics = managementService.createMetricsQuery().limit(1000).interval();
-
-    //then max 200 values are returned
-    assertEquals(MetricsQueryImpl.DEFAULT_LIMIT_SELECT_INTERVAL, metrics.size());
+    managementService.createMetricsQuery().limit(1000).interval();
   }
 
   //====================================================================================

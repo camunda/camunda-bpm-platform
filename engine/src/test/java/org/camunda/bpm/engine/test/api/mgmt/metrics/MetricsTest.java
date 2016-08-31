@@ -30,8 +30,8 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
@@ -41,25 +41,17 @@ import org.junit.rules.RuleChain;
  */
 public class MetricsTest {
 
-  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected static final ProcessEngineRule ENGINE_RULE = new ProvidedProcessEngineRule();
+  protected static final ProcessEngineTestRule TEST_RULE = new ProcessEngineTestRule(ENGINE_RULE);
 
-  @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+  @ClassRule
+  public static RuleChain RULE_CHAIN = RuleChain.outerRule(ENGINE_RULE).around(TEST_RULE);
 
-  protected RuntimeService runtimeService;
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
-  protected ManagementService managementService;
+  protected static RuntimeService runtimeService;
+  protected static ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected static ManagementService managementService;
 
-  @Before
-  public void init() {
-    runtimeService = engineRule.getRuntimeService();
-    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
-    managementService = engineRule.getManagementService();
-  }
-
-  @After
-  public void cleanUp() {
+  protected static void clearMetrics() {
     Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
     for (Meter meter : meters) {
       meter.getAndClear();
@@ -67,9 +59,24 @@ public class MetricsTest {
     managementService.deleteMetrics(null);
   }
 
+  @BeforeClass
+  public static void initMetrics() {
+    runtimeService = ENGINE_RULE.getRuntimeService();
+    processEngineConfiguration = ENGINE_RULE.getProcessEngineConfiguration();
+    managementService = ENGINE_RULE.getManagementService();
+
+    //clean up before start
+    clearMetrics();
+  }
+
+  @After
+  public void cleanUp() {
+    clearMetrics();
+  }
+
   @Test
   public void testDeleteMetrics() {
-    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+    TEST_RULE.deploy(Bpmn.createExecutableProcess("testProcess")
             .startEvent()
             .manualTask()
             .endEvent()
@@ -96,7 +103,7 @@ public class MetricsTest {
 
   @Test
   public void testDeleteMetricsWithTimestamp() {
-    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+    TEST_RULE.deploy(Bpmn.createExecutableProcess("testProcess")
             .startEvent()
             .manualTask()
             .endEvent()
@@ -123,7 +130,7 @@ public class MetricsTest {
 
   @Test
   public void testDeleteMetricsWithTimestampBefore() {
-    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+    TEST_RULE.deploy(Bpmn.createExecutableProcess("testProcess")
             .startEvent()
             .manualTask()
             .endEvent()
@@ -154,7 +161,7 @@ public class MetricsTest {
     processEngineConfiguration.setDbMetricsReporterActivate(true);
 
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+    TEST_RULE.deploy(Bpmn.createExecutableProcess("testProcess")
             .startEvent()
             .manualTask()
             .endEvent()
@@ -191,7 +198,7 @@ public class MetricsTest {
     processEngineConfiguration.setDbMetricsReporterActivate(true);
 
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+    TEST_RULE.deploy(Bpmn.createExecutableProcess("testProcess")
             .startEvent()
             .manualTask()
             .endEvent()
@@ -256,7 +263,7 @@ public class MetricsTest {
 
   @Test
   public void testQuery() {
-    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+    TEST_RULE.deploy(Bpmn.createExecutableProcess("testProcess")
             .startEvent()
             .manualTask()
             .endEvent()
@@ -291,7 +298,7 @@ public class MetricsTest {
 
   @Test
   public void testQueryEndDateExclusive() {
-    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+    TEST_RULE.deploy(Bpmn.createExecutableProcess("testProcess")
             .startEvent()
             .manualTask()
             .endEvent()
@@ -326,7 +333,7 @@ public class MetricsTest {
     processEngineConfiguration.setDbMetricsReporterActivate(true);
 
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
+    TEST_RULE.deploy(Bpmn.createExecutableProcess("testProcess")
             .startEvent()
             .manualTask()
             .endEvent()
