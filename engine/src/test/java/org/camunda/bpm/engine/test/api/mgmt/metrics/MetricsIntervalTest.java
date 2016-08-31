@@ -68,13 +68,13 @@ public class MetricsIntervalTest {
             .endEvent()
             .done());
     long startDate = 0;
-    long diff = intervall / dataPerIntervall - 1;
+    long diff = intervall / dataPerIntervall;
     for (int i = 0; i <= dataCount; i++) {
       for (int j = 0; j < dataPerIntervall; j++) {
-        startDate += diff;
         ClockUtil.setCurrentTime(new Date(startDate));
         runtimeService.startProcessInstanceByKey("testProcess");
         processEngineConfiguration.getDbMetricsReporter().reportNow();
+        startDate += diff;
       }
     }
   }
@@ -485,7 +485,7 @@ public class MetricsIntervalTest {
 
   @Test
   public void testMeterQueryCustomIntervalCalculatedValue() {
-    //given metric data created for 15 min intervals 10 test datas so each 1.5 min
+    //given metric data created for 15 min intervals 5 test datas so each 3 min
 
     //when query metric interval data with custom interval, start and end date in where clause
     //end date = Jan 1, 1970 1:30:00 PM
@@ -502,20 +502,22 @@ public class MetricsIntervalTest {
     //then result contains 3 entries
     assertEquals(3, metrics.size());
     long summedValue = 0;
-    //the first interval contains 4 entries since an entry will created each 2.98 min
-    //so the summed value is 12 because 3 activities are created per entry
-    //entries 26.82 29.8
-    assertEquals(6, metrics.get(0).getValue());
+    //data created at 15, 18, 21, 24, 27
+    //and intervals are 15, 20 and 25
+
+    //the first interval contains 1 entries since an entry will created each 3 min
+    //summed value from interval is 3 since only one entry exist (27) and 3 activities are created per entry
+    assertEquals(3, metrics.get(0).getValue());
     summedValue += metrics.get(0).getValue();
 
     //second interval contains 2 entries
-    //entries 20.86 23.84
+    //entries 21, 24
     assertEquals(6, metrics.get(1).getValue());
     summedValue += metrics.get(1).getValue();
 
     //third interval contains 1 entry
-    //entries 17.88
-    assertEquals(3, metrics.get(2).getValue());
+    //entries 15, 18
+    assertEquals(6, metrics.get(2).getValue());
     summedValue += metrics.get(2).getValue();
 
     //summed value should be equal to the summed query value
