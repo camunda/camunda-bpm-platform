@@ -175,7 +175,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificFromTimestamp1.put(POSTGRES, "TO_TIMESTAMP(");
     databaseSpecificFromTimestamp2.put(POSTGRES, ") AT TIME ZONE 'UTC'");
     databaseSpecificToTimestamp1.put(POSTGRES, "EXTRACT(epoch FROM ");
-    databaseSpecificToTimestamp2.put(POSTGRES, ")");
+    databaseSpecificToTimestamp2.put(POSTGRES, " at time zone 'UTC')");
     databaseSpecificDummyTable.put(POSTGRES, "");
     databaseSpecificTrueConstant.put(POSTGRES, "true");
     databaseSpecificFalseConstant.put(POSTGRES, "false");
