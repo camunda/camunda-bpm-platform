@@ -12,13 +12,16 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
+import java.util.Collection;
 import java.util.Date;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
 import org.camunda.bpm.engine.ManagementService;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -26,10 +29,10 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -44,9 +47,6 @@ public class MetricsTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
-
   protected RuntimeService runtimeService;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected ManagementService managementService;
@@ -60,6 +60,10 @@ public class MetricsTest {
 
   @After
   public void cleanUp() {
+    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
+    for (Meter meter : meters) {
+      meter.getAndClear();
+    }
     managementService.deleteMetrics(null);
   }
 
@@ -212,12 +216,19 @@ public class MetricsTest {
     // given
     processEngineConfiguration.setMetricsEnabled(false);
 
-    // when
-    exception.expect(ProcessEngineException.class);
-    exception.expectMessage("Metrics reporting is disabled");
-    managementService.reportDbMetricsNow();
-    // reset metrics setting
-    processEngineConfiguration.setMetricsEnabled(defaultIsMetricsEnabled);
+   try {
+      // when
+      managementService.reportDbMetricsNow();
+      fail("Exception expected");
+    }
+    catch (ProcessEngineException e) {
+      // then an exception is thrown
+      Assert.assertTrue(e.getMessage().contains("Metrics reporting is disabled"));
+    }
+    finally {
+      // reset metrics setting
+      processEngineConfiguration.setMetricsEnabled(defaultIsMetricsEnabled);
+    }
   }
 
   @Test
@@ -229,13 +240,18 @@ public class MetricsTest {
     processEngineConfiguration.setMetricsEnabled(true);
     processEngineConfiguration.setDbMetricsReporterActivate(false);
 
-    // when
-    exception.expect(ProcessEngineException.class);
-    exception.expectMessage("Metrics reporting to database is disabled");
-    managementService.reportDbMetricsNow();
-    // then an exception is thrown
-    processEngineConfiguration.setMetricsEnabled(defaultIsMetricsEnabled);
-    processEngineConfiguration.setDbMetricsReporterActivate(defaultIsMetricsReporterActivate);
+    try {
+      // when
+      managementService.reportDbMetricsNow();
+      fail("Exception expected");
+    }
+    catch (ProcessEngineException e) {
+      // then an exception is thrown
+      Assert.assertTrue(e.getMessage().contains("Metrics reporting to database is disabled"));
+    } finally {
+      processEngineConfiguration.setMetricsEnabled(defaultIsMetricsEnabled);
+      processEngineConfiguration.setDbMetricsReporterActivate(defaultIsMetricsReporterActivate);
+    }
   }
 
   @Test

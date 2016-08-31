@@ -15,6 +15,7 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import org.camunda.bpm.engine.ManagementService;
@@ -35,6 +36,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 import static junit.framework.TestCase.assertEquals;
+import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.junit.ClassRule;
 
@@ -92,6 +94,10 @@ public class MetricsIntervalTest {
   public static void cleanUp() {
     processEngineConfiguration.setDbMetricsReporterActivate(false);
     processEngineConfiguration.getDbMetricsReporter().setReporterId(lastReporterId);
+    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
+    for (Meter meter : meters) {
+      meter.getAndClear();
+    }
     managementService.deleteMetrics(null);
   }
 
