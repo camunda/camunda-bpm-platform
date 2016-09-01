@@ -173,7 +173,7 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     return null;
   }
   
-  protected Error findErrorForCode(String errorCode) {
+  protected Error findErrorForNameAndCode(String errorCode) {
     Collection<Error> errors = modelInstance.getModelElementsByType(Error.class);
     for (Error error : errors) {
       if (errorCode.equals(error.getErrorCode())) {
@@ -196,7 +196,7 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
   }
 
   protected ErrorEventDefinition createErrorEventDefinition(String errorCode) {
-    Error error = findErrorForCode(errorCode);
+    Error error = findErrorForNameAndCode(errorCode);
     ErrorEventDefinition errorEventDefinition = createInstance(ErrorEventDefinition.class);
     errorEventDefinition.setError(error);
     return errorEventDefinition;

@@ -18,8 +18,7 @@ package org.camunda.bpm.model.bpmn.builder;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.Event;
-import org.camunda.bpm.model.bpmn.instance.Definitions;
-import org.camunda.bpm.model.bpmn.instance.Error;
+
 
 /**
  *
@@ -57,7 +56,7 @@ public abstract class AbstractErrorEventDefinitionBuilder<B extends AbstractErro
    * Sets the error attribute with errorCode.
    */
   public B error(String errorCode) {
-    element.setError(findErrorForCode(errorCode));
+    element.setError(findErrorForNameAndCode(errorCode));
     return myself;
   }
 
