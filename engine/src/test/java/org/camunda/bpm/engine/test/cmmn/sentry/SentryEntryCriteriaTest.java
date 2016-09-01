@@ -850,4 +850,16 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
   }
 
+  @Deployment
+  public void testIfPartOnCaseInstanceCreateWithSentry() {
+
+    // when
+    createCaseInstanceByKey("case", Variables.putValue("myVar", 101));
+
+    // then
+    CaseExecution caseExecution = queryCaseExecutionByActivityId("PI_HumanTask_1");
+    assertTrue(caseExecution.isActive());
+
+  }
+
 }
