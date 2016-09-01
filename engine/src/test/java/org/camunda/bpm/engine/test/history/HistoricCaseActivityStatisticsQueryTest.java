@@ -66,7 +66,7 @@ public class HistoricCaseActivityStatisticsQueryTest {
       historyService
         .createHistoricCaseActivityStatisticsQuery(null)
         .list();
-      fail();
+      fail("It should not be possible to query for statistics by null.");
     } catch (NullValueException exception) {
 
     }

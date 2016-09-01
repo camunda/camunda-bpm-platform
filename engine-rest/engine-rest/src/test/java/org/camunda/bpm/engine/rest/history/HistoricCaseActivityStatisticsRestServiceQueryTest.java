@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -48,10 +48,10 @@ public class HistoricCaseActivityStatisticsRestServiceQueryTest extends Abstract
   protected static final String HISTORY_URL = TEST_RESOURCE_ROOT_PATH + "/history";
   protected static final String HISTORIC_CASE_ACTIVITY_STATISTICS_URL = HISTORY_URL + "/case-definition/{id}/statistics";
 
-  protected HistoricCaseActivityStatisticsQuery historicCaseActivityStatisticsQuery;
+  protected static HistoricCaseActivityStatisticsQuery historicCaseActivityStatisticsQuery;
 
-  @Before
-  public void setUpRuntimeData() {
+  @BeforeClass
+  public static void setUpRuntimeData() {
     List<HistoricCaseActivityStatistics> mocks = MockProvider.createMockHistoricCaseActivityStatistics();
 
     historicCaseActivityStatisticsQuery = mock(HistoricCaseActivityStatisticsQuery.class);
