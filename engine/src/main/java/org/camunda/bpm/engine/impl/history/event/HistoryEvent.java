@@ -112,6 +112,9 @@ public class HistoryEvent implements Serializable, DbEntity {
   /** the key of the case definition */
   protected String caseDefinitionKey;
 
+  /** the name of the case definition */
+  protected String caseDefinitionName;
+
   /**
    * The type of the activity audit event.
    * @see HistoryEventType#getEventName()
@@ -160,6 +163,14 @@ public class HistoryEvent implements Serializable, DbEntity {
 
   public void setProcessDefinitionName(String processDefinitionName) {
     this.processDefinitionName = processDefinitionName;
+  }
+
+  public String getCaseDefinitionName() {
+    return caseDefinitionName;
+  }
+
+  public void setCaseDefinitionName(String caseDefinitionName) {
+    this.caseDefinitionName = caseDefinitionName;
   }
 
   public String getCaseDefinitionKey() {

@@ -321,6 +321,8 @@ public class HistoricCaseInstanceRestServiceQueryTest extends AbstractRestServic
     String returnedCaseInstanceId = from(content).getString("[0].id");
     String returnedCaseInstanceBusinessKey = from(content).getString("[0].businessKey");
     String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
+    String returnedCaseDefinitionKey = from(content).getString("[0].caseDefinitionKey");
+    String returnedCaseDefinitionName = from(content).getString("[0].caseDefinitionName");
     String returnedCreateTime = from(content).getString("[0].createTime");
     String returnedCloseTime = from(content).getString("[0].closeTime");
     long returnedDurationInMillis = from(content).getLong("[0].durationInMillis");
@@ -336,6 +338,8 @@ public class HistoricCaseInstanceRestServiceQueryTest extends AbstractRestServic
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_BUSINESS_KEY, returnedCaseInstanceBusinessKey);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_ID, returnedCaseDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_KEY, returnedCaseDefinitionKey);
+    Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_NAME, returnedCaseDefinitionName);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_TIME, returnedCreateTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_CLOSE_TIME, returnedCloseTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_INSTANCE_DURATION_MILLIS, returnedDurationInMillis);

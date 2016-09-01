@@ -34,6 +34,12 @@ public interface HistoricCaseInstance {
   /** The case definition reference. */
   String getCaseDefinitionId();
 
+  /** The case definition key */
+  String getCaseDefinitionKey();
+
+  /** The case definition name */
+  String getCaseDefinitionName();
+
   /** The time the case was created. */
   Date getCreateTime();
 

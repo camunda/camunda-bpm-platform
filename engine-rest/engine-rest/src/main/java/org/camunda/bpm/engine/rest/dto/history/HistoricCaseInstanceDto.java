@@ -21,6 +21,8 @@ public class HistoricCaseInstanceDto {
   protected String id;
   protected String businessKey;
   protected String caseDefinitionId;
+  protected String caseDefinitionKey;
+  protected String caseDefinitionName;
   protected Date createTime;
   protected Date closeTime;
   protected Long durationInMillis;
@@ -43,6 +45,14 @@ public class HistoricCaseInstanceDto {
 
   public String getCaseDefinitionId() {
     return caseDefinitionId;
+  }
+
+  public String getCaseDefinitionKey() {
+    return caseDefinitionKey;
+  }
+
+  public String getCaseDefinitionName() {
+    return caseDefinitionName;
   }
 
   public Date getCreateTime() {
@@ -96,6 +106,8 @@ public class HistoricCaseInstanceDto {
     dto.id = historicCaseInstance.getId();
     dto.businessKey = historicCaseInstance.getBusinessKey();
     dto.caseDefinitionId = historicCaseInstance.getCaseDefinitionId();
+    dto.caseDefinitionKey = historicCaseInstance.getCaseDefinitionKey();
+    dto.caseDefinitionName = historicCaseInstance.getCaseDefinitionName();
     dto.createTime = historicCaseInstance.getCreateTime();
     dto.closeTime = historicCaseInstance.getCloseTime();
     dto.durationInMillis = historicCaseInstance.getDurationInMillis();

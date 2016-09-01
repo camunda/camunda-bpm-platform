@@ -179,7 +179,7 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
   })
   public void testSuperCaseInstance() {
     String caseInstanceId  = createCaseInstanceByKey("oneCaseTaskCase").getId();
-    String caseTaskId = queryCaseExecutionByActivityId("PI_CaseTask_1").getId();
+    queryCaseExecutionByActivityId("PI_CaseTask_1").getId();
 
     HistoricCaseInstance historicCaseInstance = historicQuery()
       .superCaseInstanceId(caseInstanceId)
@@ -788,6 +788,38 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
       fail("expected exception");
     } catch (NullValueException e) {
     }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
+  public void testRetrieveCaseDefinitionKey() {
+
+    // given
+    String id = createCaseInstance("oneTaskCase").getId();
+
+    // when
+    HistoricCaseInstance caseInstance = historyService.createHistoricCaseInstanceQuery()
+        .caseInstanceId(id)
+        .singleResult();
+
+    // then
+    assertEquals("oneTaskCase", caseInstance.getCaseDefinitionKey());
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
+  public void testRetrieveCaseDefinitionName() {
+
+    // given
+    String id = createCaseInstance("oneTaskCase").getId();
+
+    // when
+    HistoricCaseInstance caseInstance = historyService.createHistoricCaseInstanceQuery()
+        .caseInstanceId(id)
+        .singleResult();
+
+    // then
+    assertEquals("One Task Case", caseInstance.getCaseDefinitionName());
+
   }
 
   protected HistoricCaseInstance queryHistoricCaseInstance(String caseInstanceId) {

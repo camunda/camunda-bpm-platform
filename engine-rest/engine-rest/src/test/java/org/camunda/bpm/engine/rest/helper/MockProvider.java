@@ -1970,6 +1970,8 @@ public abstract class MockProvider {
     when(mock.getId()).thenReturn(EXAMPLE_CASE_INSTANCE_ID);
     when(mock.getBusinessKey()).thenReturn(EXAMPLE_CASE_INSTANCE_BUSINESS_KEY);
     when(mock.getCaseDefinitionId()).thenReturn(EXAMPLE_CASE_DEFINITION_ID);
+    when(mock.getCaseDefinitionKey()).thenReturn(EXAMPLE_CASE_DEFINITION_KEY);
+    when(mock.getCaseDefinitionName()).thenReturn(EXAMPLE_CASE_DEFINITION_NAME);
     when(mock.getCreateTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_TIME));
     when(mock.getCloseTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_CASE_INSTANCE_CLOSE_TIME));
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_CASE_INSTANCE_DURATION_MILLIS);
