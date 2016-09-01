@@ -37,7 +37,7 @@ public class JobMigrationScenarioTest {
   @ScenarioUnderTest("createJob.1")
   public void testSuspensionState() {
     // given
-    Job job = rule.getManagementService().createJobQuery().jobId(rule.getScenarioName()).singleResult();
+    Job job = rule.getManagementService().createJobQuery().jobId(rule.getBuisnessKey()).singleResult();
 
     // then
     Assert.assertNotNull(job);

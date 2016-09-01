@@ -143,8 +143,19 @@
     <profile>
       <id>instance-migration</id>
       <modules>
+        <module>test-db-util</module>
         <module>test-db-instance-migration</module>
       </modules>
+    </profile>
+
+    <profile>
+      <id>rolling-update</id>
+      <modules>
+        <module>test-db-util</module>
+        <module>test-db-rolling-update</module>
+      </modules>
+
+
     </profile>
 
     <profile>

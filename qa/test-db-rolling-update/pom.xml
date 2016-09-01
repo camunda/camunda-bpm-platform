@@ -2,10 +2,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.camunda.bpm.qa.upgrade</groupId>
-  <artifactId>camunda-qa-db-instance-migration</artifactId>
+  <artifactId>camunda-qa-db-rolling-update</artifactId>
 
   <packaging>pom</packaging>
-  <name>camunda BPM - QA - upgrade - instance migration</name>
+  <name>camunda BPM - QA - upgrade - rolling update</name>
 
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
@@ -14,19 +14,17 @@
   </parent>
 
   <modules>
-    <module>test-fixture-72</module>
-    <module>test-fixture-73</module>
-    <module>test-fixture-74</module>
-    <module>test-fixture-75</module>
-    <module>test-fixture-76</module>
-    <module>test-migration</module>
+    <module>rolling-update-util</module>
+    <module>create-old-engine</module>
+    <module>test-new-engine</module>
+    <module>test-old-engine</module>
   </modules>
   <build>
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
-          <artifactId>sql-maven-plugin</artifactId>       
+          <artifactId>sql-maven-plugin</artifactId>
           <configuration>
             <keepFormat>false</keepFormat>
           </configuration>

@@ -17,17 +17,6 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.qa.upgrade.scenarios.deployment.DeployProcessWithoutIsExecutableAttributeScenario;
-import org.camunda.bpm.qa.upgrade.scenarios.rolling.DeploymentWhichShouldBeDeletedScenario;
-import org.camunda.bpm.qa.upgrade.scenarios.rolling.callactivity.ProcessWithCallActivityScenario;
-import org.camunda.bpm.qa.upgrade.scenarios.rolling.eventSubProcess.ProcessWithEventSubProcessScenario;
-import org.camunda.bpm.qa.upgrade.scenarios.rolling.externalTask.ProcessWithExternalTaskScenario;
-import org.camunda.bpm.qa.upgrade.scenarios.rolling.mulltiInstance.ProcessWithMultiInstanceCallActivityScenario;
-import org.camunda.bpm.qa.upgrade.scenarios.rolling.task.ProcessWithUserTaskScenario;
-import org.camunda.bpm.qa.upgrade.scenarios.rolling.task.ProcessWithAsyncServiceTaskScenario;
-import org.camunda.bpm.qa.upgrade.scenarios.rolling.task.ProcessWithParallelGatewayScenario;
-import org.camunda.bpm.qa.upgrade.scenarios.rolling.task.ProcessWithParallelGatewayAndServiceTaskScenario;
-import org.camunda.bpm.qa.upgrade.scenarios.rolling.task.ProcessWithUserTaskAndTimerScenario;
-
 /**
  * Sets up scenarios for migration from 7.5.0
  *
@@ -50,17 +39,6 @@ public class TestFixture {
     ScenarioRunner runner = new ScenarioRunner(processEngine, ENGINE_VERSION);
     // compensation
     runner.setupScenarios(DeployProcessWithoutIsExecutableAttributeScenario.class);
-    //rolling upgrade test scenarios
-    runner.setupScenarios(ProcessWithUserTaskScenario.class);
-    runner.setupScenarios(ProcessWithAsyncServiceTaskScenario.class);
-    runner.setupScenarios(ProcessWithUserTaskAndTimerScenario.class);
-    runner.setupScenarios(DeploymentWhichShouldBeDeletedScenario.class);
-    runner.setupScenarios(ProcessWithParallelGatewayScenario.class);
-    runner.setupScenarios(ProcessWithParallelGatewayAndServiceTaskScenario.class);
-    runner.setupScenarios(ProcessWithCallActivityScenario.class);
-    runner.setupScenarios(ProcessWithMultiInstanceCallActivityScenario.class);
-    runner.setupScenarios(ProcessWithExternalTaskScenario.class);
-    runner.setupScenarios(ProcessWithEventSubProcessScenario.class);
 
     processEngine.close();
   }
