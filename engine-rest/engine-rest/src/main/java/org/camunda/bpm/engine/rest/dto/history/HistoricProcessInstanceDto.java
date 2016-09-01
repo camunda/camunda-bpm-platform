@@ -22,6 +22,7 @@ public class HistoricProcessInstanceDto {
   private String businessKey;
   private String processDefinitionId;
   private String processDefinitionKey;
+  private String processDefinitionName;
   private Date startTime;
   private Date endTime;
   private Long durationInMillis;
@@ -48,6 +49,10 @@ public class HistoricProcessInstanceDto {
 
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
+  }
+
+  public String getProcessDefinitionName() {
+    return processDefinitionName;
   }
 
   public Date getStartTime() {
@@ -106,6 +111,7 @@ public class HistoricProcessInstanceDto {
     dto.businessKey = historicProcessInstance.getBusinessKey();
     dto.processDefinitionId = historicProcessInstance.getProcessDefinitionId();
     dto.processDefinitionKey = historicProcessInstance.getProcessDefinitionKey();
+    dto.processDefinitionName = historicProcessInstance.getProcessDefinitionName();
     dto.startTime = historicProcessInstance.getStartTime();
     dto.endTime = historicProcessInstance.getEndTime();
     dto.durationInMillis = historicProcessInstance.getDurationInMillis();

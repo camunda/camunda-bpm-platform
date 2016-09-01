@@ -45,6 +45,9 @@ public interface HistoricProcessInstance {
   /** The process definition reference. */
   String getProcessDefinitionId();
 
+  /** The process definition name. */
+  String getProcessDefinitionName();
+
   /** The time the process was started. */
   Date getStartTime();
 

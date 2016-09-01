@@ -99,6 +99,7 @@
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR"/>
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionName" column="NAME_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
@@ -141,167 +142,172 @@
   </select>
 
   <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
-    from ${prefix}ACT_HI_PROCINST RES
+    from (
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-      LEFT JOIN (
-        SELECT
-            SELF.PROC_DEF_KEY_ AS KEY_
-        FROM
-            (SELECT DISTINCT DKEYS.PROC_DEF_KEY_ from ${prefix}ACT_HI_PROCINST DKEYS) SELF
-        WHERE
-            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
-      ) AUTH
-      ON AUTH.KEY_ = RES.PROC_DEF_KEY_
-    </if>
+      SELECT RES.*, DEF.NAME_
+      FROM ${prefix}ACT_HI_PROCINST RES
 
-    <if test="processKeyNotIn != null || processDefinitionKey != null || processDefinitionName != null || processDefinitionNameLike != null">
-      inner join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
-    </if>
-
-    <if test="withIncidents || incidentStatus != null || incidentMessage != null || incidentMessageLike != null">
-      inner join ${prefix}ACT_HI_INCIDENT INC on RES.PROC_INST_ID_ = INC.PROC_INST_ID_
-    </if>
-    <where>
-      <if test="processInstanceId != null">
-        RES.PROC_INST_ID_ = #{processInstanceId}
-      </if>
-      <if test="processInstanceIds != null and !processInstanceIds.isEmpty()">
-        and RES.PROC_INST_ID_ in
-        <foreach item="item" index="index" collection="processInstanceIds" open="(" separator="," close=")">
-          #{item}
-        </foreach>
-      </if>
-      <if test="caseInstanceId != null">
-        and RES.CASE_INST_ID_ = #{caseInstanceId}
-      </if>
-      <if test="processDefinitionId != null">
-        and RES.PROC_DEF_ID_ = #{processDefinitionId}
-      </if>
-      <if test="processDefinitionKey != null">
-        and DEF.KEY_ = #{processDefinitionKey}
-      </if>
-      <if test="processDefinitionName != null">
-        and DEF.NAME_ = #{processDefinitionName}
-      </if>
-      <if test="processDefinitionNameLike != null">
-        and DEF.NAME_ like #{processDefinitionNameLike}
-      </if>
-      <if test="businessKey != null">
-        and RES.BUSINESS_KEY_ = #{businessKey}
-      </if>
-      <if test="businessKeyLike != null">
-        and RES.BUSINESS_KEY_ like #{businessKeyLike}
-      </if>
-
-      <if test="startedBefore != null">
-        and RES.START_TIME_ &lt;= #{startedBefore}
-      </if>
-      <if test="startedAfter != null">
-        and RES.START_TIME_ &gt;= #{startedAfter}
-      </if>
-      <if test="finishedBefore != null">
-        and RES.END_TIME_ &lt;= #{finishedBefore}
-      </if>
-      <if test="finishedAfter != null">
-        and RES.END_TIME_ &gt;= #{finishedAfter}
-      </if>
-      <if test="processKeyNotIn != null">
-        <foreach collection="processKeyNotIn" index="index" item="procDefKey">
-        and DEF.KEY_ not like #{procDefKey}
-      </foreach>
-      </if>
-
-      <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
-      <if test="startDateOn">
-        and RES.START_TIME_ &gt;= #{startDateOnBegin}
-        and RES.START_TIME_ &lt;= #{startDateOnEnd}
-      </if>
-      <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
-      <if test="finishDateOn">
-        and RES.END_TIME_ &gt;= #{finishDateOnBegin}
-        and RES.END_TIME_ &lt;= #{finishDateOnEnd}
-      </if>
-      <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
-      <if test="finishDateBy">
-        and RES.END_TIME_ &lt;= #{finishDateBy}
-      </if>
-      <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
-      <if test="startDateBy">
-        and RES.START_TIME_ &gt;= #{startDateBy}
-      </if>
-
-      <if test="unfinished">
-        and RES.END_TIME_ IS NULL
-      </if>
-      <if test="finished">
-        and RES.END_TIME_ is not NULL
-      </if>
-
-      <if test="incidentMessage != null">
-        and INC.INCIDENT_MSG_ = #{incidentMessage}
-      </if>
-
-      <if test="incidentMessageLike != null">
-        and INC.INCIDENT_MSG_ like #{incidentMessageLike}
-      </if>
-      
-      <if test="incidentStatus == 'open'">
-        and INC.END_TIME_ is null
-      </if>
-      
-      <if test="incidentStatus == 'resolved'">
-        and INC.END_TIME_ is not null
-      </if>
-
-      <if test="startedBy != null">
-        and RES.START_USER_ID_ = #{startedBy}
-      </if>
-      <if test="superProcessInstanceId != null">
-        and RES.SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
-      </if>
-      <if test="subProcessInstanceId != null">
-        and RES.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{subProcessInstanceId})
-      </if>
-      <if test="superCaseInstanceId != null">
-        and RES.SUPER_CASE_INSTANCE_ID_ = #{superCaseInstanceId}
-      </if>
-      <if test="subCaseInstanceId != null">
-        and RES.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_CASEINST where CASE_INST_ID_ = #{subCaseInstanceId})
-      </if>
-      <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-        and EXISTS (
-          select
-            ID_
-          from
-            ${prefix}ACT_HI_VARINST
-          WHERE
-            NAME_= #{queryVariableValue.name}
-          AND PROC_INST_ID_ = RES.PROC_INST_ID_
-
-        <bind name="varTypeField" value="'VAR_TYPE_'"/>
-        <bind name="varPrefix" value="''"/>
-        <if test="queryVariableValue.valueConditions != null">
-          and
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
-        </if>
-        )
-      </foreach>
-      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
-        and RES.TENANT_ID_ in
-        <foreach item="tenantId" index="index" collection="tenantIds"
-                 open="(" separator="," close=")">
-          #{tenantId}
-        </foreach>
-      </if>
+      LEFT JOIN ${prefix}ACT_RE_PROCDEF DEF
+      ON RES.PROC_DEF_ID_ = DEF.ID_
 
       <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-        and ((RES.PROC_DEF_KEY_ is not null and AUTH.KEY_ is not null) or RES.PROC_DEF_KEY_ is null)
+        LEFT JOIN (
+          SELECT
+              SELF.PROC_DEF_KEY_ AS KEY_
+          FROM
+              (SELECT DISTINCT DKEYS.PROC_DEF_KEY_ from ${prefix}ACT_HI_PROCINST DKEYS) SELF
+          WHERE
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
+        ) AUTH
+        ON AUTH.KEY_ = RES.PROC_DEF_KEY_
       </if>
 
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+      <if test="withIncidents || incidentStatus != null || incidentMessage != null || incidentMessageLike != null">
+        inner join ${prefix}ACT_HI_INCIDENT INC on RES.PROC_INST_ID_ = INC.PROC_INST_ID_
+      </if>
+      <where>
+        <if test="processInstanceId != null">
+          RES.PROC_INST_ID_ = #{processInstanceId}
+        </if>
+        <if test="processInstanceIds != null and !processInstanceIds.isEmpty()">
+          and RES.PROC_INST_ID_ in
+          <foreach item="item" index="index" collection="processInstanceIds" open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+        <if test="caseInstanceId != null">
+          and RES.CASE_INST_ID_ = #{caseInstanceId}
+        </if>
+        <if test="processDefinitionId != null">
+          and RES.PROC_DEF_ID_ = #{processDefinitionId}
+        </if>
+        <if test="processDefinitionKey != null">
+          and DEF.KEY_ = #{processDefinitionKey}
+        </if>
+        <if test="processDefinitionName != null">
+          and DEF.NAME_ = #{processDefinitionName}
+        </if>
+        <if test="processDefinitionNameLike != null">
+          and DEF.NAME_ like #{processDefinitionNameLike}
+        </if>
+        <if test="businessKey != null">
+          and RES.BUSINESS_KEY_ = #{businessKey}
+        </if>
+        <if test="businessKeyLike != null">
+          and RES.BUSINESS_KEY_ like #{businessKeyLike}
+        </if>
 
-    </where>
+        <if test="startedBefore != null">
+          and RES.START_TIME_ &lt;= #{startedBefore}
+        </if>
+        <if test="startedAfter != null">
+          and RES.START_TIME_ &gt;= #{startedAfter}
+        </if>
+        <if test="finishedBefore != null">
+          and RES.END_TIME_ &lt;= #{finishedBefore}
+        </if>
+        <if test="finishedAfter != null">
+          and RES.END_TIME_ &gt;= #{finishedAfter}
+        </if>
+        <if test="processKeyNotIn != null">
+          <foreach collection="processKeyNotIn" index="index" item="procDefKey">
+          and DEF.KEY_ not like #{procDefKey}
+        </foreach>
+        </if>
+
+        <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
+        <if test="startDateOn">
+          and RES.START_TIME_ &gt;= #{startDateOnBegin}
+          and RES.START_TIME_ &lt;= #{startDateOnEnd}
+        </if>
+        <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
+        <if test="finishDateOn">
+          and RES.END_TIME_ &gt;= #{finishDateOnBegin}
+          and RES.END_TIME_ &lt;= #{finishDateOnEnd}
+        </if>
+        <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
+        <if test="finishDateBy">
+          and RES.END_TIME_ &lt;= #{finishDateBy}
+        </if>
+        <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
+        <if test="startDateBy">
+          and RES.START_TIME_ &gt;= #{startDateBy}
+        </if>
+
+        <if test="unfinished">
+          and RES.END_TIME_ IS NULL
+        </if>
+        <if test="finished">
+          and RES.END_TIME_ is not NULL
+        </if>
+
+        <if test="incidentMessage != null">
+          and INC.INCIDENT_MSG_ = #{incidentMessage}
+        </if>
+
+        <if test="incidentMessageLike != null">
+          and INC.INCIDENT_MSG_ like #{incidentMessageLike}
+        </if>
+
+        <if test="incidentStatus == 'open'">
+          and INC.END_TIME_ is null
+        </if>
+
+        <if test="incidentStatus == 'resolved'">
+          and INC.END_TIME_ is not null
+        </if>
+
+        <if test="startedBy != null">
+          and RES.START_USER_ID_ = #{startedBy}
+        </if>
+        <if test="superProcessInstanceId != null">
+          and RES.SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
+        </if>
+        <if test="subProcessInstanceId != null">
+          and RES.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{subProcessInstanceId})
+        </if>
+        <if test="superCaseInstanceId != null">
+          and RES.SUPER_CASE_INSTANCE_ID_ = #{superCaseInstanceId}
+        </if>
+        <if test="subCaseInstanceId != null">
+          and RES.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_CASEINST where CASE_INST_ID_ = #{subCaseInstanceId})
+        </if>
+        <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+          and EXISTS (
+            select
+              ID_
+            from
+              ${prefix}ACT_HI_VARINST
+            WHERE
+              NAME_= #{queryVariableValue.name}
+            AND PROC_INST_ID_ = RES.PROC_INST_ID_
+
+          <bind name="varTypeField" value="'VAR_TYPE_'"/>
+          <bind name="varPrefix" value="''"/>
+          <if test="queryVariableValue.valueConditions != null">
+            and
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
+          </if>
+          )
+        </foreach>
+        <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+          and RES.TENANT_ID_ in
+          <foreach item="tenantId" index="index" collection="tenantIds"
+                   open="(" separator="," close=")">
+            #{tenantId}
+          </foreach>
+        </if>
+
+        <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+          and ((RES.PROC_DEF_KEY_ is not null and AUTH.KEY_ is not null) or RES.PROC_DEF_KEY_ is null)
+        </if>
+
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+
+      </where>
+
+    ) RES
+
   </sql>
 
   <select id="selectHistoricProcessInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicProcessInstanceResultMap">

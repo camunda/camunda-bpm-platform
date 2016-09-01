@@ -100,7 +100,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().unfinished().count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
 
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", "myBusinessKey");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", "myBusinessKey");
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().unfinished().count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().finished().unfinished().count());
@@ -236,7 +236,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testHistoricProcessInstanceQueryWithIncidents() {
     // start instance with incidents
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("Process_1");
+    runtimeService.startProcessInstanceByKey("Process_1");
     executeAvailableJobs();
 
     // start instance without incidents
@@ -871,7 +871,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
   public void testSuperCaseInstanceIdProperty() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneProcessTaskCase").getId();
 
-    String processTaskId = caseService
+    caseService
         .createCaseExecutionQuery()
         .activityId("PI_ProcessTask_1")
         .singleResult()
@@ -930,6 +930,21 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
 
     assertNull(historicProcessInstance.getEndTime());
     assertNull(historicProcessInstance.getDurationInMillis());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testRetrieveProcessDefinitionName() {
+
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+
+    // when
+    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+        .processInstanceId(processInstanceId)
+        .singleResult();
+
+    // then
+    assertEquals("The One Task Process", historicProcessInstance.getProcessDefinitionName());
   }
 
 }

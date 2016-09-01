@@ -97,6 +97,9 @@ public class HistoryEvent implements Serializable, DbEntity {
   /** the key of the process definition */
   protected String processDefinitionKey;
 
+  /** the name of the process definition */
+  protected String processDefinitionName;
+
   /** the case instance in which the event has happened */
   protected String caseInstanceId;
 
@@ -149,6 +152,14 @@ public class HistoryEvent implements Serializable, DbEntity {
 
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
+  }
+
+  public String getProcessDefinitionName() {
+    return processDefinitionName;
+  }
+
+  public void setProcessDefinitionName(String processDefinitionName) {
+    this.processDefinitionName = processDefinitionName;
   }
 
   public String getCaseDefinitionKey() {
