@@ -674,7 +674,6 @@ public class ProcessBuilderTest {
       .errorEventDefinitionDone()
      .endEvent().done();
 
-    Bpmn.writeModelToStream(System.out, modelInstance);
     assertErrorEventDefinition("start", "errorCode");
     assertErrorEventDefinitionForErrorVariables("start", "errorCodeVariable", "errorMessageVariable");
   }
@@ -690,7 +689,6 @@ public class ProcessBuilderTest {
       .errorEventDefinitionDone()
      .endEvent().done();
 
-    Bpmn.writeModelToStream(System.out, modelInstance);
     assertErrorEventDefinition("start", "errorCode");
     assertErrorEventDefinitionForErrorVariables("start", "errorCodeVariable", "errorMessageVariable");
   }
