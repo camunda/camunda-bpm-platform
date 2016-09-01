@@ -19,6 +19,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 /**
  * A batch job handler manages batch jobs based
  * on the configuration {@link T}.
+ *
+ * Used by a seed job to manage lifecycle of execution jobs.
  */
 public interface BatchJobHandler<T> extends JobHandler<BatchJobConfiguration> {
 

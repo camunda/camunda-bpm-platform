@@ -84,6 +84,7 @@ import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
+import org.camunda.bpm.engine.impl.batch.deletion.DeleteProcessInstancesJobHandler;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
@@ -725,6 +726,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
       MigrationBatchJobHandler migrationHandler = new MigrationBatchJobHandler();
       batchHandlers.put(migrationHandler.getType(), migrationHandler);
+
+      DeleteProcessInstancesJobHandler deleteProcessJobHandler = new DeleteProcessInstancesJobHandler();
+      batchHandlers.put(deleteProcessJobHandler.getType(), deleteProcessJobHandler);
     }
 
     if (customBatchJobHandlers != null) {

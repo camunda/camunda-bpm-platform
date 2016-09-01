@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.ManagementService;
 public interface Batch {
 
   String TYPE_PROCESS_INSTANCE_MIGRATION = "instance-migration";
+  String TYPE_PROCESS_INSTANCE_DELETION = "instance-deletion";
 
   /**
    * @return the id of the batch

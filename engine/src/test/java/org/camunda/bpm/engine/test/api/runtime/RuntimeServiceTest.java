@@ -84,6 +84,8 @@ import org.camunda.bpm.engine.variable.type.ValueType;
  */
 public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
+  public static final String TESTING_INSTANCE_DELETION = "testing instance deletion";
+
   public void testStartProcessInstanceByKeyNullKey() {
     try {
       runtimeService.startProcessInstanceByKey(null);
@@ -162,8 +164,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
 
-    String deleteReason = "testing instance deletion";
-    runtimeService.deleteProcessInstance(processInstance.getId(), deleteReason);
+    runtimeService.deleteProcessInstance(processInstance.getId(), TESTING_INSTANCE_DELETION);
     assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
 
     // test that the delete reason of the process instance shows up as delete reason of the task in history
@@ -175,7 +176,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
               .processInstanceId(processInstance.getId())
               .singleResult();
 
-      assertEquals(deleteReason, historicTaskInstance.getDeleteReason());
+      assertEquals(TESTING_INSTANCE_DELETION, historicTaskInstance.getDeleteReason());
     }
   }
 

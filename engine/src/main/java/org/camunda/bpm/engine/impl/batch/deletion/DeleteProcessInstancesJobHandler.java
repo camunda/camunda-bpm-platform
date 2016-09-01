@@ -10,52 +10,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.migration.batch;
+
+package org.camunda.bpm.engine.impl.batch.deletion;
 
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
-import org.camunda.bpm.engine.impl.batch.BatchEntity;
-import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
-import org.camunda.bpm.engine.impl.batch.BatchJobContext;
+import org.camunda.bpm.engine.impl.batch.*;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
-import org.camunda.bpm.engine.impl.json.MigrationBatchConfigurationJsonConverter;
-import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
+import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.*;
-import org.camunda.bpm.engine.migration.MigrationPlan;
-import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
+import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.impl.util.StringUtil;
+import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import org.camunda.bpm.engine.impl.util.json.JSONTokener;
 
+import java.io.ByteArrayOutputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.List;
 
 /**
- * Job handler for batch migration jobs. The batch migration job
- * migrates a list of process instances.
+ *
+ * @author Askar Akhmerov
  */
-public class MigrationBatchJobHandler extends AbstractBatchJobHandler<MigrationBatchConfiguration> {
+public class DeleteProcessInstancesJobHandler extends AbstractBatchJobHandler<DeleteProcessInstanceBatchConfiguration> {
+  public static final DeleteProcessInstancesBatchJobDeclaration JOB_DECLARATION = new DeleteProcessInstancesBatchJobDeclaration();
 
-  public static final MigrationBatchJobDeclaration JOB_DECLARATION = new MigrationBatchJobDeclaration();
-
+  @Override
   public String getType() {
-    return Batch.TYPE_PROCESS_INSTANCE_MIGRATION;
+    return Batch.TYPE_PROCESS_INSTANCE_DELETION;
   }
 
+  protected DeleteProcessInstanceBatchConfigurationJsonConverter getJsonConverterInstance() {
+    return DeleteProcessInstanceBatchConfigurationJsonConverter.INSTANCE;
+  }
+
+  @Override
   public JobDeclaration<?, MessageEntity> getJobDeclaration() {
     return JOB_DECLARATION;
   }
 
-  protected MigrationBatchConfigurationJsonConverter getJsonConverterInstance() {
-    return MigrationBatchConfigurationJsonConverter.INSTANCE;
-  }
-
+  @Override
   public boolean createJobs(BatchEntity batch) {
     CommandContext commandContext = Context.getCommandContext();
     ByteArrayManager byteArrayManager = commandContext.getByteArrayManager();
     JobManager jobManager = commandContext.getJobManager();
 
-    MigrationBatchConfiguration configuration = readConfiguration(batch.getConfigurationBytes());
-    MigrationPlan migrationPlan = configuration.getMigrationPlan();
-    String sourceDeploymentId = getProcessDefinition(commandContext, migrationPlan.getSourceProcessDefinitionId()).getDeploymentId();
+    DeleteProcessInstanceBatchConfiguration configuration = readConfiguration(batch.getConfigurationBytes());
 
     int batchJobsPerSeed = batch.getBatchJobsPerSeed();
     int invocationsPerBatchJob = batch.getInvocationsPerBatchJob();
@@ -71,12 +73,11 @@ public class MigrationBatchJobHandler extends AbstractBatchJobHandler<MigrationB
       // view of process instances for this job
       List<String> idsForJob = processInstancesToProcess.subList(0, lastIdIndex);
 
-      MigrationBatchConfiguration jobConfiguration = MigrationBatchConfiguration
-          .create(migrationPlan, idsForJob, configuration.isSkipCustomListeners(), configuration.isSkipIoMappings());
+      DeleteProcessInstanceBatchConfiguration jobConfiguration = DeleteProcessInstanceBatchConfiguration
+          .create(idsForJob, configuration.getDeleteReason());
       ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);
 
       JobEntity job = createBatchJob(batch, configurationEntity);
-      job.setDeploymentId(sourceDeploymentId);
       jobManager.insertAndHintJobExecutor(job);
 
       idsForJob.clear();
@@ -98,31 +99,16 @@ public class MigrationBatchJobHandler extends AbstractBatchJobHandler<MigrationB
         .getDbEntityManager()
         .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
-    MigrationBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+    DeleteProcessInstanceBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
-    MigrationPlanExecutionBuilder executionBuilder = commandContext.getProcessEngineConfiguration()
-      .getRuntimeService()
-      .newMigration(batchConfiguration.getMigrationPlan())
-        .processInstanceIds(batchConfiguration.getProcessInstanceIds());
-
-    if (batchConfiguration.isSkipCustomListeners()) {
-      executionBuilder.skipCustomListeners();
-    }
-    if (batchConfiguration.isSkipIoMappings()) {
-      executionBuilder.skipIoMappings();
+    for (String pi : batchConfiguration.getProcessInstanceIds()) {
+      commandContext.getProcessEngineConfiguration()
+          .getRuntimeService()
+          .deleteProcessInstance(pi,batchConfiguration.deleteReason,true,true);
     }
 
-    // uses internal API in order to skip writing user operation log (CommandContext#disableUserOperationLog
-    // is not sufficient with legacy engine config setting "restrictUserOperationLogToAuthenticatedUsers" = false)
-    ((MigrationPlanExecutionBuilderImpl) executionBuilder).execute(false);
 
     commandContext.getByteArrayManager().delete(configurationEntity);
-  }
-
-  protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext, String processDefinitionId) {
-    return commandContext.getProcessEngineConfiguration()
-      .getDeploymentCache()
-      .findDeployedProcessDefinitionById(processDefinitionId);
   }
 
   protected JobEntity createBatchJob(BatchEntity batch, ByteArrayEntity configuration) {

@@ -10,7 +10,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.migration.batch;
+
+package org.camunda.bpm.engine.impl.batch.deletion;
 
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
@@ -24,15 +25,11 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
 /**
- * Job declaration for batch migration jobs. The batch migration job
- * migrates a list of process instances.
+ * @author Askar Akhmerov
  */
-public class MigrationBatchJobDeclaration extends JobDeclaration<BatchJobContext, MessageEntity> {
-
-  private static final long serialVersionUID = 1L;
-
-  public MigrationBatchJobDeclaration() {
-    super(Batch.TYPE_PROCESS_INSTANCE_MIGRATION);
+public class DeleteProcessInstancesBatchJobDeclaration extends JobDeclaration<BatchJobContext, MessageEntity> {
+  public DeleteProcessInstancesBatchJobDeclaration() {
+    super(Batch.TYPE_PROCESS_INSTANCE_DELETION);
   }
 
   @Override
@@ -57,8 +54,7 @@ public class MigrationBatchJobDeclaration extends JobDeclaration<BatchJobContext
 
   public ParameterValueProvider getJobPriorityProvider() {
     long batchJobPriority = Context.getProcessEngineConfiguration()
-      .getBatchJobPriority();
+        .getBatchJobPriority();
     return new ConstantValueProvider(batchJobPriority);
   }
-
 }

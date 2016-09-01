@@ -15,9 +15,10 @@ package org.camunda.bpm.engine.impl.migration.batch;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.batch.AbstractBatchConfiguration;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 
-public class MigrationBatchConfiguration {
+public class MigrationBatchConfiguration extends AbstractBatchConfiguration {
 
   protected MigrationPlan migrationPlan;
   protected List<String> processInstanceIds;
