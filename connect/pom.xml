@@ -12,6 +12,10 @@
   <name>camunda BPM - connect - root</name>
   <packaging>pom</packaging>
 
+  <properties>
+    <connect.version.old>1.0.0</connect.version.old>
+  </properties>
+
   <modules>
     <module>bom</module>
     <module>core</module>
