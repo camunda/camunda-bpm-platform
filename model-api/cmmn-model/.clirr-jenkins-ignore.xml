@@ -1,0 +1,14 @@
+<differences>
+  <difference>
+    <!-- It is okay to add classes to the set of superclasses -->
+    <className>**</className>
+    <differenceType>5000</differenceType>
+    <to>**</to>
+  </difference>
+  <difference>
+    <!-- It is okay to add methods to an interface-->
+    <className>**</className>
+    <differenceType>7012</differenceType>
+    <method>*</method>
+  </difference>
+</differences>

@@ -16,6 +16,7 @@
   <packaging>jar</packaging>
 
   <properties>
+    <camunda.version.old>7.5.0</camunda.version.old>
   </properties>
 
   <dependencyManagement>
@@ -86,6 +87,58 @@
       </plugin>
     </plugins>
   </build>
+
+  <!-- check for api differences between latest minor release -->
+  <profiles>
+    <profile>
+      <id>check-api-compatibility</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>clirr-maven-plugin</artifactId>
+            <version>2.7</version>
+            <configuration>
+              <comparisonVersion>${camunda.version.old}</comparisonVersion>
+              <logResults>true</logResults>
+              <excludes>
+                <exclude>org/camunda/bpm/model/cmmn/impl/**</exclude>
+              </excludes>
+            </configuration>
+            <executions>
+              <execution>
+                <id>all</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check-no-fork</goal>
+                </goals>
+                <configuration>
+                  <textOutputFile>${project.build.directory}/clirr-all.txt</textOutputFile>
+                  <failOnWarning>false</failOnWarning>
+                  <failOnError>false</failOnError>
+                </configuration>
+              </execution>
+              <execution>
+                <id>restrictive</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check-no-fork</goal>
+                </goals>
+                <configuration>
+                  <textOutputFile>${project.build.directory}/clirr-restrictive.txt</textOutputFile>
+                  <failOnWarning>true</failOnWarning>
+                  <ignoredDifferencesFile>.clirr-jenkins-ignore.xml</ignoredDifferencesFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <licenses>
     <license>
