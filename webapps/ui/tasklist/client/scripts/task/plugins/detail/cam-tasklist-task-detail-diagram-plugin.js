@@ -16,38 +16,16 @@ var Controller = [
     // setup ///////////////////////////////////////////////////////////
 
     var ProcessDefinition = camAPI.resource('process-definition');
+    var CaseDefinition = camAPI.resource('case-definition');
     var diagramData = $scope.taskData.newChild($scope);
 
     // provider ////////////////////////////////////////////////////////
 
-    diagramData.provide('bpmn20xml', ['processDefinition', function(processDefinition) {
-      var deferred = $q.defer();
+    diagramData.provide('bpmn20xml', createXmlDefinitionProvider($q, ProcessDefinition, 'processDefinition'));
+    diagramData.provide('cmmnXml', createXmlDefinitionProvider($q, CaseDefinition, 'caseDefinition'));
 
-      if (!processDefinition) {
-        return deferred.resolve(null);
-      }
-
-      ProcessDefinition.xml(processDefinition, function(err, res) {
-        if(err) {
-          deferred.reject(err);
-        }
-        else {
-          deferred.resolve(res);
-        }
-      });
-
-      return deferred.promise;
-    }]);
-
-    diagramData.provide('processDiagram', ['bpmn20xml', 'processDefinition', 'task', function(bpmn20xml, processDefinition, task) {
-      var processDiagram = {};
-
-      processDiagram.processDefinition = processDefinition;
-      processDiagram.task = task;
-      processDiagram.bpmn20xml = (bpmn20xml || {}).bpmn20Xml;
-
-      return processDiagram;
-    }]);
+    diagramData.provide('caseDiagram', createDiagramProvider('cmmnXml', 'caseDefinition'));
+    diagramData.provide('processDiagram', createDiagramProvider('bpmn20xml', 'processDefinition', 'bpmn20Xml'));
 
     // observer /////////////////////////////////////////////////////////
 
@@ -55,17 +33,66 @@ var Controller = [
       $scope.processDefinition = processDefinition;
     });
 
+    diagramData.observe('caseDefinition', function(caseDefinition) {
+      $scope.caseDefinition = caseDefinition;
+    });
+
     $scope.processDiagramState = diagramData.observe('processDiagram', function(processDiagram) {
       $scope.processDiagram = processDiagram;
+    });
+
+    $scope.caseDiagramState = diagramData.observe('caseDiagram', function(caseDiagram) {
+      $scope.caseDiagram = caseDiagram;
     });
 
     $scope.control = {};
 
     $scope.highlightTask = function() {
-      $scope.control.highlight($scope.processDiagram.task.taskDefinitionKey);
+      if ($scope.processDefinition ) {
+        $scope.control.highlight($scope.processDiagram.task.taskDefinitionKey);
+      } else if ($scope.caseDefinition) {
+        $scope.control.highlight($scope.caseDiagram.task.taskDefinitionKey);
+      }
     };
 
   }];
+
+// Creates new data provider for angular data depend. Provider should fetch xml of given definition.
+function createXmlDefinitionProvider($q, DefinitionApi, definitionResource) {
+  return [definitionResource, function(definition) {
+    var deferred = $q.defer();
+
+    if (!definition) {
+      return deferred.resolve(null);
+    }
+
+    DefinitionApi.xml(definition, function(err, res) {
+      if(err) {
+        deferred.reject(err);
+      }
+      else {
+        deferred.resolve(res);
+      }
+    });
+
+    return deferred.promise;
+  }];
+}
+
+// Creates new data provider for angular data depend. Provider should return the instance diagram.
+function createDiagramProvider(xmlResource, definitionResource, xmlField) {
+  xmlField = xmlField || xmlResource;
+
+  return [xmlResource, definitionResource, 'task', function(xml, definition, task) {
+    var diagram = {};
+
+    diagram[definitionResource] = definition;
+    diagram.task = task;
+    diagram[xmlResource] = (xml || {})[xmlField];
+
+    return diagram;
+  }];
+}
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
 
