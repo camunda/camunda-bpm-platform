@@ -12,13 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.*;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
-import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
@@ -32,6 +28,10 @@ import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImp
 import org.camunda.bpm.engine.impl.persistence.entity.*;
 import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Daniel Meyer
@@ -170,7 +170,7 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
     UpdateJobSuspensionStateBuilderImpl builder = new UpdateJobSuspensionStateBuilderImpl();
 
     if (processInstanceId != null) {
-      builder.byProcessDefinitionId(processInstanceId);
+      builder.byProcessInstanceId(processInstanceId);
 
     } else if (processDefinitionId != null) {
       builder.byProcessDefinitionId(processDefinitionId);

@@ -12,11 +12,6 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
@@ -25,13 +20,15 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.EventSubscription;
-import org.camunda.bpm.engine.runtime.Execution;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.*;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author Daniel Meyer
@@ -2111,6 +2108,21 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
     assertEquals(1, query.active().count());
     assertEquals(0, query.suspended().count());
+  }
+
+  @Deployment
+  public void testJobSuspensionStateUpdate() {
+
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
+    String id = instance.getProcessInstanceId();
+
+    //when
+    runtimeService.suspendProcessInstanceById(id);
+    Job job = managementService.createJobQuery().processInstanceId(id).singleResult();
+
+    // then
+    assertTrue(job.isSuspended());
   }
 
 }
