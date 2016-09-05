@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import org.camunda.bpm.engine.management.Metric;
 import org.camunda.bpm.engine.management.MetricsQuery;
 
@@ -50,25 +49,21 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
   }
 
   public MetricsQueryImpl name(String name) {
-    ensureNotNull("name", name);
     this.name = name;
     return this;
   }
 
   public MetricsQuery reporter(String reporter) {
-    ensureNotNull("reporter", reporter);
     this.reporter = reporter;
     return this;
   }
 
   public MetricsQueryImpl startDate(Date startDate) {
-    ensureNotNull("startDate", startDate);
     this.startDate = startDate;
     return this;
   }
 
   public MetricsQueryImpl endDate(Date endDate) {
-    ensureNotNull("endDate", endDate);
     this.endDate = endDate;
     return this;
   }
