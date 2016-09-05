@@ -169,7 +169,7 @@ describe('Tasklist Detail View Spec', function() {
 
   });
 
-  describe.only('cmmn diagram tab', function() {
+  describe('cmmn diagram tab', function() {
 
     before(function() {
       return testHelper(setupFile.setup4, function() {
