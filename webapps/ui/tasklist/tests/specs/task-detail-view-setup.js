@@ -55,13 +55,23 @@ var fragment4 = combine(
 var fragment5 = combine(
   operation('deployment', 'create', [{
     deploymentName:  'user-tasks',
-    files: [{
+    files: [
+      {
       name: 'case-task.cmmn',
       content: readResource('case-task.cmmn')
-    }]
+      },
+      {
+        name: 'case-task2.cmmn',
+        content: readResource('case-task2.cmmn')
+      }
+    ]
   }]),
   operation('case-definition', 'create', [{
     key: 'Case_1',
+    businessKey: 'Instance1'
+  }]),
+  operation('case-definition', 'create', [{
+    key: 'Case_2',
     businessKey: 'Instance1'
   }])
 )
