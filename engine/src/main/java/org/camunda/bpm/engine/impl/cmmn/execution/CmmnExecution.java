@@ -12,6 +12,63 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.execution;
 
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAILABLE;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.CLOSED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMPLETED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.DISABLED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ENABLED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAILED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.NEW;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDING_ON_PARENT_SUSPENSION;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDING_ON_SUSPENSION;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATING_ON_EXIT;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATING_ON_PARENT_TERMINATION;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATING_ON_TERMINATION;
+import static org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration.IF_PART;
+import static org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration.PLAN_ITEM_ON_PART;
+import static org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration.VARIABLE_ON_PART;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_COMPLETE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_CREATE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_DELETE_CASCADE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_DISABLE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_ENABLE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_EXIT;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_FIRE_ENTRY_CRITERIA;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_FIRE_EXIT_CRITERIA;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_MANUAL_COMPLETE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_MANUAL_START;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_OCCUR;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_PARENT_RESUME;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_PARENT_SUSPEND;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_PARENT_TERMINATE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_RESUME;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_RE_ACTIVATE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_RE_ENABLE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_START;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_SUSPEND;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_SUSPENDING_ON_PARENT_SUSPENSION;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_SUSPENDING_ON_SUSPENSION;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_TERMINATE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_TERMINATING_ON_EXIT;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_TERMINATING_ON_PARENT_TERMINATION;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_EXECUTION_TERMINATING_ON_TERMINATION;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_INSTANCE_CLOSE;
+import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.CASE_INSTANCE_CREATE;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+
 import org.camunda.bpm.engine.delegate.CaseVariableListener;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
@@ -19,7 +76,12 @@ import org.camunda.bpm.engine.delegate.VariableListener;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnBehaviorLogger;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity;
-import org.camunda.bpm.engine.impl.cmmn.model.*;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnIfPartDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnOnPartDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.model.CmmnVariableOnPartDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
@@ -33,14 +95,6 @@ import org.camunda.bpm.engine.impl.variable.listener.CaseVariableListenerInvocat
 import org.camunda.bpm.engine.impl.variable.listener.DelegateCaseVariableInstanceImpl;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-
-import java.util.*;
-
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.*;
-import static org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration.*;
-import static org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation.*;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Roman Smirnov
@@ -268,7 +322,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     List<String> satisfiedSentries = getSatisfiedSentries(affectedSentries);
 
     // Step 4: reset sentries -> satisfied == false
-    resetSentries(satisfiedSentries, getSentries());
+    resetSentries(satisfiedSentries);
 
     // Step 5: fire satisfied sentries
     fireSentries(satisfiedSentries);
@@ -278,10 +332,10 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   public void fireIfOnlySentryParts() {
     // the following steps are a workaround, because setVariable()
     // does not check nor fire a sentry!!!
-    HashSet<String> affectedSentries = new HashSet<String>();
+    Set<String> affectedSentries = new HashSet<String>();
     List<CmmnSentryPart> sentryParts = collectSentryParts(getSentries());
     for (CmmnSentryPart sentryPart : sentryParts) {
-      if (isNotSatisfiedIfPartOnly(sentryPart, getSentries())) {
+      if (isNotSatisfiedIfPartOnly(sentryPart)) {
         affectedSentries.add(sentryPart.getSentryId());
       }
     }
@@ -290,24 +344,24 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     List<String> satisfiedSentries = getSatisfiedSentries(new ArrayList<String>(affectedSentries));
 
     // Step 8: reset sentries -> satisfied == false
-    resetSentries(satisfiedSentries,getSentries());
+    resetSentries(satisfiedSentries);
 
     // Step 9: fire satisfied sentries
     fireSentries(satisfiedSentries);
   }
 
   public void handleVariableTransition(String variableName, String transition) {
-    Map<String,List<CmmnSentryPart>> sentries = collectAllSentries();
+    Map<String, List<CmmnSentryPart>> sentries = collectAllSentries();
 
     List<CmmnSentryPart> sentryParts = collectSentryParts(sentries);
-    
+
     List<String> affectedSentries = collectAffectedSentriesWithVariableOnParts(variableName, transition, sentryParts);
 
     List<CmmnSentryPart> affectedSentryParts = getAffectedSentryParts(sentries,affectedSentries);
     forceUpdateOnCaseSentryParts(affectedSentryParts);
 
     List<String> allSentries = new ArrayList<String>(sentries.keySet());
-    
+
     List<String> satisfiedSentries = getSatisfiedSentriesInExecutionTree(allSentries, sentries);
 
     List<CmmnSentryPart> satisfiedSentryParts = getAffectedSentryParts(sentries, satisfiedSentries);
@@ -339,9 +393,9 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     return affectedSentries;
   }
 
-  protected boolean isNotSatisfiedIfPartOnly(CmmnSentryPart sentryPart, Map<String, List<CmmnSentryPart>> sentries) {
+  protected boolean isNotSatisfiedIfPartOnly(CmmnSentryPart sentryPart) {
     return IF_PART.equals(sentryPart.getType())
-        && sentries.get(sentryPart.getSentryId()).size() == 1
+        && getSentries().get(sentryPart.getSentryId()).size() == 1
         && !sentryPart.isSatisfied();
   }
 
@@ -368,7 +422,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
       String sentryVariableName = sentryPart.getVariableName();
       String sentryVariableEvent = sentryPart.getVariableEvent();
       CmmnExecution execution = sentryPart.getCaseExecution();
-      if (VARIABLE_ON_PART.equals(sentryPart.getType()) && sentryVariableName.equals(variableName) 
+      if (VARIABLE_ON_PART.equals(sentryPart.getType()) && sentryVariableName.equals(variableName)
         && sentryVariableEvent.equals(variableEvent)
         && !hasVariableWithSameNameInParent(execution, sentryVariableName)) {
 
@@ -410,7 +464,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     }
     return affectedSentryParts;
   }
-  
+
   protected List<CmmnSentryPart> collectSentryParts(Map<String,List<CmmnSentryPart>> sentries) {
     List<CmmnSentryPart> sentryParts = new ArrayList<CmmnSentryPart>();
     for(String sentryId: sentries.keySet()) {
@@ -461,7 +515,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     if (sentryIds != null) {
 
       for (String sentryId : sentryIds) {
-        List<CmmnSentryPart> sentryParts = allSentries.get(sentryId); 
+        List<CmmnSentryPart> sentryParts = allSentries.get(sentryId);
         if (isSentryPartsSatisfied(sentryId, sentryParts)) {
           result.add(sentryId);
         }
@@ -486,9 +540,9 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     }
   }
 
-  protected void resetSentries(List<String> sentries, Map<String, List<CmmnSentryPart>> allSentries) {
+  protected void resetSentries(List<String> sentries) {
     for (String sentry : sentries) {
-      List<CmmnSentryPart> parts = allSentries.get(sentry);
+      List<CmmnSentryPart> parts = getSentries().get(sentry);
       for (CmmnSentryPart part : parts) {
         part.setSatisfied(false);
       }
@@ -511,9 +565,9 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
       // collect the execution tree.
       ArrayList<CmmnExecution> children = new ArrayList<CmmnExecution>();
       collectCaseExecutionsInExecutionTree(children);
-      
+
       for (CmmnExecution currentChild : children) {
- 
+
         // check and fire first exitCriteria
         currentChild.checkAndFireExitCriteria(satisfiedSentries);
 
@@ -532,11 +586,11 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   protected void collectCaseExecutionsInExecutionTree(List<CmmnExecution> children) {
     for(CmmnExecution child: getCaseExecutions()) {
-      child.collectCaseExecutionsInExecutionTree(children);  
+      child.collectCaseExecutionsInExecutionTree(children);
     }
     children.addAll(getCaseExecutions());
   }
-  
+
   protected void checkAndFireExitCriteria(List<String> satisfiedSentries) {
     if (isActive()) {
       CmmnActivity activity = getActivity();
@@ -596,7 +650,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   public boolean isSentrySatisfied(String sentryId) {
     List<? extends CmmnSentryPart> sentryParts = findSentry(sentryId);
     return isSentryPartsSatisfied(sentryId, sentryParts);
-    
+
   }
 
   protected boolean isSentryPartsSatisfied(String sentryId, List<? extends CmmnSentryPart> sentryParts) {
@@ -666,7 +720,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
     for (CmmnSentryPart part : sentryParts) {
       CmmnExecution caseExecution = part.getCaseExecution();
-      if (IF_PART.equals(part.getType()) && caseExecution != null 
+      if (IF_PART.equals(part.getType()) && caseExecution != null
           && caseExecution.isActive()) {
         return true;
       }
