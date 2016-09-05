@@ -1,29 +1,29 @@
-<div ng-show="!processDiagramState.$loaded && !caseDiagramState.$loaded"
+<div ng-show="!diagramState.$loaded"
      class="loader">
   <span class="animate-spin glyphicon glyphicon-refresh"></span>
   {{ 'LOADING' | translate }}
 </div>
 
-<div ng-if="processDiagramState.$loaded || caseDiagramState.$loaded">
-  <div ng-hide="(processDefinition && processDiagram.bpmn20xml) || (caseDefinition && caseDiagram.cmmnXml)"
+<div ng-if="diagramState.$loaded">
+  <div ng-hide="diagram.definition && diagram.xml"
        class="well">
     <span class="glyphicon glyphicon-info-sign"></span>
     {{ 'NO_DIAGRAM' | translate }}
   </div>
 
-  <div ng-if="processDefinition && processDiagram.bpmn20xml">
+  <div ng-if="processDefinition && diagram.xml">
     <div class="diagram-pane"
          cam-widget-bpmn-viewer
-         diagram-data="processDiagram.bpmn20xml"
+         diagram-data="diagram.xml"
          on-load="highlightTask()"
          control="control">
     </div>
   </div>
 
-  <div ng-if="caseDefinition && caseDiagram.cmmnXml">
+  <div ng-if="caseDefinition && diagram.xml">
     <div class="diagram-pane"
          cam-widget-cmmn-viewer
-         diagram-data="caseDiagram.cmmnXml"
+         diagram-data="diagram.xml"
          on-load="highlightTask()"
          control="control">
     </div>

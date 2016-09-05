@@ -169,7 +169,7 @@ describe('Tasklist Detail View Spec', function() {
 
   });
 
-  describe('cmmn diagram tab', function() {
+  describe.only('cmmn diagram tab', function() {
 
     before(function() {
       return testHelper(setupFile.setup4, function() {
@@ -179,7 +179,6 @@ describe('Tasklist Detail View Spec', function() {
     });
 
     it('should display the process and highlight current task', function() {
-
       // given
       taskListPage.selectTask('Task1');
       dashboardPage.waitForElementToBeVisible(taskViewPage.taskName());
@@ -189,6 +188,19 @@ describe('Tasklist Detail View Spec', function() {
 
       // then
       expect(taskViewPage.diagram.isActivitySelected('PlanItem_1')).to.eventually.be.true;
+    });
+
+    it('should display diagram and highlight current task after changing task', function() {
+      // given
+      taskListPage.selectTask('Task1');
+      dashboardPage.waitForElementToBeVisible(taskViewPage.taskName());
+      taskViewPage.diagram.selectTab();
+
+      // when
+      taskListPage.selectTask('Task 2');
+
+      // then
+      expect(taskViewPage.diagram.isActivitySelected('PlanItem_2')).to.eventually.be.true;
     });
   });
 
