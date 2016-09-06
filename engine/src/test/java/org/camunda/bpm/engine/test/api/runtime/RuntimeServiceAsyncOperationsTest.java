@@ -98,8 +98,10 @@ public class RuntimeServiceAsyncOperationsTest {
           .createHistoricTaskInstanceQuery().count(),is(2l));
     }
 
-
-    assertThat(engineRule.getHistoryService().createHistoricBatchQuery().count(), is(1l));
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory()) &&
+        !ProcessEngineConfiguration.HISTORY_AUDIT.equals(engineRule.getProcessEngineConfiguration().getHistory()) ) {
+      assertThat(engineRule.getHistoryService().createHistoricBatchQuery().count(), is(1l));
+    }
     assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().list().size(),is(0));
   }
 
@@ -134,8 +136,10 @@ public class RuntimeServiceAsyncOperationsTest {
           .createHistoricTaskInstanceQuery().count(),is(2l));
     }
 
-
-    assertThat(engineRule.getHistoryService().createHistoricBatchQuery().count(), is(1l));
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory()) &&
+        !ProcessEngineConfiguration.HISTORY_AUDIT.equals(engineRule.getProcessEngineConfiguration().getHistory()) ) {
+      assertThat(engineRule.getHistoryService().createHistoricBatchQuery().count(), is(1l));
+    }
     assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().list().size(),is(0));
 
     engineRule.getManagementService().deleteBatch(
@@ -201,7 +205,10 @@ public class RuntimeServiceAsyncOperationsTest {
           .createHistoricTaskInstanceQuery().count(),is(2l));
     }
 
-    assertThat(engineRule.getHistoryService().createHistoricBatchQuery().count(), is(1l));
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory()) &&
+        !ProcessEngineConfiguration.HISTORY_AUDIT.equals(engineRule.getProcessEngineConfiguration().getHistory()) ) {
+      assertThat(engineRule.getHistoryService().createHistoricBatchQuery().count(), is(1l));
+    }
     assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().list().size(),is(0));
   }
 
