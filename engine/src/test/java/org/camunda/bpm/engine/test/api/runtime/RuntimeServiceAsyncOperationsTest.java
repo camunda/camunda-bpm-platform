@@ -26,12 +26,10 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
+import org.junit.runners.MethodSorters;
 
 import java.util.*;
 
@@ -83,8 +81,11 @@ public class RuntimeServiceAsyncOperationsTest {
     engineRule.getRuntimeService().deleteProcessInstancesAsync(processInstanceIds,TESTING_INSTANCE_DELETION);
 
     engineRule.getManagementService().executeJob(engineRule.getManagementService().createJobQuery().singleResult().getId());
-    assertThat(engineRule.getManagementService().createJobQuery().list().size(),is(3));
-    testRule.executeAvailableJobs();
+    List<Job> list = engineRule.getManagementService().createJobQuery().list();
+    assertThat(list.size(),is(3));
+    for(Job job: list) {
+      engineRule.getManagementService().executeJob(job.getId());
+    }
 
     if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory())) {
 
@@ -190,8 +191,11 @@ public class RuntimeServiceAsyncOperationsTest {
     engineRule.getRuntimeService().deleteProcessInstancesAsync(processInstanceQuery,TESTING_INSTANCE_DELETION);
 
     engineRule.getManagementService().executeJob(engineRule.getManagementService().createJobQuery().singleResult().getId());
-    assertThat(engineRule.getManagementService().createJobQuery().list().size(),is(3));
-    testRule.executeAvailableJobs();
+    List<Job> list = engineRule.getManagementService().createJobQuery().list();
+    assertThat(list.size(),is(3));
+    for(Job job: list) {
+      engineRule.getManagementService().executeJob(job.getId());
+    }
 
     if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory())) {
 
