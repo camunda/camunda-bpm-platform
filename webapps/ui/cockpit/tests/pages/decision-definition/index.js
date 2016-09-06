@@ -5,7 +5,7 @@ var TableDecisionInstancesPage = require('./tabs/decision-instances-tab');
 var TablePage = require('./../dmn-table');
 var VersionPage = require('./version');
 var InformationPage = require('./../sidebar-information');
-var SearchWidget = require('./../search-widget');
+var SearchWidget = require('./../../../../common/tests/pages/search-widget');
 
 module.exports = new DecisionDefinitionPage();
 module.exports.table = new TablePage();

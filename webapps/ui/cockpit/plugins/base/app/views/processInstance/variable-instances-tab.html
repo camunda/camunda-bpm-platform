@@ -1,4 +1,12 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/variable-instances-tab.html -->
+<div cam-widget-search
+     cam-widget-search-valid-searches="searchConfig.searches"
+     cam-widget-search-translations="searchConfig.tooltips"
+     cam-widget-search-types="searchConfig.types"
+     cam-widget-search-operators="searchConfig.operators"
+     cam-widget-search-mode="filter">
+</div>
+
 <div cam-widget-loader
      loading-state="{{ loadingState }}"
      text-empty="No process variables">

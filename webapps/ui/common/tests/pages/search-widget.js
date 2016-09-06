@@ -1,6 +1,6 @@
 'use strict';
 
-var Base = require('./base');
+var Base = require('./../../../cockpit/tests/pages/base');
 
 module.exports = Base.extend({
   formElement: function() {
@@ -62,7 +62,7 @@ module.exports = Base.extend({
       .click();
   },
 
-  clearSearch: function () {
+  clearSearch: function() {
     this
       .searchPills()
       .all(by.css('.remove-search'))

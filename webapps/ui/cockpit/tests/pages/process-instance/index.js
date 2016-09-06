@@ -15,6 +15,7 @@ var SuspensionModalPage = require('./action-bar/suspension-modal');
 var InstanceTreePage = require('./instance-tree');
 var IdentityLinksModalPage = require('./modals/identity-links-modal');
 var InformationPage = require('./../sidebar-information');
+var SearchWidget = require('../../../../common/tests/pages/search-widget');
 
 module.exports = new ProcessInstancePage();
 module.exports.diagram = new DiagramPage();
@@ -31,3 +32,4 @@ module.exports.cancelInstance.modal = new CancelInstanceModalPage();
 module.exports.retryFailedJob = new RetryFailedJobPage();
 module.exports.instanceTree = new InstanceTreePage();
 module.exports.information = new InformationPage();
+module.exports.search = new SearchWidget();
