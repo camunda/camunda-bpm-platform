@@ -1,10 +1,10 @@
 'use strict';
 
+var angular = require('angular');
 var fs = require('fs');
 
 var actionTemplate = fs.readFileSync(__dirname + '/add-variable-action.html', 'utf8');
-var dialogTemplate = fs.readFileSync(__dirname + '/add-variable-dialog.html', 'utf8');
-var angular = require('angular');
+var addTemplate = require('../../../../../client/scripts/components/variables/variable-add-dialog');
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.action', {
@@ -18,11 +18,11 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
           var dialog = $modal.open({
             scope: $scope,
             resolve: {
-              processData: function() { return $scope.processData; },
-              processInstance: function() { return $scope.processInstance; }
+              instance: function() { return $scope.processInstance; },
+              isProcessInstance: function() { return true; }
             },
-            controller: 'AddVariableController',
-            template: dialogTemplate
+            controller: addTemplate.controller,
+            template: addTemplate.template
           });
 
           dialog.result.then(function(result) {
