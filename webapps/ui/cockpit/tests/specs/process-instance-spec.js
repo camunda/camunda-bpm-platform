@@ -549,4 +549,60 @@ describe('Cockpit Process Instance Spec', function() {
 
   });
 
+  describe('search widget', function() {
+    before(function() {
+      return testHelper(setupFile.multiTenancySetup, function() {
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.goToSection('Processes');
+
+        processesPage.deployedProcessesList.selectProcess(1);
+        definitionPage.processInstancesTab.selectInstanceId(0);
+
+        instancePage.variablesTab.selectTab();
+      });
+    });
+
+    afterEach(function() {
+      instancePage.search.clearSearch();
+    });
+
+    it('should display search widget', function() {
+      expect(instancePage.search.formElement().isDisplayed()).to.eventually.be.true;
+    });
+
+    it('should have Variable Name filter with = operator', function() {
+      //when
+      instancePage.search.createSearch('Variable Name', '=', 'test');
+
+      //then
+      var eqOperator = instancePage
+        .search
+        .formElement()
+        .element(by.cssContainingText('[tooltip="Operator"]', '='));
+
+      expect(eqOperator.isDisplayed()).to.eventually.be.true;
+    });
+
+    it('should have Variable Name filter with like operator', function() {
+      //when
+      instancePage.search.createSearch('Variable Name', 'like', 'test');
+
+      //then
+      var likeOperator = instancePage
+        .search
+        .formElement()
+        .element(by.cssContainingText('[tooltip="Operator"]', 'like'));
+
+      expect(likeOperator.isDisplayed()).to.eventually.be.true;
+    });
+
+    it('should display only one variable with name test', function() {
+      //when
+      instancePage.search.createSearch('Variable Name', '=', 'test');
+
+      //then
+      expect(instancePage.variablesTab.table().count()).to.eventually.eql(1);
+    });
+  });
 });

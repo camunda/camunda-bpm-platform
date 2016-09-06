@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 var angular = require('angular');
-var createSearchQueryForDecisionInstance = require('./create-search-query-for-decision-instance');
+var createSearchQueryForSearchWidget = require('./../../../../../../common/scripts/util/create-search-query-for-search-widget');
 
 var template = fs.readFileSync(__dirname + '/decision-instance-table.html', 'utf8');
 var decisionSearchConfig = JSON.parse(fs.readFileSync(__dirname + '/decision-instance-search-config.json', 'utf8'));
@@ -72,7 +72,8 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           var page = pages.current,
               count = pages.size,
               firstResult = (page - 1) * count,
-              searchQuery = createSearchQueryForDecisionInstance($scope.decisionSearchConfig.searches);
+              searchQuery = createSearchQueryForSearchWidget($scope.decisionSearchConfig.searches,
+                ['activityIdIn', 'activityInstanceIdIn']);
 
           $scope.decisionInstances = null;
           $scope.loadingState = 'LOADING';

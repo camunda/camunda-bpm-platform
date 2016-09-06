@@ -3,10 +3,12 @@
 var fs = require('fs');
 
 var angular = require('angular');
+var createSearchQueryForSearchWidget = require('../../../../../../common/scripts/util/create-search-query-for-search-widget');
 
 var uploadTemplate = fs.readFileSync(__dirname + '/variable-instance-upload-dialog.html', 'utf8');
 var inspectTemplate = fs.readFileSync(__dirname + '/variable-instance-inspect-dialog.html', 'utf8');
 var instancesTemplate = fs.readFileSync(__dirname + '/variable-instances-tab.html', 'utf8');
+var variableInstancesTabSearchConfig = JSON.parse(fs.readFileSync(__dirname + '/variable-instances-tab-search-config.json', 'utf8'));
 
 module.exports = function(ngModule) {
   ngModule.controller('VariableInstancesController', [
@@ -30,6 +32,15 @@ module.exports = function(ngModule) {
 
       var filter = null;
 
+      $scope.searchConfig = angular.copy(variableInstancesTabSearchConfig);
+      variableInstanceData.provide('searches', angular.copy($scope.searchConfig.searches));
+
+      $scope.$watch('searchConfig.searches', function(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          variableInstanceData.set('searches', angular.copy($scope.searchConfig.searches));
+        }
+      });
+
       $scope.$watch('pages.current', function(newValue, oldValue) {
         if (newValue == oldValue) {
           return;
@@ -38,11 +49,14 @@ module.exports = function(ngModule) {
         search('page', !newValue || newValue == 1 ? null : newValue);
       });
 
-      variableInstanceData.observe([ 'filter', 'instanceIdToInstanceMap' ], function(newFilter, instanceIdToInstanceMap) {
-        pages.current = newFilter.page || 1;
+      variableInstanceData.observe(
+        [ 'filter', 'instanceIdToInstanceMap', 'searches' ],
+        function(newFilter, instanceIdToInstanceMap, searches) {
+          pages.current = newFilter.page || 1;
 
-        updateView(newFilter, instanceIdToInstanceMap);
-      });
+          updateView(newFilter, instanceIdToInstanceMap, searches);
+        }
+      );
 
       $scope.uploadVariable = function(info) {
         var promise = $q.defer();
@@ -185,7 +199,7 @@ module.exports = function(ngModule) {
         return promise.promise;
       };
 
-      function updateView(newFilter, instanceIdToInstanceMap) {
+      function updateView(newFilter, instanceIdToInstanceMap, searches) {
         filter = $scope.filter = angular.copy(newFilter);
 
         delete filter.page;
@@ -206,7 +220,9 @@ module.exports = function(ngModule) {
           deserializeValues: false
         };
 
-        var params = angular.extend({}, filter, defaultParams);
+        var variableQuery = createSearchQueryForSearchWidget(searches);
+
+        var params = angular.extend({}, filter, defaultParams, variableQuery);
 
           // fix missmatch -> activityInstanceIds -> activityInstanceIdIn
         params.activityInstanceIdIn = params.activityInstanceIds;
