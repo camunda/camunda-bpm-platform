@@ -1,0 +1,105 @@
+<!-- # CE - camunda-bpm-webapp/ui/cockpit/scripts/variables/variable-inspect-modal.html -->
+<div class="modal-header">
+  <h3>Inspect "{{ variable.name }}" variable</h3>
+</div>
+
+
+<div class="modal-body variable-inspect">
+
+  <div notifications-panel></div>
+
+  <div ng-show="status === 'beforeChange' || status === 'confirmChange'">
+
+    <div class="form-group">
+      <label>Object Type Name:</label>
+      <code class="form-control-static"
+            cam-widget-clipboard="variable.valueInfo.objectTypeName">{{ variable.valueInfo.objectTypeName }}</code>
+    </div>
+
+    <div class="form-group">
+      <label>Serialization Data Format:</label>
+      <code class="form-control-static"
+            cam-widget-clipboard="variable.valueInfo.serializationDataFormat">{{ variable.valueInfo.serializationDataFormat }}</code>
+    </div>
+
+    <div class="form-group">
+
+      <ul class="nav nav-tabs">
+        <li ng-class="{ active: selectedTab === 'serialized' }">
+          <a href ng-click="selectTab('serialized')">Serialized</a>
+        </li>
+        <li ng-class="{ active: selectedTab === 'deserialized' }">
+          <a href ng-click="selectTab('deserialized')">Deserialized</a>
+        </li>
+      </ul>
+
+      <textarea ng-if="selectedTab === 'serialized'"
+                name="currentValue"
+                ng-readonly="readonly"
+                ng-model="currentValue"
+                ng-keyup="typeIn(this, 'serialized')"
+                rows="10"
+                class="form-control">
+      </textarea>
+
+      <div ng-if="selectedTab === 'deserialized'">
+        <div class="alert alert-danger"
+             ng-show="deserializationError">
+          <strong>Deserialization Error</strong>:
+          {{deserializationError}}
+        </div>
+
+        <div ng-show="!deserializationError">
+          <textarea name="currentDeserializedValue"
+                    ng-readonly="readonly"
+                    ng-model="currentDeserializedValue"
+                    ng-keyup="typeIn(this, 'deserialized')"
+                    rows="10"
+                    class="form-control">
+          </textarea>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="alert alert-warning"
+       ng-show="status === 'confirmChange'">
+    <span class="glyphicon glyphicon-alert"></span>
+    <strong>Warning:</strong>
+    Are you sure you want to change the value of this Object? Changing the variable in an incompatible way may lead to severe runtime problems.
+  </div>
+
+</div>
+
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="$dismiss()"
+          ng-hide="status === 'changeSuccess'">
+    Close
+  </button>
+
+  <![if gt IE 9]>
+    <button class="btn btn-primary"
+            ng-click="$close()"
+            ng-show="!readlonly && status === 'changeSuccess'">
+      OK
+    </button>
+
+    <button class="btn btn-primary"
+            ng-click="change()"
+            ng-disabled="status !== 'beforeChange' || !hasChanged()"
+            ng-hide="readonly || status !== 'beforeChange'">
+      Change
+    </button>
+
+    <button class="btn btn-warning"
+            ng-click="change()"
+            ng-hide="readonly || status !== 'confirmChange'">
+      Confirm Change
+    </button>
+  <![endif]>
+</div>
+<!-- / CE - camunda-bpm-webapp/ui/cockpit/scripts/variables/variable-inspect-modal.html -->

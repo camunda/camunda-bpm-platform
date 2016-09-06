@@ -1,14 +1,15 @@
 'use strict';
 
+var angular = require('angular');
 var fs = require('fs');
 
-var angular = require('angular');
 var createSearchQueryForSearchWidget = require('../../../../../../common/scripts/util/create-search-query-for-search-widget');
-
-var uploadTemplate = fs.readFileSync(__dirname + '/variable-instance-upload-dialog.html', 'utf8');
-var inspectTemplate = fs.readFileSync(__dirname + '/variable-instance-inspect-dialog.html', 'utf8');
-var instancesTemplate = fs.readFileSync(__dirname + '/variable-instances-tab.html', 'utf8');
 var variableInstancesTabSearchConfig = JSON.parse(fs.readFileSync(__dirname + '/variable-instances-tab-search-config.json', 'utf8'));
+
+var instancesTemplate = fs.readFileSync(__dirname + '/variable-instances-tab.html', 'utf8');
+var inspectTemplate = require('../../../../../client/scripts/components/variables/variable-inspect-dialog');
+var uploadTemplate = require('../../../../../client/scripts/components/variables/variable-upload-dialog');
+
 
 module.exports = function(ngModule) {
   ngModule.controller('VariableInstancesController', [
@@ -62,10 +63,11 @@ module.exports = function(ngModule) {
         var promise = $q.defer();
         $modal.open({
           resolve: {
-            variableInstance: function() { return info.variable; }
+            basePath: function() { return getBasePath(info.variable); },
+            variable: function() { return info.variable; }
           },
-          controller: 'VariableInstanceUploadController',
-          template: uploadTemplate
+          controller: uploadTemplate.controller,
+          template: uploadTemplate.template
         })
           .result.then(function() {
             // updated the variable, need to get the new data
@@ -127,27 +129,30 @@ module.exports = function(ngModule) {
         var promise = $q.defer();
 
         $modal.open({
-          template: inspectTemplate,
+          template: inspectTemplate.template,
 
-          controller: 'VariableInstanceInspectController',
+          controller: inspectTemplate.controller,
 
           windowClass: 'cam-widget-variable-dialog',
 
           resolve: {
-            variableInstance: function() { return info.variable; }
+            basePath: function() { return getBasePath(info.variable); },
+            history: function() { return false; },
+            readonly: function() { return false; },
+            variable: function() { return info.variable; }
           }
         })
-          .result.then(function() {
-            // updated the variable, need to get the new data
-            // reject the promise anyway
-            promise.reject();
+        .result.then(function() {
+          // updated the variable, need to get the new data
+          // reject the promise anyway
+          promise.reject();
 
-            // but then update the filter to force re-get of variables
-            variableInstanceData.set('filter', angular.copy($scope.filter));
-          }, function() {
-            // did not update the variable, reject the promise
-            promise.reject();
-          });
+          // but then update the filter to force re-get of variables
+          variableInstanceData.set('filter', angular.copy($scope.filter));
+        }, function() {
+          // did not update the variable, reject the promise
+          promise.reject();
+        });
 
         return promise.promise;
       };
@@ -157,8 +162,8 @@ module.exports = function(ngModule) {
         var variable = info.variable;
         var modifiedVariable = {};
 
-        var newValue = variable.value;//$scope.getCopy(variable.id).value;
-        var newType = variable.type;//$scope.getCopy(variable.id).type;
+        var newValue = variable.value;
+        var newType = variable.type;
 
         var newVariable = { value: newValue, type: newType };
         modifiedVariable[variable.name] = newVariable;
@@ -198,6 +203,11 @@ module.exports = function(ngModule) {
 
         return promise.promise;
       };
+
+
+      function getBasePath(variable) {
+        return 'engine://engine/:engine/execution/' + variable.executionId + '/localVariables/' + variable.name;
+      }
 
       function updateView(newFilter, instanceIdToInstanceMap, searches) {
         filter = $scope.filter = angular.copy(newFilter);
@@ -287,43 +297,6 @@ module.exports = function(ngModule) {
         });
       }
 
-      $scope.getCopy = function(variableId) {
-        var copy = variableCopies[variableId];
-        if (isNull(copy)) {
-          copy.type = 'String';
-        }
-        return copy;
-      };
-
-      var isNull = $scope.isNull = function(variable) {
-        return variable.type === 'null' || variable.type === 'Null';
-      };
-
-      $scope.getBinaryVariableDownloadLink = function(variable) {
-        return Uri.appUri('engine://engine/:engine/variable-instance/'+variable.id+'/data');
-      };
-
-      $scope.openUploadDialog = function(variableInstance) {
-        $modal.open({
-          resolve: {
-            variableInstance: function() { return variableInstance; }
-          },
-          controller: 'VariableInstanceUploadController',
-          template: uploadTemplate
-        });
-      };
-
-      $scope.openInspectDialog = function(variableInstance) {
-        $modal.open({
-          resolve: {
-            variableInstance: function() { return variableInstance; }
-          },
-          controller: 'VariableInstanceInspectController',
-          template: inspectTemplate
-        }).result.then(function() {
-          variableInstanceData.set('filter', angular.copy($scope.filter));
-        });
-      };
     }]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
