@@ -203,7 +203,7 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void FAILING_testForkWithThreeBranchesAndJoinOfTwoBranches() {
+  public void testForkWithThreeBranchesAndJoinOfTwoBranches() {
     // given
     runtimeService.startProcessInstanceByKey("process");
 
