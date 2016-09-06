@@ -78,6 +78,21 @@ module.exports = ['camAPI', 'Notifications', function(camAPI, Notifications) {
         });
       };
 
+      function checkPassword() {
+        $scope.passwordsMismatch = $scope.changePassword.new.$dirty &&
+                                      $scope.changePassword.confirmation.$dirty &&
+                                      $scope.password.new !== $scope.password.confirmation;
+
+        $scope.changePassword.new.$setValidity('mismatch', !$scope.passwordsMismatch);
+        $scope.changePassword.confirmation.$setValidity('mismatch', !$scope.passwordsMismatch);
+      }
+
+      $scope.$watch('password.new', checkPassword);
+      $scope.$watch('password.confirmation', checkPassword);
+      $scope.$watch('changePassword.new.$dirty', checkPassword);
+      $scope.$watch('changePassword.confirmation.$dirty', checkPassword);
+
+
       $scope.submitPassword = function() {
         $scope.processing = true;
 

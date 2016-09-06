@@ -5,15 +5,16 @@
       Your profile
     </h3>
 
-    <ul class="action-links list-inline small pull-right">
+    <ul class="action-links list-inline small text-right">
       <li><a ng-click="showForm('profile')">Edit profile</a></li>
       <li><a ng-click="showForm('password')">Change password</a></li>
     </ul>
 
 
     <div class="user-profile-info">
-      <div class="user-profile-username">{{ user.id }}</div>
-      <div class="h3 user-profile-name">{{ user.firstName }} {{ user.lastName }}</div>
+      <span class="user-profile-name">{{ user.firstName }} {{ user.lastName }}</span>
+      <span class="user-profile-username"
+            tooltip="User name to be used for authentication">{{ user.id }}</span>
       <div class="user-profile-email">{{ user.email }}</div>
     </div>
 
@@ -117,6 +118,8 @@
              name="confirmation"
              required
              ng-model="password.confirmation" />
+      <div ng-if="passwordsMismatch"
+           class="help-block error">The new password and the confirmation are not matching.</div>
     </div>
 
     <div class="form-group actions row">
@@ -127,7 +130,7 @@
       </div>
       <div class="col-xs-6 text-right">
         <button type="submit"
-                ng-disabled="changePassword.$invalid || changePassword.$pristine || processing || password.new !== password.confirmation"
+                ng-disabled="changePassword.$invalid || changePassword.$pristine || processing || passwordsMismatch"
                 class="btn btn-primary">Change password</button>
       </div>
     </div>
