@@ -47,7 +47,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           pages.current = search().page || 1;
         });
 
-        $scope.$watch('decisionSearchConfig.searches', function (newValue, oldValue) {
+        $scope.$watch('decisionSearchConfig.searches', function(newValue, oldValue) {
           if (newValue !== oldValue) {
             updateView();
           }
