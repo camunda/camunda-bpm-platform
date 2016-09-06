@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.test.api.authorization.batch;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
@@ -115,7 +116,10 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
         engineRule.getManagementService().createJobQuery().singleResult().getId());
     testHelper.executeAvailableJobs();
 
-    assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(),is(3l));
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory()) &&
+        !ProcessEngineConfiguration.HISTORY_AUDIT.equals(engineRule.getProcessEngineConfiguration().getHistory()) ) {
+      assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(3l));
+    }
   }
 
   @Test
@@ -130,7 +134,10 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
         engineRule.getManagementService().createJobQuery().singleResult().getId());
     testHelper.executeAvailableJobs();
 
-    assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(),is(3l));
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory()) &&
+        !ProcessEngineConfiguration.HISTORY_AUDIT.equals(engineRule.getProcessEngineConfiguration().getHistory()) ) {
+      assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(3l));
+    }
   }
 
   @Test
@@ -165,7 +172,10 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
         engineRule.getManagementService().createJobQuery().singleResult().getId());
     testHelper.executeAvailableJobs();
 
-    assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(),is(3l));
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory()) &&
+        !ProcessEngineConfiguration.HISTORY_AUDIT.equals(engineRule.getProcessEngineConfiguration().getHistory()) ) {
+      assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(3l));
+    }
   }
 
   @Test
@@ -195,8 +205,10 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
     engineRule.getManagementService().executeJob(
         engineRule.getManagementService().createJobQuery().singleResult().getId());
     testHelper.executeAvailableJobs();
-
-    assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(),is(3l));
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory()) &&
+        !ProcessEngineConfiguration.HISTORY_AUDIT.equals(engineRule.getProcessEngineConfiguration().getHistory()) ) {
+      assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(3l));
+    }
   }
 
 }
