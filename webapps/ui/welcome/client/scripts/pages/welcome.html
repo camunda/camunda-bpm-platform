@@ -65,4 +65,15 @@
            username="$root.authentication.name"></div>
     </div>
   </section>
+
+  <div ng-if="plugins.length"
+       class="col-xs-12 plugins">
+    <div class="row">
+      <view ng-repeat="plugin in plugins"
+            class="plugin"
+            ng-class="plugin.id"
+            data-plugin-id="{{ plugin.id }}"
+            provider="plugin"></view>
+    </div>
+  </div>
 </div>
