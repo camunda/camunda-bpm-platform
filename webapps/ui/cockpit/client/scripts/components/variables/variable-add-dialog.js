@@ -1,10 +1,30 @@
 'use strict';
 
 var angular = require('angular');
+var fs = require('fs');
 
-module.exports = [
-  '$scope', '$http', 'Uri', 'Notifications', '$modalInstance', 'processInstance',
-  function($scope,   $http,   Uri,   Notifications,   $modalInstance,   processInstance) {
+var template = fs.readFileSync(__dirname + '/variable-add-dialog.html', 'utf8');
+
+var Controller = [
+  '$http',
+  '$modalInstance',
+  '$scope',
+  'Notifications',
+  'Uri',
+  'instance',
+  'isProcessInstance',
+  function(
+    $http,
+    $modalInstance,
+    $scope,
+    Notifications,
+    Uri,
+    instance,
+    isProcessInstance
+  ) {
+
+
+    $scope.isProcessInstance = isProcessInstance;  
 
     $scope.variableTypes = [
       'String',
@@ -58,7 +78,7 @@ module.exports = [
       delete data.name;
 
       $http
-      .put(Uri.appUri('engine://engine/:engine/process-instance/' + processInstance.id + '/variables/' + name), data)
+      .put(Uri.appUri('engine://engine/:engine/'+(isProcessInstance ? 'process' : 'case')+'-instance/'+instance.id+'/variables/'+name), data)
       .success(function() {
         $scope.status = SUCCESS;
 
@@ -78,3 +98,9 @@ module.exports = [
       });
     };
   }];
+
+module.exports = {
+  template: template,
+  controller: Controller
+};
+

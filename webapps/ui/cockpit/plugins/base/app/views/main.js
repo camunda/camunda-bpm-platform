@@ -37,7 +37,6 @@ var angular = require('angular'),
     cancelProcessInstanceAction = require('./processInstance/cancelProcessInstanceAction'),
     cancelProcessInstanceDialog = require('./processInstance/cancelProcessInstanceDialog'),
     addVariableAction = require('./processInstance/addVariableAction'),
-    addVariableDialog = require('./processInstance/addVariableDialog'),
     updateSuspensionStateActionPI = require('./processInstance/updateSuspensionStateAction'),
     updateSuspensionStateDialogPI = require('./processInstance/updateSuspensionStateDialog'),
     activityInstanceStatisticsOverlayPI = require('./processInstance/activityInstanceStatisticsOverlay'),
@@ -74,7 +73,6 @@ ngModule.controller('ExternalTaskRetryController', externalTaskRetryDialog);
 cancelProcessInstanceAction(ngModule);
 ngModule.controller('CancelProcessInstanceController', cancelProcessInstanceDialog);
 ngModule.config(addVariableAction);
-ngModule.controller('AddVariableController', addVariableDialog);
 ngModule.config(updateSuspensionStateActionPI);
 ngModule.controller('UpdateProcessInstanceSuspensionStateController', updateSuspensionStateDialogPI);
 ngModule.config(activityInstanceStatisticsOverlayPI);

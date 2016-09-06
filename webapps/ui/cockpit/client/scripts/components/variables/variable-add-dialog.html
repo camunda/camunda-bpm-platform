@@ -1,6 +1,6 @@
-<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/add-variable-dialog.html -->
+<!-- # CE - camunda-bpm-webapp/ui/cockpit/client/scripts/components/variables/variable-add-dialog.html -->
 <div class="modal-header">
-  <h3>Add Variable to Process Instance</h3>
+  <h3>Add Variable to {{ isProcessInstance ? 'Process' : 'Case' }} Instance</h3>
 </div>
 
 <div class="modal-body add-variable-dialog">
@@ -64,11 +64,11 @@
   </form>
 
   <div ng-show="status === 'SUCCESS'">
-    The variable "{{ newVariable.name }}" has been added to the process instance successfully.
+    The variable "{{ newVariable.name }}" has been added to the {{ isProcessInstance ? 'process' : 'case' }} instance successfully.
   </div>
 
   <div ng-show="status === 'FAIL'">
-    The variable "{{ newVariable.name }}" could not be added to the process instance.
+    The variable "{{ newVariable.name }}" could not be added to the {{ isProcessInstance ? 'process' : 'case' }} instance.
   </div>
 
 </div>
@@ -89,4 +89,4 @@
           ng-click="close()"
           ng-show="status === 'SUCCESS' || status === 'FAIL'">OK</button>
 </div>
-<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/add-variable-dialog.html -->
+<!-- / CE - camunda-bpm-webapp/ui/cockpit/client/scripts/components/variables/variable-add-dialog.html -->
