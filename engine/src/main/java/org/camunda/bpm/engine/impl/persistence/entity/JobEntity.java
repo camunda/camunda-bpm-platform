@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.ExceptionUtil.createJobExceptionByteArray;
+import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -37,8 +39,6 @@ import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 
 /**
  * Stub of the common parts of a Job. You will normally work with a subclass of
@@ -103,7 +103,6 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   protected String tenantId;
 
   // runtime state /////////////////////////////
-  protected boolean executing = false;
   protected String activityId;
   protected JobDefinition jobDefinition;
   protected ExecutionEntity execution;
@@ -173,7 +172,9 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
       jobHandler.onDelete(getJobHandlerConfiguration(), this);
     }
 
-    commandContext.getJobManager().deleteJob(this, !executing);
+    // fire delete event if this job is not being executed
+    boolean executingJob = this.equals(commandContext.getCurrentJob());
+    commandContext.getJobManager().deleteJob(this, !executingJob);
 
     // Also delete the job's exception byte array
     if (exceptionByteArrayId != null) {
@@ -570,14 +571,6 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   public void resetLock() {
     this.lockOwner = null;
     this.lockExpirationTime = null;
-  }
-
-  public boolean isExecuting() {
-    return executing;
-  }
-
-  public void setExecuting(boolean executing) {
-    this.executing = executing;
   }
 
   public String getActivityId() {

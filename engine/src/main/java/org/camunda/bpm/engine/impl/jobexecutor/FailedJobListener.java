@@ -13,11 +13,9 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.management.Metrics;
@@ -26,7 +24,7 @@ import org.camunda.bpm.engine.management.Metrics;
  * @author Frederik Heremans
  * @author Bernd Ruecker
  */
-public class FailedJobListener implements TransactionListener, CommandContextListener {
+public class FailedJobListener implements Command<Void> {
 
   protected CommandExecutor commandExecutor;
   protected String jobId;
@@ -34,16 +32,12 @@ public class FailedJobListener implements TransactionListener, CommandContextLis
   private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   public FailedJobListener(CommandExecutor commandExecutor, String jobId, Throwable exception) {
-    this(commandExecutor, jobId);
+    this.commandExecutor = commandExecutor;
+    this.jobId = jobId;
     this.exception = exception;
   }
 
-  public FailedJobListener(CommandExecutor commandExecutor, String jobId) {
-    this.commandExecutor = commandExecutor;
-    this.jobId = jobId;
-  }
-
-  public void execute(CommandContext commandContext) {
+  public Void execute(CommandContext commandContext) {
     logJobFailure(commandContext);
 
     FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
@@ -65,6 +59,8 @@ public class FailedJobListener implements TransactionListener, CommandContextLis
         return null;
       }
     });
+
+    return null;
   }
 
   protected void fireHistoricJobFailedEvt(JobEntity job) {
@@ -85,25 +81,6 @@ public class FailedJobListener implements TransactionListener, CommandContextLis
       commandContext.getProcessEngineConfiguration()
               .getMetricsRegistry()
               .markOccurrence(Metrics.JOB_FAILED);
-    }
-  }
-
-  public void setException(Throwable exception) {
-    this.exception = exception;
-  }
-
-  public Throwable getException() {
-    return exception;
-  }
-
-  public void onCommandContextClose(CommandContext commandContext) {
-    // ignored
-  }
-
-  public void onCommandFailed(CommandContext commandContext, Throwable t) {
-    // log exception if not already present
-    if (this.exception == null) {
-      this.exception = t;
     }
   }
 

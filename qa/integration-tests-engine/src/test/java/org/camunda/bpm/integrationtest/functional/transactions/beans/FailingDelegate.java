@@ -1,4 +1,4 @@
-package org.camunda.bpm.integrationtest.functional.transactions;
+package org.camunda.bpm.integrationtest.functional.transactions.beans;
 
 import javax.inject.Named;
 
