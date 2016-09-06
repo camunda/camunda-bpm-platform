@@ -20,8 +20,8 @@ import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.management.Metric;
 import org.camunda.bpm.engine.management.MetricsQuery;
+import org.camunda.bpm.engine.management.MetricIntervalValue;
 
 /**
  * @author Daniel Meyer
@@ -77,7 +77,7 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
   protected Command<Object> callback;
 
   @Override
-  public List<Metric> interval() {
+  public List<MetricIntervalValue> interval() {
     callback = new Command() {
       @Override
       public Object execute(CommandContext commandContext) {
@@ -86,11 +86,11 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
       }
     };
 
-    return (List<Metric>) commandExecutor.execute(this);
+    return (List<MetricIntervalValue>) commandExecutor.execute(this);
   }
 
   @Override
-  public List<Metric> interval(long interval) {
+  public List<MetricIntervalValue> interval(long interval) {
     this.interval = interval;
     return interval();
   }
@@ -130,7 +130,7 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
   @Override
   public void setMaxResults(int maxResults) {
     if (maxResults > DEFAULT_LIMIT_SELECT_INTERVAL) {
-      throw new ProcessEngineException("Metrics interval query row limit can't be set larger than 200.");
+      throw new ProcessEngineException("Metrics interval query row limit can't be set larger than " + DEFAULT_LIMIT_SELECT_INTERVAL + '.');
     }
     this.maxResults = maxResults;
   }

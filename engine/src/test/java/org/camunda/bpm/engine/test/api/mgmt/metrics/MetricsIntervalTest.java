@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.management.Metric;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -33,12 +32,16 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-import static junit.framework.TestCase.assertEquals;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
+import org.camunda.bpm.engine.management.MetricIntervalValue;
+import static junit.framework.TestCase.assertEquals;
+import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Assert;
 
 /**
  *
@@ -49,6 +52,12 @@ public class MetricsIntervalTest {
   protected static final ProcessEngineRule ENGINE_RULE = new ProvidedProcessEngineRule();
   protected static final ProcessEngineTestRule TEST_RULE = new ProcessEngineTestRule(ENGINE_RULE);
   protected static final String REPORTER_ID = "REPORTER_ID";
+  protected static final String PROCESS_DEF_KEY = "testProcess";
+  protected static final BpmnModelInstance PROCESS_MODEL = Bpmn.createExecutableProcess(PROCESS_DEF_KEY)
+                                                                  .startEvent()
+                                                                  .manualTask()
+                                                                  .endEvent()
+                                                                  .done();
 
   @ClassRule
   public static RuleChain RULE_CHAIN = RuleChain.outerRule(ENGINE_RULE).around(TEST_RULE);
@@ -62,17 +71,13 @@ public class MetricsIntervalTest {
   protected static String lastReporterId;
 
   private static void generateMeterData(long dataCount, long intervall, long dataPerIntervall) {
-    TEST_RULE.deploy(Bpmn.createExecutableProcess("testProcess")
-            .startEvent()
-            .manualTask()
-            .endEvent()
-            .done());
+    TEST_RULE.deploy(PROCESS_MODEL);
     long startDate = 0;
     long diff = intervall / dataPerIntervall;
     for (int i = 0; i <= dataCount; i++) {
       for (int j = 0; j < dataPerIntervall; j++) {
         ClockUtil.setCurrentTime(new Date(startDate));
-        runtimeService.startProcessInstanceByKey("testProcess");
+        runtimeService.startProcessInstanceByKey(PROCESS_DEF_KEY);
         processEngineConfiguration.getDbMetricsReporter().reportNow();
         startDate += diff;
       }
@@ -80,11 +85,15 @@ public class MetricsIntervalTest {
   }
 
   protected static void clearMetrics() {
+    clearLocalMetrics();
+    managementService.deleteMetrics(null);
+  }
+
+  protected static void clearLocalMetrics() {
     Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
     for (Meter meter : meters) {
       meter.getAndClear();
     }
-    managementService.deleteMetrics(null);
   }
 
   @BeforeClass
@@ -110,9 +119,8 @@ public class MetricsIntervalTest {
     clearMetrics();
   }
 
-  //====================================================================================
-  //====================================LIMIT===========================================
-  //====================================================================================
+  // LIMIT //////////////////////////////////////////////////////////////////////
+
   @Test
   public void testMeterQueryLimit() {
     //since generating test data of 200 metrics will take a long time we check if the default values are set of the query
@@ -127,12 +135,12 @@ public class MetricsIntervalTest {
     assertEquals(201, query.getLastRow());
   }
 
-  @Test
+    @Test
   public void testMeterQueryDecreaseLimit() {
     //given metric data
 
     //when query metric interval data with limit of 10 values
-    List<Metric> metrics = managementService.createMetricsQuery().limit(10).interval();
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().limit(10).interval();
 
     //then 10 values are returned
     assertEquals(10, metrics.size());
@@ -148,15 +156,14 @@ public class MetricsIntervalTest {
     managementService.createMetricsQuery().limit(1000).interval();
   }
 
-  //====================================================================================
-  //====================================OFFSET==========================================
-  //====================================================================================
+  // OFFSET //////////////////////////////////////////////////////////////////////
+
   @Test
   public void testMeterQueryOffset() {
     //given metric data
 
     //when query metric interval data with offset of 10
-    List<Metric> metrics = managementService.createMetricsQuery().offset(10).interval();
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().offset(10).interval();
 
     //then 26 values are returned and highest interval is second last interval, since first 9 was skipped
     assertEquals(26, metrics.size());
@@ -168,27 +175,26 @@ public class MetricsIntervalTest {
     //given metric data
 
     //when query metric interval data with max offset
-    List<Metric> metrics = managementService.createMetricsQuery().offset(Integer.MAX_VALUE).interval();
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().offset(Integer.MAX_VALUE).interval();
 
     //then 0 values are returned
     assertEquals(0, metrics.size());
   }
 
-  //====================================================================================
-  //====================================INTERVAL========================================
-  //====================================================================================
+  // INTERVAL //////////////////////////////////////////////////////////////////////
+
   @Test
   public void testMeterQueryDefaultInterval() {
     //given metric data
 
     //when query metric interval data with default values
-    List<Metric> metrics = managementService.createMetricsQuery().interval();
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().interval();
 
     //then default interval is 900 s (15 minutes)
     int interval = 15 * 60 * 1000;
     long lastTimestamp = metrics.get(0).getTimestamp().getTime();
     metrics.remove(0);
-    for (Metric metric : metrics) {
+    for (MetricIntervalValue metric : metrics) {
       long nextTimestamp = metric.getTimestamp().getTime();
       if (lastTimestamp != nextTimestamp) {
         assertEquals(lastTimestamp, nextTimestamp + interval);
@@ -202,13 +208,13 @@ public class MetricsIntervalTest {
     //given metric data
 
     //when query metric interval data with custom time interval
-    List<Metric> metrics = managementService.createMetricsQuery().interval(300);
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().interval(300);
 
     //then custom interval is 300 s (5 minutes)
     int interval = 5 * 60 * 1000;
     long lastTimestamp = metrics.get(0).getTimestamp().getTime();
     metrics.remove(0);
-    for (Metric metric : metrics) {
+    for (MetricIntervalValue metric : metrics) {
       long nextTimestamp = metric.getTimestamp().getTime();
       if (lastTimestamp != nextTimestamp) {
         assertEquals(lastTimestamp, nextTimestamp + interval);
@@ -217,15 +223,14 @@ public class MetricsIntervalTest {
     }
   }
 
-  //====================================================================================
-  //==================================WHERE REPORTER====================================
-  //====================================================================================
+  // WHERE REPORTER //////////////////////////////////////////////////////////////////////
+
   @Test
   public void testMeterQueryDefaultIntervalWhereReporter() {
     //given metric data
 
     //when query metric interval data with reporter in where clause
-    List<Metric> metrics = managementService.createMetricsQuery().reporter(REPORTER_ID).interval();
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().reporter(REPORTER_ID).interval();
 
     //then result contains only metrics from given reporter, since it is the default it contains all
     assertEquals(36, metrics.size());
@@ -233,7 +238,7 @@ public class MetricsIntervalTest {
     long lastTimestamp = metrics.get(0).getTimestamp().getTime();
     String reporter = metrics.get(0).getReporter();
     metrics.remove(0);
-    for (Metric metric : metrics) {
+    for (MetricIntervalValue metric : metrics) {
       assertEquals(reporter, metric.getReporter());
       long nextTimestamp = metric.getTimestamp().getTime();
       if (lastTimestamp != nextTimestamp) {
@@ -248,7 +253,7 @@ public class MetricsIntervalTest {
     //given metric data
 
     //when query metric interval data with not existing reporter in where clause
-    List<Metric> metrics = managementService.createMetricsQuery().reporter("notExist").interval();
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().reporter("notExist").interval();
 
     //then result contains no metrics from given reporter
     assertEquals(0, metrics.size());
@@ -259,7 +264,7 @@ public class MetricsIntervalTest {
     //given metric data
 
     //when query metric interval data with custom interval and reporter in where clause
-    List<Metric> metrics = managementService.createMetricsQuery().reporter(REPORTER_ID).interval(300);
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().reporter(REPORTER_ID).interval(300);
 
     //then result contains only metrics from given reporter, since it is the default it contains all
     //36 * (15/5) = 108
@@ -268,7 +273,7 @@ public class MetricsIntervalTest {
     long lastTimestamp = metrics.get(0).getTimestamp().getTime();
     String reporter = metrics.get(0).getReporter();
     metrics.remove(0);
-    for (Metric metric : metrics) {
+    for (MetricIntervalValue metric : metrics) {
       assertEquals(reporter, metric.getReporter());
       long nextTimestamp = metric.getTimestamp().getTime();
       if (lastTimestamp != nextTimestamp) {
@@ -283,21 +288,20 @@ public class MetricsIntervalTest {
     //given metric data
 
     //when query metric interval data with custom interval and non existing reporter in where clause
-    List<Metric> metrics = managementService.createMetricsQuery().reporter("notExist").interval(300);
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().reporter("notExist").interval(300);
 
     //then result contains no metrics from given reporter
     assertEquals(0, metrics.size());
   }
 
-  //====================================================================================
-  //==================================WHERE NAME========================================
-  //====================================================================================
+  // WHERE NAME //////////////////////////////////////////////////////////////////////
+
   @Test
   public void testMeterQueryDefaultIntervalWhereName() {
     //given metric data
 
     //when query metric interval data with name in where clause
-    List<Metric> metrics = managementService.createMetricsQuery().name("activity-instance-start").interval();
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().name("activity-instance-start").interval();
 
     //then result contains only metrics with given name
     assertEquals(4, metrics.size());
@@ -305,7 +309,7 @@ public class MetricsIntervalTest {
     long lastTimestamp = metrics.get(0).getTimestamp().getTime();
     String name = metrics.get(0).getName();
     metrics.remove(0);
-    for (Metric metric : metrics) {
+    for (MetricIntervalValue metric : metrics) {
       assertEquals(name, metric.getName());
       long nextTimestamp = metric.getTimestamp().getTime();
       if (lastTimestamp != nextTimestamp) {
@@ -320,7 +324,7 @@ public class MetricsIntervalTest {
     //given metric data
 
     //when query metric interval data with non existing name in where clause
-    List<Metric> metrics = managementService.createMetricsQuery().name("notExist").interval();
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().name("notExist").interval();
 
     //then result contains no metrics with given name
     assertEquals(0, metrics.size());
@@ -331,7 +335,7 @@ public class MetricsIntervalTest {
     //given metric data
 
     //when query metric interval data with custom interval and name in where clause
-    List<Metric> metrics = managementService.createMetricsQuery().name("activity-instance-start").interval(300);
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().name("activity-instance-start").interval(300);
 
     //then result contains only metrics with given name
     assertEquals(12, metrics.size());
@@ -339,7 +343,7 @@ public class MetricsIntervalTest {
     long lastTimestamp = metrics.get(0).getTimestamp().getTime();
     String name = metrics.get(0).getName();
     metrics.remove(0);
-    for (Metric metric : metrics) {
+    for (MetricIntervalValue metric : metrics) {
       assertEquals(name, metric.getName());
       long nextTimestamp = metric.getTimestamp().getTime();
       if (lastTimestamp != nextTimestamp) {
@@ -354,15 +358,14 @@ public class MetricsIntervalTest {
     //given metric data
 
     //when query metric interval data with custom interval and non existing name in where clause
-    List<Metric> metrics = managementService.createMetricsQuery().name("notExist").interval(300);
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().name("notExist").interval(300);
 
     //then result contains no metrics from given name
     assertEquals(0, metrics.size());
   }
 
-  //====================================================================================
-  //==================================START DATE========================================
-  //====================================================================================
+  // START DATE //////////////////////////////////////////////////////////////////////
+
   @Test
   public void testMeterQueryDefaultIntervalWhereStartDate() {
     //given metric data created for 14.9  min intervals 5 test datas so each 2.98 min
@@ -370,7 +373,7 @@ public class MetricsIntervalTest {
     //when query metric interval data with second last interval as start date in where clause
     //second last interval = start date = Jan 1, 1970 1:30:00 AM
     Date startDate = new Date(2 * 15 * 60 * 1000);
-    List<Metric> metrics = managementService.createMetricsQuery().startDate(startDate).interval();
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().startDate(startDate).interval();
 
     //then result contains 18 entries since 9 different metrics are created
     //intervals Jan 1, 1970 1:45:00 AM and Jan 1, 1970 1:30:00 AM
@@ -384,16 +387,15 @@ public class MetricsIntervalTest {
     //when query metric interval data with custom interval and second last interval as start date in where clause
     //second last interval = start date = Jan 1, 1970 1:30:00 AM
     Date startDate = new Date(2 * 15 * 60 * 1000);
-    List<Metric> metrics = managementService.createMetricsQuery().startDate(startDate).interval(300);
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().startDate(startDate).interval(300);
 
     //then result contains 54 entries since 9 different metrics are created
     //intervals Jan 1, 1970 1:55:00 PM, 1:50, 1:45, 1:40, 1:35
     assertEquals(54, metrics.size());
   }
 
-  //====================================================================================
-  //==================================END DATE========================================
-  //====================================================================================
+  // END DATE //////////////////////////////////////////////////////////////////////
+
   @Test
   public void testMeterQueryDefaultIntervalWhereEndDate() {
     //given metric data created for 14.9 min intervals 5 test datas so each 2.98 min
@@ -401,7 +403,7 @@ public class MetricsIntervalTest {
     //when query metric interval data with second interval as end date in where clause
     //second interval = end date = Jan 1, 1970 1:30:00 PM
     Date endDate = new Date(2 * 15 * 60 * 1000);
-    List<Metric> metrics = managementService.createMetricsQuery().endDate(endDate).interval();
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().endDate(endDate).interval();
 
     //then result contains 18 entries since 9 different metrics are created
     //intervals Jan 1, 1970 1:00:00 PM and Jan 1, 1970 1:15:00 PM
@@ -415,7 +417,7 @@ public class MetricsIntervalTest {
     //when query metric interval data with custom interval and second interval as end date in where clause
     //second interval = end date = Jan 1, 1970 1:30:00 PM
     Date endDate = new Date(2 * 15 * 60 * 1000);
-    List<Metric> metrics = managementService.createMetricsQuery().endDate(endDate).interval(300);
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().endDate(endDate).interval(300);
 
     //then result contains 54 entries since 9 different metrics are created
     //intervals Jan 1, 1970 1:00:00 PM, 1:05, 1:10, 1:15, 1:20, 1:25
@@ -423,9 +425,8 @@ public class MetricsIntervalTest {
     assertEquals(54, metrics.size());
   }
 
-  //====================================================================================
-  //==================================START AND END DATE================================
-  //====================================================================================
+  // START AND END DATE //////////////////////////////////////////////////////////////////////
+
   @Test
   public void testMeterQueryDefaultIntervalWhereStartAndEndDate() {
     //given metric data created for 15 min intervals 10 test datas so each 1.5 min
@@ -435,7 +436,7 @@ public class MetricsIntervalTest {
     //start date = Jan 1, 1970 1:15:00 PM
     Date endDate = new Date(2 * 15 * 60 * 1000);
     Date startDate = new Date(1 * 15 * 60 * 1000);
-    List<Metric> metrics = managementService.createMetricsQuery().startDate(startDate).endDate(endDate).interval();
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().startDate(startDate).endDate(endDate).interval();
 
     //then result contains 9 entries since 9 different metrics are created
     assertEquals(9, metrics.size());
@@ -450,7 +451,7 @@ public class MetricsIntervalTest {
     //start date = Jan 1, 1970 1:15:00 PM
     Date endDate = new Date(2 * 15 * 60 * 1000);
     Date startDate = new Date(1 * 15 * 60 * 1000);
-    List<Metric> metrics = managementService.createMetricsQuery().startDate(startDate).endDate(endDate).interval(300);
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().startDate(startDate).endDate(endDate).interval(300);
 
     //then result contains 27 entries since 9 different metrics are created
     //intervals Jan 1, 1970 1:15:00 PM, 1:20, 1:25
@@ -458,9 +459,8 @@ public class MetricsIntervalTest {
     assertEquals(27, metrics.size());
   }
 
-  //====================================================================================
-  //=======================================VALUE========================================
-  //====================================================================================
+  // VALUE //////////////////////////////////////////////////////////////////////
+
   @Test
   public void testMeterQueryDefaultIntervalCalculatedValue() {
     //given metric data created for 15 min intervals 10 test datas so each 1.5 min
@@ -474,7 +474,7 @@ public class MetricsIntervalTest {
             .startDate(startDate)
             .endDate(endDate)
             .name("activity-instance-start");
-    List<Metric> metrics = metricQuery.interval();
+    List<MetricIntervalValue> metrics = metricQuery.interval();
     long sum = metricQuery.sum();
 
     //then result contains 1 entries
@@ -496,7 +496,7 @@ public class MetricsIntervalTest {
             .startDate(startDate)
             .endDate(endDate)
             .name("activity-instance-start");
-    List<Metric> metrics = metricQuery.interval(300);
+    List<MetricIntervalValue> metrics = metricQuery.interval(300);
     long sum = metricQuery.sum();
 
     //then result contains 3 entries
@@ -522,5 +522,37 @@ public class MetricsIntervalTest {
 
     //summed value should be equal to the summed query value
     assertEquals(sum, summedValue);
+  }
+
+  // NOT LOGGED METRICS //////////////////////////////////////////////////////////////////////
+
+  @Test
+  public void testMeterQueryNotLoggedInterval() {
+    //given metric data
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().name(ACTIVTY_INSTANCE_START).limit(1).interval();
+    long value = metrics.get(0).getValue();
+
+    //when start process and metrics are not logged
+    TEST_RULE.deploy(PROCESS_MODEL);
+    runtimeService.startProcessInstanceByKey(PROCESS_DEF_KEY);
+
+    //then metrics values are either way aggregated to the last interval
+    //on query with name
+     metrics = managementService.createMetricsQuery().name(ACTIVTY_INSTANCE_START).limit(1).interval();
+    long newValue = metrics.get(0).getValue();
+    Assert.assertTrue(value + 3 == newValue);
+
+    //on query without name also
+     metrics = managementService.createMetricsQuery().interval();
+     for (MetricIntervalValue intervalValue : metrics) {
+       if (intervalValue.getName().equalsIgnoreCase(ACTIVTY_INSTANCE_START)) {
+        newValue = intervalValue.getValue();
+        Assert.assertTrue(value + 3 == newValue);
+        break;
+       }
+     }
+
+    //clean up
+    clearLocalMetrics();
   }
 }

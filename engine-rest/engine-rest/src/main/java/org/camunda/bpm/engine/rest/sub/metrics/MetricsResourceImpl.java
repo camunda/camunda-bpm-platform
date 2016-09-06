@@ -12,10 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.sub.metrics;
 
-import org.camunda.bpm.engine.rest.util.DateParam;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Date;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.management.MetricsQuery;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.metrics.MetricsResultDto;
 
 
@@ -27,26 +31,40 @@ public class MetricsResourceImpl implements MetricsResource {
 
   protected String metricsName;
   protected ProcessEngine processEngine;
+  protected ObjectMapper objectMapper;
 
-  public MetricsResourceImpl(String metricsName, ProcessEngine processEngine) {
+  public MetricsResourceImpl(String metricsName, ProcessEngine processEngine, ObjectMapper objectMapper) {
     this.metricsName = metricsName;
     this.processEngine = processEngine;
+    this.objectMapper = objectMapper;
   }
 
   @Override
-  public MetricsResultDto sum(DateParam startDate, DateParam endDate) {
+  public MetricsResultDto sum(UriInfo uriInfo) {
     MetricsQuery query = processEngine.getManagementService()
       .createMetricsQuery()
       .name(metricsName);
 
-    if (startDate != null) {
-      query.startDate(startDate.getDate());
-    }
-
-    if (endDate != null) {
-      query.endDate(endDate.getDate());
-    }
+    applyQueryParams(query, uriInfo);
 
     return new MetricsResultDto(query.sum());
   }
+
+  protected void applyQueryParams(MetricsQuery query, UriInfo uriInfo) {
+    MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+
+    DateConverter dateConverter = new DateConverter();
+    dateConverter.setObjectMapper(objectMapper);
+
+    if(queryParameters.getFirst("startDate") != null) {
+      Date startDate = dateConverter.convertQueryParameterToType(queryParameters.getFirst("startDate"));
+      query.startDate(startDate);
+    }
+
+    if(queryParameters.getFirst("endDate") != null) {
+      Date endDate = dateConverter.convertQueryParameterToType(queryParameters.getFirst("endDate"));
+      query.endDate(endDate);
+    }
+  }
+
 }

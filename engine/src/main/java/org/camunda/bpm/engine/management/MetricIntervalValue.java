@@ -24,7 +24,7 @@ import java.util.Date;
  * @author Christopher Zell <christopher.zell@camunda.com>
  * @since 7.6.0
  */
-public interface Metric {
+public interface MetricIntervalValue {
 
   /**
    * Returns the name of the metric.

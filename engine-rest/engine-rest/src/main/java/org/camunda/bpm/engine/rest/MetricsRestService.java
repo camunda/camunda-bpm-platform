@@ -17,12 +17,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.dto.metrics.MetricsIntervalResultDto;
 
 import org.camunda.bpm.engine.rest.sub.metrics.MetricsResource;
-import org.camunda.bpm.engine.rest.util.DateParam;
 
 /**
  * @author Daniel Meyer
@@ -39,11 +39,5 @@ public interface MetricsRestService {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  List<MetricsIntervalResultDto> interval(@QueryParam(value = "name") String name,
-                        @QueryParam(value = "reporter") String reporter,
-                        @QueryParam(value = "startDate") DateParam startDate,
-                        @QueryParam(value = "endDate") DateParam endDate,
-                        @QueryParam(value = "firstResult") Integer firstResult,
-                        @QueryParam(value = "maxResults") Integer maxResults,
-                        @QueryParam(value = "interval") Long interval);
+  List<MetricsIntervalResultDto> interval(@Context UriInfo uriInfo);
 }

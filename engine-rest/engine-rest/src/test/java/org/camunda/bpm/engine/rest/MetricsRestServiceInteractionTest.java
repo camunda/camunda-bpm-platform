@@ -144,7 +144,6 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
     verifyNoMoreInteractions(meterQueryMock);
   }
 
-
   @Test
   public void testGetIntervalWithLimit() {
     given()

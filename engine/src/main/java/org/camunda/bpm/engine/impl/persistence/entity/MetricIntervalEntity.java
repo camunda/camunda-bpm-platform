@@ -18,13 +18,13 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.util.Date;
 import org.camunda.bpm.engine.impl.db.DbEntity;
-import org.camunda.bpm.engine.management.Metric;
+import org.camunda.bpm.engine.management.MetricIntervalValue;
 
 /**
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class MetricIntervalEntity implements Metric, DbEntity, Serializable {
+public class MetricIntervalEntity implements MetricIntervalValue, DbEntity, Serializable {
 
 
   protected Date timestamp;
@@ -86,7 +86,7 @@ public class MetricIntervalEntity implements Metric, DbEntity, Serializable {
 
   @Override
   public void setId(String id) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override

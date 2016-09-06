@@ -16,7 +16,7 @@
 package org.camunda.bpm.engine.rest.dto.metrics;
 
 import java.util.Date;
-import org.camunda.bpm.engine.management.Metric;
+import org.camunda.bpm.engine.management.MetricIntervalValue;
 
 /**
  *
@@ -32,7 +32,7 @@ public class MetricsIntervalResultDto {
 
   protected long value;
 
-  public MetricsIntervalResultDto(Metric metric) {
+  public MetricsIntervalResultDto(MetricIntervalValue metric) {
     this.timestamp = metric.getTimestamp();
     this.name = metric.getName();
     this.reporter = metric.getReporter();

@@ -16,13 +16,12 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
-import org.camunda.bpm.engine.management.Metric;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class MeterLogEntity implements Metric, DbEntity, Serializable {
+public class MeterLogEntity implements DbEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
 

@@ -12,17 +12,19 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.management.Metric;
+import org.camunda.bpm.engine.management.MetricIntervalValue;
 
 /**
  * @author Daniel Meyer
@@ -57,19 +59,46 @@ public class MeterLogManager extends AbstractManager {
     return result;
   }
 
-  public List<Metric> executeSelectInterval(MetricsQueryImpl query) {
-    return getDbEntityManager().selectList(SELECT_METER_INTERVAL, query);
+  public List<MetricIntervalValue> executeSelectInterval(MetricsQueryImpl query) {
+    List<MetricIntervalValue> intervalResult = getDbEntityManager().selectList(SELECT_METER_INTERVAL, query);
+    intervalResult = intervalResult != null ? intervalResult : new ArrayList<MetricIntervalValue>();
+
+    String reporterId = Context.getProcessEngineConfiguration().getDbMetricsReporter().getMetricsCollectionTask().getReporter();
+    if (!intervalResult.isEmpty() && isEndTimeAfterLastReportInterval(query) && reporterId != null) {
+      Map<String, Meter> metrics = Context.getProcessEngineConfiguration().getMetricsRegistry().getMeters();
+      String queryName = query.getName();
+      //we have to add all unlogged metrics to last interval
+      if (queryName != null) {
+        MetricIntervalEntity intervalEntity = (MetricIntervalEntity) intervalResult.get(0);
+        intervalEntity.setValue(intervalEntity.getValue() + metrics.get(queryName).get());
+      } else {
+        Set<String> metricNames = metrics.keySet();
+        Date lastIntervalTimestamp = intervalResult.get(0).getTimestamp();
+        for (String metricName : metricNames) {
+          MetricIntervalEntity entity = new MetricIntervalEntity(lastIntervalTimestamp, metricName, reporterId);
+          int idx = intervalResult.indexOf(entity);
+          if (idx >= 0) {
+            MetricIntervalEntity intervalValue = (MetricIntervalEntity) intervalResult.get(idx);
+            intervalValue.setValue(intervalValue.getValue() + metrics.get(metricName).get());
+          }
+        }
+      }
+    }
+    return intervalResult;
   }
 
-  protected boolean shouldAddCurrentUnloggedCount(MetricsQueryImpl query) {
-
+  protected boolean isEndTimeAfterLastReportInterval(MetricsQueryImpl query) {
     long reportingIntervalInSeconds = Context.getProcessEngineConfiguration()
       .getDbMetricsReporter()
       .getReportingIntervalInSeconds();
 
-    return query.getName() != null
-        && (query.getEndDate() == null
+    return (query.getEndDate() == null
         || query.getEndDate().getTime() >= ClockUtil.getCurrentTime().getTime() - (1000 * reportingIntervalInSeconds));
+  }
+
+  protected boolean shouldAddCurrentUnloggedCount(MetricsQueryImpl query) {
+    return query.getName() != null
+        && isEndTimeAfterLastReportInterval(query);
 
   }
 

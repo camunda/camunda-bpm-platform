@@ -80,7 +80,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.JobDefinition;
-import org.camunda.bpm.engine.management.Metric;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.query.PeriodUnit;
@@ -117,6 +116,7 @@ import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.camunda.bpm.engine.management.MetricIntervalValue;
 
 /**
  * Provides mocks for the basic engine entities, such as
@@ -2536,8 +2536,8 @@ public abstract class MockProvider {
 
   }
 
-  public static List<Metric> createMockMetricIntervalResult() {
-    List<Metric> metrics = new ArrayList<Metric>();
+  public static List<MetricIntervalValue> createMockMetricIntervalResult() {
+    List<MetricIntervalValue> metrics = new ArrayList<MetricIntervalValue>();
 
     MetricIntervalEntity entity1 = new MetricIntervalEntity(new Date(15 * 60 * 1000 * 1), EXAMPLE_METRICS_NAME, EXAMPLE_METRICS_REPORTER);
     entity1.setValue(21);

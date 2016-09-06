@@ -69,7 +69,7 @@ public interface MetricsQuery {
    *
    * @return the aggregated metrics
    */
-  List<Metric> interval();
+  List<MetricIntervalValue> interval();
 
 
 
@@ -84,7 +84,7 @@ public interface MetricsQuery {
    *                  The time unit is seconds.
    * @return the aggregated metrics
    */
-  List<Metric> interval(long interval);
+  List<MetricIntervalValue> interval(long interval);
 
   /**
    * @return the aggregated sum
