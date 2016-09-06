@@ -14,17 +14,20 @@ package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
+import org.camunda.bpm.engine.rest.dto.runtime.batch.DeleteProcessInstancesDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.ProcessInstanceResourceImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
@@ -108,6 +111,21 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     }
 
     dto.updateSuspensionState(getProcessEngine());
+  }
+
+  public Response deleteAsync(DeleteProcessInstancesDto dto) {
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    if (dto.getProcessInstanceIds() != null && !dto.getProcessInstanceIds().isEmpty()) {
+      runtimeService.deleteProcessInstancesAsync(dto.getProcessInstanceIds(),dto.getDeletionReason());
+      return Response.ok().build();
+    } else if (dto.getProcessInstanceQuery() != null) {
+      ProcessInstanceQuery processInstanceQuery = dto.getProcessInstanceQuery().toQuery(getProcessEngine());
+      runtimeService.deleteProcessInstancesAsync(processInstanceQuery,dto.getDeletionReason());
+      return Response.ok().build();
+    } else {
+      String message = "Either processInstanceIds or processInstanceQuery has to be provided.";
+      throw new InvalidRequestException(Status.BAD_REQUEST, message);
+    }
   }
 
 }

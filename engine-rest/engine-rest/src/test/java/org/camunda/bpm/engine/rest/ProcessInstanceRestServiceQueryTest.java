@@ -54,7 +54,7 @@ public class ProcessInstanceRestServiceQueryTest extends
 
   protected static final String PROCESS_INSTANCE_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance";
   protected static final String PROCESS_INSTANCE_COUNT_QUERY_URL = PROCESS_INSTANCE_QUERY_URL + "/count";
-  private ProcessInstanceQuery mockedQuery;
+  protected ProcessInstanceQuery mockedQuery;
 
   @Before
   public void setUpRuntimeData() {

@@ -10,19 +10,8 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyCollectionOf;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,6 +28,7 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
@@ -79,20 +69,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
+import org.mockito.Mockito;
 
 public class ProcessInstanceRestServiceInteractionTest extends
     AbstractRestServiceTest {
 
+  public static final String TEST_DELETE_REASON = "test";
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
   protected static final String PROCESS_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance";
   protected static final String SINGLE_PROCESS_INSTANCE_URL = PROCESS_INSTANCE_URL + "/{id}";
   protected static final String PROCESS_INSTANCE_VARIABLES_URL = SINGLE_PROCESS_INSTANCE_URL + "/variables";
+  protected static final String DELETE_PROCESS_INSTANCES_ASYNC_URL = PROCESS_INSTANCE_URL + "/delete";
   protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_URL = PROCESS_INSTANCE_VARIABLES_URL + "/{varId}";
   protected static final String SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL = SINGLE_PROCESS_INSTANCE_VARIABLE_URL + "/data";
   protected static final String PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL = SINGLE_PROCESS_INSTANCE_URL + "/activity-instances";
-  private static final String EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE = "aProcessInstanceWithNullValueAsVariable";
+  protected static final String EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE = "aProcessInstanceWithNullValueAsVariable";
   protected static final String SINGLE_PROCESS_INSTANCE_SUSPENDED_URL = SINGLE_PROCESS_INSTANCE_URL + "/suspended";
   protected static final String PROCESS_INSTANCE_SUSPENDED_URL = PROCESS_INSTANCE_URL + "/suspended";
   protected static final String PROCESS_INSTANCE_MODIFICATION_URL = SINGLE_PROCESS_INSTANCE_URL + "/modification";
@@ -226,6 +219,56 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
 
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
+  }
+
+  @Test
+  public void testDeleteAsync() {
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+
+    Map<String, Object> messageBodyJson = new HashMap<String,Object>();
+    messageBodyJson.put("processInstanceIds", ids);
+    messageBodyJson.put("deletionReason", TEST_DELETE_REASON);
+//    ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
+    //messageBodyJson.put("processInstanceQuery", query);
+    given()
+        .contentType(ContentType.JSON).body(messageBodyJson)
+    .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
+
+    verify(runtimeServiceMock,times(1)).deleteProcessInstancesAsync(ids,TEST_DELETE_REASON);
+  }
+
+  @Test
+  public void testDeleteAsyncWithQuery() {
+
+    Map<String, Object> messageBodyJson = new HashMap<String,Object>();
+    messageBodyJson.put("deletionReason", TEST_DELETE_REASON);
+    ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
+    messageBodyJson.put("processInstanceQuery", query);
+
+    given()
+        .contentType(ContentType.JSON).body(messageBodyJson)
+    .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
+
+    verify(runtimeServiceMock,times(1)).deleteProcessInstancesAsync(
+        Mockito.any(ProcessInstanceQuery.class),Mockito.eq(TEST_DELETE_REASON));
+  }
+
+
+  @Test
+  public void testDeleteAsyncWithBadRequestQuery() {
+
+    Map<String, Object> messageBodyJson = new HashMap<String,Object>();
+    messageBodyJson.put("deletionReason", TEST_DELETE_REASON);
+
+    given()
+        .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
   }
 
   @Test
