@@ -14,30 +14,6 @@
     },
     {
       "id": {
-        "key": "decisionDefinitionKey",
-        "value": "Definition Key"
-      },
-      "operators": [
-        {
-          "key": "eq",
-          "value": "="
-        }
-      ]
-    },
-    {
-      "id": {
-        "key": "decisionDefinitionName",
-        "value": "Definition Name"
-      },
-      "operators": [
-        {
-          "key": "eq",
-          "value": "="
-        }
-      ]
-    },
-    {
-      "id": {
         "key": "processDefinitionId",
         "value": "Process Definition ID"
       },
@@ -134,18 +110,6 @@
     },
     {
       "id": {
-        "key": "tenantIdIn",
-        "value": "Tenant ID"
-      },
-      "operators": [
-        {
-          "key": "eq",
-          "value": "="
-        }
-      ]
-    },
-    {
-      "id": {
         "key": "evaluatedDate",
         "value": "Evaluated Date"
       },
@@ -173,34 +137,6 @@
           "value": "="
         }
       ]
-    },
-    {
-      "id": {
-        "key": "includeInputs",
-        "value": "Include Inputs"
-      },
-      "basic": true
-    },
-    {
-      "id": {
-        "key": "includeOutputs",
-        "value": "Include Outputs"
-      },
-      "basic": true
-    },
-    {
-      "id": {
-        "key": "disableBinaryFetching",
-        "value": "Disable Binary Fetching"
-      },
-      "basic": true
-    },
-    {
-      "id": {
-        "key": "disableCustomObjectDeserialization",
-        "value": "Disable Custom Object Deserialization"
-      },
-      "basic": true
     }
   ],
   "operators": {
