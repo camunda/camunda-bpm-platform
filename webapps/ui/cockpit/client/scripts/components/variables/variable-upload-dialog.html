@@ -11,7 +11,8 @@ This feature is unsupported in your Browser.
 
 <![if gt IE 9]>
 
-<div class="variable-instance-upload modal-body">
+<div class="modal-body variable-upload">
+
   <div notifications-panel></div>
 
   <div ng-show="status === 'beforeUpload'">
@@ -33,28 +34,17 @@ This feature is unsupported in your Browser.
     Upload progress: {{progress}}%
   </div>
 
-  <div ng-show="status === 'uploadSuccess'">
-    <p>
-      Variable <code>{{variableInstance.name}}</code> of execution <code>{{variableInstance.executionId}}</code>
-      was successfully replaced with the content of the uploaded file.
-    </p>
-  </div>
-
-  <div ng-show="status === 'uploadFailed'">
-      Could not update variable <code>{{variableInstance.name}}</code> of execution <code>{{variableInstance.executionId}}</code>.
-  </div>
-
 </div>
 
 <div class="modal-footer">
   <button class="btn btn-default"
-          ng-click="close(status)"
+          ng-click="$dismiss()"
           ng-hide="status === 'uploadSuccess' || status === 'uploadFailed'">
     Close
   </button>
 
   <button class="btn btn-primary"
-          ng-click="close(status)"
+          ng-click="$close()"
           ng-show="status === 'uploadSuccess' || status === 'uploadFailed'">
     OK
   </button>

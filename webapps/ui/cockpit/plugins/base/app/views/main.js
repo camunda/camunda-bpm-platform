@@ -25,8 +25,6 @@ var angular = require('angular'),
 
     // process instance
     variableInstancesTab = require('./processInstance/variableInstancesTab'),
-    variableInstanceUploadDialog = require('./processInstance/variableInstanceUploadDialog'),
-    variableInstanceInspectDialog = require('./processInstance/variableInstanceInspectDialog'),
     incidentsTab = require('./processInstance/incidentsTab'),
     calledProcessInstanceTable = require('./processInstance/calledProcessInstanceTable'),
     userTasksTable = require('./processInstance/userTasksTable'),
@@ -61,8 +59,6 @@ ngModule.controller('UpdateProcessDefinitionSuspensionStateController', updateSu
 ngModule.config(activityInstanceStatisticsOverlay);
 
 variableInstancesTab(ngModule);
-ngModule.controller('VariableInstanceUploadController', variableInstanceUploadDialog);
-ngModule.controller('VariableInstanceInspectController', variableInstanceInspectDialog);
 ngModule.config(incidentsTab);
 calledProcessInstanceTable(ngModule);
 userTasksTable(ngModule);
