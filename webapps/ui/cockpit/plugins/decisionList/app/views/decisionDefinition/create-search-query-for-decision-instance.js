@@ -75,7 +75,7 @@ function parseValue(value) {
 }
 
 function isArraySearchType(type) {
-  return includes(['activityIdIn', 'activityIdIn', 'tenantIdIn'], type);
+  return includes(['activityIdIn', 'activityInstanceIdIn'], type);
 }
 
 function includes(array, value) {

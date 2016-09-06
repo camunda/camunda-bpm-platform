@@ -47,7 +47,11 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           pages.current = search().page || 1;
         });
 
-        $scope.$watch('decisionSearchConfig.searches', updateView, true);
+        $scope.$watch('decisionSearchConfig.searches', function (newValue, oldValue) {
+          if (newValue !== oldValue) {
+            updateView();
+          }
+        }, true);
 
         var historyService = camAPI.resource('history');
 
@@ -63,8 +67,6 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           search('page', !newValue || newValue == 1 ? null : newValue);
           updateView();
         });
-
-        updateView();
 
         function updateView() {
           var page = pages.current,

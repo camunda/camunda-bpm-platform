@@ -84,7 +84,7 @@ describe('Cockpit Decision Definition Spec', function() {
     });
   });
 
-  describe.only('search widget', function() {
+  describe('search widget', function() {
 
     before(function() {
       return testHelper(setupFile.setup5, function() {
@@ -112,7 +112,7 @@ describe('Cockpit Decision Definition Spec', function() {
       expect(searchPillsCount).to.eventually.eql(1);
     });
 
-    it('should empty table when non existing value is choosen', function() {
+    it('should empty table when non existing value is chosen', function() {
       //when
       definitionPage.search.createSearch('ID', 'ff');
 
@@ -124,25 +124,6 @@ describe('Cockpit Decision Definition Spec', function() {
         .count();
 
       expect(tableRowsCount).to.eventually.eql(0);
-    });
-
-    it('should add basic search pills', function() {
-      var basics = ['Include Inputs', 'Include Outputs', 'Disable Binary Fetching',
-        'Disable Custom Object Deserialization'];
-
-      //when
-      basics.forEach(function(search) {
-        definitionPage.search.createSearch(search);
-      });
-
-      //then
-      var operatorsCount = definitionPage
-        .search
-        .formElement()
-        .all(by.css('[tooltip="Operator"]'))
-        .count();
-
-      expect(operatorsCount).to.eventually.eql(0);
     });
 
     it('should have after and before operators for Evaluated Date filter', function() {
