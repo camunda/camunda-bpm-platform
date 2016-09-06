@@ -3,7 +3,6 @@ var _links = [
   {
     label: 'Documentation',
     href: 'https://docs.camunda.org/manual/latest/webapps/',
-    // image: './../assets/image/camunda.plain.svg',
     description: 'Camunda webapps user documentation',
     priority: 99
   }
