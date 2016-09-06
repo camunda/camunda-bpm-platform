@@ -1,0 +1,329 @@
+{
+  "types": [
+    {
+      "id": {
+        "key": "decisionInstanceId",
+        "value": "ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "decisionDefinitionKey",
+        "value": "Definition Key"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "decisionDefinitionName",
+        "value": "Definition Name"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "processDefinitionId",
+        "value": "Process Definition ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "processDefinitionKey",
+        "value": "Process Definition Key"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "processInstanceId",
+        "value": "Process Instance ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "caseDefinitionId",
+        "value": "Case Definition ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "caseDefinitionKey",
+        "value": "Case Definition Key"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "caseInstanceId",
+        "value": "Case Instance ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "activityIdIn",
+        "value": "Activity ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "activityInstanceIdIn",
+        "value": "Activity Instance ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "tenantIdIn",
+        "value": "Tenant ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "evaluatedDate",
+        "value": "Evaluated Date"
+      },
+      "operators": [
+        {
+          "key": "Before",
+          "value": "before"
+        },
+        {
+          "key": "After",
+          "value": "after"
+        }
+      ],
+      "allowDates": true,
+      "enforceDates": true
+    },
+    {
+      "id": {
+        "key": "userId",
+        "value": "User ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "includeInputs",
+        "value": "Include Inputs"
+      },
+      "basic": true
+    },
+    {
+      "id": {
+        "key": "includeOutputs",
+        "value": "Include Outputs"
+      },
+      "basic": true
+    },
+    {
+      "id": {
+        "key": "disableBinaryFetching",
+        "value": "Disable Binary Fetching"
+      },
+      "basic": true
+    },
+    {
+      "id": {
+        "key": "disableCustomObjectDeserialization",
+        "value": "Disable Custom Object Deserialization"
+      },
+      "basic": true
+    }
+  ],
+  "operators": {
+    "undefined":  [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      },
+      {
+        "key": "like",
+        "value": "like"
+      }
+    ],
+    "string":     [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      },
+      {
+        "key": "like",
+        "value": "like"
+      }
+    ],
+    "number":     [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      }
+    ],
+    "boolean":    [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      }
+    ],
+    "object":     [{
+      "key": "eq",
+      "value": "="
+    },
+      {
+        "key": "neq",
+        "value": "!="
+      }],
+    "date":     [{
+      "key": "lteq",
+      "value": "before"
+    },
+      {
+        "key": "gteq",
+        "value": "after"
+      }]
+  },
+  "tooltips": {
+    "inputPlaceholder": "Add criteria",
+    "invalid": "This search query is not valid",
+    "deleteSearch": "Remove search",
+    "type": "Type",
+    "name": "Property",
+    "operator": "Operator",
+    "value": "Value"
+  }
+}

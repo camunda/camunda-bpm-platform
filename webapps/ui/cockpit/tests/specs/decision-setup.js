@@ -86,10 +86,10 @@ operation('decision-definition', 'evaluate', [{
 );
 
 var multiTenancyDeployment = combine(
-		
+
     operation('deployment', 'create', [{
       deploymentName:  'processTenantOne',
-      tenantId: 'tenant1', 
+      tenantId: 'tenant1',
       files: [{
         name: 'invoice.bpmn',
         filename: 'invoice-deployment-binding.bpmn',
@@ -100,7 +100,7 @@ var multiTenancyDeployment = combine(
         content: readResource('assign-approver-groups.dmn')
       }]
     }]),
-      
+
     operation('deployment', 'create', [{
       deploymentName:  'processNoTenant',
       files: [{
@@ -113,7 +113,7 @@ var multiTenancyDeployment = combine(
         content: readResource('assign-approver-groups.dmn')
       }]
     }]),
-    
+
     operation('process-definition', 'start', [{
       key: 'invoice',
       tenantId: 'tenant1',
@@ -132,7 +132,7 @@ var multiTenancyDeployment = combine(
         }
       }
     }]),
-    
+
     operation('process-definition', 'start', [{
       key: 'invoice',
       variables: {
@@ -152,12 +152,49 @@ var multiTenancyDeployment = combine(
     }])
 );
 
+var deployMultipleInstances = combine(
+
+  operation('deployment', 'create', [{
+    deploymentName: 'assign-approver',
+    files: [
+      {
+        name: 'assign-approver-groups.dmn',
+        content: readResource('assign-approver-groups.dmn')
+      },
+      {
+        name: 'invoice.bpmn',
+        content: readResource('invoice.bpmn')
+      }
+    ]
+  }
+  ]),
+
+  operation('process-definition', 'start', [{
+    key: 'invoice',
+    businessKey: 'invoice1',
+    variables: {
+      amount: { value: 100 },
+      invoiceCategory: { value: 'travelExpenses' }
+    }
+  }]),
+  operation('process-definition', 'start', [{
+    key: 'invoice',
+    businessKey: 'invoice2',
+    variables: {
+      amount: { value: 200 },
+      invoiceCategory: { value: 'travelExpenses2' }
+    }
+  }])
+
+);
+
 module.exports = {
 
   setup1: deployFirst,
   setup2: combine(deployFirst, deploySecond),
   setup3: deployThird,
   setup4: deploy4,
+  setup5: deployMultipleInstances,
   multiTenancySetup: multiTenancyDeployment
-  
+
 };

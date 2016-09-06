@@ -42,12 +42,10 @@ describe('Cockpit Decision Definition Spec', function() {
   describe('instance list', function() {
     before(function() {
       return testHelper(setupFile.setup1, function() {
-
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.goToSection('Decisions');
         decisionsPage.deployedDecisionsList.selectDecision(0);
-
       });
     });
 
@@ -73,7 +71,6 @@ describe('Cockpit Decision Definition Spec', function() {
 
     before(function() {
       return testHelper(setupFile.setup1, function() {
-
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.goToSection('Decisions');
@@ -82,17 +79,104 @@ describe('Cockpit Decision Definition Spec', function() {
     });
 
     it('should display decision table', function() {
-
       // then
       expect(definitionPage.table.tableElement().isDisplayed()).to.eventually.be.true;
     });
+  });
 
+  describe.only('search widget', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup5, function() {
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.goToSection('Decisions');
+        decisionsPage.deployedDecisionsList.selectDecision(0);
+      });
+    });
+
+    afterEach(function() {
+      definitionPage.search.clearSearch();
+    });
+
+    it('should add new filter', function() {
+      //when
+      definitionPage.search.createSearch('ID', '1.5');
+
+      //then
+      var searchPillsCount = definitionPage
+        .search
+        .searchPills()
+        .count();
+
+      expect(searchPillsCount).to.eventually.eql(1);
+    });
+
+    it('should empty table when non existing value is choosen', function() {
+      //when
+      definitionPage.search.createSearch('ID', 'ff');
+
+      //then
+      var tableRowsCount = definitionPage
+        .decisionInstancesTab
+        .table()
+        .all(by.css('tbody > tr'))
+        .count();
+
+      expect(tableRowsCount).to.eventually.eql(0);
+    });
+
+    it('should add basic search pills', function() {
+      var basics = ['Include Inputs', 'Include Outputs', 'Disable Binary Fetching',
+        'Disable Custom Object Deserialization'];
+
+      //when
+      basics.forEach(function(search) {
+        definitionPage.search.createSearch(search);
+      });
+
+      //then
+      var operatorsCount = definitionPage
+        .search
+        .formElement()
+        .all(by.css('[tooltip="Operator"]'))
+        .count();
+
+      expect(operatorsCount).to.eventually.eql(0);
+    });
+
+    it('should have after and before operators for Evaluated Date filter', function() {
+      //given
+      definitionPage
+        .search
+        .createSearch('Evaluated Date');
+
+      //when
+      definitionPage
+        .search
+        .searchPills()
+        .last()
+        .element(by.css('[value="operator.value"]'))
+        .click();
+
+      //then
+      expect(isOperatorDisplayed('after')).to.eventually.be.true;
+      expect(isOperatorDisplayed('before')).to.eventually.be.true;
+
+      function isOperatorDisplayed(operator) {
+        return definitionPage
+          .search
+          .searchPills()
+          .last()
+          .element(by.cssContainingText('[value="operator.value"] .dropdown-menu li', operator))
+          .isDisplayed();
+      }
+    });
   });
 
   describe('version interaction', function() {
     before(function() {
       return testHelper(setupFile.setup2, function() {
-
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.goToSection('Decisions');

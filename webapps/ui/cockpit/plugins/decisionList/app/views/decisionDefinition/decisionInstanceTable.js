@@ -1,9 +1,11 @@
 'use strict';
 
 var fs = require('fs');
-
 var angular = require('angular');
+var createSearchQueryForDecisionInstance = require('./create-search-query-for-decision-instance');
+
 var template = fs.readFileSync(__dirname + '/decision-instance-table.html', 'utf8');
+var decisionSearchConfig = JSON.parse(fs.readFileSync(__dirname + '/decision-instance-search-config.json', 'utf8'));
 
 module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
@@ -28,6 +30,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
             return '#/process-definition/' + decisionInstance.processDefinitionId;
           }
         };
+
         $scope.getProcessInstanceLink = function(decisionInstance) {
           if(hasHistoryPlugin) {
             return '#/process-instance/' + decisionInstance.processInstanceId + '/history' +
@@ -38,10 +41,13 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           }
         };
 
+        $scope.decisionSearchConfig = angular.copy(decisionSearchConfig);
 
         $scope.$on('$routeChanged', function() {
           pages.current = search().page || 1;
         });
+
+        $scope.$watch('decisionSearchConfig.searches', updateView, true);
 
         var historyService = camAPI.resource('history');
 
@@ -63,18 +69,24 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         function updateView() {
           var page = pages.current,
               count = pages.size,
-              firstResult = (page - 1) * count;
+              firstResult = (page - 1) * count,
+              searchQuery = createSearchQueryForDecisionInstance($scope.decisionSearchConfig.searches);
 
           $scope.decisionInstances = null;
-
           $scope.loadingState = 'LOADING';
-          historyService.decisionInstance({
-            decisionDefinitionId: $scope.decisionDefinition.id,
-            firstResult: firstResult,
-            maxResults: count,
-            sortBy: 'evaluationTime',
-            sortOrder: 'desc'
-          }, function(err, data) {
+
+          var decisionInstanceQuery = angular.extend(
+            {
+              decisionDefinitionId: $scope.decisionDefinition.id,
+              firstResult: firstResult,
+              maxResults: count,
+              sortBy: 'evaluationTime',
+              sortOrder: 'desc'
+            },
+            searchQuery
+          );
+
+          historyService.decisionInstance(decisionInstanceQuery, function(err, data) {
             $scope.decisionInstances = data;
             $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 
@@ -82,12 +94,16 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
             if(phase !== '$apply' && phase !== '$digest') {
               $scope.$apply();
             }
-
           });
 
-          historyService.decisionInstanceCount({
-            decisionDefinitionId: $scope.decisionDefinition.id
-          }, function(err, data) {
+          var countQuery = angular.extend(
+            {
+              decisionDefinitionId: $scope.decisionDefinition.id
+            },
+            searchQuery
+          );
+
+          historyService.decisionInstanceCount(countQuery, function(err, data) {
             pages.total = data.count;
 
             var phase = $rootScope.$$phase;
@@ -97,8 +113,6 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
           });
         }
-
-
       }],
     priority: 10
   });

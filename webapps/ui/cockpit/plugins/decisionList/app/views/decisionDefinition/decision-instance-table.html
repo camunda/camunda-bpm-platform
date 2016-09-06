@@ -1,4 +1,12 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/decisionList/app/views/decisionDefinition/decision-instance-table.html -->
+<div cam-widget-search
+     cam-widget-search-valid-searches="decisionSearchConfig.searches"
+     cam-widget-search-translations="decisionSearchConfig.tooltips"
+     cam-widget-search-types="decisionSearchConfig.types"
+     cam-widget-search-operators="decisionSearchConfig.operators"
+     cam-widget-search-mode="filter">
+</div>
+
 <div cam-widget-loader
      loading-state="{{ loadingState }}"
      text-empty="No decision instances matched by current filter.">
