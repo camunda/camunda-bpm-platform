@@ -69,17 +69,17 @@ module.exports = function(ngModule) {
           controller: uploadTemplate.controller,
           template: uploadTemplate.template
         })
-          .result.then(function() {
-            // updated the variable, need to get the new data
-            // reject the promise anyway
-            promise.reject();
+        .result.then(function() {
+          // updated the variable, need to get the new data
+          // reject the promise anyway
+          promise.reject();
 
-            // but then update the filter to force re-get of variables
-            variableInstanceData.set('filter', angular.copy($scope.filter));
-          }, function() {
-            // did not update the variable, reject the promise
-            promise.reject();
-          });
+          // but then update the filter to force re-get of variables
+          variableInstanceData.set('filter', angular.copy($scope.filter));
+        }, function() {
+          // did not update the variable, reject the promise
+          promise.reject();
+        });
 
         return promise.promise;
       };
