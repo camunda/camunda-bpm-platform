@@ -52,11 +52,16 @@ describe('Cockpit Variable Spec', function() {
       // then
       expect(instancePage.variablesTab.table().count()).to.eventually.eql(4);
 
-      instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'myTestVar')
+
+      instancePage.variablesTab.findElementIndexInRepeater('(v, info) in variables', by.binding('variable.name'), 'myTestVar')
         .then(function(idx) {
-          expect(instancePage.variablesTab.variableName(idx).getText()).to.eventually.eql('myTestVar');
-          expect(instancePage.variablesTab.variableType(idx).getText()).to.eventually.eql('String');
-          expect(instancePage.variablesTab.variableValue(idx).getText()).to.eventually.eql('12345');
+
+          var variable = instancePage.variablesTab.variableAt(idx);
+
+          expect(variable.name().getText()).to.eventually.eql('myTestVar');
+          expect(variable.type().getText()).to.eventually.eql('String');
+          expect(variable.value().getText()).to.eventually.eql('12345');
+
           expect(instancePage.variablesTab.variableScope(idx).getText()).to.eventually.eql('User Tasks');
         });
     });
@@ -73,11 +78,15 @@ describe('Cockpit Variable Spec', function() {
         // then
         expect(instancePage.variablesTab.table().count()).to.eventually.eql(varCountBefore+1);
 
-        instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'myBooleanVar')
+        instancePage.variablesTab.findElementIndexInRepeater('(v, info) in variables', by.binding('variable.name'), 'myBooleanVar')
           .then(function(idx) {
-            expect(instancePage.variablesTab.variableName(idx).getText()).to.eventually.eql('myBooleanVar');
-            expect(instancePage.variablesTab.variableType(idx).getText()).to.eventually.eql('Boolean');
-            expect(instancePage.variablesTab.variableValue(idx).getText()).to.eventually.eql('true');
+
+            var variable = instancePage.variablesTab.variableAt(idx);
+
+            expect(variable.name().getText()).to.eventually.eql('myBooleanVar');
+            expect(variable.type().getText()).to.eventually.eql('Boolean');
+            expect(variable.value().getText()).to.eventually.eql('true');
+
             expect(instancePage.variablesTab.variableScope(idx).getText()).to.eventually.eql('User Tasks');
           });
       });
@@ -94,11 +103,15 @@ describe('Cockpit Variable Spec', function() {
 
         // then
         expect(instancePage.variablesTab.table().count()).to.eventually.eql(varCountBefore+1);
-        instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'myNullVar')
+        instancePage.variablesTab.findElementIndexInRepeater('(v, info) in variables', by.binding('variable.name'), 'myNullVar')
         .then(function(idx) {
-          expect(instancePage.variablesTab.variableName(idx).getText()).to.eventually.eql('myNullVar');
-          expect(instancePage.variablesTab.variableType(idx).getText()).to.eventually.eql('Null');
-          expect(instancePage.variablesTab.variableValue(idx).getText()).to.eventually.eql('');
+
+          var variable = instancePage.variablesTab.variableAt(idx);
+
+          expect(variable.name().getText()).to.eventually.eql('myNullVar');
+          expect(variable.type().getText()).to.eventually.eql('Null');
+          expect(variable.value().getText()).to.eventually.eql('');
+
           expect(instancePage.variablesTab.variableScope(idx).getText()).to.eventually.eql('User Tasks');
         });
       });
@@ -112,18 +125,22 @@ describe('Cockpit Variable Spec', function() {
 
         // when
         instancePage.addVariable.addVariable('myObjectVar', 'Object', {
-          value: '',
-          objectTypeName: 'java.lang.Object',
+          value: 'rO0ABXNyABNqYXZhLnV0aWwuQXJyYXlMaXN0eIHSHZnHYZ0DAAFJAARzaXpleHAAAAADdwQAAAADdAADb25ldAADdHdvdAAFdGhyZWV4',
+          objectTypeName: 'java.util.ArrayList',
           serializationDataFormat: 'application/x-java-serialized-object'
         });
 
         // then
         expect(instancePage.variablesTab.table().count()).to.eventually.eql(varCountBefore+1);
-        instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'myObjectVar')
+        instancePage.variablesTab.findElementIndexInRepeater('(v, info) in variables', by.binding('variable.name'), 'myObjectVar')
         .then(function(idx) {
-          expect(instancePage.variablesTab.variableName(idx).getText()).to.eventually.eql('myObjectVar');
-          expect(instancePage.variablesTab.variableType(idx).getText()).to.eventually.eql('Object');
-          expect(instancePage.variablesTab.variableValue(idx).getText()).to.eventually.eql('java.lang.Object');
+
+          var variable = instancePage.variablesTab.variableAt(idx);
+
+          expect(variable.name().getText()).to.eventually.eql('myObjectVar');
+          expect(variable.type().getText()).to.eventually.eql('Object');
+          expect(variable.value().getText()).to.eventually.eql('java.util.ArrayList');
+
           expect(instancePage.variablesTab.variableScope(idx).getText()).to.eventually.eql('User Tasks');
         });
       });
@@ -133,49 +150,39 @@ describe('Cockpit Variable Spec', function() {
     it('should change variable', function() {
 
       // given
-      instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'test')
-        .then(function(idx) {
-          expect(instancePage.variablesTab.variableType(idx).getText()).to.eventually.eql('Double');
-          expect(instancePage.variablesTab.variableValue(idx).getText()).to.eventually.eql('1.49');
+      var variable = instancePage.variablesTab.variableByName('test');
 
-          // when
-          instancePage.variablesTab.editVariableButton(idx).click().then(function() {
-            instancePage.variablesTab.editVariableInput().clear();
-            instancePage.variablesTab.editVariableInput('1.5');
-            instancePage.variablesTab.editVariableType('String');
-            instancePage.variablesTab.editVariableConfirmButton().click();
-          });
+      expect(variable.type().getText()).to.eventually.eql('Double');
+      expect(variable.value().getText()).to.eventually.eql('1.49');
 
-          // then
-          expect(instancePage.variablesTab.variableName(idx).getText()).to.eventually.eql('test');
-          expect(instancePage.variablesTab.variableValue(idx).getText()).to.eventually.eql('1.5');
-          expect(instancePage.variablesTab.variableType(idx).getText()).to.eventually.eql('String');
-        });
+      // when
+      variable.enterEditMode();
+      variable.valueInput().clear().sendKeys('1.5');
+      variable.typeSelect('String').click();
+      variable.saveButton().click();
+
+      // then
+      expect(variable.name().getText()).to.eventually.eql('test');
+      expect(variable.type().getText()).to.eventually.eql('String');
+      expect(variable.value().getText()).to.eventually.eql('1.5');
     });
 
 
     it('should select wrong variable type', function() {
 
       // given
-      instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'myDate')
-        .then(function(idx) {
-          expect(instancePage.variablesTab.variableType(idx).getText()).to.eventually.eql('Date');
-          expect(instancePage.variablesTab.variableValue(idx).getText()).to.eventually.eql('2011-11-11T11:11:11');
+      var variable = instancePage.variablesTab.variableByName('myDate');
 
-          // when
-          instancePage.variablesTab.editVariableButton(idx).click().then(function() {
-            instancePage.variablesTab.editVariableType('Short');
-          });
+      expect(variable.type().getText()).to.eventually.eql('Date');
+      expect(variable.value().getText()).to.eventually.eql('2011-11-11T11:11:11');
+      
+      // when
+      variable.enterEditMode();
+      variable.typeSelect('Short').click();
 
-          // then
-          expect(instancePage.variablesTab.editVariableErrorText()).to.eventually.eql('Invalid value: Only a Short value is allowed.');
-          expect(instancePage.variablesTab.editVariableConfirmButton().isEnabled()).to.eventually.be.false;
-
-          // finaly
-          instancePage.variablesTab.editVariableCancelButton().click().then(function() {
-            expect(instancePage.variablesTab.inlineEditRow().isPresent()).to.eventually.be.false;
-          });
-        });
+      // then
+      expect(variable.classes()).to.eventually.match(/invalid/);
+      expect(variable.saveButton().isEnabled()).to.be.eventually.be.false;
     });
 
 
