@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -43,14 +44,16 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 import org.slf4j.Logger;
 
 /**
@@ -61,11 +64,20 @@ public class ConcurrentJobExecutorTest {
 
   private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
-  @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule();
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+    @Override
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      // use a new process engine since the test change the process engine configuration
+      return configuration;
+    }
+  };
+
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+
 
   protected RuntimeService runtimeService;
   protected RepositoryService repositoryService;
