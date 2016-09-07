@@ -118,10 +118,18 @@ public class RuntimeServiceAsyncOperationsTest {
     List<String> listWithFake = Arrays.asList(processInstance.getId(), processInstance2.getId(), "fake");
     engineRule.getRuntimeService().deleteProcessInstancesAsync(listWithFake,TESTING_INSTANCE_DELETION);
     engineRule.getManagementService().executeJob(engineRule.getManagementService().createJobQuery().singleResult().getId());
-    assertThat(engineRule.getManagementService().createJobQuery().list().size(),is(4));
+    List<Job> list = engineRule.getManagementService().createJobQuery().list();
+    assertThat(list.size(),is(4));
 
-    //wait non interrupting
-    testRule.waitForJobExecutorToProcessAllJobs(100l);
+    for(Job job: list) {
+      try {
+        engineRule.getManagementService().executeJob(job.getId());
+      } catch (Exception e) {
+        if (!e.getMessage().startsWith("No process instance found for id 'fake'")) {
+          throw new RuntimeException("unexpected exception");
+        }
+      }
+    }
 
     assertThat(engineRule.getManagementService().createJobQuery().withException().list().size(),is(1));
 
