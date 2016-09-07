@@ -12,9 +12,11 @@
 
 
     <div class="user-profile-info">
-      <span class="user-profile-name">{{ user.firstName }} {{ user.lastName }}</span>
-      <span class="user-profile-username"
-            tooltip="User name to be used for authentication">{{ user.id }}</span>
+      <span class="user-profile-name"
+            ng-if="user.firstName || user.lastName"
+            tooltip="Username for authentication: {{ user.id }}">{{ user.firstName }} {{ user.lastName }}</span>
+      <span class="user-profile-name"
+            ng-if="!user.firstName && !user.lastName">{{ user.id }}</span>
       <div class="user-profile-email">{{ user.email }}</div>
     </div>
 
