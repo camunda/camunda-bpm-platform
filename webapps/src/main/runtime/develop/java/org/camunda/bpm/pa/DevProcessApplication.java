@@ -217,6 +217,8 @@ public class DevProcessApplication extends ServletProcessApplication {
       .setVariable("anotherVariable", "xyz")
       .create();
 
+    caseService.createCaseInstanceByKey("CallingCase");
+
     Task standaloneTask = taskService.newTask();
     standaloneTask.setName("A Standalone Task");
     standaloneTask.setAssignee("jonny1");
