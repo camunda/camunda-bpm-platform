@@ -23,6 +23,14 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           return plugin.id === 'history';
         }).length > 0;
 
+        $scope.hasCasePlugin = false;
+        try {
+          $scope.hasCasePlugin = !!angular.module('cockpit.plugin.case');
+        }
+        catch (e) {
+          // do nothing
+        }
+
         $scope.getProcessDefinitionLink = function(decisionInstance) {
           if(hasHistoryPlugin) {
             return '#/process-definition/' + decisionInstance.processDefinitionId + '/history';
@@ -39,6 +47,16 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           } else {
             return '#/process-instance/' + decisionInstance.processInstanceId;
           }
+        };
+
+        $scope.getActivitySearch = function(decisionInstance) {
+
+          return JSON.stringify([{
+            type: 'caseActivityIdIn',
+            operator: 'eq',
+            value: decisionInstance.activityId
+          }]);
+
         };
 
         $scope.decisionSearchConfig = angular.copy(decisionSearchConfig);
