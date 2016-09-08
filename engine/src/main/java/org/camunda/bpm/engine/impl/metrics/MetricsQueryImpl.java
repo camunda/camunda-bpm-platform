@@ -36,8 +36,8 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
 
   protected String name;
   protected String reporter;
-  protected Date startDate;
-  protected Date endDate;
+  protected Long startDate;
+  protected Long endDate;
   protected Long interval;
 
   protected transient CommandExecutor commandExecutor;
@@ -59,12 +59,12 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
   }
 
   public MetricsQueryImpl startDate(Date startDate) {
-    this.startDate = startDate;
+    this.startDate = startDate.getTime();
     return this;
   }
 
   public MetricsQueryImpl endDate(Date endDate) {
-    this.endDate = endDate;
+    this.endDate = endDate.getTime();
     return this;
   }
 
@@ -135,11 +135,11 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
     this.maxResults = maxResults;
   }
 
-  public Date getStartDate() {
+  public Long getStartDate() {
     return startDate;
   }
 
-  public Date getEndDate() {
+  public Long getEndDate() {
     return endDate;
   }
 

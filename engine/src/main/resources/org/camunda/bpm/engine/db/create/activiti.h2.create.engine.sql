@@ -237,7 +237,8 @@ create table ACT_RU_METER_LOG (
   NAME_ varchar(64) not null,
   REPORTER_ varchar(255),
   VALUE_ long,
-  TIMESTAMP_ timestamp not null,
+  TIMESTAMP_ timestamp,
+  MILLISECONDS_ bigint DEFAULT 0,
   primary key (ID_)
 );
 

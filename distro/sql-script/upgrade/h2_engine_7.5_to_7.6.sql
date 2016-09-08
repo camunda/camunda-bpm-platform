@@ -84,3 +84,7 @@ update ACT_HI_PROCINST set STATE_ = 'COMPLETED' where END_TIME_ is not null;
 
 -- add indexes on PROC_DEF_KEY_ columns in history tables
 create index ACT_IDX_HI_ACT_INST_PROCDEF on ACT_HI_ACTINST(PROC_DEF_ID_);
+
+-- CAM-6725
+ALTER TABLE ACT_RU_METER_LOG
+ ADD MILLISECONDS_ bigint DEFAULT 0;

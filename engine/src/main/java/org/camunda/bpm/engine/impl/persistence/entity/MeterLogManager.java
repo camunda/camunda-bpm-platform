@@ -93,7 +93,7 @@ public class MeterLogManager extends AbstractManager {
       .getReportingIntervalInSeconds();
 
     return (query.getEndDate() == null
-        || query.getEndDate().getTime() >= ClockUtil.getCurrentTime().getTime() - (1000 * reportingIntervalInSeconds));
+        || query.getEndDate() >= ClockUtil.getCurrentTime().getTime() - (1000 * reportingIntervalInSeconds));
   }
 
   protected boolean shouldAddCurrentUnloggedCount(MetricsQueryImpl query) {
@@ -108,7 +108,9 @@ public class MeterLogManager extends AbstractManager {
 
   public void deleteByTimestampAndReporter(Date timestamp, String reporter) {
     Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("timestamp", timestamp);
+    if (timestamp != null) {
+      parameters.put("milliseconds", timestamp.getTime());
+    }
     parameters.put("reporter", reporter);
     getDbEntityManager().delete(MeterLogEntity.class, DELETE_ALL_METER_BY_TIMESTAMP_AND_REPORTER, parameters);
   }

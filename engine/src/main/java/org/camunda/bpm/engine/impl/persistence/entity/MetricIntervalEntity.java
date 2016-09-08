@@ -35,24 +35,36 @@ public class MetricIntervalEntity implements MetricIntervalValue, DbEntity, Seri
 
   protected long value;
 
-  /**
-   *
-   * @param timestamp is object, since mybatis can't resolve ctor
-   * @param name
-   * @param reporter
-   */
-  public MetricIntervalEntity(Object timestamp, String name, String reporter) {
-    this.timestamp = (Date) timestamp;
+  public MetricIntervalEntity(Date timestamp, String name, String reporter) {
+    this.timestamp = timestamp;
     this.name = name;
     this.reporter = reporter;
   }
 
+  /**
+   * Ctor will be used by Mybatis
+   *
+   * @param timestamp
+   * @param name
+   * @param reporter
+   */
+  public MetricIntervalEntity(Long timestamp, String name, String reporter) {
+    this.timestamp = new Date(timestamp);
+    this.name = name;
+    this.reporter = reporter;
+  }
+
+  @Override
   public Date getTimestamp() {
     return timestamp;
   }
 
   public void setTimestamp(Date timestamp) {
     this.timestamp = timestamp;
+  }
+
+  public void setTimestamp(long timestamp) {
+    this.timestamp = new Date(timestamp);
   }
 
   public String getName() {

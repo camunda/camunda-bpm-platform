@@ -237,7 +237,8 @@ create table ACT_RU_METER_LOG (
   NAME_ varchar(64) not null,
   REPORTER_ varchar(255),
   VALUE_ bigint,
-  TIMESTAMP_ timestamp(3) not null,
+  TIMESTAMP_ timestamp(3),
+  MILLISECONDS_ bigint DEFAULT 0,
   primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

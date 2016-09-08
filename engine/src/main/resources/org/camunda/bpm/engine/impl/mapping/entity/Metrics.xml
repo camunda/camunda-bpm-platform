@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <!--
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~       http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
+~ Licensed under the Apache License, Version 2.0 (the "License");
+~ you may not use this file except in compliance with the License.
+~ You may obtain a copy of the License at
+~
+~       http://www.apache.org/licenses/LICENSE-2.0
+~
+~ Unless required by applicable law or agreed to in writing, software
+~ distributed under the License is distributed on an "AS IS" BASIS,
+~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~ See the License for the specific language governing permissions and
+~ limitations under the License.
+-->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
@@ -21,13 +21,13 @@
   <!-- METER INSERT -->
 
   <insert id="insertMeterLog" parameterType="org.camunda.bpm.engine.impl.persistence.entity.MeterLogEntity">
-    insert into ${prefix}ACT_RU_METER_LOG (ID_, NAME_, REPORTER_, VALUE_, TIMESTAMP_)
+    insert into ${prefix}ACT_RU_METER_LOG (ID_, NAME_, REPORTER_, VALUE_, MILLISECONDS_)
     values (
-      #{id ,jdbcType=VARCHAR},
-      #{name ,jdbcType=VARCHAR},
-      #{reporter, jdbcType=VARCHAR},
-      #{value ,jdbcType=BIGINT},
-      #{timestamp ,jdbcType=TIMESTAMP}
+    #{id ,jdbcType=VARCHAR},
+    #{name ,jdbcType=VARCHAR},
+    #{reporter, jdbcType=VARCHAR},
+    #{value ,jdbcType=BIGINT},
+    #{milliseconds ,jdbcType=BIGINT}
     )
   </insert>
 
@@ -43,8 +43,8 @@
       <if test="reporter != null">
         and REPORTER_ = #{reporter, jdbcType=VARCHAR}
       </if>
-      <if test="timestamp != null">
-        and TIMESTAMP_ &lt;= #{timestamp, jdbcType=TIMESTAMP}
+      <if test="milliseconds != null">
+        and MILLISECONDS_ &lt;= #{milliseconds, jdbcType=BIGINT}
       </if>
 
     </where>
@@ -58,7 +58,7 @@
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="reporter" column="REPORTER_" jdbcType="VARCHAR" />
     <result property="value" column="VALUE_" jdbcType="BIGINT" />
-    <result property="timestamp" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
+    <result property="milliseconds" column="MILLISECONDS_" jdbcType="BIGINT" />
   </resultMap>
 
 
@@ -80,10 +80,10 @@
         and RES.REPORTER_ = #{reporter}
       </if>
       <if test="startDate != null">
-        and RES.TIMESTAMP_ &gt;= #{startDate}
+        and RES.MILLISECONDS_ &gt;= #{startDate}
       </if>
       <if test="endDate != null">
-        and RES.TIMESTAMP_ &lt; #{endDate}
+        and RES.MILLISECONDS_ &lt; #{endDate}
       </if>
     </where>
   </sql>
@@ -91,20 +91,20 @@
 
   <resultMap id="meterResultIntervallMap" type="org.camunda.bpm.engine.impl.persistence.entity.MetricIntervalEntity">
     <constructor>
-      <idArg column="INTERVAL_" jdbcType="TIMESTAMP"/>
+      <idArg column="INTERVAL_" jdbcType="BIGINT" javaType="java.lang.Long"/>
       <idArg column="NAME_" javaType="java.lang.String" jdbcType="VARCHAR" />
       <idArg column="REPORTER_" javaType="java.lang.String" jdbcType="VARCHAR"/>
-   </constructor>
+    </constructor>
     <result property="value" column="VALUE_" jdbcType="BIGINT" />
   </resultMap>
 
   <select id="selectMeterLogAggregatedByTimeInterval_db2_or_mssql"  parameterType="org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl" resultMap="meterResultIntervallMap">
     SELECT NAME_, REPORTER_, VALUE_, INTERVAL_
     FROM (
-      SELECT row_number() OVER ( ORDER BY INTERVAL_ DESC, NAME_ DESC, REPORTER_ DESC) AS rid, RES.*
-      FROM (
-        <include refid="selectMeterLogAggregatedByTimeIntervalQuery"/>
-      ) RES
+    SELECT row_number() OVER ( ORDER BY INTERVAL_ DESC, NAME_ DESC, REPORTER_ DESC) AS rid, RES.*
+    FROM (
+    <include refid="selectMeterLogAggregatedByTimeIntervalQuery"/>
+    ) RES
     ) RES
     WHERE RES.rid BETWEEN #{firstRow} AND #{lastRow}-1
     ORDER BY INTERVAL_ DESC
@@ -114,17 +114,17 @@
     SELECT NAME_, REPORTER_, SUM(VALUE_) as VALUE_, INTERVAL_
     FROM
     (
-      SELECT
-        NAME_,
-        REPORTER_,
-        VALUE_,
-        ${fromTimestamp1} FLOOR( ${toTimestamp1} TIMESTAMP_ ${toTimestamp2} / #{interval} ) * #{interval} ${fromTimestamp2} as INTERVAL_
-      <include refid="selectMeterLogsByQueryCriteriaSql"/>
+    SELECT
+    NAME_,
+    REPORTER_,
+    VALUE_,
+    FLOOR( (MILLISECONDS_ / 1000) / #{interval}) * #{interval} * 1000 as INTERVAL_
+    <include refid="selectMeterLogsByQueryCriteriaSql"/>
     ) RES
     GROUP BY
-      NAME_,
-      REPORTER_,
-      INTERVAL_
+    NAME_,
+    REPORTER_,
+    INTERVAL_
   </sql>
 
   <select id="selectMeterLogAggregatedByTimeInterval"  parameterType="org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl" resultMap="meterResultIntervallMap">
