@@ -103,7 +103,7 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
@@ -122,7 +122,8 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <argLine>-XX:MaxPermSize=160m -Xmx768m</argLine>
         </configuration>
       </plugin>
     </plugins>
