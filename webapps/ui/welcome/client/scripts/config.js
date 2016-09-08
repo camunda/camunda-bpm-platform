@@ -3,20 +3,17 @@ window.camWelcomeConf = {
   //   {
   //     label: 'Angular.js Docs',
   //     href: 'https://code.angularjs.org/1.2.16/docs',
-  //     description: 'Almost interesting',
-  //     priority: 0
+  //     description: 'Almost interesting'
   //   },
   //   {
   //     label: 'XKCD',
   //     href: 'https://xkcd.org',
-  //     description: 'Nerdy comic',
-  //     priority: 1
+  //     description: 'Nerdy comic'
   //   },
   //   {
   //     label: 'Slashdot',
   //     href: 'https://slashdot.org',
-  //     description: 'News for nerds, stuff that matter',
-  //     priority: 2
+  //     description: 'News for nerds, stuff that matter'
   //   }
   // ]
 };
