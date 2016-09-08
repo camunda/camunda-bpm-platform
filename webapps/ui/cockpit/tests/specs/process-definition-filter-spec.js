@@ -8,7 +8,7 @@ var processesPage = require('../pages/processes');
 var definitionPage = require('../pages/process-definition');
 
 
-describe.only('Cockpit Process Definition Filter Spec', function() {
+describe('Cockpit Process Definition Filter Spec', function() {
   afterEach(function() {
     definitionPage.search.clearSearch();
   });
