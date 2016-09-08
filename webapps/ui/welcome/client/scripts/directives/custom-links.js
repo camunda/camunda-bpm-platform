@@ -12,11 +12,7 @@ module.exports = ['customLinks', function(customLinks) {
     replace: true,
 
     link: function($scope) {
-      $scope.links = customLinks.sort(function(a, b) {
-        var ap = a.priority || 0;
-        var bp = b.priority || 0;
-        return ap < bp ? 1 : (ap > bp ? -1 : 0);
-      });
+      $scope.links = customLinks;
     }
   };
 }];
