@@ -74,16 +74,8 @@ public class ExecuteJobsRunnable implements Runnable {
     }
   }
 
-  protected static void unlockJob(String nextJobId, CommandExecutor commandExecutor) {
+  protected void unlockJob(String nextJobId, CommandExecutor commandExecutor) {
     commandExecutor.execute(new UnlockJobCmd(nextJobId));
   }
 
-
-  protected static FailedJobListener createFailedJobListener(CommandExecutor commandExecutor, Throwable exception, String jobId) {
-    return new FailedJobListener(commandExecutor, jobId, exception);
-  }
-
-  protected static SuccessfulJobListener createSuccessfulJobListener(CommandExecutor commandExecutor) {
-    return new SuccessfulJobListener();
-  }
 }
