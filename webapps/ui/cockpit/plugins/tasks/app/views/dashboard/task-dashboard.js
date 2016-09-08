@@ -150,7 +150,7 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
 
           // we take all data from unfinished tasks for the open task dashboard
           var resetSearch = function() {
-            return [ addTermToSearch('TAunfinished') ];
+            return [ addTermToSearch('unfinished') ];
           };
 
           var searchLinks = resetSearch();
@@ -159,24 +159,24 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
             if(group === 'statistics') {
               switch (identifier) {
               case 'openAssignedTasks':
-                searchLinks.push(addTermToSearch('TAassigned'));
+                searchLinks.push(addTermToSearch('assigned'));
                 break;
               case 'openGroupTasks':
-                searchLinks.push(addTermToSearch('TAwithCandidateGroups'));
-                searchLinks.push(addTermToSearch('TAunassigned'));
+                searchLinks.push(addTermToSearch('withCandidateGroups'));
+                searchLinks.push(addTermToSearch('unassigned'));
                 break;
               case 'openUnassignedTasks':
-                searchLinks.push(addTermToSearch('TAwithoutCandidateGroups'));
-                searchLinks.push(addTermToSearch('TAunassigned'));
+                searchLinks.push(addTermToSearch('withoutCandidateGroups'));
+                searchLinks.push(addTermToSearch('unassigned'));
                 break;
               }
             } else {
               if(identifier != null) {
-                searchLinks.push(addTermToSearch('TAtaskHadCandidateGroup', 'eq', identifier));
+                searchLinks.push(addTermToSearch('taskHadCandidateGroup', 'eq', identifier));
               } else {
                 // without group!
-                searchLinks.push(addTermToSearch('TAwithoutCandidateGroups'));
-                searchLinks.push(addTermToSearch('TAunassigned'));
+                searchLinks.push(addTermToSearch('withoutCandidateGroups'));
+                searchLinks.push(addTermToSearch('unassigned'));
               }
             }
 
@@ -186,7 +186,6 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
 
           // prevents the initializer from overwriting the exisiting search
           if(!search().hasOwnProperty('searchQuery')) {
-            resetSearch();
             search.updateSilently({ searchQuery: JSON.stringify(searchLinks) }, true);
           }
         }
