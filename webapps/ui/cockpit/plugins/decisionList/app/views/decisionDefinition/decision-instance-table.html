@@ -15,8 +15,8 @@
       <tr>
         <th class="instance-id">ID</th>
         <th class="start-time">Evaluation Time</th>
-        <th class="process-definition-key">Process Definition Key</th>
-        <th class="process-instance-id">Process Instance ID</th>
+        <th class="definition-key">Definition Key</th>
+        <th class="instance-id">Instance ID</th>
         <th class="activity-id">Activity ID</th>
       </tr>
     </thead>
@@ -34,24 +34,59 @@
           {{ decisionInstance.evaluationTime | camDate }}
         </td>
 
-        <td class="process-definition-key"
+        <td class="definition-key"
+            ng-if="decisionInstance.processDefinitionKey"
             cam-widget-clipboard="decisionInstance.processDefinitionKey">
           <a ng-href="{{ getProcessDefinitionLink(decisionInstance) }}">
             {{ decisionInstance.processDefinitionKey }}
           </a>
         </td>
+        <td class="definition-key"
+            ng-if="decisionInstance.caseDefinitionKey"
+            cam-widget-clipboard="decisionInstance.caseDefinitionKey">
+          <a ng-if="hasCasePlugin"
+             ng-href="#/case-definition/{{ decisionInstance.caseDefinitionId }}?searchQuery={{ getActivitySearch(decisionInstance) }}">
+            {{ decisionInstance.caseDefinitionKey }}
+          </a>
+          <span ng-if="!hasCasePlugin">
+            {{ decisionInstance.caseDefinitionKey }}
+          </span>
+        </td>
+        <td class="definition-key"
+            ng-if="!decisionInstance.processDefinitionKey && !decisionInstance.caseDefinitionKey">
+        </td>
 
-        <td class="process-instance-id"
+        <td class="instance-id"
+            ng-if="decisionInstance.processInstanceId"
             cam-widget-clipboard="decisionInstance.processInstanceId">
           <a ng-href="{{ getProcessInstanceLink(decisionInstance) }}">
             {{ decisionInstance.processInstanceId }}
           </a>
         </td>
+        <td class="instance-id"
+            ng-if="decisionInstance.caseInstanceId"
+            cam-widget-clipboard="decisionInstance.caseInstanceId">
+          <a ng-if="hasCasePlugin"
+             ng-href="#/case-instance/{{ decisionInstance.caseInstanceId }}?searchQuery={{ getActivitySearch(decisionInstance) }}">
+            {{ decisionInstance.caseInstanceId }}
+          </a>
+          <span ng-if="!hasCasePlugin">
+            {{ decisionInstance.caseInstanceId }}
+          </span>
+        </td>
+        <td class="instance-id"
+            ng-if="!decisionInstance.processInstanceId && !decisionInstance.caseInstanceId">
+        </td>
 
         <td class="activity-id"
+            ng-if="decisionInstance.activityId"
             cam-widget-clipboard="decisionInstance.activityId">
           {{ decisionInstance.activityId }}
         </td>
+        <td class="activity-id"
+            ng-if="!decisionInstance.activityId">
+        </td>
+
       </tr>
     </tbody>
   </table>
