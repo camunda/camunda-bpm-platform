@@ -18,13 +18,38 @@
     },
     {
       "id": {
-        "key": "variableValue",
+        "key": "variableValues",
         "value": "Variable Value"
       },
+      "extended": true,
       "operators": [
         {
           "key": "eq",
           "value": "="
+        },
+        {
+          "key": "neq",
+          "value": "!="
+        },
+        {
+          "key": "gt",
+          "value": ">"
+        },
+        {
+          "key": "gteq",
+          "value": ">="
+        },
+        {
+          "key": "lt",
+          "value": "<"
+        },
+        {
+          "key": "lteq",
+          "value": "<="
+        },
+        {
+          "key": "like",
+          "value": "like"
         }
       ]
     }
