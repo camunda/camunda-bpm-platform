@@ -2,19 +2,19 @@
   <div class="user-profile-display"
        ng-if="!visibleForm">
     <h3 class="section-title">
-      Your profile
+      Profile
     </h3>
 
     <div class="user-profile-info">
-      <span class="user-profile-name"
-            ng-if="user.firstName || user.lastName"
-            tooltip="Username for authentication: {{ user.id }}">{{ user.firstName }} {{ user.lastName }}</span>
-      <span class="user-profile-name"
-            ng-if="!user.firstName && !user.lastName">{{ user.id }}</span>
+      <h4 class="user-profile-name"
+          ng-if="user.firstName || user.lastName"
+          tooltip="Username for authentication: {{ user.id }}">{{ user.firstName }} {{ user.lastName }}</h4>
+      <h4 class="user-profile-name"
+          ng-if="!user.firstName && !user.lastName">{{ user.id }}</h4>
       <div class="user-profile-email">{{ user.email }}</div>
     </div>
 
-    <ul class="action-links list-inline small text-right">
+    <ul class="action-links list-inline">
       <li><a ng-click="showForm('profile')">Edit profile</a></li>
       <li><a ng-click="showForm('password')">Change password</a></li>
     </ul>
