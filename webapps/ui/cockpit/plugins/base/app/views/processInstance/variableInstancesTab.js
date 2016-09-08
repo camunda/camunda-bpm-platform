@@ -230,7 +230,7 @@ module.exports = function(ngModule) {
           deserializeValues: false
         };
 
-        var variableQuery = createSearchQueryForSearchWidget(searches);
+        var variableQuery = createSearchQueryForSearchWidget(searches, [], ['variableValues']);
 
         var params = angular.extend({}, filter, defaultParams, variableQuery);
 
