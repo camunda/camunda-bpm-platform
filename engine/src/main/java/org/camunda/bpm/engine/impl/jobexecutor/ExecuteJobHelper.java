@@ -51,13 +51,15 @@ public class ExecuteJobHelper {
   }
 
   protected static void invokeJobListener(CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector) {
-    if (jobFailureCollector.getFailure() != null) {
-      // the failed job listener is responsible for decrementing the retries and logging the exception to the DB.
-      FailedJobListener failedJobListener = createFailedJobListener(commandExecutor, jobFailureCollector.getFailure(), jobFailureCollector.getJobId());
-      commandExecutor.execute(failedJobListener);
-    } else {
-      SuccessfulJobListener successListener = createSuccessfulJobListener(commandExecutor);
-      commandExecutor.execute(successListener);
+    if(jobFailureCollector.getJobId() != null) {
+      if (jobFailureCollector.getFailure() != null) {
+        // the failed job listener is responsible for decrementing the retries and logging the exception to the DB.
+        FailedJobListener failedJobListener = createFailedJobListener(commandExecutor, jobFailureCollector.getFailure(), jobFailureCollector.getJobId());
+        commandExecutor.execute(failedJobListener);
+      } else {
+        SuccessfulJobListener successListener = createSuccessfulJobListener(commandExecutor);
+        commandExecutor.execute(successListener);
+      }
     }
   }
 
