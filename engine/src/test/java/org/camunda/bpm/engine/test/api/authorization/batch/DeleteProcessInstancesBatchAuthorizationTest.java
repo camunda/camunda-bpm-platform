@@ -116,8 +116,7 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
         engineRule.getManagementService().createJobQuery().singleResult().getId());
     testHelper.executeAvailableJobs();
 
-    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory()) &&
-        !ProcessEngineConfiguration.HISTORY_AUDIT.equals(engineRule.getProcessEngineConfiguration().getHistory()) ) {
+    if(ProcessEngineConfiguration.HISTORY_FULL.equals(engineRule.getProcessEngineConfiguration().getHistory())  ) {
       assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(3l));
     }
   }
@@ -134,8 +133,7 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
         engineRule.getManagementService().createJobQuery().singleResult().getId());
     testHelper.executeAvailableJobs();
 
-    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory()) &&
-        !ProcessEngineConfiguration.HISTORY_AUDIT.equals(engineRule.getProcessEngineConfiguration().getHistory()) ) {
+    if(ProcessEngineConfiguration.HISTORY_FULL.equals(engineRule.getProcessEngineConfiguration().getHistory()) ) {
       assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(3l));
     }
   }
@@ -172,8 +170,7 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
         engineRule.getManagementService().createJobQuery().singleResult().getId());
     testHelper.executeAvailableJobs();
 
-    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory()) &&
-        !ProcessEngineConfiguration.HISTORY_AUDIT.equals(engineRule.getProcessEngineConfiguration().getHistory()) ) {
+    if(ProcessEngineConfiguration.HISTORY_FULL.equals(engineRule.getProcessEngineConfiguration().getHistory()) ) {
       assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(3l));
     }
   }
@@ -205,8 +202,7 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
     engineRule.getManagementService().executeJob(
         engineRule.getManagementService().createJobQuery().singleResult().getId());
     testHelper.executeAvailableJobs();
-    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory()) &&
-        !ProcessEngineConfiguration.HISTORY_AUDIT.equals(engineRule.getProcessEngineConfiguration().getHistory()) ) {
+    if(ProcessEngineConfiguration.HISTORY_FULL.equals(engineRule.getProcessEngineConfiguration().getHistory()) ) {
       assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(3l));
     }
   }
