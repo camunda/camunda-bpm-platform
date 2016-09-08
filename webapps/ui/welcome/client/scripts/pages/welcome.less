@@ -5,27 +5,28 @@
   max-width: 220px;
   max-height: 220px;
   overflow: hidden;
+  background-position: center;
+  background-size: 125%;
 
   &:before {
     content: '';
     display: block;
     padding-top: 100%;
-    background-position: center;
-    background-size: cover;
   }
 }
 
 .app-name {
   text-align: center;
+  margin-top: 10px;
 }
 
-.cockpit-app .app-label-wrapper:before {
+.cockpit-app .app-label-wrapper{
   background-image: url('../assets/images/cockpit.svg');
 }
-.tasklist-app .app-label-wrapper:before {
+.tasklist-app .app-label-wrapper{
   background-image: url('../assets/images/tasklist.svg');
 }
-.admin-app .app-label-wrapper:before {
+.admin-app .app-label-wrapper{
   background-image: url('../assets/images/admin.svg');
 }
 
