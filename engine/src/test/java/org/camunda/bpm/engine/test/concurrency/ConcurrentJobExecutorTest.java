@@ -35,7 +35,9 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
+import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.JobFailureCollector;
 import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -132,7 +134,7 @@ public class ConcurrentJobExecutorTest {
     Job currentJob = managementService.createJobQuery().singleResult();
 
     // when a job is executed
-    ControllableExecuteJobThread threadOne = new ControllableExecuteJobThread(processEngineConfiguration, currentJob.getId());
+    JobExecutionThread threadOne = new JobExecutionThread(currentJob.getId());
     threadOne.startAndWaitUntilControlIsReturned();
     //and deleted in parallel
     managementService.deleteJob(currentJob.getId());
@@ -153,10 +155,10 @@ public class ConcurrentJobExecutorTest {
     assertEquals(2, currentJobs.size());
 
     // when the jobs are executed in parallel
-    ControllableExecuteJobThread threadOne = new ControllableExecuteJobThread(processEngineConfiguration, currentJobs.get(0).getId());
+    JobExecutionThread threadOne = new JobExecutionThread(currentJobs.get(0).getId());
     threadOne.startAndWaitUntilControlIsReturned();
 
-    ControllableExecuteJobThread threadTwo = new ControllableExecuteJobThread(processEngineConfiguration, currentJobs.get(1).getId());
+    JobExecutionThread threadTwo = new JobExecutionThread(currentJobs.get(1).getId());
     threadTwo.startAndWaitUntilControlIsReturned();
 
     // then the first committing thread succeeds
@@ -192,10 +194,10 @@ public class ConcurrentJobExecutorTest {
     assertEquals(2, currentJobs.size());
 
     // when the jobs are executed in parallel
-    ControllableExecuteJobThread threadOne = new ControllableExecuteJobThread(processEngineConfiguration, currentJobs.get(0).getId());
+    JobExecutionThread threadOne = new JobExecutionThread(currentJobs.get(0).getId());
     threadOne.startAndWaitUntilControlIsReturned();
 
-    ControllableExecuteJobThread threadTwo = new ControllableExecuteJobThread(processEngineConfiguration, currentJobs.get(1).getId());
+    JobExecutionThread threadTwo = new JobExecutionThread(currentJobs.get(1).getId());
     threadTwo.startAndWaitUntilControlIsReturned();
 
     // then the first committing thread succeeds
@@ -230,7 +232,7 @@ public class ConcurrentJobExecutorTest {
     Job job = managementService.createJobQuery().singleResult();
 
     // given a waiting execution and a waiting suspension
-    ControllableExecuteJobThread executionthread = new ControllableExecuteJobThread(processEngineConfiguration, job.getId());
+    JobExecutionThread executionthread = new JobExecutionThread(job.getId());
     executionthread.startAndWaitUntilControlIsReturned();
 
     JobSuspensionThread jobSuspensionThread = new JobSuspensionThread("simpleAsyncProcess");
@@ -247,7 +249,7 @@ public class ConcurrentJobExecutorTest {
     //--------------------------------------------
 
     // given a waiting execution and a waiting suspension
-    executionthread = new ControllableExecuteJobThread(processEngineConfiguration, job.getId());
+    executionthread = new JobExecutionThread(job.getId());
     executionthread.startAndWaitUntilControlIsReturned();
 
     jobSuspensionThread = new JobSuspensionThread("simpleAsyncProcess");
@@ -354,7 +356,7 @@ public class ConcurrentJobExecutorTest {
     List<Job> jobs = managementService.createJobQuery().list();
 
     // when the first job is executed but has not yet committed
-    ControllableExecuteJobThread executionThread = new ControllableExecuteJobThread(processEngineConfiguration, jobs.get(0).getId());
+    JobExecutionThread executionThread = new JobExecutionThread(jobs.get(0).getId());
     executionThread.startAndWaitUntilControlIsReturned();
 
     // and the job priority is updated
@@ -413,50 +415,32 @@ public class ConcurrentJobExecutorTest {
     }
   }
 
-  public class ControllableExecuteJobThread extends ControllableThread {
 
-    protected final String jobId;
-    protected OptimisticLockingException exception;
+  public class JobExecutionThread extends ControllableThread {
 
-    public ControllableExecuteJobThread(ProcessEngineConfigurationImpl processEngineConfiguration, String jobId) {
+    OptimisticLockingException exception;
+    String jobId;
+
+    JobExecutionThread(String jobId) {
       this.jobId = jobId;
     }
 
     @Override
     public synchronized void startAndWaitUntilControlIsReturned() {
+      activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
 
     @Override
     public void run() {
-      final CommandExecutor commandExecutorTxRequiresNew = processEngineConfiguration.getCommandExecutorTxRequiresNew();
-
       try {
-        // replace the command executor by a controllable one which is used inside the command
-        processEngineConfiguration.setCommandExecutorTxRequiresNew(new CommandExecutor() {
+        JobFailureCollector jobFailureCollector = new JobFailureCollector(jobId);
+        ExecuteJobHelper.executeJob(jobId, processEngineConfiguration.getCommandExecutorTxRequired(),jobFailureCollector, new ControlledCommand<Void>(activeThread, new ExecuteJobsCmd(jobId, jobFailureCollector)));
 
-          public <T> T execute(final Command<T> command) {
-            return commandExecutorTxRequiresNew.execute(new Command<T>() {
-
-              public T execute(CommandContext commandContext) {
-                T result = command.execute(commandContext);
-
-                // only interrupt the embedded command which executes the job
-                if (command.getClass().getName().startsWith(ExecuteJobsCmd.class.getName())) {
-                  returnControlToTestThreadAndWait();
-                }
-                return result;
-              }
-            });
-          }
-        });
-
-        processEngineConfiguration.getCommandExecutorTxRequired().execute(new ExecuteJobsCmd(jobId));
-
-      } catch (OptimisticLockingException e) {
+      }
+      catch (OptimisticLockingException e) {
         this.exception = e;
       }
-
       LOG.debug(getName() + " ends");
     }
   }

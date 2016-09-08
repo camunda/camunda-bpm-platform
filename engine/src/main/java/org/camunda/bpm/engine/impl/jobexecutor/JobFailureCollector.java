@@ -15,10 +15,17 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 public class JobFailureCollector implements CommandContextListener {
 
   protected Throwable failure;
+  protected JobEntity job;
+  protected String jobId;
+
+  public JobFailureCollector(String jobId) {
+    this.jobId = jobId;
+  }
 
   public void setFailure(Throwable failure) {
     // log failure if not already present
@@ -39,6 +46,18 @@ public class JobFailureCollector implements CommandContextListener {
   @Override
   public void onCommandContextClose(CommandContext commandContext) {
     // ignore
+  }
+
+  public void setJob(JobEntity job) {
+    this.job = job;
+  }
+
+  public JobEntity getJob() {
+    return job;
+  }
+
+  public String getJobId() {
+    return jobId;
   }
 
 }
