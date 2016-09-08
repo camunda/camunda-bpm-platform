@@ -10,21 +10,34 @@ module.exports = createSearchQueryForSearchWidget;
  *
  * @param searches list of search pills
  * @param arrayTypes list of types that should be arrays
+ * @param variableTypes list of types that should be treated as variables,
+ *        by default it is singleton with variable type
  * @returns {*}
  */
-function createSearchQueryForSearchWidget(searches, arrayTypes) {
+function createSearchQueryForSearchWidget(searches, arrayTypes, variableTypes) {
   searches = angular.isArray(searches) ? searches : [];
   arrayTypes = angular.isArray(arrayTypes) ? arrayTypes : [];
+  variableTypes = angular.isArray(variableTypes) ? variableTypes : ['variables'];
 
-  return searches.reduce(addSearchToQuery.bind(null, arrayTypes), {});
+  //all variable types are also array types
+  arrayTypes = arrayTypes.concat(variableTypes);
+
+  return searches.reduce(
+    addSearchToQuery.bind(null, arrayTypes, variableTypes),
+    {}
+  );
 }
 
-function addSearchToQuery(arrayTypes, query, search) {
-  var type = getSearchType(search);
-  var value = getSearchValue(search);
+function addSearchToQuery(arrayTypes, variableTypes, query, search) {
+  var type = getSearchType(search, variableTypes);
+  var value = getSearchValue(search, type, variableTypes);
+
+  if (includes(variableTypes, type)) {
+    value = createVariableValue(search, value);
+  }
 
   if (includes(arrayTypes, type)) {
-    query[type] = angular.isArray(query[type]) ? query[type].concat([value]) : [value];
+    query[type] = appendNewValueToArrayType(query, type, value);
   } else {
     query[type] = value;
   }
@@ -32,7 +45,7 @@ function addSearchToQuery(arrayTypes, query, search) {
   return query;
 }
 
-function getSearchType(search) {
+function getSearchType(search, variableTypes) {
   var type = search.type.value.key;
   var op = search.operator.value.key;
 
@@ -40,7 +53,7 @@ function getSearchType(search) {
     type = type.slice(0, -4);
   }
 
-  if (isOperatorAppendable(op)) {
+  if (isOperatorAppendable(op) && !includes(variableTypes, type)) {
     type += op;
   }
 
@@ -88,4 +101,16 @@ function parseValue(value) {
     return value.substr(1, value.length - 2);
   }
   return value;
+}
+
+function createVariableValue(search, value) {
+  return {
+    name: search.name.value,
+    operator: search.operator.value.key,
+    value: value
+  };
+}
+
+function appendNewValueToArrayType(query, type, value) {
+  return angular.isArray(query[type]) ? query[type].concat([value]) : [value];
 }

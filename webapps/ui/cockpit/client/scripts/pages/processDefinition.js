@@ -31,24 +31,6 @@ var Controller = [
       setDefaultTab($scope.processDefinitionTabs);
     });
 
-    function collect(elements, fn) {
-      var result = [];
-
-      angular.forEach(elements, function(e) {
-        try {
-          var c = fn(e);
-
-          if (c !== undefined) {
-            result.push(c);
-          }
-        } catch (ex) {
-          // safe collect -> error skips element
-        }
-      });
-
-      return result;
-    }
-
     var currentFilter = null;
 
     /**
@@ -58,7 +40,6 @@ var Controller = [
      * @param  {Object} filter the filter to auto complete
      */
     function autoCompleteFilter(filter) {
-
       // only apply when external (non completed)
       // filter changes occur
       if (currentFilter === filter) {
@@ -96,7 +77,6 @@ var Controller = [
     }
 
     function parseFilterFromUri() {
-
       var params = search(),
           filter;
 
@@ -108,69 +88,28 @@ var Controller = [
         return str.split(/,/);
       }
 
-      function parseVariables(vars) {
-        return collect(vars, Variables.parse);
-      }
-
-      function parseStartDateFilter(params) {
-        var after = params.startedAfter,
-            before = params.startedBefore;
-
-        var result = [];
-
-        if (after) {
-          result.push({ type: 'after', value: after });
-        }
-
-        if (before) {
-          result.push({ type: 'before', value: before });
-        }
-
-        return result;
-      }
-
       var activityIds = parseArray(params.activityIds);
 
       filter = {
         activityIds: activityIds,
-        parentProcessDefinitionId: params.parentProcessDefinitionId,
-        businessKey: params.businessKey,
-        variables: parseVariables(parseArray(params.variables)),
-        start: parseStartDateFilter(params),
-        page: parseInt(params.page) || undefined
+        parentProcessDefinitionId: params.parentProcessDefinitionId
       };
 
       return filter;
     }
 
     function serializeFilterToUri(filter) {
-      var businessKey = filter.businessKey,
-          activityIds = filter.activityIds,
-          parentProcessDefinitionId = filter.parentProcessDefinitionId,
-          variables = filter.variables,
-          start = filter.start;
+      var activityIds = filter.activityIds,
+          parentProcessDefinitionId = filter.parentProcessDefinitionId;
 
       function nonEmpty(array) {
         return array && array.length;
       }
 
-      function getDateValueForType(dateFilters, type) {
-        for (var i = 0; i < dateFilters.length; i++) {
-          var filter = dateFilters[i];
-          if (filter.type === type) {
-            return filter.value;
-          }
-        }
-        return null;
-      }
 
       search.updateSilently({
-        businessKey: businessKey || null,
         activityIds: nonEmpty(activityIds) ? activityIds.join(',') : null,
-        variables: nonEmpty(variables) ? collect(variables, Variables.toString).join(',') : null,
-        parentProcessDefinitionId: parentProcessDefinitionId || null,
-        startedAfter: nonEmpty(start) ? getDateValueForType(start, 'after') : null ,
-        startedBefore: nonEmpty(start) ? getDateValueForType(start, 'before') : null
+        parentProcessDefinitionId: parentProcessDefinitionId || null
       });
 
       currentFilter = filter;
@@ -262,6 +201,11 @@ var Controller = [
 
     // begin data usage ////////////////////////////
     $rootScope.showBreadcrumbs = true;
+    $scope.sidebarTab = 'info';
+
+    processData.observe('allProcessDefinitions', function(allDefinitions) {
+      $scope.allDefinitions = allDefinitions;
+    });
 
     $scope.breadcrumbData = processData.observe([ 'processDefinition', 'parent' ], function(definition, parent) {
       page.breadcrumbsClear();
@@ -322,7 +266,7 @@ var Controller = [
           selected = idx !== -1;
 
       if (!activityId) {
-        activityIds = null;
+        activityIds = [];
 
       } else {
 
@@ -343,7 +287,7 @@ var Controller = [
 
       newFilter.activityIds = activityIds;
 
-      processData.set('filter', newFilter);
+      $scope.$apply(processData.set.bind(processData, 'filter', newFilter));
     };
 
     $scope.processDefinition = processDefinition;
@@ -436,259 +380,6 @@ var Controller = [
 
   }];
 
-var ProcessDefinitionFilterController = [
-  '$scope',
-  '$filter',
-  'debounce',
-  'Variables',
-
-  function($scope, $filter, debounce, Variables) {
-
-    var processData = $scope.processData.newChild($scope),
-        filterData,
-        dateFilter = $filter('date'),
-        dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
-
-    $scope.dateTypeItems = [ 'after', 'before' ];
-
-    function createRefs(elements) {
-      var result = [];
-
-      angular.forEach(elements, function(e) {
-        result.push({
-          value: e
-        });
-      });
-
-      return result;
-    }
-
-    function createActivities(ids, bpmnElements) {
-      var result = [];
-
-      angular.forEach(ids, function(id) {
-        if(bpmnElements[id]) {
-          result.push({ id: id, name: bpmnElements[id].name || id });
-        }
-      });
-
-      return result;
-    }
-
-    function createDateFilter(dateFilter) {
-      return angular.copy(dateFilter) || [];
-    }
-
-    processData.provide('filterData', [ 'processDefinition', 'allProcessDefinitions', 'filter', 'parent', 'bpmnElements', function(definition, allDefinitions, filter, parent, bpmnElements) {
-
-      if (!filterData || filterData.filter != filter) {
-        return {
-          definition: definition,
-          allDefinitions: allDefinitions,
-          businessKey: filter.businessKey ? { value: filter.businessKey } : null,
-          parent: parent,
-          filter: filter,
-          variables: createRefs(filter.variables),
-          activities: createActivities(filter.activityIds, bpmnElements),
-          start : createDateFilter(filter.start)
-        };
-      } else {
-        return filterData;
-      }
-    }]);
-
-    processData.observe([ 'filterData' ], function(_filterData) {
-      $scope.filterData = filterData = _filterData;
-    });
-
-    $scope.operators = Variables.operators;
-
-    $scope.filterChanged = debounce(function() {
-
-      if ($scope.filterForm.$invalid) {
-        return;
-      }
-
-      var variables = filterData.variables,
-          activities = filterData.activities,
-          parent = filterData.parent,
-          businessKey = filterData.businessKey,
-          start = filterData.start,
-          newFilterVariables = [],
-          newFilterActivityIds = [],
-          newStart = [],
-          newFilter = {};
-
-      // business key
-      if (businessKey) {
-        newFilter.businessKey = businessKey.value;
-      }
-
-      // variables
-      angular.forEach(variables, function(v) {
-        if (v.value) {
-          newFilterVariables.push(v.value);
-        }
-      });
-
-      if (newFilterVariables.length) {
-        newFilter.variables = newFilterVariables;
-      }
-
-      // start
-      angular.forEach(start, function(filter) {
-        if (filter.value) {
-          if (filter.type === 'after') {
-            newStart.push({ type: 'after', value: filter.value });
-          } else if (filter.type === 'before') {
-            newStart.push({ type: 'before', value: filter.value });
-          }
-        }
-      });
-
-      newFilter.start = newStart;
-
-      // parentId
-      if (parent) {
-        newFilter.parentProcessDefinitionId = parent.id;
-      }
-
-      // activityIds
-      angular.forEach(activities, function(a) {
-        newFilterActivityIds.push(a.id);
-      });
-
-      if (newFilterActivityIds.length) {
-        newFilter.activityIds = newFilterActivityIds;
-      }
-
-      // update cached filter
-      filterData.filter = newFilter;
-
-      processData.set('filter', newFilter);
-    }, 2000);
-
-    var getLatestVersion = function() {
-      if($scope.filterData && $scope.filterData.allDefinitions) {
-        return Math.max.apply(null, $scope.filterData.allDefinitions.map(function(def) {
-          return def.version;
-        }));
-      }
-    };
-
-    $scope.isLatestVersion = function() {
-      if($scope.processDefinition) {
-        return $scope.processDefinition.version === getLatestVersion();
-      }
-      return false;
-    };
-
-    $scope.getMigrationUrl = function() {
-      var path = '#/migration';
-
-      var latestVersion = getLatestVersion();
-
-      var searches = {
-        sourceKey: $scope.processDefinition.key,
-        targetKey: $scope.processDefinition.key,
-        sourceVersion: $scope.isLatestVersion() ? $scope.processDefinition.version - 1 : $scope.processDefinition.version,
-        targetVersion: $scope.isLatestVersion() ? $scope.processDefinition.version : latestVersion
-      };
-
-      return routeUtil.redirectTo(path, searches, [ 'sourceKey', 'targetKey', 'sourceVersion', 'targetVersion' ]);
-    };
-
-    $scope.toggleVariableFilterHelp = function() {
-      $scope.showVariableFilterHelp = !$scope.showVariableFilterHelp;
-    };
-
-    $scope.addVariableFilter = function() {
-      filterData.variables.push({});
-    };
-
-    $scope.addBusinessKeyFilter = function() {
-      filterData.businessKey = { };
-    };
-
-    $scope.addStartDateFilter = function() {
-      var value = dateFilter(Date.now(), dateFormat),
-          start = filterData.start = filterData.start || [];
-
-      if (start && !start.length) {
-        start.push({ type: 'after', value: value });
-
-      } else if (start.length === 1) {
-        var newType = start[0].type === 'after' ? 'before' : 'after';
-        start.push({ type: newType, value: value });
-      } else {
-        // it should not be possible to add more than two startDateFilter.
-        return;
-      }
-
-      $scope.filterChanged();
-    };
-
-    $scope.removeBusinessKeyFilter = function() {
-      filterData.businessKey = null;
-      $scope.filterChanged();
-    };
-
-    $scope.removeParentFilter = function() {
-      filterData.parent = null;
-      $scope.filterChanged();
-    };
-
-    $scope.removeVariableFilter = function(variable) {
-      var variables = filterData.variables,
-          idx = variables.indexOf(variable);
-
-      if (idx !== -1) {
-        variables.splice(idx, 1);
-      }
-
-      $scope.filterChanged();
-    };
-
-    $scope.removeActivityFilter = function(activity) {
-      var activities = filterData.activities,
-          idx = activities.indexOf(activity);
-
-      if (idx !== -1) {
-        activities.splice(idx, 1);
-      }
-
-      $scope.filterChanged();
-    };
-
-    $scope.removeStartDateFilter = function(filter) {
-      var start = filterData.start,
-          idx = start.indexOf(filter);
-
-      if (idx !== -1) {
-        start.splice(idx, 1);
-      }
-
-      $scope.filterChanged();
-    };
-
-    $scope.dateFilterTypeChanged = function(firstSelectBox, secondSelectBox) {
-      if (firstSelectBox && secondSelectBox) {
-
-        if (firstSelectBox.$modelValue === secondSelectBox.$modelValue) {
-          firstSelectBox.$setValidity('dateTypeEqual', false);
-          secondSelectBox.$setValidity('dateTypeEqual', false);
-        } else {
-          firstSelectBox.$setValidity('dateTypeEqual', true);
-          secondSelectBox.$setValidity('dateTypeEqual', true);
-        }
-      }
-
-      $scope.filterChanged();
-    };
-
-    $scope.sidebarTab = 'info';
-  }];
-
 var RouteConfig = [
   '$routeProvider',
   function(
@@ -736,9 +427,7 @@ var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
 }];
 
 ngModule
-    .controller('ProcessDefinitionFilterController', ProcessDefinitionFilterController)
     .config(RouteConfig)
-    .config(ViewConfig)
-  ;
+    .config(ViewConfig);
 
 module.exports = ngModule;

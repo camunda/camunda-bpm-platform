@@ -43,9 +43,6 @@ describe('Cockpit Process Definition Spec', function() {
 
 
     it('should display definition key', function() {
-      // when
-      definitionPage.sidebarTabClick('Information');
-
       // then
       expect(definitionPage.information.definitionKey()).to.eventually.contain('user-tasks');
     });
@@ -118,13 +115,11 @@ describe('Cockpit Process Definition Spec', function() {
 
 
     it('should select activity', function() {
-
       // when
       definitionPage.diagram.selectActivity('UserTask_1');
 
       // then
       expect(definitionPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
-      expect(definitionPage.filter.activitySelection('User Task 1').isPresent()).to.eventually.be.true;
     });
 
 
@@ -138,18 +133,6 @@ describe('Cockpit Process Definition Spec', function() {
       // then
       expect(definitionPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
     });
-
-
-    it('should process clicks in Filter table', function() {
-
-      // when
-      definitionPage.sidebarTabClick('Filter');
-      definitionPage.filter.removeSelectionButton('User Task 1').click();
-
-      // then
-      expect(definitionPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.false;
-    });
-
   });
 
   describe('multi tenancy', function() {
@@ -171,26 +154,17 @@ describe('Cockpit Process Definition Spec', function() {
         });
 
         it('should display definition tenant id', function() {
-          // when
-          definitionPage.sidebarTabClick('Information');
-
           // then
           expect(definitionPage.information.tenantId()).to.eventually.contain('tenant1');
         });
 
         it('should display definition version for tenant only', function() {
-          // when
-          definitionPage.sidebarTabClick('Information');
-
           // then
           expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
           expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
         });
 
         it('should display running instances for tenant only', function() {
-          // when
-          definitionPage.sidebarTabClick('Information');
-
           // then
           expect(definitionPage.information.definitionInstancesCurrent()).to.eventually.contain('1');
           expect(definitionPage.information.definitionInstancesAll()).to.eventually.contain('1');
@@ -208,26 +182,17 @@ describe('Cockpit Process Definition Spec', function() {
       });
 
       it('should not display definition tenant id', function() {
-          // when
-          definitionPage.sidebarTabClick('Information');
-
           // then
           expect(definitionPage.information.tenantId()).to.eventually.contain('null');
         });
 
       it('should display definition version for non-tenant only', function() {
-        // when
-        definitionPage.sidebarTabClick('Information');
-
         // then
         expect(definitionPage.information.definitionVersion()).to.eventually.contain('1');
         expect(definitionPage.information.definitionVersionDropdownButton().isPresent()).to.eventually.be.false;
       });
 
       it('should display running instances for non-tenant only', function() {
-        // when
-        definitionPage.sidebarTabClick('Information');
-
         // then
         expect(definitionPage.information.definitionInstancesCurrent()).to.eventually.contain('1');
         expect(definitionPage.information.definitionInstancesAll()).to.eventually.contain('1');
@@ -257,9 +222,6 @@ describe('Cockpit Process Definition Spec', function() {
       });
 
       it('should display definition version tag', function() {
-        // when
-        definitionPage.sidebarTabClick('Information');
-
         // then
         expect(definitionPage.information.versionTag()).to.eventually.contain('1.0.0');
       });
@@ -274,9 +236,6 @@ describe('Cockpit Process Definition Spec', function() {
       });
 
       it('should display null on missing definition version tag', function() {
-        // when
-        definitionPage.sidebarTabClick('Information');
-
         // then
         expect(definitionPage.information.versionTag()).to.eventually.contain('null');
       });
