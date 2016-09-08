@@ -5,13 +5,13 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
 import org.camunda.bpm.container.impl.threading.ra.inflow.JobExecutionHandler;
-import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobHelper;
 
 
 /**
  * <p>MessageDrivenBean implementation of the {@link JobExecutionHandler} interface</p>
- * 
+ *
  * @author Daniel Meyer
  */
 @MessageDriven(
@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 public class JobExecutionHandlerMDB implements JobExecutionHandler {
 
   public void executeJob(String job, CommandExecutor commandExecutor) {
-    commandExecutor.execute(new ExecuteJobsCmd(job));
+    ExecuteJobHelper.executeJob(job, commandExecutor);
   }
 
 }
