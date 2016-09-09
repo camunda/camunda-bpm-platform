@@ -11,7 +11,7 @@ var usersPage = require('../pages/users');
 var groupsPage = require('../pages/groups');
 
 
-describe.only('Admin Users Spec', function() {
+describe('Admin Users Spec', function() {
 
   describe('user page navigation', function() {
 
