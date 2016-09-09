@@ -17,6 +17,9 @@ package org.camunda.bpm.qa.rolling.update.scenarios.externalTask;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.qa.rolling.update.TestFixture;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioSetup;
 import org.camunda.bpm.qa.upgrade.Times;
@@ -28,18 +31,25 @@ import org.camunda.bpm.qa.upgrade.Times;
 public class ProcessWithExternalTaskScenario {
 
   public static final String PROCESS_DEF_KEY = "processWithExternalTask";
-  public static final String TOPIC_NAME = "externalTaskTopic";
   public static final long LOCK_TIME = 5 * 60 * 1000;
 
   @Deployment
-  public static String deploy() {
-    return "org/camunda/bpm/qa/rolling/update/processWithExternalTask.bpmn20.xml";
+  public static BpmnModelInstance deploy() {
+    return Bpmn.createExecutableProcess(PROCESS_DEF_KEY)
+                .startEvent()
+                .serviceTask("externalTask")
+                  .camundaType("external")
+                  .camundaTopic(TestFixture.currentFixtureTag)
+                .endEvent()
+                .done();
   }
 
   @DescribesScenario("init")
   @Times(1)
   public static ScenarioSetup startProcess() {
     return new ScenarioSetup() {
+
+      @Override
       public void execute(ProcessEngine engine, String scenarioName) {
         engine.getRuntimeService().startProcessInstanceByKey(PROCESS_DEF_KEY, scenarioName);
       }
@@ -51,10 +61,12 @@ public class ProcessWithExternalTaskScenario {
   @Times(1)
   public static ScenarioSetup startProcessWithFetch() {
     return new ScenarioSetup() {
+
+      @Override
       public void execute(ProcessEngine engine, String scenarioName) {
         engine.getRuntimeService().startProcessInstanceByKey(PROCESS_DEF_KEY, scenarioName);
         engine.getExternalTaskService().fetchAndLock(1, scenarioName)
-                                       .topic(TOPIC_NAME, LOCK_TIME)
+                                       .topic(TestFixture.currentFixtureTag, LOCK_TIME)
                                        .execute();
       }
     };

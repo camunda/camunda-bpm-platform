@@ -38,6 +38,7 @@ import org.camunda.bpm.qa.upgrade.ScenarioRunner;
 public class TestFixture {
 
   public static final String DEFAULT_TAG = "7.5.0";
+  public static String currentFixtureTag;
 
   public TestFixture(ProcessEngine processEngine) {
   }
@@ -47,6 +48,7 @@ public class TestFixture {
     if (args.length > 0) {
       tag = args[0];
     }
+    currentFixtureTag = tag;
 
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("camunda.cfg.xml");

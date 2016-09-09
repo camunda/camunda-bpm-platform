@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  * @author Thorben Lindhauer
@@ -57,6 +58,13 @@ public class ScenarioRunner {
             .name(clazz.getSimpleName() + "." + method.getName())
             .addClasspathResource(deploymentResourcePath)
             .deploy();
+        } else if (BpmnModelInstance.class.isAssignableFrom(method.getReturnType())) {
+          if (deploymentResource != null) {
+            BpmnModelInstance instance = (BpmnModelInstance) deploymentResource;
+            engine.getRepositoryService().createDeployment()
+            .addModelInstance(clazz.getSimpleName() + "." + method.getName() + ".bpmn20.xml", instance)
+            .deploy();
+          }
         }
       }
     }

@@ -36,8 +36,6 @@ import static org.junit.Assert.assertNull;
 @EngineVersions({ RollingUpdateConstants.OLD_ENGINE_TAG, RollingUpdateConstants.NEW_ENGINE_TAG})
 public class CompleteProcessWithExternalTaskTest {
 
-  public static final String WORKER_ID = "workerId";
-  public static final String TOPIC_NAME = "externalTaskTopic";
   public static final long LOCK_TIME = 5 * 60 * 1000;
 
   @Rule
@@ -46,9 +44,11 @@ public class CompleteProcessWithExternalTaskTest {
   @Test
   @ScenarioUnderTest("init.1")
   public void testCompleteProcessWithExternalTask() {
+
+
     //given process with external task
     List<LockedExternalTask> externalTasks = rule.getExternalTaskService().fetchAndLock(1, rule.getBuisnessKey())
-      .topic(TOPIC_NAME, LOCK_TIME)
+      .topic(rule.getTag(), LOCK_TIME)
       .execute();
     assertEquals(1, externalTasks.size());
 
@@ -66,6 +66,7 @@ public class CompleteProcessWithExternalTaskTest {
     ExternalTask task = rule.getExternalTaskService()
                             .createExternalTaskQuery()
                             .locked()
+                            .topicName(rule.getTag())
                             .workerId(rule.getBuisnessKey())
                             .singleResult();
     Assert.assertNotNull(task);
@@ -77,6 +78,7 @@ public class CompleteProcessWithExternalTaskTest {
     task = rule.getExternalTaskService()
                             .createExternalTaskQuery()
                             .locked()
+                            .topicName(rule.getTag())
                             .workerId(rule.getBuisnessKey())
                             .singleResult();
     assertNull(task);
