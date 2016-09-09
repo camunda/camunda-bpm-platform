@@ -418,6 +418,12 @@
           <version>${wink.version}</version>
           <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+          <version>1.5.11</version>
+          <scope>test</scope>
+        </dependency>
       </dependencies>
       <build>
         <plugins>
@@ -481,6 +487,12 @@
         <dependency>
           <groupId>org.glassfish.jersey.containers</groupId>
           <artifactId>jersey-container-grizzly2-http</artifactId>
+          <version>2.21.1</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.glassfish.jersey.containers</groupId>
+          <artifactId>jersey-container-servlet</artifactId>
           <version>2.21.1</version>
           <scope>test</scope>
         </dependency>
