@@ -27,19 +27,6 @@
     <jersey.version>1.17.1</jersey.version>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-bom</artifactId>
-        <version>${project.version}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
-
   <dependencies>
     <dependency>
       <groupId>commons-fileupload</groupId>
