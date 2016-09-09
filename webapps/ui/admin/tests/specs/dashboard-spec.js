@@ -61,6 +61,26 @@ describe('Admin Dashboard Spec', function() {
         dashboardPage.authentication.ensureUserLogout();
       });
 
+      it('shows an error', function() {
+        expect(element(by.cssContainingText('.notifications', 'missing access rights to application')).isPresent()).to.eventually.eql(true);
+      });
+    });
+
+
+    describe('as a conventional user with admin access', function () {
+      before(function () {
+        dashboardPage.navigateToWebapp('Admin');
+        dashboardPage.authentication.userLogin('mm', 'SweetDreams');
+      });
+
+      after(function () {
+        dashboardPage.authentication.ensureUserLogout();
+      });
+
+
+      it('shows an error', function() {
+        expect(element(by.cssContainingText('.notifications', 'missing access rights to application')).isPresent()).to.eventually.eql(false);
+      });
 
       it('should present the user section', function () {
         expect(dashboardPage.section('user').isPresent()).to.eventually.eql(true);

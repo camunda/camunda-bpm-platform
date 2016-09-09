@@ -13,6 +13,22 @@ module.exports = {
       firstName:  'John',
       lastName:   'Bonham',
       email:      'john.bonham@led-zeppelin.com'
+    },
+    {
+      id:         'mm',
+      password:   'SweetDreams',
+      firstName:  'uʎlᴉɹɐW',
+      lastName:   'uosuɐW',
+      email:      'm.m@rock.com'
+    }]),
+
+    operation('authorization', 'create', [{
+      type : 1,
+      permissions: ['ALL'],
+      userId: 'mm',
+      groupId: null,
+      resourceType: 0,
+      resourceId: 'admin'
     }])
   )
 };
