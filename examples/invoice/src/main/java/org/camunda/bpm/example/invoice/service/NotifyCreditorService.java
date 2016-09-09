@@ -27,7 +27,7 @@ public class NotifyCreditorService implements JavaDelegate {
 
   public void execute(DelegateExecution execution) throws Exception {
 
-    LOGGER.info("\n\n  ... Now notfying creditor " + execution.getVariable("creditor") + "\n\n");
+    LOGGER.info("\n\n  ... Now notifying creditor " + execution.getVariable("creditor") + "\n\n");
 
   }
 
