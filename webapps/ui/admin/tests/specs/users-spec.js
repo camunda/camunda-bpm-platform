@@ -11,7 +11,7 @@ var usersPage = require('../pages/users');
 var groupsPage = require('../pages/groups');
 
 
-describe('Admin Users Spec', function() {
+describe.only('Admin Users Spec', function() {
 
   describe('user page navigation', function() {
 
@@ -62,8 +62,7 @@ describe('Admin Users Spec', function() {
       expect(usersPage.editUserProfile.emailInput().getAttribute('value')).to.eventually.eql(users[0].params.email);
     });
 
-  })
-
+  });
 
   describe('create a new user', function() {
 
@@ -93,7 +92,7 @@ describe('Admin Users Spec', function() {
     it('should enter new user data', function() {
 
       // when
-      usersPage.newUser.createNewUser('Xäbi', 'password1234', 'password1234', 'Xäbi', 'Älönsö', 'xaebi.aeloensoe@fcb.de' );
+      usersPage.newUser.createNewUser('Xäbi', 'pass', 'pass', 'Xäbi', 'Älönsö', 'xaebi.aeloensoe@fcb.de' );
       usersPage.editUserProfile.navigateTo({ user: 'Xäbi' });
 
       // then
@@ -115,9 +114,10 @@ describe('Admin Users Spec', function() {
 
       // given
       usersPage.logout();
+      usersPage.navigateToWebapp('Welcome');
 
       // when
-      usersPage.authentication.userLogin('Xäbi', 'password1234');
+      usersPage.authentication.userLogin('Xäbi', 'pass');
       browser.get(usersPage.url);
 
       // then
@@ -261,6 +261,7 @@ describe('Admin Users Spec', function() {
 
         // given
         usersPage.logout();
+        usersPage.navigateToWebapp('Welcome');
 
         // when
         usersPage.authentication.userLogin(users[2].params.id, 'asdfasdf');
