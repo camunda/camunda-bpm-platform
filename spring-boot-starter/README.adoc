@@ -1,9 +1,10 @@
 # camunda-bpm-spring-boot-starter
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-bpm-spring-boot-starter/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-bpm-spring-boot-starter)  [![Project Stats](https://www.openhub.net/p/camunda-bpm-spring-boot-starter/widgets/project_thin_badge.gif)](https://www.openhub.net/p/camunda-bpm-spring-boot-starter) [![Travis Build](https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter.svg?branch=master)](https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter)
-
-</tr>
-</table>
+image::https://img.shields.io/badge/License-Apache%202.0-blue.svg[link="http://www.apache.org/licenses/LICENSE-2.0"]
+image::https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-bpm-spring-boot-starter/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-bpm-spring-boot-starter"]
+image::https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension.springboot/camunda-bpm-spring-boot-starter/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension.springboot"]
+image::https://www.openhub.net/p/camunda-bpm-spring-boot-starter/widgets/project_thin_badge.gif[link="https://www.openhub.net/p/camunda-bpm-spring-boot-starter"]
+image::https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter.svg?branch=master[link=https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter"]
 
 ## Get started
 
@@ -57,13 +58,13 @@ If you have implemented an `CamundaConfiguration` you have to switch to `Process
 
 ### Roadmap
 
-* [Milestone 1.3.0](https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/4?closed=1)
-* [Milestone 2.0.0](https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/3) - Java8 + Spring Boot 1.4
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/4?closed=1[Milestone 1.3.0]
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/3[Milestone 2.0.0] - Java8 + Spring Boot 1.4
 
 ## Contribution
 
 As of release 2.0.0, this extension uses Java8 only. To ensure correct behavior of maven builds we use 
-the [maven wrapper](https://github.com/takari/maven-wrapper) and maven 3.3.1.
+the https://github.com/takari/maven-wrapper[maven wrapper] and maven 3.3.1.
 
 Build with:
 
@@ -71,9 +72,9 @@ Build with:
 
 ## Maintainer
 
-*  _[Oliver Steinhauer](https://github.com/osteinhauer)_
-*  _[Jan Galinski](https://github.com/jangalinski)_
-*  _[Christian Lipphardt](https://github.com/hawky-4s-)_
+*  _https://github.com/osteinhauer[Oliver Steinhauer]_
+*  _https://github.com/jangalinski[Jan Galinski]_
+*  _https://github.com/hawky-4s-[Christian Lipphardt]_
 
 ## License
 
