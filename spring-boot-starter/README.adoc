@@ -12,7 +12,7 @@ The extension is published on maven central, so if you are using maven, just add
 
 ```xml
 <dependency>
-  <groupId>org.camunda.bpm.extension</groupId>
+  <groupId>org.camunda.bpm.extension.springboot</groupId>
   <artifactId>camunda-bpm-spring-boot-starter([-rest|-webapp])</artifactId>
   <version>1.3.0</version>
 </dependency>
