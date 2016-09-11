@@ -40,25 +40,27 @@ Check out the [Documentation](https://camunda.github.io/camunda-bpm-spring-boot-
 * https://github.com/camunda/camunda-bpm-spring-boot-starter/issues[Issue Tracker]
 * link:./CONTRIBUTE.md[Contributing]
 
-
 ## Releases
+
+### 1.3.0
+
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/4?closed=1[Release Notes 1.3.0]
+
+### Migration hints from < 1.3.0 to >= 1.3.0
+
+*Configuration*
+
+We have decided to refactor the configuration mechanism. Especially we removed the  `org.camunda.bpm.spring.boot.starter.configuration.CamundaConfiguration` interface. For now each configuration is a `org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin`. With this it is possible to hook into `preInit`, `postInit` and `postProcessEngineBuild` which supports more complex situations.
+
+If you have implemented an `CamundaConfiguration` you have to switch to `ProcessEnginePlugin` (and its `preInit` method). You can also extend your configuration from `org.camunda.bpm.spring.boot.starter.configuration.impl.AbstractCamundaConfiguration` to avoid a cast to `SpringProcessEngineConfiguration`.
+
+### 1.2.1 
 
 * https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/5?closed=1[Release Notes 1.2.1]
 * https://blog.camunda.org/post/2016/06/camunda-spring-boot-1.2.0-released/[Blog Article for release 1.2.0]
  
-### Migration hints
+## Roadmap
 
-#### From < 1.3.0 to >= 1.3.0
-
-##### Configuration
-
-We have decided to refactor the configuration mechanism. Especially we removed the  `org.camunda.bpm.spring.boot.starter.configuration.CamundaConfiguration` interface. For now all configurations are `org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin`s. With this it is possible to hook into `preInit`, `postInit` and `postProcessEngineBuild` which provides more complex possibilities.
-
-If you have implemented an `CamundaConfiguration` you have to switch to `ProcessEnginePlugin` (and its `preInit` method). You can also extend your configuration from `org.camunda.bpm.spring.boot.starter.configuration.impl.AbstractCamundaConfiguration` to avoid a cast to `SpringProcessEngineConfiguration`.
-
-### Roadmap
-
-* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/4?closed=1[Milestone 1.3.0]
 * https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/3[Milestone 2.0.0] - Java8 + Spring Boot 1.4
 
 ## Contribution
