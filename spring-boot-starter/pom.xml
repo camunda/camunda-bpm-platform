@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -44,7 +43,7 @@
             </archive>
           </configuration>
         </plugin>
-        <!-- set version for spring-boot-maven-plugin because we use the 
+        <!-- set version for spring-boot-maven-plugin because we use the
           spring-boot-parent only in dependencyManagement section, not as parent. -->
         <plugin>
           <groupId>org.springframework.boot</groupId>
@@ -112,7 +111,7 @@
     <tag>HEAD</tag>
   </scm>
 
-  <!-- repositories used for distribution of releases and snapshots, DO NOT 
+  <!-- repositories used for distribution of releases and snapshots, DO NOT
     CHANGE -->
   <distributionManagement>
     <repository>
