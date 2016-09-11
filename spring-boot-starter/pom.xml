@@ -17,6 +17,8 @@
 
   <modules>
     <module>extension</module>
+    <module>bom</module>
+
     <module>examples</module>
     <module>docs</module>
   </modules>
