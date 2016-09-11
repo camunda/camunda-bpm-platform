@@ -37,14 +37,14 @@ Check out the [Documentation](https://camunda.github.io/camunda-bpm-spring-boot-
 
 ## Resources
 
-* [Issue Tracker](https://github.com/camunda/camunda-bpm-spring-boot-starter/issues)
-* [Contributing](https://github.com/camunda/camunda-bpm-spring-boot-starter/blob/master/CONTRIBUTE.md)
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/issues[Issue Tracker]
+* link:./CONTRIBUTE.md[Contributing]
 
 
 ## Releases
 
-* [Release Notes 1.2.1](https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/5?closed=1)
-* [Blog Article for release 1.2.0](https://blog.camunda.org/post/2016/06/camunda-spring-boot-1.2.0-released/)
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/5?closed=1[Release Notes 1.2.1]
+* https://blog.camunda.org/post/2016/06/camunda-spring-boot-1.2.0-released/[Blog Article for release 1.2.0]
  
 ### Migration hints
 
