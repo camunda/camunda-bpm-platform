@@ -32,7 +32,7 @@ public class WebappExampleProcessApplication extends SpringBootProcessApplicatio
 }
 ```
 
-Check out the [Documentation](https://camunda.github.io/camunda-bpm-spring-boot-starter) and the [Examples](https://github.com/camunda/camunda-bpm-spring-boot-starter/tree/master/examples)
+Check out the https://camunda.github.io/camunda-bpm-spring-boot-starter[Documentation] and the https://github.com/camunda/camunda-bpm-spring-boot-starter/tree/master/examples[Examples]
 
 
 ## Resources
