@@ -1,6 +1,6 @@
 # camunda-bpm-spring-boot-starter
 
-image::https://img.shields.io/badge/License-Apache%202.0-blue.svg[link="http://www.apache.org/licenses/LICENSE-2.0"]
+image::https://img.shields.io/badge/License-Apache%202.0-blue.svg[link="./LICENSE"]
 image::https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-bpm-spring-boot-starter/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension/camunda-bpm-spring-boot-starter"]
 image::https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension.springboot/camunda-bpm-spring-boot-starter/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension.springboot"]
 image::https://www.openhub.net/p/camunda-bpm-spring-boot-starter/widgets/project_thin_badge.gif[link="https://www.openhub.net/p/camunda-bpm-spring-boot-starter"]
@@ -78,5 +78,5 @@ Build with:
 
 ## License
 
-* [Apache License, Version 2.0](./LICENSE)
+* link:./LICENSE[Apache License, Version 2.0]
 
