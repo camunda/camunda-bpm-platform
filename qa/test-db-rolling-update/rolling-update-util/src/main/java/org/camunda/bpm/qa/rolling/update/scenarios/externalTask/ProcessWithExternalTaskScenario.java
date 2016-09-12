@@ -16,10 +16,8 @@
 package org.camunda.bpm.qa.rolling.update.scenarios.externalTask;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.qa.rolling.update.TestFixture;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioSetup;
 import org.camunda.bpm.qa.upgrade.Times;
@@ -31,17 +29,29 @@ import org.camunda.bpm.qa.upgrade.Times;
 public class ProcessWithExternalTaskScenario {
 
   public static final String PROCESS_DEF_KEY = "processWithExternalTask";
+  public static final String EXTERNAL_TASK = "externalTask";
+  public static final String EXTERNAL_TASK_TYPE = "external";
   public static final long LOCK_TIME = 5 * 60 * 1000;
 
-  @Deployment
-  public static BpmnModelInstance deploy() {
-    return Bpmn.createExecutableProcess(PROCESS_DEF_KEY)
-                .startEvent()
-                .serviceTask("externalTask")
-                  .camundaType("external")
-                  .camundaTopic(TestFixture.currentFixtureTag)
-                .endEvent()
-                .done();
+  /**
+   * Deploy a process model, which contains an external task. The topic is
+   * given via parameter so the test cases are independent.
+   *
+   * @param engine the engine which is used to deploy the instance
+   * @param topicName the topic name for the external task
+   */
+  public static void deploy(ProcessEngine engine, String topicName) {
+    BpmnModelInstance instance = Bpmn.createExecutableProcess(PROCESS_DEF_KEY)
+            .startEvent()
+            .serviceTask(EXTERNAL_TASK)
+            .camundaType(EXTERNAL_TASK_TYPE)
+            .camundaTopic(topicName)
+            .endEvent()
+            .done();
+
+    engine.getRepositoryService().createDeployment()
+        .addModelInstance(ProcessWithExternalTaskScenario.class.getSimpleName() + ".startProcessWithFetch.bpmn20.xml", instance)
+        .deploy();
   }
 
   @DescribesScenario("init")
@@ -51,6 +61,7 @@ public class ProcessWithExternalTaskScenario {
 
       @Override
       public void execute(ProcessEngine engine, String scenarioName) {
+        deploy(engine, scenarioName);
         engine.getRuntimeService().startProcessInstanceByKey(PROCESS_DEF_KEY, scenarioName);
       }
     };
@@ -64,9 +75,11 @@ public class ProcessWithExternalTaskScenario {
 
       @Override
       public void execute(ProcessEngine engine, String scenarioName) {
+        deploy(engine, scenarioName);
+
         engine.getRuntimeService().startProcessInstanceByKey(PROCESS_DEF_KEY, scenarioName);
         engine.getExternalTaskService().fetchAndLock(1, scenarioName)
-                                       .topic(TestFixture.currentFixtureTag, LOCK_TIME)
+                                       .topic(scenarioName, LOCK_TIME)
                                        .execute();
       }
     };

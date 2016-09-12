@@ -37,16 +37,15 @@ public class CompleteProcessWithExternalTaskTest extends AbstractRollingUpdateTe
   @Test
   @ScenarioUnderTest("init.1")
   public void testCompleteProcessWithExternalTask() {
-
-
     //given process with external task
-    List<LockedExternalTask> externalTasks = rule.getExternalTaskService().fetchAndLock(1, rule.getBuisnessKey())
-      .topic(rule.getTag(), LOCK_TIME)
+    String buisnessKey = rule.getBuisnessKey();
+    List<LockedExternalTask> externalTasks = rule.getExternalTaskService().fetchAndLock(1, buisnessKey)
+      .topic(buisnessKey, LOCK_TIME)
       .execute();
     assertEquals(1, externalTasks.size());
 
     //when external task is completed
-    rule.getExternalTaskService().complete(externalTasks.get(0).getId(), rule.getBuisnessKey());
+    rule.getExternalTaskService().complete(externalTasks.get(0).getId(), buisnessKey);
 
     //then process instance is ended
     rule.assertScenarioEnded();
@@ -54,26 +53,28 @@ public class CompleteProcessWithExternalTaskTest extends AbstractRollingUpdateTe
 
   @Test
   @ScenarioUnderTest("init.fetch.1")
-  public void testCompleteProcessWithFetchedExternalTask() {
+  public void testCompleteProcessWithFetchedExternalTask() throws InterruptedException {
     //given process with locked external task
+    String buisnessKey = rule.getBuisnessKey();
     ExternalTask task = rule.getExternalTaskService()
                             .createExternalTaskQuery()
                             .locked()
-                            .topicName(rule.getTag())
-                            .workerId(rule.getBuisnessKey())
+                            .topicName(buisnessKey)
+                            .workerId(buisnessKey)
                             .singleResult();
     Assert.assertNotNull(task);
 
     //when external task is completed
-    rule.getExternalTaskService().complete(task.getId(), rule.getBuisnessKey());
+    rule.getExternalTaskService().complete(task.getId(), buisnessKey);
 
     //then no locked external task with worker id exists
     task = rule.getExternalTaskService()
                             .createExternalTaskQuery()
                             .locked()
-                            .topicName(rule.getTag())
-                            .workerId(rule.getBuisnessKey())
+                            .topicName(buisnessKey)
+                            .workerId(buisnessKey)
                             .singleResult();
     assertNull(task);
+    rule.assertScenarioEnded();
   }
 }
