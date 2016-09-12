@@ -33,6 +33,32 @@ var Controller = [
       $scope.hovered = id || null;
     };
 
+    $scope.hasCasePlugin = false;
+    try {
+      $scope.hasCasePlugin = !!angular.module('cockpit.plugin.case');
+    }
+    catch (e) {
+      // do nothing
+    }
+
+
+    var processInstancePlugins = Views.getProviders({ component: 'cockpit.processInstance.view' });
+
+    var hasHistoryPlugin = processInstancePlugins.filter(function(plugin) {
+      return plugin.id === 'history';
+    }).length > 0;
+
+    if(hasHistoryPlugin) {
+      // if we have no history plugin, then just go to the runtime view
+      $scope.processInstanceLink =
+          '#/process-instance/' + $scope.decisionInstance.processInstanceId + '/history' +
+          '?activityInstanceIds=' + $scope.decisionInstance.activityInstanceId +
+          '&activityIds=' + $scope.decisionInstance.activityId;
+    } else {
+      // if we have the history plugin, go to the history view and select the activity, that executed the decision
+      $scope.processInstanceLink = '#/process-instance/' + $scope.decisionInstance.processInstanceId;
+    }
+
     // end utilities ///////////////////////
 
 
@@ -120,6 +146,16 @@ var Controller = [
       };
 
       return routeUtil.redirectTo(path, searches, [ 'deployment', 'resourceName', 'deploymentsQuery' ]);
+    };
+
+    $scope.getActivitySearch = function(decisionInstance) {
+
+      return JSON.stringify([{
+        type: 'caseActivityIdIn',
+        operator: 'eq',
+        value: decisionInstance.activityId
+      }]);
+
     };
 
     $scope.initializeTablePlugins = function() {

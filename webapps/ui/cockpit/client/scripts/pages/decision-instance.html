@@ -71,6 +71,38 @@
           <a ng-href="{{ getDeploymentUrl() }}">{{ decisionDefinition.deploymentId }}</a>
         </dd>
 
+        <dt ng-if="decisionInstance.processInstanceId"
+            cam-widget-clipboard="decisionInstance.processInstanceId"
+            ng-class="{hovered: hovered === 'super-process-instance-id'}">Process Instance ID:</dt>
+        <dd class="super-process-instance-id"
+            ng-if="decisionInstance.processInstanceId"
+            ng-mouseenter="hoverTitle('super-process-instance-id')"
+            ng-mouseleave="hoverTitle()">
+          <a ng-href="{{ processInstanceLink }}">{{ decisionInstance.processInstanceId }}</a>
+        </dd>
+        <dt ng-if="!decisionInstance.processInstanceId">Process Instance ID:</dt>
+        <dd class="super-process-instance-id"
+            ng-if="!decisionInstance.processInstanceId"><span class="null-value">null</span></dd>
+
+        <dt ng-if="decisionInstance.caseInstanceId"
+            cam-widget-clipboard="decisionInstance.caseInstanceId"
+            ng-class="{hovered: hovered === 'super-case-instance-id'}">Case Instance ID:</dt>
+        <dd class="super-case-instance-id"
+            ng-if="decisionInstance.caseInstanceId"
+            ng-mouseenter="hoverTitle('super-case-instance-id')"
+            ng-mouseleave="hoverTitle()">
+          <a ng-if="hasCasePlugin"
+             ng-href="#/case-instance/{{decisionInstance.caseInstanceId}}?searchQuery={{ getActivitySearch(decisionInstance) }}">
+            {{ decisionInstance.caseInstanceId }}
+          </a>
+          <span ng-if="!hasCasePlugin">
+            {{ decisionInstance.caseInstanceId }}
+          </span>
+        </dd>
+        <dt ng-if="!decisionInstance.caseInstanceId">Case Instance ID:</dt>
+        <dd class="super-case-instance-id"
+            ng-if="!decisionInstance.caseInstanceId"><span class="null-value">null</span></dd>
+
       </dl>
 
       <a class="hide-collapsable pull-right"></a>

@@ -9,5 +9,18 @@ module.exports = Base.extend({
   pageHeader: function() {
     this.waitForElementToBeVisible(element(by.css('.ctn-header h1')));
     return element(by.css('.ctn-header h1'));
+  },
+
+  processInstanceLink: function() {
+    return element(by.css('.super-process-instance-id'));
+  },
+
+  gotoProcessInstanceButton: function() {
+    return this.processInstanceLink().element(by.css('a'));
+  },
+
+  gotoProcessInstance: function() {
+    return this.gotoProcessInstanceButton().click();
   }
+
 });

@@ -11,7 +11,6 @@ var angular = require('angular'),
     // decision instance
     inputTable = require('./decisionInstance/inputTable'),
     outputTable = require('./decisionInstance/outputTable'),
-    gotoProcessInstanceAction = require('./decisionInstance/gotoProcessInstanceAction'),
 
     // decision instance table
     highlightRules = require('./decisionInstance/highlightRules'),
@@ -27,7 +26,5 @@ ngModule.config(outputTable);
 ngModule.config(highlightRules);
 ngModule.config(realInput);
 ngModule.config(realOutput);
-
-gotoProcessInstanceAction(ngModule);
 
 module.exports = ngModule;
