@@ -16,10 +16,7 @@
 package org.camunda.bpm.qa.rolling.update;
 
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.qa.rolling.upgrade.EngineVersions;
-import org.camunda.bpm.qa.rolling.upgrade.RollingUpdateRule;
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -29,11 +26,7 @@ import org.junit.Test;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 @ScenarioUnderTest("DeploymentWhichShouldBeDeletedScenario")
-@EngineVersions({ RollingUpdateConstants.OLD_ENGINE_TAG, RollingUpdateConstants.NEW_ENGINE_TAG})
-public class DeleteDeploymentTest {
-
-  @Rule
-  public RollingUpdateRule rule = new RollingUpdateRule();
+public class DeleteDeploymentTest extends AbstractRollingUpdateTestCase {
 
   @Test
   @ScenarioUnderTest("init.1")

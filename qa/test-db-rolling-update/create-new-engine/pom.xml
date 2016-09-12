@@ -7,9 +7,9 @@
     <version>7.6.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>camunda-qa-db-test-new-engine</artifactId>
+  <artifactId>camunda-qa-db-create-new-engine</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - rolling update - test new engine</name>
+  <name>camunda BPM - QA - upgrade - rolling update - create new engine</name>
 
   <properties>
     <camunda.version.current>${project.version}</camunda.version.current>

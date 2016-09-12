@@ -1,4 +1,7 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
+/*
+ * Copyright 2016 camunda services GmbH.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -13,16 +16,11 @@
 package org.camunda.bpm.qa.rolling.update;
 
 /**
- * Creates process instances with the new engine for the rolling updates.
- * Executes the utility test fixture class with the current engine version.
+ * Contains the rolling update tags which are used for the scenarios and test cases.
  *
- * @author Christopher Zell
+ * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class TestNewEngineMain {
-
-  public static final String NEW_ENGINE_VERSION = "7.6.0";
-
-  public static void main(String[] args) {
-    org.camunda.bpm.qa.rolling.update.TestFixture.main(new String[]{NEW_ENGINE_VERSION});
-  }
+public final class RollingUpdateConstants {
+  public static final String OLD_ENGINE_TAG = "OLD";
+  public static final String NEW_ENGINE_TAG = "CURRENT";
 }

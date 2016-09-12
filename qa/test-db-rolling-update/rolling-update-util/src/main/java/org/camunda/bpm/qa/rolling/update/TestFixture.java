@@ -30,14 +30,14 @@ import org.camunda.bpm.qa.rolling.update.scenarios.task.ProcessWithUserTaskScena
 import org.camunda.bpm.qa.upgrade.ScenarioRunner;
 
 /**
- * Sets up scenarios for migration from 7.5.0
+ * Sets up scenarios for rolling updates.
  *
  * @author Thorben Lindhauer
  * @author Christopher Zell
  */
 public class TestFixture {
 
-  public static final String DEFAULT_TAG = "7.5.0";
+  public static final String DEFAULT_TAG = RollingUpdateConstants.OLD_ENGINE_TAG;
   public static String currentFixtureTag;
 
   public TestFixture(ProcessEngine processEngine) {

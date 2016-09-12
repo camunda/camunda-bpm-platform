@@ -54,9 +54,10 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
     </dependency>
+    
     <dependency>
       <groupId>org.camunda.bpm.qa.upgrade</groupId>
-      <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
+      <artifactId>camunda-qa-db-rolling-update-util</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

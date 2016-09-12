@@ -18,11 +18,8 @@ package org.camunda.bpm.qa.rolling.update.multiInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
-import org.camunda.bpm.qa.rolling.update.RollingUpdateConstants;
-import org.camunda.bpm.qa.rolling.upgrade.EngineVersions;
-import org.camunda.bpm.qa.rolling.upgrade.RollingUpdateRule;
+import org.camunda.bpm.qa.rolling.update.AbstractRollingUpdateTestCase;
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
-import org.junit.Rule;
 import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 
@@ -31,11 +28,7 @@ import static org.junit.Assert.assertNotNull;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 @ScenarioUnderTest("ProcessWithMultiInstanceCallActivityScenario")
-@EngineVersions({ RollingUpdateConstants.OLD_ENGINE_TAG, RollingUpdateConstants.NEW_ENGINE_TAG})
-public class CompleteProcessWithMultiInstanceCallActivityTest {
-
-  @Rule
-  public RollingUpdateRule rule = new RollingUpdateRule();
+public class CompleteProcessWithMultiInstanceCallActivityTest extends AbstractRollingUpdateTestCase {
 
   @Test
   @ScenarioUnderTest("init.1")

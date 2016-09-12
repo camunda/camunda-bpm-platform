@@ -16,7 +16,7 @@
   <modules>
     <module>rolling-update-util</module>
     <module>create-old-engine</module>
-    <module>test-new-engine</module>
+    <module>create-new-engine</module>
     <module>test-old-engine</module>
   </modules>
   <build>

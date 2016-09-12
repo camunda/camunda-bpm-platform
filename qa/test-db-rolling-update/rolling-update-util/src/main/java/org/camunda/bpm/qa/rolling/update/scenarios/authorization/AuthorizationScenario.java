@@ -36,8 +36,8 @@ import org.camunda.bpm.qa.upgrade.Times;
  */
 public class AuthorizationScenario {
 
-  protected static final String USER_ID = "test";
-  protected static final String GROUP_ID = "accounting";
+  protected static final String USER_ID = "user";
+  protected static final String GROUP_ID = "group";
   public static final String PROCESS_DEF_KEY = "oneTaskProcess";
 
   @Deployment

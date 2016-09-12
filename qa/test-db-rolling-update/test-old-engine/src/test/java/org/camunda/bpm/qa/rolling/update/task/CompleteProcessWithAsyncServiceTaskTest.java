@@ -17,12 +17,9 @@ package org.camunda.bpm.qa.rolling.update.task;
 
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.qa.rolling.update.RollingUpdateConstants;
-import org.camunda.bpm.qa.rolling.upgrade.EngineVersions;
-import org.camunda.bpm.qa.rolling.upgrade.RollingUpdateRule;
+import org.camunda.bpm.qa.rolling.update.AbstractRollingUpdateTestCase;
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -32,11 +29,7 @@ import org.junit.Test;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 @ScenarioUnderTest("ProcessWithAsyncServiceTaskScenario")
-@EngineVersions({ RollingUpdateConstants.OLD_ENGINE_TAG, RollingUpdateConstants.NEW_ENGINE_TAG})
-public class CompleteProcessWithAsyncServiceTaskTest {
-
-  @Rule
-  public RollingUpdateRule rule = new RollingUpdateRule();
+public class CompleteProcessWithAsyncServiceTaskTest extends AbstractRollingUpdateTestCase {
 
   @Test
   @ScenarioUnderTest("init.1")

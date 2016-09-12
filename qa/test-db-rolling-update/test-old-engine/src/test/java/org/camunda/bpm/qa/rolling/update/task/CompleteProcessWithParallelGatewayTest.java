@@ -20,12 +20,9 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.qa.rolling.update.RollingUpdateConstants;
-import org.camunda.bpm.qa.rolling.upgrade.EngineVersions;
-import org.camunda.bpm.qa.rolling.upgrade.RollingUpdateRule;
+import org.camunda.bpm.qa.rolling.update.AbstractRollingUpdateTestCase;
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -35,11 +32,7 @@ import org.junit.Test;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 @ScenarioUnderTest("ProcessWithParallelGatewayScenario")
-@EngineVersions({ RollingUpdateConstants.OLD_ENGINE_TAG, RollingUpdateConstants.NEW_ENGINE_TAG})
-public class CompleteProcessWithParallelGatewayTest {
-
-  @Rule
-  public RollingUpdateRule rule = new RollingUpdateRule();
+public class CompleteProcessWithParallelGatewayTest extends AbstractRollingUpdateTestCase {
 
   @Test
   @ScenarioUnderTest("init.none.1")

@@ -20,11 +20,8 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
-import org.camunda.bpm.qa.rolling.update.RollingUpdateConstants;
-import org.camunda.bpm.qa.rolling.upgrade.EngineVersions;
-import org.camunda.bpm.qa.rolling.upgrade.RollingUpdateRule;
+import org.camunda.bpm.qa.rolling.update.AbstractRollingUpdateTestCase;
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.Before;
 import static org.junit.Assert.assertNotNull;
@@ -34,17 +31,12 @@ import static org.junit.Assert.assertNotNull;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 @ScenarioUnderTest("ProcessWithCallActivityScenario")
-@EngineVersions({ RollingUpdateConstants.OLD_ENGINE_TAG, RollingUpdateConstants.NEW_ENGINE_TAG})
-public class CompleteProcessWithCallActivityTest {
-
-  @Rule
-  public RollingUpdateRule rule = new RollingUpdateRule();
-
+public class CompleteProcessWithCallActivityTest extends AbstractRollingUpdateTestCase {
 
   protected RuntimeService runtimeService;
 
   @Before
-  public void init() {
+  public void setUp() {
     runtimeService = rule.getRuntimeService();
   }
 

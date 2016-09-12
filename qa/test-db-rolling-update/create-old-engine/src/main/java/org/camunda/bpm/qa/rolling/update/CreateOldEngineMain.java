@@ -21,9 +21,7 @@ package org.camunda.bpm.qa.rolling.update;
  */
 public class CreateOldEngineMain {
 
-  public static final String OLD_ENGINE_VERSION = "7.5.0";
-
   public static void main(String[] args) {
-    org.camunda.bpm.qa.rolling.update.TestFixture.main(new String[]{OLD_ENGINE_VERSION});
+    org.camunda.bpm.qa.rolling.update.TestFixture.main(new String[]{RollingUpdateConstants.OLD_ENGINE_TAG});
   }
 }

@@ -31,13 +31,10 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.qa.rolling.update.RollingUpdateConstants;
-import org.camunda.bpm.qa.rolling.upgrade.EngineVersions;
-import org.camunda.bpm.qa.rolling.upgrade.RollingUpdateRule;
+import org.camunda.bpm.qa.rolling.update.AbstractRollingUpdateTestCase;
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -47,13 +44,11 @@ import static org.junit.Assert.assertNotNull;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 @ScenarioUnderTest("AuthorizationScenario")
-@EngineVersions({ RollingUpdateConstants.OLD_ENGINE_TAG, RollingUpdateConstants.NEW_ENGINE_TAG})
-public class AuthorizationTest {
+public class AuthorizationTest extends AbstractRollingUpdateTestCase {
 
   public static final String PROCESS_DEF_KEY = "oneTaskProcess";
-
-  @Rule
-  public RollingUpdateRule rule = new RollingUpdateRule("camunda.auth.cfg.xml");
+  protected static final String USER_ID = "user";
+  protected static final String GROUP_ID = "group";
 
   protected IdentityService identityService;
   protected RepositoryService repositoryService;
@@ -72,7 +67,7 @@ public class AuthorizationTest {
     formService = rule.getFormService();
 
     identityService.clearAuthentication();
-    identityService.setAuthentication("test" + rule.getBuisnessKey(), Arrays.asList("accounting" + rule.getBuisnessKey()));
+    identityService.setAuthentication(USER_ID + rule.getBuisnessKey(), Arrays.asList(GROUP_ID + rule.getBuisnessKey()));
   }
 
   @After

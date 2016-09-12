@@ -18,13 +18,10 @@ package org.camunda.bpm.qa.rolling.update.externalTask;
 import java.util.List;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.qa.rolling.update.RollingUpdateConstants;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 import static junit.framework.TestCase.assertEquals;
-import org.camunda.bpm.qa.rolling.upgrade.EngineVersions;
-import org.camunda.bpm.qa.rolling.upgrade.RollingUpdateRule;
+import org.camunda.bpm.qa.rolling.update.AbstractRollingUpdateTestCase;
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
 import static org.junit.Assert.assertNull;
 
@@ -33,13 +30,9 @@ import static org.junit.Assert.assertNull;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 @ScenarioUnderTest("ProcessWithExternalTaskScenario")
-@EngineVersions({ RollingUpdateConstants.OLD_ENGINE_TAG, RollingUpdateConstants.NEW_ENGINE_TAG})
-public class CompleteProcessWithExternalTaskTest {
+public class CompleteProcessWithExternalTaskTest extends AbstractRollingUpdateTestCase {
 
   public static final long LOCK_TIME = 5 * 60 * 1000;
-
-  @Rule
-  public RollingUpdateRule rule = new RollingUpdateRule();
 
   @Test
   @ScenarioUnderTest("init.1")
