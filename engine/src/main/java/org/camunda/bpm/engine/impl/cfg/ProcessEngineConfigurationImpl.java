@@ -838,6 +838,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (service instanceof ServiceImpl) {
       ((ServiceImpl)service).setCommandExecutor(commandExecutorTxRequired);
     }
+    if (service instanceof RepositoryServiceImpl) {
+      ((RepositoryServiceImpl) service).setDeploymentCharset(getDefaultCharset());
+    }
   }
 
   // DataSource ///////////////////////////////////////////////////////////////

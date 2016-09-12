@@ -12,12 +12,14 @@
  */
 package org.camunda.bpm.engine.impl.repository;
 
+import java.io.ByteArrayOutputStream;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -85,15 +87,29 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     ensureNotNull("text", text);
     ResourceEntity resource = new ResourceEntity();
     resource.setName(resourceName);
-    resource.setBytes(text.getBytes());
+
+    if (repositoryService != null && repositoryService.getDeploymentCharset() != null) {
+      Charset deploymentCharset = repositoryService.getDeploymentCharset();
+      resource.setBytes(text.getBytes(deploymentCharset));
+    } else {
+      resource.setBytes(text.getBytes());
+    }
+
     deployment.addResource(resource);
     return this;
   }
 
   public DeploymentBuilder addModelInstance(String resourceName, BpmnModelInstance modelInstance) {
     ensureNotNull("modelInstance", modelInstance);
-    String processText = Bpmn.convertToString(modelInstance);
-    return addString(resourceName, processText);
+
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    Bpmn.writeModelToStream(outputStream, modelInstance);
+    ResourceEntity resource = new ResourceEntity();
+    resource.setBytes(outputStream.toByteArray());
+    resource.setName(resourceName);
+    deployment.addResource(resource);
+
+    return this;
   }
 
   public DeploymentBuilder addZipInputStream(ZipInputStream zipInputStream) {

@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 
@@ -86,6 +87,16 @@ import org.camunda.bpm.model.dmn.DmnModelInstance;
  * @author Joram Barrez
  */
 public class RepositoryServiceImpl extends ServiceImpl implements RepositoryService {
+
+  protected Charset deploymentCharset;
+
+  public Charset getDeploymentCharset() {
+    return deploymentCharset;
+  }
+
+  public void setDeploymentCharset(Charset deploymentCharset) {
+    this.deploymentCharset = deploymentCharset;
+  }
 
   public DeploymentBuilder createDeployment() {
     return new DeploymentBuilderImpl(this);
