@@ -209,7 +209,7 @@ describe('Cockpit Decision Instance Spec', function() {
       it('go to the process instance page', function() {
 
         // when
-        instancePage.gotoProcessInstanceAction.gotoProcessInstance();
+        instancePage.gotoProcessInstance();
 
         // then
         expect(browser.getCurrentUrl()).to.eventually.contain('#/process-instance/');
@@ -234,7 +234,7 @@ describe('Cockpit Decision Instance Spec', function() {
       it('is not displayed', function() {
 
         // then
-        expect(instancePage.gotoProcessInstanceAction.gotoProcessInstanceButton().isDisplayed()).to.eventually.eql(false);
+        expect(instancePage.processInstanceLink().getText()).to.eventually.eql('null');
       });
 
     });
