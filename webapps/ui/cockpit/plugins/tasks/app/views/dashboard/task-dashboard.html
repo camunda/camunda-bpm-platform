@@ -16,7 +16,7 @@
         <tr>
           <th>
             <span ng-if="!openTasksState.$loaded" class="glyphicon glyphicon-refresh animate-spin"></span>
-            <span ng-if="openTasksState.$loaded && !hasSearchPlugin"">{{ openTasksCount }}</span>
+            <span ng-if="openTasksState.$loaded && !hasSearchPlugin">{{ openTasksCount }}</span>
             <span ng-if="openTasksState.$loaded && hasSearchPlugin">
               <a class="search-link" ng-click="createSearch('allOpenTasks', 'statistics')">{{ openTasksCount }}</a>
             </span>
