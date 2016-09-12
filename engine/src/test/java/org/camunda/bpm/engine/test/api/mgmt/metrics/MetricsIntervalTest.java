@@ -146,7 +146,7 @@ public class MetricsIntervalTest extends AbstractMetricsIntervalTest {
     List<MetricIntervalValue> metrics = managementService.createMetricsQuery().reporter(REPORTER_ID).interval();
 
     //then result contains only metrics from given reporter, since it is the default it contains all
-    assertEquals(27, metrics.size());
+    assertEquals(3 * metricsCount, metrics.size());
     long lastTimestamp = metrics.get(0).getTimestamp().getTime();
     String reporter = metrics.get(0).getReporter();
     metrics.remove(0);
@@ -361,7 +361,7 @@ public class MetricsIntervalTest extends AbstractMetricsIntervalTest {
 
     //then result contains 27 entries since 9 different metrics are created
     //endTime is exclusive which means the given date is not included in the result
-    assertEquals(27, metrics.size());
+    assertEquals(3 * metricsCount, metrics.size());
   }
 
   // VALUE //////////////////////////////////////////////////////////////////////

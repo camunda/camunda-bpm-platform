@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.management;
 public class Metrics {
 
   public final static String ACTIVTY_INSTANCE_START = "activity-instance-start";
+  public final static String ACTIVTY_INSTANCE_END = "activity-instance-end";
 
   /**
    * Number of times job acqusition is performed

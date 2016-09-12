@@ -1614,6 +1614,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initDefaultMetrics(MetricsRegistry metricsRegistry) {
     metricsRegistry.createMeter(Metrics.ACTIVTY_INSTANCE_START);
+    metricsRegistry.createMeter(Metrics.ACTIVTY_INSTANCE_END);
 
     metricsRegistry.createMeter(Metrics.JOB_ACQUISITION_ATTEMPT);
     metricsRegistry.createMeter(Metrics.JOB_ACQUIRED_SUCCESS);
