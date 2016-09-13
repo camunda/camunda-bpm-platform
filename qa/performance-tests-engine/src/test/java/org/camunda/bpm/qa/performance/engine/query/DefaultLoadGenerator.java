@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Process;
@@ -25,6 +26,7 @@ import org.camunda.bpm.qa.performance.engine.junit.PerfTestProcessEngine;
 import org.camunda.bpm.qa.performance.engine.loadgenerator.LoadGenerator;
 import org.camunda.bpm.qa.performance.engine.loadgenerator.LoadGeneratorConfiguration;
 import org.camunda.bpm.qa.performance.engine.loadgenerator.tasks.DeployModelInstancesTask;
+import org.camunda.bpm.qa.performance.engine.loadgenerator.tasks.GenerateMetricsTask;
 import org.camunda.bpm.qa.performance.engine.loadgenerator.tasks.StartProcessInstanceTask;
 
 /**
@@ -32,6 +34,11 @@ import org.camunda.bpm.qa.performance.engine.loadgenerator.tasks.StartProcessIns
  *
  */
 public class DefaultLoadGenerator {
+
+  /**
+   * The reported ID for the metrics.
+   */
+  protected static final String REPORTER_ID = "REPORTER_ID";
 
   public static void main(String[] args) throws InterruptedException {
 
@@ -60,15 +67,21 @@ public class DefaultLoadGenerator {
       }
     }
 
-    final Runnable[] workerRunnables = new Runnable[keys.size()];
-    for (int i = 0; i < workerRunnables.length; i++) {
+
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    processEngineConfiguration.setMetricsEnabled(true);
+    processEngineConfiguration.getDbMetricsReporter().setReporterId(REPORTER_ID);
+    final Runnable[] workerRunnables = new Runnable[keys.size()+1];
+    for (int i = 0; i < keys.size(); i++) {
       workerRunnables[i] = new StartProcessInstanceTask(processEngine, keys.get(i));
     }
+    workerRunnables[keys.size()] = new GenerateMetricsTask(processEngine);
     config.setWorkerTasks(workerRunnables);
 
     new LoadGenerator(config).execute();
 
     System.out.println(processEngine.getHistoryService().createHistoricProcessInstanceQuery().count()+ " Process Instances in DB");
+    processEngineConfiguration.setMetricsEnabled(false);
   }
 
   static List<BpmnModelInstance> createProcesses() {
