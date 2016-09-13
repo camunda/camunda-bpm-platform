@@ -14,20 +14,20 @@ package org.camunda.bpm.engine.impl.pvm.runtime;
 
 import static org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil.SIGNAL_COMPENSATION_DONE;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntityPersistenceListener;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
@@ -55,6 +55,7 @@ import org.camunda.bpm.engine.impl.tree.ScopeCollector;
 import org.camunda.bpm.engine.impl.tree.ScopeExecutionCollector;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.python.google.common.collect.ImmutableList;
 
 /**
  * @author Daniel Meyer
@@ -982,6 +983,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     propagatingExecution.isActive = true;
     propagatingExecution.isEnded = false;
+
+    @SuppressWarnings(value = "unchecked")
+    List<VariableInstanceLifecycleListener<CoreVariableInstance>> variableInstanceLifecycleListeners =
+            Collections.<VariableInstanceLifecycleListener<CoreVariableInstance>>singletonList(
+                    (VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE);
+
+    for(CoreVariableInstance coreVariableInstance : propagatingExecution.getVariableStore().getVariables()) {
+      invokeVariableLifecycleListenersDelete(coreVariableInstance, this, variableInstanceLifecycleListeners);
+      propagatingExecution.getVariableStore().removeVariable(coreVariableInstance.getName());
+    }
 
     if (_transitions.isEmpty()) {
       propagatingExecution.end(!propagatingExecution.isConcurrent());
