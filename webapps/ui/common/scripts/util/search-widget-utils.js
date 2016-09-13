@@ -3,7 +3,69 @@
 var angular = require('angular');
 var includes = require('./includes');
 
-module.exports = createSearchQueryForSearchWidget;
+module.exports = {
+  getActivityIdsFromSearches: getActivityIdsFromSearches,
+  updateSearchWidgetWithActivities: updateSearchWidgetWithActivities,
+  createSearchQueryForSearchWidget: createSearchQueryForSearchWidget
+};
+
+/**
+ * Extract activity ids from search pills for given search pill type
+ *
+ * @param searchType
+ * @param searches
+ * @returns {*}
+ */
+function getActivityIdsFromSearches(searchType, searches) {
+  return searches
+    .filter(function(search) {
+      return search.type.value.key === searchType;
+    })
+    .map(function(search) {
+      return search.value.value;
+    });
+}
+
+/**
+ * Updates search widget with selected activity ids (usually from filter)
+ *
+ * @param search service that updates location search
+ * @param searchType type of activity search pill
+ * @param selectedActivityIds list of ids for selected activities
+ */
+function updateSearchWidgetWithActivities(search, searchType, selectedActivityIds) {
+  selectedActivityIds = angular.isArray(selectedActivityIds) ? selectedActivityIds : [];
+
+  var urlParams = search();
+  var searches = JSON.parse(urlParams.searchQuery || '[]');
+
+  searches = removeActivitySearches(searchType, searches)
+    .concat(createSearchesForActivityIds(searchType, selectedActivityIds));
+
+  search.updateSilently(angular.extend(urlParams, {
+    searchQuery: JSON.stringify(searches)
+  }), true);
+}
+
+function removeActivitySearches(searchType, searches) {
+  return searches.filter(function(search) {
+    return search.type !== searchType;
+  });
+}
+
+function createSearchesForActivityIds(searchType, activityIds) {
+  return activityIds.map(
+    createActivitySearch.bind(null, searchType)
+  );
+}
+
+function createActivitySearch(searchType, value) {
+  return {
+    type: searchType,
+    operator: 'eq',
+    value: value
+  };
+}
 
 /**
  * Function that creates query parameters based on search pills

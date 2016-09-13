@@ -18,6 +18,18 @@
     },
     {
       "id": {
+        "key": "activityInstanceIdIn",
+        "value": "Activity Instance Id"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
         "key": "variableValues",
         "value": "Variable Value"
       },

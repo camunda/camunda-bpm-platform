@@ -3,7 +3,7 @@
 var angular = require('angular');
 var fs = require('fs');
 
-var createSearchQueryForSearchWidget = require('../../../../../../common/scripts/util/create-search-query-for-search-widget');
+var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
 var variableInstancesTabSearchConfig = JSON.parse(fs.readFileSync(__dirname + '/variable-instances-tab-search-config.json', 'utf8'));
 
 var instancesTemplate = fs.readFileSync(__dirname + '/variable-instances-tab.html', 'utf8');
@@ -48,6 +48,25 @@ module.exports = function(ngModule) {
         }
 
         search('page', !newValue || newValue == 1 ? null : newValue);
+      });
+
+      variableInstanceData.observe('filter', function(filter) {
+        searchWidgetUtils.updateSearchWidgetWithActivities(search, 'activityInstanceIdIn', filter.activityInstanceIds);
+      });
+
+      variableInstanceData.observe(['searches', 'filter'], function(searches, filter) {
+        if (searches) {
+          filter.activityInstanceIds = searchWidgetUtils.getActivityIdsFromSearches(
+            'activityInstanceIdIn',
+            searches
+          );
+
+          filter.activityIds = filter.activityInstanceIds.map(function(id) {
+            return id.split(':')[0];
+          });
+
+          variableInstanceData.set('filter', filter);
+        }
       });
 
       variableInstanceData.observe(
@@ -230,12 +249,11 @@ module.exports = function(ngModule) {
           deserializeValues: false
         };
 
-        var variableQuery = createSearchQueryForSearchWidget(searches, [], ['variableValues']);
+        var variableQuery = searchWidgetUtils.createSearchQueryForSearchWidget(searches, ['activityInstanceIdIn'], ['variableValues']);
 
         var params = angular.extend({}, filter, defaultParams, variableQuery);
 
-          // fix missmatch -> activityInstanceIds -> activityInstanceIdIn
-        params.activityInstanceIdIn = params.activityInstanceIds;
+        // fix missmatch -> activityInstanceIds -> activityInstanceIdIn
         delete params.activityInstanceIds;
 
         $scope.variables = null;
