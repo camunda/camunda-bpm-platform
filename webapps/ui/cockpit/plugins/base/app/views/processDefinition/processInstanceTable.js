@@ -49,13 +49,11 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
             searches = removeActivitySearches(searches)
               .concat(createSearchesForActivityIds(selectedActivityIds));
 
-            search(angular.extend(urlParams, {
+            search.updateSilently(angular.extend(urlParams, {
               searchQuery: JSON.stringify(searches)
-            }));
+            }), true);
           }
         });
-
-        processData.observe('searches', updateView);
 
         processData.observe(['searches'], function(searches) {
           if (searches) {
@@ -66,6 +64,8 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
               .map(function(search) {
                 return search.value.value;
               });
+
+            updateView(searches);
           }
         });
 
@@ -96,7 +96,9 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
             $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
           });
 
-          PluginProcessInstanceResource.count(query).$promise.then(function(data) {
+          var countParams = angular.extend({}, query, defaultParams);
+
+          PluginProcessInstanceResource.count(countParams).$promise.then(function(data) {
             pages.total = data.count;
           });
         }

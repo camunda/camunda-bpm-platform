@@ -201,7 +201,6 @@ var Controller = [
 
     // begin data usage ////////////////////////////
     $rootScope.showBreadcrumbs = true;
-    $scope.sidebarTab = 'info';
 
     processData.observe('allProcessDefinitions', function(allDefinitions) {
       $scope.allDefinitions = allDefinitions;
@@ -265,30 +264,34 @@ var Controller = [
           idx = activityIds.indexOf(activityId),
           selected = idx !== -1;
 
+      newFilter.activityIds = getNewActivityIds(activityId, activityIds, ctrl, selected);
+
+      processData.set('filter', newFilter);
+    };
+
+    function getNewActivityIds(activityId, activityIds, ctrl, selected) {
       if (!activityId) {
-        activityIds = [];
-
-      } else {
-
-        if (ctrl) {
-          if (selected) {
-            activityIds.splice(idx, 1);
-            activityIds.splice(activityIds.indexOf(activityId + '#multiInstanceBody'), 1);
-
-          } else {
-            activityIds.push(activityId);
-            activityIds.push(activityId+'#multiInstanceBody');
-          }
-
-        } else {
-          activityIds = [ activityId, activityId+'#multiInstanceBody' ];
-        }
+        return [];
       }
 
-      newFilter.activityIds = activityIds;
+      if (ctrl & selected) {
+        return activityIds.filter(function(id) {
+          return id !== activityId && id !== activityId + '#multiInstanceBody';
+        });
+      }
 
-      $scope.$apply(processData.set.bind(processData, 'filter', newFilter));
-    };
+      var newIds = [activityId];
+
+      if (isMultipleInstance(activityId)) {
+        newIds.push(activityId+'#multiInstanceBody');
+      }
+
+      return (ctrl ? activityIds: []).concat(newIds);
+    }
+
+    function isMultipleInstance(activityId) {
+      return $scope.processDiagram.bpmnElements[activityId].loopCharacteristics;
+    }
 
     $scope.processDefinition = processDefinition;
 
@@ -376,6 +379,33 @@ var Controller = [
       };
 
       return routeUtil.redirectTo(path, searches, [ 'deployment', 'resourceName', 'deploymentsQuery' ]);
+    };
+
+    $scope.isLatestVersion = function() {
+      return $scope.processDefinition && $scope.processDefinition.version === getLatestVersion();
+    };
+
+    function getLatestVersion()  {
+      if ($scope.allDefinitions) {
+        return Math.max.apply(null, $scope.allDefinitions.map(function(def) {
+          return def.version;
+        }));
+      }
+    }
+
+    $scope.getMigrationUrl = function() {
+      var path = '#/migration';
+
+      var latestVersion = getLatestVersion();
+
+      var searches = {
+        sourceKey: $scope.processDefinition.key,
+        targetKey: $scope.processDefinition.key,
+        sourceVersion: $scope.isLatestVersion() ? $scope.processDefinition.version - 1 : $scope.processDefinition.version,
+        targetVersion: $scope.isLatestVersion() ? $scope.processDefinition.version : latestVersion
+      };
+
+      return routeUtil.redirectTo(path, searches, [ 'sourceKey', 'targetKey', 'sourceVersion', 'targetVersion' ]);
     };
 
   }];
