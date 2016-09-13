@@ -55,12 +55,22 @@ var DirectiveController = ['$scope', '$compile', 'Views', function( $scope,   $c
   };
 
   $scope.onClick = function(element, $event) {
-    if(bpmnElements[element.businessObject.id] && isElementSelectable(bpmnElements[element.businessObject.id])) {
-      $scope.onElementClick({id: element.businessObject.id, $event: $event});
-    } else {
-      $scope.onElementClick({id: null, $event: $event});
-    }
+    safeApply(function() {
+      if(bpmnElements[element.businessObject.id] && isElementSelectable(bpmnElements[element.businessObject.id])) {
+        $scope.onElementClick({id: element.businessObject.id, $event: $event});
+      } else {
+        $scope.onElementClick({id: null, $event: $event});
+      }
+    });
   };
+
+  function safeApply(fn) {
+    if (!$scope.$$phase) {
+      $scope.$apply(fn);
+    } else {
+      fn();
+    }
+  }
 
   $scope.onMouseEnter = function(element) {
     if(bpmnElements[element.businessObject.id] && isElementSelectable(bpmnElements[element.businessObject.id])) {
