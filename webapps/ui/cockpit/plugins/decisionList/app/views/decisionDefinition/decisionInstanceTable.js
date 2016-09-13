@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 var angular = require('angular');
-var createSearchQueryForSearchWidget = require('./../../../../../../common/scripts/util/create-search-query-for-search-widget');
+var createSearchQueryForSearchWidget = require('./../../../../../../common/scripts/util/search-widget-utils').createSearchQueryForSearchWidget;
 
 var template = fs.readFileSync(__dirname + '/decision-instance-table.html', 'utf8');
 var decisionSearchConfig = JSON.parse(fs.readFileSync(__dirname + '/decision-instance-search-config.json', 'utf8'));

@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 var angular = require('angular');
-var createSearchQueryForSearchWidget = require('../../../../../../common/scripts/util/create-search-query-for-search-widget');
+var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
 
 var template = fs.readFileSync(__dirname + '/process-instance-table.html', 'utf8');
 var searchConfig = JSON.parse(fs.readFileSync(__dirname + '/process-instance-search-config.json', 'utf8'));
@@ -42,28 +42,12 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         processData.observe('filter', function(filter) {
           var selectedActivityIds = filter.activityIds;
 
-          if (selectedActivityIds !== null) {
-            var urlParams = search();
-            var searches = JSON.parse(urlParams.searchQuery || '[]');
-
-            searches = removeActivitySearches(searches)
-              .concat(createSearchesForActivityIds(selectedActivityIds));
-
-            search.updateSilently(angular.extend(urlParams, {
-              searchQuery: JSON.stringify(searches)
-            }), true);
-          }
+          searchWidgetUtils.updateSearchWidgetWithActivities(search, 'activityIdIn', selectedActivityIds);
         });
 
-        processData.observe(['searches'], function(searches) {
+        processData.observe('searches', function(searches) {
           if (searches) {
-            $scope.filter.activityIds = searches
-              .filter(function(search) {
-                return search.type.value.key === 'activityIdIn';
-              })
-              .map(function(search) {
-                return search.value.value;
-              });
+            $scope.filter.activityIds = searchWidgetUtils.getActivityIdsFromSearches('activityIdIn', searches);
 
             updateView(searches);
           }
@@ -85,7 +69,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
             sortOrder: 'desc'
           };
 
-          var query = createSearchQueryForSearchWidget(searches, ['activityIdIn']);
+          var query = searchWidgetUtils.createSearchQueryForSearchWidget(searches, ['activityIdIn']);
           var params = angular.extend({}, query, pagingParams, defaultParams);
 
           $scope.processInstances = null;
@@ -119,21 +103,3 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
     priority: 10
   });
 }];
-
-function removeActivitySearches(searches) {
-  return searches.filter(function(search) {
-    return search.type !== 'activityIdIn';
-  });
-}
-
-function createSearchesForActivityIds(activityIds) {
-  return activityIds.map(createActivitySearch);
-}
-
-function createActivitySearch(value) {
-  return {
-    type: 'activityIdIn',
-    operator: 'eq',
-    value: value
-  };
-}
