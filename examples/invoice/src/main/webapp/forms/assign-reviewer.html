@@ -1,0 +1,52 @@
+<form class="form-horizontal"
+      role="form">
+
+  <div class="control-group">
+    <label class="control-label">Creditor</label>
+    <div class="controls">
+      <input cam-variable-name="creditor"
+             type="text"
+             name="creditor"
+             readonly="true"
+             class="form-control" />
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label">Amount</label>
+    <div class="controls">
+      <input cam-variable-name="amount"
+             type="text"
+             name="amount"
+             readonly="true"
+             class="form-control" />
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label">Invoice Number</label>
+    <div class="controls">
+      <input cam-variable-name="invoiceNumber"
+             type="text"
+             name="invoiceNumber"
+             readonly="true"
+             class="form-control" />
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label">Reviewer: </label>
+    <div class="controls">
+      <select cam-variable-name="reviewer"
+              cam-variable-type="String"
+              type="text"
+              name="reviewer"
+              class="form-control"
+              required>
+        <option></option>
+        <option value="demo">Demo</option>
+        <option value="john">John</option>
+        <option value="peter">Peter</option>
+        <option value="mary">Mary</option>
+      </select>
+      <p>Who should review this invoice?</p>
+    </div>
+  </div>
+</form>

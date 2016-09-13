@@ -80,6 +80,7 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
         repositoryService.createDeployment(this.getReference())
           .addInputStream("invoice.v1.bpmn", classLoader.getResourceAsStream("invoice.v1.bpmn"))
           .addInputStream("assign-approver-groups.dmn", classLoader.getResourceAsStream("assign-approver-groups.dmn"))
+          .addInputStream("review-invoice.cmmn", classLoader.getResourceAsStream("review-invoice.cmmn"))
           .deploy();
       }
     }
