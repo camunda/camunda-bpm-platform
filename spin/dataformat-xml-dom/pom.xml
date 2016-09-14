@@ -9,13 +9,13 @@
 
   <artifactId>camunda-spin-dataformat-xml-dom</artifactId>
   <name>camunda Spin - DOM XML data format</name>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-core</artifactId>
     </dependency>
-  
+
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
@@ -25,7 +25,7 @@
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-utils</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -81,6 +81,55 @@
                 <exclude>**/javascript/**</exclude>
               </excludes>
             </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <!-- check for api differences between latest minor release -->
+    <profile>
+      <id>check-api-compatibility</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>clirr-maven-plugin</artifactId>
+            <version>2.7</version>
+            <configuration>
+              <comparisonVersion>${spin.version.old}</comparisonVersion>
+              <logResults>true</logResults>
+              <excludes>
+                <exclude>org/camunda/spin/impl/**</exclude>
+              </excludes>
+            </configuration>
+            <executions>
+              <execution>
+                <id>all</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check-no-fork</goal>
+                </goals>
+                <configuration>
+                  <textOutputFile>${project.build.directory}/clirr-all.txt</textOutputFile>
+                  <failOnWarning>false</failOnWarning>
+                  <failOnError>false</failOnError>
+                </configuration>
+              </execution>
+              <execution>
+                <id>restrictive</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check-no-fork</goal>
+                </goals>
+                <configuration>
+                  <textOutputFile>${project.build.directory}/clirr-restrictive.txt</textOutputFile>
+                  <failOnWarning>true</failOnWarning>
+                  <ignoredDifferencesFile>../.clirr-jenkins-ignore.xml</ignoredDifferencesFile>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>

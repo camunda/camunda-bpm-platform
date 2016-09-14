@@ -9,7 +9,7 @@
 
   <artifactId>camunda-spin-core</artifactId>
   <name>camunda Spin - core</name>
-  
+
   <properties>
     <powermock.version>1.5.6</powermock.version>
   </properties>
@@ -146,7 +146,7 @@
                 <configuration>
                   <textOutputFile>${project.build.directory}/clirr-restrictive.txt</textOutputFile>
                   <failOnWarning>true</failOnWarning>
-                  <ignoredDifferencesFile>.clirr-jenkins-ignore.xml</ignoredDifferencesFile>
+                  <ignoredDifferencesFile>../.clirr-jenkins-ignore.xml</ignoredDifferencesFile>
                 </configuration>
               </execution>
             </executions>
