@@ -102,7 +102,7 @@
               <comparisonVersion>${camunda.version.old}</comparisonVersion>
               <logResults>true</logResults>
               <excludes>
-                <exclude>org/camunda/bpm/model/impl/**</exclude>
+                <exclude>org/camunda/bpm/model/xml/impl/**</exclude>
               </excludes>
             </configuration>
             <executions>
