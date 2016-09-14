@@ -152,7 +152,7 @@
                 <configuration>
                   <textOutputFile>${project.build.directory}/clirr-restrictive.txt</textOutputFile>
                   <failOnWarning>true</failOnWarning>
-                  <ignoredDifferencesFile>.clirr-jenkins-ignore.xml</ignoredDifferencesFile>
+                  <ignoredDifferencesFile>../.clirr-jenkins-ignore.xml</ignoredDifferencesFile>
                 </configuration>
               </execution>
             </executions>
