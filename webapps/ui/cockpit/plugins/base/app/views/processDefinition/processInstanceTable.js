@@ -3,6 +3,7 @@
 var fs = require('fs');
 var angular = require('angular');
 var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
+var paginationUtils = require('../../../../../../common/scripts/util/pagination-utils');
 
 var template = fs.readFileSync(__dirname + '/process-instance-table.html', 'utf8');
 var searchConfig = JSON.parse(fs.readFileSync(__dirname + '/process-instance-search-config.json', 'utf8'));
@@ -16,42 +17,20 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
     controller: [
       '$scope', '$location', 'search', 'routeUtil', 'PluginProcessInstanceResource',
       function($scope,   $location,   search,   routeUtil,   PluginProcessInstanceResource) {
-        var processData = $scope.processData.newChild($scope);
         var processDefinition = $scope.processDefinition;
-        var DEFAULT_PAGES = { size: 50, total: 0, current: 1 };
-        var pages = $scope.pages = angular.copy(DEFAULT_PAGES);
+        var pages = paginationUtils.initializePaginationInController($scope, search, function(newValue, oldValue) {
+          if (!angular.equals(newValue, oldValue)) {
+            updateView($scope.searchConfig.searches);
+          }
+        });
 
         $scope.searchConfig = angular.copy(searchConfig);
 
-        processData.provide('searches', $scope.searchConfig.searches);
-
-        $scope.$watch('pages.current', function(newValue, oldValue) {
-          if (newValue == oldValue) {
-            return;
-          }
-
-          search('page', !newValue || newValue == 1 ? null : newValue);
-        });
-
         $scope.$watch('searchConfig.searches', function(newValue, oldValue) {
-          if (newValue !== oldValue) {
-            processData.set('searches', $scope.searchConfig.searches);
+          if (!angular.equals(newValue, oldValue)) {
+            updateView($scope.searchConfig.searches);
           }
         }, true);
-
-        processData.observe('filter', function(filter) {
-          var selectedActivityIds = filter.activityIds;
-
-          searchWidgetUtils.updateSearchWidgetWithActivities(search, 'activityIdIn', selectedActivityIds);
-        });
-
-        processData.observe('searches', function(searches) {
-          if (searches) {
-            $scope.filter.activityIds = searchWidgetUtils.getActivityIdsFromSearches('activityIdIn', searches);
-
-            updateView(searches);
-          }
-        });
 
         function updateView(searches) {
           var page = pages.current,

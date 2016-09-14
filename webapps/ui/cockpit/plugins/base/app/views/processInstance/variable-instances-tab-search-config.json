@@ -19,7 +19,7 @@
     {
       "id": {
         "key": "activityInstanceIdIn",
-        "value": "Activity Instance Id"
+        "value": "Activity Instance ID"
       },
       "operators": [
         {

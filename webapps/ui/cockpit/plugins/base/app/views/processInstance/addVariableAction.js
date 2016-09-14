@@ -12,8 +12,8 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
     label: 'Add Variable Action',
     template: actionTemplate,
     controller: [
-      '$scope', '$modal',
-      function($scope,   $modal) {
+      '$scope', '$modal', '$rootScope',
+      function($scope, $modal, $rootScope) {
         $scope.openDialog = function() {
           var dialog = $modal.open({
             scope: $scope,
@@ -31,6 +31,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
             if (result === 'SUCCESS') {
               // refresh filter and all views
               $scope.processData.set('filter', angular.extend({}, $scope.filter));
+              $rootScope.$broadcast('addVariableNotification');
             }
           });
         };
