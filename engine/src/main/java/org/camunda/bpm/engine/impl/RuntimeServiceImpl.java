@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.*;
 
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.FindActiveActivityIdsCmd;
@@ -144,13 +145,13 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   @Override
-  public void deleteProcessInstancesAsync(List<String> processInstanceIds, String deleteReason) {
-    commandExecutor.execute(new DeleteProcessInstanceBatchCmd(processInstanceIds,deleteReason));
+  public Batch deleteProcessInstancesAsync(List<String> processInstanceIds, String deleteReason) {
+    return commandExecutor.execute(new DeleteProcessInstanceBatchCmd(processInstanceIds,deleteReason));
   }
 
   @Override
-  public void deleteProcessInstancesAsync(ProcessInstanceQuery processInstanceQuery, String deleteReason) {
-    commandExecutor.execute(new DeleteProcessInstanceBatchCmd(processInstanceQuery,deleteReason));
+  public Batch deleteProcessInstancesAsync(ProcessInstanceQuery processInstanceQuery, String deleteReason) {
+    return commandExecutor.execute(new DeleteProcessInstanceBatchCmd(processInstanceQuery,deleteReason));
   }
 
   public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners) {

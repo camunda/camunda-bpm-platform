@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
@@ -113,15 +114,16 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     dto.updateSuspensionState(getProcessEngine());
   }
 
-  public Response deleteAsync(DeleteProcessInstancesDto dto) {
+  public BatchDto deleteAsync(DeleteProcessInstancesDto dto) {
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
     if (dto.getProcessInstanceIds() != null && !dto.getProcessInstanceIds().isEmpty()) {
-      runtimeService.deleteProcessInstancesAsync(dto.getProcessInstanceIds(),dto.getDeletionReason());
-      return Response.ok().build();
+      return BatchDto.fromBatch(
+          runtimeService.deleteProcessInstancesAsync(dto.getProcessInstanceIds(),dto.getDeletionReason()));
     } else if (dto.getProcessInstanceQuery() != null) {
       ProcessInstanceQuery processInstanceQuery = dto.getProcessInstanceQuery().toQuery(getProcessEngine());
-      runtimeService.deleteProcessInstancesAsync(processInstanceQuery,dto.getDeletionReason());
-      return Response.ok().build();
+
+      return BatchDto.fromBatch(
+          runtimeService.deleteProcessInstancesAsync(processInstanceQuery,dto.getDeletionReason()));
     } else {
       String message = "Either processInstanceIds or processInstanceQuery has to be provided.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);

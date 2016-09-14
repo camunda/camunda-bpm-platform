@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -34,6 +35,7 @@ import org.junit.runners.MethodSorters;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 
@@ -211,6 +213,46 @@ public class RuntimeServiceAsyncOperationsTest {
           .singleResult();
 
       assertThat(historicTaskInstance.getDeleteReason(), is(TESTING_INSTANCE_DELETION));
+      assertThat(engineRule.getHistoryService()
+          .createHistoricTaskInstanceQuery().count(),is(2l));
+    }
+
+    if(ProcessEngineConfiguration.HISTORY_FULL.equals(engineRule.getProcessEngineConfiguration().getHistory())) {
+      assertThat(engineRule.getHistoryService().createHistoricBatchQuery().count(), is(1l));
+    }
+    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().list().size(),is(0));
+  }
+
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
+  public void testDeleteProcessInstancesAsyncWithQueryWithoutDeletionReason() throws Exception {
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
+    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
+    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery()
+        .processDefinitionKey(ONE_TASK_PROCESS).count(),is(2l));
+
+
+    ProcessInstanceQuery processInstanceQuery = engineRule.getRuntimeService()
+        .createProcessInstanceQuery().processInstanceIds(
+            new HashSet<String>(Arrays.asList(processInstance.getId(),processInstance1.getId())));
+    engineRule.getRuntimeService().deleteProcessInstancesAsync(processInstanceQuery,null);
+
+    engineRule.getManagementService().executeJob(engineRule.getManagementService().createJobQuery().singleResult().getId());
+    List<Job> list = engineRule.getManagementService().createJobQuery().list();
+    assertThat(list.size(),is(3));
+    for(Job job: list) {
+      engineRule.getManagementService().executeJob(job.getId());
+    }
+
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory())) {
+
+      HistoricTaskInstance historicTaskInstance = engineRule.getHistoryService()
+          .createHistoricTaskInstanceQuery()
+          .processInstanceId(processInstance.getId())
+          .singleResult();
+
+      assertThat(historicTaskInstance.getDeleteReason(), is(TaskEntity.DELETE_REASON_DELETED));
       assertThat(engineRule.getHistoryService()
           .createHistoricTaskInstanceQuery().count(),is(2l));
     }

@@ -579,7 +579,7 @@ public interface RuntimeService {
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
-  void deleteProcessInstancesAsync (List<String> processInstanceIds, String deleteReason);
+  Batch deleteProcessInstancesAsync (List<String> processInstanceIds, String deleteReason);
 
   /**
    * Delete an existing runtime process instances asynchronously using Batch operation.
@@ -593,7 +593,7 @@ public interface RuntimeService {
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
-  void deleteProcessInstancesAsync (ProcessInstanceQuery processInstanceQuery, String deleteReason);
+  Batch deleteProcessInstancesAsync (ProcessInstanceQuery processInstanceQuery, String deleteReason);
 
   /**
    * Delete an existing runtime process instance.
