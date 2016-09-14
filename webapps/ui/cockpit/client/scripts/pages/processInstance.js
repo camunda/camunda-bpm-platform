@@ -4,9 +4,10 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/process-instance.html', 'utf8');
 
-var angular = require('camunda-commons-ui/vendor/angular'),
-    routeUtil = require('../../../../common/scripts/util/routeUtil'),
-    camCommons = require('camunda-commons-ui/lib');
+var angular = require('camunda-commons-ui/vendor/angular');
+var routeUtil = require('../../../../common/scripts/util/routeUtil');
+var searchWidgetUtils = require('../../../../common/scripts/util/search-widget-utils');
+var camCommons = require('camunda-commons-ui/lib');
 
 var ngModule = angular.module('cam.cockpit.pages.processInstance', [camCommons.name, 'dataDepend']);
 
@@ -42,23 +43,21 @@ var Controller = [
       pageData.set('activeTab', getDefaultTab($scope.processInstanceTabs));
     });
 
+    $scope.$on('$locationChangeSuccess', function() {
+      processData.set('filter', parseFilterFromUri());
+    });
+
     function parseFilterFromUri() {
-
-      var params = search(),
-          activityInstanceIdsParam = parseArray(params.activityInstanceIds),
-          activityIdsParam = parseArray(params.activityIds);
-
-      function parseArray(str) {
-        if (!str) {
-          return [];
-        }
-
-        return str.split(/,/);
-      }
+      var params = search();
+      var activityInstanceIds = searchWidgetUtils.getActivityIdsFromUrlParams('activityInstanceIdIn', params);
+      var activityIds = searchWidgetUtils.getActivityIdsBasedOnInstances(
+        $scope.instanceIdToInstanceMap,
+        activityInstanceIds
+      );
 
       $scope.filter = filter = {
-        activityIds: activityIdsParam,
-        activityInstanceIds: activityInstanceIdsParam,
+        activityIds: activityIds,
+        activityInstanceIds: activityInstanceIds,
         page: parseInt(params.page, 10) || undefined
       };
 
@@ -66,16 +65,10 @@ var Controller = [
     }
 
     function serializeFilterToUri(newFilter) {
-      var activityIds = newFilter.activityIds,
-          activityInstanceIds = newFilter.activityInstanceIds;
-
-      function nonEmpty(array) {
-        return array && array.length;
-      }
+      var activityInstanceIds = newFilter.activityInstanceIds;
 
       search.updateSilently({
-        activityIds: nonEmpty(activityIds) ? activityIds.join(',') : null,
-        activityInstanceIds: nonEmpty(activityInstanceIds) ? activityInstanceIds.join(',') : null
+        searchQuery: searchWidgetUtils.replaceActivitiesInSearchQuery(search, 'activityInstanceIdIn', activityInstanceIds)
       });
 
       $scope.filter = filter = newFilter;

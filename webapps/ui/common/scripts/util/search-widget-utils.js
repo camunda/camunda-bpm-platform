@@ -4,25 +4,55 @@ var angular = require('angular');
 var includes = require('./includes');
 
 module.exports = {
-  getActivityIdsFromSearches: getActivityIdsFromSearches,
-  updateSearchWidgetWithActivities: updateSearchWidgetWithActivities,
+  getActivityIdsBasedOnInstances: getActivityIdsBasedOnInstances,
+  getActivityIdsFromUrlParams: getActivityIdsFromUrlParams,
+  replaceActivitiesInSearchQuery: replaceActivitiesInSearchQuery,
   createSearchQueryForSearchWidget: createSearchQueryForSearchWidget
 };
 
 /**
- * Extract activity ids from search pills for given search pill type
+ * Gets list of activity ids based on instances ids
  *
- * @param searchType
- * @param searches
+ * @param instanceIdToInstanceMap
+ * @param ids
+ * @returns {Array}
+ */
+function getActivityIdsBasedOnInstances(instanceIdToInstanceMap, ids) {
+  ids = angular.isArray(ids) ? ids : [];
+
+  if (!instanceIdToInstanceMap) {
+    return [];
+  }
+
+  return ids
+    .filter(function(id) {
+      return instanceIdToInstanceMap[id];
+    })
+    .map(function(id) {
+      return instanceIdToInstanceMap[id].activityId;
+    });
+}
+
+/**
+ * Extracts activity ids from searchQuery param
+ *
+ * @param searchType type of pill with activity ids
+ * @param params url params
  * @returns {*}
  */
+function getActivityIdsFromUrlParams(searchType, params) {
+  var searches = JSON.parse(params.searchQuery || '[]');
+
+  return getActivityIdsFromSearches(searchType, searches);
+}
+
 function getActivityIdsFromSearches(searchType, searches) {
   return searches
     .filter(function(search) {
-      return search.type.value.key === searchType;
+      return search.type === searchType;
     })
     .map(function(search) {
-      return search.value.value;
+      return search.value;
     });
 }
 
@@ -33,18 +63,26 @@ function getActivityIdsFromSearches(searchType, searches) {
  * @param searchType type of activity search pill
  * @param selectedActivityIds list of ids for selected activities
  */
-function updateSearchWidgetWithActivities(search, searchType, selectedActivityIds) {
+function replaceActivitiesInSearchQuery(search, searchType, selectedActivityIds) {
   selectedActivityIds = angular.isArray(selectedActivityIds) ? selectedActivityIds : [];
 
   var urlParams = search();
+
+  //when there is no searchQuery present and there is no ids to add to searchQuery don't change anything
+  if (!urlParams.searchQuery && !selectedActivityIds.length) {
+    return null;
+  }
+
+  return constructNewSearchQuery(urlParams, searchType, selectedActivityIds);
+}
+
+function constructNewSearchQuery(urlParams, searchType, selectedActivityIds) {
   var searches = JSON.parse(urlParams.searchQuery || '[]');
 
   searches = removeActivitySearches(searchType, searches)
     .concat(createSearchesForActivityIds(searchType, selectedActivityIds));
 
-  search.updateSilently(angular.extend(urlParams, {
-    searchQuery: JSON.stringify(searches)
-  }), true);
+  return JSON.stringify(searches);
 }
 
 function removeActivitySearches(searchType, searches) {

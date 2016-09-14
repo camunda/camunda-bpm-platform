@@ -4,9 +4,10 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/process-definition.html', 'utf8');
 
-var angular = require('camunda-commons-ui/vendor/angular'),
-    routeUtil = require('../../../../common/scripts/util/routeUtil'),
-    camCommons = require('camunda-commons-ui/lib');
+var angular = require('camunda-commons-ui/vendor/angular');
+var routeUtil = require('../../../../common/scripts/util/routeUtil');
+var searchWidgetUtils = require('../../../../common/scripts/util/search-widget-utils');
+var camCommons = require('camunda-commons-ui/lib');
 
 var ngModule = angular.module('cam.cockpit.pages.processDefinition', ['dataDepend', camCommons.name]);
 
@@ -29,6 +30,10 @@ var Controller = [
       processData.set('filter', parseFilterFromUri());
       // update tab selection
       setDefaultTab($scope.processDefinitionTabs);
+    });
+
+    $scope.$on('$locationChangeSuccess', function() {
+      processData.set('filter', parseFilterFromUri());
     });
 
     var currentFilter = null;
@@ -80,18 +85,8 @@ var Controller = [
       var params = search(),
           filter;
 
-      function parseArray(str) {
-        if (!str) {
-          return [];
-        }
-
-        return str.split(/,/);
-      }
-
-      var activityIds = parseArray(params.activityIds);
-
       filter = {
-        activityIds: activityIds,
+        activityIds: searchWidgetUtils.getActivityIdsFromUrlParams('activityIdIn', params),
         parentProcessDefinitionId: params.parentProcessDefinitionId
       };
 
@@ -102,14 +97,9 @@ var Controller = [
       var activityIds = filter.activityIds,
           parentProcessDefinitionId = filter.parentProcessDefinitionId;
 
-      function nonEmpty(array) {
-        return array && array.length;
-      }
-
-
       search.updateSilently({
-        activityIds: nonEmpty(activityIds) ? activityIds.join(',') : null,
-        parentProcessDefinitionId: parentProcessDefinitionId || null
+        parentProcessDefinitionId: parentProcessDefinitionId || null,
+        searchQuery: searchWidgetUtils.replaceActivitiesInSearchQuery(search, 'activityIdIn', activityIds)
       });
 
       currentFilter = filter;
