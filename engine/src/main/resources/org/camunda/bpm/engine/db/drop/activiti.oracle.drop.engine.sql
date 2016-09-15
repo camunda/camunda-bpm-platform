@@ -23,6 +23,8 @@ drop index ACT_IDX_IDENT_LNK_GROUP;
 drop index ACT_IDX_VARIABLE_TASK_ID;
 
 drop index ACT_IDX_METER_LOG;
+drop index ACT_IDX_METER_LOG_MS;
+drop index ACT_IDX_METER_LOG_REPORT;
 drop index ACT_IDX_EXT_TASK_TOPIC;
 
 drop index ACT_IDX_JOB_EXECUTION_ID;
